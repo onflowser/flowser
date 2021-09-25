@@ -17,7 +17,7 @@ services:
     networks:
       - flowser-network
     volumes:
-      - ./backend:/usr/src/app
+      - ./backend:/app
       - /app/node_modules
     command: npm run start:debug
     restart: unless-stopped
