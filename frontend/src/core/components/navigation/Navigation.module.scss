@@ -1,0 +1,16 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.navigationContainer {
+  background-color: $light-grey;
+  padding: $base-spacing;
+  ul {
+    display: flex;
+    list-style-type: none;
+    li {
+      text-decoration: none;
+      color: $black;
+      margin-right: $base-spacing;
+    }
+  }
+}

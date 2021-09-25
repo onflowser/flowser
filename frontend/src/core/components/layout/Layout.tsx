@@ -1,21 +1,20 @@
 import React, { FunctionComponent } from 'react';
 import './Layout.module.scss';
+import Navigation from '../navigation/Navigation';
+import Content from '../content/Content';
 
 interface OwnProps {
-    some: string;
+    children?: any;
 }
 
 type Props = OwnProps;
 
-const Layout: FunctionComponent<Props> = (props) => {
+const Layout: FunctionComponent<Props> = ({ children }) => {
     return (
-        <>
-            <div className="layout-root">
-                <div></div>
-                <div></div>
-                {props.children}
-            </div>
-        </>
+        <div className="layout-container">
+            <Navigation />
+            <Content>{children}</Content>
+        </div>
     );
 };
 

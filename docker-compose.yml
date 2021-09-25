@@ -20,7 +20,7 @@ services:
       - ./backend:/usr/src/app
       - /app/node_modules
     command: npm run start:debug
-    restart: "no"
+    restart: unless-stopped
   frontend:
     container_name: frontend
     image: frontend:dev
@@ -40,7 +40,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     command: npm run start
-    restart: "no"
+    restart: unless-stopped
 
 networks:
   flowser-network:
