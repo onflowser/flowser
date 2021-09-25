@@ -15,7 +15,21 @@ Git hooks and Husky setup inspired by the following articles:
 -   [Git hooks React setup](https://nickymeuleman.netlify.app/blog/git-hooks)
 -   [EsLint & Prettier React](https://robertcooper.me/post/using-eslint-and-prettier-in-a-typescript-project)
 
-### Available Scripts
+### Docker
+
+Build frontend Docker development container:
+
+```
+docker build -t frontend:dev .
+```
+
+Run frontend Docker development container:
+
+```
+docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3001:3000 -e CHOKIDAR_USEPOLLING=true frontend:dev
+```
+
+### Available NPM Scripts
 
 In the project directory, you can run:
 

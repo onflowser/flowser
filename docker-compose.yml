@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    image: backend:dev
+    build:
+      context: ./backend
+      target: development
+      dockerfile: ./Dockerfile
+    environment:
+      - APP_BACKEND_PORT=${APP_BACKEND_PORT}
+    expose:
+      - ${APP_BACKEND_PORT}
+    ports:
+      - ${APP_BACKEND_PORT}:${APP_BACKEND_PORT}
+    networks:
+      - flowser-network
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:debug
+    restart: "no"
+  frontend:
+    container_name: frontend
+    image: frontend:dev
+    build:
+      context: ./frontend
+      target: development
+      dockerfile: ./Dockerfile
+    environment:
+      - APP_FRONTEND_PORT=${APP_FRONTEND_PORT}
+    expose:
+      - ${APP_FRONTEND_PORT}
+    ports:
+      - ${APP_FRONTEND_PORT}:${APP_FRONTEND_PORT}
+    networks:
+      - flowser-network
+    volumes:
+      - ./frontend:/app
+      - /usr/src/app/node_modules
+    command: npm run start
+    restart: "no"
+
+networks:
+  flowser-network:
