@@ -1,8 +1,21 @@
-# Getting Started with Create React App
+# Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Frontend is React SPA which was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+### Automatic tasks
+
+Some automatic tasks are running in the background:
+
+1. ESSlint (Run automatically on every commit via Git hooks & Husky)
+2. Prettier (Run automatically on every commit via Git hooks & Husky)
+
+Git hooks and Husky setup inspired by the following articles:
+
+-   [Git hooks (Mono repo)](https://scottsauber.com/2021/06/01/using-husky-git-hooks-and-lint-staged-with-nested-folders/)
+-   [Git hooks React setup](https://nickymeuleman.netlify.app/blog/git-hooks)
+-   [EsLint & Prettier React](https://robertcooper.me/post/using-eslint-and-prettier-in-a-typescript-project)
+
+### Available Scripts
 
 In the project directory, you can run:
 
