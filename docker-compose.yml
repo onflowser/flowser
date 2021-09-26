@@ -41,6 +41,22 @@ services:
       - /app/node_modules
     command: npm run start
     restart: unless-stopped
+  database:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    ports:
+      - 27016:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      flowser-network:
 
 networks:
   flowser-network:
+    driver: bridge
+
+volumes:
+  mongodb_data_container:

@@ -7,11 +7,10 @@ Flowser is Flow Browser. TODO: Add description
 
 ### Development
 
-Local development stack consist of frontend Nestjs application and frontend React application.
-Each of the two is run in a separate Docker container. Use the following docker-compose commands
-to start up development stack and point your browser to http://localhost:3000
+Application stack consist of frontend Nestjs backend API server, frontend React SPA application and Mongo database.
+Use the following docker-compose commands to start up development stack and point your browser to http://localhost:3000
 
-Make sure that you have .env file properly configured, for local development simply rename .env.sample to .env!
+Make sure that you have ```.env``` file properly configured, for local development simply rename .env.sample to .env!
 
 To get more information on frontend and backend respectively refer to README.md in /frontend and /backend folders.
 
@@ -32,7 +31,19 @@ See logs.
 docker-compose logs -f
 ```
 
-#### Important:
+#### Connect to Mongo with a client ([example Robo 3T](https://robomongo.org/))
+Follow the following steps to configure Mongo client access to Mongo container. Keep in mind that Mongo container IP might change over time so repeat the steps described bellow to obtain latest containers IP.  
+```
+Address: localhost
+Port: 27016
+Username: ${MONGO_ROOT_USERNAME} // what ever set in your .env file
+Password: ${MONGO_ROOT_PASSWORD} // what ever set in your .env file
+```
+
+
+
+
+### Development important notes:
 
 After installing new NPM library you have to stop docker-compose, remove Docker image, and run docker-compose up again. Below example for frontend:
 1. Stop docker-compose
