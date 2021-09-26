@@ -12,7 +12,6 @@
         "@types/react-dom": "^17.0.9",
         "axios": "^0.21.4",
         "husky": "^7.0.2",
-        "node-sass": "^6.0.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-query": "^3.24.4",
@@ -55,7 +54,8 @@
         "eslint-plugin-prettier": "^4.0.0",
         "eslint-plugin-react": "^7.26.0",
         "lint-staged": "^11.1.2",
-        "prettier": "^2.4.1"
+        "prettier": "^2.4.1",
+        "sass": "^1.42.1"
     },
     "husky": {
         "hooks": {
