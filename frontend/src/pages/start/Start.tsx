@@ -11,19 +11,19 @@ type Props = OwnProps;
 
 const Start: FunctionComponent<Props> = (props) => {
     const fetchData = (): Promise<any[]> => {
-        return axios.get('/api').then((response) => response.data);
+        return axios.get('/api/projects').then((response) => response.data);
     };
 
-    const useGroups = () => {
-        return useQuery('groups', fetchData);
+    const useProjects = () => {
+        return useQuery('projects', fetchData);
     };
 
-    const { data } = useGroups();
+    const { data } = useProjects();
 
     return (
         <div className={classes.container}>
             <h1>Start</h1>
-            <p>Data from backend is {data}</p>
+            {data && <p>Project name is: {data[0].name}</p>}
         </div>
     );
 };

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { AccountsModule } from './accounts/accounts.module';
+import { ProjectsModule } from './projects/projects.module';
 
 const mongoUser = process.env.MONGODB_USERNAME;
 const mongoPassword = process.env.MONGODB_PASSWORD;
@@ -20,11 +20,9 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
             type: 'mongodb',
             url,
             useNewUrlParser: true,
-            entities: [
-                __dirname + '/**/*.entity.ts',
-            ]
+            autoLoadEntities: true,
         }),
-        AccountsModule,
+        ProjectsModule,
     ],
     controllers: [AppController],
     providers: [AppService],
