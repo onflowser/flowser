@@ -1,7 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import classes from './Start.module.scss';
-import axios from 'axios';
-import { useQuery } from 'react-query';
+import { routes } from '../../shared/constants/routes';
 
 interface OwnProps {
     some: string;
@@ -10,20 +10,27 @@ interface OwnProps {
 type Props = OwnProps;
 
 const Start: FunctionComponent<Props> = (props) => {
-    const fetchData = (): Promise<any[]> => {
-        return axios.get('/api/projects').then((response) => response.data);
-    };
-
-    const useProjects = () => {
-        return useQuery('projects', fetchData);
-    };
-
-    const { data } = useProjects();
+    const history = useHistory();
+    const onQuickstart = useCallback(() => {
+        history.push(`/${routes.firstRouteAfterStart}`);
+    }, []);
 
     return (
         <div className={classes.container}>
-            <h1>Start</h1>
-            {data && <p>Project name is: {data[0].name}</p>}
+            <div className={classes.topContainer}>
+                <header>
+                    <h1>Flowser</h1>
+                    <p className="tagline">Flowser is Flow Browser</p>
+                </header>
+            </div>
+            <div className={classes.bottomContainer}>
+                <h2>Create a new project</h2>
+                <span>Quickstart for a one-click blockchain or create a new workspace for advanced setup options.</span>
+                <div className={classes.buttonsContainer}>
+                    <button onClick={onQuickstart}>Quickstart</button>
+                    <button disabled={true}>New Project</button>
+                </div>
+            </div>
         </div>
     );
 };

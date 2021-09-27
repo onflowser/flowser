@@ -3,5 +3,19 @@
 
 .container {
   padding: $base-spacing;
-  color: $dark-grey;
+  color: $black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+
+  .topContainer {
+  }
+  .bottomContainer {
+    text-align: center;
+
+    .buttonsContainer {
+      margin-top: $base-spacing;
+    }
+  }
 }
