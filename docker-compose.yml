@@ -10,6 +10,11 @@ services:
       dockerfile: ./Dockerfile
     environment:
       - APP_BACKEND_PORT=${APP_BACKEND_PORT}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
     expose:
       - ${APP_BACKEND_PORT}
     ports:
@@ -19,6 +24,8 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+    links:
+      - database
     command: npm run start:debug
     restart: unless-stopped
   frontend:
@@ -42,21 +49,20 @@ services:
     command: npm run start
     restart: unless-stopped
   database:
-    image: mongo:latest
+    build: ./database
+    container_name: database
+    volumes:
+      - ./database/db:/data/db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
     ports:
       - 27016:27017
-    volumes:
-      - mongodb_data_container:/data/db
     networks:
       flowser-network:
 
 networks:
   flowser-network:
     driver: bridge
-
-volumes:
-  mongodb_data_container:

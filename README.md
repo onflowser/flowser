@@ -31,13 +31,14 @@ See logs.
 docker-compose logs -f
 ```
 
-#### Connect to Mongo with a client ([example Robo 3T](https://robomongo.org/))
-Follow the following steps to configure Mongo client access to Mongo container. Keep in mind that Mongo container IP might change over time so repeat the steps described bellow to obtain latest containers IP.  
+#### Connect to Mongo Docker instance with your local machine client ([example Robo 3T](https://robomongo.org/))
+Connect MongoDb Client using settings in ```.env``` file. Bellow example from ```.env.sample```. Keep in mind that
+in docker-compose.yml we mapped port 27017 to 27016, use ````localhost```` instead of ```database``` docker-compose internal
+host name
 ```
-Address: localhost
-Port: 27016
-Username: ${MONGO_ROOT_USERNAME} // what ever set in your .env file
-Password: ${MONGO_ROOT_PASSWORD} // what ever set in your .env file
+mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@localhost:27016/${MONGODB_DATABASE}
+
+mongodb://root:rootpassword@localhost:27016/flowser
 ```
 
 
