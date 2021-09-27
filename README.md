@@ -1,5 +1,5 @@
 # flowser
-Flowser is Flow Browser. TODO: Add description
+Flowser is Flow Browser. Visit the online [documentation page](https://www.notion.so/Architecture-a9f2791672f444cbb09bca885e141a00)
 
 ### Requirements
 - Docker
