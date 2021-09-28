@@ -43,11 +43,16 @@ async function getTransactionById (id) {
 async function getBlockData (height) {
   const block = await getBlockByHeight(height);
   const collections = await Promise.all(
-    block.collectionGuarantees.map(e => getCollectionById(e.collectionId))
+    block.collectionGuarantees.map(async guarantee => ({
+      blockId: block.id,
+      ...await getCollectionById(guarantee.collectionId)
+    }))
   )
-  const transactions = await Promise.all(collections.map(e =>
-    Promise.all(e.transactionIds.map(txId => getTransactionById(txId)))
-  ))
+  const transactions = (await Promise.all(collections.map(collection =>
+    Promise.all(collection.transactionIds.map(async txId => ({
+      collectionId: collection.id, ...await getTransactionById(txId)
+    })))
+  ))).flat()
   return {
     block,
     collections,
@@ -84,7 +89,7 @@ const USAGE =
   "   --json    Output in json format (usefull for storing data in files)\n" +
   "   --help    Output usage help\n"
 
-const isValidHeightArg = value => value && typeof value === 'number';
+const isValidHeightArg = value => typeof value === 'number' && !isNaN(value);
 
 if (outputHelp) {
   process.stdout.write(USAGE);
@@ -97,7 +102,7 @@ if (outputHelp) {
   error("[Flowser] Error: invalid use.\n\n" + USAGE);
 }
 
-function logData(data) {
+function logData (data) {
   if (printJsonFormat) {
     process.stdout.write(JSON.stringify(data, null, 4))
   } else {
