@@ -66,9 +66,6 @@
         "*.{js,ts,tsx}": [
             "eslint --quiet --fix"
         ],
-        "*.{ts,tsx}": [
-            "tsc --esModuleInterop --jsx react"
-        ],
         "*.{json,md,html}": [
             "prettier --write"
         ]
