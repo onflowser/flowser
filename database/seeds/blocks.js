@@ -18,7 +18,8 @@ const blocks = [
         "blockSeals": [],
         "signatures": [
             ""
-        ]
+        ],
+        "createdAt" : 1632857534571
     },
     {
         "id": "86674c24865aa6be9c2e77c23099703cdb74a76348d400c6422c239331539fbd",
@@ -36,7 +37,8 @@ const blocks = [
         "blockSeals": [],
         "signatures": [
             ""
-        ]
+        ],
+        "createdAt" : 1632857534571
     },
     {
         "id": "86674c24865aa6be9c2e77c23099703cdb74a76348d400c6422c239331539fbd",
@@ -54,7 +56,8 @@ const blocks = [
         "blockSeals": [],
         "signatures": [
             ""
-        ]
+        ],
+        "createdAt" : 1632857534571
     },
     {
         "id": "86674c24865aa6be9c2e77c23099703cdb74a76348d400c6422c239331539fbd",
@@ -72,7 +75,8 @@ const blocks = [
         "blockSeals": [],
         "signatures": [
             ""
-        ]
+        ],
+        "createdAt" : 1632857534571
     },
     {
         "id": "86674c24865aa6be9c2e77c23099703cdb74a76348d400c6422c239331539fbd",
@@ -90,7 +94,8 @@ const blocks = [
         "blockSeals": [],
         "signatures": [
             ""
-        ]
+        ],
+        "createdAt" : 1632857534571
     }
 ]
 try {
