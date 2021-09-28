@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSearch } from '../../shared/hooks/search';
 
 const Accounts = () => {
-    const { term, setPlaceholder } = useSearch();
+    const { searchTerm, setPlaceholder } = useSearch();
 
     useEffect(() => {
         setPlaceholder('Search accounts');
@@ -11,7 +11,7 @@ const Accounts = () => {
     return (
         <div>
             <h2>Accounts</h2>
-            <span>Search value: {term}</span>
+            <span>Search value: {searchTerm}</span>
         </div>
     );
 };
