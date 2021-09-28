@@ -1,5 +1,5 @@
 # flowser
-Flowser is Flow Browser. Visit the online [documentation page](https://www.notion.so/Architecture-a9f2791672f444cbb09bca885e141a00)
+Flowser is Flow Browser. Visit the online [documentation page](https://www.notion.so/Engineering-Wiki-07b2d4453ce24a70804e7b50b5045b6d)
 
 ### Requirements
 - Docker
