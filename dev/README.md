@@ -16,7 +16,7 @@ To generate and fetch sample data from local emulator follow the bellow steps.
     ```
 2. **Deploy "HelloWorld" contract to test account**
     ```shell
-   flow accounts add-contract HelloWorld transactions/HelloWorld.cdc
+   flow accounts add-contract HelloWorld contracts/HelloWorld.cdc
     ```
    
     Sample output:
@@ -52,42 +52,35 @@ To generate and fetch sample data from local emulator follow the bellow steps.
    
     Sample output:
     ```shell
-    Transaction ID: 71be5c54993af5104552f7d5bb6b2a9b5831480cf0ad29b00a5c8d3c6e39b342
+    Transaction ID: b4cd56e49c47800fea06866126a09abc5fb2c3c27f26850363b06c4f82e37124
 
-    ❌ Transaction Error
-    execution error code 1101: [Error Code: 1101] cadence runtime error Execution failed:
-    error: [Error Code: 1054] location (f8d6e0586b0a20c7) is not a valid location: expecting an AddressLocation, but other location types are passed
-    --> f8d6e0586b0a20c7
+   Status		✅ SEALED
+   ID		b4cd56e49c47800fea06866126a09abc5fb2c3c27f26850363b06c4f82e37124
+   Payer		f8d6e0586b0a20c7
+   Authorizers	[f8d6e0586b0a20c7]
 
-    error: cannot find variable in this scope: `HelloWorld`
-    --> 71be5c54993af5104552f7d5bb6b2a9b5831480cf0ad29b00a5c8d3c6e39b342:8:8
-    |
-    8 |     log(HelloWorld.hello())
-    |         ^^^^^^^^^^ not found in this scope
+   Proposal Key:
+   Address	f8d6e0586b0a20c7
+   Index	0
+   Sequence	1
 
+   No Payload Signatures
 
+   Envelope Signature 0: f8d6e0586b0a20c7
+   Signatures (minimized, use --include signatures)
 
-    Status		✅ SEALED
-    ID		71be5c54993af5104552f7d5bb6b2a9b5831480cf0ad29b00a5c8d3c6e39b342
-    Payer		f8d6e0586b0a20c7
-    Authorizers	[f8d6e0586b0a20c7]
-
-    Proposal Key:
-    Address	f8d6e0586b0a20c7
-    Index	0
-    Sequence	2
-
-    No Payload Signatures
-
-    Envelope Signature 0: f8d6e0586b0a20c7
-    Signatures (minimized, use --include signatures)
-
-    Events:	 None
+   Events:		 
+   Index	0
+   Type	A.f8d6e0586b0a20c7.HelloWorld.Greet
+   Tx ID	b4cd56e49c47800fea06866126a09abc5fb2c3c27f26850363b06c4f82e37124
+   Values
+   - x (String): "Hello, World!"
 
 
-    Code (hidden, use --include code)
 
-    Payload (hidden, use --include payload)
+   Code (hidden, use --include code)
+
+   Payload (hidden, use --include payload)
     ```
 
 4. **Query blockchain data with `data-aggregator.js`**
@@ -106,78 +99,83 @@ To generate and fetch sample data from local emulator follow the bellow steps.
 
     Sample output:
     ```json
-    [
-        {
-            "block": {
-                "id": "86674c24865aa6be9c2e77c23099703cdb74a76348d400c6422c239331539fbd",
-                "parentId": "789b8969c0f03b85037297ee49e05a96fe15ec35e5b7f73aa72e9cc825155d8e",
-                "height": 2,
-                "timestamp": "2021-09-27T22:09:22.732Z",
-                "collectionGuarantees": [
-                    {
-                        "collectionId": "18b34f06516c83f5655e6f1961635ba55d6278c6d9cdb90ed2bff9df37d2cf4c",
-                        "signatures": [
-                            ""
-                        ]
-                    }
-                ],
-                "blockSeals": [],
-                "signatures": [
-                    ""
-                ]
-            },
-            "collections": [
-                {
-                    "id": "18b34f06516c83f5655e6f1961635ba55d6278c6d9cdb90ed2bff9df37d2cf4c",
-                    "transactionIds": [
-                        "8cf04984291824f6567b6cdb252a2d1d37369ff6c38d7ac1e992c879d966d3ee"
-                    ]
-                }
-            ],
-            "transactions": [
-                [
-                    {
-                        "data": {
-                            "script": "\n\ttransaction(name: String, code: String ) {\n\t\tprepare(signer: AuthAccount) {\n\t\t\tsigner.contracts.add(name: name, code: code.decodeHex() )\n\t\t}\n\t}",
-                            "args": [
-                                {
-                                    "type": "String",
-                                    "value": "HelloWorld"
-                                },
-                                {
-                                    "type": "String",
-                                    "value": "696d706f72742048656c6c6f576f726c642066726f6d20307830310a0a7472616e73616374696f6e207b0a0a20207072657061726528616363743a20417574684163636f756e7429207b7d0a0a202065786563757465207b0a202020206c6f672848656c6c6f576f726c642e68656c6c6f2829290a20207d0a7d0a0a"
-                                }
-                            ],
-                            "referenceBlockId": "789b8969c0f03b85037297ee49e05a96fe15ec35e5b7f73aa72e9cc825155d8e",
-                            "gasLimit": 9999,
-                            "proposalKey": {
-                                "address": "f8d6e0586b0a20c7",
-                                "keyId": 0,
-                                "sequenceNumber": 0
-                            },
-                            "payer": "f8d6e0586b0a20c7",
-                            "authorizers": [
-                                "f8d6e0586b0a20c7"
-                            ],
-                            "payloadSignatures": [],
-                            "envelopeSignatures": [
-                                {
-                                    "address": "f8d6e0586b0a20c7",
-                                    "keyId": 0,
-                                    "signature": "017c6a35cea5fe166b331f45635a705c972f33046594befbf65bef6d21f13ca1af4b071b065f6b7dc0236dc7a90b9cc8844175c79296daaff0213750871f1473"
-                                }
-                            ]
-                        },
-                        "status": {
-                            "status": 4,
-                            "statusCode": 1,
-                            "errorMessage": "execution error code 1101: [Error Code: 1101] cadence runtime error Execution failed:\nerror: cannot deploy invalid contract\n --> 8cf04984291824f6567b6cdb252a2d1d37369ff6c38d7ac1e992c879d966d3ee:4:3\n  |\n4 | \t\t\tsigner.contracts.add(name: name, code: code.decodeHex() )\n  |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: cannot find declaration `HelloWorld` in `0000000000000001.HelloWorld`\n --> f8d6e0586b0a20c7.HelloWorld:1:7\n  |\n1 | import HelloWorld from 0x01\n  |        ^^^^^^^^^^ available exported declarations are:\n\n\nerror: transaction declarations are not valid at the top-level\n --> f8d6e0586b0a20c7.HelloWorld:3:0\n  |\n3 | transaction {\n  | ^\n",
-                            "events": []
-                        }
-                    }
-                ]
+    {
+      "block":{
+        "id":"4943cf52542ee6788eee40002d258eee0691357e6ea418dacc647a0070a175e1",
+        "parentId":"5f7c8cd9d64271418f5be1b18a7746cab083e051262527935854c06b93e772cc",
+        "height":3,
+        "timestamp":"2021-09-28T21:14:05.839Z",
+        "collectionGuarantees":[
+          {
+            "collectionId":"3f36bf9be61008c11a5508fb5e0e295d8d57c2845d04c5af53393cb6c6ee2516",
+            "signatures":[
+              ""
             ]
+          }
+        ],
+        "blockSeals":[
+          
+        ],
+        "signatures":[
+          ""
+        ]
+      },
+      "collections":[
+        {
+          "blockId":"4943cf52542ee6788eee40002d258eee0691357e6ea418dacc647a0070a175e1",
+          "id":"3f36bf9be61008c11a5508fb5e0e295d8d57c2845d04c5af53393cb6c6ee2516",
+          "transactionIds":[
+            "b4cd56e49c47800fea06866126a09abc5fb2c3c27f26850363b06c4f82e37124"
+          ]
         }
-    ]
+      ],
+      "transactions":[
+        {
+          "collectionId":"3f36bf9be61008c11a5508fb5e0e295d8d57c2845d04c5af53393cb6c6ee2516",
+          "data":{
+            "script":"import HelloWorld from 0xf8d6e0586b0a20c7\n\ntransaction {\n\n  prepare(acct: AuthAccount) {}\n\n  execute {\n    log(HelloWorld.hello())\n  }\n}\n",
+            "args":[
+              
+            ],
+            "referenceBlockId":"5f7c8cd9d64271418f5be1b18a7746cab083e051262527935854c06b93e772cc",
+            "gasLimit":1000,
+            "proposalKey":{
+              "address":"f8d6e0586b0a20c7",
+              "keyId":0,
+              "sequenceNumber":1
+            },
+            "payer":"f8d6e0586b0a20c7",
+            "authorizers":[
+              "f8d6e0586b0a20c7"
+            ],
+            "payloadSignatures":[
+              
+            ],
+            "envelopeSignatures":[
+              {
+                "address":"f8d6e0586b0a20c7",
+                "keyId":0,
+                "signature":"bf61780e52946b692e3854760c9dcb281fca052bf285b7431a0e6de9f25bcd5bbc146a8c5ca8ec01221f7b35794607adf5649a2152bed1783b70362aff62ad8d"
+              }
+            ]
+          },
+          "status":{
+            "status":4,
+            "statusCode":0,
+            "errorMessage":"",
+            "events":[
+              {
+                "type":"A.f8d6e0586b0a20c7.HelloWorld.Greet",
+                "transactionId":"b4cd56e49c47800fea06866126a09abc5fb2c3c27f26850363b06c4f82e37124",
+                "transactionIndex":1,
+                "eventIndex":0,
+                "data":{
+                  "x":"Hello, World!"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
     ```
