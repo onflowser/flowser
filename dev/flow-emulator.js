@@ -1,5 +1,5 @@
 const {spawn} = require("child_process")
-const {mkdir} =  require("fs/promises")
+const {mkdir,stat} =  require("fs/promises")
 const {join} = require("path");
 
 const CONFIG_ROOT_DIR = '.'
@@ -15,6 +15,19 @@ class FlowEmulator {
 
   projectDir() {
     return join(CONFIG_ROOT_DIR, this.projectId);
+  }
+
+  static async configExists(projectId = "default") {
+    try {
+      await stat(join(CONFIG_ROOT_DIR, projectId))
+      return true;
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        return false;
+      } else {
+        throw e;
+      }
+    }
   }
 
   async createConfig() {
@@ -38,13 +51,17 @@ class FlowEmulator {
 
 (async function () {
   const emulator = new FlowEmulator();
-  try {
-    await emulator.createConfig();
-  } catch (e) {
-    console.error(`[Flowser] Failed to create flow config: ${e}`)
-    process.exit(1);
+  if (!await FlowEmulator.configExists()) {
+    try {
+      await emulator.createConfig();
+      console.info(`[Flowser] Flow config initialised in: ${emulator.projectDir()}`)
+    } catch (e) {
+      console.error(`[Flowser] Failed to create flow config: ${e}`)
+      process.exit(1);
+    }
+  } else {
+    console.info(`[Flowser] Config exists - skipping flow config initialisation.`)
   }
-  console.info(`[Flowser] Flow config initialised in: ${emulator.projectDir()}`)
 
   const emulatorProcess = emulator.start();
 
