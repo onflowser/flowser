@@ -39,10 +39,30 @@ class FlowEmulator {
     }))
   }
 
-  start() {
-    return spawn("flow", ['emulator'], {
+  start(cb = () => null) {
+    const emulatorProcess = spawn("flow", ['emulator'], {
       cwd: this.projectDir()
     })
+
+    emulatorProcess.stdout.on("data", data => {
+      const lines = data.toString().split("\n").filter(e => !!e)
+      cb(null, lines)
+    })
+
+    emulatorProcess.stderr.on("data", data => {
+      const error = data.toString();
+      cb(error, null)
+    })
+
+    emulatorProcess.on("close", code => {
+      console.log("[Flowser] emulator exited with code: ", code)
+    })
+
+    emulatorProcess.on("error", error => {
+      cb(error, null)
+    })
+
+    return emulatorProcess;
   }
 
 }
@@ -63,23 +83,11 @@ class FlowEmulator {
     console.info(`[Flowser] Config exists - skipping flow config initialisation.`)
   }
 
-  const emulatorProcess = emulator.start();
-
-  console.info(`[Flowser] Flow emulator process started`)
-
-  emulatorProcess.stdout.on("data", data => {
-    console.debug("[Flowser] emulator stdout: ", data.toString())
-  })
-
-  emulatorProcess.stderr.on("data", data => {
-    console.debug("[Flowser] emulator stderr: ", data.toString())
-  })
-
-  emulatorProcess.on("close", code => {
-    console.log("[Flowser] emulator exited with code: ", code)
-  })
-
-  emulatorProcess.on("error", error => {
-    console.error(`[Flowser] emulator error: ${error}`)
-  })
+  emulator.start((error, data) => {
+    if (error) {
+      console.log(`[Flower] Received an error from emulator: ${error}`)
+    } else {
+      console.log(`[Flower] Received ${data.length} line of data from emulator`)
+    }
+  });
 })()
