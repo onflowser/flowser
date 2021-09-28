@@ -1,53 +1,59 @@
-import React, { FunctionComponent } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { routes } from '../../../shared/constants/routes';
+import classes from './Navigation.module.scss';
 
-import styles from './Navigation.module.scss';
-
-interface OwnProps {
-    some?: string;
-}
-
-type Props = OwnProps;
-
-const Navigation: FunctionComponent<Props> = (props) => {
+const Navigation = () => {
     return (
-        <div className={styles.navigationContainer}>
+        <div className={classes.navigationContainer}>
             <nav>
                 <ul>
                     <li>
-                        <Link to={'/start'} className="nav-link">
+                        <NavLink to={`/${routes.start}`} className={classes.navLink} activeClassName={classes.active}>
                             Home
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to={'/accounts'} className="nav-link">
+                        <NavLink
+                            to={`/${routes.accounts}`}
+                            className={classes.navLink}
+                            activeClassName={classes.active}
+                        >
                             Accounts
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to={'/blocks'} className="nav-link">
+                        <NavLink to={`/${routes.blocks}`} className={classes.navLink} activeClassName={classes.active}>
                             Blocks
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to={'/transactions'} className="nav-link">
+                        <NavLink
+                            to={`/${routes.transactions}`}
+                            className={classes.navLink}
+                            activeClassName={classes.active}
+                        >
                             Transactions
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to={'/contracts'} className="nav-link">
+                        <NavLink
+                            to={`/${routes.contracts}`}
+                            className={classes.navLink}
+                            activeClassName={classes.active}
+                        >
                             Contracts
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to={'/events'} className="nav-link">
+                        <NavLink to={`/${routes.events}`} className={classes.navLink} activeClassName={classes.active}>
                             Events
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to={'/logs'} className="nav-link">
+                        <NavLink to={`/${routes.logs}`} className={classes.navLink} activeClassName={classes.active}>
                             Logs
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
             </nav>

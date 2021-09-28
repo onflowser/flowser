@@ -1,15 +1,17 @@
-import React, { FunctionComponent } from 'react';
+import React, { useEffect } from 'react';
+import { useSearch } from '../../shared/hooks/search';
 
-interface OwnProps {
-    some?: string;
-}
+const Blocks = () => {
+    const { term, setPlaceholder } = useSearch();
 
-type Props = OwnProps;
+    useEffect(() => {
+        setPlaceholder('Search blocks');
+    }, []);
 
-const Blocks: FunctionComponent<Props> = (props) => {
     return (
         <div>
             <h2>Blocks</h2>
+            <p>Search term: {term}</p>
         </div>
     );
 };

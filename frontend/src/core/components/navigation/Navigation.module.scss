@@ -2,7 +2,7 @@
 @import 'styles/spacings';
 
 .navigationContainer {
-  background-color: $light-grey;
+  background-color: $grey;
   padding: $base-spacing;
   ul {
     display: flex;
@@ -12,5 +12,12 @@
       color: $black;
       margin-right: $base-spacing;
     }
+  }
+}
+
+.navLink {
+  &.active {
+    font-weight: bold;
+    color: $black;
   }
 }

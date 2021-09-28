@@ -1,0 +1,12 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.container {
+  display: flex;
+  align-items: flex-end;
+  margin: $base-spacing;
+  padding: $base-spacing;
+  background-color: $light-grey;
+  justify-content: end;
+
+}

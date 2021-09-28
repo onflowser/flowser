@@ -1,9 +1,11 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import './App.scss';
+import { BrowserRouter, Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import Layout from './core/components/layout/Layout';
 import Start from './pages/start/Start';
 import { routes } from './shared/constants/routes';
+import { UiStateContextProvider } from './shared/contexts/ui-state.context';
+import { useSearch } from './shared/hooks/search';
+import './App.scss';
 
 const LazyAccounts = React.lazy(() => import('./pages/accounts/Accounts'));
 const LazyBlocks = React.lazy(() => import('./pages/blocks/Blocks'));
@@ -18,23 +20,37 @@ const RouteWithLayout = (props: any) => (
     </Layout>
 );
 
-function App() {
+const BrowserRouterEvents = withRouter(({ children, history }) => {
+    const { setSearchTerm } = useSearch();
+    history.listen((location: any, action: any) => {
+        if (action === 'PUSH') {
+            setSearchTerm('');
+        }
+    });
+    return <>{children}</>;
+});
+
+export const App = () => {
     return (
         <Suspense fallback="loading ...">
-            <BrowserRouter>
-                <Switch>
-                    <Route exact path={`/${routes.start}`} component={Start} />
-                    <RouteWithLayout path={`/${routes.accounts}`} component={LazyAccounts} />
-                    <RouteWithLayout path={`/${routes.blocks}`} component={LazyBlocks} />
-                    <RouteWithLayout path={`/${routes.transactions}`} component={LazyTransactions} />
-                    <RouteWithLayout path={`/${routes.contracts}`} component={LazyContracts} />
-                    <RouteWithLayout path={`/${routes.events}`} component={LazyEvents} />
-                    <RouteWithLayout path={`/${routes.logs}`} component={LazyLogs} />
-                    <Redirect from="*" to={`/${routes.start}`} />
-                </Switch>
-            </BrowserRouter>
+            <UiStateContextProvider>
+                <BrowserRouter>
+                    <BrowserRouterEvents>
+                        <Switch>
+                            <Route exact path={`/${routes.start}`} component={Start} />
+                            <RouteWithLayout path={`/${routes.accounts}`} component={LazyAccounts} />
+                            <RouteWithLayout path={`/${routes.blocks}`} component={LazyBlocks} />
+                            <RouteWithLayout path={`/${routes.transactions}`} component={LazyTransactions} />
+                            <RouteWithLayout path={`/${routes.contracts}`} component={LazyContracts} />
+                            <RouteWithLayout path={`/${routes.events}`} component={LazyEvents} />
+                            <RouteWithLayout path={`/${routes.logs}`} component={LazyLogs} />
+                            <Redirect from="*" to={`/${routes.start}`} />
+                        </Switch>
+                    </BrowserRouterEvents>
+                </BrowserRouter>
+            </UiStateContextProvider>
         </Suspense>
     );
-}
+};
 
 export default App;
