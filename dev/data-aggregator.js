@@ -5,19 +5,6 @@ const ACCESS_NODE = "http://localhost:8080"; // use default flow http server por
 
 fcl.config().put("accessNode.api", ACCESS_NODE) // Configure FCL's Access Node
 
-// retrieve specific events (probably not useful)
-async function getEventsByBlockHeight (height, accountAddress, contractName, eventName) {
-  return fcl
-    .send([
-      fcl.getEventsAtBlockHeightRange(
-        // e.g. "A.f8d6e0586b0a20c7.HelloWorld.Greet
-        `A.${accountAddress}.${contractName}.${eventName}`,
-        height,
-        height
-      ),
-    ])
-    .then(fcl.decode)
-}
 
 async function getBlockByHeight (height) {
   return fcl.send([
@@ -40,6 +27,12 @@ async function getTransactionById (id) {
   return {data, status}
 }
 
+async function getAccount (address) {
+  return fcl.send([
+    fcl.getAccount(address)
+  ]).then(fcl.decode)
+}
+
 async function getBlockData (height) {
   const block = await getBlockByHeight(height);
   const collections = await Promise.all(
@@ -53,10 +46,19 @@ async function getBlockData (height) {
       collectionId: collection.id, ...await getTransactionById(txId)
     })))
   ))).flat()
+  // find all account addresses that are related to some transaction
+  // account can be either a payer, authorizer or both
+  // therefore we need to remove duplicate account addresses
+  const accountAddresses = Object.keys(transactions
+    .map(tx => [...tx.data.authorizers, tx.data.payer])
+    .flat()
+    .reduce((p, c) => ({...p, [c]: true}), {}))
+  const accounts = await Promise.all(accountAddresses.map(getAccount));
   return {
     block,
     collections,
     transactions,
+    accounts
   }
 }
 
