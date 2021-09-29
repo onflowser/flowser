@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MongoRepository } from 'typeorm';
+import { Block } from './entities/block.entity';
 
 @Injectable()
 export class BlocksService {
-  create(createBlockDto: CreateBlockDto) {
-    return 'This action adds a new block';
-  }
 
-  findAll() {
-    return `This action returns all blocks`;
-  }
+    constructor(@InjectRepository(Block)
+                private blockRepository: MongoRepository<Block>) {
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} block`;
-  }
+    create(createBlockDto: CreateBlockDto) {
+        return 'This action adds a new block';
+    }
 
-  update(id: number, updateBlockDto: UpdateBlockDto) {
-    return `This action updates a #${id} block`;
-  }
+    findAll(): Promise<Block[]> {
+        return this.blockRepository.find();
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} block`;
-  }
+    findAllNewerThanTimestamp(timestamp): Promise<Block[]> {
+        return this.blockRepository.find({
+            where: {createdAt: {$gt: timestamp}}
+        });
+    }
+
+
+    findOne(id: number) {
+        return `This action returns a #${id} block`;
+    }
+
+    update(id: number, updateBlockDto: UpdateBlockDto) {
+        return `This action updates a #${id} block`;
+    }
+
+    remove(id: number) {
+        return `This action removes a #${id} block`;
+    }
 }

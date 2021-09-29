@@ -40,7 +40,8 @@ const transactions = [
             "statusCode": 1,
             "errorMessage": "execution error code 1101: [Error Code: 1101] cadence runtime error Execution failed:\nerror: cannot deploy invalid contract\n --> 8cf04984291824f6567b6cdb252a2d1d37369ff6c38d7ac1e992c879d966d3ee:4:3\n  |\n4 | \t\t\tsigner.contracts.add(name: name, code: code.decodeHex() )\n  |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: cannot find declaration `HelloWorld` in `0000000000000001.HelloWorld`\n --> f8d6e0586b0a20c7.HelloWorld:1:7\n  |\n1 | import HelloWorld from 0x01\n  |        ^^^^^^^^^^ available exported declarations are:\n\n\nerror: transaction declarations are not valid at the top-level\n --> f8d6e0586b0a20c7.HelloWorld:3:0\n  |\n3 | transaction {\n  | ^\n",
             "events": []
-        }
+        },
+        "createdAt": 1632857534571
     },
     {
         "data": {
@@ -80,7 +81,8 @@ const transactions = [
             "statusCode": 1,
             "errorMessage": "execution error code 1101: [Error Code: 1101] cadence runtime error Execution failed:\nerror: cannot deploy invalid contract\n --> 8cf04984291824f6567b6cdb252a2d1d37369ff6c38d7ac1e992c879d966d3ee:4:3\n  |\n4 | \t\t\tsigner.contracts.add(name: name, code: code.decodeHex() )\n  |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: cannot find declaration `HelloWorld` in `0000000000000001.HelloWorld`\n --> f8d6e0586b0a20c7.HelloWorld:1:7\n  |\n1 | import HelloWorld from 0x01\n  |        ^^^^^^^^^^ available exported declarations are:\n\n\nerror: transaction declarations are not valid at the top-level\n --> f8d6e0586b0a20c7.HelloWorld:3:0\n  |\n3 | transaction {\n  | ^\n",
             "events": []
-        }
+        },
+        "createdAt" : 1632857534571
     },
     {
         "data": {
@@ -120,7 +122,8 @@ const transactions = [
             "statusCode": 1,
             "errorMessage": "execution error code 1101: [Error Code: 1101] cadence runtime error Execution failed:\nerror: cannot deploy invalid contract\n --> 8cf04984291824f6567b6cdb252a2d1d37369ff6c38d7ac1e992c879d966d3ee:4:3\n  |\n4 | \t\t\tsigner.contracts.add(name: name, code: code.decodeHex() )\n  |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: cannot find declaration `HelloWorld` in `0000000000000001.HelloWorld`\n --> f8d6e0586b0a20c7.HelloWorld:1:7\n  |\n1 | import HelloWorld from 0x01\n  |        ^^^^^^^^^^ available exported declarations are:\n\n\nerror: transaction declarations are not valid at the top-level\n --> f8d6e0586b0a20c7.HelloWorld:3:0\n  |\n3 | transaction {\n  | ^\n",
             "events": []
-        }
+        },
+        "createdAt" : 1632857534571
     },
     {
         "data": {
@@ -160,8 +163,9 @@ const transactions = [
             "statusCode": 1,
             "errorMessage": "execution error code 1101: [Error Code: 1101] cadence runtime error Execution failed:\nerror: cannot deploy invalid contract\n --> 8cf04984291824f6567b6cdb252a2d1d37369ff6c38d7ac1e992c879d966d3ee:4:3\n  |\n4 | \t\t\tsigner.contracts.add(name: name, code: code.decodeHex() )\n  |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: cannot find declaration `HelloWorld` in `0000000000000001.HelloWorld`\n --> f8d6e0586b0a20c7.HelloWorld:1:7\n  |\n1 | import HelloWorld from 0x01\n  |        ^^^^^^^^^^ available exported declarations are:\n\n\nerror: transaction declarations are not valid at the top-level\n --> f8d6e0586b0a20c7.HelloWorld:3:0\n  |\n3 | transaction {\n  | ^\n",
             "events": []
-        }
-    }
+        },
+    "createdAt" : 1632857534571
+    },
 ];
 
 try {
