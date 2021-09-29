@@ -9,8 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     controllers: [ProjectsController],
     providers: [
         ProjectsService
-    ],
-    exports: [TypeOrmModule]
+    ]
 })
 export class ProjectsModule {
 }

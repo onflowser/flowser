@@ -5,9 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Block } from './entities/block.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Block])],
-  controllers: [BlocksController],
-  providers: [BlocksService],
-  exports: [TypeOrmModule]
+    imports: [TypeOrmModule.forFeature([Block])],
+    controllers: [BlocksController],
+    providers: [
+        BlocksService
+    ]
 })
-export class BlocksModule {}
+export class BlocksModule {
+}

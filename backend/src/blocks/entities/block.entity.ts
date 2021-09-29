@@ -1,9 +1,13 @@
-import { Column, CreateDateColumn, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn, } from 'typeorm';
+import { PollingEntity } from '../../shared/entities/polling.entity';
 
 @Entity({name: 'blocks'})
-export class Block {
+export class Block extends PollingEntity {
     @ObjectIdColumn()
-    id: ObjectID;
+    _id: ObjectID;
+
+    @Column()
+    id: string;
 
     @Column()
     parentId: string;
@@ -22,7 +26,4 @@ export class Block {
 
     @Column()
     signatures: any[]; // TODO
-
-    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: number;
 }
