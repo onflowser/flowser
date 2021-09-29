@@ -3,7 +3,10 @@ import { Column, CreateDateColumn, Entity, ObjectID, ObjectIdColumn } from 'type
 @Entity({name: 'blocks'})
 export class Block {
     @ObjectIdColumn()
-    id: ObjectID;
+    _id: ObjectID;
+
+    @Column()
+    id: string;
 
     @Column()
     parentId: string;
