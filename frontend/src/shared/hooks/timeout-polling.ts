@@ -7,7 +7,7 @@ export interface TimeoutPollingHook<T> {
     startPolling: () => void;
     isFetching: boolean;
     error: Error | null;
-    data: T[] | undefined;
+    data: T[];
 }
 
 export const useTimeoutPolling = <T>(resource: string, interval = 1000): TimeoutPollingHook<T> => {
