@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class ProjectsService {
 
     constructor(@InjectRepository(Project)
-                private projectRepository: Repository<Project>) {
+                private projectRepository: MongoRepository<Project>) {
     }
 
     create(createProjectDto: CreateProjectDto) {
@@ -20,8 +20,8 @@ export class ProjectsService {
         return this.projectRepository.find();
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} project`;
+    findOne(id: string): Promise<Project> {
+        return this.projectRepository.findOne(id);
     }
 
     update(id: number, updateProjectDto: UpdateProjectDto) {

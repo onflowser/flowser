@@ -1,4 +1,5 @@
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
+import { GatewayConfiguration } from './gateway-configuration';
 
 @Entity({name: 'projects'})
 export class Project {
@@ -9,5 +10,8 @@ export class Project {
     name: string;
 
     @Column()
-    configuration: any;
+    gateway: GatewayConfiguration;
+
+    @Column()
+    isQuickStart: boolean = false;
 }
