@@ -9,6 +9,9 @@ import { Block } from './entities/block.entity';
     controllers: [BlocksController],
     providers: [
         BlocksService
+    ],
+    exports: [
+      BlocksService
     ]
 })
 export class BlocksModule {

@@ -3,7 +3,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { GatewayConfiguration } from './dto/gateway-configuration';
-import { FlowGatewayService } from '../shared/services/flow-gateway/flow-gateway.service';
+import { FlowGatewayService } from '../flow/flow-gateway.service';
 
 @Controller('projects')
 export class ProjectsController {

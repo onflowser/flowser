@@ -1,11 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Contract } from "./entities/contract.entity";
+import { MongoRepository } from "typeorm";
 
 @Injectable()
 export class ContractsService {
+
+  constructor (
+    @InjectRepository(Contract)
+    private contractRepository: MongoRepository<Contract>
+  ) {}
+
   create(createContractDto: CreateContractDto) {
-    return 'This action adds a new contract';
+    return this.contractRepository.save(createContractDto);
   }
 
   findAll() {

@@ -4,7 +4,7 @@ import { GatewayConfiguration } from './gateway-configuration';
 @Entity({name: 'projects'})
 export class Project {
     @ObjectIdColumn()
-    id: string;
+    _id: string;
 
     @Column()
     name: string;

@@ -10,7 +10,4 @@ export class GatewayConfiguration {
 
     @Column()
     address: string;
-
-    @Column()
-    key: string;
 }

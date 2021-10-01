@@ -1,7 +1,7 @@
 const fcl = require("@onflow/fcl");
 
 // const ACCESS_NODE = "https://access-testnet.onflow.org";
-const ACCESS_NODE = "http://localhost:8080"; // use default flow http server port 8080
+const ACCESS_NODE = "http://127.0.0.1:8080"; // use default flow http server port 8080
 
 fcl.config().put("accessNode.api", ACCESS_NODE) // Configure FCL's Access Node
 
@@ -63,9 +63,10 @@ async function getBlockData (height) {
 }
 
 async function getBlockDataWithinHeightRange(fromHeight, toHeight) {
+  if (fromHeight === toHeight) return [];
   return Promise.all(
     Array.from({length: toHeight - fromHeight + 1})
-      .map((_, i) => getBlockData(fromHeight + 1))
+      .map((_, i) => getBlockData(fromHeight + i))
   )
 }
 

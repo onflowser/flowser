@@ -9,6 +9,7 @@ services:
       target: development
       dockerfile: ./Dockerfile
     environment:
+      - DATA_FETCH_INTERVAl=${DATA_FETCH_INTERVAl}
       - APP_BACKEND_PORT=${APP_BACKEND_PORT}
       - MONGODB_USERNAME=${MONGODB_USERNAME}
       - MONGODB_PASSWORD=${MONGODB_PASSWORD}
