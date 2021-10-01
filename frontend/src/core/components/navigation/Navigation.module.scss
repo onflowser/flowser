@@ -3,14 +3,14 @@
 
 .navigationContainer {
   background-color: $grey;
-  padding: $base-spacing;
+  padding: $spacing-base;
   ul {
     display: flex;
     list-style-type: none;
     li {
       text-decoration: none;
       color: $black;
-      margin-right: $base-spacing;
+      margin-right: $spacing-base;
     }
   }
 }
