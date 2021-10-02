@@ -39,6 +39,9 @@ export class FlowAggregatorService {
       await Promise.all(data.map(({ transactions }) => (
         Promise.all(transactions.map(tx => this.transactionService.create(tx)))
       )))
+      await Promise.all(data.map(({ events }) => (
+        Promise.all(events.map(event => this.eventService.create(event)))
+      )))
       // TODO: iterate over events and trigger additional actions for events of interest (e.g. "flow.AccountCreated")
     } catch (e) {
       console.error(`[Flowser] block fetch error: ${e}`)

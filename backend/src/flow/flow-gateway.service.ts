@@ -47,7 +47,7 @@ export class FlowGatewayService {
             fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
             fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode)
         ])
-        return {data, status}
+        return {...data, status}
     }
 
     public async getAccount (address: string): Promise<any> {
@@ -56,7 +56,7 @@ export class FlowGatewayService {
         ]).then(fcl.decode)
     }
 
-    public async getBlockData (height: number): Promise<any> {
+    public async getBlockData (height) {
         const block = await this.getBlockByHeight(height);
         const collections = await Promise.all(
           block.collectionGuarantees.map(async guarantee => ({
@@ -64,24 +64,36 @@ export class FlowGatewayService {
               ...await this.getCollectionById(guarantee.collectionId)
           }))
         )
-        const transactions = (await Promise.all(collections.map((collection: any) =>
+        const transactionsWithDetails = (await Promise.all(collections.map((collection: any) =>
           Promise.all(collection.transactionIds.map(async txId => ({
-              collectionId: collection.id, ...await this.getTransactionById(txId)
+              id: txId,
+              ...await this.getTransactionById(txId)
           })))
         ))).flat()
         // find all account addresses that are related to some transaction
         // account can be either a payer, authorizer or both
         // therefore we need to remove duplicate account addresses
-        const accountAddresses = Object.keys(transactions
-          .map((tx: any) => [...tx.data.authorizers, tx.data.payer])
+        const accountAddresses = Object.keys(transactionsWithDetails
+          .map((tx: any) => [...tx.authorizers, tx.payer])
           .flat()
           .reduce((p, c) => ({...p, [c]: true}), {}))
         const accounts = await Promise.all(accountAddresses.map(this.getAccount));
+        const transactions = transactionsWithDetails.map((tx: any) => {
+            const {events, ...status} = tx.status;
+            return {
+                ...tx,
+                status: {...status, eventsCount: tx.status.events.length}
+            }
+        })
+        const events = transactionsWithDetails.map((tx: any) =>
+          tx.status.events.map(event => ({transactionId: tx.id, ...event}))
+        )
         return {
             block,
             collections,
             transactions,
-            accounts
+            accounts,
+            events
         }
     }
 
