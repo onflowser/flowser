@@ -24,9 +24,9 @@ export class Account extends PollingEntity {
   @Column(type => AccountContract)
   contracts: AccountContract[];
 
-  static init(flowAccountObject: FlowAccount): Account {
+  static init(flowAccountObject: FlowAccount, options?: Partial<Account>): Account {
     const {keys, contracts} = flowAccountObject;
-    const account = Object.assign<Account, FlowAccount>(new Account(), flowAccountObject);
+    const account = Object.assign<Account, FlowAccount, Partial<Account>>(new Account(), flowAccountObject, options);
     account._id = flowAccountObject.address;
     account.keys = keys.map(key => (
       Object.assign<AccountKey, any>(new AccountKey(), key)

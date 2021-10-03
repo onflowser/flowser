@@ -30,7 +30,16 @@ export class AccountsService {
   }
 
   update(address: string, updateAccountDto: UpdateAccountDto) {
-    return this.accountRepository.updateOne({ address }, updateAccountDto);
+    // we refetch and insert the whole account entity
+    // contracts & keys can be added or removed
+    // therefore collection needs to be replaced and not just updated
+    return this.accountRepository.replaceOne(
+      { address },
+      updateAccountDto,
+      // TODO: why default emulator-account creation event is not logged inside a transaction ?
+      // this is why we need to create new account if account doesn't exists (edge case)
+      { upsert: true }
+    );
   }
 
   remove(id: number) {

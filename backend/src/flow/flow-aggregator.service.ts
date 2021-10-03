@@ -41,12 +41,21 @@ export class FlowAggregatorService {
       const transactions = data.map(({ transactions }) => transactions).flat();
       const blocks = data.map(({ block }) => block);
       // store fetched data
-      await Promise.all(blocks.map(e => this.blockService.create(Block.init(e))))
-      await Promise.all(transactions.map(e => this.transactionService.create(Transaction.init(e))))
-      await Promise.all(events.map(e => this.eventService.create(Event.init(e))))
+      await Promise.all(blocks.map(e =>
+        this.blockService.create(Block.init(e))
+          .catch(e => console.error(`[Flowser] block save error: `, e))
+      ))
+      await Promise.all(transactions.map(e =>
+        this.transactionService.create(Transaction.init(e))
+          .catch(e => console.error(`[Flowser] transaction save error: `, e))
+      ))
+      await Promise.all(events.map(e =>
+        this.eventService.create(Event.init(e))
+          .catch(e => console.error(`[Flowser] event save error: `, e))
+      ))
       await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
     } catch (e) {
-      console.error(`[Flowser] block fetch error: ${e}`, e.stack)
+      console.error(`[Flowser] data fetch error: ${e}`, e.stack)
     }
   }
 
@@ -102,6 +111,9 @@ export class FlowAggregatorService {
   async updateAccount(address: string) {
     const account = await this.flowGatewayService.getAccount(address);
     console.log("[Flow] Account updated: ", account.address);
-    return this.accountService.update(address, Account.init(account))
+    return this.accountService.update(
+      address,
+      Account.init(account, {updatedAt: new Date().getTime()})
+    )
   }
 }
