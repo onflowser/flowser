@@ -1,8 +1,23 @@
 import { PollingEntity } from '../../shared/entities/polling.entity';
-import { Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
 
 @Entity({ name: 'events' })
 export class Event extends PollingEntity {
   @ObjectIdColumn()
   _id: ObjectID;
+
+  @Column()
+  transactionId: string;
+
+  @Column()
+  type: string;
+
+  @Column()
+  transactionIndex: number;
+
+  @Column()
+  eventIndex: number;
+
+  @Column()
+  data: object;
 }

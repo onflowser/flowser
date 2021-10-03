@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { GatewayConfiguration } from '../projects/dto/gateway-configuration';
+import {
+    FlowAccount,
+    FlowBlock,
+    FlowCollection,
+    FlowTransaction,
+    FlowTransactionStatus
+} from "./types";
 const fcl = require("@onflow/fcl");
-
-// TODO: add FlowGatewayService types later
 
 @Injectable()
 export class FlowGatewayService {
@@ -25,24 +30,27 @@ export class FlowGatewayService {
         fcl.config().put("accessNode.api", accessNodeApi)
     }
 
-    public async getLatestBlock (): Promise<any> {
+    public async getLatestBlock (): Promise<FlowBlock> {
         return fcl.latestBlock();
     }
 
-    public async getBlockByHeight (height: number): Promise<any> {
+    public async getBlockByHeight (height: number): Promise<FlowBlock> {
         return fcl.send([
             fcl.getBlock(),
             fcl.atBlockHeight(height)
         ]).then(fcl.decode);
     }
 
-    public async getCollectionById (id: string): Promise<any> {
+    public async getCollectionById (id: string): Promise<FlowCollection> {
         return fcl.send([
             fcl.getCollection(id)
         ]).then(fcl.decode)
     }
 
-    public async getTransactionById (id: string): Promise<any> {
+    public async getTransactionById (id: string): Promise<{
+      data: FlowTransaction,
+      status: FlowTransactionStatus
+    }> {
         const [data, status] = await Promise.all([
             fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
             fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode)
@@ -50,7 +58,7 @@ export class FlowGatewayService {
         return {...data, status}
     }
 
-    public async getAccount (address: string): Promise<any> {
+    public async getAccount (address: string): Promise<FlowAccount> {
         return fcl.send([
             fcl.getAccount(address)
         ]).then(fcl.decode)
