@@ -1,3 +1,39 @@
-.layout-root {
-  background-color: red;
+@import 'styles/spacings';
+
+.layoutContainer {
+  display: grid;
+  grid-template-columns: [first] $spacing-l [ first-end content] auto [last] $spacing-l [last];
+  grid-template-rows: [navigation] 118px [subnavigation] 100px [content] auto [logs] 63px [last];
+  row-gap: 30px;
+  min-height: 100vh;
+
+  .header {
+    grid-column-start: 1;
+    grid-column-end: 4;
+  }
+
+  .subheader {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    // TODO: Remove
+    border: 1px solid yellow;
+  }
+
+  .content {
+    display: grid;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    // TODO: Remove
+    border: 1px solid yellow;
+  }
+
+  .logs {
+    display: grid;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row-start: logs;
+    grid-row-end: last;
+    // TODO: Remove
+    border: 1px solid yellow;
+  }
 }

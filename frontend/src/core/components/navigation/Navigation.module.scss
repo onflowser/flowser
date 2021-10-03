@@ -1,23 +1,72 @@
 @import 'styles/colors';
 @import 'styles/spacings';
+@import 'styles/typography';
 
 .navigationContainer {
-  background-color: $grey;
-  padding: $spacing-base;
-  ul {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: $color-table-blue;
+  padding: 0 $spacing-base;
+
+  .logoContainer {
+    img {
+      width: 60px;
+      height: 60px;
+    }
+    margin-right: $spacing-base * 3;
+  }
+
+  .navLinksContainer {
+    margin-top: -18px;
     display: flex;
-    list-style-type: none;
-    li {
-      text-decoration: none;
-      color: $black;
-      margin-right: $spacing-base;
+
+    & > div:not(:last-child) {
+      margin-right: $spacing-base * 3;
+    }
+  }
+
+  .rightContainer {
+    display: flex;
+    margin-left: auto;
+
+    & > div:first-child {
+      display: flex;
+      flex-direction: column;
+      padding-right: $spacing-base * 3;
+
+      span {
+        font-size: $font-size-small;
+        height: 18px;
+        line-height: 18px;
+      }
+
+      span:first-child {
+        color: $color-white;
+      }
+
+      span:last-child {
+        color: $color-main-yellow;
+        font-weight: bold;
+      }
+
+    }
+
+    & > div:last-child {
+      padding-left: $spacing-base * 3 + 4px;
+      border-left: 1px solid $color-white;
+      display: flex;
+      align-items: center;
+
+      button + button {
+        margin-left: $spacing-base;
+      }
     }
   }
 }
 
-.navLink {
-  &.active {
-    font-weight: bold;
-    color: $black;
-  }
+.settingsIcon {
+  fill: $color-not-active-button-text-grey;
+  width: 18px;
+  height: 18px;
 }
