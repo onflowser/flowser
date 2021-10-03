@@ -25,8 +25,12 @@ export class AccountsService {
     return `This action returns a #${id} account`;
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  findOneByAddress(address: string) {
+    return this.accountRepository.findOne({ where: { address }});
+  }
+
+  update(address: string, updateAccountDto: UpdateAccountDto) {
+    return this.accountRepository.updateOne({ address }, updateAccountDto);
   }
 
   remove(id: number) {

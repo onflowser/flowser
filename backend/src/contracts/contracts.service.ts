@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Contract } from "./entities/contract.entity";
+import { AccountContract } from "../accounts/entities/contract.entity";
 import { MongoRepository } from "typeorm";
 
 @Injectable()
 export class ContractsService {
 
   constructor (
-    @InjectRepository(Contract)
-    private contractRepository: MongoRepository<Contract>
+    @InjectRepository(AccountContract)
+    private contractRepository: MongoRepository<AccountContract>
   ) {}
 
   create(createContractDto: CreateContractDto) {
@@ -23,6 +23,10 @@ export class ContractsService {
 
   findOne(id: number) {
     return `This action returns a #${id} contract`;
+  }
+
+  findOneByName(name: string) {
+    return this.contractRepository.findOne({ where: { name }});
   }
 
   update(id: number, updateContractDto: UpdateContractDto) {

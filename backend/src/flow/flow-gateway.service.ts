@@ -70,14 +70,6 @@ export class FlowGatewayService {
               ...await this.getTransactionById(txId)
           })))
         ))).flat()
-        // find all account addresses that are related to some transaction
-        // account can be either a payer, authorizer or both
-        // therefore we need to remove duplicate account addresses
-        const accountAddresses = Object.keys(transactionsWithDetails
-          .map((tx: any) => [...tx.authorizers, tx.payer])
-          .flat()
-          .reduce((p, c) => ({...p, [c]: true}), {}))
-        const accounts = await Promise.all(accountAddresses.map(this.getAccount));
         const transactions = transactionsWithDetails.map((tx: any) => {
             const {events, ...status} = tx.status;
             return {
@@ -87,12 +79,11 @@ export class FlowGatewayService {
         })
         const events = transactionsWithDetails.map((tx: any) =>
           tx.status.events.map(event => ({transactionId: tx.id, ...event}))
-        )
+        ).flat()
         return {
             block,
             collections,
             transactions,
-            accounts,
             events
         }
     }
