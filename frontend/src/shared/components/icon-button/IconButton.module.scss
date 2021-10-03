@@ -1,0 +1,10 @@
+@import 'styles/spacings';
+
+.root {
+  & svg:first-child {
+    margin-right: $spacing-base;
+  }
+  & svg:last-child {
+    margin-left: $spacing-base;
+  }
+}

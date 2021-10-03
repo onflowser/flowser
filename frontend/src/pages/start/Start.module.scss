@@ -17,7 +17,7 @@
     width: 108px;
     margin-bottom: 50px;
     transform: scale(1) rotate(0deg);
-    animation: pulse 1.3s;
+    animation: logoPulse 1.3s;
     transition-timing-function: ease-in-out;
     animation-delay: 0.8s;
   }
@@ -37,11 +37,14 @@
     width: 214px;
     height: 66px;
   }
-
 }
 
-// TODO: Move to its own file
-@keyframes pulse {
+.newProjectBtn {
+  letter-spacing: $letter-spacing-m;
+}
+
+
+@keyframes logoPulse {
   0% {
     transform: scale(1) rotate(0deg);
   }

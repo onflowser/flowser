@@ -1,9 +1,11 @@
 import React, { FunctionComponent, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { routes } from '../../shared/constants/routes';
-import Button from '../../shared/components/button/Button';
+import IconButton from '../../shared/components/icon-button/IconButton';
 import Logo from '../../shared/assets/images/logo.svg';
 import classes from './Start.module.scss';
+import { ReactComponent as PlayIcon } from '../../shared/assets/icons/play.svg';
+import { ReactComponent as PlusIcon } from '../../shared/assets/icons/plus.svg';
 
 const Start: FunctionComponent<any> = () => {
     const history = useHistory();
@@ -15,11 +17,13 @@ const Start: FunctionComponent<any> = () => {
         <div className={classes.container}>
             <img src={Logo} alt="FLOWSER" />
             <h1>FLOWSER</h1>
-
-            <Button onClick={onQuickstart} variant="big">
+            <IconButton onClick={onQuickstart} variant="big" icon={<PlayIcon />}>
                 QUICK START
-            </Button>
-            <Button disabled={true}>NEW PROJECT</Button>
+            </IconButton>
+
+            <IconButton disabled={true} icon={<PlusIcon />} className={`${classes.newProjectBtn}`}>
+                NEW PROJECT
+            </IconButton>
         </div>
     );
 };

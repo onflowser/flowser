@@ -1,13 +1,14 @@
 import React, { FunctionComponent } from 'react';
 import classes from './Button.module.scss';
 
-interface OwnProps {
+export interface ButtonProps {
     onClick?: () => void;
     variant?: 'big' | 'normal';
     disabled?: boolean;
+    [key: string]: any;
 }
 
-type Props = OwnProps;
+type Props = ButtonProps;
 
 const Button: FunctionComponent<Props> = ({
     onClick = () => true,
@@ -19,7 +20,9 @@ const Button: FunctionComponent<Props> = ({
         <button
             onClick={onClick}
             disabled={disabled}
-            className={`${classes.button} ${classes[variant]} ${disabled ? classes.disabled : ''}`}
+            className={`${classes.button} ${classes[variant]} ${disabled ? classes.disabled : ''} ${
+                restProps.className
+            }`}
         >
             {restProps.children}
         </button>
