@@ -20,4 +20,11 @@ export class Event extends PollingEntity {
 
   @Column()
   data: object;
+
+  static init(flowEventObject): Event {
+    return Object.assign(new Event(), {
+      ...flowEventObject,
+      _id: `${flowEventObject.transactionId}:${flowEventObject.type}`
+    });
+  }
 }

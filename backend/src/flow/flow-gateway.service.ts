@@ -73,7 +73,7 @@ export class FlowGatewayService {
           }))
         )
         const transactionsWithDetails = (await Promise.all(collections.map((collection: any) =>
-          Promise.all(collection.transactionIds.map(async txId => ({
+          Promise.all(collection.transactionIds.map (async txId => ({
               id: txId,
               ...await this.getTransactionById(txId)
           })))

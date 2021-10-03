@@ -27,4 +27,11 @@ export class Block extends PollingEntity {
 
     @Column()
     signatures: string[];
+
+    static init(flowBlockObject): Block {
+        return Object.assign(new Block(), {
+            ...flowBlockObject,
+            _id: flowBlockObject.id
+        })
+    }
 }

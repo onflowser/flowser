@@ -1,13 +1,16 @@
+import config from "../config";
 import { Injectable } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import { FlowGatewayService } from "./flow-gateway.service";
 import { BlocksService } from "../blocks/blocks.service";
-import config from "../config";
 import { TransactionsService } from "../transactions/transactions.service";
 import { AccountsService } from "../accounts/accounts.service";
 import { ContractsService } from "../contracts/contracts.service";
 import { EventsService } from "../events/events.service";
 import { Account } from "../accounts/entities/account.entity";
+import { Event } from "../events/entities/event.entity";
+import { Transaction } from "../transactions/entities/transaction.entity";
+import { Block } from "../blocks/entities/block.entity";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -38,20 +41,20 @@ export class FlowAggregatorService {
       const transactions = data.map(({ transactions }) => transactions).flat();
       const blocks = data.map(({ block }) => block);
       // store fetched data
-      await Promise.all(blocks.map(e => this.blockService.create(e)))
-      await Promise.all(transactions.map(e => this.transactionService.create(e)))
-      await Promise.all(events.map(e => this.eventService.create(e)))
-      await Promise.all(events.map(e => this.handleEvent(e)))
+      await Promise.all(blocks.map(e => this.blockService.create(Block.init(e))))
+      await Promise.all(transactions.map(e => this.transactionService.create(Transaction.init(e))))
+      await Promise.all(events.map(e => this.eventService.create(Event.init(e))))
+      await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
     } catch (e) {
       console.error(`[Flowser] block fetch error: ${e}`, e.stack)
     }
   }
 
   // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
-  async handleEvent(event) {
+  async handleEvent(event: Event) {
     console.log(`[Flowser] handling event: `, event.type)
     const {data, type} = event;
-    const {address, contract} = data;
+    const {address, contract} = data as any;
     switch (type) {
       case "flow.AccountCreated":
         return this.handleAccountCreated(address);

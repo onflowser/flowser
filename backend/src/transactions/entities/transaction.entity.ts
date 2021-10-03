@@ -59,4 +59,11 @@ export class Transaction extends PollingEntity {
 
   @Column()
   status: TransactionStatus;
+
+  static init(flowTransactionObject): Transaction {
+    return Object.assign(new Transaction(), {
+      ...flowTransactionObject,
+      _id: flowTransactionObject.id
+    });
+  }
 }
