@@ -21,7 +21,7 @@ const Start: FunctionComponent<any> = () => {
                 QUICK START
             </IconButton>
 
-            <IconButton disabled={true} icon={<PlusIcon />} className={`${classes.newProjectBtn}`}>
+            <IconButton variant="big" disabled={true} icon={<PlusIcon />} className={`${classes.newProjectBtn}`}>
                 NEW PROJECT
             </IconButton>
         </div>

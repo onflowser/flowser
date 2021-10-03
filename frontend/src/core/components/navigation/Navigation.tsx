@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import { routes } from '../../../shared/constants/routes';
 import classes from './Navigation.module.scss';
 import NavigationItem from './NavigationItem';
@@ -13,6 +14,11 @@ import { ReactComponent as IconEvents } from '../../../shared/assets/icons/event
 import { ReactComponent as IconSettings } from '../../../shared/assets/icons/settings.svg';
 
 const Navigation = (props: any) => {
+    const history = useHistory();
+    const onSwitchProject = useCallback(() => {
+        history.push(`/${routes.start}`);
+    }, []);
+
     return (
         <div className={`${classes.navigationContainer} ${props.className}`}>
             <div className={classes.logoContainer}>
@@ -47,7 +53,7 @@ const Navigation = (props: any) => {
                 </div>
                 <div>
                     <Button disabled={true}>SAVE</Button>
-                    <Button disabled={true}>SWITCH</Button>
+                    <Button onClick={onSwitchProject}>SWITCH</Button>
                     <IconButton disabled={true} icon={<IconSettings className={classes.settingsIcon} />} />
                 </div>
             </div>
