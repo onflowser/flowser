@@ -4,7 +4,7 @@
 
 .button {
   background-color: $color-main-yellow;
-  border-radius: $border-radius;
+  border-radius: $border-radius-button;
   color: $color-background;
   font-size: $font-size-big;
   font-family: $font-family-oswald;
@@ -29,7 +29,7 @@
 .big {
   width: 216px;
   height: 65px;
-  font-size: $font-size-normal;
+  font-size: $font-size-big;
 }
 
 .disabled {

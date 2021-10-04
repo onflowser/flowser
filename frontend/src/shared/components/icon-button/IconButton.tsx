@@ -11,17 +11,25 @@ interface IconButtonProps extends ButtonProps {
 type Props = IconButtonProps;
 
 const IconButton: FunctionComponent<Props> = ({ icon, iconPosition = 'before', ...restProps }) => {
-    return (
-        <Button {...restProps} className={`${classes.root} ${restProps.className}`}>
-            {iconPosition === 'before' ? (
-                <>
+    let children = icon;
+    if (restProps.children) {
+        if (iconPosition === 'before') {
+            children = (
+                <span className={classes.before}>
                     {icon} {restProps.children}
-                </>
-            ) : (
-                <>
+                </span>
+            );
+        } else {
+            children = (
+                <span className={classes.after}>
                     {restProps.children} {icon}
-                </>
-            )}
+                </span>
+            );
+        }
+    }
+    return (
+        <Button {...restProps} className={`${restProps.className}`}>
+            {children}
         </Button>
     );
 };

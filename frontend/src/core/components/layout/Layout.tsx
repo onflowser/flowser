@@ -14,8 +14,8 @@ type Props = OwnProps;
 const Layout: FunctionComponent<Props> = ({ children }) => {
     return (
         <div className={classes.layoutContainer}>
-            <Navigation className={classes.header} />
-            <SubNavigation className={classes.subheader} />
+            <Navigation className={classes.navigation} />
+            <SubNavigation className={classes.subNavigation} />
             <Content className={classes.content}>{children} </Content>
             <Logs className={classes.logs} />
         </div>

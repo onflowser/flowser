@@ -7,16 +7,14 @@
   row-gap: 30px;
   min-height: 100vh;
 
-  .header {
+  .navigation {
     grid-column-start: 1;
     grid-column-end: 4;
   }
 
-  .subheader {
+  .subNavigation {
     grid-column-start: 2;
     grid-column-end: 3;
-    // TODO: Remove
-    border: 1px solid yellow;
   }
 
   .content {

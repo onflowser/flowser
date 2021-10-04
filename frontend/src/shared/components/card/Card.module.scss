@@ -1,0 +1,7 @@
+@import 'styles/colors';
+@import 'styles/rules';
+
+.root {
+  border-radius: $border-radius-card;
+  background-color: $color-table-blue;
+}
