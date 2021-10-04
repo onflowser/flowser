@@ -21,7 +21,7 @@ const Contracts = () => {
             <ListContainer>
                 {data.map((d: any, index: number) => (
                     <ListItem isNew={d.isNew} key={index}>
-                        {d.address}
+                        {d.accountAddress}: {d.name}
                     </ListItem>
                 ))}
             </ListContainer>
