@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors, Query, ParseIntPipe
+} from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
 
 @Controller('accounts')
 export class AccountsController {
@@ -15,6 +25,12 @@ export class AccountsController {
   @Get()
   findAll() {
     return this.accountsService.findAll();
+  }
+
+  @Get('/polling')
+  @UseInterceptors(PollingResponseInterceptor)
+  findAllNew(@Query('timestamp', ParseIntPipe) timestamp) {
+    return this.accountsService.findAllNewerThanTimestamp(timestamp);
   }
 
   @Get(':id')

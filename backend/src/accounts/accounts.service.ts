@@ -18,7 +18,13 @@ export class AccountsService {
   }
 
   findAll() {
-    return `This action returns all accounts`;
+    return this.accountRepository.find();
+  }
+
+  findAllNewerThanTimestamp(timestamp): Promise<Account[]> {
+    return this.accountRepository.find({
+      where: {createdAt: {$gt: timestamp}}
+    });
   }
 
   findOne(id: number) {
