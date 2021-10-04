@@ -18,6 +18,12 @@ export class TransactionsService {
     return this.transactionService.save(createTransactionDto);
   }
 
+  findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
+    return this.transactionService.find({
+      where: {createdAt: {$gt: timestamp}}
+    });
+  }
+
   findAll() {
     return `This action returns all transactions`;
   }

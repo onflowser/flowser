@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors, Query, ParseIntPipe
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
 
 @Controller('transactions')
 export class TransactionsController {
@@ -15,6 +25,12 @@ export class TransactionsController {
   @Get()
   findAll() {
     return this.transactionsService.findAll();
+  }
+
+  @Get("/polling")
+  @UseInterceptors(PollingResponseInterceptor)
+  findAllNew(@Query('timestamp', ParseIntPipe) timestamp) {
+    return this.transactionsService.findAllNewerThanTimestamp(timestamp);
   }
 
   @Get(':id')

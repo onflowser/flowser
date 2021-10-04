@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSearch } from '../../shared/hooks/search';
 import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
-
-import classes from './Blocks.module.scss';
+import ListContainer from '../../shared/components/list-container/ListContainer';
+import ListItem from '../../shared/components/list-item/ListItem';
 
 const Blocks = () => {
     const { searchTerm, setPlaceholder } = useSearch();
@@ -18,15 +18,13 @@ const Blocks = () => {
             <p>Search term: {searchTerm}</p>
             {data && <p>Data length: {data?.length}</p>}
 
-            <div className={classes.listContainer}>
-                {data &&
-                    data.length &&
-                    data.map((d: any, index: number) => (
-                        <span key={index} className={`${d.isNew ? classes.newItem : ''}`}>
-                            {d.id}
-                        </span>
-                    ))}
-            </div>
+            <ListContainer>
+                {data.map((d: any, index: number) => (
+                    <ListItem isNew={d.isNew} key={index}>
+                        {d.id}
+                    </ListItem>
+                ))}
+            </ListContainer>
         </div>
     );
 };
