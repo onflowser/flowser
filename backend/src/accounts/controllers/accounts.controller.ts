@@ -8,10 +8,10 @@ import {
   Delete,
   UseInterceptors, Query, ParseIntPipe
 } from '@nestjs/common';
-import { AccountsService } from './accounts.service';
-import { CreateAccountDto } from './dto/create-account.dto';
-import { UpdateAccountDto } from './dto/update-account.dto';
-import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { AccountsService } from '../services/accounts.service';
+import { CreateAccountDto } from '../dto/create-account.dto';
+import { UpdateAccountDto } from '../dto/update-account.dto';
+import { PollingResponseInterceptor } from "../../shared/interceptors/polling-response.interceptor";
 
 @Controller('accounts')
 export class AccountsController {

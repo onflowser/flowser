@@ -9,7 +9,6 @@ import { ProjectsModule } from './projects/projects.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { TransactionsModule } from './transactions/transactions.module';
-import { ContractsModule } from './contracts/contracts.module';
 import { EventsModule } from './events/events.module';
 import { LogsModule } from './logs/logs.module';
 import { FlowModule } from "./flow/flow.module";
@@ -39,7 +38,6 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
         AccountsModule,
         BlocksModule,
         TransactionsModule,
-        ContractsModule,
         EventsModule,
         LogsModule,
         FlowModule
