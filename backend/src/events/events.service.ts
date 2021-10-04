@@ -18,7 +18,13 @@ export class EventsService {
   }
 
   findAll() {
-    return `This action returns all events`;
+    return this.eventRepository.find();
+  }
+
+  findAllNewerThanTimestamp(timestamp): Promise<Event[]> {
+    return this.eventRepository.find({
+      where: {createdAt: {$gt: timestamp}}
+    });
   }
 
   findOne(id: number) {

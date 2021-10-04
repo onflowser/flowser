@@ -7,6 +7,9 @@ export class Event extends PollingEntity {
   _id: ObjectID;
 
   @Column()
+  id: string;
+
+  @Column()
   transactionId: string;
 
   @Column()
@@ -22,9 +25,11 @@ export class Event extends PollingEntity {
   data: object;
 
   static init(flowEventObject): Event {
+    const id = `${flowEventObject.transactionId}:${flowEventObject.type}`;
     return Object.assign(new Event(), {
       ...flowEventObject,
-      _id: `${flowEventObject.transactionId}:${flowEventObject.type}`
+      _id: id,
+      id
     });
   }
 }

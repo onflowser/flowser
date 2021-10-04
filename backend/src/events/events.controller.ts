@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  Query,
+  ParseIntPipe
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
 
 @Controller('events')
 export class EventsController {
@@ -15,6 +27,12 @@ export class EventsController {
   @Get()
   findAll() {
     return this.eventsService.findAll();
+  }
+
+  @Get('/polling')
+  @UseInterceptors(PollingResponseInterceptor)
+  findAllNew(@Query('timestamp', ParseIntPipe) timestamp) {
+    return this.eventsService.findAllNewerThanTimestamp(timestamp);
   }
 
   @Get(':id')
