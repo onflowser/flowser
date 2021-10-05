@@ -1,0 +1,36 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+@import 'styles/typography';
+
+.root {
+  padding: $spacing-l;
+
+  .header {
+    display: flex;
+    color: $color-link-blue;
+
+    span span {
+      margin-left: 5px;
+      margin-top: 5px;
+      position: absolute;
+    }
+
+    & > div {
+      display: flex;
+      margin-left: auto;
+
+      & > div {
+        margin-left: 20px;
+      }
+
+    }
+
+    .control {
+      cursor: pointer;
+    }
+
+    .control + .control {
+      margin-left: $spacing-base;
+    }
+  }
+}

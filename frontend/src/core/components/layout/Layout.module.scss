@@ -1,4 +1,6 @@
 @import 'styles/spacings';
+@import 'styles/colors';
+
 
 .layoutContainer {
   display: grid;
@@ -21,8 +23,7 @@
     display: grid;
     grid-column-start: 2;
     grid-column-end: 3;
-    // TODO: Remove
-    border: 1px solid yellow;
+    color: $color-white;
   }
 
   .logs {
@@ -31,7 +32,20 @@
     grid-column-end: 4;
     grid-row-start: logs;
     grid-row-end: last;
-    // TODO: Remove
-    border: 1px solid yellow;
+    border-top: 1px solid $color-logs-border;
+  }
+
+  &.contentSmall {
+    grid-template-rows: [navigation] 118px [subnavigation] 100px [content] auto [logs] 30% [last];
+  }
+
+  &.noContent {
+    border: 1px solid pink;
+    grid-template-rows: [navigation] 118px [logs] auto [last];
+    row-gap: 0;
+    .subNavigation,
+    .content {
+      display: none;
+    }
   }
 }
