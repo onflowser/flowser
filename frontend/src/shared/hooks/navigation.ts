@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { UiState, UiStateContext } from '../contexts/ui-state.context';
 
 export interface Breadcrumb {
-    link: string;
+    to: string;
     label: string;
 }
 
@@ -22,11 +22,11 @@ export const useNavigation = (): UseNavigationHook => {
     const [state, setState] = useContext(UiStateContext);
 
     const showNavigationDrawer = (show: boolean) => {
-        setState((state: UiState) => ({ ...state, showNavigationDrawer: show }));
+        setState((state: UiState) => ({ ...state, isNavigationDrawerVisible: show }));
     };
 
     const showBackButton = (show: boolean) => {
-        setState((state: UiState) => ({ ...state, showBackButton: show }));
+        setState((state: UiState) => ({ ...state, isShowBackButtonVisible: show }));
     };
 
     const setBreadcrumbs = (breadcrumbs: Breadcrumb[]) => {

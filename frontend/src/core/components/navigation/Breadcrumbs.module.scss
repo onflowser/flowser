@@ -1,0 +1,19 @@
+@import 'styles/typography';
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.root {
+  display: flex;
+  align-items: center;
+
+  & span {
+    margin: 0 $spacing-base / 2;
+  }
+
+  * {
+    font-family: $font-family-oswald;
+    font-size: $font-size-small;
+    color: $color-grey;
+    text-decoration: none;
+  }
+}

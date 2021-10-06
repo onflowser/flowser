@@ -12,11 +12,21 @@ import { ReactComponent as IconTransactions } from '../../../shared/assets/icons
 import { ReactComponent as IconContracts } from '../../../shared/assets/icons/contracts.svg';
 import { ReactComponent as IconEvents } from '../../../shared/assets/icons/events.svg';
 import { ReactComponent as IconSettings } from '../../../shared/assets/icons/settings.svg';
+import { ReactComponent as IconBackButton } from '../../../shared/assets/icons/back-button.svg';
+import { useNavigation } from '../../../shared/hooks/navigation';
+import Breadcrumbs from './Breadcrumbs';
+import Search from '../../../shared/components/search/Search';
 
 const Navigation = (props: any) => {
     const history = useHistory();
+    const { isShowBackButtonVisible } = useNavigation();
+
     const onSwitchProject = useCallback(() => {
         history.push(`/${routes.start}`);
+    }, []);
+
+    const onBack = useCallback(() => {
+        history.goBack();
     }, []);
 
     return (
@@ -65,7 +75,11 @@ const Navigation = (props: any) => {
                     </div>
                 </div>
                 {/* NAVIGATION DRAWER */}
-                {/*<div className={classes.navigationDrawerContainer}>asdf</div>*/}
+                <div className={classes.navigationDrawerContainer}>
+                    {isShowBackButtonVisible && <IconBackButton onClick={onBack} className={classes.backButton} />}
+                    <Breadcrumbs className={classes.breadcrumbs} />
+                    <Search className={classes.searchBar} />
+                </div>
             </div>
         </>
     );
