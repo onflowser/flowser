@@ -1,23 +1,35 @@
 @import 'styles/colors';
+@import 'styles/typography';
+@import 'styles/spacings';
 
-.search {
-  border: 1px solid $dark-grey;
+.root {
   display: flex;
-  max-height: 30px;
-  background-color: #fff;
   align-items: center;
-  border-radius: 10px;
+
+  border: 1px solid $color-logs-border;
+  background: transparent;
+  border-radius: 20px;
+  padding: 0 $spacing-base + 5px;
+  max-height: 37px;
+
+  .cancelIcon {
+    cursor: pointer;
+  }
+
+  &:focus-within {
+    border: 1px solid $color-main-yellow;
+  }
 
   & > input {
     flex: 10;
     border: none;
     margin: 10px;
-  }
-
-  img {
-    flex: 1;
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+    margin-left: 0;
+    background: none;
+    outline: none;
+    color: $color-white;
+    font-size: $font-size-small;
+    padding-left: 0;
+    text-transform: uppercase;
   }
 }

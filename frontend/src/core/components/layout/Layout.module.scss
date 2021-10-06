@@ -1,51 +1,37 @@
 @import 'styles/spacings';
 @import 'styles/colors';
 
+$grid-gap: 30px;
 
 .layoutContainer {
-  display: grid;
-  grid-template-columns: [first] $spacing-l [ first-end content] auto [last] $spacing-l [last];
-  grid-template-rows: [navigation] 118px [subnavigation] 100px [content] auto [logs] 63px [last];
-  row-gap: 30px;
+  display: flex;
+  position: relative;
+  flex-direction: column;
   min-height: 100vh;
 
-  .navigation {
-    grid-column-start: 1;
-    grid-column-end: 4;
-  }
-
   .subNavigation {
-    grid-column-start: 2;
-    grid-column-end: 3;
+    margin: $grid-gap $spacing-l;
+    height: 100px;
   }
 
   .content {
-    display: grid;
-    grid-column-start: 2;
-    grid-column-end: 3;
+    margin: $grid-gap $spacing-l;
     color: $color-white;
   }
 
   .logs {
-    display: grid;
-    grid-column-start: 1;
-    grid-column-end: 4;
-    grid-row-start: logs;
-    grid-row-end: last;
-    border-top: 1px solid $color-logs-border;
-  }
+    position: fixed;
+    display: block;
+    bottom: 0;
+    left: 0;
+    right: 0;
 
-  &.contentSmall {
-    grid-template-rows: [navigation] 118px [subnavigation] 100px [content] auto [logs] 30% [last];
-  }
+    &.opened {
+      top: 50%;
+    }
 
-  &.noContent {
-    border: 1px solid pink;
-    grid-template-rows: [navigation] 118px [logs] auto [last];
-    row-gap: 0;
-    .subNavigation,
-    .content {
-      display: none;
+    &.expanded {
+      top: 118px;
     }
   }
 }

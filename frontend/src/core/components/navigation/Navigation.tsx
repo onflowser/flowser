@@ -20,44 +20,54 @@ const Navigation = (props: any) => {
     }, []);
 
     return (
-        <div className={`${classes.navigationContainer} ${props.className}`}>
-            <div className={classes.logoContainer}>
-                <img src={Logo} alt="FLOWSER" />
-            </div>
-            <div className={classes.navLinksContainer}>
-                <NavigationItem to={`/${routes.accounts}`} activeClassName={classes.active} icon={<IconUser />}>
-                    ACCOUNTS
-                </NavigationItem>
-                <NavigationItem to={`/${routes.blocks}`} activeClassName={classes.active} icon={<IconBlocks />}>
-                    BLOCKS
-                </NavigationItem>
-                <NavigationItem
-                    to={`/${routes.transactions}`}
-                    activeClassName={classes.active}
-                    icon={<IconTransactions />}
-                >
-                    TRANSACTIONS
-                </NavigationItem>
-                <NavigationItem to={`/${routes.contracts}`} activeClassName={classes.active} icon={<IconContracts />}>
-                    CONTRACTS
-                </NavigationItem>
-                <NavigationItem to={`/${routes.events}`} activeClassName={classes.active} icon={<IconEvents />}>
-                    EVENTS
-                </NavigationItem>
-            </div>
+        <>
+            <div className={`${classes.navigationContainer} ${props.className}`}>
+                <div className={classes.mainContainer}>
+                    <div className={classes.logoContainer}>
+                        <img src={Logo} alt="FLOWSER" />
+                    </div>
+                    <div className={classes.navLinksContainer}>
+                        <NavigationItem to={`/${routes.accounts}`} activeClassName={classes.active} icon={<IconUser />}>
+                            ACCOUNTS
+                        </NavigationItem>
+                        <NavigationItem to={`/${routes.blocks}`} activeClassName={classes.active} icon={<IconBlocks />}>
+                            BLOCKS
+                        </NavigationItem>
+                        <NavigationItem
+                            to={`/${routes.transactions}`}
+                            activeClassName={classes.active}
+                            icon={<IconTransactions />}
+                        >
+                            TRANSACTIONS
+                        </NavigationItem>
+                        <NavigationItem
+                            to={`/${routes.contracts}`}
+                            activeClassName={classes.active}
+                            icon={<IconContracts />}
+                        >
+                            CONTRACTS
+                        </NavigationItem>
+                        <NavigationItem to={`/${routes.events}`} activeClassName={classes.active} icon={<IconEvents />}>
+                            EVENTS
+                        </NavigationItem>
+                    </div>
 
-            <div className={classes.rightContainer}>
-                <div>
-                    <span>WORKSPACE</span>
-                    <span>QUICKSTART</span>
+                    <div className={classes.rightContainer}>
+                        <div>
+                            <span>WORKSPACE</span>
+                            <span>QUICKSTART</span>
+                        </div>
+                        <div>
+                            <Button disabled={true}>SAVE</Button>
+                            <Button onClick={onSwitchProject}>SWITCH</Button>
+                            <IconButton disabled={true} icon={<IconSettings className={classes.settingsIcon} />} />
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <Button disabled={true}>SAVE</Button>
-                    <Button onClick={onSwitchProject}>SWITCH</Button>
-                    <IconButton disabled={true} icon={<IconSettings className={classes.settingsIcon} />} />
-                </div>
+                {/* NAVIGATION DRAWER */}
+                {/*<div className={classes.navigationDrawerContainer}>asdf</div>*/}
             </div>
-        </div>
+        </>
     );
 };
 

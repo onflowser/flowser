@@ -6,7 +6,7 @@ import Card from '../../../shared/components/card/Card';
 const SubNavigation: FunctionComponent<any> = (props: any) => {
     return (
         <Card className={`${classes.container} ${props.className}`}>
-            <Search />
+            <Search className={classes.searchBox} />
         </Card>
     );
 };

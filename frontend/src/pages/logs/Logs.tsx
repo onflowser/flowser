@@ -15,7 +15,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 const Logs: FunctionComponent<Props> = ({ className }) => {
-    const { size, setSize } = useLogDrawer();
+    const { logDrawerSize, setSize } = useLogDrawer();
 
     return (
         <div className={`${classes.root} ${className}`}>
@@ -25,12 +25,20 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
                     <span>LOGS</span>
                 </span>
                 <div>
-                    {size !== 'tiny' && <Search />}
+                    {logDrawerSize !== 'tiny' && <Search className={classes.searchBox} />}
                     <div>
-                        {size === 'tiny' && <OpenIcon className={classes.control} onClick={() => setSize('small')} />}
-                        {size === 'small' && <CloseIcon className={classes.control} onClick={() => setSize('tiny')} />}
-                        {size === 'small' && <ExpandIcon className={classes.control} onClick={() => setSize('big')} />}
-                        {size === 'big' && <ShrinkIcon className={classes.control} onClick={() => setSize('small')} />}
+                        {logDrawerSize === 'tiny' && (
+                            <OpenIcon className={classes.control} onClick={() => setSize('small')} />
+                        )}
+                        {logDrawerSize === 'small' && (
+                            <ExpandIcon className={classes.control} onClick={() => setSize('big')} />
+                        )}
+                        {logDrawerSize === 'small' && (
+                            <CloseIcon className={classes.control} onClick={() => setSize('tiny')} />
+                        )}
+                        {logDrawerSize === 'big' && (
+                            <ShrinkIcon className={classes.control} onClick={() => setSize('small')} />
+                        )}
                     </div>
                 </div>
             </div>

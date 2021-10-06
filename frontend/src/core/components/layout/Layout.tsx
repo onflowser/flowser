@@ -13,17 +13,17 @@ interface OwnProps {
 type Props = OwnProps;
 
 const Layout: FunctionComponent<Props> = ({ children }) => {
-    const { size } = useLogDrawer();
+    const { logDrawerSize } = useLogDrawer();
     const getLogDrawerLayoutClass = useCallback(() => {
-        return size === 'tiny' ? '' : size === 'small' ? classes.contentSmall : classes.noContent;
-    }, [size]);
+        return logDrawerSize === 'tiny' ? '' : logDrawerSize === 'small' ? classes.opened : classes.expanded;
+    }, [logDrawerSize]);
 
     return (
-        <div className={`${classes.layoutContainer} ${getLogDrawerLayoutClass()}`}>
+        <div className={`${classes.layoutContainer}`}>
             <Navigation className={classes.navigation} />
             <SubNavigation className={classes.subNavigation} />
             <Content className={classes.content}>{children} </Content>
-            <Logs className={classes.logs} />
+            <Logs className={`${classes.logs} ${getLogDrawerLayoutClass()}`} />
         </div>
     );
 };

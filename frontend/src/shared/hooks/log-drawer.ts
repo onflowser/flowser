@@ -2,9 +2,13 @@ import { useContext } from 'react';
 import { UiState, UiStateContext } from '../contexts/ui-state.context';
 
 export type LogDrawerSize = 'tiny' | 'small' | 'big';
-export interface UseLogDrawerHook {
+
+export interface LogDrawerUiState {
+    logDrawerSize: LogDrawerSize;
+}
+
+export interface UseLogDrawerHook extends LogDrawerUiState {
     setSize: (size: LogDrawerSize) => void;
-    size: LogDrawerSize;
 }
 
 export const useLogDrawer = (): UseLogDrawerHook => {
@@ -16,6 +20,6 @@ export const useLogDrawer = (): UseLogDrawerHook => {
 
     return {
         setSize,
-        size: state.logDrawerSize,
+        logDrawerSize: state.logDrawerSize,
     };
 };

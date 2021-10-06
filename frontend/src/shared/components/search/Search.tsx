@@ -1,10 +1,16 @@
-import React, { useCallback } from 'react';
+import React, { FunctionComponent, useCallback } from 'react';
 import { useSearch } from '../../hooks/search';
 import classes from './Search.module.scss';
-import search from './search.svg';
-import cancel from './cancel.svg';
+import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
+import { ReactComponent as CancelIcon } from '../../assets/icons/cancel.svg';
 
-const Search = () => {
+interface SearchProps {
+    className?: any;
+}
+
+type Props = SearchProps;
+
+const Search: FunctionComponent<Props> = (props) => {
     const { searchTerm, setSearchTerm, placeholder } = useSearch();
 
     const onSearchChange = useCallback((event) => {
@@ -17,12 +23,12 @@ const Search = () => {
     }, []);
 
     return (
-        <div className={classes.search}>
+        <div className={`${classes.root} ${props.className}`}>
             <input type="text" onChange={onSearchChange} value={searchTerm} placeholder={placeholder} />
             {searchTerm ? (
-                <img src={cancel} alt="search" onClick={clearSearchState} />
+                <CancelIcon className={`${classes.cancelIcon}`} onClick={clearSearchState} />
             ) : (
-                <img src={search} alt="search" />
+                <SearchIcon />
             )}
         </div>
     );

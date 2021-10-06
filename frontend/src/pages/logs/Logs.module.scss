@@ -3,11 +3,15 @@
 @import 'styles/typography';
 
 .root {
-  padding: $spacing-l;
+  padding: 0 $spacing-l * 2;
+  border-top: 1px solid $color-logs-border;
+  background-color: $color-background;
 
   .header {
     display: flex;
+    height: 63px;
     color: $color-link-blue;
+    align-items: center;
 
     span span {
       margin-left: 5px;
@@ -18,6 +22,7 @@
     & > div {
       display: flex;
       margin-left: auto;
+      align-items: center;
 
       & > div {
         margin-left: 20px;
@@ -30,7 +35,11 @@
     }
 
     .control + .control {
-      margin-left: $spacing-base;
+      margin-left: $spacing-l;
+    }
+
+    .searchBox {
+      width: 451px;
     }
   }
 }
