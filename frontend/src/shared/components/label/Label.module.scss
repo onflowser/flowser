@@ -1,0 +1,8 @@
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  color: $color-grey;
+  font-family: $font-family-oswald;
+  font-size: $font-size-small;
+}
