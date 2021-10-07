@@ -1,26 +1,15 @@
-import React, { useEffect } from 'react';
-import { useSearch } from '../../shared/hooks/search';
-import { Breadcrumb, useNavigation } from '../../shared/hooks/navigation';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import Main from './main/Main';
+import Details from './details/Details';
 
 const Accounts = () => {
-    const { searchTerm, setPlaceholder } = useSearch();
-    const { isShowBackButtonVisible, setBreadcrumbs } = useNavigation();
-
-    const breadcrumns: Breadcrumb[] = [
-        { to: '/accounts', label: 'Account' },
-        { to: '/accounts', label: 'block details' },
-    ];
-
-    useEffect(() => {
-        setPlaceholder('Search accounts');
-        setBreadcrumbs(breadcrumns);
-    }, []);
-
     return (
-        <div>
-            <h2>Accounts</h2>
-            <span>Search value: {searchTerm}</span>
-        </div>
+        <Switch>
+            <Route exact path={`/accounts`} component={Main} />
+            <Route path={`/accounts/details/:accountId`} component={Details} />
+            <Redirect from="*" to={`/accounts`} />
+        </Switch>
     );
 };
 
