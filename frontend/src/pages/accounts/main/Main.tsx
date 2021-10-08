@@ -10,11 +10,12 @@ import { useFilterData } from '../../../shared/hooks/filter-data';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
-    const { showNavigationDrawer } = useNavigation();
+    const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
         showNavigationDrawer(false);
+        showSubNavigation(true);
     }, []);
 
     // TODO: remove

@@ -1,0 +1,8 @@
+@import 'styles/typography';
+@import 'styles/spacings';
+
+.root {
+  font-family: $font-family-courier-new;
+  font-weight: lighter;
+  padding: $spacing-base * 3;
+}

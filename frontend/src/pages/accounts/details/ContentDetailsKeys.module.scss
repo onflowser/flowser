@@ -1,0 +1,28 @@
+@import 'styles/typography';
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.root {
+  font-family: $font-family-courier-new;
+  font-weight: lighter;
+  margin-bottom: $spacing-l;
+  padding-left: $spacing-l * 2;
+
+  > div {
+    display: flex;
+    margin-top: $spacing-l;
+
+    .blueBg {
+      background-color: $color-counter-badge-blue;
+      margin-left: $spacing-l;
+      border-radius: 8px;
+      padding: $spacing-l / 3;
+      color: $color-main-text;
+      font-family: $font-family-oswald;
+    }
+
+    .keyIcon {
+      transform: rotate(-135deg);
+    }
+  }
+}

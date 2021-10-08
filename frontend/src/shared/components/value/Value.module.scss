@@ -13,4 +13,15 @@
     text-decoration: none;
     color: $color-link-blue;
   }
+
+  &.medium {
+    font-size: $font-size-large;
+  }
+
+  &.large {
+    font-size: $font-size-big;
+    a {
+      font-size: $font-size-big;
+    }
+  }
 }

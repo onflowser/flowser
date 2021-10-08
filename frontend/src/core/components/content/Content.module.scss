@@ -2,6 +2,8 @@
 @import 'styles/colors';
 
 .contentContainer {
-  //padding: $spacing-base;
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
 }

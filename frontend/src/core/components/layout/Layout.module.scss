@@ -10,13 +10,17 @@ $grid-gap: 30px;
   min-height: 100vh;
 
   .subNavigation {
-    margin: $grid-gap $spacing-l;
+    margin: $grid-gap $spacing-l 0;
     height: 100px;
   }
 
   .content {
-    margin: 0 $spacing-l;
+    margin: $grid-gap $spacing-l 0;
+    /* Visual effect: log component will overlap bottom part of content */
+    padding-bottom: 100px;
     color: $color-white;
+    align-items: stretch;
+
   }
 
   .logs {
