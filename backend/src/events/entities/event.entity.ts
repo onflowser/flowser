@@ -7,9 +7,6 @@ export class Event extends PollingEntity {
   _id: ObjectID;
 
   @Column()
-  id: string;
-
-  @Column()
   transactionId: string;
 
   @Column()

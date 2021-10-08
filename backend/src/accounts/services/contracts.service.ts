@@ -7,6 +7,7 @@ import { Account } from "../entities/account.entity";
 import { AccountContract } from "../entities/contract.entity";
 import { exec } from 'child_process';
 import { toArray } from 'rxjs';
+import { ObjectLiteral } from "typeorm/common/ObjectLiteral";
 
 @Injectable()
 export class ContractsService {
@@ -23,12 +24,37 @@ export class ContractsService {
     }
 
     async findAll() {
-        return serializeAccountContracts(await this.accountRepository.find());
+        return this._findAll();
     }
 
     async findAllNewerThanTimestamp(timestamp): Promise<AccountContract[]> {
+        return this._findAll([
+            {$match: {'createdAt': {$gt: timestamp}}},
+        ])
+    }
+
+    findOne(id: string) {
+        return this._findAll([
+            {$match: {'_id': {$eq: id}}}
+        ])
+    }
+
+    findOneByName(name: string) {
+        return this._findAll([
+            {$match: {'name': name}}
+        ])
+    }
+
+    update(id: string, updateContractDto: UpdateContractDto) {
+        return `This action updates a #${id} contract`;
+    }
+
+    remove(id: string) {
+        return `This action removes a #${id} contract`;
+    }
+
+    async _findAll(pipeline: ObjectLiteral[] = []) {
         return this.accountRepository.aggregate([
-            {$match: {'contracts.createdAt': {$gt: timestamp}}},
             {
                 $project: {
                     address: 1,
@@ -47,24 +73,9 @@ export class ContractsService {
                 }
             },
             {$unwind: "$contracts"},
-            {$replaceRoot: {newRoot: "$contracts"}}
+            {$replaceRoot: {newRoot: "$contracts"}},
+            ...pipeline
         ]).toArray()
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} contract`;
-    }
-
-    findOneByName(name: string) {
-        return this.accountRepository.findOne({where: {name}});
-    }
-
-    update(id: number, updateContractDto: UpdateContractDto) {
-        return `This action updates a #${id} contract`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} contract`;
     }
 }
 

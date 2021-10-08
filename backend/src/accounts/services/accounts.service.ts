@@ -27,8 +27,8 @@ export class AccountsService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} account`;
+  findOne(id: string) {
+    return this.accountRepository.findOne(id);
   }
 
   findOneByAddress(address: string) {
@@ -48,7 +48,7 @@ export class AccountsService {
     );
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} account`;
   }
 }

@@ -8,9 +8,6 @@ export class Block extends PollingEntity {
     _id: ObjectID;
 
     @Column()
-    id: string;
-
-    @Column()
     parentId: string;
 
     @Column()

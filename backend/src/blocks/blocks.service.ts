@@ -30,15 +30,15 @@ export class BlocksService {
         });
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} block`;
+    findOne(id: string) {
+        return this.blockRepository.findOne(id);
     }
 
-    update(id: number, updateBlockDto: UpdateBlockDto) {
+    update(id: string, updateBlockDto: UpdateBlockDto) {
         return `This action updates a #${id} block`;
     }
 
-    remove(id: number) {
+    remove(id: string) {
         return `This action removes a #${id} block`;
     }
 }

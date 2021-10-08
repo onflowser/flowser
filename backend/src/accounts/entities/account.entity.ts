@@ -32,7 +32,11 @@ export class Account extends PollingEntity {
       Object.assign<AccountKey, any>(new AccountKey(), key)
     ))
     account.contracts = Object.keys(contracts).map(name => (
-      Object.assign<AccountContract, any>(new AccountContract(), { name, code: contracts[name] })
+      Object.assign<AccountContract, any>(new AccountContract(), {
+        _id: `${flowAccountObject.address}.${name}`,
+        name,
+        code: contracts[name]
+      })
     )) as AccountContract[] & Map<string, string>;
     return account;
   }

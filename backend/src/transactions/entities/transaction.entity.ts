@@ -31,9 +31,6 @@ export class Transaction extends PollingEntity {
   _id: ObjectID;
 
   @Column()
-  id: string;
-
-  @Column()
   script: string;
 
   @Column()
