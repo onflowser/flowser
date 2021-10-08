@@ -1,0 +1,37 @@
+@import 'styles/spacings';
+
+.container {
+  padding: $spacing-xl;
+}
+
+.header {
+  display: flex;
+  margin-bottom: $spacing-base;
+  & > * {
+    margin-right: $spacing-l;
+    & > *:first-child {
+      margin-right: $spacing-s;
+    }
+  }
+}
+
+.body {
+  & > * {
+    margin-bottom: $spacing-base;
+    & > *:first-child {
+      display: inline-block;
+      width: 150px;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  margin-top: $spacing-xl;
+  & > * {
+    margin-right: $spacing-l;
+    & > *:first-child {
+      margin-right: $spacing-s;
+    }
+  }
+}
