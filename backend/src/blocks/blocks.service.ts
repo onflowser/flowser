@@ -3,6 +3,7 @@ import { MongoRepository } from 'typeorm';
 import { Block } from './entities/block.entity';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
+import { NotFoundException } from "@nestjs/common";
 
 export class BlocksService {
 
@@ -30,8 +31,13 @@ export class BlocksService {
         });
     }
 
-    findOne(id: string) {
-        return this.blockRepository.findOne(id);
+    async findOne(id: string) {
+        const [block] = await this.blockRepository.find({ where: {_id: id} });
+        if (block) {
+            return block;
+        } else {
+            throw new NotFoundException("Block not found")
+        }
     }
 
     update(id: string, updateBlockDto: UpdateBlockDto) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { UpdateAccountDto } from '../dto/update-account.dto';
 import { InjectRepository } from "@nestjs/typeorm";
@@ -27,8 +27,13 @@ export class AccountsService {
     });
   }
 
-  findOne(id: string) {
-    return this.accountRepository.findOne(id);
+  async findOne(id: string) {
+    const [account] = await this.accountRepository.find({ where: {_id: id} });
+    if (account) {
+      return account;
+    } else {
+      throw new NotFoundException("Account not found")
+    }
   }
 
   findOneByAddress(address: string) {

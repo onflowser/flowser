@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { InjectRepository } from "@nestjs/typeorm";
@@ -28,8 +28,19 @@ export class TransactionsService {
     return this.transactionService.find();
   }
 
-  findOne(id: string) {
-    return this.transactionService.findOne(id);
+  findAllByBlock(blockId: string) {
+    return this.transactionService.find({
+      where: {referenceBlockId:blockId}
+    });
+  }
+
+  async findOne(id: string) {
+    const [transaction] = await this.transactionService.find({ where: {_id: id} });
+    if (transaction) {
+      return transaction;
+    } else {
+      throw new NotFoundException("Transaction not found")
+    }
   }
 
   update(id: string, updateTransactionDto: UpdateTransactionDto) {
