@@ -8,3 +8,9 @@
 .authorizersLabel {
   vertical-align: top;
 }
+
+.detailsItemsWrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-top: $spacing-l;
+}

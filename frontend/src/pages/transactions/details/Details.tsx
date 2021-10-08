@@ -6,6 +6,7 @@ import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import { NavLink } from 'react-router-dom';
 import classes from './Details.module.scss';
+import DetailsItem from '../../../shared/components/details-item/DetailsItem';
 
 type RouteParams = {
     transactionId: string;
@@ -50,19 +51,21 @@ const Details: FunctionComponent<any> = () => {
                 <div>
                     <Label>BLOCK</Label>
                     <Value>
-                        <NavLink to={`/blocks/${data.referenceBlockId}`}>{data.referenceBlockId}</NavLink>
+                        <NavLink to={`/blocks/details/${data.referenceBlockId}`}>{data.referenceBlockId}</NavLink>
                     </Value>
                 </div>
                 <div>
                     <Label>PROPOSER</Label>
                     <Value>
-                        <NavLink to={`/accounts/${data.proposalKey.address}`}>{data.proposalKey.address}</NavLink>
+                        <NavLink to={`/accounts/details/${data.proposalKey.address}`}>
+                            {data.proposalKey.address}
+                        </NavLink>
                     </Value>
                 </div>
                 <div>
                     <Label>PAYER</Label>
                     <Value>
-                        <NavLink to={`/accounts/${data.payer}`}>{data.payer}</NavLink>
+                        <NavLink to={`/accounts/details/${data.payer}`}>{data.payer}</NavLink>
                     </Value>
                 </div>
                 <div>
@@ -76,6 +79,12 @@ const Details: FunctionComponent<any> = () => {
                     </Value>
                 </div>
             </DetailsCard>
+            <div className={classes.detailsItemsWrapper}>
+                <DetailsItem label="EVENTS" value={12} onClick={console.log} />
+                <DetailsItem label="EVENTS" value={12} />
+                <DetailsItem label="EVENTS" value={12} />
+                <DetailsItem label="EVENTS" value={12} onClick={console.log} />
+            </div>
         </div>
     );
 };
