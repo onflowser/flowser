@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import classes from './ContentDetailsKeys.module.scss';
 import Card from '../../../shared/components/card/Card';
 import Label from '../../../shared/components/label/Label';
+import CopyButton from '../../../shared/components/copy-button/CopyButton';
 import { ReactComponent as KeyIcon } from '../../../shared/assets/icons/key.svg';
 
 interface OwnProps {
@@ -19,6 +20,7 @@ const ContentDetailsKeys: FunctionComponent<Props> = ({ keys }) => {
                     <div>
                         <KeyIcon className={classes.keyIcon} />
                         <span className={classes.blueBg}>{key}</span>
+                        <CopyButton value={key} />
                     </div>
                 </Card>
             ))}
