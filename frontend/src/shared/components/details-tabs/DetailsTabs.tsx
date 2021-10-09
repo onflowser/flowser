@@ -17,6 +17,7 @@ type ContainerProps = {
 
 export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => {
     const [selected, setSelected] = useState(0);
+    console.log({ children });
     const selectedChildren = children[selected].props.children;
 
     return (

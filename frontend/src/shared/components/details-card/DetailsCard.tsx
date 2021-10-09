@@ -11,9 +11,11 @@ interface Props {
 const DetailsCard: FunctionComponent<Props> = ({ children, Header, Footer }) => {
     return (
         <div>
-            <div className={classes.header}>
-                <Header />
-            </div>
+            {Header && (
+                <div className={classes.header}>
+                    <Header />
+                </div>
+            )}
             <Card className={classes.container}>
                 <div className={classes.body}>{children}</div>
                 {Footer && (
