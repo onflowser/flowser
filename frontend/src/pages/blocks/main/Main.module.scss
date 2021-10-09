@@ -1,0 +1,23 @@
+@import 'styles/spacings';
+@import 'styles/animations';
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-base $spacing-l;
+  margin-bottom: $spacing-base;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .parentIdContainer {
+    min-width: 590px;
+  }
+
+
+  &.isNew {
+    @include addNewContentAnimation(1s);
+  }
+}

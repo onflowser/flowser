@@ -14,3 +14,26 @@
     }
   }
 }
+
+@mixin addNewContentAnimation($time) {
+
+  -webkit-animation: new-content-animation #{$time}; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: new-content-animation #{$time}; /* Firefox < 16 */
+  -ms-animation: new-content-animation #{$time}; /* Internet Explorer */
+  -o-animation: new-content-animation #{$time}; /* Opera < 12.1 */
+  animation: new-content-animation #{$time};
+
+  @keyframes new-content-animation {
+    from {
+      opacity: 0;
+      background-color: #496F8D;
+      color: #496F8D;
+      font-size: 20%;
+    }
+
+    50% {
+      opacity: 0.5;
+      background-color: #496F8D;
+    }
+  }
+}
