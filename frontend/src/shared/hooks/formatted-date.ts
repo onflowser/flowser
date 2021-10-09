@@ -5,7 +5,7 @@ export interface UseFormattedDateHook {
 }
 
 // TODO: Move to some config
-export const DATE_FORMAT = 'dS mmmm yyyy, hh:MM:ss';
+export const DATE_FORMAT = 'dS mmm yyyy, hh:MM:ss';
 
 export const useFormattedDate = (): UseFormattedDateHook => {
     const formatDate = (date: string): string => {
