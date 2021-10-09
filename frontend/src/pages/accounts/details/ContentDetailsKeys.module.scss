@@ -10,13 +10,18 @@
 
   > div {
     display: flex;
+    align-items: center;
     margin-top: $spacing-l;
+
+    * + * {
+      margin-left: $spacing-l / 2;
+    }
 
     .blueBg {
       background-color: $color-counter-badge-blue;
       margin-left: $spacing-l;
-      border-radius: 8px;
       padding: $spacing-l / 3;
+      border-radius: 8px;
       color: $color-main-text;
       font-family: $font-family-oswald;
     }
