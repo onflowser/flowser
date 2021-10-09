@@ -25,6 +25,7 @@ export const defaultUiState: UiState = {
     isNavigationDrawerVisible: false,
     isSubNavigationVisible: true,
     isShowBackButtonVisible: true,
+    isSearchBarVisible: true,
 };
 
 export const UiStateContextProvider: FunctionComponent<Props> = ({ children }) => {

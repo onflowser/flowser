@@ -10,11 +10,14 @@ const Breadcrumbs: FunctionComponent<any> = ({ className }) => {
         return <></>;
     }
 
+    const currentUrl = window.location.pathname;
+    console.log('currentUrl', currentUrl);
+
     return (
         <div className={`${classes.root} ${className}`}>
             {breadcrumbs
                 .map<React.ReactNode>((item, key) => (
-                    <NavLink key={key} to={item.to}>
+                    <NavLink key={key} to={item.to || currentUrl}>
                         {item.label}
                     </NavLink>
                 ))

@@ -19,7 +19,7 @@ import Search from '../../../shared/components/search/Search';
 
 const Navigation = (props: any) => {
     const history = useHistory();
-    const { isShowBackButtonVisible, isNavigationDrawerVisible } = useNavigation();
+    const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
 
     const onSwitchProject = useCallback(() => {
         history.push(`/${routes.start}`);
@@ -79,7 +79,7 @@ const Navigation = (props: any) => {
                     <div className={classes.navigationDrawerContainer}>
                         {isShowBackButtonVisible && <IconBackButton onClick={onBack} className={classes.backButton} />}
                         <Breadcrumbs className={classes.breadcrumbs} />
-                        <Search className={classes.searchBar} />
+                        {isSearchBarVisible && <Search className={classes.searchBar} />}
                     </div>
                 )}
             </div>
