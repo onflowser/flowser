@@ -17,7 +17,7 @@ enum ContentDetails {
 
 const Details: FunctionComponent<any> = () => {
     const { setPlaceholder } = useSearch();
-    const { setBreadcrumbs } = useNavigation();
+    const { setBreadcrumbs, showSearchBar } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const [contentDetails, setContentDetails] = useState(ContentDetails.SCRIPT);
 
@@ -29,6 +29,10 @@ const Details: FunctionComponent<any> = () => {
         showSubNavigation(false);
         setBreadcrumbs(breadcrumbs);
     }, []);
+
+    useEffect(() => {
+        showSearchBar(contentDetails !== ContentDetails.SCRIPT);
+    }, [contentDetails]);
 
     const showDetails = useCallback((contentDetails: ContentDetails) => {
         setContentDetails(contentDetails);

@@ -1,0 +1,16 @@
+@mixin fadeInAnimation($time) {
+  -webkit-animation: fadeIn #{$time}; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeIn #{$time}; /* Firefox < 16 */
+  -ms-animation: fadeIn #{$time}; /* Internet Explorer */
+  -o-animation: fadeIn #{$time}; /* Opera < 12.1 */
+  animation: fadeIn #{$time};
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
