@@ -1,0 +1,35 @@
+@import 'styles/spacings';
+
+.cardsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: $spacing-l * 2;
+
+  .smallCard {
+    display: flex;
+    flex-direction: column;
+    width: 33%;
+    padding: $spacing-l;
+    align-items: center;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.7;
+    }
+
+    &__disabled {
+      cursor: default !important;
+    }
+
+    * + * {
+      margin-top: $spacing-l;
+    }
+  }
+
+  .smallCard + .smallCard {
+    margin-left: $spacing-l;
+  }
+}
+
+.contentDetailsContainer {
+}

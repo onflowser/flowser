@@ -5,6 +5,7 @@
 .root {
   border-radius: $border-radius-card;
   padding: $spacing-l;
+  border: 1px solid transparent;
 
   &.blue {
     background-color: $color-table-blue;

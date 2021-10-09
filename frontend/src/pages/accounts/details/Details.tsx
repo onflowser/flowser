@@ -5,21 +5,15 @@ import classes from './Details.module.scss';
 import Value from '../../../shared/components/value/Value';
 import Card from '../../../shared/components/card/Card';
 import Label from '../../../shared/components/label/Label';
-import ContentDetailsScript from './ContentDetailsScript';
+import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 import ContentDetailsKeys from './ContentDetailsKeys';
 import CopyButton from '../../../shared/components/copy-button/CopyButton';
-
-enum ContentDetails {
-    SCRIPT = 'script',
-    CONTRACTS = 'contracts',
-    KEYS = 'keys',
-}
+import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 
 const Details: FunctionComponent<any> = () => {
     const { setPlaceholder } = useSearch();
     const { setBreadcrumbs, showSearchBar } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const [contentDetails, setContentDetails] = useState(ContentDetails.SCRIPT);
 
     const breadcrumbs: Breadcrumb[] = [{ to: '/accounts', label: 'Accounts' }, { label: 'Details' }];
 
@@ -27,22 +21,6 @@ const Details: FunctionComponent<any> = () => {
         showNavigationDrawer(true);
         showSubNavigation(false);
         setBreadcrumbs(breadcrumbs);
-    }, []);
-
-    useEffect(() => {
-        showSearchBar(contentDetails !== ContentDetails.SCRIPT);
-        switch (contentDetails) {
-            case ContentDetails.CONTRACTS:
-                setPlaceholder('search for contracts');
-                break;
-            case ContentDetails.KEYS:
-                setPlaceholder('search for keys');
-                break;
-        }
-    }, [contentDetails]);
-
-    const showDetails = useCallback((contentDetails: ContentDetails) => {
-        setContentDetails(contentDetails);
     }, []);
 
     // TODO: Remove
@@ -82,40 +60,17 @@ const Details: FunctionComponent<any> = () => {
                     <Value variant="large">0x55ad22f01ef000a1</Value>
                 </div>
             </Card>
-            <div className={classes.threeCardsContainer}>
-                <Card
-                    active={contentDetails === ContentDetails.SCRIPT}
-                    className={classes.smallCard}
-                    onClick={() => showDetails(ContentDetails.SCRIPT)}
-                >
-                    <Label variant="medium">SCRIPT</Label>
-                    <Value variant="large">
-                        <a>{'<>'}</a>
-                    </Value>
-                </Card>
-                <Card
-                    active={contentDetails === ContentDetails.CONTRACTS}
-                    className={classes.smallCard}
-                    onClick={() => showDetails(ContentDetails.CONTRACTS)}
-                >
-                    <Label variant="medium">CONTRACTS</Label>
-                    <Value variant="medium">33</Value>
-                </Card>
-                <Card
-                    active={contentDetails === ContentDetails.KEYS}
-                    className={classes.smallCard}
-                    onClick={() => showDetails(ContentDetails.KEYS)}
-                >
-                    <Label variant="medium">KEYS</Label>
-                    <Value variant="medium">
-                        <a>2</a>
-                    </Value>
-                </Card>
-            </div>
-            <div className={classes.contentDetailsContainer}>
-                {contentDetails === ContentDetails.SCRIPT && <ContentDetailsScript script={script} />}
-                {contentDetails === ContentDetails.KEYS && <ContentDetailsKeys keys={keys} />}
-            </div>
+            <DetailsTabs>
+                <DetailsTabItem label="SCRIPTS" value="<>">
+                    <ContentDetailsScript script={script} />
+                </DetailsTabItem>
+                <DetailsTabItem label="CONTRACTS" value={6} onClick={() => setPlaceholder('search for contracts')}>
+                    <div>List of contracts</div>
+                </DetailsTabItem>
+                <DetailsTabItem label="KEYS" value={2} onClick={() => setPlaceholder('search for keys')}>
+                    <ContentDetailsKeys keys={keys} />
+                </DetailsTabItem>
+            </DetailsTabs>
         </div>
     );
 };

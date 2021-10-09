@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import classes from './ContentDetailsScript.module.scss';
-import Card from '../../../shared/components/card/Card';
-import CadenceSourceCode from '../../../shared/components/cadence-source-code/CadenceSourceCode';
+import Card from '../card/Card';
+import CadenceSourceCode from '../cadence-source-code/CadenceSourceCode';
 
 interface OwnProps {
     script: string;

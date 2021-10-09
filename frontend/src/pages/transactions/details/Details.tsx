@@ -7,6 +7,8 @@ import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import { NavLink } from 'react-router-dom';
 import classes from './Details.module.scss';
 import DetailsItem from '../../../shared/components/details-item/DetailsItem';
+import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
+import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 
 type RouteParams = {
     transactionId: string;
@@ -79,12 +81,21 @@ const Details: FunctionComponent<any> = () => {
                     </Value>
                 </div>
             </DetailsCard>
-            <div className={classes.detailsItemsWrapper}>
-                <DetailsItem label="EVENTS" value={12} onClick={console.log} />
-                <DetailsItem label="EVENTS" value={12} />
-                <DetailsItem label="EVENTS" value={12} />
-                <DetailsItem label="EVENTS" value={12} onClick={console.log} />
-            </div>
+            <DetailsTabs>
+                <DetailsTabItem label="SCRIPT" value="<>">
+                    <ContentDetailsScript script={data.script} />
+                </DetailsTabItem>
+                <DetailsTabItem label="GAS LIMIT" value={9000} />
+                <DetailsTabItem label="PAYLOAD SIGNATURES" value={11}>
+                    <div>List of signatures</div>
+                </DetailsTabItem>
+                <DetailsTabItem label="ENVELOPE SIGNATURES" value={31}>
+                    <div>List of signatures</div>
+                </DetailsTabItem>
+                <DetailsTabItem label="EVENTS" value={6}>
+                    <div>List of signatures</div>
+                </DetailsTabItem>
+            </DetailsTabs>
         </div>
     );
 };

@@ -35,33 +35,4 @@
       }
     }
   }
-
-  .threeCardsContainer {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: $spacing-l * 2;
-
-    .smallCard {
-      display: flex;
-      flex-direction: column;
-      width: 33%;
-      padding: $spacing-l;
-      align-items: center;
-      cursor: pointer;
-      &:hover {
-        opacity: 0.7;
-      }
-
-      * + * {
-        margin-top: $spacing-l;
-      }
-    }
-
-    .smallCard + .smallCard {
-      margin-left: $spacing-l;
-    }
-  }
-
-  .contentDetailsContainer {
-  }
 }
