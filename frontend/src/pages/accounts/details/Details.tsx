@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { useNavigation } from '../../../shared/hooks/navigation';
+import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
 import { useSearch } from '../../../shared/hooks/search';
 import classes from './Details.module.scss';
 import Value from '../../../shared/components/value/Value';
@@ -17,13 +17,17 @@ enum ContentDetails {
 
 const Details: FunctionComponent<any> = () => {
     const { setPlaceholder } = useSearch();
+    const { setBreadcrumbs } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const [contentDetails, setContentDetails] = useState(ContentDetails.SCRIPT);
+
+    const breadcrumbs: Breadcrumb[] = [{ to: '/accounts', label: 'Accounts' }, { label: 'Details' }];
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
         showNavigationDrawer(true);
         showSubNavigation(false);
+        setBreadcrumbs(breadcrumbs);
     }, []);
 
     const showDetails = useCallback((contentDetails: ContentDetails) => {

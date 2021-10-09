@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { UiState, UiStateContext } from '../contexts/ui-state.context';
 
 export interface Breadcrumb {
-    to: string;
+    to?: string;
     label: string;
 }
 
