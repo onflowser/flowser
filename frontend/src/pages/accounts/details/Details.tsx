@@ -24,7 +24,6 @@ const Details: FunctionComponent<any> = () => {
     const breadcrumbs: Breadcrumb[] = [{ to: '/accounts', label: 'Accounts' }, { label: 'Details' }];
 
     useEffect(() => {
-        setPlaceholder('search for block numbers or tx hashes');
         showNavigationDrawer(true);
         showSubNavigation(false);
         setBreadcrumbs(breadcrumbs);
@@ -32,6 +31,14 @@ const Details: FunctionComponent<any> = () => {
 
     useEffect(() => {
         showSearchBar(contentDetails !== ContentDetails.SCRIPT);
+        switch (contentDetails) {
+            case ContentDetails.CONTRACTS:
+                setPlaceholder('search for contracts');
+                break;
+            case ContentDetails.KEYS:
+                setPlaceholder('search for keys');
+                break;
+        }
     }, [contentDetails]);
 
     const showDetails = useCallback((contentDetails: ContentDetails) => {
