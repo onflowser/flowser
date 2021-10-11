@@ -6,9 +6,9 @@ import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import { NavLink } from 'react-router-dom';
 import classes from './Details.module.scss';
-import DetailsItem from '../../../shared/components/details-item/DetailsItem';
 import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
+import Card from '../../../shared/components/card/Card';
 
 type RouteParams = {
     transactionId: string;
@@ -90,7 +90,24 @@ const Details: FunctionComponent<any> = () => {
                     <div>List of signatures</div>
                 </DetailsTabItem>
                 <DetailsTabItem label="ENVELOPE SIGNATURES" value={31}>
-                    <div>List of signatures</div>
+                    {data.envelopeSignatures.map((item: any, i: number) => (
+                        <Card key={i}>
+                            <div>
+                                <Label className={classes.label}>ACCOUNT ADDRESS</Label>
+                                <Value>
+                                    <NavLink to={`/accounts/details/${item.address}`}>{item.address}</NavLink>
+                                </Value>
+                            </div>
+                            <div>
+                                <Label className={classes.label}>KEY ID</Label>
+                                <Value>{item.keyId}</Value>
+                            </div>
+                            <div>
+                                <Label className={classes.label}>SIGNATURE</Label>
+                                <Value>{item.signature}</Value>
+                            </div>
+                        </Card>
+                    ))}
                 </DetailsTabItem>
                 <DetailsTabItem label="EVENTS" value={6}>
                     <div>List of signatures</div>
