@@ -28,7 +28,7 @@
       opacity: 0;
       background-color: #496F8D;
       color: #496F8D;
-      font-size: 20%;
+      font-size: 95%; // Using lower percentage will break ellipsis on hashes :/
     }
 
     50% {
@@ -36,4 +36,14 @@
       background-color: #496F8D;
     }
   }
+}
+
+@mixin flipVertical($time) {
+  -webkit-transition: -webkit-transform #{$time} ease-in-out;
+  -ms-transition: -ms-transform #{$time} ease-in-out;
+  transition: transform #{$time} ease-in-out;
+
+  transform:rotateX(180deg);
+  -ms-transform:rotateX(180deg);
+  -webkit-transform:rotateX(180deg);
 }

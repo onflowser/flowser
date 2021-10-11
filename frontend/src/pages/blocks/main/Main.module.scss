@@ -12,12 +12,14 @@
     flex-direction: column;
   }
 
-  .parentIdContainer {
-    min-width: 590px;
+  &.isNew {
+    @include addNewContentAnimation(.4s);
   }
 
-
-  &.isNew {
-    @include addNewContentAnimation(1s);
+  .hash {
+    max-width: 20vw;
+    min-width: 20vw;
+    display: inline-block;
+    overflow: hidden;
   }
 }

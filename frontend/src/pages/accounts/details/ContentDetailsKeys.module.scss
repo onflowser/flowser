@@ -30,4 +30,12 @@
       transform: rotate(-135deg);
     }
   }
+  .badges {
+    color: $color-grey;
+    font-family: $font-family-oswald;
+    padding-left: ($spacing-base * 2) + 6;
+    span span {
+      color: $color-white;
+    }
+  }
 }

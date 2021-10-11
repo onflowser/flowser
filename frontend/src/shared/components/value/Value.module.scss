@@ -3,16 +3,10 @@
 
 .root {
   display: inline-block;
-  * {
-
-    color: $color-white;
-    font-family: $font-family-oswald;
-    font-size: $font-size-normal;
-  }
 
   a {
     text-decoration: none;
-    color: $color-link-blue;
+    color: $color-link-blue !important;
   }
 
   &.medium {
@@ -21,6 +15,7 @@
 
   &.large {
     font-size: $font-size-big;
+
     a {
       font-size: $font-size-big;
     }

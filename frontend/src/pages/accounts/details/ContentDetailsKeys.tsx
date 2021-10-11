@@ -19,8 +19,28 @@ const ContentDetailsKeys: FunctionComponent<Props> = ({ keys }) => {
                     <Label variant="large">KEY</Label>
                     <div>
                         <KeyIcon className={classes.keyIcon} />
-                        <span className={classes.blueBg}>{key}</span>
-                        <CopyButton value={key} />
+                        <span className={classes.blueBg}>{key.publicKey}</span>
+                        <CopyButton value={key.publicKey} />
+                    </div>
+                    <div className={classes.badges}>
+                        <span>
+                            WEIGHT: <span>{key.weight}</span>
+                        </span>
+                        <span>
+                            SEQ. NUMBER: <span>{key.sequenceNumber}</span>
+                        </span>
+                        <span>
+                            INDEX: <span>{key.index}</span>
+                        </span>
+                        <span>
+                            SIGN ALGO.: <span>{key.signAlgo}</span>
+                        </span>
+                        <span>
+                            HASH ALGO.: <span>{key.hashAlgo}</span>
+                        </span>
+                        <span>
+                            REVOKED: <span>{key.revoked ? 'YES' : 'NO'}</span>
+                        </span>
                     </div>
                 </Card>
             ))}

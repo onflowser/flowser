@@ -12,18 +12,19 @@ type TabItemProps = {
 };
 
 type ContainerProps = {
-    children: ReactElement<TabItemProps, 'DetailsTabItem'>[];
+    children: ReactElement<TabItemProps, 'DetailsTabItem'>[] | any;
 };
 
 export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => {
     const [selected, setSelected] = useState(0);
-    console.log({ children });
-    const selectedChildren = children[selected].props.children;
+    const noNilChildren = children.filter((c: any) => !!c);
+    console.log({ noNilChildren });
+    const selectedChildren = noNilChildren[selected].props.children;
 
     return (
         <>
             <div className={classes.cardsContainer}>
-                {children.map((child, index) => {
+                {noNilChildren.map((child: any, index: number) => {
                     const isDisabled = !child.props.children;
                     return (
                         <Card

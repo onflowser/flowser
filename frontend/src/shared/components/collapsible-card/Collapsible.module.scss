@@ -1,0 +1,47 @@
+@import 'styles/spacings';
+@import 'styles/animations';
+@import 'styles/colors';
+
+.root {
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    align-items: center;
+
+    &.expanded {
+      border-bottom: 1px solid $color-logs-text;
+      padding-bottom: $spacing-l * 2;
+    }
+
+    & > span {
+      font-weight: bold;
+      flex: 1;
+      margin-right: $spacing-l * 2;
+    }
+
+    .icon {
+      cursor: pointer;
+      margin-left: auto;
+
+      &.expanded {
+        @include flipVertical(.2s);
+      }
+    }
+  }
+
+  .content {
+    max-height: 0;
+    transition-property: max-height;
+    transition: 100ms ease-in;
+    opacity: 0;
+    overflow: hidden;
+
+    &.expanded {
+      opacity: 1;
+      margin-top: $spacing-l * 2;
+      max-height: initial;
+    }
+  }
+}
