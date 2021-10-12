@@ -3,6 +3,7 @@ import classes from './DetailsTabs.module.scss';
 import Card from '../card/Card';
 import Label from '../label/Label';
 import Value from '../value/Value';
+import CaretIcon from '../caret-icon/CaretIcon';
 
 type TabItemProps = {
     label: string;
@@ -18,7 +19,6 @@ type ContainerProps = {
 export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => {
     const [selected, setSelected] = useState(0);
     const noNilChildren = children.filter((c: any) => !!c);
-    console.log({ noNilChildren });
     const selectedChildren = noNilChildren[selected].props.children;
 
     return (
@@ -36,8 +36,17 @@ export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => 
                                 if (child.props.onClick) child.props.onClick(e);
                             }}
                         >
-                            <Label variant="medium">{child.props.label}</Label>
-                            <Value variant="large">{child.props.value}</Value>
+                            <div className={classes.labelValue}>
+                                <Label variant="medium">{child.props.label}</Label>
+                                <Value variant="large" className={`${!isDisabled ? classes.clickable : ''}`}>
+                                    {child.props.value}
+                                </Value>
+                            </div>
+                            {!isDisabled && (
+                                <div className={classes.caret}>
+                                    <CaretIcon isOpen={selected === index} />
+                                </div>
+                            )}
                         </Card>
                     );
                 })}

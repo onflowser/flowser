@@ -38,12 +38,12 @@
   }
 }
 
-@mixin flipVertical($time) {
-  -webkit-transition: -webkit-transform #{$time} ease-in-out;
-  -ms-transition: -ms-transform #{$time} ease-in-out;
-  transition: transform #{$time} ease-in-out;
+@mixin flipVertical($time, $deg: 180deg) {
+  -webkit-transition: -webkit-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
+  -ms-transition: -ms-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
+  transition: transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
 
-  transform:rotateX(180deg);
-  -ms-transform:rotateX(180deg);
-  -webkit-transform:rotateX(180deg);
+  transform:rotateX(#{$deg});
+  -ms-transform:rotateX(#{$deg});
+  -webkit-transform:rotateX(#{$deg});
 }
