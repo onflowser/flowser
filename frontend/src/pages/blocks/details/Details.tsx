@@ -1,11 +1,15 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
-import classes from '../../accounts/details/Details.module.scss';
 import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import CopyButton from '../../../shared/components/copy-button/CopyButton';
 import Card from '../../../shared/components/card/Card';
+import TimeAgo from '../../../shared/components/time-ago/TimeAgo';
+import DateWithCalendar from '../../../shared/components/date-with-calendar/DateWithCalendar';
+import classes from './Details.module.scss';
+import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 
 enum ContentDetails {
     HEIGHT = 'height',
@@ -44,14 +48,92 @@ const Details: FunctionComponent<any> = () => {
         setContentDetails(contentDetails);
     }, []);
 
-    // TODO: Remove
-    const script =
-        'import FungibleToken from 0xee82856bf20e2aa6\nimport FlowToken from 0x0ae53cb6e3f42a79\nimport FlowFees from 0xe5a8b7f23e8b548f\nimport FlowStorageFees from 0xf8d6e0586b0a20c7\n\npub contract FlowServiceAccount {\n\n    pub event TransactionFeeUpdated(newFee: UFix64)\n\n    pub event AccountCreationFeeUpdated(newFee: UFix64)\n\n    pub event AccountCreatorAdded(accountCreator: Address)\n\n    pub event AccountCreatorRemoved(accountCreator: Address)\n\n    pub event IsAccountCreationRestrictedUpdated(isRestricted: Bool)\n\n    /// A fixed-rate fee charged to execute a transaction\n    pub var transactionFee: UFix64\n\n    /// A fixed-rate fee charged to create a new account\n    pub var accountCreationFee: UFix64\n\n    /// The list of account addresses that have permission to create accounts\n    access(contract) var accountCreators: {Address: Bool}\n\n    /// Initialize an account with a FlowToken Vault and publish capabilities.\n    pub fun initDefaultToken(_ acct: AuthAccount) {\n        // Create a new FlowToken Vault and save it in storage\n        acct.save(<-FlowToken.createEmptyVault(), to: /storage/flowTokenVault)\n\n        // Create a public capability to the Vault that only exposes\n        // the deposit function through the Receiver interface\n        acct.link<&FlowToken.Vault{FungibleToken.Receiver}>(\n            /public/flowTokenReceiver,\n            target: /storage/flowTokenVault\n        )\n\n        // Create a public capability to the Vault that only exposes\n        // the balance field through the Balance interface\n        acct.link<&FlowToken.Vault{FungibleToken.Balance}>(\n            /public/flowTokenBalance,\n            target: /storage/flowTokenVault\n        )\n    }\n\n    /// Get the default token balance on an account\n    pub fun defaultTokenBalance(_ acct: PublicAccount): UFix64 {\n        let balanceRef = acct\n            .getCapability(/public/flowTokenBalance)\n            .borrow<&FlowToken.Vault{FungibleToken.Balance}>()!\n\n        return balanceRef.balance\n    }\n\n    /// Return a reference to the default token vault on an account\n    pub fun defaultTokenVault(_ acct: AuthAccount): &FlowToken.Vault {\n        return acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)\n            ?? panic("Unable to borrow reference to the default token vault")\n    }\n\n    /// Called when a transaction is submitted to deduct the fee\n    /// from the AuthAccount that submitted it\n    pub fun deductTransactionFee(_ acct: AuthAccount) {\n        if self.transactionFee == UFix64(0) {\n            return\n        }\n\n        let tokenVault = self.defaultTokenVault(acct)\n        let feeVault <- tokenVault.withdraw(amount: self.transactionFee)\n\n        FlowFees.deposit(from: <-feeVault)\n    }\n\n    /// - Deducts the account creation fee from a payer account.\n    /// - Inits the default token.\n    /// - Inits account storage capacity.\n    pub fun setupNewAccount(newAccount: AuthAccount, payer: AuthAccount) {\n        if !FlowServiceAccount.isAccountCreator(payer.address) {\n            panic("Account not authorized to create accounts")\n        }\n\n\n        if self.accountCreationFee < FlowStorageFees.minimumStorageReservation {\n            panic("Account creation fees setup incorrectly")\n        }\n\n        let tokenVault = self.defaultTokenVault(payer)\n        let feeVault <- tokenVault.withdraw(amount: self.accountCreationFee)\n        let storageFeeVault <- (feeVault.withdraw(amount: FlowStorageFees.minimumStorageReservation) as! @FlowToken.Vault)\n        FlowFees.deposit(from: <-feeVault)\n\n        FlowServiceAccount.initDefaultToken(newAccount)\n\n        let vaultRef = FlowServiceAccount.defaultTokenVault(newAccount)\n\n        vaultRef.deposit(from: <-storageFeeVault)\n    }\n\n    /// Returns true if the given address is permitted to create accounts, false otherwise\n    pub fun isAccountCreator(_ address: Address): Bool {\n        // If account creation is not restricted, then anyone can create an account\n        if !self.isAccountCreationRestricted() {\n            return true\n        }\n        return self.accountCreators[address] ?? false\n    }\n\n    /// Is true if new acconts can only be created by approved accounts `self.accountCreators`\n    pub fun isAccountCreationRestricted(): Bool {\n        return self.account.copy<Bool>(from: /storage/isAccountCreationRestricted) ?? false\n    }\n\n    // Authorization resource to change the fields of the contract\n    /// Returns all addresses permitted to create accounts\n    pub fun getAccountCreators(): [Address] {\n        return self.accountCreators.keys\n    }\n\n    /// Authorization resource to change the fields of the contract\n    pub resource Administrator {\n\n        /// Sets the transaction fee\n        pub fun setTransactionFee(_ newFee: UFix64) {\n            FlowServiceAccount.transactionFee = newFee\n            emit TransactionFeeUpdated(newFee: newFee)\n        }\n\n        /// Sets the account creation fee\n        pub fun setAccountCreationFee(_ newFee: UFix64) {\n            FlowServiceAccount.accountCreationFee = newFee\n            emit AccountCreationFeeUpdated(newFee: newFee)\n        }\n\n        /// Adds an account address as an authorized account creator\n        pub fun addAccountCreator(_ accountCreator: Address) {\n            FlowServiceAccount.accountCreators[accountCreator] = true\n            emit AccountCreatorAdded(accountCreator: accountCreator)\n        }\n\n        /// Removes an account address as an authorized account creator\n        pub fun removeAccountCreator(_ accountCreator: Address) {\n            FlowServiceAccount.accountCreators.remove(key: accountCreator)\n            emit AccountCreatorRemoved(accountCreator: accountCreator)\n        }\n\n         pub fun setIsAccountCreationRestricted(_ enabled: Bool) {\n            let path = /storage/isAccountCreationRestricted\n            let oldValue = FlowServiceAccount.account.load<Bool>(from: path)\n            FlowServiceAccount.account.save<Bool>(enabled, to: path)\n            if enabled != oldValue {\n                emit IsAccountCreationRestrictedUpdated(isRestricted: enabled)\n            }\n        }\n    }\n\n    init() {\n        self.transactionFee = 0.0\n        self.accountCreationFee = 0.0\n\n        self.accountCreators = {}\n\n        let admin <- create Administrator()\n        admin.addAccountCreator(self.account.address)\n\n        self.account.save(<-admin, to: /storage/flowServiceAdmin)\n    }\n}\n';
-
-    // TODO: Remove
-    const keys = [
-        'G9DSJ4tOSLBqSFR2Ht4cs/GFh5UVb0F1LOl0F44ZZYreX2wQFc3Nzws9WSZhGQX6CW639pZOmvWuOgRRDItoig==',
-        'G9DSJ4tOSLBqSFR2Ht4cs/GFh5UVb0F1LOl0F44ZZYreX2wQFc3Nzws9WSZhGQX6CW639pZOmvWuOgRRDItoig==',
+    const data = [
+        {
+            createdAt: 1633698442496,
+            _id: '38a334c2db31346325c80f0b70db182107a856475ed9ea78442edfa5fbba279a',
+            parentId: 'e8f54263b30f4804f89dfb686762e5a5a8c64cfae7e97642ec9994219ed02071',
+            height: 3,
+            timestamp: '2021-10-08T13:07:20.631Z',
+            blockSeals: [],
+            signatures: [''],
+            collectionGuarantees: [
+                {
+                    collectionId: '1438df55840dc8cf5cfdcc5fc9311279110b1395b27f9b6fe105d49cdf33c6b5',
+                    signatures: [''],
+                },
+            ],
+        },
+        {
+            createdAt: 1633698442496,
+            _id: 'e8f54263b30f4804f89dfb686762e5a5a8c64cfae7e97642ec9994219ed02071',
+            parentId: '8913fea1d149877f52aa529a195b0e0c2107da51567771c6c024aa78101a52e2',
+            height: 2,
+            timestamp: '2021-10-08T13:07:20.334Z',
+            blockSeals: [],
+            signatures: [''],
+            collectionGuarantees: [
+                {
+                    collectionId: 'a8713acd9c1707b9f08014509ec783f3726bcca5d7696dc1ad21f1d9efe242b7',
+                    signatures: [''],
+                },
+            ],
+        },
+        {
+            createdAt: 1633698442494,
+            _id: '7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7',
+            parentId: '0000000000000000000000000000000000000000000000000000000000000000',
+            height: 0,
+            timestamp: '2018-12-19T22:32:30.000Z',
+            blockSeals: [],
+            signatures: [''],
+            collectionGuarantees: [],
+        },
+        {
+            createdAt: 1633698442496,
+            _id: '8913fea1d149877f52aa529a195b0e0c2107da51567771c6c024aa78101a52e2',
+            parentId: '7bc42fe85d32ca513769a74f97f7e1a7bad6c9407f0d934c2aa645ef9cf613c7',
+            height: 1,
+            timestamp: '2021-10-08T12:47:41.086Z',
+            blockSeals: [],
+            signatures: [''],
+            collectionGuarantees: [
+                {
+                    collectionId: 'b32b9a5f88b996181ca39217a1b6a0d17dac78f48922d3823e7a94f74646f33f',
+                    signatures: [''],
+                },
+            ],
+        },
+        {
+            createdAt: 1633698442496,
+            _id: 'b8dad2e826e6fd363ed43039ea68fc3ae471c3ea40c996d2c648cc57475466f0',
+            parentId: '38a334c2db31346325c80f0b70db182107a856475ed9ea78442edfa5fbba279a',
+            height: 4,
+            timestamp: '2021-10-08T13:07:21.056Z',
+            blockSeals: [],
+            signatures: [''],
+            collectionGuarantees: [
+                {
+                    collectionId: 'ce8a4b607f7b1b429ee081888ea32b198daaa8dd99bbec015b7f1fc7bb6a7c75',
+                    signatures: [''],
+                },
+            ],
+        },
+        {
+            createdAt: 1633698442496,
+            _id: '0ee11d607c29eae94695b56e2c64b42a067a2d8b98cbf342e76c7052d7e4f6b7',
+            parentId: 'b8dad2e826e6fd363ed43039ea68fc3ae471c3ea40c996d2c648cc57475466f0',
+            height: 5,
+            timestamp: '2021-10-08T13:07:21.433Z',
+            blockSeals: [],
+            signatures: [''],
+            collectionGuarantees: [
+                {
+                    collectionId: '203513dc91d1009699a65674844f30b4991f136f85896af42a82d303c8f6699a',
+                    signatures: [''],
+                },
+            ],
+        },
     ];
 
     return (
@@ -66,39 +148,37 @@ const Details: FunctionComponent<any> = () => {
                     <Label variant="large" className={classes.label}>
                         PARENT ID
                     </Label>
-                    <Value variant="large">0.47000000 FLOW</Value>
+                    <Value variant="large">
+                        <NavLink to={`/blocks/details/0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E`}>
+                            0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E
+                        </NavLink>
+                    </Value>
+                </div>
+                <div className={classes.dateAndTimeAgo}>
+                    <TimeAgo date={'2021-10-12T20:37:20.631Z'} />
+                    <DateWithCalendar date={'2021-10-12T20:37:20.631Z'} />
                 </div>
             </Card>
-            <div className={classes.threeCardsContainer}>
-                <Card className={classes.smallCard}>
-                    <Label variant="medium">HEIGHT</Label>
-                    <Value variant="large">1</Value>
-                </Card>
-                <Card
-                    active={contentDetails === ContentDetails.TRANSACTIONS}
-                    className={classes.smallCard}
-                    onClick={() => showDetails(ContentDetails.TRANSACTIONS)}
+
+            <DetailsTabs>
+                <DetailsTabItem label="HEIGHT" value="" />
+                <DetailsTabItem
+                    label="Transactions"
+                    value={data.length}
+                    onClick={() => setPlaceholder('search for transactions')}
                 >
-                    <Label variant="medium">TRANSACTIONS</Label>
-                    <Value variant="medium">
-                        <a>13</a>
-                    </Value>
-                </Card>
-                <Card
-                    active={contentDetails === ContentDetails.COLLECTIONS}
-                    className={classes.smallCard}
-                    onClick={() => showDetails(ContentDetails.COLLECTIONS)}
-                >
-                    <Label variant="medium">COLLECTIONS</Label>
-                    <Value variant="medium">
-                        <a>2</a>
-                    </Value>
-                </Card>
-            </div>
-            <div className={classes.contentDetailsContainer}>
-                {/*{contentDetails === ContentDetails.TRANSACTIONS && <ContentDetailsScript script={script} />}*/}
-                {/*{contentDetails === ContentDetails.COLLECTIONS && <ContentDetailsKeys keys={keys} />}*/}
-            </div>
+                    {data.map((transaction, index) => (
+                        <Card variant="black" key={index} className={classes.transactionListItem}>
+                            <Label>TRANSACTION ID</Label>
+                            <Value>
+                                <NavLink to={`/transactions/details/${transaction._id}`}>{transaction._id}</NavLink>
+                            </Value>
+                        </Card>
+                    ))}
+                </DetailsTabItem>
+
+                <DetailsTabItem label="COLLECTIONS" value={2} />
+            </DetailsTabs>
         </div>
     );
 };

@@ -9,6 +9,8 @@ import classes from './Details.module.scss';
 import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 import Card from '../../../shared/components/card/Card';
+import TimeAgo from '../../../shared/components/time-ago/TimeAgo';
+import DateWithCalendar from '../../../shared/components/date-with-calendar/DateWithCalendar';
 
 type RouteParams = {
     transactionId: string;
@@ -35,14 +37,8 @@ const Details: FunctionComponent<any> = () => {
                 )}
                 Footer={() => (
                     <>
-                        <div>
-                            <Label>icon</Label>
-                            <Value>55min ago</Value>
-                        </div>
-                        <div>
-                            <Label>icon</Label>
-                            <Value>18 August 2021</Value>
-                        </div>
+                        <TimeAgo date={'2021-10-12T20:37:20.631Z'} />
+                        <DateWithCalendar date={'2021-10-12T20:37:20.631Z'} />
                     </>
                 )}
             >
