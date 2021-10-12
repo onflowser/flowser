@@ -1,11 +1,12 @@
 import React, { FunctionComponent, useCallback, useState } from 'react';
 import Card from '../card/Card';
 import classes from './Collapsible.module.scss';
-import { ReactComponent as CollapseIcon } from '../../assets/icons/open-logs.svg';
+import CaretIcon from '../caret-icon/CaretIcon';
 
 interface OwnProps {
     children: any;
     header: string;
+    subheader?: string;
     variant?: 'blue' | 'black';
 
     [key: string]: any;
@@ -13,7 +14,7 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const CollapsibleCard: FunctionComponent<Props> = ({ children, variant, header, ...restProps }) => {
+const CollapsibleCard: FunctionComponent<Props> = ({ children, variant, header, subheader, ...restProps }) => {
     const [state, setState] = useState(false);
 
     const onToggle = useCallback(() => {
@@ -23,8 +24,11 @@ const CollapsibleCard: FunctionComponent<Props> = ({ children, variant, header, 
     return (
         <Card variant={variant} className={`${classes.root} ${restProps.className}`}>
             <div className={`${classes.header} ${state ? classes.expanded : ''}`}>
-                <span>{header}</span>
-                <CollapseIcon className={`${classes.icon} ${!state ? classes.expanded : ''}`} onClick={onToggle} />
+                <div className={classes.title}>
+                    <span>{header}</span>
+                    {subheader && <span onClick={onToggle}>{subheader}</span>}
+                </div>
+                <CaretIcon className={classes.icon} isOpen={state} onChange={onToggle} />
             </div>
             <div className={`${classes.content} ${state ? classes.expanded : ''}`}>{children}</div>
         </Card>

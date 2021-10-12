@@ -5,11 +5,13 @@ import classes from './CaretIcon.module.scss';
 interface OwnProps {
     isOpen?: boolean;
     onChange?: (isOpen: boolean) => void;
+
+    [key: string]: any;
 }
 
 type Props = OwnProps;
 
-const CaretIcon: FunctionComponent<Props> = ({ isOpen = false, onChange = () => false }) => {
+const CaretIcon: FunctionComponent<Props> = ({ isOpen = false, onChange = () => false, ...restProps }) => {
     const [state, setState] = useState(isOpen);
 
     useEffect(() => {
@@ -21,7 +23,12 @@ const CaretIcon: FunctionComponent<Props> = ({ isOpen = false, onChange = () => 
         onChange(state);
     }, [isOpen]);
 
-    return <CaretIconSvg className={`${classes.root} ${state ? classes.isOpen : ''}`} onClick={onToggle} />;
+    return (
+        <CaretIconSvg
+            className={`${classes.root} ${restProps.className} ${state ? classes.isOpen : ''}`}
+            onClick={onToggle}
+        />
+    );
 };
 
 export default CaretIcon;

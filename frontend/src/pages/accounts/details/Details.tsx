@@ -100,7 +100,13 @@ const Details: FunctionComponent<any> = () => {
                     onClick={() => setPlaceholder('search for contracts')}
                 >
                     {data.contracts.map((contract, index) => (
-                        <CollapsibleCard key={index} header={contract.name} variant="black" className={classes.script}>
+                        <CollapsibleCard
+                            key={index}
+                            header="CONTRACT NAME"
+                            subheader={contract.name}
+                            variant="black"
+                            className={classes.script}
+                        >
                             <ContentDetailsScript script={contract.code} />
                         </CollapsibleCard>
                     ))}

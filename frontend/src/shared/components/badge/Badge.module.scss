@@ -1,0 +1,10 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.root {
+  border: .5px solid $color-light-gray;
+  color: $color-light-gray;
+
+  border-radius: 8px;
+  padding: ($spacing-l / 4) $spacing-l;
+}
