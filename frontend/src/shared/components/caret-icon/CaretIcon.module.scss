@@ -2,13 +2,14 @@
 @import 'styles/colors';
 
 .root {
-  fill: $color-main-yellow;
-  stroke: $color-main-yellow;
+
   @include flipVertical(.2s, 0deg);
+  fill: $color-link-blue;
+  stroke: $color-link-blue;
 
   &.isOpen {
     @include flipVertical(.2s);
-    fill: $color-link-blue;
-    stroke: $color-link-blue;
+    fill: $color-main-yellow;
+    stroke: $color-main-yellow;
   }
 }
