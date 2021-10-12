@@ -1,4 +1,4 @@
-import React, { FunctionComponent, MouseEventHandler, ReactElement, useState } from 'react';
+import React, { FunctionComponent, MouseEventHandler, ReactElement, useEffect, useState } from 'react';
 import classes from './DetailsTabs.module.scss';
 import Card from '../card/Card';
 import Label from '../label/Label';
@@ -17,9 +17,15 @@ type ContainerProps = {
 };
 
 export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => {
-    const [selected, setSelected] = useState(0);
     const noNilChildren = children.filter((c: any) => !!c);
+    const selectedIndex = noNilChildren.findIndex((c: any) => c.props?.children);
+    const [selected, setSelected] = useState(selectedIndex);
     const selectedChildren = noNilChildren[selected].props.children;
+    const [childContent, setChildContent] = useState(selectedChildren);
+
+    useEffect(() => {
+        setChildContent(noNilChildren[selected].props.children);
+    }, [selected]);
 
     return (
         <>
@@ -51,7 +57,7 @@ export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => 
                     );
                 })}
             </div>
-            <div className={classes.contentDetailsContainer}>{selectedChildren}</div>
+            <div className={classes.contentDetailsContainer}>{childContent}</div>
         </>
     );
 };
