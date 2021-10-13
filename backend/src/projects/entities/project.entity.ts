@@ -1,5 +1,7 @@
-import { Column, Entity, ObjectIdColumn } from 'typeorm';
-import { GatewayConfiguration } from './gateway-configuration';
+import { Column, Entity, Index, ObjectIdColumn } from 'typeorm';
+import { GatewayConfigurationEntity } from './gateway-configuration.entity';
+import { toKebabCase } from "../../utils";
+import { CreateProjectDto } from "../dto/create-project.dto";
 
 @Entity({name: 'projects'})
 export class Project {
@@ -7,11 +9,25 @@ export class Project {
     _id: string;
 
     @Column()
+    @Index({unique: true})
+    id: string;
+
+    @Column()
     name: string;
 
     @Column()
-    gateway: GatewayConfiguration;
+    gateway: GatewayConfigurationEntity;
 
+    // data will be fetched from this block height
+    // leave this undefined to start fetching from latest block
     @Column()
-    isQuickStart: boolean = false;
+    startBlockHeight?: number;
+
+    static init (dto: CreateProjectDto) {
+        return Object.assign(new Project(), {
+            id: toKebabCase(dto.name),
+            ...dto
+        })
+    }
+
 }

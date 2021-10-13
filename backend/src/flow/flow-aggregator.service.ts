@@ -11,28 +11,44 @@ import { Account } from "../accounts/entities/account.entity";
 import { Event } from "../events/entities/event.entity";
 import { Transaction } from "../transactions/entities/transaction.entity";
 import { Block } from "../blocks/entities/block.entity";
+import { Project } from "../projects/entities/project.entity";
 
 @Injectable()
 export class FlowAggregatorService {
 
+  private project: Project;
+
   constructor (
-    private flowGatewayService: FlowGatewayService,
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
     private contractService: ContractsService,
-    private eventService: EventsService
+    private eventService: EventsService,
+    private flowGatewayService: FlowGatewayService
   ) {}
+
+  configureProjectContext(project: Project) {
+    this.project = project;
+  }
 
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
     try {
       const lastStoredBlock = await this.blockService.findLastBlock();
       const latestBlock = await this.flowGatewayService.getLatestBlock();
-      // fetch from initial block if no stored blocks found
-      const startBlockHeight = lastStoredBlock ? lastStoredBlock.height : 0;
+      // user can specify (on a project level) what is the starting block height
+      // if user provides no specification, the latest block height is used
+      const initialStartBlockHeight = this.project.startBlockHeight === undefined
+        ? latestBlock.height :
+        this.project.startBlockHeight;
+      // fetch from last stored block (if there are already blocks in the database)
+      const startBlockHeight = lastStoredBlock ?
+        lastStoredBlock.height :
+        initialStartBlockHeight;
       const endBlockHeight = latestBlock.height;
+
       console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
+
       const data = await this.flowGatewayService.getBlockDataWithinHeightRange(
         startBlockHeight,
         endBlockHeight
@@ -55,7 +71,7 @@ export class FlowAggregatorService {
       ))
       await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
     } catch (e) {
-      console.error(`[Flowser] data fetch error: ${e}`, e.stack)
+      console.error(`[Flowser] data fetch error: ${e}`, e.message)
     }
   }
 

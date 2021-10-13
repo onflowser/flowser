@@ -32,6 +32,7 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
             url,
             useNewUrlParser: true,
             autoLoadEntities: true,
+            synchronize: process.env.NODE_ENV !== 'production'
         }),
         ScheduleModule.forRoot(),
         ProjectsModule,

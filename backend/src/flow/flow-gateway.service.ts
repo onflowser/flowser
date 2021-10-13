@@ -1,5 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { GatewayConfiguration } from '../projects/dto/gateway-configuration';
 import {
     FlowAccount,
     FlowBlock,
@@ -7,27 +5,23 @@ import {
     FlowTransaction,
     FlowTransactionStatus
 } from "./types";
+import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
+import { Injectable } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
+import fetch from "node-fetch";
 
 @Injectable()
 export class FlowGatewayService {
-    private configuration: GatewayConfiguration;
 
-    constructor () {
-        // TODO: init default configuration just for development
-        this.configureDataSourceGateway({
-            port: 8080,
-            network: "emulator",
-            address: "http://host.docker.internal" // same as 127.0.0.1 on host
-        })
+    private configuration: GatewayConfigurationEntity;
+
+    public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
+        this.configuration = configuration;
+        fcl.config().put("accessNode.api", this.url())
     }
 
-
-    public configureDataSourceGateway(configuration: GatewayConfiguration) {
-        console.info('FlowGatewayService configuration changed', configuration);
-        this.configuration = configuration;
-        const accessNodeApi = `${configuration.address}:${configuration.port}`;
-        fcl.config().put("accessNode.api", accessNodeApi)
+    private url() {
+        return `${this.configuration.address}:${this.configuration.port}`
     }
 
     public async getLatestBlock (): Promise<FlowBlock> {
@@ -104,7 +98,12 @@ export class FlowGatewayService {
         )
     }
 
-    private isConnectedToGateway(): boolean {
-        return !!this.configuration;
+    async isConnectedToGateway(): Promise<boolean> {
+        try {
+            await fetch(this.url());
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 }
