@@ -11,8 +11,8 @@ export class BlocksService {
                 private blockRepository: MongoRepository<Block>) {
     }
 
-    async create(createBlockDto: CreateBlockDto): Promise<Block> {
-        return this.blockRepository.save(createBlockDto);
+    async create(createBlockDto: CreateBlockDto, repository?: MongoRepository<Block>): Promise<Block> {
+        return (repository || this.blockRepository).save(createBlockDto);
     }
 
     findAll(): Promise<Block[]> {

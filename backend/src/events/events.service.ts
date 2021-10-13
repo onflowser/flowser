@@ -13,8 +13,8 @@ export class EventsService {
     private eventRepository: MongoRepository<Event>
   ) {}
 
-  create(createEventDto: CreateEventDto) {
-    return this.eventRepository.save(createEventDto);
+  create(createEventDto: CreateEventDto, repository?: MongoRepository<Event>) {
+    return (repository || this.eventRepository).save(createEventDto);
   }
 
   findAll() {

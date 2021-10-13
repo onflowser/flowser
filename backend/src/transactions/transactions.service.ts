@@ -14,8 +14,8 @@ export class TransactionsService {
   ) {}
 
 
-  create(createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.save(createTransactionDto);
+  create(createTransactionDto: CreateTransactionDto, repository?: MongoRepository<Transaction>) {
+    return (repository || this.transactionService).save(createTransactionDto);
   }
 
   findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {

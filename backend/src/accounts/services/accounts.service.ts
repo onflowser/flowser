@@ -13,8 +13,8 @@ export class AccountsService {
     private accountRepository: MongoRepository<Account>
   ) {}
 
-  create(createAccountDto: CreateAccountDto) {
-    return this.accountRepository.save(createAccountDto);
+  create(createAccountDto: CreateAccountDto, repository?: MongoRepository<Account>) {
+    return (repository || this.accountRepository).save(createAccountDto);
   }
 
   findAll() {
@@ -40,11 +40,11 @@ export class AccountsService {
     return this.accountRepository.findOne({ where: { address }});
   }
 
-  update(address: string, updateAccountDto: UpdateAccountDto) {
+  update(address: string, updateAccountDto: UpdateAccountDto, repository?: MongoRepository<Account>) {
     // we refetch and insert the whole account entity
     // contracts & keys can be added or removed
     // therefore collection needs to be replaced and not just updated
-    return this.accountRepository.replaceOne(
+    return (repository || this.accountRepository).replaceOne(
       { address },
       updateAccountDto,
       // TODO: why default emulator-account creation event is not logged inside a transaction ?

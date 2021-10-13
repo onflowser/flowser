@@ -11,6 +11,7 @@ import { Account } from "../accounts/entities/account.entity";
 import { Event } from "../events/entities/event.entity";
 import { Transaction } from "../transactions/entities/transaction.entity";
 import { Block } from "../blocks/entities/block.entity";
+import { getMongoManager, MongoRepository } from "typeorm";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -26,94 +27,81 @@ export class FlowAggregatorService {
 
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
-    try {
-      const lastStoredBlock = await this.blockService.findLastBlock();
-      const latestBlock = await this.flowGatewayService.getLatestBlock();
-      // fetch from initial block if no stored blocks found
-      const startBlockHeight = lastStoredBlock ? lastStoredBlock.height : 0;
-      const endBlockHeight = latestBlock.height;
-      console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
-      const data = await this.flowGatewayService.getBlockDataWithinHeightRange(
-        startBlockHeight,
-        endBlockHeight
-      );
-      const events = data.map(({ events }) => events).flat();
-      const transactions = data.map(({ transactions }) => transactions).flat();
-      const blocks = data.map(({ block }) => block);
+    return getMongoManager().transaction(async entityManager => {
+      const {blocks, transactions, events} = await this.fetchData();
+
+      const blockRepository = entityManager.getMongoRepository(Block);
+      const transactionRepository = entityManager.getMongoRepository(Transaction);
+      const eventRepository = entityManager.getMongoRepository(Event);
+      const accountRepository = entityManager.getMongoRepository(Account);
+
       // store fetched data
       await Promise.all(blocks.map(e =>
-        this.blockService.create(Block.init(e))
-          .catch(e => console.error(`[Flowser] block save error: `, e))
+        this.blockService.create(Block.init(e), blockRepository)
       ))
       await Promise.all(transactions.map(e =>
-        this.transactionService.create(Transaction.init(e))
-          .catch(e => console.error(`[Flowser] transaction save error: `, e))
+        this.transactionService.create(Transaction.init(e), transactionRepository)
       ))
       await Promise.all(events.map(e =>
-        this.eventService.create(Event.init(e))
-          .catch(e => console.error(`[Flowser] event save error: `, e))
+        this.eventService.create(Event.init(e), eventRepository)
       ))
-      await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
-    } catch (e) {
-      console.error(`[Flowser] data fetch error: ${e}`, e.stack)
-    }
+      await Promise.all(events.map(e => this.handleEvent(Event.init(e), accountRepository)))
+    }).catch(e => {
+      console.log(`[Flowser] failed to fetch data: `, e)
+    })
+  }
+
+  async fetchData() {
+    const lastStoredBlock = await this.blockService.findLastBlock();
+    const latestBlock = await this.flowGatewayService.getLatestBlock();
+    // fetch from initial block if no stored blocks found
+    const startBlockHeight = lastStoredBlock ? lastStoredBlock.height : 0;
+    const endBlockHeight = latestBlock.height;
+    console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
+    const data = await this.flowGatewayService.getBlockDataWithinHeightRange(
+      startBlockHeight,
+      endBlockHeight
+    );
+    const events = data.map(({ events }) => events).flat();
+    const transactions = data.map(({ transactions }) => transactions).flat();
+    const blocks = data.map(({ block }) => block);
+    return {events, transactions, blocks};
   }
 
   // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
-  async handleEvent(event: Event) {
-    console.log(`[Flowser] handling event: `, event.type)
+  async handleEvent(event: Event, accountRepository?: MongoRepository<Account>) {
     const {data, type} = event;
-    const {address, contract} = data as any;
+    const {address} = data as any;
+    const updateAccount = () => this.updateAccount(address, accountRepository)
     switch (type) {
       case "flow.AccountCreated":
-        return this.handleAccountCreated(address);
+        return this.handleAccountCreated(address, accountRepository);
       case "flow.AccountKeyAdded":
-        return this.handleAccountKeyAdded(address);
+        return updateAccount();
       case "flow.AccountKeyRemoved":
-        return this.handleAccountKeyRemoved(address);
+        return updateAccount();
       case "flow.AccountContractAdded":
-        return this.handleAccountContractAdded(address, contract);
+        return updateAccount();
       case "flow.AccountContractUpdated":
-        return this.handleAccountContractUpdated(address, contract);
+        return updateAccount();
       case "flow.AccountContractRemoved":
-        return this.handleAccountContractRemoved(address, contract);
+        return updateAccount();
       default:
         return null; // not a core event, ignore it
     }
   }
 
-  async handleAccountCreated(address: string) {
+  async handleAccountCreated(address: string, repository?: MongoRepository<Account>) {
     const account = await this.flowGatewayService.getAccount(address);
-    console.log("[Flow] Account created: ", account.address);
-    return this.accountService.create(Account.init(account));
+    return this.accountService.create(Account.init(account), repository);
   }
 
-  async handleAccountKeyAdded(address: string) {
-    return this.updateAccount(address)
-  }
-
-  async handleAccountKeyRemoved(address: string) {
-    return this.handleAccountKeyAdded(address);
-  }
-
-  async handleAccountContractAdded(address: string, contractName: string) {
-    return this.updateAccount(address)
-  }
-
-  async handleAccountContractUpdated(address: string, contractName: string) {
-    return this.updateAccount(address)
-  }
-
-  async handleAccountContractRemoved(address: string, contractName: string) {
-    return this.updateAccount(address)
-  }
-
-  async updateAccount(address: string) {
+  async updateAccount(address: string, repository?: MongoRepository<Account>) {
     const account = await this.flowGatewayService.getAccount(address);
-    console.log("[Flow] Account updated: ", account.address);
     return this.accountService.update(
       address,
-      Account.init(account, {updatedAt: new Date().getTime()})
+      Account.init(account, {updatedAt: new Date().getTime()}),
+      repository
     )
   }
 }
