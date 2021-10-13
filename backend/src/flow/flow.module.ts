@@ -7,6 +7,7 @@ import { EventsModule } from "../events/events.module";
 import { TransactionsModule } from "../transactions/transactions.module";
 import { ProjectsModule } from "../projects/projects.module";
 import { FlowGatewayService } from "./flow-gateway.service";
+import { FlowController } from "./flow.controller";
 
 @Module({
   imports: [
@@ -16,6 +17,9 @@ import { FlowGatewayService } from "./flow-gateway.service";
     BlocksModule,
     EventsModule,
     TransactionsModule,
+  ],
+  controllers: [
+    FlowController
   ],
   providers: [
     FlowAggregatorService,

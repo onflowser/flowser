@@ -8,14 +8,20 @@ import {
 import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
 import { Injectable } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
+import fetch from "node-fetch";
 
 @Injectable()
 export class FlowGatewayService {
 
+    private configuration: GatewayConfigurationEntity;
+
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
-        console.info('FlowGatewayService configuration changed', configuration);
-        const accessNodeApi = `${configuration.address}:${configuration.port}`;
-        fcl.config().put("accessNode.api", accessNodeApi)
+        this.configuration = configuration;
+        fcl.config().put("accessNode.api", this.url())
+    }
+
+    private url() {
+        return `${this.configuration.address}:${this.configuration.port}`
     }
 
     public async getLatestBlock (): Promise<FlowBlock> {
@@ -92,7 +98,12 @@ export class FlowGatewayService {
         )
     }
 
-    private isConnectedToGateway(): boolean {
-        return true; // TODO: implement ping
+    async isConnectedToGateway(): Promise<boolean> {
+        try {
+            await fetch(this.url());
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 }
