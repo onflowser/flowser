@@ -2,18 +2,16 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UnprocessableEntityE
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { GatewayConfiguration } from './dto/gateway-configuration';
-import { FlowGatewayService } from '../shared/services/flow-gateway/flow-gateway.service';
+import { Project } from "./entities/project.entity";
 
 @Controller('projects')
 export class ProjectsController {
-    constructor(private readonly projectsService: ProjectsService,
-                private flowGatewayService: FlowGatewayService) {
+    constructor(private readonly projectsService: ProjectsService) {
     }
 
     @Post()
     create(@Body() createProjectDto: CreateProjectDto) {
-        return this.projectsService.create(createProjectDto);
+        return this.projectsService.create(Project.init(createProjectDto));
     }
 
     @Get()
@@ -38,13 +36,6 @@ export class ProjectsController {
 
     @Post('/use/:id')
     async useProject(@Param('id') id: string):Promise<void> {
-        try {
-            const project = await this.projectsService.findOne(id);
-            const configuration: GatewayConfiguration = project.gateway;
-            this.flowGatewayService.configureDataSourceGateway(configuration)
-        } catch (e) {
-            const description = `Can not use project with id '${id}'`;
-            throw new UnprocessableEntityException(e, description);
-        }
+        return this.projectsService.useProject(id);
     }
 }

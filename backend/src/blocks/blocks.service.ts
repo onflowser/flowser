@@ -1,20 +1,18 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { Block } from './entities/block.entity';
-import { Interval } from '@nestjs/schedule';
-import { FlowGatewayService } from '../shared/services/flow-gateway/flow-gateway.service';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { UpdateBlockDto } from './dto/update-block.dto';
+import { NotFoundException } from "@nestjs/common";
 
 export class BlocksService {
 
     constructor(@InjectRepository(Block)
-                private blockRepository: MongoRepository<Block>,
-                private flowGatewayService: FlowGatewayService) {
+                private blockRepository: MongoRepository<Block>) {
     }
 
-    create(createBlockDto: CreateBlockDto) {
-        return 'This action adds a new block';
+    async create(createBlockDto: CreateBlockDto): Promise<Block> {
+        return this.blockRepository.save(createBlockDto);
     }
 
     findAll(): Promise<Block[]> {
@@ -27,22 +25,26 @@ export class BlocksService {
         });
     }
 
-
-    findOne(id: number) {
-        return `This action returns a #${id} block`;
+    findLastBlock(): Promise<Block> {
+        return this.blockRepository.findOne({
+            order: {height: 'DESC'},
+        });
     }
 
-    update(id: number, updateBlockDto: UpdateBlockDto) {
+    async findOne(id: string) {
+        const [block] = await this.blockRepository.find({ where: {_id: id} });
+        if (block) {
+            return block;
+        } else {
+            throw new NotFoundException("Block not found")
+        }
+    }
+
+    update(id: string, updateBlockDto: UpdateBlockDto) {
         return `This action updates a #${id} block`;
     }
 
-    remove(id: number) {
+    remove(id: string) {
         return `This action removes a #${id} block`;
-    }
-
-    @Interval(5000) // TODO: Move to configuration
-    async fetchDataFromDataSource(): Promise<void> {
-        const block = await this.flowGatewayService.fetchBlocks();
-        return await this.blockRepository.save(block);
     }
 }

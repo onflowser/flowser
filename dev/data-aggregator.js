@@ -1,7 +1,7 @@
 const fcl = require("@onflow/fcl");
 
 // const ACCESS_NODE = "https://access-testnet.onflow.org";
-const ACCESS_NODE = "http://localhost:8080"; // use default flow http server port 8080
+const ACCESS_NODE = "http://127.0.0.1:8080"; // use default flow http server port 8080
 
 fcl.config().put("accessNode.api", ACCESS_NODE) // Configure FCL's Access Node
 
@@ -24,7 +24,7 @@ async function getTransactionById (id) {
     fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
     fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode)
   ])
-  return {data, status}
+  return {...data, status}
 }
 
 async function getAccount (address) {
@@ -41,31 +41,44 @@ async function getBlockData (height) {
       ...await getCollectionById(guarantee.collectionId)
     }))
   )
-  const transactions = (await Promise.all(collections.map(collection =>
+  const transactionsWithDetails = (await Promise.all(collections.map(collection =>
     Promise.all(collection.transactionIds.map(async txId => ({
-      collectionId: collection.id, ...await getTransactionById(txId)
+      id: txId,
+      ...await getTransactionById(txId)
     })))
   ))).flat()
   // find all account addresses that are related to some transaction
   // account can be either a payer, authorizer or both
   // therefore we need to remove duplicate account addresses
-  const accountAddresses = Object.keys(transactions
-    .map(tx => [...tx.data.authorizers, tx.data.payer])
+  const accountAddresses = Object.keys(transactionsWithDetails
+    .map(tx => [...tx.authorizers, tx.payer])
     .flat()
     .reduce((p, c) => ({...p, [c]: true}), {}))
   const accounts = await Promise.all(accountAddresses.map(getAccount));
+  const transactions = transactionsWithDetails.map(tx => {
+    const {events, ...status} = tx.status;
+    return {
+      ...tx,
+      status: {...status, eventsCount: tx.status.events.length}
+    }
+  })
+  const events = transactionsWithDetails.map(tx =>
+    tx.status.events.map(event => ({transactionId: tx.id, ...event}))
+  )
   return {
     block,
     collections,
     transactions,
-    accounts
+    accounts,
+    events
   }
 }
 
 async function getBlockDataWithinHeightRange(fromHeight, toHeight) {
+  if (fromHeight === toHeight) return [];
   return Promise.all(
     Array.from({length: toHeight - fromHeight + 1})
-      .map((_, i) => getBlockData(fromHeight + 1))
+      .map((_, i) => getBlockData(fromHeight + i))
   )
 }
 

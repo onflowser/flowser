@@ -9,10 +9,9 @@ import { ProjectsModule } from './projects/projects.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { TransactionsModule } from './transactions/transactions.module';
-import { ContractsModule } from './contracts/contracts.module';
 import { EventsModule } from './events/events.module';
 import { LogsModule } from './logs/logs.module';
-import { FlowGatewayService } from './shared/services/flow-gateway/flow-gateway.service';
+import { FlowModule } from "./flow/flow.module";
 
 const mongoUser = process.env.MONGODB_USERNAME;
 const mongoPassword = process.env.MONGODB_PASSWORD;
@@ -25,10 +24,6 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
 @Module({
     providers: [
         AppService,
-        FlowGatewayService,
-    ],
-    exports: [
-        FlowGatewayService
     ],
     imports: [
         ConfigModule.forRoot(),
@@ -37,15 +32,16 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
             url,
             useNewUrlParser: true,
             autoLoadEntities: true,
+            synchronize: process.env.NODE_ENV !== 'production'
         }),
         ScheduleModule.forRoot(),
         ProjectsModule,
         AccountsModule,
         BlocksModule,
         TransactionsModule,
-        ContractsModule,
         EventsModule,
         LogsModule,
+        FlowModule
     ],
     controllers: [AppController]
 })

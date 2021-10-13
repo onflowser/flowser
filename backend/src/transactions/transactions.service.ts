@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Transaction } from "./entities/transaction.entity";
+import { MongoRepository } from "typeorm";
 
 @Injectable()
 export class TransactionsService {
+
+  constructor (
+    @InjectRepository(Transaction)
+    private transactionService: MongoRepository<Transaction>
+  ) {}
+
+
   create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
+    return this.transactionService.save(createTransactionDto);
+  }
+
+  findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
+    return this.transactionService.find({
+      where: {createdAt: {$gt: timestamp}}
+    });
   }
 
   findAll() {
-    return `This action returns all transactions`;
+    return this.transactionService.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  findAllByBlock(blockId: string) {
+    return this.transactionService.find({
+      where: {referenceBlockId:blockId}
+    });
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
+  async findOne(id: string) {
+    const [transaction] = await this.transactionService.find({ where: {_id: id} });
+    if (transaction) {
+      return transaction;
+    } else {
+      throw new NotFoundException("Transaction not found")
+    }
+  }
+
+  update(id: string, updateTransactionDto: UpdateTransactionDto) {
     return `This action updates a #${id} transaction`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} transaction`;
   }
 }
