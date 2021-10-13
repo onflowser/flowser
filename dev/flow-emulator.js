@@ -1,6 +1,6 @@
-const {spawn} = require("child_process")
-const {mkdir,stat} =  require("fs/promises")
-const {join} = require("path");
+const { spawn } = require("child_process")
+const { mkdir, stat } = require("fs/promises")
+const { join } = require("path");
 
 const CONFIG_ROOT_DIR = '.'
 
@@ -8,16 +8,31 @@ const CONFIG_ROOT_DIR = '.'
 // TODO: refactor to TypeScript when adding to real codebase
 class FlowEmulator {
 
-  constructor ({ logLevel = 'debug', projectId = "default" } = {}) {
-    this.logLevel = logLevel;
+  constructor ({
+    verboseLogging = true,
+    projectId = "default",
+    rpcServerPort = 3569,
+    httpServerPort = 8080,
+    blockTime,
+    persist = false
+  } = {}) {
+    this.verboseLogging = verboseLogging;
     this.projectId = projectId;
+    this.httpServerPort = httpServerPort;
+    this.rpcServerPort = rpcServerPort;
+    this.blocktime = blockTime;
+    this.persist = persist;
   }
 
-  projectDir() {
+  projectDir () {
     return join(CONFIG_ROOT_DIR, this.projectId);
   }
 
-  static async configExists(projectId = "default") {
+  databaseDir () {
+    return join(this.projectDir(), "flowdb")
+  }
+
+  async projectDirExists (projectId = "default") {
     try {
       await stat(join(CONFIG_ROOT_DIR, projectId))
       return true;
@@ -30,39 +45,51 @@ class FlowEmulator {
     }
   }
 
-  async createConfig() {
-    await mkdir(this.projectDir());
-    const flowInit = spawn("flow", ['init'], { cwd: this.projectDir() });
-    return new Promise(((resolve, reject) => {
-      flowInit.on("close", (code) => code > 0 ? reject() : resolve())
-      flowInit.on("error", error => reject(error))
-    }))
+  async init() {
+    if (!(await this.projectDirExists())) {
+      await mkdir(this.projectDir());
+    }
   }
 
-  start(cb = () => null) {
-    const emulatorProcess = spawn("flow", ['emulator'], {
+  flag (name, userValue, defaultValue) {
+    const value = userValue || defaultValue;
+    return value ? `--${name}=${value}` : undefined;
+  }
+
+  start (cb = () => null) {
+    const emulatorProcess = spawn("flow", [
+      'emulator',
+      this.flag("dbpath", this.databaseDir()),
+      this.flag("http-port", this.httpServerPort),
+      this.flag("persist", this.persist),
+      this.flag("port", this.rpcServerPort),
+      this.flag("verbose", this.verboseLogging)
+    ], {
       cwd: this.projectDir()
     })
 
-    emulatorProcess.stdout.on("data", data => {
-      const lines = data.toString().split("\n").filter(e => !!e)
-      cb(null, lines)
-    })
+    return new Promise(((resolve, reject) => {
+      emulatorProcess.stdout.on("data", data => {
+        const lines = data.toString().split("\n").filter(e => !!e)
+        cb(null, lines)
+      })
 
-    emulatorProcess.stderr.on("data", data => {
-      const error = data.toString();
-      cb(error, null)
-    })
+      emulatorProcess.stderr.on("data", data => {
+        const error = data.toString();
+        cb(error, null)
+      })
 
-    emulatorProcess.on("close", code => {
-      console.log("[Flowser] emulator exited with code: ", code)
-    })
+      emulatorProcess.on("close", code => {
+        console.log("[Flowser] emulator exited with code: ", code)
+        resolve(code);
+      })
 
-    emulatorProcess.on("error", error => {
-      cb(error, null)
-    })
+      emulatorProcess.on("error", error => {
+        cb(error, null)
+        reject(error)
+      })
+    }))
 
-    return emulatorProcess;
   }
 
 }
@@ -71,23 +98,13 @@ class FlowEmulator {
 
 (async function () {
   const emulator = new FlowEmulator();
-  if (!await FlowEmulator.configExists()) {
-    try {
-      await emulator.createConfig();
-      console.info(`[Flowser] Flow config initialised in: ${emulator.projectDir()}`)
-    } catch (e) {
-      console.error(`[Flowser] Failed to create flow config: ${e}`)
-      process.exit(1);
-    }
-  } else {
-    console.info(`[Flowser] Config exists - skipping flow config initialisation.`)
-  }
+  await emulator.init();
 
-  emulator.start((error, data) => {
+  await emulator.start((error, data) => {
     if (error) {
       console.log(`[Flower] Received an error from emulator: ${error}`)
     } else {
-      console.log(`[Flower] Received ${data.length} line of data from emulator`)
+      console.log(`[Flower] Received ${data.length} line of data from emulator: `, data)
     }
   });
 })()
