@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FlowGatewayService } from './flow-gateway.service';
+import { FlowGateway } from './flow.gateway';
 
-describe('FlowGatewayService', () => {
-  let service: FlowGatewayService;
+describe('FlowGateway', () => {
+  let service: FlowGateway;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FlowGatewayService],
+      providers: [FlowGateway],
     }).compile();
 
-    service = module.get<FlowGatewayService>(FlowGatewayService);
+    service = module.get<FlowGateway>(FlowGateway);
   });
 
   it('should be defined', () => {

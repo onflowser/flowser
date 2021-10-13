@@ -1,5 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { GatewayConfiguration } from '../projects/dto/gateway-configuration';
 import {
     FlowAccount,
     FlowBlock,
@@ -7,23 +5,17 @@ import {
     FlowTransaction,
     FlowTransactionStatus
 } from "./types";
+import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
 const fcl = require("@onflow/fcl");
 
-@Injectable()
-export class FlowGatewayService {
-    private configuration: GatewayConfiguration;
+export class FlowGateway {
+    private configuration: GatewayConfigurationEntity;
 
-    constructor () {
-        // TODO: init default configuration just for development
-        this.configureDataSourceGateway({
-            port: 8080,
-            network: "emulator",
-            address: "http://host.docker.internal" // same as 127.0.0.1 on host
-        })
+    constructor (configuration: GatewayConfigurationEntity) {
+        this.configureDataSourceGateway(configuration)
     }
 
-
-    public configureDataSourceGateway(configuration: GatewayConfiguration) {
+    public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         console.info('FlowGatewayService configuration changed', configuration);
         this.configuration = configuration;
         const accessNodeApi = `${configuration.address}:${configuration.port}`;

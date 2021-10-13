@@ -1,7 +1,7 @@
 import config from "../config";
 import { Injectable } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
-import { FlowGatewayService } from "./flow-gateway.service";
+import { FlowGateway } from "./flow.gateway";
 import { BlocksService } from "../blocks/blocks.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { AccountsService } from "../accounts/services/accounts.service";
@@ -11,28 +11,48 @@ import { Account } from "../accounts/entities/account.entity";
 import { Event } from "../events/entities/event.entity";
 import { Transaction } from "../transactions/entities/transaction.entity";
 import { Block } from "../blocks/entities/block.entity";
+import { Project } from "../projects/entities/project.entity";
+import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
 
 @Injectable()
 export class FlowAggregatorService {
 
+  private project: Project;
+  private flowGatewayService: FlowGateway;
+
   constructor (
-    private flowGatewayService: FlowGatewayService,
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
     private contractService: ContractsService,
     private eventService: EventsService
-  ) {}
+  ) {
+    // TODO: use project from current user "context"
+    this.project = new Project();
+    this.project.name = "Emulator";
+    this.project.startBlockHeight = 0;
+    this.project.gateway = new GatewayConfigurationEntity("http://host.docker.internal", 8080);
+    this.flowGatewayService = new FlowGateway(this.project.gateway);
+  }
 
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
     try {
       const lastStoredBlock = await this.blockService.findLastBlock();
       const latestBlock = await this.flowGatewayService.getLatestBlock();
-      // fetch from initial block if no stored blocks found
-      const startBlockHeight = lastStoredBlock ? lastStoredBlock.height : 0;
+      // user can specify (on a project level) what is the starting block height
+      // if user provides no specification, the latest block height is used
+      const initialStartBlockHeight = this.project.startBlockHeight === undefined
+        ? latestBlock.height :
+        this.project.startBlockHeight;
+      // fetch from last stored block (if there are already blocks in the database)
+      const startBlockHeight = lastStoredBlock ?
+        lastStoredBlock.height :
+        initialStartBlockHeight;
       const endBlockHeight = latestBlock.height;
+
       console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
+
       const data = await this.flowGatewayService.getBlockDataWithinHeightRange(
         startBlockHeight,
         endBlockHeight

@@ -3,12 +3,10 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { GatewayConfiguration } from './dto/gateway-configuration';
-import { FlowGatewayService } from '../flow/flow-gateway.service';
 
 @Controller('projects')
 export class ProjectsController {
-    constructor(private readonly projectsService: ProjectsService,
-                private flowGatewayService: FlowGatewayService) {
+    constructor(private readonly projectsService: ProjectsService) {
     }
 
     @Post()
@@ -41,7 +39,7 @@ export class ProjectsController {
         try {
             const project = await this.projectsService.findOne(id);
             const configuration: GatewayConfiguration = project.gateway;
-            this.flowGatewayService.configureDataSourceGateway(configuration)
+            // TODO: use above configuration in the current project context
         } catch (e) {
             const description = `Can not use project with id '${id}'`;
             throw new UnprocessableEntityException(e, description);

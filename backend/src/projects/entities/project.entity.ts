@@ -1,5 +1,5 @@
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
-import { GatewayConfiguration } from './gateway-configuration';
+import { GatewayConfigurationEntity } from './gateway-configuration.entity';
 
 @Entity({name: 'projects'})
 export class Project {
@@ -10,8 +10,10 @@ export class Project {
     name: string;
 
     @Column()
-    gateway: GatewayConfiguration;
+    gateway: GatewayConfigurationEntity;
 
+    // data will be fetched from this block height
+    // leave this undefined to start fetching from latest block
     @Column()
-    isQuickStart: boolean = false;
+    startBlockHeight?: number;
 }
