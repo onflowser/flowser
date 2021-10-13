@@ -1,17 +1,17 @@
-import config from "../config";
+import config from "../../config";
 import { Injectable } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import { FlowGatewayService } from "./flow-gateway.service";
-import { BlocksService } from "../blocks/blocks.service";
-import { TransactionsService } from "../transactions/transactions.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { ContractsService } from "../accounts/services/contracts.service";
-import { EventsService } from "../events/events.service";
-import { Account } from "../accounts/entities/account.entity";
-import { Event } from "../events/entities/event.entity";
-import { Transaction } from "../transactions/entities/transaction.entity";
-import { Block } from "../blocks/entities/block.entity";
-import { Project } from "../projects/entities/project.entity";
+import { BlocksService } from "../../blocks/blocks.service";
+import { TransactionsService } from "../../transactions/transactions.service";
+import { AccountsService } from "../../accounts/services/accounts.service";
+import { ContractsService } from "../../accounts/services/contracts.service";
+import { EventsService } from "../../events/events.service";
+import { Account } from "../../accounts/entities/account.entity";
+import { Event } from "../../events/entities/event.entity";
+import { Transaction } from "../../transactions/entities/transaction.entity";
+import { Block } from "../../blocks/entities/block.entity";
+import { Project } from "../../projects/entities/project.entity";
 
 @Injectable()
 export class FlowAggregatorService {

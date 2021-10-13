@@ -5,7 +5,6 @@ const { join } = require("path");
 const CONFIG_ROOT_DIR = '.'
 
 // A simple emulator js bindings implemented in js
-// TODO: refactor to TypeScript when adding to real codebase
 class FlowEmulator {
 
   constructor ({

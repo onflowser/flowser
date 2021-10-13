@@ -4,8 +4,8 @@ import {
     FlowCollection,
     FlowTransaction,
     FlowTransactionStatus
-} from "./types";
-import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
+} from "../types";
+import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import fetch from "node-fetch";

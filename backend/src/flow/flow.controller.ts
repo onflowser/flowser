@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { FlowGatewayService } from "./flow-gateway.service";
+import { FlowGatewayService } from "./services/flow-gateway.service";
 
 @Controller("flow")
 export class FlowController {

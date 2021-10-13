@@ -7,8 +7,8 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { MongoRepository } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FlowGatewayService } from "../flow/flow-gateway.service";
-import { FlowAggregatorService } from "../flow/flow-aggregator.service";
+import { FlowGatewayService } from "../flow/services/flow-gateway.service";
+import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
 
 @Injectable()
 export class ProjectsService {
