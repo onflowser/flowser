@@ -1,7 +1,7 @@
 import config from "../config";
 import { Injectable } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
-import { FlowGateway } from "./flow.gateway";
+import { FlowGatewayService } from "./flow-gateway.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { AccountsService } from "../accounts/services/accounts.service";
@@ -12,27 +12,23 @@ import { Event } from "../events/entities/event.entity";
 import { Transaction } from "../transactions/entities/transaction.entity";
 import { Block } from "../blocks/entities/block.entity";
 import { Project } from "../projects/entities/project.entity";
-import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
 
 @Injectable()
 export class FlowAggregatorService {
 
   private project: Project;
-  private flowGatewayService: FlowGateway;
 
   constructor (
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
     private contractService: ContractsService,
-    private eventService: EventsService
-  ) {
-    // TODO: use project from current user "context"
-    this.project = new Project();
-    this.project.name = "Emulator";
-    this.project.startBlockHeight = 0;
-    this.project.gateway = new GatewayConfigurationEntity("http://host.docker.internal", 8080);
-    this.flowGatewayService = new FlowGateway(this.project.gateway);
+    private eventService: EventsService,
+    private flowGatewayService: FlowGatewayService
+  ) {}
+
+  configureProjectContext(project: Project) {
+    this.project = project;
   }
 
   @Interval(config.dataFetchInterval)
@@ -75,7 +71,7 @@ export class FlowAggregatorService {
       ))
       await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
     } catch (e) {
-      console.error(`[Flowser] data fetch error: ${e}`, e.stack)
+      console.error(`[Flowser] data fetch error: ${e}`, e.message)
     }
   }
 

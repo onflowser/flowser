@@ -13,6 +13,9 @@ import { FlowModule } from "../flow/flow.module";
     controllers: [ProjectsController],
     providers: [
         ProjectsService
+    ],
+    exports: [
+        ProjectsService
     ]
 })
 export class ProjectsModule {

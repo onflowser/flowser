@@ -6,18 +6,14 @@ import {
     FlowTransactionStatus
 } from "./types";
 import { GatewayConfigurationEntity } from "../projects/entities/gateway-configuration.entity";
+import { Injectable } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 
-export class FlowGateway {
-    private configuration: GatewayConfigurationEntity;
-
-    constructor (configuration: GatewayConfigurationEntity) {
-        this.configureDataSourceGateway(configuration)
-    }
+@Injectable()
+export class FlowGatewayService {
 
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         console.info('FlowGatewayService configuration changed', configuration);
-        this.configuration = configuration;
         const accessNodeApi = `${configuration.address}:${configuration.port}`;
         fcl.config().put("accessNode.api", accessNodeApi)
     }
@@ -97,6 +93,6 @@ export class FlowGateway {
     }
 
     private isConnectedToGateway(): boolean {
-        return !!this.configuration;
+        return true; // TODO: implement ping
     }
 }

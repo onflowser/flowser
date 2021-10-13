@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UnprocessableEntityE
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { GatewayConfiguration } from './dto/gateway-configuration';
+import { Project } from "./entities/project.entity";
 
 @Controller('projects')
 export class ProjectsController {
@@ -11,7 +11,7 @@ export class ProjectsController {
 
     @Post()
     create(@Body() createProjectDto: CreateProjectDto) {
-        return this.projectsService.create(createProjectDto);
+        return this.projectsService.create(Project.init(createProjectDto));
     }
 
     @Get()
@@ -36,13 +36,6 @@ export class ProjectsController {
 
     @Post('/use/:id')
     async useProject(@Param('id') id: string):Promise<void> {
-        try {
-            const project = await this.projectsService.findOne(id);
-            const configuration: GatewayConfiguration = project.gateway;
-            // TODO: use above configuration in the current project context
-        } catch (e) {
-            const description = `Can not use project with id '${id}'`;
-            throw new UnprocessableEntityException(e, description);
-        }
+        return this.projectsService.useProject(id);
     }
 }
