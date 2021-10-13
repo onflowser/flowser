@@ -25,7 +25,8 @@ $grid-gap: 30px;
 
   .logs {
     position: fixed;
-    display: block;
+    display: flex;
+    flex-direction: column;
     bottom: 0;
     left: 0;
     right: 0;

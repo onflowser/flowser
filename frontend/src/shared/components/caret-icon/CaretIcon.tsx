@@ -5,27 +5,35 @@ import classes from './CaretIcon.module.scss';
 interface OwnProps {
     isOpen?: boolean;
     onChange?: (isOpen: boolean) => void;
+    inverted?: boolean; // Close state is upside orientated instead of downside orientated
 
     [key: string]: any;
 }
 
 type Props = OwnProps;
 
-const CaretIcon: FunctionComponent<Props> = ({ isOpen = false, onChange = () => false, ...restProps }) => {
+const CaretIcon: FunctionComponent<Props> = ({
+    isOpen = false,
+    onChange = () => false,
+    inverted = false,
+    ...restProps
+}) => {
     const [state, setState] = useState(isOpen);
 
     useEffect(() => {
         setState(isOpen);
     }, [isOpen]);
 
-    const onToggle = useCallback(() => {
-        setState((state) => !!state);
+    const onToggle = () => {
+        setState(!state);
         onChange(state);
-    }, [isOpen]);
+    };
 
     return (
         <CaretIconSvg
-            className={`${classes.root} ${restProps.className} ${state ? classes.isOpen : ''}`}
+            className={`${classes.root} ${restProps.className} ${state ? classes.isOpen : ''} ${
+                inverted ? classes.inverted : ''
+            }`}
             onClick={onToggle}
         />
     );

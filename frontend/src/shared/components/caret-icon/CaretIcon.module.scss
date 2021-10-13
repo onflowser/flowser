@@ -12,4 +12,12 @@
     fill: $color-main-yellow;
     stroke: $color-main-yellow;
   }
+
+  &.inverted {
+    @include flipVertical(.2s);
+
+    &.isOpen {
+      @include flipVertical(.2s, 0deg);
+    }
+  }
 }
