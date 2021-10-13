@@ -8,6 +8,7 @@ import { TransactionsModule } from "../transactions/transactions.module";
 import { ProjectsModule } from "../projects/projects.module";
 import { FlowGatewayService } from "./services/flow-gateway.service";
 import { FlowController } from "./flow.controller";
+import { FlowEmulatorService } from "./services/flow-emulator.service";
 
 @Module({
   imports: [
@@ -23,11 +24,13 @@ import { FlowController } from "./flow.controller";
   ],
   providers: [
     FlowAggregatorService,
-    FlowGatewayService
+    FlowGatewayService,
+    FlowEmulatorService
   ],
   exports: [
     FlowAggregatorService,
-    FlowGatewayService
+    FlowGatewayService,
+    FlowEmulatorService
   ]
 })
 export class FlowModule {

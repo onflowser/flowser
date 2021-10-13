@@ -12,6 +12,7 @@ import { Event } from "../../events/entities/event.entity";
 import { Transaction } from "../../transactions/entities/transaction.entity";
 import { Block } from "../../blocks/entities/block.entity";
 import { Project } from "../../projects/entities/project.entity";
+import { FlowEmulatorService } from "./flow-emulator.service";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -24,11 +25,26 @@ export class FlowAggregatorService {
     private accountService: AccountsService,
     private contractService: ContractsService,
     private eventService: EventsService,
-    private flowGatewayService: FlowGatewayService
+    private flowGatewayService: FlowGatewayService,
+    private flowEmulatorService: FlowEmulatorService
   ) {}
 
   configureProjectContext(project: Project) {
     this.project = project;
+  }
+
+  async startEmulator() {
+    await this.flowEmulatorService.init();
+    if (this.flowEmulatorService.isRunning()) {
+      this.flowEmulatorService.stop();
+    }
+    await this.flowEmulatorService.start(((error, data) => {
+      if (error) {
+        console.error(`[Flowser] received emulator error: `, error)
+      } else {
+        console.log(`[Flowser] received emulator logs: `, data)
+      }
+    }))
   }
 
   @Interval(config.dataFetchInterval)

@@ -8,7 +8,6 @@ import {
 import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
-import fetch from "node-fetch";
 
 @Injectable()
 export class FlowGatewayService {
@@ -100,7 +99,14 @@ export class FlowGatewayService {
 
     async isConnectedToGateway(): Promise<boolean> {
         try {
-            await fetch(this.url());
+            // > nestjs transpiles
+            // import fetch from "node-fetch"
+            // > into
+            // const fetch = require("node-fetch")
+            // > which causes problems, because node-fetch doesn't support "require"
+            // https://github.com/standard-things/esm/issues/868
+            const fetch = await import("node-fetch");
+            await fetch.default(this.url());
             return true;
         } catch (e) {
             return false;
