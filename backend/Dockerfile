@@ -1,4 +1,3 @@
-# TODO: set alpine ubuntu x86 as base image
 FROM node:16-alpine3.11 AS development
 
 WORKDIR /app
@@ -10,13 +9,14 @@ RUN npm install glob rimraf
 RUN npm install --only=development
 
 # install flow-cli
-RUN sh -ci "$(wget https://storage.googleapis.com/flow-cli/install.sh -qO /dev/stdout)"
+# TODO: replace temporary flow-cli install script with official file
+# when arm64-darwin support is added
+RUN sh -ci "$(wget https://raw.githubusercontent.com/bartolomej/flowser/emulator_service/backend/install-flow-cli.sh?token=AITP5A22WKLNGLLTRLEUTF3BORQGU -qO /dev/stdout)"
 
 COPY . .
 
 RUN npm run build
 
-# TODO: set alpine ubuntu x86 as base image
 FROM node:16-alpine3.11 as production
 
 ARG NODE_ENV=production
@@ -27,6 +27,11 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm install --only=production
+
+# install flow-cli
+# TODO: replace temporary flow-cli install script with official file
+# when arm64-darwin support is added
+RUN sh -ci "$(wget https://raw.githubusercontent.com/bartolomej/flowser/emulator_service/backend/install-flow-cli.sh?token=AITP5A22WKLNGLLTRLEUTF3BORQGU -qO /dev/stdout)"
 
 COPY . .
 
