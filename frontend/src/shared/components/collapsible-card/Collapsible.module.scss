@@ -10,6 +10,7 @@
   .header {
     display: flex;
     align-items: center;
+    color: $color-grey;
 
     &.expanded {
       border-bottom: 1px solid $color-logs-text;

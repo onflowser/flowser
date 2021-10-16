@@ -70,8 +70,8 @@ const Details: FunctionComponent<any> = () => {
     return (
         <div className={classes.root}>
             <div className={classes.firstRow}>
-                <Label variant="medium">ADDRESS</Label>
-                <Value variant="medium">0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E</Value>
+                <Label variant="large">ADDRESS</Label>
+                <Value variant="large">0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E</Value>
                 <CopyButton value="0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E" />
             </div>
             <Card className={classes.bigCard}>
@@ -80,12 +80,6 @@ const Details: FunctionComponent<any> = () => {
                         BALANCE
                     </Label>
                     <Value variant="large">0.47000000 FLOW</Value>
-                </div>
-                <div>
-                    <Label variant="large" className={classes.label}>
-                        PAYER
-                    </Label>
-                    <Value variant="large">0x55ad22f01ef000a1</Value>
                 </div>
             </Card>
             <DetailsTabs>

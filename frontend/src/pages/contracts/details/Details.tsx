@@ -1,20 +1,31 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import sampleData from '../data.json';
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
-import { NavLink } from 'react-router-dom';
-import classes from './Details.module.scss';
-import DetailsItem from '../../../shared/components/details-item/DetailsItem';
-import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
+import { useSearch } from '../../../shared/hooks/search';
+import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
 
 type RouteParams = {
     contractId: string;
 };
 
 const Details: FunctionComponent<any> = () => {
+    const { setPlaceholder } = useSearch();
+    const { setBreadcrumbs, showSearchBar } = useNavigation();
+    const { showNavigationDrawer, showSubNavigation } = useNavigation();
+
+    const breadcrumbs: Breadcrumb[] = [{ to: '/contracts', label: 'Contracts' }, { label: 'Details' }];
+
+    useEffect(() => {
+        showNavigationDrawer(true);
+        showSubNavigation(false);
+        setBreadcrumbs(breadcrumbs);
+        showSearchBar(false);
+    }, []);
+
     const { contractId } = useParams<RouteParams>();
     const data = sampleData.find((e) => e._id === contractId) as any;
 
@@ -22,12 +33,12 @@ const Details: FunctionComponent<any> = () => {
         <div>
             <DetailsCard>
                 <div>
-                    <Label>NAME</Label>
-                    <Value>{data.name}</Value>
+                    <Label variant="large">NAME</Label>
+                    <Value variant="large">{data.name}</Value>
                 </div>
                 <div>
-                    <Label>ACCOUNT</Label>
-                    <Value>
+                    <Label variant="large">ACCOUNT</Label>
+                    <Value variant="large">
                         <NavLink to={`/accounts/details/${data.accountAddress}`}>{data.accountAddress}</NavLink>
                     </Value>
                 </div>

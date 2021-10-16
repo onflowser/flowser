@@ -31,7 +31,7 @@
         ],
         "status": {
             "status": 4,
-            "statusCode": 0,
+            "statusCode": 4,
             "errorMessage": "",
             "eventsCount": 1
         }
@@ -59,7 +59,7 @@
         ],
         "status": {
             "status": 4,
-            "statusCode": 0,
+            "statusCode": 3,
             "errorMessage": "",
             "eventsCount": 1
         }
@@ -87,7 +87,7 @@
         ],
         "status": {
             "status": 4,
-            "statusCode": 0,
+            "statusCode": 5,
             "errorMessage": "",
             "eventsCount": 1
         }
@@ -115,7 +115,7 @@
         ],
         "status": {
             "status": 4,
-            "statusCode": 0,
+            "statusCode": 1,
             "errorMessage": "",
             "eventsCount": 1
         }
@@ -143,7 +143,7 @@
         ],
         "status": {
             "status": 4,
-            "statusCode": 0,
+            "statusCode": 2,
             "errorMessage": "",
             "eventsCount": 1
         }

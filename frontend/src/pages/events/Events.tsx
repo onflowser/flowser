@@ -181,10 +181,6 @@ const Events: FunctionComponent<Props> = (props) => {
                                 </Value>
                             </div>
                             <div>
-                                <Label>HEIGHT</Label>
-                                <Value>000 ?</Value>
-                            </div>
-                            <div>
                                 <Label>TIMESTAMP</Label>
                                 <Value>{formatDate(new Date(item.createdAt).toISOString())}</Value>
                             </div>
@@ -193,7 +189,7 @@ const Events: FunctionComponent<Props> = (props) => {
                                 <Value>{item.type}</Value>
                             </div>
                             <div>
-                                <Label>TRANSACTION</Label>
+                                <Label>TRANSACTION ID</Label>
                                 <Value>
                                     <NavLink to={`/transactions/details/${item.transactionId}`}>
                                         <Ellipsis className={classes.hash}>{item.transactionId}</Ellipsis>

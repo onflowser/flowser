@@ -8,14 +8,17 @@ import { NavLink } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { useFilterData } from '../../../shared/hooks/filter-data';
 import data from '../data.json';
+import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
+import StatusCode from '../shared/StatusCode';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
-    const { showNavigationDrawer } = useNavigation();
+    const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
         showNavigationDrawer(false);
+        showSubNavigation(true);
     }, []);
 
     const { filteredData } = useFilterData(data, searchTerm);
@@ -26,26 +29,31 @@ const Main: FunctionComponent<any> = () => {
                 filteredData.map((item, i) => (
                     <Card key={i} className={classes.card}>
                         <div>
-                            <Label>ID</Label>
+                            <Label>TRANSACTION ID</Label>
                             <Value>
-                                <NavLink to={`/transactions/details/${item._id}`}>{item._id}</NavLink>
-                            </Value>
-                        </div>
-                        <div>
-                            <Label>BLOCK</Label>
-                            <Value>
-                                <NavLink to={`/blocks/details/${item.referenceBlockId}`}>
-                                    {item.referenceBlockId}
+                                <NavLink to={`/transactions/details/${item._id}`}>
+                                    <Ellipsis className={classes.hash}>{item._id}</Ellipsis>
                                 </NavLink>
                             </Value>
                         </div>
                         <div>
-                            <Label>GAS LIMIT</Label>
-                            <Value>{item.gasLimit}</Value>
+                            <Label>BLOCK ID</Label>
+                            <Value>
+                                <NavLink to={`/blocks/details/${item.referenceBlockId}`}>
+                                    <Ellipsis className={classes.hash}>{item.referenceBlockId}</Ellipsis>
+                                </NavLink>
+                            </Value>
+                        </div>
+                        <div>
+                            <StatusCode statusCode={item.status.statusCode} />
                         </div>
                         <div>
                             <Label>PAYER</Label>
                             <Value>{item.payer}</Value>
+                        </div>
+                        <div>
+                            <Label>PROPOSER</Label>
+                            <Value>{item.proposalKey.address}</Value>
                         </div>
                     </Card>
                 ))}

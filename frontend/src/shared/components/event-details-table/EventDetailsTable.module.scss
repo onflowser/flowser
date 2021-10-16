@@ -5,8 +5,8 @@
 .root {
   display: flex;
   flex-direction: column;
-  min-width: 40%;
-  max-width: 40%;
+  min-width: 50%;
+  max-width: 50%;
 
   @include fadeInAnimation(.1s);
 
@@ -40,6 +40,13 @@
 
     > div:first-child {
       padding-left: $spacing-l * 3;
+    }
+
+    .ellipsis {
+      max-width: 10vw;
+      min-width: 10vw;
+      display: inline-block;
+      overflow: hidden;
     }
   }
 }

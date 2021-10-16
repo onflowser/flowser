@@ -1,14 +1,19 @@
 import React, { FunctionComponent } from 'react';
 import classes from './EventDetailsTable.module.scss';
+import Ellipsis from '../ellipsis/Ellipsis';
+import CopyButton from '../copy-button/CopyButton';
 
 interface EventDetail {
     name: string;
     type: string;
     value: string;
+
+    [key: string]: any;
 }
 
 interface OwnProps {
     items: EventDetail[];
+
     [key: string]: any;
 }
 
@@ -27,9 +32,16 @@ const EventDetailsTable: FunctionComponent<Props> = ({ items, ...restProps }) =>
                 items.map((item, index) => (
                     <div key={index} className={classes.row}>
                         <div></div>
-                        <div>{item.name}</div>
-                        <div>{item.type}</div>
-                        <div>{item.value}</div>
+                        <div>
+                            <Ellipsis className={classes.ellipsis}>{item.name}</Ellipsis>
+                        </div>
+                        <div>
+                            <Ellipsis className={classes.ellipsis}>{item.type}</Ellipsis>
+                        </div>
+                        <div>
+                            <Ellipsis className={classes.ellipsis}>{item.value}</Ellipsis>
+                            <CopyButton value={item.value} />
+                        </div>
                     </div>
                 ))}
         </div>

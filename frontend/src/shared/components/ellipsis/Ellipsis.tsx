@@ -20,9 +20,9 @@ const Ellipsis: FunctionComponent<Props> = ({ children, ellipsis = '...', ...res
             const scrollWidth = elRef.current ? (elRef.current as any).scrollWidth : 0;
             if (offsetWidth < scrollWidth) {
                 const charWidth = Math.ceil(scrollWidth / children.length);
-                const hiddenLength = Math.ceil(scrollWidth - offsetWidth);
-                const numCharsRemove = Math.ceil(hiddenLength / charWidth) + ellipsis?.length;
-                const half = Math.ceil((children.length - numCharsRemove) / 2) - 4;
+                const textHalf = Math.ceil(offsetWidth / charWidth / 2);
+                const ellipsisHalf = Math.ceil(ellipsis.length / charWidth / 2);
+                const half = textHalf - ellipsisHalf - 2; // safety 2 :)
                 const ellipsisText = children.substr(0, half) + ellipsis + children.substring(children.length - half);
                 setState(ellipsisText);
             }

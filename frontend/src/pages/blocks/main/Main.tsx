@@ -8,11 +8,20 @@ import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import classes from './Main.module.scss';
 import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
+import { useNavigation } from '../../../shared/hooks/navigation';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
+    const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { formatDate } = useFormattedDate();
     // const { data } = useTimeoutPolling('/api/blocks/polling');
+
+    useEffect(() => {
+        setPlaceholder('Search for block ids, parent ids, time, ...');
+        showNavigationDrawer(false);
+        showSubNavigation(true);
+    }, []);
+
     // TODO: Remove
     const data = [
         {
@@ -110,10 +119,6 @@ const Main: FunctionComponent<any> = () => {
     const { filteredData } = useFilterData(data, searchTerm);
 
     useEffect(() => {
-        setPlaceholder('Search for block ids, parent ids, time, ...');
-    }, []);
-
-    useEffect(() => {
         console.log('filtered data changed', filteredData);
     }, [filteredData]);
 
@@ -122,6 +127,10 @@ const Main: FunctionComponent<any> = () => {
             {filteredData &&
                 filteredData.map((item, i) => (
                     <Card key={i} className={`${classes.card} ${i + 1 === filteredData.length ? classes.isNew : ''}`}>
+                        <div>
+                            <Label>BLOCK HEIGHT</Label>
+                            <Value>{item.height}</Value>
+                        </div>
                         <div>
                             <Label>BLOCK ID</Label>
                             <Value>
@@ -137,10 +146,6 @@ const Main: FunctionComponent<any> = () => {
                                     <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
                                 </NavLink>
                             </Value>
-                        </div>
-                        <div>
-                            <Label>HEIGHT</Label>
-                            <Value>{item.height}</Value>
                         </div>
                         <div>
                             <Label>TIME</Label>

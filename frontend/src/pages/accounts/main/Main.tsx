@@ -82,10 +82,6 @@ const Main: FunctionComponent<any> = () => {
                             <Label>TX COUNT</Label>
                             <Value>{item.txCount}</Value>
                         </div>
-                        <div>
-                            <Label>INDEX</Label>
-                            <Value>{item.index}</Value>
-                        </div>
                     </Card>
                 ))}
         </>

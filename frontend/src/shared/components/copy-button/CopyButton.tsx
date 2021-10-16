@@ -10,9 +10,13 @@ interface OwnProps {
 type Props = OwnProps;
 
 const CopyButton: FunctionComponent<Props> = ({ value }) => {
+    const MAX_CHARS_DISPLAY = 60;
+
+    const displayValue = value.length > MAX_CHARS_DISPLAY ? value.substr(0, MAX_CHARS_DISPLAY) + '...' : value;
+
     const copyToClipboard = useCallback(() => {
         copy(value);
-        toast(`"${value}" copied to your clipboard`);
+        toast(`"${displayValue}" copied to your clipboard`);
     }, []);
     return (
         <span className={classes.root}>

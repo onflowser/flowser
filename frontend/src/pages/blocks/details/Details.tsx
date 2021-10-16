@@ -139,8 +139,8 @@ const Details: FunctionComponent<any> = () => {
     return (
         <div className={classes.root}>
             <div className={classes.firstRow}>
-                <Label variant="medium">BLOCK ID</Label>
-                <Value variant="medium">0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E</Value>
+                <Label variant="large">BLOCK ID</Label>
+                <Value variant="large">0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E</Value>
                 <CopyButton value="0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E" />
             </div>
             <Card className={classes.bigCard}>
@@ -161,9 +161,9 @@ const Details: FunctionComponent<any> = () => {
             </Card>
 
             <DetailsTabs>
-                <DetailsTabItem label="HEIGHT" value="" />
+                <DetailsTabItem label="HEIGHT" value="1" />
                 <DetailsTabItem
-                    label="Transactions"
+                    label="TRANSACTIONS"
                     value={data.length}
                     onClick={() => setPlaceholder('search for transactions')}
                 >

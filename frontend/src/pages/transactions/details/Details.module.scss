@@ -1,20 +1,60 @@
 @import 'styles/spacings';
 
-.authorizersAddress {
-  display: block;
-  margin-bottom: $spacing-s;
-}
-
-.authorizersLabel {
-  vertical-align: top;
-}
-
-.detailsItemsWrapper {
+.root {
   display: flex;
-  justify-content: space-between;
-  margin-top: $spacing-l;
-}
+  flex-direction: column;
+  align-self: center;
+  max-width: 1690px;
+  width: 100%;
+  margin-top: 48px;
 
-.label {
-  margin-right: $spacing-s;
+  .firstLine {
+    margin-bottom: $spacing-l * 2;
+  }
+
+  .twoColumns {
+    display: flex;
+    .inlineValue,
+    .inlineLabel {
+      margin-left: $spacing-l * 2;
+    }
+  }
+
+  .authorizersAddress {
+    display: block;
+    margin-bottom: $spacing-s;
+  }
+
+  .authorizersLabel {
+    vertical-align: top;
+  }
+
+  .detailsItemsWrapper {
+    display: flex;
+    justify-content: space-between;
+    margin-top: $spacing-l;
+  }
+
+  .listCard {
+    display: flex;
+    justify-content: space-between;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  .hash {
+    max-width: 30vw;
+    min-width: 30vw;
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .detailsTable {
+    margin-bottom: $spacing-base;
+    position: relative;
+    margin-left: auto;
+    display: flex;
+  }
 }

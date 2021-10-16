@@ -11,11 +11,12 @@ import data from '../data.json';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
-    const { showNavigationDrawer } = useNavigation();
+    const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
     useEffect(() => {
         setPlaceholder('search for contracts');
         showNavigationDrawer(false);
+        showSubNavigation(true);
     }, []);
 
     const { filteredData } = useFilterData(data, searchTerm);
