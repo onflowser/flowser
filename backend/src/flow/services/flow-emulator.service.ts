@@ -6,7 +6,7 @@ import config from "../../config";
 import { Project } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 
-type StartCallback = (error: Error, data: string) => void;
+type StartCallback = (error: Error, data: string[]) => void;
 
 @Injectable()
 export class FlowEmulatorService {

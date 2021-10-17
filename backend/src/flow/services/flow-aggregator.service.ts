@@ -13,6 +13,8 @@ import { Transaction } from "../../transactions/entities/transaction.entity";
 import { Block } from "../../blocks/entities/block.entity";
 import { Project } from "../../projects/entities/project.entity";
 import { FlowEmulatorService } from "./flow-emulator.service";
+import { LogsService } from "../../logs/logs.service";
+import { Log } from "../../logs/entities/log.entity";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -26,7 +28,8 @@ export class FlowAggregatorService {
     private contractService: ContractsService,
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
-    private flowEmulatorService: FlowEmulatorService
+    private flowEmulatorService: FlowEmulatorService,
+    private logsService: LogsService
   ) {}
 
   configureProjectContext(project: Project) {
@@ -43,6 +46,11 @@ export class FlowAggregatorService {
         console.error(`[Flowser] received emulator error: `, error)
       } else {
         console.log(`[Flowser] received emulator logs: `, data)
+        Promise.all(data.map(line => {
+          const log = new Log();
+          log.data = line;
+          this.logsService.create(log);
+        }))
       }
     }))
   }

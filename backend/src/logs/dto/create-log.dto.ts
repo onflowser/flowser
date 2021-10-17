@@ -1,1 +1,3 @@
-export class CreateLogDto {}
+export class CreateLogDto {
+  data: string;
+}

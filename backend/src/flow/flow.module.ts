@@ -9,10 +9,12 @@ import { ProjectsModule } from "../projects/projects.module";
 import { FlowGatewayService } from "./services/flow-gateway.service";
 import { FlowController } from "./flow.controller";
 import { FlowEmulatorService } from "./services/flow-emulator.service";
+import { LogsModule } from "../logs/logs.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(),
+    LogsModule,
     BlocksModule,
     AccountsModule,
     BlocksModule,

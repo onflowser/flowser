@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors, Query, ParseIntPipe
+} from '@nestjs/common';
 import { LogsService } from './logs.service';
 import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
+import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
 
 @Controller('logs')
 export class LogsController {
@@ -20,6 +30,12 @@ export class LogsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.logsService.findOne(+id);
+  }
+
+  @Get('/polling')
+  @UseInterceptors(PollingResponseInterceptor)
+  findAllNew(@Query('timestamp', ParseIntPipe) timestamp) {
+    return this.logsService.findAllNewerThanTimestamp(timestamp);
   }
 
   @Patch(':id')
