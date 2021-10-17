@@ -1,12 +1,16 @@
 import {
     FlowAccount,
     FlowBlock,
-    FlowCollection,
+    FlowCollection, FlowCollectionGuarantee,
     FlowTransaction,
     FlowTransactionStatus
 } from "../types";
 import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable } from "@nestjs/common";
+import { Block } from "../../blocks/entities/block.entity";
+import { CollectionGuarantee } from "../../blocks/entities/collection-guarantee.entity";
+import { Transaction } from "../../transactions/entities/transaction.entity";
+import { Event } from "../../events/entities/event.entity";
 const fcl = require("@onflow/fcl");
 
 @Injectable()
@@ -59,26 +63,16 @@ export class FlowGatewayService {
 
     public async getBlockData (height) {
         const block = await this.getBlockByHeight(height);
-        const collections = await Promise.all(
-          block.collectionGuarantees.map(async guarantee => ({
-              blockId: block.id,
-              ...await this.getCollectionById(guarantee.collectionId)
-          }))
-        )
-        const transactionsWithDetails = (await Promise.all(collections.map((collection: any) =>
-          Promise.all(collection.transactionIds.map (async txId => ({
-              id: txId,
-              ...await this.getTransactionById(txId)
-          })))
-        ))).flat()
-        const transactions = transactionsWithDetails.map((tx: any) => {
+        const collections = await this.fetchCollectionGuarantees(block);
+        const txWithStatuses = await this.fetchTransactionsWithStatuses(collections);
+        const transactions = txWithStatuses.map((tx: any) => {
             const {events, ...status} = tx.status;
             return {
                 ...tx,
                 status: {...status, eventsCount: tx.status.events.length}
             }
         })
-        const events = transactionsWithDetails.map((tx: any) =>
+        const events = txWithStatuses.map((tx: any) =>
           tx.status.events.map(event => ({transactionId: tx.id, ...event}))
         ).flat()
         return {
@@ -87,6 +81,23 @@ export class FlowGatewayService {
             transactions,
             events
         }
+    }
+
+    private async fetchCollectionGuarantees(block: FlowBlock) {
+        return Promise.all(
+          block.collectionGuarantees.map(async guarantee => ({
+              blockId: block.id,
+              ...await this.getCollectionById(guarantee.collectionId)
+          }))
+        )
+    }
+
+    private async fetchTransactionsWithStatuses(collections: any[]) {
+        const txIds = collections.map(collection => collection.transactionIds).flat();
+        return await Promise.all(txIds.map(async txId => ({
+            id: txId,
+            ...await this.getTransactionById(txId)
+        })))
     }
 
     public async getBlockDataWithinHeightRange(fromHeight, toHeight) {

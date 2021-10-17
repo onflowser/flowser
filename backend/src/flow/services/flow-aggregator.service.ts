@@ -57,29 +57,42 @@ export class FlowAggregatorService {
 
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
-    try {
       const lastStoredBlock = await this.blockService.findLastBlock();
-      const latestBlock = await this.flowGatewayService.getLatestBlock();
+      let latestBlock;
+      try {
+        latestBlock = await this.flowGatewayService.getLatestBlock();
+      } catch (e) {
+        return console.log(`[Flowser] failed to fetch latest block from blockchain: ${e.message}`)
+      }
+
       // user can specify (on a project level) what is the starting block height
       // if user provides no specification, the latest block height is used
       const initialStartBlockHeight = this.project.startBlockHeight === undefined
-        ? latestBlock.height :
-        this.project.startBlockHeight;
+        ? latestBlock.height
+        : this.project.startBlockHeight;
       // fetch from last stored block (if there are already blocks in the database)
-      const startBlockHeight = lastStoredBlock ?
-        lastStoredBlock.height :
-        initialStartBlockHeight;
+      const startBlockHeight = lastStoredBlock
+        ? lastStoredBlock.height + 1
+        : initialStartBlockHeight;
       const endBlockHeight = latestBlock.height;
 
       console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
 
-      const data = await this.flowGatewayService.getBlockDataWithinHeightRange(
+    let data;
+    try {
+      data = await this.flowGatewayService.getBlockDataWithinHeightRange(
         startBlockHeight,
         endBlockHeight
       );
-      const events = data.map(({ events }) => events).flat();
-      const transactions = data.map(({ transactions }) => transactions).flat();
-      const blocks = data.map(({ block }) => block);
+    } catch (e) {
+      return console.log(`[Flowser] failed to fetch block data: ${e.message}`)
+    }
+
+    const events = data.map(({ events }) => events).flat();
+    const transactions = data.map(({ transactions }) => transactions).flat();
+    const blocks = data.map(({ block }) => block);
+
+    try {
       // store fetched data
       await Promise.all(blocks.map(e =>
         this.blockService.create(Block.init(e))
@@ -95,7 +108,8 @@ export class FlowAggregatorService {
       ))
       await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
     } catch (e) {
-      console.error(`[Flowser] data fetch error: ${e}`, e.message)
+      // TODO: revert writes (wrap in db transaction)
+      console.error(`[Flowser] data store error: ${e}`, e.message)
     }
   }
 
