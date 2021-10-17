@@ -64,11 +64,11 @@ const Navigation = (props: any) => {
 
                     <div className={classes.rightContainer}>
                         <div>
-                            <span>WORKSPACE</span>
-                            <span>QUICKSTART</span>
+                            <span>NETWORK</span>
+                            <span>EMULATOR</span>
                         </div>
                         <div>
-                            <Button disabled={true}>SAVE</Button>
+                            {/*<Button disabled={true}>SAVE</Button>*/}
                             <Button onClick={onSwitchProject}>SWITCH</Button>
                             <IconButton disabled={true} icon={<IconSettings className={classes.settingsIcon} />} />
                         </div>

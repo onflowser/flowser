@@ -49,7 +49,7 @@ export const App = () => {
                 <BrowserRouter>
                     <BrowserRouterEvents>
                         <Switch>
-                            <Route exact path={`/${routes.start}`} component={Start} />
+                            <Route path={`/${routes.start}`} component={Start} />
                             <RouteWithLayout path={`/${routes.accounts}`} component={LazyAccounts} />
                             <RouteWithLayout path={`/${routes.blocks}`} component={LazyBlocks} />
                             <RouteWithLayout path={`/${routes.transactions}`} component={LazyTransactions} />

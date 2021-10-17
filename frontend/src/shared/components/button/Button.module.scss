@@ -11,7 +11,7 @@
   letter-spacing: $character-spacing-medium;
   font-style: normal;
   font-weight: bold;
-  border: none;
+  border: 2px solid $color-main-yellow;
   cursor: pointer;
 
   &:hover {
@@ -26,15 +26,22 @@
   font-size: $font-size-xsmall !important;
 }
 
+.middle {
+  width: 127px;
+  height: 46px;
+  font-size: $font-size-xsmall !important;
+}
+
 .big {
   width: 216px;
   height: 65px;
-  font-size: $font-size-big;
+  font-size: $font-size-big !important;
 }
 
 .disabled {
   background: $color-not-active-button-grey;
   color: $color-not-active-button-text-grey;
+  border: 2px solid $color-not-active-button-grey;
   cursor: default;
   font-size: $font-size-normal;
 
@@ -47,3 +54,11 @@
   }
 }
 
+.outlined {
+  background: none;
+  color: $color-main-yellow;
+
+  &.disabled {
+    color: $color-not-active-button-text-grey;
+  }
+}

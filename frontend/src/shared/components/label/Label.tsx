@@ -4,7 +4,7 @@ import classes from './Label.module.scss';
 interface LabelProps {
     children: any;
     className?: any;
-    variant?: 'small' | 'normal' | 'medium' | 'large';
+    variant?: 'small' | 'normal' | 'medium' | 'large' | 'xlarge';
 }
 
 type Props = LabelProps;

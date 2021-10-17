@@ -3,8 +3,9 @@ import classes from './Button.module.scss';
 
 export interface ButtonProps {
     onClick?: () => void;
-    variant?: 'big' | 'normal';
+    variant?: 'big' | 'middle' | 'normal';
     disabled?: boolean;
+    outlined?: boolean;
     [key: string]: any;
 }
 
@@ -14,6 +15,7 @@ const Button: FunctionComponent<Props> = ({
     onClick = () => true,
     disabled = false,
     variant = 'normal',
+    outlined = false,
     ...restProps
 }) => {
     return (
@@ -22,7 +24,7 @@ const Button: FunctionComponent<Props> = ({
             disabled={disabled}
             className={`${classes.button} ${classes[variant]} ${disabled ? classes.disabled : ''} ${
                 restProps.className
-            }`}
+            } ${outlined ? classes.outlined : ''}`}
         >
             {restProps.children}
         </button>

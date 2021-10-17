@@ -4,7 +4,7 @@ import classes from './IconButton.module.scss';
 
 interface IconButtonProps extends ButtonProps {
     icon: React.Component | any;
-    iconPosition?: 'before' | 'after';
+    iconPosition?: 'before' | 'after' | 'after-end';
     [key: string]: any;
 }
 
@@ -19,6 +19,12 @@ const IconButton: FunctionComponent<Props> = ({ icon, iconPosition = 'before', .
                     {icon} {restProps.children}
                 </span>
             );
+        } else if (iconPosition === 'after-end') {
+            children = (
+                <span className={classes.afterEnd}>
+                    {restProps.children} {icon}
+                </span>
+            );
         } else {
             children = (
                 <span className={classes.after}>
@@ -28,7 +34,7 @@ const IconButton: FunctionComponent<Props> = ({ icon, iconPosition = 'before', .
         }
     }
     return (
-        <Button {...restProps} className={`${restProps.className}`}>
+        <Button {...restProps} className={`${classes.root} ${restProps.className}`}>
             {children}
         </Button>
     );
