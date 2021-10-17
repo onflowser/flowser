@@ -17,4 +17,5 @@ export class EmulatorConfigurationDto {
   serviceHashAlgorithm: string;
   storageLimit: boolean;
   transactionFees: boolean;
+  numberOfInitialAccounts: number;
 }

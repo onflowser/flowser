@@ -1,4 +1,5 @@
 import {
+    ConflictException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
@@ -50,6 +51,14 @@ export class ProjectsService {
         } catch (e) {
             const description = `Can not use project with id '${id}'`;
             throw new NotFoundException(e, description);
+        }
+    }
+
+    async seedAccounts(id: string, n: number) {
+        if (this.currentProject.id === id) {
+            return this.flowEmulatorService.initialiseAccounts(n);
+        } else {
+            throw new ConflictException("This project is not currently used.")
         }
     }
 

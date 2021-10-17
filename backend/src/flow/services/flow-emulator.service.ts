@@ -12,6 +12,7 @@ type StartCallback = (error: Error, data: string) => void;
 export class FlowEmulatorService {
 
   private projectId: string;
+  private isFlowServerStarted: boolean = false;
   private configuration: EmulatorConfigurationEntity;
   private emulatorProcess: ChildProcessWithoutNullStreams;
 
@@ -59,6 +60,7 @@ export class FlowEmulatorService {
   }
 
   start (cb: StartCallback = () => null) {
+    this.isFlowServerStarted = false;
     const {flag} = FlowEmulatorService;
     // DOCS: https://github.com/onflow/flow-emulator#configuration
     const flags = [
@@ -96,6 +98,10 @@ export class FlowEmulatorService {
     return new Promise(((resolve, reject) => {
       this.emulatorProcess.stdout.on("data", data => {
         const lines = data.toString().split("\n").filter(e => !!e)
+        if (!this.isFlowServerStarted && lines.find(line => line.includes("Starting"))) {
+          this.isFlowServerStarted = true;
+          this.onServerStarted();
+        }
         cb(null, lines)
       })
 
@@ -105,7 +111,7 @@ export class FlowEmulatorService {
       })
 
       this.emulatorProcess.on("close", code => {
-        console.log("[Flowser] emulator exited with code: ", code)
+        console.log(`[Flowser] "${this.projectId}" emulator exited with code: `, code)
         resolve(code);
       })
 
@@ -113,6 +119,39 @@ export class FlowEmulatorService {
         cb(error, null)
         reject(error)
       })
+    }))
+  }
+
+  // called when emulator logs "Starting gRPC/HTTP server..."
+  onServerStarted() {
+    if (this.configuration.numberOfInitialAccounts) {
+      this.initialiseAccounts(this.configuration.numberOfInitialAccounts)
+    }
+  }
+
+  async initialiseAccounts(n: number) {
+    console.debug(`[Flowser] initialising ${n} initial flow accounts...`)
+
+    let out = [];
+    for (let i = 0; i < n; i++) {
+      out.push(await this.createAccount());
+    }
+    return out;
+  }
+
+  createAccount(): Promise<string> {
+    return new Promise(((resolve, reject) => {
+      let out = "";
+      spawn("flow", [
+        'accounts',
+        'create'
+      ], {
+        cwd: this.projectDir()
+      })
+        .stdout.on("data", data => {
+          out += data.toString()
+        })
+        .on("close", (code) => code > 0 ? reject(code) : resolve(out))
     }))
   }
 
