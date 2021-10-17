@@ -21,20 +21,22 @@ export class FlowEmulatorService {
   }
 
   projectDir () {
-    return join(config.cacheRootDir, this.projectId);
+    return join(config.flowserRootDir, this.projectId);
   }
 
   databaseDir () {
     return join(this.projectDir(), "flowdb")
   }
 
-  async projectDirExists () {
+  // create directory if it does not already exist
+  static async mkdirIfEnoent(path: string) {
     try {
-      await stat(this.projectDir())
-      return true;
+      await stat(path)
+      console.debug(`[Flowser] directory "${path}", skipping creation.`)
     } catch (e) {
       if (e.code === "ENOENT") {
-        return false;
+        console.debug(`[Flowser] directory "${path}" not found, creating...`)
+        await mkdir(path)
       } else {
         throw e;
       }
@@ -43,10 +45,8 @@ export class FlowEmulatorService {
 
   async init() {
     console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
-    if (!(await this.projectDirExists())) {
-      await mkdir(this.projectDir());
-      console.log(`[Flowser] created project dir under ${this.projectDir()}`)
-    }
+    await FlowEmulatorService.mkdirIfEnoent(config.flowserRootDir);
+    await FlowEmulatorService.mkdirIfEnoent(this.projectDir());
   }
 
   private static flag (name: string, userValue: any, defaultValue?: any) {
@@ -59,15 +59,32 @@ export class FlowEmulatorService {
   }
 
   start (cb: StartCallback = () => null) {
+    const {flag} = FlowEmulatorService;
+    // DOCS: https://github.com/onflow/flow-emulator#configuration
     const flags = [
-      FlowEmulatorService.flag("dbpath", this.databaseDir()),
-      FlowEmulatorService.flag("http-port", this.configuration.httpServerPort),
-      FlowEmulatorService.flag("persist", this.configuration.persist),
-      FlowEmulatorService.flag("port", this.configuration.rpcServerPort),
-      FlowEmulatorService.flag("verbose", this.configuration.verboseLogging)
+      flag("port", this.configuration.rpcServerPort),
+      flag("http-port", this.configuration.httpServerPort),
+      flag("block-time", this.configuration.blockTime),
+      flag("service-priv-key", this.configuration.servicePrivateKey),
+      flag("service-pub-key", this.configuration.servicePublicKey),
+      flag("database-path", this.configuration.databasePath),
+      flag("token-supply", this.configuration.tokenSupply),
+      flag("transaction-expiry", this.configuration.transactionExpiry),
+      flag("storage-per-flow", this.configuration.storagePerFlow),
+      flag("min-account-balance", this.configuration.minAccountBalance),
+      flag("transaction-max-gas-limit", this.configuration.transactionMaxGasLimit),
+      flag("script-gas-limit", this.configuration.scriptGasLimit),
+      flag("service-sig-algo", this.configuration.serviceSignatureAlgorithm),
+      flag("service-hash-algo", this.configuration.serviceHashAlgorithm),
+      flag("storage-limit", this.configuration.storageLimit),
+      flag("transaction-fees", this.configuration.transactionFees),
+      flag("dbpath", this.configuration.databasePath || this.databaseDir()),
+      flag("persist", this.configuration.persist),
+      flag("verbose", this.configuration.verboseLogging),
+      flag("init", true)
     ].filter(Boolean);
 
-    console.log(`[Flowser] starting the emulator with flags: `, flags.join(" "))
+    console.log(`[Flowser] starting the emulator with (${flags.length}) flags: `, flags.join(" "))
 
     this.emulatorProcess = spawn("flow", [
       'emulator',

@@ -46,6 +46,7 @@ export class ProjectsService {
             this.flowAggregatorService.configureProjectContext(this.currentProject);
             this.flowEmulatorService.configureProjectContext(this.currentProject)
             this.flowAggregatorService.startEmulator(); // TODO: test this
+            console.debug(`[Flowser] using project: ${id}`)
         } catch (e) {
             const description = `Can not use project with id '${id}'`;
             throw new NotFoundException(e, description);

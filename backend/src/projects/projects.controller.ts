@@ -19,6 +19,11 @@ export class ProjectsController {
         return this.projectsService.findAll();
     }
 
+    @Get('current')
+    findCurrent() {
+        return this.projectsService.getCurrentProject();
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.projectsService.findOne(id);
