@@ -1,17 +1,14 @@
 import {
     FlowAccount,
     FlowBlock,
-    FlowCollection, FlowCollectionGuarantee,
+    FlowCollection,
     FlowTransaction,
     FlowTransactionStatus
 } from "../types";
 import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable } from "@nestjs/common";
-import { Block } from "../../blocks/entities/block.entity";
-import { CollectionGuarantee } from "../../blocks/entities/collection-guarantee.entity";
-import { Transaction } from "../../transactions/entities/transaction.entity";
-import { Event } from "../../events/entities/event.entity";
 const fcl = require("@onflow/fcl");
+import * as http from "http";
 
 @Injectable()
 export class FlowGatewayService {
@@ -108,19 +105,26 @@ export class FlowGatewayService {
         )
     }
 
-    async isConnectedToGateway(): Promise<boolean> {
-        try {
-            // > nestjs transpiles
-            // import fetch from "node-fetch"
-            // > into
-            // const fetch = require("node-fetch")
-            // > which causes problems, because node-fetch doesn't support "require"
-            // https://github.com/standard-things/esm/issues/868
-            const fetch = await import("node-fetch");
-            await fetch.default(this.url());
+    async isConnectedToGateway() {
+        const {address, port} = this.configuration;
+        return FlowGatewayService.isPingable(address, port);
+    }
+
+    static async isPingable(host: string, port: number): Promise<boolean> {
+        return new Promise(resolve => {
+            const req = http.get({ host, port}, () => {
+                req.end();
+                return resolve(true);
+            })
+              .on("error", (error: any) => {
+                  req.end();
+                  if (error.code === "ECONNREFUSED") {
+                      return resolve(false)
+                  }
+                  console.log(`[Flowser] couldn't connect to flow emulator: `, error)
+                  throw new Error("Couldn't connect to flow gateway")
+              })
             return true;
-        } catch (e) {
-            return false;
-        }
+        })
     }
 }

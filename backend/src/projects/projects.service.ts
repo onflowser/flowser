@@ -66,8 +66,16 @@ export class ProjectsService {
         return this.projectRepository.insert(createProjectDto);
     }
 
-    findAll(): Promise<Project[]> {
-        return this.projectRepository.find();
+    async findAll(): Promise<Project[]> {
+        const projects = await this.projectRepository.find();
+        return Promise.all(projects.map(async project => {
+            const {address, port} = project.gateway;
+            return {
+                ...project,
+                pingable: await FlowGatewayService.isPingable(address, port)
+            }
+        }))
+
     }
 
     async findOne(id: string): Promise<Project> {
@@ -75,11 +83,15 @@ export class ProjectsService {
         if (!project) {
             throw new NotFoundException("Project not found")
         }
-        return project;
+        const {port, address} = project.gateway;
+        return {
+            ...project,
+            pingable: await FlowGatewayService.isPingable(address, port)
+        };
     }
 
-    update(id: number, updateProjectDto: UpdateProjectDto) {
-        return `This action updates a #${id} project`;
+    update(id: string, updateProjectDto: UpdateProjectDto) {
+        return this.projectRepository.update({ id }, updateProjectDto);
     }
 
     remove(id: number) {

@@ -17,6 +17,9 @@ export class Project {
     name: string;
 
     @Column()
+    pingable: boolean;
+
+    @Column()
     gateway: GatewayConfigurationEntity;
 
     @Column()
