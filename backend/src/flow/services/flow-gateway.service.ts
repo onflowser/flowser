@@ -113,7 +113,9 @@ export class FlowGatewayService {
 
     static async isPingable(host: string, port: number): Promise<boolean> {
         return new Promise(resolve => {
-            const req = http.get({ host, port}, () => {
+            // must provide host without protocol prefix,
+            // otherwise hostname will not be resolved and ENOTFOUND error will be thrown
+            const req = http.get({ host: host.replace("http://", ""), port}, () => {
                 req.end();
                 return resolve(true);
             })
