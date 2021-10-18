@@ -57,5 +57,8 @@ export class EmulatorConfigurationEntity {
   persist: boolean;
 
   @Column()
+  simpleAddresses: boolean;
+
+  @Column()
   numberOfInitialAccounts: number;
 }

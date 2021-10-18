@@ -69,7 +69,7 @@ export class FlowEmulatorService {
       flag("block-time", this.configuration.blockTime),
       flag("service-priv-key", this.configuration.servicePrivateKey),
       flag("service-pub-key", this.configuration.servicePublicKey),
-      flag("database-path", this.configuration.databasePath),
+      flag("dbpath", this.configuration.databasePath),
       flag("token-supply", this.configuration.tokenSupply),
       flag("transaction-expiry", this.configuration.transactionExpiry),
       flag("storage-per-flow", this.configuration.storagePerFlow),
