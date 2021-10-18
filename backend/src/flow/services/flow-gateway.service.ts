@@ -21,7 +21,8 @@ export class FlowGatewayService {
     }
 
     private url() {
-        return `${this.configuration.address}:${this.configuration.port}`
+        const host = `${this.configuration.address}:${this.configuration.port}`
+        return host.startsWith("http") ? host : `http://${host}`;
     }
 
     public async getLatestBlock (): Promise<FlowBlock> {
@@ -118,11 +119,10 @@ export class FlowGatewayService {
             })
               .on("error", (error: any) => {
                   req.end();
-                  if (error.code === "ECONNREFUSED") {
-                      return resolve(false)
+                  if (error.code !== "ECONNREFUSED") {
+                      console.log(`[Flowser] couldn't connect to flow emulator for unknown reason: `, error)
                   }
-                  console.log(`[Flowser] couldn't connect to flow emulator: `, error)
-                  throw new Error("Couldn't connect to flow gateway")
+                  return resolve(false)
               })
             return true;
         })
