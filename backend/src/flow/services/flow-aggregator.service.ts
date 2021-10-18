@@ -1,17 +1,20 @@
-import config from "../config";
+import config from "../../config";
 import { Injectable } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import { FlowGatewayService } from "./flow-gateway.service";
-import { BlocksService } from "../blocks/blocks.service";
-import { TransactionsService } from "../transactions/transactions.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { ContractsService } from "../accounts/services/contracts.service";
-import { EventsService } from "../events/events.service";
-import { Account } from "../accounts/entities/account.entity";
-import { Event } from "../events/entities/event.entity";
-import { Transaction } from "../transactions/entities/transaction.entity";
-import { Block } from "../blocks/entities/block.entity";
-import { Project } from "../projects/entities/project.entity";
+import { BlocksService } from "../../blocks/blocks.service";
+import { TransactionsService } from "../../transactions/transactions.service";
+import { AccountsService } from "../../accounts/services/accounts.service";
+import { ContractsService } from "../../accounts/services/contracts.service";
+import { EventsService } from "../../events/events.service";
+import { Account } from "../../accounts/entities/account.entity";
+import { Event } from "../../events/entities/event.entity";
+import { Transaction } from "../../transactions/entities/transaction.entity";
+import { Block } from "../../blocks/entities/block.entity";
+import { Project } from "../../projects/entities/project.entity";
+import { FlowEmulatorService } from "./flow-emulator.service";
+import { LogsService } from "../../logs/logs.service";
+import { Log } from "../../logs/entities/log.entity";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -24,38 +27,72 @@ export class FlowAggregatorService {
     private accountService: AccountsService,
     private contractService: ContractsService,
     private eventService: EventsService,
-    private flowGatewayService: FlowGatewayService
+    private flowGatewayService: FlowGatewayService,
+    private flowEmulatorService: FlowEmulatorService,
+    private logsService: LogsService
   ) {}
 
   configureProjectContext(project: Project) {
     this.project = project;
   }
 
+  async startEmulator() {
+    await this.flowEmulatorService.init();
+    if (this.flowEmulatorService.isRunning()) {
+      this.flowEmulatorService.stop();
+    }
+    await this.flowEmulatorService.start(((error, data) => {
+      if (error) {
+        console.error(`[Flowser] received emulator error: `, error)
+      } else {
+        console.log(`[Flowser] received emulator logs: `, data)
+        Promise.all(data.map(line => {
+          const log = new Log();
+          log.data = line;
+          this.logsService.create(log);
+        }))
+      }
+    }))
+  }
+
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
-    try {
       const lastStoredBlock = await this.blockService.findLastBlock();
-      const latestBlock = await this.flowGatewayService.getLatestBlock();
+      let latestBlock;
+      try {
+        latestBlock = await this.flowGatewayService.getLatestBlock();
+      } catch (e) {
+        return console.log(`[Flowser] failed to fetch latest block from blockchain: ${e.message}`)
+      }
+
       // user can specify (on a project level) what is the starting block height
       // if user provides no specification, the latest block height is used
       const initialStartBlockHeight = this.project.startBlockHeight === undefined
-        ? latestBlock.height :
-        this.project.startBlockHeight;
+        ? latestBlock.height
+        : this.project.startBlockHeight;
       // fetch from last stored block (if there are already blocks in the database)
-      const startBlockHeight = lastStoredBlock ?
-        lastStoredBlock.height :
-        initialStartBlockHeight;
+      const startBlockHeight = lastStoredBlock
+        ? lastStoredBlock.height + 1
+        : initialStartBlockHeight;
       const endBlockHeight = latestBlock.height;
 
       console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
 
-      const data = await this.flowGatewayService.getBlockDataWithinHeightRange(
+    let data;
+    try {
+      data = await this.flowGatewayService.getBlockDataWithinHeightRange(
         startBlockHeight,
         endBlockHeight
       );
-      const events = data.map(({ events }) => events).flat();
-      const transactions = data.map(({ transactions }) => transactions).flat();
-      const blocks = data.map(({ block }) => block);
+    } catch (e) {
+      return console.log(`[Flowser] failed to fetch block data: ${e.message}`)
+    }
+
+    const events = data.map(({ events }) => events).flat();
+    const transactions = data.map(({ transactions }) => transactions).flat();
+    const blocks = data.map(({ block }) => block);
+
+    try {
       // store fetched data
       await Promise.all(blocks.map(e =>
         this.blockService.create(Block.init(e))
@@ -71,7 +108,8 @@ export class FlowAggregatorService {
       ))
       await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
     } catch (e) {
-      console.error(`[Flowser] data fetch error: ${e}`, e.message)
+      // TODO: revert writes (wrap in db transaction)
+      console.error(`[Flowser] data store error: ${e}`, e.message)
     }
   }
 

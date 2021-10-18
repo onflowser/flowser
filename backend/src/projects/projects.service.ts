@@ -1,4 +1,5 @@
 import {
+    ConflictException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
@@ -7,8 +8,9 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { MongoRepository } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FlowGatewayService } from "../flow/flow-gateway.service";
-import { FlowAggregatorService } from "../flow/flow-aggregator.service";
+import { FlowGatewayService } from "../flow/services/flow-gateway.service";
+import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
+import { FlowEmulatorService } from "../flow/services/flow-emulator.service";
 
 @Injectable()
 export class ProjectsService {
@@ -19,9 +21,14 @@ export class ProjectsService {
       @InjectRepository(Project)
       private projectRepository: MongoRepository<Project>,
       private flowGatewayService: FlowGatewayService,
-      private flowAggregatorService: FlowAggregatorService
+      private flowAggregatorService: FlowAggregatorService,
+      private flowEmulatorService: FlowEmulatorService
       ) {
-        this.useProject("emulator") // default project for dev
+        try {
+            this.useProject("emulator") // default project for dev
+        } catch (e) {
+            console.error(`[Flowser] failed to use default project: `, e)
+        }
     }
 
     getCurrentProject() {
@@ -38,9 +45,20 @@ export class ProjectsService {
             // update project context
             this.flowGatewayService.configureDataSourceGateway(this.currentProject.gateway);
             this.flowAggregatorService.configureProjectContext(this.currentProject);
+            this.flowEmulatorService.configureProjectContext(this.currentProject)
+            this.flowAggregatorService.startEmulator(); // TODO: test this
+            console.debug(`[Flowser] using project: ${id}`)
         } catch (e) {
             const description = `Can not use project with id '${id}'`;
             throw new NotFoundException(e, description);
+        }
+    }
+
+    async seedAccounts(id: string, n: number) {
+        if (this.currentProject.id === id) {
+            return this.flowEmulatorService.initialiseAccounts(n);
+        } else {
+            throw new ConflictException("This project is not currently used.")
         }
     }
 
@@ -48,16 +66,32 @@ export class ProjectsService {
         return this.projectRepository.insert(createProjectDto);
     }
 
-    findAll(): Promise<Project[]> {
-        return this.projectRepository.find();
+    async findAll(): Promise<Project[]> {
+        const projects = await this.projectRepository.find();
+        return Promise.all(projects.map(async project => {
+            const {address, port} = project.gateway;
+            return {
+                ...project,
+                pingable: await FlowGatewayService.isPingable(address, port)
+            }
+        }))
+
     }
 
-    findOne(id: string): Promise<Project> {
-        return this.projectRepository.findOne({ id });
+    async findOne(id: string): Promise<Project> {
+        const project = await this.projectRepository.findOne({ id });
+        if (!project) {
+            throw new NotFoundException("Project not found")
+        }
+        const {port, address} = project.gateway;
+        return {
+            ...project,
+            pingable: await FlowGatewayService.isPingable(address, port)
+        };
     }
 
-    update(id: number, updateProjectDto: UpdateProjectDto) {
-        return `This action updates a #${id} project`;
+    update(id: string, updateProjectDto: UpdateProjectDto) {
+        return this.projectRepository.update({ id }, updateProjectDto);
     }
 
     remove(id: number) {

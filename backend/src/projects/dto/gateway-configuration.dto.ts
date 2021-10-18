@@ -1,6 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 
-export class GatewayConfiguration {
+export class GatewayConfigurationDto {
     @IsNotEmpty()
     port: number;
 

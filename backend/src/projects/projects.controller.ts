@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UnprocessableEntityException } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param, ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+    UnprocessableEntityException
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -19,6 +29,11 @@ export class ProjectsController {
         return this.projectsService.findAll();
     }
 
+    @Get('current')
+    findCurrent() {
+        return this.projectsService.getCurrentProject();
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.projectsService.findOne(id);
@@ -26,7 +41,7 @@ export class ProjectsController {
 
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-        return this.projectsService.update(+id, updateProjectDto);
+        return this.projectsService.update(id, updateProjectDto);
     }
 
     @Delete(':id')
@@ -37,5 +52,10 @@ export class ProjectsController {
     @Post('/use/:id')
     async useProject(@Param('id') id: string):Promise<void> {
         return this.projectsService.useProject(id);
+    }
+
+    @Post('/:id/seed/accounts')
+    async seed(@Param('id') id: string, @Query("n", ParseIntPipe) n: number) {
+        return this.projectsService.seedAccounts(id, n);
     }
 }

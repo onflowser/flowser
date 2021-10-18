@@ -18,6 +18,7 @@ services:
       - MONGODB_DATABASE=${MONGODB_DATABASE}
     expose:
       - ${APP_BACKEND_PORT}
+      - ${FLOW_EMULATOR_PORT}
     ports:
       - ${APP_BACKEND_PORT}:${APP_BACKEND_PORT}
     networks:

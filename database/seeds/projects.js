@@ -9,6 +9,11 @@ const quickStartProject = [
         gateway: {
             port: 8080,
             address: 'http://host.docker.internal',
+        },
+        emulator: {
+            verboseLogging: true,
+            httpServerPort: 8080,
+            persist: false
         }
     }
 ];
