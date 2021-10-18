@@ -1,0 +1,75 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+@import 'styles/typography';
+
+.container {
+  background: $dark-blue;
+  padding: $spacing-base;
+  color: $black;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 108px;
+    margin-bottom: 50px;
+    transform: scale(1) rotate(0deg);
+    animation: logoPulse 1.3s;
+    transition-timing-function: ease-in-out;
+    animation-delay: 0.8s;
+  }
+
+  h1 {
+    color: $color-white;
+    opacity: 0.74;
+    font-family: $font-family-days-one;
+    font-size: 35px;
+    font-weight: normal;
+    letter-spacing: 1.4px;
+    margin-bottom: $spacing-l * 3;
+  }
+
+  button {
+    margin-bottom: $spacing-base;
+    width: 368px;
+    height: 66px;
+  }
+
+  .caret {
+    transform: rotate(-90deg);
+  }
+}
+
+.newProjectBtn {
+  color: $color-grey;
+  border: 2px solid $color-grey;
+}
+
+h2 {
+  margin-top: $spacing-l * 2;
+  font-size: $font-size-small;
+  color: $color-grey;
+}
+
+.link {
+  color: $color-link-blue;
+  text-decoration: none;
+  margin-top: $spacing-base;
+}
+
+@keyframes logoPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  30% {
+    transform: scale(1.2) rotate(15deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}

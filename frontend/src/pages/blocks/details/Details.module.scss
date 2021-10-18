@@ -1,0 +1,50 @@
+@import 'styles/spacings';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  max-width: 1690px;
+  width: 100%;
+
+  .firstRow {
+    margin-bottom: $spacing-base;
+    margin-top: $spacing-l * 3;
+
+    * + * {
+      margin-left: $spacing-l;
+    }
+
+    *:last-child {
+      margin-left: $spacing-l / 4;
+    }
+  }
+
+  .bigCard {
+    margin-bottom: $spacing-l * 2;
+    padding: $spacing-base * 3;
+
+    & > div {
+      display: flex;
+      margin-bottom: $spacing-l;
+
+      .label {
+        min-width: 188px;
+        display: inline-flex;
+      }
+    }
+
+    .dateAndTimeAgo {
+      margin-bottom: 0;
+      > * + * {
+        margin-left: $spacing-l;
+      }
+    }
+  }
+
+  .transactionListItem {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: $spacing-base;
+  }
+}

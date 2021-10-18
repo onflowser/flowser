@@ -1,0 +1,37 @@
+@import 'styles/spacings';
+@import 'styles/typography';
+@import 'styles/colors';
+
+.status {
+  font-size: $font-size-xsmall;
+  display: flex;
+  align-items: center;
+
+  > span {
+    margin-left: $spacing-s;
+  }
+
+  &.unknown {
+    color: $color-status-unknown;
+  }
+
+  &.pending {
+    color: $color-status-pending;
+  }
+
+  &.finalized {
+    color: $color-status-finalized;
+  }
+
+  &.executed {
+    color: $color-status-executed;
+  }
+
+  &.sealed {
+    color: $color-status-sealed;
+  }
+
+  &.expired {
+    color: $color-status-expired;
+  }
+}

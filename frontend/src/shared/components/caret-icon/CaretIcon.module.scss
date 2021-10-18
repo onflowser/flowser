@@ -1,0 +1,23 @@
+@import 'styles/animations';
+@import 'styles/colors';
+
+.root {
+  @include flipVertical(.2s, 0deg);
+  fill: $color-link-blue;
+  stroke: $color-link-blue;
+  cursor: pointer;
+
+  &.isOpen {
+    @include flipVertical(.2s);
+    fill: $color-main-yellow;
+    stroke: $color-main-yellow;
+  }
+
+  &.inverted {
+    @include flipVertical(.2s);
+
+    &.isOpen {
+      @include flipVertical(.2s, 0deg);
+    }
+  }
+}

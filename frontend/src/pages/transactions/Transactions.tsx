@@ -1,37 +1,15 @@
-import React, { FunctionComponent, useEffect } from 'react';
-import { useSearch } from '../../shared/hooks/search';
-import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
-import ListContainer from '../../shared/components/list-container/ListContainer';
-import ListItem from '../../shared/components/list-item/ListItem';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import Main from './main/Main';
+import Details from './details/Details';
 
-interface OwnProps {
-    some?: string;
-}
-
-type Props = OwnProps;
-
-const Transactions: FunctionComponent<Props> = (props) => {
-    const { searchTerm, setPlaceholder } = useSearch();
-    const { data } = useTimeoutPolling('/api/transactions/polling');
-
-    useEffect(() => {
-        setPlaceholder('Search transactions');
-    }, []);
-
+const Transactions = () => {
     return (
-        <div>
-            <h2>Transactions</h2>
-            <p>Search term: {searchTerm}</p>
-            {data && <p>Data length: {data?.length}</p>}
-
-            <ListContainer>
-                {data.map((d: any, index: number) => (
-                    <ListItem isNew={d.isNew} key={index}>
-                        {d.id}
-                    </ListItem>
-                ))}
-            </ListContainer>
-        </div>
+        <Switch>
+            <Route exact path={`/transactions`} component={Main} />
+            <Route path={`/transactions/details/:transactionId`} component={Details} />
+            <Redirect from="*" to={`/transactions`} />
+        </Switch>
     );
 };
 

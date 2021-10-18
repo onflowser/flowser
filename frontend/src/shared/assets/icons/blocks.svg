@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16.545" height="16.545" viewBox="0 0 16.545 16.545">
+  <g id="Group_21" data-name="Group 21" transform="translate(-23.227 -137.727)">
+    <g id="blocks" transform="translate(23.227 137.727)">
+      <path id="Path_5" data-name="Path 5" d="M.689,7.583h6.2a.69.69,0,0,0,.689-.689V.689A.69.69,0,0,0,6.894,0H.689A.69.69,0,0,0,0,.689v6.2A.69.69,0,0,0,.689,7.583Z"/>
+      <path id="Path_6" data-name="Path 6" d="M19.894,0h-6.2A.69.69,0,0,0,13,.689v6.2a.69.69,0,0,0,.689.689h6.2a.69.69,0,0,0,.689-.689V.689A.69.69,0,0,0,19.894,0Z" transform="translate(-4.038)"/>
+      <path id="Path_7" data-name="Path 7" d="M.689,20.583h6.2a.69.69,0,0,0,.689-.689v-6.2A.69.69,0,0,0,6.894,13H.689A.69.69,0,0,0,0,13.689v6.2A.69.69,0,0,0,.689,20.583Z" transform="translate(0 -4.038)"/>
+      <path id="Path_8" data-name="Path 8" d="M19.894,13h-6.2a.69.69,0,0,0-.689.689v6.2a.69.69,0,0,0,.689.689h6.2a.69.69,0,0,0,.689-.689v-6.2A.69.69,0,0,0,19.894,13Z" transform="translate(-4.038 -4.038)"/>
+    </g>
+  </g>
+</svg>

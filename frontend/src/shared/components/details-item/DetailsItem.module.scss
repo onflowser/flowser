@@ -1,0 +1,31 @@
+@import "styles/spacings";
+@import "styles/colors";
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-base;
+  border: 1px solid transparent;
+  position: relative;
+  &:not(:last-child) {
+    margin-right: $spacing-base;
+  }
+  &__clickable {
+    cursor: pointer;
+    &:hover {
+      border-color: $color-main-yellow;
+    }
+  }
+}
+
+.icon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: $spacing-base;
+  display: flex;
+  align-items: center;
+}

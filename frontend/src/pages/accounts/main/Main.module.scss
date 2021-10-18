@@ -1,0 +1,13 @@
+@import 'styles/spacings';
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-base $spacing-l;
+  margin-bottom: $spacing-base;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
+}

@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter, Redirect, Route, Switch, withRouter } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Layout from './core/components/layout/Layout';
 import Start from './pages/start/Start';
 import { routes } from './shared/constants/routes';
@@ -29,6 +30,17 @@ const BrowserRouterEvents = withRouter(({ children, history }) => {
     });
     return <>{children}</>;
 });
+// TODO: Move to some config
+const toastOptions = {
+    className: '',
+    duration: 2000,
+    style: {
+        background: '#88C4F2', // $color-link-blue
+        color: '#202A40', // $color-table-blue
+        padding: '12px', // $spacing-base
+        maxWidth: 'initial',
+    },
+};
 
 export const App = () => {
     return (
@@ -37,7 +49,7 @@ export const App = () => {
                 <BrowserRouter>
                     <BrowserRouterEvents>
                         <Switch>
-                            <Route exact path={`/${routes.start}`} component={Start} />
+                            <Route path={`/${routes.start}`} component={Start} />
                             <RouteWithLayout path={`/${routes.accounts}`} component={LazyAccounts} />
                             <RouteWithLayout path={`/${routes.blocks}`} component={LazyBlocks} />
                             <RouteWithLayout path={`/${routes.transactions}`} component={LazyTransactions} />
@@ -46,6 +58,7 @@ export const App = () => {
                             <RouteWithLayout path={`/${routes.logs}`} component={LazyLogs} />
                             <Redirect from="*" to={`/${routes.start}`} />
                         </Switch>
+                        <Toaster position="bottom-center" gutter={8} toastOptions={toastOptions} />
                     </BrowserRouterEvents>
                 </BrowserRouter>
             </UiStateContextProvider>

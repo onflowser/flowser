@@ -1,0 +1,38 @@
+@import 'styles/typography';
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.root {
+  font-family: $font-family-courier-new;
+  font-weight: lighter;
+  margin-bottom: $spacing-l;
+  padding-left: $spacing-l * 2;
+
+  > div {
+    display: flex;
+    align-items: center;
+    margin-top: $spacing-l;
+
+    * + * {
+      margin-left: $spacing-l / 2;
+    }
+
+    .blueBg {
+      background-color: $color-counter-badge-blue;
+      margin-left: $spacing-l;
+      padding: $spacing-l / 3;
+      border-radius: 8px;
+      color: $color-main-text;
+      font-family: $font-family-oswald;
+    }
+
+    .keyIcon {
+      transform: rotate(-135deg);
+    }
+  }
+  .badges {
+    color: $color-grey;
+    font-family: $font-family-oswald;
+    padding-left: ($spacing-base * 2) + 6;
+  }
+}

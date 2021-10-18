@@ -1,23 +1,100 @@
 @import 'styles/colors';
 @import 'styles/spacings';
+@import 'styles/typography';
 
 .navigationContainer {
-  background-color: $grey;
-  padding: $base-spacing;
-  ul {
+  display: flex;
+  flex-direction: column;
+
+  .mainContainer {
     display: flex;
-    list-style-type: none;
-    li {
-      text-decoration: none;
-      color: $black;
-      margin-right: $base-spacing;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 $spacing-l;
+    background-color: $color-table-blue;
+    height: 118px;
+
+    .logoContainer {
+      img {
+        width: 60px;
+        height: 60px;
+      }
+
+      margin-right: $spacing-base * 3;
     }
+
+    .navLinksContainer {
+      margin-top: -18px;
+      display: flex;
+
+      & > div:not(:last-child) {
+        margin-right: $spacing-base * 3;
+      }
+    }
+
+    .rightContainer {
+      display: flex;
+      margin-left: auto;
+
+      & > div:first-child {
+        display: flex;
+        flex-direction: column;
+        padding-right: $spacing-base * 3;
+
+        span {
+          font-size: $font-size-small;
+          height: 18px;
+          line-height: 18px;
+        }
+
+        span:first-child {
+          color: $color-white;
+        }
+
+        span:last-child {
+          color: $color-main-yellow;
+          font-weight: bold;
+        }
+
+      }
+
+      & > div:last-child {
+        padding-left: $spacing-base * 3 + 4px;
+        border-left: 1px solid $color-white;
+        display: flex;
+        align-items: center;
+
+        button + button {
+          margin-left: $spacing-base;
+        }
+      }
+    }
+  }
+
+  .navigationDrawerContainer {
+    background-color: $color-navigation-drawer-background;
+    display: flex;
+    height: 72px;
+    padding-right: $spacing-base * 2;
   }
 }
 
-.navLink {
-  &.active {
-    font-weight: bold;
-    color: $black;
-  }
+.settingsIcon {
+  fill: $color-not-active-button-text-grey;
+  width: 18px;
+  height: 18px;
+}
+
+.breadcrumbs {
+  margin-left: $spacing-base * 3;
+}
+
+.backButton {
+  cursor: pointer;
+}
+
+.searchBar {
+  align-self: center;
+  margin-left: auto;
+  width: 531px;
 }

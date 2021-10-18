@@ -3,10 +3,11 @@
 
 .container {
   display: flex;
-  align-items: flex-end;
-  margin: $base-spacing;
-  padding: $base-spacing;
-  background-color: $light-grey;
+  align-items: center;
+  padding: $spacing-base;
   justify-content: flex-end;
 
+  .searchBox {
+    width: 531px;
+  }
 }

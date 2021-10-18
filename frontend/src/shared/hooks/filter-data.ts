@@ -8,6 +8,10 @@ export const useFilterData = <T>(data: T[], search: string, filterByProps?: stri
     }
 
     filterByProps = filterByProps || Object.keys(data[0]);
-    const filteredData = data.filter((item) => JSON.stringify(item, filterByProps).indexOf(search.toString()) !== -1);
+    const filteredData = data.filter(
+        (item) =>
+            JSON.stringify(item, filterByProps).toLocaleLowerCase().indexOf(search.toLocaleLowerCase().toString()) !==
+            -1,
+    );
     return { filteredData };
 };

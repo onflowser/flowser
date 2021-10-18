@@ -1,0 +1,64 @@
+@import 'styles/colors';
+@import 'styles/rules';
+@import 'styles/typography';
+
+.button {
+  background-color: $color-main-yellow;
+  border-radius: $border-radius-button;
+  color: $color-background;
+  font-size: $font-size-big;
+  font-family: $font-family-oswald;
+  letter-spacing: $character-spacing-medium;
+  font-style: normal;
+  font-weight: bold;
+  border: 2px solid $color-main-yellow;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.92;
+  }
+}
+
+.normal {
+  background: $color-main-yellow;
+  height: 32px;
+  padding: 0 18px;
+  font-size: $font-size-xsmall !important;
+}
+
+.middle {
+  width: 127px;
+  height: 46px;
+  font-size: $font-size-xsmall !important;
+}
+
+.big {
+  width: 216px;
+  height: 65px;
+  font-size: $font-size-big !important;
+}
+
+.disabled {
+  background: $color-not-active-button-grey;
+  color: $color-not-active-button-text-grey;
+  border: 2px solid $color-not-active-button-grey;
+  cursor: default;
+  font-size: $font-size-normal;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.big {
+    font-size: $font-size-small;
+  }
+}
+
+.outlined {
+  background: none;
+  color: $color-main-yellow;
+
+  &.disabled {
+    color: $color-not-active-button-text-grey;
+  }
+}

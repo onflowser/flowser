@@ -1,0 +1,21 @@
+@import 'styles/colors';
+@import 'styles/rules';
+@import 'styles/spacings';
+
+.root {
+  border-radius: $border-radius-card;
+  padding: $spacing-l;
+  border: 1px solid transparent;
+
+  &.blue {
+    background-color: $color-table-blue;
+  }
+
+  &.black {
+    background-color: $color-table-black;
+  }
+
+  &.active {
+    border: 1px solid $color-main-yellow;
+  }
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17.31" height="17.321" viewBox="0 0 17.31 17.321">
+  <g id="full-screen" transform="translate(271.12 561.3)">
+    <g id="Group_78" data-name="Group 78" transform="translate(-270.82 -561)">
+      <g id="Group_71" data-name="Group 71" transform="translate(0)">
+        <g id="Group_70" data-name="Group 70" transform="translate(0)">
+          <path id="Path_62" data-name="Path 62" d="M6.265,5.351l-4.3-4.3H4.929A.522.522,0,0,0,4.929,0L.7,0A.522.522,0,0,0,.18.522V4.751a.522.522,0,1,0,1.044,0V1.785l4.3,4.3a.522.522,0,0,0,.739-.739Z" transform="translate(-0.18)" fill="#ffc016" stroke="#ffc015" stroke-width="0.6"/>
+        </g>
+      </g>
+      <g id="Group_73" data-name="Group 73" transform="translate(10.469 0.002)">
+        <g id="Group_72" data-name="Group 72">
+          <path id="Path_63" data-name="Path 63" d="M326.862.225a.52.52,0,0,0-.369-.153h-4.227a.522.522,0,1,0,0,1.044h2.966l-4.3,4.3a.522.522,0,0,0,.739.739l4.3-4.3V4.821a.522.522,0,0,0,1.044,0V.594A.52.52,0,0,0,326.862.225Z" transform="translate(-320.774 -0.072)" fill="#ffc016" stroke="#ffc015" stroke-width="0.6"/>
+        </g>
+      </g>
+      <g id="Group_75" data-name="Group 75" transform="translate(10.469 10.481)">
+        <g id="Group_74" data-name="Group 74">
+          <path id="Path_64" data-name="Path 64" d="M326.492,321.921a.521.521,0,0,0-.522.522v2.966l-4.3-4.3a.522.522,0,0,0-.739.739l4.3,4.3h-2.964a.522.522,0,1,0,0,1.044h4.227a.521.521,0,0,0,.522-.522v-4.227A.523.523,0,0,0,326.492,321.921Z" transform="translate(-320.774 -320.954)" fill="#ffc016" stroke="#ffc015" stroke-width="0.6"/>
+        </g>
+      </g>
+      <g id="Group_77" data-name="Group 77" transform="translate(0 10.481)">
+        <g id="Group_76" data-name="Group 76" transform="translate(0)">
+          <path id="Path_65" data-name="Path 65" d="M6.265,321.107a.518.518,0,0,0-.736,0l-4.3,4.3v-2.964a.522.522,0,1,0-1.044,0v4.227a.522.522,0,0,0,.522.522H4.929a.522.522,0,1,0,0-1.044H1.963l4.3-4.3A.521.521,0,0,0,6.265,321.107Z" transform="translate(-0.18 -320.954)" fill="#ffc016" stroke="#ffc015" stroke-width="0.6"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

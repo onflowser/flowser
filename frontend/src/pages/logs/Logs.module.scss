@@ -1,0 +1,112 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+@import 'styles/typography';
+
+.root {
+  padding: 0 $spacing-l * 2;
+  padding-bottom: $spacing-l;
+  border-top: 1px solid $color-logs-border;
+  background-color: $color-background;
+
+  .header {
+    display: flex;
+    height: 63px;
+    color: $color-link-blue;
+    align-items: center;
+    overflow: hidden;
+
+    &.expanded {
+      height: 88px;
+    }
+
+    .leftContainer {
+      min-width: 84px;
+
+      span {
+        margin-left: 5px;
+        margin-top: 5px;
+        position: absolute;
+      }
+    }
+
+    .midContainer {
+      display: flex;
+      flex-direction: column;
+      font-size: $font-size-small;
+      font-weight: 100;
+
+      color: $color-white;
+      opacity: 0.4;
+      cursor: default;
+
+      height: 50px;
+      overflow: scroll;
+      filter: blur(1.3px);
+      -o-filter: blur(1.3px);
+      -ms-filter: blur(1.3px);
+      -moz-filter: blur(1.3px);
+      -webkit-filter: blur(1.3px);
+
+      span {
+        display: block;
+      }
+    }
+
+    .rightContainer {
+      display: flex;
+      margin-left: auto;
+      align-items: center;
+
+      & > div {
+        margin-left: 20px;
+      }
+
+      .control {
+        cursor: pointer;
+      }
+
+      .control + .control {
+        margin-left: $spacing-l;
+      }
+
+      .searchBox {
+        width: 451px;
+      }
+    }
+  }
+
+  .bigLogsContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: scroll;
+    color: $color-white;
+
+    // TODO: Hide scrollbars
+    //padding-right: 17px; /* Increase/decrease this value for cross-browser compatibility */
+    //box-sizing: content-box;
+
+    & > span {
+      display: flex;
+      margin-bottom: $spacing-l / 2;
+    }
+  }
+
+  /**
+   * Emulator output colors
+   */
+  [class="blue"],
+  .blue {
+    color: #32BBC7;
+  }
+
+  [class="red"],
+  .red {
+    color: #C33820;
+  }
+
+  [class="yellow"],
+  .yellow {
+    color: #AEAD23;
+  }
+}
