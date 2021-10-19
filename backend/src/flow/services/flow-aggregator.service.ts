@@ -62,7 +62,7 @@ export class FlowAggregatorService {
       try {
         latestBlock = await this.flowGatewayService.getLatestBlock();
       } catch (e) {
-        return console.log(`[Flowser] failed to fetch latest block from blockchain: ${e.message}`)
+        return console.log(`[Flowser] failed to fetch latest block: ${e.message}`)
       }
 
       // user can specify (on a project level) what is the starting block height

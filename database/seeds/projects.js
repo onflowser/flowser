@@ -11,6 +11,15 @@ const quickStartProject = [
             address: 'http://host.docker.internal',
         },
         emulator: null
+    },
+    {
+        id: "testnet",
+        name: "Testnet",
+        gateway: {
+            port: 443,
+            address: "https://access-testnet.onflow.org"
+        },
+        emulator: null
     }
 ];
 
