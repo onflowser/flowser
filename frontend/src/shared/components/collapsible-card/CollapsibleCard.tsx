@@ -8,13 +8,13 @@ interface OwnProps {
     header: string;
     subheader?: string;
     variant?: 'blue' | 'black';
-
+    isNew?: boolean;
     [key: string]: any;
 }
 
 type Props = OwnProps;
 
-const CollapsibleCard: FunctionComponent<Props> = ({ children, variant, header, subheader, ...restProps }) => {
+const CollapsibleCard: FunctionComponent<Props> = ({ children, variant, header, subheader, isNew, ...restProps }) => {
     const [state, setState] = useState(false);
 
     const onToggle = useCallback(() => {
@@ -22,7 +22,7 @@ const CollapsibleCard: FunctionComponent<Props> = ({ children, variant, header, 
     }, []);
 
     return (
-        <Card variant={variant} className={`${classes.root} ${restProps.className}`}>
+        <Card variant={variant} className={`${classes.root} ${restProps.className} ${isNew && classes.isNew}`}>
             <div className={`${classes.header} ${state ? classes.expanded : ''}`}>
                 <div className={classes.title}>
                     <span>{header}</span>

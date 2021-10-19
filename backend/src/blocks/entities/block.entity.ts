@@ -1,4 +1,4 @@
-import { Column, Entity, ObjectID, ObjectIdColumn, } from 'typeorm';
+import { Column, Entity, Index, ObjectID, ObjectIdColumn, } from 'typeorm';
 import { PollingEntity } from '../../shared/entities/polling.entity';
 import { CollectionGuarantee } from "./collection-guarantee.entity";
 
@@ -6,6 +6,10 @@ import { CollectionGuarantee } from "./collection-guarantee.entity";
 export class Block extends PollingEntity {
     @ObjectIdColumn()
     _id: ObjectID;
+
+    @Column()
+    @Index({unique: true})
+    id: string;
 
     @Column()
     parentId: string;
@@ -26,9 +30,6 @@ export class Block extends PollingEntity {
     signatures: string[];
 
     static init(flowBlockObject): Block {
-        return Object.assign(new Block(), {
-            ...flowBlockObject,
-            _id: flowBlockObject.id
-        })
+        return Object.assign(new Block(), flowBlockObject)
     }
 }

@@ -26,4 +26,8 @@ export class AccountKey extends PollingEntity {
 
   @Column()
   revoked: boolean;
+
+  static init(flowAccountKeyObject: any) {
+    return Object.assign<AccountKey, any>(new AccountKey(), flowAccountKeyObject);
+  }
 }

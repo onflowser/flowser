@@ -25,7 +25,7 @@ export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => 
 
     useEffect(() => {
         setChildContent(noNilChildren[selected].props.children);
-    }, [selected]);
+    }, [selected, children]);
 
     return (
         <>

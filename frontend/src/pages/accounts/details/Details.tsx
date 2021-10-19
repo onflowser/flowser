@@ -32,7 +32,7 @@ const Details: FunctionComponent<any> = () => {
         setBreadcrumbs(breadcrumbs);
     }, []);
 
-    if (isLoading) {
+    if (isLoading || !data) {
         return null; // TODO: add proper loader ?
     }
 
@@ -65,6 +65,7 @@ const Details: FunctionComponent<any> = () => {
                     {data.contracts.map((contract: any, index: number) => (
                         <CollapsibleCard
                             key={index}
+                            isNew={contract.isNew}
                             header="CONTRACT NAME"
                             subheader={contract.name}
                             variant="black"

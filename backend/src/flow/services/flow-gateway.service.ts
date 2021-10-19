@@ -50,6 +50,7 @@ export class FlowGatewayService {
             fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
             fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode)
         ])
+        console.log({data})
         return {...data, status}
     }
 
@@ -115,9 +116,13 @@ export class FlowGatewayService {
         return new Promise(resolve => {
             // must provide host without protocol prefix,
             // otherwise hostname will not be resolved and ENOTFOUND error will be thrown
-            const req = http.get({ host: host.replace("http://", ""), port}, () => {
+            const req = http.get({
+                host: host.replace(/http(s?):\/\//, ""),
+                path: "/live",
+                port,
+            }, (res) => {
                 req.end();
-                return resolve(true);
+                return resolve(res.statusCode === 200);
             })
               .on("error", (error: any) => {
                   req.end();

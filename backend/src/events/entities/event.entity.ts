@@ -1,10 +1,14 @@
 import { PollingEntity } from '../../shared/entities/polling.entity';
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
 
 @Entity({ name: 'events' })
 export class Event extends PollingEntity {
   @ObjectIdColumn()
   _id: ObjectID;
+
+  @Column()
+  @Index({unique: true})
+  id: string;
 
   @Column()
   transactionId: string;
@@ -22,11 +26,9 @@ export class Event extends PollingEntity {
   data: object;
 
   static init(flowEventObject): Event {
-    const id = `${flowEventObject.transactionId}:${flowEventObject.type}`;
     return Object.assign(new Event(), {
       ...flowEventObject,
-      _id: id,
-      id
+      id: `${flowEventObject.transactionId}:${flowEventObject.type}`
     });
   }
 }
