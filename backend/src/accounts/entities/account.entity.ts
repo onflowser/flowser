@@ -1,5 +1,5 @@
 import { PollingEntity } from '../../shared/entities/polling.entity';
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
 import { FlowAccount } from "../../flow/types";
@@ -8,6 +8,10 @@ import { FlowAccount } from "../../flow/types";
 export class Account extends PollingEntity {
   @ObjectIdColumn()
   _id: ObjectID | any;
+
+  @Column()
+  @Index({unique: true})
+  id: string;
 
   @Column()
   address: string;
@@ -27,16 +31,10 @@ export class Account extends PollingEntity {
   static init(flowAccountObject: FlowAccount, options?: Partial<Account>): Account {
     const {keys, contracts} = flowAccountObject;
     const account = Object.assign<Account, FlowAccount, Partial<Account>>(new Account(), flowAccountObject, options);
-    account._id = flowAccountObject.address;
-    account.keys = keys.map(key => (
-      Object.assign<AccountKey, any>(new AccountKey(), key)
-    ))
+    account.id = flowAccountObject.address;
+    account.keys = keys.map(key => AccountKey.init(key));
     account.contracts = Object.keys(contracts).map(name => (
-      Object.assign<AccountContract, any>(new AccountContract(), {
-        _id: `${flowAccountObject.address}.${name}`,
-        name,
-        code: contracts[name]
-      })
+      AccountContract.init(flowAccountObject.address, name, contracts[name])
     )) as AccountContract[] & Map<string, string>;
     return account;
   }

@@ -1,5 +1,5 @@
 import { PollingEntity } from '../../shared/entities/polling.entity';
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
 
 type TransactionArgument = {
   type: string;
@@ -31,6 +31,10 @@ export class Transaction extends PollingEntity {
   _id: ObjectID;
 
   @Column()
+  @Index({unique: true})
+  id: string;
+
+  @Column()
   script: string;
 
   @Column()
@@ -58,9 +62,6 @@ export class Transaction extends PollingEntity {
   status: TransactionStatus;
 
   static init(flowTransactionObject): Transaction {
-    return Object.assign(new Transaction(), {
-      ...flowTransactionObject,
-      _id: flowTransactionObject.id
-    });
+    return Object.assign(new Transaction(), flowTransactionObject);
   }
 }
