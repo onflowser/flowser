@@ -38,6 +38,15 @@ export class TransactionsController {
     return this.transactionsService.findAllByBlock(blockId);
   }
 
+  @Get("/blocks/:blockId/transactions/polling")
+  @UseInterceptors(PollingResponseInterceptor)
+  findAllNewByBlock(
+    @Param("blockId") blockId,
+    @Query('timestamp', ParseIntPipe) timestamp
+  ) {
+    return this.transactionsService.findAllByBlockNewerThanTimestamp(blockId, timestamp);
+  }
+
   @Get('/transactions/:id')
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(id);

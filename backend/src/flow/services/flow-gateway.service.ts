@@ -50,6 +50,7 @@ export class FlowGatewayService {
             fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
             fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode)
         ])
+        console.log({data})
         return {...data, status}
     }
 

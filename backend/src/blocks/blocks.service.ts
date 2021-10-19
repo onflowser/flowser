@@ -32,7 +32,7 @@ export class BlocksService {
     }
 
     async findOne(id: string) {
-        const [block] = await this.blockRepository.find({ where: {_id: id} });
+        const [block] = await this.blockRepository.find({ where: {id: id} });
         if (block) {
             return block;
         } else {

@@ -12,7 +12,7 @@ import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data } = useTimeoutPolling<any>('/api/accounts/polling');
+    const { data: transactions } = useTimeoutPolling<any>('/api/accounts/polling');
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
@@ -20,7 +20,7 @@ const Main: FunctionComponent<any> = () => {
         showSubNavigation(true);
     }, []);
 
-    const { filteredData } = useFilterData(data, searchTerm);
+    const { filteredData } = useFilterData(transactions, searchTerm);
 
     return (
         <>

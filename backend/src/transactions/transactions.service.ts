@@ -10,32 +10,41 @@ export class TransactionsService {
 
   constructor (
     @InjectRepository(Transaction)
-    private transactionService: MongoRepository<Transaction>
+    private transactionRepository: MongoRepository<Transaction>
   ) {}
 
 
   create(createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.save(createTransactionDto);
+    return this.transactionRepository.save(createTransactionDto);
   }
 
   findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
-    return this.transactionService.find({
+    return this.transactionRepository.find({
       where: {createdAt: {$gt: timestamp}}
     });
   }
 
   findAll() {
-    return this.transactionService.find();
+    return this.transactionRepository.find();
   }
 
   findAllByBlock(blockId: string) {
-    return this.transactionService.find({
+    return this.transactionRepository.find({
       where: {referenceBlockId:blockId}
     });
   }
 
+  findAllByBlockNewerThanTimestamp(blockId: string, timestamp) {
+    return this.transactionRepository.find({
+      where: {
+        referenceBlockId: blockId,
+        createdAt: {$gt: timestamp}
+      }
+    });
+  }
+
   async findOne(id: string) {
-    const [transaction] = await this.transactionService.find({ where: {_id: id} });
+    const [transaction] = await this.transactionRepository.find({ where: {_id: id} });
     if (transaction) {
       return transaction;
     } else {
