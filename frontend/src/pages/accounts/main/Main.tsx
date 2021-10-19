@@ -26,7 +26,7 @@ const Main: FunctionComponent<any> = () => {
         <>
             {filteredData &&
                 filteredData.map((item, i) => (
-                    <Card key={i} className={classes.card}>
+                    <Card key={i} className={`${classes.card} ${item.isNew && classes.isNew}`}>
                         <div>
                             <Label>ADDRESS</Label>
                             <Value>
