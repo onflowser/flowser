@@ -22,6 +22,7 @@ const Button: FunctionComponent<Props> = ({
         <button
             onClick={onClick}
             disabled={disabled}
+            {...restProps}
             className={`${classes.button} ${classes[variant]} ${disabled ? classes.disabled : ''} ${
                 restProps.className
             } ${outlined ? classes.outlined : ''}`}

@@ -13,6 +13,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from "./entities/project.entity";
+import { defaultEmulatorFlags } from './data/default-emulator-flags';
 
 @Controller('projects')
 export class ProjectsController {
@@ -20,7 +21,7 @@ export class ProjectsController {
     }
 
     @Post()
-    create(@Body() createProjectDto: CreateProjectDto) {
+    async create(@Body() createProjectDto: CreateProjectDto) {
         return this.projectsService.create(Project.init(createProjectDto));
     }
 
@@ -32,6 +33,12 @@ export class ProjectsController {
     @Get('current')
     findCurrent() {
         return this.projectsService.getCurrentProject();
+    }
+
+    @Get('/default')
+    async default() {
+        return defaultEmulatorFlags;
+
     }
 
     @Get(':id')

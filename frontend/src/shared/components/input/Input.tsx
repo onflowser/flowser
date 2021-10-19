@@ -4,7 +4,7 @@ import classes from './Input.module.scss';
 interface OwnProps {
     type?: string;
     value?: any;
-    onChange?: () => void;
+    onChange?: (e: any) => void;
 }
 
 type Props = OwnProps;

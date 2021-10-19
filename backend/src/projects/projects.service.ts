@@ -45,8 +45,10 @@ export class ProjectsService {
             // update project context
             this.flowGatewayService.configureDataSourceGateway(this.currentProject.gateway);
             this.flowAggregatorService.configureProjectContext(this.currentProject);
-            this.flowEmulatorService.configureProjectContext(this.currentProject)
-            this.flowAggregatorService.startEmulator(); // TODO: test this
+            if (this.currentProject.emulator) {
+                this.flowEmulatorService.configureProjectContext(this.currentProject)
+                this.flowAggregatorService.startEmulator(); // TODO: test this
+            }
             console.debug(`[Flowser] using project: ${id}`)
         } catch (e) {
             const description = `Can not use project with id '${id}'`;
@@ -63,7 +65,11 @@ export class ProjectsService {
     }
 
     create(createProjectDto: CreateProjectDto) {
-        return this.projectRepository.insert(createProjectDto);
+        try {
+            return this.projectRepository.save(createProjectDto);
+        } catch (e) {
+            return e;
+        }
     }
 
     async findAll(): Promise<Project[]> {

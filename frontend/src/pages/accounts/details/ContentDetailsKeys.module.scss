@@ -14,13 +14,13 @@
     margin-top: $spacing-l;
 
     * + * {
-      margin-left: $spacing-l / 2;
+      margin-left: $spacing-l * 0.5;
     }
 
     .blueBg {
       background-color: $color-counter-badge-blue;
       margin-left: $spacing-l;
-      padding: $spacing-l / 3;
+      padding: $spacing-l * 0.33;
       border-radius: 8px;
       color: $color-main-text;
       font-family: $font-family-oswald;

@@ -1,4 +1,4 @@
-@mixin fadeInAnimation($time) {
+  @mixin fadeInAnimation($time) {
   -webkit-animation: fadeIn #{$time}; /* Safari, Chrome and Opera > 12.1 */
   -moz-animation: fadeIn #{$time}; /* Firefox < 16 */
   -ms-animation: fadeIn #{$time}; /* Internet Explorer */
@@ -43,7 +43,26 @@
   -ms-transition: -ms-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
   transition: transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
 
-  transform:rotateX(#{$deg});
-  -ms-transform:rotateX(#{$deg});
-  -webkit-transform:rotateX(#{$deg});
+  transform: rotateX(#{$deg});
+  -ms-transform: rotateX(#{$deg});
+  -webkit-transform: rotateX(#{$deg});
+}
+
+@mixin pulse($time) {
+  transform: scale(1);
+  animation: pulse #{$time} infinite;
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0.9);
+    }
+
+    50% {
+      transform: scale(1);
+    }
+
+    100% {
+      transform: scale(0.9);
+    }
+  }
 }

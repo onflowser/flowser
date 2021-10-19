@@ -76,7 +76,7 @@ export class FlowAggregatorService {
         : initialStartBlockHeight;
       const endBlockHeight = latestBlock.height;
 
-      console.log(`[Flowser] block range: ${startBlockHeight} - ${endBlockHeight}`)
+      console.log(`[Flowser] (next block: ${startBlockHeight}, prev block: ${endBlockHeight})`)
 
     let data;
     try {
