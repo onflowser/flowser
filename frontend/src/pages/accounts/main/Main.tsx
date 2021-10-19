@@ -7,55 +7,18 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import { NavLink } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { useFilterData } from '../../../shared/hooks/filter-data';
+import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
+    const { data } = useTimeoutPolling<any>('/api/accounts/polling');
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
         showNavigationDrawer(false);
         showSubNavigation(true);
     }, []);
-
-    // TODO: remove
-    const data = [
-        {
-            address: '0x00daAf23dDa4Ff97D0182D550E4BA9A74d6F291E',
-            balance: '200.0 ETH',
-            keyCount: 0,
-            txCount: 0,
-            index: 0,
-        },
-        {
-            address: '0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E',
-            balance: '100.0 ETH',
-            keyCount: 0,
-            txCount: 0,
-            index: 0,
-        },
-        {
-            address: '0x9gyaAf23dDa4Ff97D0182D550E4BA9A74d6F291E',
-            balance: '300.0 ETH',
-            keyCount: 0,
-            txCount: 0,
-            index: 0,
-        },
-        {
-            address: '0x0bdaAf23dDa4Ff97D0182D550E4BA9A74d6F291E',
-            balance: '100.0 ETH',
-            keyCount: 0,
-            txCount: 0,
-            index: 0,
-        },
-        {
-            address: '0x0000f23dDa4Ff97D0182D550E4BA9A74d6F291E',
-            balance: '100.0 ETH',
-            keyCount: 0,
-            txCount: 0,
-            index: 0,
-        },
-    ];
 
     const { filteredData } = useFilterData(data, searchTerm);
 
@@ -76,7 +39,7 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                         <div>
                             <Label>KEY COUNT</Label>
-                            <Value>{item.keyCount}</Value>
+                            <Value>{item.keys.length}</Value>
                         </div>
                         <div>
                             <Label>TX COUNT</Label>

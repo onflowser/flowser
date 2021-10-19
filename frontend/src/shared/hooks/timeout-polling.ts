@@ -10,7 +10,7 @@ export interface TimeoutPollingHook<T> {
     data: T[];
 }
 
-export const useTimeoutPolling = <T>(resource: string, interval = 1000): TimeoutPollingHook<T> => {
+export const useTimeoutPolling = <T>(resource: string, interval?: number): TimeoutPollingHook<T> => {
     const [pollingTime, setPollingTime] = useState(0);
     const [stop, setStop] = useState(false);
     const [data, setData] = useState<any>([]);
@@ -39,7 +39,7 @@ export const useTimeoutPolling = <T>(resource: string, interval = 1000): Timeout
             }
         },
         enabled: !stop,
-        refetchInterval: interval,
+        refetchInterval: interval || 1000,
         refetchIntervalInBackground: true,
         refetchOnWindowFocus: false,
     });
