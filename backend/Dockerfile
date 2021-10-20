@@ -3,13 +3,12 @@ FROM node:16-alpine3.11 AS development
 WORKDIR /app
 
 # install flow-cli
-# TODO: replace temporary flow-cli install script with official file
-# when arm64-darwin support is added
+# TODO: test for "aarch64" architecture when support is added
 RUN apk update
 RUN apk upgrade
 RUN apk --no-cache add curl
-RUN sh -ci "$(curl -fsSL https://raw.githubusercontent.com/bartolomej/flowser/emulator_service/backend/install-flow-cli.sh?token=AITP5A22WKLNGLLTRLEUTF3BORQGU)"
-
+RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
+RUN export PATH="$PATH:/root/.local/bin"
 
 COPY package*.json ./
 
@@ -29,13 +28,12 @@ ENV NODE_ENV=${NODE_ENV}
 WORKDIR /app
 
 # install flow-cli
-# TODO: replace temporary flow-cli install script with official file
-# when arm64-darwin support is added
+# TODO: test for "aarch64" architecture when support is added
 RUN apk update
 RUN apk upgrade
 RUN apk --no-cache add curl
-RUN sh -ci "$(curl -fsSL https://raw.githubusercontent.com/bartolomej/flowser/emulator_service/backend/install-flow-cli.sh?token=AITP5A22WKLNGLLTRLEUTF3BORQGU)"
-
+RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
+RUN export PATH="$PATH:/root/.local/bin"
 
 COPY package*.json ./
 
