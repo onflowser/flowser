@@ -36,8 +36,6 @@ const Details: FunctionComponent<any> = () => {
         return null; // TODO: add proper loader ?
     }
 
-    console.log({ data });
-
     return (
         <div className={classes.root}>
             <div className={classes.firstRow}>

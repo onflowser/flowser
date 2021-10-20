@@ -1,4 +1,7 @@
-import React, { FunctionComponent, useCallback } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import Joi from 'joi';
 import classes from './Configuration.module.scss';
 import Input from '../../../shared/components/input/Input';
 import ToggleButton from '../../../shared/components/toggle-button/ToggleButton';
@@ -9,12 +12,104 @@ import { useHistory } from 'react-router-dom';
 import Label from '../../../shared/components/label/Label';
 import Button from '../../../shared/components/button/Button';
 import { routes } from '../../../shared/constants/routes';
+import { useProjectApi } from '../../../shared/hooks/project-api';
 
-const Configuration: FunctionComponent<any> = () => {
+const formSchema = Joi.object()
+    .keys({
+        name: Joi.string().allow(' ').min(3).max(100).required(),
+        rpcServerPort: Joi.number().integer().greater(1000).less(10000).required(),
+        httpServerPort: Joi.number().integer().greater(1000).less(10000).required(),
+        blockTime: Joi.string().pattern(new RegExp('(^[1-9][0-9]*(ns|us|µs|ms|s|m|h)$)|(^0{1}$)')),
+        tokenSupply: Joi.number().integer().positive().required(),
+        transactionExpiry: Joi.number().integer().positive().required(),
+        transactionMaxGasLimit: Joi.number().integer().positive().required(),
+        scriptGasLimit: Joi.number().integer().positive().required(),
+    })
+    .unknown(true);
+
+const Configuration: FunctionComponent<any> = ({ props }) => {
+    const [formState, setFormState] = useState<any>({});
+    const [validation, setValidation] = useState(formSchema.validate(formState));
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
     const history = useHistory();
+    const { confId } = useParams<any>();
+    const { getDefaultConfiguration, saveConfiguration, useProject } = useProjectApi();
 
-    const onChange = (checked: boolean) => {
-        console.log('checked', checked);
+    useEffect(() => {
+        async function init() {
+            try {
+                // TODO: Implement
+                console.log('fetch ', confId);
+                const response = await getDefaultConfiguration();
+                setFormState(response.data);
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 300);
+            } catch (e) {
+                setIsLoading(false);
+                setError('Something went wrong: Can not fetch default configuration from server');
+            }
+        }
+
+        init();
+    }, []);
+
+    useEffect(() => {
+        setValidation(formSchema.validate(formState));
+    }, [formState]);
+
+    const onFormFieldChange = (name: string, value: any) => {
+        setFormState((state: any) => ({ ...state, [name]: value }));
+    };
+
+    const getValidationError = useCallback(
+        (formField: string) => {
+            if (isLoading || !validation.error) {
+                return '';
+            } else {
+                const error = validation.error.details.find((detail) => detail.context?.key === formField);
+                return error?.message || '';
+            }
+        },
+        [validation],
+    );
+
+    const handleSubmit = async (event: any) => {
+        let response;
+        setIsLoading(true);
+        setError('');
+        event.preventDefault();
+        const name = formState.name;
+        const configuration = {
+            name,
+            emulator: formState,
+            gateway: {
+                port: formState.httpServerPort,
+                address: 'http://127.0.0.1',
+            },
+        };
+        try {
+            response = await saveConfiguration(configuration);
+        } catch (e) {
+            setError('Can not save the configuration. Try again and make sure configuration name is unique');
+            setIsLoading(false);
+            return false;
+        }
+
+        try {
+            if (!response || !response.data) {
+                throw new Error('Can not use project');
+            }
+            await useProject(response.data.id);
+        } catch (e) {
+            setError('Something went wrong, can not run emulator');
+            setIsLoading(false);
+            return false;
+        }
+        setIsLoading(false);
+        history.push(`/${routes.firstRouteAfterStart}`);
     };
 
     const onBack = useCallback(() => {
@@ -30,212 +125,360 @@ const Configuration: FunctionComponent<any> = () => {
     };
 
     return (
-        <div className={classes.root}>
-            <div className={classes.inner}>
-                <IconBackButton className={classes.backButton} onClick={onBack} />
-                <div className={classes.top}>
-                    <h2>EMULATOR CONFIGURATION</h2>
+        <form onSubmit={handleSubmit}>
+            <div className={classes.root}>
+                <div className={classes.inner}>
+                    <IconBackButton className={classes.backButton} onClick={onBack} />
+                    <div className={classes.top}>
+                        <h2>EMULATOR CONFIGURATION</h2>
+                    </div>
+                    <Card className={classes.bottom} loading={isLoading}>
+                        {error && (
+                            <div className={classes.errors}>
+                                <span>{error}</span>
+                            </div>
+                        )}
+                        <div className={classes.bottom1}>
+                            <Label variant="xlarge">Configuration Name:</Label>
+
+                            <div className={classes.nameInput}>
+                                <input
+                                    type="text"
+                                    value={formState.name || ''}
+                                    onChange={(e) => onFormFieldChange('name', e.target.value)}
+                                />
+                            </div>
+                            {getValidationError('name') && (
+                                <span className={classes.errorMessage}>{getValidationError('name')}</span>
+                            )}
+                        </div>
+                        <div className={classes.bottom2}>
+                            {/* LEFT */}
+                            <div className={classes.left}>
+                                <div className={classes.row}>
+                                    <span>Port</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.rpcServerPort}
+                                        onChange={(e) => onFormFieldChange('rpcServerPort', e.target.value)}
+                                    />
+                                    {getValidationError('rpcServerPort') ? (
+                                        <span className={classes.errorMessage}>Provide a valid port number</span>
+                                    ) : (
+                                        <span>RPC port to listen on</span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>HTTP Port</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.httpServerPort}
+                                        onChange={(e) => onFormFieldChange('httpServerPort', e.target.value)}
+                                    />
+                                    {getValidationError('httpServerPort') ? (
+                                        <span className={classes.errorMessage}>Provide a valid port number</span>
+                                    ) : (
+                                        <span>HTTP port to listen on</span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Block Time</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.blockTime}
+                                        onChange={(e) => onFormFieldChange('blockTime', e.target.value)}
+                                    />
+                                    {getValidationError('blockTime') ? (
+                                        <span className={classes.errorMessage}>
+                                            Valid block time is required or zero. Valid units are: ns, us (or µs), ms,
+                                            s, m or h
+                                        </span>
+                                    ) : (
+                                        <span>
+                                            Time between sealed blocks. Valid units are: ns, us (or µs), ms, s, m or h
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Service Private Key</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.servicePrivateKey}
+                                        onChange={(e) => onFormFieldChange('servicePrivateKey', e.target.value)}
+                                    />
+                                    <span>Private key used for the service account</span>
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Service Public Key</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.servicePublicKey}
+                                        onChange={(e) => onFormFieldChange('servicePublicKey', e.target.value)}
+                                    />
+                                    <span>Public key used for the service account</span>
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Database Path</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.databasePath}
+                                        onChange={(e) => onFormFieldChange('databasePath', e.target.value)}
+                                    />
+                                    {getValidationError('databasePath') ? (
+                                        <span className={classes.errorMessage}>Database Path is required</span>
+                                    ) : (
+                                        <span>Specify path for the database file persisting the state</span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Token supply</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.tokenSupply}
+                                        onChange={(e) => onFormFieldChange('tokenSupply', e.target.value)}
+                                    />
+                                    {getValidationError('tokenSupply') ? (
+                                        <span className={classes.errorMessage}>Token Supply is required</span>
+                                    ) : (
+                                        <span>Initial FLOW token supply</span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Transaction Expiry</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.transactionExpiry}
+                                        onChange={(e) => onFormFieldChange('transactionExpiry', e.target.value)}
+                                    />
+                                    {getValidationError('transactionExpiry') ? (
+                                        <span className={classes.errorMessage}>Transaction Expiry is required</span>
+                                    ) : (
+                                        <span>Transaction expiry, measured in blocks</span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Storage Per Flow</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.storagePerFlow}
+                                        onChange={(e) => onFormFieldChange('storagePerFlow', e.target.value)}
+                                    />
+                                    <span>
+                                        Specify size of the storage in MB for each FLOW in account balance. Default
+                                        value from the flow-go
+                                    </span>
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Minimum Account Balance</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.minAccountBalance}
+                                        onChange={(e) => onFormFieldChange('minAccountBalance', e.target.value)}
+                                    />
+                                    <span>
+                                        Specify minimum balance the account must have. Default value from the flow-go
+                                    </span>
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Transaction Max Gas Limit</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.transactionMaxGasLimit}
+                                        onChange={(e) => onFormFieldChange('transactionMaxGasLimit', e.target.value)}
+                                    />
+                                    {getValidationError('transactionMaxGasLimit') ? (
+                                        <span className={classes.errorMessage}>
+                                            Transaction Max Gas Limit is required
+                                        </span>
+                                    ) : (
+                                        <span>Maximum gas limit for transactions</span>
+                                    )}
+                                </div>
+
+                                <div className={classes.row}>
+                                    <span>Script Gas Limit</span>
+                                    <Input
+                                        type="text"
+                                        value={formState.scriptGasLimit}
+                                        onChange={(e) => onFormFieldChange('scriptGasLimit', e.target.value)}
+                                    />
+                                    {getValidationError('scriptGasLimit') ? (
+                                        <span className={classes.errorMessage}>Script Gas Limit is required</span>
+                                    ) : (
+                                        <span>Specify gas limit for script execution</span>
+                                    )}
+                                </div>
+                            </div>
+                            {/* RIGHT */}
+                            <div className={classes.right}>
+                                <div className={classes.firstPart}>
+                                    <div>
+                                        <div>
+                                            <h6>
+                                                Service Signature Algorithm
+                                                <span>Service account key signature algorithm</span>
+                                            </h6>
+                                        </div>
+                                        <div>
+                                            <span>ECDSA_P256</span>
+                                            <RadioButton
+                                                checked={formState.serviceSignatureAlgorithm === 'ECDSA_P256'}
+                                                onChange={(e) =>
+                                                    onFormFieldChange('serviceSignatureAlgorithm', 'ECDSA_P256')
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <span>ECDSA_secp256k1</span>
+                                            <RadioButton
+                                                checked={formState.serviceSignatureAlgorithm === 'ECDSA_secp256k1'}
+                                                onChange={(e) =>
+                                                    onFormFieldChange('serviceSignatureAlgorithm', 'ECDSA_secp256k1')
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <span>BLS_BLS_12_381</span>
+                                            <RadioButton
+                                                checked={formState.serviceSignatureAlgorithm === 'BLS_BLS_12_381'}
+                                                onChange={(e) =>
+                                                    onFormFieldChange('serviceSignatureAlgorithm', 'BLS_BLS_12_381')
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <h6>
+                                                Service Hash Algorithm
+                                                <span>Service account key hash algorithm</span>
+                                            </h6>
+                                        </div>
+                                        <div>
+                                            <span>SHA2_256</span>
+                                            <RadioButton
+                                                checked={formState.serviceHashAlgorithm === 'SHA2_256'}
+                                                onChange={(e) => onFormFieldChange('serviceHashAlgorithm', 'SHA2_256')}
+                                            />
+                                        </div>
+                                        <div>
+                                            <span>SHA2_384</span>
+                                            <RadioButton
+                                                checked={formState.serviceHashAlgorithm === 'SHA2_384'}
+                                                onChange={(e) => onFormFieldChange('serviceHashAlgorithm', 'SHA2_384')}
+                                            />
+                                        </div>
+                                        <div>
+                                            <span>SHA3_256</span>
+                                            <RadioButton
+                                                checked={formState.serviceHashAlgorithm === 'SHA3_256'}
+                                                onChange={(e) => onFormFieldChange('serviceHashAlgorithm', 'SHA3_256')}
+                                            />
+                                        </div>
+                                        <div>
+                                            <span>SHA3_384</span>
+                                            <RadioButton
+                                                checked={formState.serviceHashAlgorithm === 'SHA3_384'}
+                                                onChange={(e) => onFormFieldChange('serviceHashAlgorithm', 'SHA3_384')}
+                                            />
+                                        </div>
+                                        <div>
+                                            <span>KMAC128_BLS_BLS12_381</span>
+                                            <RadioButton
+                                                checked={formState.serviceHashAlgorithm === 'KMAC128_BLS_BLS12_381'}
+                                                onChange={(e) =>
+                                                    onFormFieldChange('serviceHashAlgorithm', 'KMAC128_BLS_BLS12_381')
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={classes.secondPart}>
+                                    <div className={classes.row}>
+                                        <span>Verbose</span>
+                                        <div>
+                                            <span>False</span>
+                                            <ToggleButton
+                                                value={formState.verboseLogging === true}
+                                                onChange={(state) => onFormFieldChange('verboseLogging', state)}
+                                            />
+                                            <span>True</span>
+                                        </div>
+                                        <span>Enable verbose logging (useful for debugging)</span>
+                                    </div>
+                                    <div className={classes.row}>
+                                        <span>Persist</span>
+                                        <div>
+                                            <span>False</span>
+                                            <ToggleButton
+                                                value={formState.persist === true}
+                                                onChange={(state) => onFormFieldChange('persist', state)}
+                                            />
+                                            <span>True</span>
+                                        </div>
+                                        <span>Enable persistence of the state between restarts</span>
+                                    </div>
+                                    <div className={classes.row}>
+                                        <span>Simple Addresses</span>
+                                        <div>
+                                            <span>False</span>
+                                            <ToggleButton
+                                                value={formState.simpleAddresses === true}
+                                                onChange={(state) => onFormFieldChange('simpleAddresses', state)}
+                                            />
+                                            <span>True</span>
+                                        </div>
+                                        <span>Use sequential addresses starting with 0x1</span>
+                                    </div>
+                                    <div className={classes.row}>
+                                        <span>Storage Limit</span>
+                                        <div>
+                                            <span>False</span>
+                                            <ToggleButton
+                                                value={formState.storageLimit === true}
+                                                onChange={(state) => onFormFieldChange('storageLimit', state)}
+                                            />
+                                            <span>True</span>
+                                        </div>
+                                        <span>Enable account storage limit</span>
+                                    </div>
+                                    <div className={classes.row}>
+                                        <span>Transaction Fees</span>
+                                        <div>
+                                            <span>False</span>
+                                            <ToggleButton
+                                                value={formState.transactionFees === true}
+                                                onChange={(state) => onFormFieldChange('transactionFees', state)}
+                                            />
+                                            <span>True</span>
+                                        </div>
+                                        <span>Enable transaction fees</span>
+                                    </div>
+                                </div>
+                                <div className={classes.buttons}>
+                                    <Button onClick={onDelete} variant="middle" outlined={true} disabled={true}>
+                                        DELETE
+                                    </Button>
+                                    <Button variant="middle" type="submit" disabled={validation.error !== undefined}>
+                                        SAVE & RUN
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
                 </div>
-                <Card className={classes.bottom}>
-                    <div className={classes.bottom1}>
-                        <Label variant="xlarge">Configuration Name:</Label>
-
-                        <div className={classes.nameInput}>
-                            <input type="text" value="New emulator configuration #1" />
-                        </div>
-                    </div>
-                    <div className={classes.bottom2}>
-                        {/* LEFT */}
-                        <div className={classes.left}>
-                            <div className={classes.row}>
-                                <span>Port</span>
-                                <Input type="text" value="3569" />
-                                <span>RPC port to listen on</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>HTTP Port</span>
-                                <Input type="text" value="8080" />
-                                <span>HTTP port to listen on</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Block Time</span>
-                                <Input type="text" value="0" />
-                                <span>Time between sealed blocks. Valid units are: ns, us (or µs), ms, s, m or h</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Service Private Key</span>
-                                <Input type="text" value="" />
-                                <span>Private key used for the service account</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Service Public Key</span>
-                                <Input type="text" value="" />
-                                <span>Public key used for the service account</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Database Path</span>
-                                <Input type="text" value="./flowdb" />
-                                <span>Specify path for the database file persisting the state</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Token supply</span>
-                                <Input type="text" value="1000000000.0" />
-                                <span>Initial FLOW token supply</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Transaction Expiry</span>
-                                <Input type="text" value="10" />
-                                <span>Transaction expiry, measured in blocks</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Storage Per Flow</span>
-                                <Input type="text" value="" />
-                                <span>
-                                    Specify size of the storage in MB for each FLOW in account balance. Default value
-                                    from the flow-go
-                                </span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Minimum Account Balance</span>
-                                <Input type="text" value="" />
-                                <span>
-                                    Specify minimum balance the account must have. Default value from the flow-go
-                                </span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Transaction Max Gas Limit</span>
-                                <Input type="text" value="9999" />
-                                <span>Maximum gas limit for transactions</span>
-                            </div>
-
-                            <div className={classes.row}>
-                                <span>Script Gas Limit</span>
-                                <Input type="text" value="100000" />
-                                <span>Specify gas limit for script execution</span>
-                            </div>
-                        </div>
-                        {/* RIGHT */}
-                        <div className={classes.right}>
-                            <div className={classes.firstPart}>
-                                <div>
-                                    <div>
-                                        <h6>
-                                            Service Signature Algorithm
-                                            <span>Service account key signature algorithm</span>
-                                        </h6>
-                                    </div>
-                                    <div>
-                                        <span>ECDSA_P256</span>
-                                        <RadioButton checked={true} onChange={() => false} />
-                                    </div>
-                                    <div>
-                                        <span>ECDSA_secp256k1</span>
-                                        <RadioButton checked={false} onChange={() => false} />
-                                    </div>
-                                    <div>
-                                        <span>BLS_BLS_12_381</span>
-                                        <RadioButton checked={false} onChange={() => true} />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div>
-                                        <h6>
-                                            Service Hash Algorithm
-                                            <span>Service account key hash algorithm</span>
-                                        </h6>
-                                    </div>
-                                    <div>
-                                        <span>SHA2_256</span>
-                                        <RadioButton checked={false} onChange={() => false} />
-                                    </div>
-                                    <div>
-                                        <span>SHA2_384</span>
-                                        <RadioButton checked={true} onChange={() => false} />
-                                    </div>
-                                    <div>
-                                        <span>SHA3_256</span>
-                                        <RadioButton checked={false} onChange={() => true} />
-                                    </div>
-                                    <div>
-                                        <span>SHA3_384</span>
-                                        <RadioButton checked={false} onChange={() => false} />
-                                    </div>
-                                    <div>
-                                        <span>KMAC128_BLS_BLS12_381</span>
-                                        <RadioButton checked={false} onChange={() => false} />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={classes.secondPart}>
-                                <div className={classes.row}>
-                                    <span>Verbose</span>
-                                    <div>
-                                        <span>False</span>
-                                        <ToggleButton value={true} />
-                                        <span>True</span>
-                                    </div>
-                                    <span>Enable verbose logging (useful for debugging)</span>
-                                </div>
-                                <div className={classes.row}>
-                                    <span>Persist</span>
-                                    <div>
-                                        <span>False</span>
-                                        <ToggleButton value={true} />
-                                        <span>True</span>
-                                    </div>
-                                    <span>Enable persistence of the state between restarts</span>
-                                </div>
-                                <div className={classes.row}>
-                                    <span>Simple Addresses</span>
-                                    <div>
-                                        <span>False</span>
-                                        <ToggleButton value={true} />
-                                        <span>True</span>
-                                    </div>
-                                    <span>Use sequential addresses starting with 0x1</span>
-                                </div>
-                                <div className={classes.row}>
-                                    <span>Storage Limit</span>
-                                    <div>
-                                        <span>False</span>
-                                        <ToggleButton value={true} />
-                                        <span>True</span>
-                                    </div>
-                                    <span>Enable account storage limit</span>
-                                </div>
-                                <div className={classes.row}>
-                                    <span>Transaction Fees</span>
-                                    <div>
-                                        <span>False</span>
-                                        <ToggleButton value={true} />
-                                        <span>True</span>
-                                    </div>
-                                    <span>Enable transaction fees</span>
-                                </div>
-                            </div>
-                            <div className={classes.buttons}>
-                                <Button onClick={onDelete} variant="middle" outlined={true} disabled={true}>
-                                    DELETE
-                                </Button>
-                                <Button onClick={onSaveAndRun} variant="middle">
-                                    SAVE & RUN
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
             </div>
-        </div>
+        </form>
     );
 };
 

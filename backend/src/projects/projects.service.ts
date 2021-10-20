@@ -65,7 +65,11 @@ export class ProjectsService {
     }
 
     create(createProjectDto: CreateProjectDto) {
-        return this.projectRepository.insert(createProjectDto);
+        try {
+            return this.projectRepository.save(createProjectDto);
+        } catch (e) {
+            return e;
+        }
     }
 
     async findAll(): Promise<Project[]> {
