@@ -100,7 +100,7 @@ export class ProjectsService {
         return this.projectRepository.update({ id }, updateProjectDto);
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} project`;
+    remove(id: string) {
+        return this.projectRepository.delete({ id });
     }
 }

@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Event } from "./entities/event.entity";
 import { MongoRepository } from "typeorm";
@@ -40,13 +39,5 @@ export class EventsService {
     } else {
       throw new NotFoundException("Event not found")
     }
-  }
-
-  update(id: string, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} event`;
   }
 }

@@ -3,11 +3,11 @@ import {
     Controller,
     Delete,
     Get,
-    Param, ParseIntPipe,
+    Param,
+    ParseIntPipe,
     Patch,
     Post,
     Query,
-    UnprocessableEntityException
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -53,7 +53,7 @@ export class ProjectsController {
 
     @Delete(':id')
     remove(@Param('id') id: string) {
-        return this.projectsService.remove(+id);
+        return this.projectsService.remove(id);
     }
 
     @Post('/use/:id')
