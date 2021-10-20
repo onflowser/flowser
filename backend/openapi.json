@@ -337,10 +337,19 @@
                 }
             }
         },
-        "/api/transactions/{transactionId}/events": {
+        "/api/transactions/{id}/events": {
             "get": {
                 "operationId": "EventsController_findAllByTransaction",
-                "parameters": [],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -348,10 +357,19 @@
                 }
             }
         },
-        "/api/transactions/{transactionId}/events/polling": {
+        "/api/transactions/{id}/events/polling": {
             "get": {
                 "operationId": "EventsController_findAllNewByTransaction",
-                "parameters": [],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -412,10 +430,19 @@
                 }
             }
         },
-        "/api/blocks/{blockId}/transactions": {
+        "/api/blocks/{id}/transactions": {
             "get": {
                 "operationId": "TransactionsController_findAllByBlock",
-                "parameters": [],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -423,10 +450,27 @@
                 }
             }
         },
-        "/api/blocks/{blockId}/transactions/polling": {
+        "/api/blocks/{id}/transactions/polling": {
             "get": {
                 "operationId": "TransactionsController_findAllNewByBlock",
-                "parameters": [],
+                "parameters": [
+                    {
+                        "name": "timestamp",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""

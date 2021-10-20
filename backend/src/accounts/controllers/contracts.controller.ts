@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ContractsService } from '../services/contracts.service';
 import { PollingResponseInterceptor } from "../../shared/interceptors/polling-response.interceptor";
+import { ApiParam } from "@nestjs/swagger";
 
 @Controller('contracts')
 export class ContractsController {
@@ -22,6 +23,7 @@ export class ContractsController {
     return this.contractsService.findAllNewerThanTimestamp(timestamp);
   }
 
+  @ApiParam({ name: "id", type: String })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.contractsService.findOne(id);

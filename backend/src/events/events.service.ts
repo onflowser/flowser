@@ -32,6 +32,15 @@ export class EventsService {
     });
   }
 
+  findAllByTransactionNewerThanTimestamp(transactionId: string, timestamp) {
+    return this.eventRepository.find({
+      where: {
+        createdAt: {$gt: timestamp},
+        transactionId,
+      }
+    });
+  }
+
   async findOne(id: string) {
     const [event] = await this.eventRepository.find({ where: {_id: id} });
     if (event) {

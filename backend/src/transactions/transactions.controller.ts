@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { ApiParam, ApiQuery } from "@nestjs/swagger";
 
 @Controller()
 export class TransactionsController {
@@ -22,20 +23,24 @@ export class TransactionsController {
     return this.transactionsService.findAllNewerThanTimestamp(timestamp);
   }
 
-  @Get("/blocks/:blockId/transactions")
-  findAllByBlock(@Param("blockId") blockId) {
+  @ApiParam({ name: "id", type: String })
+  @Get("/blocks/:id/transactions")
+  findAllByBlock(@Param("id") blockId) {
     return this.transactionsService.findAllByBlock(blockId);
   }
 
-  @Get("/blocks/:blockId/transactions/polling")
+  @ApiParam({ name: "id", type: String })
+  @ApiQuery({ name: "timestamp", type: Number })
+  @Get("/blocks/:id/transactions/polling")
   @UseInterceptors(PollingResponseInterceptor)
   findAllNewByBlock(
-    @Param("blockId") blockId,
+    @Param("id") blockId,
     @Query('timestamp', ParseIntPipe) timestamp
   ) {
     return this.transactionsService.findAllByBlockNewerThanTimestamp(blockId, timestamp);
   }
 
+  @ApiParam({ name: "id", type: String })
   @Get('/transactions/:id')
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(id);
