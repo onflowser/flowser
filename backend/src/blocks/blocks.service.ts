@@ -2,7 +2,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { Block } from './entities/block.entity';
 import { CreateBlockDto } from './dto/create-block.dto';
-import { UpdateBlockDto } from './dto/update-block.dto';
 import { NotFoundException } from "@nestjs/common";
 
 export class BlocksService {
@@ -38,13 +37,5 @@ export class BlocksService {
         } else {
             throw new NotFoundException("Block not found")
         }
-    }
-
-    update(id: string, updateBlockDto: UpdateBlockDto) {
-        return `This action updates a #${id} block`;
-    }
-
-    remove(id: string) {
-        return `This action removes a #${id} block`;
     }
 }

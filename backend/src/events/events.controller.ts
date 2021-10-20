@@ -1,37 +1,38 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   UseInterceptors,
   Query,
   ParseIntPipe
 } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { ApiParam } from "@nestjs/swagger";
 
 @Controller()
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
-
-  @Post("/events")
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
-  }
 
   @Get("/events")
   findAll() {
     return this.eventsService.findAll();
   }
 
-  @Get("/transactions/:transactionId/events")
-  findAllByTransaction(@Param("transactionId") transactionId) {
+  @ApiParam({ name: "id", type: String })
+  @Get("/transactions/:id/events")
+  findAllByTransaction(@Param("id") transactionId) {
     return this.eventsService.findAllByTransaction(transactionId);
+  }
+
+  @ApiParam({ name: "id", type: String })
+  @Get("/transactions/:id/events/polling")
+  @UseInterceptors(PollingResponseInterceptor)
+  findAllNewByTransaction(
+    @Param("transactionId") transactionId,
+    @Query('timestamp', ParseIntPipe) timestamp
+  ) {
+    return this.eventsService.findAllByTransactionNewerThanTimestamp(transactionId, timestamp);
   }
 
   @Get('/events/polling')
@@ -40,18 +41,9 @@ export class EventsController {
     return this.eventsService.findAllNewerThanTimestamp(timestamp);
   }
 
+  @ApiParam({ name: "id", type: String })
   @Get('/events/:id')
   findOne(@Param('id') id: string) {
     return this.eventsService.findOne(id);
-  }
-
-  @Patch('/events/:id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(id, updateEventDto);
-  }
-
-  @Delete('/events:id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(id);
   }
 }

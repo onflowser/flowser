@@ -15,6 +15,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from "./entities/project.entity";
 import { defaultEmulatorFlags } from './data/default-emulator-flags';
+import { ApiParam } from "@nestjs/swagger";
 
 @Controller('projects')
 export class ProjectsController {
@@ -42,21 +43,27 @@ export class ProjectsController {
 
     }
 
+    @ApiParam({ name: "id", type: String })
     @Get(':id')
-    findOne(@Param('id') id: string) {
+    findOne(
+      @Param('id') id: string
+    ) {
         return this.projectsService.findOne(id);
     }
 
+    @ApiParam({ name: "id", type: String })
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
         return this.projectsService.update(id, updateProjectDto);
     }
 
+    @ApiParam({ name: "id", type: String })
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.projectsService.remove(id);
     }
 
+    @ApiParam({ name: "id", type: String })
     @Post('/use/:id')
     async useProject(@Param('id') id: string):Promise<Project> {
         try {
@@ -66,6 +73,7 @@ export class ProjectsController {
         }
     }
 
+    @ApiParam({ name: "id", type: String })
     @Post('/:id/seed/accounts')
     async seed(@Param('id') id: string, @Query("n", ParseIntPipe) n: number) {
         return this.projectsService.seedAccounts(id, n);

@@ -52,8 +52,4 @@ export class AccountsService {
       { upsert: true }
     );
   }
-
-  remove(id: string) {
-    return `This action removes a #${id} account`;
-  }
 }

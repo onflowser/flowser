@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Event } from "./entities/event.entity";
 import { MongoRepository } from "typeorm";
@@ -33,6 +32,15 @@ export class EventsService {
     });
   }
 
+  findAllByTransactionNewerThanTimestamp(transactionId: string, timestamp) {
+    return this.eventRepository.find({
+      where: {
+        createdAt: {$gt: timestamp},
+        transactionId,
+      }
+    });
+  }
+
   async findOne(id: string) {
     const [event] = await this.eventRepository.find({ where: {_id: id} });
     if (event) {
@@ -40,13 +48,5 @@ export class EventsService {
     } else {
       throw new NotFoundException("Event not found")
     }
-  }
-
-  update(id: string, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} event`;
   }
 }

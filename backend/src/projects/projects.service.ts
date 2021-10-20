@@ -114,6 +114,6 @@ export class ProjectsService {
     }
 
     remove(id: string) {
-        return this.projectRepository.delete({id});
+        return this.projectRepository.delete({ id });
     }
 }

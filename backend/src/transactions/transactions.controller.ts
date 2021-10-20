@@ -1,26 +1,16 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   UseInterceptors, Query, ParseIntPipe
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { ApiParam, ApiQuery } from "@nestjs/swagger";
 
 @Controller()
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
-
-  @Post("/transactions")
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
-  }
 
   @Get("/transactions")
   findAll() {
@@ -33,32 +23,26 @@ export class TransactionsController {
     return this.transactionsService.findAllNewerThanTimestamp(timestamp);
   }
 
-  @Get("/blocks/:blockId/transactions")
-  findAllByBlock(@Param("blockId") blockId) {
+  @ApiParam({ name: "id", type: String })
+  @Get("/blocks/:id/transactions")
+  findAllByBlock(@Param("id") blockId) {
     return this.transactionsService.findAllByBlock(blockId);
   }
 
-  @Get("/blocks/:blockId/transactions/polling")
+  @ApiParam({ name: "id", type: String })
+  @ApiQuery({ name: "timestamp", type: Number })
+  @Get("/blocks/:id/transactions/polling")
   @UseInterceptors(PollingResponseInterceptor)
   findAllNewByBlock(
-    @Param("blockId") blockId,
+    @Param("id") blockId,
     @Query('timestamp', ParseIntPipe) timestamp
   ) {
     return this.transactionsService.findAllByBlockNewerThanTimestamp(blockId, timestamp);
   }
 
+  @ApiParam({ name: "id", type: String })
   @Get('/transactions/:id')
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(id);
-  }
-
-  @Patch('/transactions/:id')
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionsService.update(id, updateTransactionDto);
-  }
-
-  @Delete('/transactions/:id')
-  remove(@Param('id') id: string) {
-    return this.transactionsService.remove(id);
   }
 }
