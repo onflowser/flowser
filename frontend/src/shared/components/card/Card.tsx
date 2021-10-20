@@ -7,6 +7,7 @@ interface OwnProps {
     variant?: 'blue' | 'black';
     active?: boolean;
     loading?: boolean;
+    loadingText?: string;
     [key: string]: any;
 }
 
@@ -18,6 +19,7 @@ const Card: FunctionComponent<Props> = ({
     variant = 'blue',
     active = false,
     loading = false,
+    loadingText = 'Loading ...',
     ...restProps
 }) => {
     return (
@@ -25,7 +27,7 @@ const Card: FunctionComponent<Props> = ({
             className={`${classes.root} ${classes[variant]} ${active ? classes.active : ''} ${className}`}
             {...restProps}
         >
-            {loading && <span className={classes.loading}>loading ... </span>}
+            {loading && <span className={classes.loading}>{loadingText}</span>}
             {children}
         </div>
     );

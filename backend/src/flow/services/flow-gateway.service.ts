@@ -108,6 +108,10 @@ export class FlowGatewayService {
     }
 
     async isConnectedToGateway() {
+        if (!this.configuration) {
+            return false;
+        }
+
         const {address, port} = this.configuration;
         return FlowGatewayService.isPingable(address, port);
     }

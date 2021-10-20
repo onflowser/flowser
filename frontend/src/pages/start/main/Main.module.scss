@@ -30,10 +30,6 @@
   img {
     width: 108px;
     margin-bottom: 50px;
-    transform: scale(1) rotate(0deg);
-    animation: logoPulse 1.3s;
-    transition-timing-function: ease-in-out;
-    animation-delay: 0.8s;
   }
 
   h1 {
@@ -54,6 +50,16 @@
 
   .caret {
     transform: rotate(-90deg);
+  }
+
+  .noEmulators,
+  .loading {
+    margin-top: $spacing-base;
+    color: $color-grey;
+    font-weight: 100;
+  }
+  .loading {
+    @include pulse(1.8s);
   }
 }
 

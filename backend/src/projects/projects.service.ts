@@ -18,18 +18,12 @@ export class ProjectsService {
     private currentProject: Project;
 
     constructor(
-      @InjectRepository(Project)
-      private projectRepository: MongoRepository<Project>,
-      private flowGatewayService: FlowGatewayService,
-      private flowAggregatorService: FlowAggregatorService,
-      private flowEmulatorService: FlowEmulatorService
-      ) {
-        try {
-            this.useProject("emulator") // default project for dev
-        } catch (e) {
-            console.error(`[Flowser] failed to use default project: `, e)
-        }
-    }
+        @InjectRepository(Project)
+        private projectRepository: MongoRepository<Project>,
+        private flowGatewayService: FlowGatewayService,
+        private flowAggregatorService: FlowAggregatorService,
+        private flowEmulatorService: FlowEmulatorService
+    ) {}
 
     getCurrentProject() {
         if (this.currentProject) {
@@ -49,10 +43,11 @@ export class ProjectsService {
                 this.flowEmulatorService.configureProjectContext(this.currentProject)
                 this.flowAggregatorService.startEmulator(); // TODO: test this
             }
-            console.debug(`[Flowser] using project: ${id}`)
+            console.debug(`[Flowser] using project: ${id}`);
+            return this.currentProject;
         } catch (e) {
             const description = `Can not use project with id '${id}'`;
-            throw new NotFoundException(e, description);
+            throw new Error(description);
         }
     }
 
@@ -75,32 +70,50 @@ export class ProjectsService {
     async findAll(): Promise<Project[]> {
         const projects = await this.projectRepository.find();
         return Promise.all(projects.map(async project => {
-            const {address, port} = project.gateway;
-            return {
-                ...project,
-                pingable: await FlowGatewayService.isPingable(address, port)
+            if (project.gateway) {
+                const {address, port} = project.gateway;
+                const pingable = await FlowGatewayService.isPingable(address, port)
+                return {
+                    ...project,
+                    pingable
+                }
+            } else {
+                return project
             }
         }))
-
     }
 
     async findOne(id: string): Promise<Project> {
-        const project = await this.projectRepository.findOne({ id });
+        const project = await this.projectRepository.findOne({id});
         if (!project) {
             throw new NotFoundException("Project not found")
         }
-        const {port, address} = project.gateway;
-        return {
-            ...project,
-            pingable: await FlowGatewayService.isPingable(address, port)
-        };
+
+        if (project.gateway) {
+            const {port, address} = project.gateway;
+            const pingable = await FlowGatewayService.isPingable(address, port)
+            return {
+                ...project,
+                pingable
+            };
+        } else {
+            return project;
+        }
     }
 
-    update(id: string, updateProjectDto: UpdateProjectDto) {
-        return this.projectRepository.update({ id }, updateProjectDto);
+    async update(id: string, updateProjectDto: UpdateProjectDto) {
+        try {
+            const response = await this.projectRepository.findOneAndUpdate({id}, {$set: updateProjectDto}, {
+                upsert: true,
+                returnOriginal: false
+            });
+            return response.value;
+        } catch (e) {
+            return e;
+        }
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} project`;
+    remove(id: string) {
+        return this.projectRepository.delete({id});
     }
 }

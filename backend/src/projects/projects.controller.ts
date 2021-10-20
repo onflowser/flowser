@@ -3,11 +3,12 @@ import {
     Controller,
     Delete,
     Get,
-    Param, ParseIntPipe,
+    Param,
+    ParseIntPipe,
     Patch,
     Post,
     Query,
-    UnprocessableEntityException
+    ServiceUnavailableException
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -53,12 +54,16 @@ export class ProjectsController {
 
     @Delete(':id')
     remove(@Param('id') id: string) {
-        return this.projectsService.remove(+id);
+        return this.projectsService.remove(id);
     }
 
     @Post('/use/:id')
-    async useProject(@Param('id') id: string):Promise<void> {
-        return this.projectsService.useProject(id);
+    async useProject(@Param('id') id: string):Promise<Project> {
+        try {
+            return await this.projectsService.useProject(id);
+        } catch (e) {
+            throw new ServiceUnavailableException(`Can not use project with id ${id}`);
+        }
     }
 
     @Post('/:id/seed/accounts')

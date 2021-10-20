@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import classes from './Button.module.scss';
 
 export interface ButtonProps {
-    onClick?: () => void;
+    onClick?: (event: any) => void;
     variant?: 'big' | 'middle' | 'normal';
     disabled?: boolean;
     outlined?: boolean;

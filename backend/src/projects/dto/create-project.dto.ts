@@ -8,6 +8,7 @@ export class CreateProjectDto {
     name: string;
 
     startBlockHeight: number;
+    isCustom: boolean
 
     @IsNotEmpty()
     @ValidateNested()

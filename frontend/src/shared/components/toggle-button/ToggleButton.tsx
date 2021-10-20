@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import classes from './ToggleButton.module.scss';
 
 interface OwnProps {
@@ -14,10 +14,12 @@ const ToggleButton: FunctionComponent<Props> = ({ value = false, onChange = () =
         setState(value);
     }, [value]);
 
+    useEffect(() => {
+        onChange(state);
+    }, [state]);
+
     const onToggle = () => {
         setState(!state);
-        console.log('state change', state);
-        onChange(state);
     };
 
     return (

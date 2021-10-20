@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { routes } from '../../../shared/constants/routes';
 import IconButton from '../../../shared/components/icon-button/IconButton';
@@ -10,13 +10,34 @@ import { useProjectApi } from '../../../shared/hooks/project-api';
 
 const Main: FunctionComponent<any> = () => {
     const [error, setError] = useState('');
-    const { useProject } = useProjectApi();
+    const [loading, setLoading] = useState(true);
+    const [customProjects, setCustomProjects] = useState([]);
+    const { useProject, getAllProjects } = useProjectApi();
     const history = useHistory();
 
-    const onQuickstart = async () => {
+    useEffect(() => {
+        async function init() {
+            try {
+                const response = await getAllProjects();
+                if (response && response.data) {
+                    const projects = response.data.filter((project: any) => project.isCustom === true);
+                    setTimeout(() => {
+                        setCustomProjects(projects);
+                        setLoading(false);
+                    }, 1000);
+                }
+            } catch (e) {
+                setLoading(false);
+            }
+        }
+
+        init();
+    }, []);
+
+    const onQuickstart = async (name: string) => {
         setError('');
         try {
-            await useProject('emulator');
+            await useProject(name);
             history.push(`/${routes.firstRouteAfterStart}`);
         } catch (e) {
             setError(
@@ -37,7 +58,7 @@ const Main: FunctionComponent<any> = () => {
                 <img src={Logo} alt="FLOWSER" />
                 <h1>FLOWSER</h1>
                 <IconButton
-                    onClick={onQuickstart}
+                    onClick={() => onQuickstart('emulator')}
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"
@@ -45,7 +66,7 @@ const Main: FunctionComponent<any> = () => {
                     EMULATOR
                 </IconButton>
                 <IconButton
-                    onClick={onQuickstart}
+                    onClick={() => onQuickstart('testnet')}
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"
@@ -53,7 +74,7 @@ const Main: FunctionComponent<any> = () => {
                     TESTNET
                 </IconButton>
                 <IconButton
-                    onClick={onQuickstart}
+                    onClick={() => onQuickstart('mainnet')}
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"
@@ -73,15 +94,20 @@ const Main: FunctionComponent<any> = () => {
                 </IconButton>
 
                 <h2>YOUR CUSTOM EMULATORS</h2>
-                <NavLink className={classes.link} to="/start/configure/11jh12g3j1h2g3j1h2">
-                    Test 1
-                </NavLink>
-                <NavLink className={classes.link} to="/start/configure/11jh12g3j1h2g3j1h2">
-                    Another Test
-                </NavLink>
-                <NavLink className={classes.link} to="/start/configure/11jh12g3j1h2g3j1h2">
-                    Local Machine Emulator
-                </NavLink>
+                {loading && <div className={classes.loading}>loading your custom emulators ...</div>}
+
+                {!loading && (
+                    <>
+                        {customProjects.map((project: any, index: number) => (
+                            <NavLink key={index} className={classes.link} to={`/start/configure/${project.id}`}>
+                                {project.name}
+                            </NavLink>
+                        ))}
+                        {customProjects.length === 0 && (
+                            <span className={classes.noEmulators}>No custom emulators added yet</span>
+                        )}
+                    </>
+                )}
             </div>
         </>
     );

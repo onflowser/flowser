@@ -88,12 +88,17 @@ export class FlowEmulatorService {
 
     console.log(`[Flowser] starting the emulator with (${flags.length}) flags: `, flags.join(" "))
 
-    this.emulatorProcess = spawn("flow", [
-      'emulator',
-      ...flags
-    ], {
-      cwd: this.projectDir()
-    })
+    try {
+      this.emulatorProcess = spawn("flow", [
+        'emulator',
+        ...flags
+      ], {
+        cwd: this.projectDir()
+      })
+    } catch (e) {
+      console.error(e);
+      cb(e, null)
+    }
 
     return new Promise(((resolve, reject) => {
       this.emulatorProcess.stdout.on("data", data => {

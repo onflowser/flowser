@@ -25,6 +25,9 @@ export class Project {
     @Column()
     emulator: EmulatorConfigurationEntity;
 
+    @Column('boolean', {default: false})
+    isCustom: boolean = false;
+
     // data will be fetched from this block height
     // leave this undefined to start fetching from latest block
     @Column()

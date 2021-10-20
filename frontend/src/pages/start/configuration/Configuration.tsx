@@ -32,24 +32,43 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
     const [validation, setValidation] = useState(formSchema.validate(formState));
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [loadingText, setLoadingText] = useState('loading');
 
     const history = useHistory();
-    const { confId } = useParams<any>();
-    const { getDefaultConfiguration, saveConfiguration, useProject } = useProjectApi();
+    const { id } = useParams<any>();
+    const {
+        getDefaultConfiguration,
+        saveConfiguration,
+        updateConfiguration,
+        useProject,
+        deleteProject,
+        getProjectDetails,
+    } = useProjectApi();
 
     useEffect(() => {
         async function init() {
+            let response;
             try {
-                // TODO: Implement
-                console.log('fetch ', confId);
-                const response = await getDefaultConfiguration();
-                setFormState(response.data);
+                if (id) {
+                    response = await getProjectDetails(id);
+                    if (!response.data) {
+                        throw Error('No data');
+                    }
+                    setFormState({ ...response.data.emulator, name: response.data.name });
+                } else {
+                    response = await getDefaultConfiguration();
+                    setFormState(response.data);
+                }
                 setTimeout(() => {
                     setIsLoading(false);
                 }, 300);
             } catch (e) {
                 setIsLoading(false);
-                setError('Something went wrong: Can not fetch default configuration from server');
+                if (id) {
+                    setError(`Something went wrong: Can not load emulator settings from server`);
+                } else {
+                    setError('Something went wrong: Can not fetch default settings from server');
+                }
             }
         }
 
@@ -81,8 +100,32 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         setIsLoading(true);
         setError('');
         event.preventDefault();
+
+        if (id) {
+            response = await updateExistingEmulator();
+        } else {
+            response = await createNewEmulator();
+        }
+
+        try {
+            if (!response) {
+                throw new Error('Can not run emulator');
+            }
+            await useProject(response.data.id);
+        } catch (e) {
+            setError('Something went wrong, can not run emulator');
+            setIsLoading(false);
+            return false;
+        }
+        setIsLoading(false);
+        history.push(`/${routes.firstRouteAfterStart}`);
+    };
+
+    const createNewEmulator = async () => {
+        let response: any;
         const name = formState.name;
         const configuration = {
+            isCustom: true,
             name,
             emulator: formState,
             gateway: {
@@ -95,33 +138,59 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         } catch (e) {
             setError('Can not save the configuration. Try again and make sure configuration name is unique');
             setIsLoading(false);
-            return false;
+            response = false;
         }
 
+        return response;
+    };
+
+    const updateExistingEmulator = async () => {
+        let response;
+        const name = formState.name;
+        const configuration = {
+            id,
+            name,
+            emulator: formState,
+            gateway: {
+                port: formState.httpServerPort,
+                address: 'http://127.0.0.1',
+            },
+        };
+
         try {
-            if (!response || !response.data) {
-                throw new Error('Can not use project');
-            }
-            await useProject(response.data.id);
+            response = await updateConfiguration(id, configuration);
         } catch (e) {
-            setError('Something went wrong, can not run emulator');
+            setError('Can not update the configuration. Try again and make sure configuration name is unique');
             setIsLoading(false);
-            return false;
+            response = false;
         }
-        setIsLoading(false);
-        history.push(`/${routes.firstRouteAfterStart}`);
+        return response;
     };
 
     const onBack = useCallback(() => {
-        history.goBack();
+        history.push(`/${routes.start}`);
     }, []);
 
-    const onSaveAndRun = () => {
-        console.log('onSaveAndRun');
-        history.push(`/${routes.firstRouteAfterStart}`);
-    };
-    const onDelete = () => {
-        console.log('onDelete');
+    const onDelete = (event: any) => {
+        setLoadingText('Deleting ...');
+        setIsLoading(true);
+
+        async function deleteEmulator() {
+            event.preventDefault();
+            try {
+                await deleteProject(id);
+                console.log('onDelete', id);
+            } catch (e) {
+                setIsLoading(false);
+                setError('Something went wrong: can not delete custom emulator');
+            }
+        }
+
+        deleteEmulator();
+        setTimeout(() => {
+            setIsLoading(false);
+            onBack();
+        }, 500);
     };
 
     return (
@@ -132,7 +201,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                     <div className={classes.top}>
                         <h2>EMULATOR CONFIGURATION</h2>
                     </div>
-                    <Card className={classes.bottom} loading={isLoading}>
+                    <Card className={classes.bottom} loading={isLoading} loadingText={loadingText}>
                         {error && (
                             <div className={classes.errors}>
                                 <span>{error}</span>
@@ -466,7 +535,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                     </div>
                                 </div>
                                 <div className={classes.buttons}>
-                                    <Button onClick={onDelete} variant="middle" outlined={true} disabled={true}>
+                                    <Button onClick={onDelete} variant="middle" outlined={true} disabled={!id}>
                                         DELETE
                                     </Button>
                                     <Button variant="middle" type="submit" disabled={validation.error !== undefined}>

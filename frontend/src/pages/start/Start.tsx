@@ -8,7 +8,7 @@ const Start: FunctionComponent<any> = () => {
         <div>
             <Switch>
                 <Route exact path={`/start`} component={Main} />
-                <Route path={`/start/configure/:confId?`} component={Configuration} />
+                <Route path={`/start/configure/:id?`} component={Configuration} />
                 <Redirect from="*" to={`/start`} />
             </Switch>
         </div>
