@@ -2,6 +2,7 @@ import {
     ConflictException,
     Injectable,
     NotFoundException,
+    ServiceUnavailableException,
 } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -34,11 +35,14 @@ export class ProjectsService {
     }
 
     async useProject(id: string) {
+        this.currentProject = await this.findOne(id);
+        // update project context
+        this.flowGatewayService.configureDataSourceGateway(this.currentProject.gateway);
+        this.flowAggregatorService.configureProjectContext(this.currentProject);
+        if (!await this.flowGatewayService.isConnectedToGateway()) {
+            throw new ServiceUnavailableException("Emulator not accessible")
+        }
         try {
-            this.currentProject = await this.findOne(id);
-            // update project context
-            this.flowGatewayService.configureDataSourceGateway(this.currentProject.gateway);
-            this.flowAggregatorService.configureProjectContext(this.currentProject);
             if (this.currentProject.emulator) {
                 this.flowEmulatorService.configureProjectContext(this.currentProject)
                 this.flowAggregatorService.startEmulator(); // TODO: test this
@@ -46,8 +50,10 @@ export class ProjectsService {
             console.debug(`[Flowser] using project: ${id}`);
             return this.currentProject;
         } catch (e) {
-            const description = `Can not use project with id '${id}'`;
-            throw new Error(description);
+            throw new ServiceUnavailableException(
+              `Can not use project with id ${id}`,
+              e.message
+            );
         }
     }
 
