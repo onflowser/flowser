@@ -119,6 +119,26 @@
                 }
             }
         },
+        "/api/projects/use": {
+            "delete": {
+                "operationId": "ProjectsController_unUseProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/projects/use/{id}": {
             "post": {
                 "operationId": "ProjectsController_useProject",
