@@ -57,6 +57,11 @@ export class ProjectsController {
         return this.projectsService.update(id, updateProjectDto);
     }
 
+    @Delete('/use')
+    async unUseProject(@Param('id') id: string):Promise<void> {
+        return await this.projectsService.unUseProject();
+    }
+
     @ApiParam({ name: "id", type: String })
     @Delete(':id')
     remove(@Param('id') id: string) {
@@ -66,11 +71,7 @@ export class ProjectsController {
     @ApiParam({ name: "id", type: String })
     @Post('/use/:id')
     async useProject(@Param('id') id: string):Promise<Project> {
-        try {
-            return await this.projectsService.useProject(id);
-        } catch (e) {
-            throw new ServiceUnavailableException(`Can not use project with id ${id}`);
-        }
+        return await this.projectsService.useProject(id);
     }
 
     @ApiParam({ name: "id", type: String })

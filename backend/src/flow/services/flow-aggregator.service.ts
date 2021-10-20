@@ -33,28 +33,36 @@ export class FlowAggregatorService {
     ) {
     }
 
-    configureProjectContext(project: Project) {
+    configureProjectContext(project?: Project) {
         this.project = project;
     }
 
     async startEmulator() {
         await this.flowEmulatorService.init();
-        if (this.flowEmulatorService.isRunning()) {
-            this.flowEmulatorService.stop();
-        }
-        await this.flowEmulatorService.start(((error, data) => {
-            if (error) {
-                console.error(`[Flowser] received emulator error: `, error)
-                throw new Error(`[Flowser] received emulator error: ${error.message}`);
-            } else {
-                console.log(`[Flowser] received emulator logs: `, data)
-                Promise.all(data.map(line => {
-                    const log = new Log();
-                    log.data = line;
-                    this.logsService.create(log);
-                }))
-            }
-        }));
+        await this.stopEmulator();
+        return new Promise((resolve, reject) => {
+            this.flowEmulatorService.start(((error, data) => {
+                if (error) {
+                    console.error(`[Flowser] received emulator error: `, error)
+                    reject(error)
+                } else {
+                    console.log(`[Flowser] received emulator logs: `, data)
+                    this.handleEmulatorLogs(data);
+                }
+            })).then(resolve).catch(reject)
+        })
+    }
+
+    stopEmulator() {
+        return this.flowEmulatorService.stop();
+    }
+
+    handleEmulatorLogs(data: string[]) {
+        return Promise.all(data.map(line => {
+            const log = new Log();
+            log.data = line;
+            return this.logsService.create(log);
+        }))
     }
 
     @Interval(config.dataFetchInterval)

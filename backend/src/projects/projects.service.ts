@@ -2,6 +2,7 @@ import {
     ConflictException,
     Injectable,
     NotFoundException,
+    ServiceUnavailableException,
 } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -33,22 +34,42 @@ export class ProjectsService {
         }
     }
 
+    async unUseProject() {
+        this.currentProject = undefined;
+        this.flowAggregatorService.configureProjectContext(this.currentProject);
+        this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
+        await this.flowAggregatorService.stopEmulator();
+    }
+
     async useProject(id: string) {
-        try {
-            this.currentProject = await this.findOne(id);
-            // update project context
-            this.flowGatewayService.configureDataSourceGateway(this.currentProject.gateway);
-            this.flowAggregatorService.configureProjectContext(this.currentProject);
-            if (this.currentProject.emulator) {
-                this.flowEmulatorService.configureProjectContext(this.currentProject)
-                this.flowAggregatorService.startEmulator(); // TODO: test this
-            }
-            console.debug(`[Flowser] using project: ${id}`);
-            return this.currentProject;
-        } catch (e) {
-            const description = `Can not use project with id '${id}'`;
-            throw new Error(description);
+        this.currentProject = await this.findOne(id);
+
+        // user may have previously used a custom emulator project
+        // make sure that in any running emulators are stopped
+        await this.flowAggregatorService.stopEmulator();
+
+        // update project context
+        this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
+        this.flowAggregatorService.configureProjectContext(this.currentProject);
+
+        if (this.currentProject.emulator) {
+            this.flowEmulatorService.configureProjectContext(this.currentProject)
+            await this.flowAggregatorService.startEmulator()
+              .catch(async e => {
+                  await this.unUseProject();
+                  throw new ServiceUnavailableException(
+                    `Can not start emulator with project id ${id}`,
+                    e.message
+                  )
+              })
         }
+
+        if (!await this.flowGatewayService.isConnectedToGateway()) {
+            await this.unUseProject();
+            throw new ServiceUnavailableException("Emulator not accessible")
+        }
+        console.debug(`[Flowser] using project: ${id}`);
+        return this.currentProject;
     }
 
     async seedAccounts(id: string, n: number) {

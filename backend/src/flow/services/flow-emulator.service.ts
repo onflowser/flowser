@@ -5,19 +5,27 @@ import { Injectable } from "@nestjs/common";
 import config from "../../config";
 import { Project } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
+import { EventEmitter } from "events";
 
 type StartCallback = (error: Error, data: string[]) => void;
+
+export enum FlowEmulatorState {
+  STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)
+  STARTED = "started", // emulator has been started, but is not yet running (it may error out)
+  RUNNING = "running", // emulator is safely running without initialisation errors
+}
 
 @Injectable()
 export class FlowEmulatorService {
 
+  public events: EventEmitter = new EventEmitter();
+  public state: FlowEmulatorState = FlowEmulatorState.STOPPED;
   private projectId: string;
-  private isFlowServerStarted: boolean = false;
   private configuration: EmulatorConfigurationEntity;
   private emulatorProcess: ChildProcessWithoutNullStreams;
 
   configureProjectContext(project: Project) {
-    this.projectId = project.id;
+    this.projectId = project?.id;
     this.configuration = project.emulator;
   }
 
@@ -44,6 +52,16 @@ export class FlowEmulatorService {
     }
   }
 
+  private setState(state: FlowEmulatorState) {
+    console.log("[Flowser] emulator state changed: ", state)
+    this.events.emit(state);
+    this.state = state;
+  }
+
+  private isState(state: FlowEmulatorState) {
+    return this.state === state;
+  }
+
   async init() {
     console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
     await FlowEmulatorService.mkdirIfEnoent(config.flowserRootDir);
@@ -55,15 +73,11 @@ export class FlowEmulatorService {
     return value ? `--${name}=${value}` : undefined;
   }
 
-  isRunning() {
-    return this.emulatorProcess && !this.emulatorProcess.killed;
-  }
-
-  start (cb: StartCallback = () => null) {
-    this.isFlowServerStarted = false;
+  private getFlags() {
     const {flag} = FlowEmulatorService;
-    // DOCS: https://github.com/onflow/flow-emulator#configuration
-    const flags = [
+
+    // https://github.com/onflow/flow-emulator#configuration
+    return [
       flag("port", this.configuration.rpcServerPort),
       flag("http-port", this.configuration.httpServerPort),
       flag("block-time", this.configuration.blockTime),
@@ -85,50 +99,77 @@ export class FlowEmulatorService {
       flag("verbose", this.configuration.verboseLogging),
       flag("init", true)
     ].filter(Boolean);
+  }
 
+  isRunning() {
+    return (
+      this.emulatorProcess &&
+      [FlowEmulatorState.STARTED, FlowEmulatorState.RUNNING].includes(this.state)
+    );
+  }
+
+  start (cb: StartCallback = () => null) {
+    const flags = this.getFlags();
     console.log(`[Flowser] starting the emulator with (${flags.length}) flags: `, flags.join(" "))
 
-    try {
-      this.emulatorProcess = spawn("flow", [
-        'emulator',
-        ...flags
-      ], {
-        cwd: this.projectDir()
-      })
-    } catch (e) {
-      console.error(e);
-      cb(e, null)
-    }
-
     return new Promise(((resolve, reject) => {
+      try {
+        this.emulatorProcess = spawn("flow", [
+          'emulator',
+          ...flags
+        ], {
+          cwd: this.projectDir()
+        })
+      } catch (e) {
+        this.setState(FlowEmulatorState.STOPPED);
+        cb(e, null)
+        reject(e);
+      }
+
       this.emulatorProcess.stdout.on("data", data => {
         const lines = data.toString().split("\n").filter(e => !!e)
-        if (!this.isFlowServerStarted && lines.find(line => line.includes("Starting"))) {
-          this.isFlowServerStarted = true;
-          this.onServerStarted();
+
+        const lineMatch = (line, s) => line.toLowerCase().includes(s.toLowerCase());
+        const linesMatch = s => Boolean(lines.find(line => lineMatch(line, s)));
+
+        if (this.isState(FlowEmulatorState.STOPPED) && linesMatch("starting http server")) {
+          // emulator is starting (could still exit due to init error)
+          this.setState(FlowEmulatorState.STARTED)
         }
+        // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
+        else if (this.isState(FlowEmulatorState.STARTED) && !linesMatch("server error")) {
+          // emulator successfully started
+          this.setState(FlowEmulatorState.RUNNING)
+          this.onServerRunning();
+          resolve(true);
+        }
+
         cb(null, lines)
       })
 
-      this.emulatorProcess.stderr.on("data", data => {
-        const error = data.toString();
-        cb(error, null)
-      })
+      // No data is emitted to stderr for now
+      // this.emulatorProcess.stderr.on("data", data => {})
 
       this.emulatorProcess.on("close", code => {
-        console.log(`[Flowser] "${this.projectId}" emulator exited with code: `, code)
-        resolve(code);
+        const error = new Error(`Emulator exited with code ${code}`)
+        this.setState(FlowEmulatorState.STOPPED);
+        cb(error, null)
+        reject(error);
       })
 
       this.emulatorProcess.on("error", error => {
         cb(error, null)
         reject(error)
       })
+
+      // given that no logs are emitted after "🌱  Starting HTTP server ..." line
+      // assume that the server successfully started after 2s timeout
+      setTimeout(resolve, 2000)
     }))
   }
 
-  // called when emulator logs "Starting gRPC/HTTP server..."
-  onServerStarted() {
+  // called when emulator is up and running
+  onServerRunning() {
     if (this.configuration.numberOfInitialAccounts) {
       this.initialiseAccounts(this.configuration.numberOfInitialAccounts)
     }
@@ -161,10 +202,17 @@ export class FlowEmulatorService {
   }
 
   stop() {
-    console.log(`[Flowser] stopping emulator process: ${this.emulatorProcess.pid}`)
-    if (this.isRunning()) {
-      this.emulatorProcess.kill();
-    }
+    return new Promise(resolve => {
+      console.log(`[Flowser] stopping emulator: ${this.isRunning()}`)
+      if (this.isRunning()) {
+        console.log(`[Flowser] stopped emulator process: ${this.emulatorProcess.pid}`)
+        const isKilled = this.emulatorProcess.kill();
+        // resolve only when the emulator process exits
+        this.events.on(FlowEmulatorState.STOPPED, () => resolve(isKilled))
+      } else {
+        resolve(true);
+      }
+    })
   }
 
 }
