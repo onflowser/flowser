@@ -1,6 +1,6 @@
-##Minimal Requirements
+## Minimal Requirements
 
-#####Here is the list of minimal features Flowser is going to implement until reaching the milestone four:
+##### Here is the list of minimal features Flowser is going to implement until reaching the milestone four:
 
 - User can run Flowser application on her local machine by issuing a single "start" command.
 - User can select predefined "Emulator" configuration which connects Flowser client to (already) running Flow Emulator on her local machine.
