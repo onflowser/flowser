@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { routes } from '../../../shared/constants/routes';
 import classes from './Navigation.module.scss';
@@ -16,13 +16,35 @@ import { ReactComponent as IconBackButton } from '../../../shared/assets/icons/b
 import { useNavigation } from '../../../shared/hooks/navigation';
 import Breadcrumbs from './Breadcrumbs';
 import Search from '../../../shared/components/search/Search';
+import axios from 'axios';
+
+export interface Counters {
+    accounts: number;
+    blocks: number;
+    transactions: number;
+    contracts: number;
+    events: number;
+}
 
 const Navigation = (props: any) => {
     const history = useHistory();
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
+    const [counters, setCounters] = useState<Counters>();
 
     const onSwitchProject = useCallback(() => {
         history.push(`/${routes.start}`);
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            axios.get('/api/common/counters').then((response: any) => {
+                setCounters(response.data);
+            });
+        }, 1000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
 
     const onBack = useCallback(() => {
@@ -37,15 +59,26 @@ const Navigation = (props: any) => {
                         <img src={Logo} alt="FLOWSER" />
                     </div>
                     <div className={classes.navLinksContainer}>
-                        <NavigationItem to={`/${routes.accounts}`} activeClassName={classes.active} icon={<IconUser />}>
+                        <NavigationItem
+                            to={`/${routes.accounts}`}
+                            activeClassName={classes.active}
+                            icon={<IconUser />}
+                            counter={counters?.accounts}
+                        >
                             ACCOUNTS
                         </NavigationItem>
-                        <NavigationItem to={`/${routes.blocks}`} activeClassName={classes.active} icon={<IconBlocks />}>
+                        <NavigationItem
+                            to={`/${routes.blocks}`}
+                            activeClassName={classes.active}
+                            icon={<IconBlocks />}
+                            counter={counters?.blocks}
+                        >
                             BLOCKS
                         </NavigationItem>
                         <NavigationItem
                             to={`/${routes.transactions}`}
                             activeClassName={classes.active}
+                            counter={counters?.transactions}
                             icon={<IconTransactions />}
                         >
                             TRANSACTIONS
@@ -53,11 +86,17 @@ const Navigation = (props: any) => {
                         <NavigationItem
                             to={`/${routes.contracts}`}
                             activeClassName={classes.active}
+                            counter={counters?.contracts}
                             icon={<IconContracts />}
                         >
                             CONTRACTS
                         </NavigationItem>
-                        <NavigationItem to={`/${routes.events}`} activeClassName={classes.active} icon={<IconEvents />}>
+                        <NavigationItem
+                            to={`/${routes.events}`}
+                            activeClassName={classes.active}
+                            icon={<IconEvents />}
+                            counter={counters?.events}
+                        >
                             EVENTS
                         </NavigationItem>
                     </div>

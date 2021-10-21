@@ -12,6 +12,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { EventsModule } from './events/events.module';
 import { LogsModule } from './logs/logs.module';
 import { FlowModule } from "./flow/flow.module";
+import { CommonModule } from './common/common.module';
 
 const mongoUser = process.env.MONGODB_USERNAME;
 const mongoPassword = process.env.MONGODB_PASSWORD;
@@ -41,7 +42,8 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
         TransactionsModule,
         EventsModule,
         LogsModule,
-        FlowModule
+        FlowModule,
+        CommonModule
     ],
     controllers: [AppController]
 })

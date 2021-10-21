@@ -25,7 +25,7 @@ export const useTimeoutPolling = <T>(resource: string, interval?: number): Timeo
 
     const { isFetching, error } = useQuery<{ data: T[] }, Error>(resource, fetchCallback, {
         onSuccess: (response: any) => {
-            if (response.status === 200 && response.data.data.length) {
+            if (response.status === 200 && response.data?.data?.length) {
                 const latestTimestamp = response.data?.meta?.latestTimestamp;
                 if (latestTimestamp > 0) {
                     setPollingTime(latestTimestamp);
