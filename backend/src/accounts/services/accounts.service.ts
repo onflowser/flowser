@@ -36,8 +36,13 @@ export class AccountsService {
     }
   }
 
-  findOneByAddress(address: string) {
-    return this.accountRepository.findOne({ where: { address }});
+  async findOneByAddress(address: string) {
+    const account = await this.accountRepository.findOne({ where: { address }});
+    if (account) {
+      return account;
+    } else {
+      throw new NotFoundException("Account not found")
+    }
   }
 
   update(address: string, updateAccountDto: UpdateAccountDto) {

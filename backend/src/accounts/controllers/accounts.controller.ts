@@ -23,9 +23,9 @@ export class AccountsController {
     return this.accountsService.findAllNewerThanTimestamp(timestamp);
   }
 
-  @ApiParam({ name: "id", type: String })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.accountsService.findOne(id);
+  @ApiParam({ name: "address", type: String })
+  @Get(':address')
+  findOne(@Param('address') address: string) {
+    return this.accountsService.findOneByAddress(address)
   }
 }

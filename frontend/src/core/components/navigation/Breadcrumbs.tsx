@@ -11,7 +11,6 @@ const Breadcrumbs: FunctionComponent<any> = ({ className }) => {
     }
 
     const currentUrl = window.location.pathname;
-    console.log('currentUrl', currentUrl);
 
     return (
         <div className={`${classes.root} ${className}`}>
