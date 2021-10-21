@@ -14,6 +14,7 @@ import { routes } from '../../../shared/constants/routes';
 import { useProjectApi } from '../../../shared/hooks/project-api';
 import ConfirmDialog from '../../../shared/components/confirm-dialog/ConfirmDialog';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
+import { toast } from 'react-hot-toast';
 
 const formSchema = Joi.object()
     .keys({
@@ -102,7 +103,6 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
 
     const handleSubmit = async (event: any) => {
         let response;
-        setIsSubmitting(true);
         setError('');
         event.preventDefault();
 
@@ -112,10 +112,15 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             response = await createNewEmulator();
         }
 
+        if (!response) {
+            window.scrollTo(0, 0);
+            return;
+        }
+
+        toast('Configuration saved successfully!');
+        setIsSubmitting(true);
+
         try {
-            if (!response) {
-                throw new Error('Can not run emulator');
-            }
             await useProject(response.data.id);
         } catch (e) {
             setError('Something went wrong, can not run emulator');
@@ -140,10 +145,8 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         };
         try {
             response = await saveConfiguration(configuration);
-        } catch (e) {
-            setError('Can not save the configuration. Try again and make sure configuration name is unique');
-            setIsLoading(false);
-            response = false;
+        } catch (e: any) {
+            setError(`Can not save the configuration. ${e.message}`);
         }
 
         return response;
@@ -164,10 +167,8 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
 
         try {
             response = await updateConfiguration(id, configuration);
-        } catch (e) {
-            setError('Can not update the configuration. Try again and make sure configuration name is unique');
-            setIsLoading(false);
-            response = false;
+        } catch (e: any) {
+            setError(`Can not update the configuration. ${e.message}`);
         }
         return response;
     };

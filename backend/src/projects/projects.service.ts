@@ -1,6 +1,7 @@
 import {
     ConflictException,
     Injectable,
+    InternalServerErrorException,
     NotFoundException,
     ServiceUnavailableException,
 } from '@nestjs/common';
@@ -81,11 +82,7 @@ export class ProjectsService {
     }
 
     create(createProjectDto: CreateProjectDto) {
-        try {
-            return this.projectRepository.save(createProjectDto);
-        } catch (e) {
-            return e;
-        }
+        return this.projectRepository.save(createProjectDto).catch(this.handleMongoError);
     }
 
     async findAll(): Promise<Project[]> {
@@ -123,18 +120,20 @@ export class ProjectsService {
     }
 
     async update(id: string, updateProjectDto: UpdateProjectDto) {
-        try {
-            const response = await this.projectRepository.findOneAndUpdate({id}, {$set: updateProjectDto}, {
-                upsert: true,
-                returnOriginal: false
-            });
-            return response.value;
-        } catch (e) {
-            return e;
-        }
+        return this.projectRepository.findOneAndUpdate({id}, {$set: updateProjectDto}, {
+            upsert: true,
+            returnOriginal: false
+        }).then(res => res.value).catch(this.handleMongoError);
     }
 
     remove(id: string) {
         return this.projectRepository.delete({ id });
+    }
+
+    private handleMongoError(error) {
+        switch (error.code) {
+            case 11000: throw new ConflictException("Project name already exists")
+            default: throw new InternalServerErrorException(error.message)
+        }
     }
 }

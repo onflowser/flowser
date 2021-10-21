@@ -14,6 +14,7 @@ export class Project {
     id: string;
 
     @Column()
+    @Index({unique: true})
     name: string;
 
     @Column()
