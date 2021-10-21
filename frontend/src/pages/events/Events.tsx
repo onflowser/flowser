@@ -12,6 +12,7 @@ import CaretIcon from '../../shared/components/caret-icon/CaretIcon';
 import EventDetailsTable from '../../shared/components/event-details-table/EventDetailsTable';
 import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
 import NoResults from '../../shared/components/no-results/NoResults';
+import FullScreenLoading from '../../shared/components/fullscreen-loading/FullScreenLoading';
 
 interface OwnProps {
     some?: string;
@@ -23,7 +24,14 @@ const Events: FunctionComponent<Props> = (props) => {
     const [openedLog, setOpenedLog] = useState('');
     const { formatDate } = useFormattedDate();
     const { searchTerm, setPlaceholder } = useSearch();
-    const { data } = useTimeoutPolling(`/api/events/polling`);
+    const { data, isFetching } = useTimeoutPolling(`/api/events/polling`);
+    const [firstFetch, setFirstFetch] = useState(false);
+
+    useEffect(() => {
+        if (!isFetching && !firstFetch) {
+            setFirstFetch(true);
+        }
+    }, [isFetching]);
 
     useEffect(() => {
         setPlaceholder('Search for block id, type, transaction ...');
@@ -93,7 +101,8 @@ const Events: FunctionComponent<Props> = (props) => {
                         )}
                     </React.Fragment>
                 ))}
-            {filteredData.length === 0 && <NoResults className={classes.noResults} />}
+            {!firstFetch && <FullScreenLoading />}
+            {firstFetch && filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
     );
 };

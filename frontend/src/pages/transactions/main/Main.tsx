@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import classes from './Main.module.scss';
 import Card from '../../../shared/components/card/Card';
 import Label from '../../../shared/components/label/Label';
@@ -11,11 +11,19 @@ import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 import StatusCode from '../shared/StatusCode';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import NoResults from '../../../shared/components/no-results/NoResults';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data } = useTimeoutPolling('/api/transactions/polling');
+    const { data, isFetching } = useTimeoutPolling('/api/transactions/polling');
+    const [firstFetch, setFirstFetch] = useState(false);
+
+    useEffect(() => {
+        if (!isFetching && !firstFetch) {
+            setFirstFetch(true);
+        }
+    }, [isFetching]);
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
@@ -59,7 +67,8 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                     </Card>
                 ))}
-            {filteredData.length === 0 && <NoResults className={classes.noResults} />}
+            {!firstFetch && <FullScreenLoading />}
+            {firstFetch && filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
     );
 };
