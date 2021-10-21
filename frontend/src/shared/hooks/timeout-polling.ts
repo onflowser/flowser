@@ -1,7 +1,6 @@
 import { useQuery } from 'react-query';
 import { useCallback, useState } from 'react';
-import axios from 'axios';
-import { useNavigation } from './navigation';
+import axios from '../axios';
 
 export interface TimeoutPollingHook<T> {
     stopPolling: () => void;
