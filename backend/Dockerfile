@@ -39,7 +39,7 @@ RUN apt-get -yq install nodejs
 #RUN apt-get -yq install npm
 RUN npm install
 RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
-RUN export PATH="$PATH:/root/.local/bin"
+ENV PATH="$PATH:/root/.local/bin"
 
 COPY package*.json ./
 
