@@ -17,7 +17,9 @@ export class FlowGatewayService {
 
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         this.configuration = configuration;
-        fcl.config().put("accessNode.api", this.url())
+        if (this.configuration) {
+            fcl.config().put("accessNode.api", this.url())
+        }
     }
 
     private url() {
