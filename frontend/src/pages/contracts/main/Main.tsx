@@ -8,6 +8,7 @@ import { NavLink } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { useFilterData } from '../../../shared/hooks/filter-data';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
+import NoResults from '../../../shared/components/no-results/NoResults';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
@@ -41,6 +42,7 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                     </Card>
                 ))}
+            {filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
     );
 };

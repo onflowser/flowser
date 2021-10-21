@@ -10,6 +10,7 @@ import classes from './Main.module.scss';
 import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 import { useNavigation } from '../../../shared/hooks/navigation';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
+import NoResults from '../../../shared/components/no-results/NoResults';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
@@ -68,6 +69,8 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                     </Card>
                 ))}
+
+            {filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
     );
 };

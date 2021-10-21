@@ -11,6 +11,7 @@ import { useSearch } from '../../shared/hooks/search';
 import CaretIcon from '../../shared/components/caret-icon/CaretIcon';
 import EventDetailsTable from '../../shared/components/event-details-table/EventDetailsTable';
 import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
+import NoResults from '../../shared/components/no-results/NoResults';
 
 interface OwnProps {
     some?: string;
@@ -92,6 +93,7 @@ const Events: FunctionComponent<Props> = (props) => {
                         )}
                     </React.Fragment>
                 ))}
+            {filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
     );
 };
