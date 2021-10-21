@@ -31,7 +31,7 @@ export class ContractsService {
 
     async findOne(id: string) {
         const [contract] = await this._findAll([
-            {$match: {'_id': {$eq: id}}}
+            {$match: {'id': {$eq: id}}}
         ])
         if (contract) {
             return contract;

@@ -7,11 +7,12 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import { NavLink } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { useFilterData } from '../../../shared/hooks/filter-data';
-import data from '../data.json';
+import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
+    const { data } = useTimeoutPolling('/api/contracts/polling');
 
     useEffect(() => {
         setPlaceholder('search for contracts');
@@ -24,12 +25,12 @@ const Main: FunctionComponent<any> = () => {
     return (
         <>
             {filteredData &&
-                filteredData.map((item, i) => (
+                filteredData.map((item: any, i) => (
                     <Card key={i} className={classes.card}>
                         <div>
                             <Label>NAME</Label>
                             <Value>
-                                <NavLink to={`/contracts/details/${item._id}`}>{item.name}</NavLink>
+                                <NavLink to={`/contracts/details/${item.id}`}>{item.name}</NavLink>
                             </Value>
                         </div>
                         <div>
