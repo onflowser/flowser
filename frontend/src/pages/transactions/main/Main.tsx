@@ -7,13 +7,14 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import { NavLink } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { useFilterData } from '../../../shared/hooks/filter-data';
-import data from '../data.json';
 import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 import StatusCode from '../shared/StatusCode';
+import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
+    const { data } = useTimeoutPolling('/api/transactions/polling');
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
@@ -26,13 +27,13 @@ const Main: FunctionComponent<any> = () => {
     return (
         <>
             {filteredData &&
-                filteredData.map((item, i) => (
+                filteredData.map((item: any, i) => (
                     <Card key={i} className={classes.card}>
                         <div>
                             <Label>TRANSACTION ID</Label>
                             <Value>
-                                <NavLink to={`/transactions/details/${item._id}`}>
-                                    <Ellipsis className={classes.hash}>{item._id}</Ellipsis>
+                                <NavLink to={`/transactions/details/${item.id}`}>
+                                    <Ellipsis className={classes.hash}>{item.id}</Ellipsis>
                                 </NavLink>
                             </Value>
                         </div>

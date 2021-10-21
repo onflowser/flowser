@@ -17,7 +17,7 @@ export class FlowGatewayService {
 
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         this.configuration = configuration;
-        fcl.config().put("accessNode.api", this.url())
+        fcl.config().put("accessNode.api", this.configuration ? this.url() : null)
     }
 
     private url() {
@@ -50,7 +50,6 @@ export class FlowGatewayService {
             fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
             fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode)
         ])
-        console.log({data})
         return {...data, status}
     }
 

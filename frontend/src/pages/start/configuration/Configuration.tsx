@@ -118,6 +118,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         } catch (e) {
             setError('Something went wrong, can not run emulator');
             setIsLoading(false);
+            window.scrollTo(0, 0);
             return false;
         }
         setIsLoading(false);

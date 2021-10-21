@@ -43,7 +43,7 @@ export class TransactionsService {
   }
 
   async findOne(id: string) {
-    const [transaction] = await this.transactionRepository.find({ where: {_id: id} });
+    const [transaction] = await this.transactionRepository.find({ where: {id} });
     if (transaction) {
       return transaction;
     } else {
