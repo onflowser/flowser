@@ -4,6 +4,11 @@
 @import 'styles/rules';
 @import 'styles/animations';
 
+.loader {
+  height: 100vh !important;
+  display: flex;
+}
+
 .root {
   display: flex;
   flex-direction: column;

@@ -6,6 +6,7 @@ import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 type RouteParams = {
     contractId: string;
@@ -27,7 +28,7 @@ const Details: FunctionComponent<any> = () => {
     }, []);
 
     if (isLoading || !data) {
-        return null;
+        return <FullScreenLoading />;
     }
 
     return (

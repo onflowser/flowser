@@ -12,6 +12,7 @@ import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-
 import CollapsibleCard from '../../../shared/components/collapsible-card/CollapsibleCard';
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useParams } from 'react-router-dom';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 type RouteParams = {
     accountId: string;
@@ -33,7 +34,7 @@ const Details: FunctionComponent<any> = () => {
     }, []);
 
     if (isLoading || !data) {
-        return null; // TODO: add proper loader ?
+        return <FullScreenLoading />;
     }
 
     return (

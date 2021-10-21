@@ -12,6 +12,7 @@ import classes from './Details.module.scss';
 import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 enum ContentDetails {
     HEIGHT = 'height',
@@ -55,12 +56,8 @@ const Details: FunctionComponent<any> = () => {
         }
     }, [contentDetails]);
 
-    const showDetails = useCallback((contentDetails: ContentDetails) => {
-        setContentDetails(contentDetails);
-    }, []);
-
     if (isLoading || !data) {
-        return null;
+        return <FullScreenLoading />;
     }
 
     return (

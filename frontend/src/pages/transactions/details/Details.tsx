@@ -16,6 +16,7 @@ import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 import EventDetailsTable, { EventDetail } from '../../../shared/components/event-details-table/EventDetailsTable';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 type RouteParams = {
     transactionId: string;
@@ -38,10 +39,8 @@ const Details: FunctionComponent<any> = () => {
     }, []);
 
     if (isLoading || !data) {
-        return null;
+        return <FullScreenLoading />;
     }
-
-    console.log(data);
 
     return (
         <div className={classes.root}>
