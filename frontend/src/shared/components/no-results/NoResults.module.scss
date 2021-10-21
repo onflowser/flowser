@@ -1,8 +1,10 @@
 @import 'styles/spacings';
 @import 'styles/colors';
 @import 'styles/typography';
+@import 'styles/animations';
 
 .root {
+  @include fadeInAnimation(2s);
   display: flex;
   flex-direction: column;
   align-items: center;

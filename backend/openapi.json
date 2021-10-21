@@ -284,12 +284,12 @@
                 }
             }
         },
-        "/api/accounts/{id}": {
+        "/api/accounts/{address}": {
             "get": {
                 "operationId": "AccountsController_findOne",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "address",
                         "required": true,
                         "in": "path",
                         "schema": {

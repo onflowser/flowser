@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useFormattedDate } from '../../../shared/hooks/formatted-date';
 import { useFilterData } from '../../../shared/hooks/filter-data';
@@ -11,12 +11,20 @@ import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 import { useNavigation } from '../../../shared/hooks/navigation';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import NoResults from '../../../shared/components/no-results/NoResults';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { formatDate } = useFormattedDate();
-    const { data: transactions } = useTimeoutPolling('/api/blocks/polling');
+    const { data: transactions, isFetching } = useTimeoutPolling('/api/blocks/polling');
+    const [firstFetch, setFirstFetch] = useState(false);
+
+    useEffect(() => {
+        if (!isFetching && !firstFetch) {
+            setFirstFetch(true);
+        }
+    }, [isFetching]);
 
     useEffect(() => {
         setPlaceholder('Search for block ids, parent ids, time, ...');
@@ -70,7 +78,8 @@ const Main: FunctionComponent<any> = () => {
                     </Card>
                 ))}
 
-            {filteredData.length === 0 && <NoResults className={classes.noResults} />}
+            {!firstFetch && <FullScreenLoading />}
+            {firstFetch && filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
     );
 };

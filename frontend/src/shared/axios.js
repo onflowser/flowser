@@ -13,7 +13,7 @@ instance.interceptors.response.use(
         // status codes outside of the 2xx range trigger this function
         return Promise.reject({
             // use error message returned from the server, otherwise use default error message
-            message: error.response.data ? error.response.data.message : error.message,
+            message: error.response?.data ? error.response.data?.message : error.message,
             error,
         });
     },
