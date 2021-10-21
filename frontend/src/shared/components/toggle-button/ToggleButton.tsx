@@ -9,10 +9,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 const ToggleButton: FunctionComponent<Props> = ({ value = false, onChange = () => false }) => {
-    const [state, setState] = useState(false);
-    useEffect(() => {
-        setState(value);
-    }, [value]);
+    const [state, setState] = useState(value);
 
     useEffect(() => {
         onChange(state);
