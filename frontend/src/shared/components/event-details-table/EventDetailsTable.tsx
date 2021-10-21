@@ -3,7 +3,7 @@ import classes from './EventDetailsTable.module.scss';
 import Ellipsis from '../ellipsis/Ellipsis';
 import CopyButton from '../copy-button/CopyButton';
 
-interface EventDetail {
+export interface EventDetail {
     name: string;
     type: string;
     value: string;

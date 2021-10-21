@@ -13,6 +13,7 @@ import Button from '../../../shared/components/button/Button';
 import { routes } from '../../../shared/constants/routes';
 import { useProjectApi } from '../../../shared/hooks/project-api';
 import ConfirmDialog from '../../../shared/components/confirm-dialog/ConfirmDialog';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 const formSchema = Joi.object()
     .keys({
@@ -33,6 +34,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
     const [formState, setFormState] = useState<any>({});
     const [validation, setValidation] = useState(formSchema.validate(formState));
     const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [loadingText, setLoadingText] = useState('loading');
     const [showDialog, setShowDialog] = useState(false);
@@ -100,7 +102,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
 
     const handleSubmit = async (event: any) => {
         let response;
-        setIsLoading(true);
+        setIsSubmitting(true);
         setError('');
         event.preventDefault();
 
@@ -117,10 +119,10 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             await useProject(response.data.id);
         } catch (e) {
             setError('Something went wrong, can not run emulator');
-            setIsLoading(false);
+            setIsSubmitting(false);
+            window.scrollTo(0, 0);
             return false;
         }
-        setIsLoading(false);
         history.push(`/${routes.firstRouteAfterStart}`);
     };
 
@@ -203,6 +205,10 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         event.preventDefault();
         setShowDialog(true);
     };
+
+    if (isSubmitting) {
+        return <FullScreenLoading className={classes.loader} />;
+    }
 
     return (
         <>

@@ -1,21 +1,22 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import sampleData from '../data.json';
 import { NavLink, useParams } from 'react-router-dom';
 import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
-import { useSearch } from '../../../shared/hooks/search';
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
+import { useDetailsQuery } from '../../../shared/hooks/details-query';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 type RouteParams = {
     contractId: string;
 };
 
 const Details: FunctionComponent<any> = () => {
-    const { setPlaceholder } = useSearch();
+    const { contractId } = useParams<RouteParams>();
     const { setBreadcrumbs, showSearchBar } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
+    const { isLoading, data } = useDetailsQuery(`/api/contracts/${contractId}`);
 
     const breadcrumbs: Breadcrumb[] = [{ to: '/contracts', label: 'Contracts' }, { label: 'Details' }];
 
@@ -26,8 +27,9 @@ const Details: FunctionComponent<any> = () => {
         showSearchBar(false);
     }, []);
 
-    const { contractId } = useParams<RouteParams>();
-    const data = sampleData.find((e) => e._id === contractId) as any;
+    if (isLoading || !data) {
+        return <FullScreenLoading />;
+    }
 
     return (
         <div>

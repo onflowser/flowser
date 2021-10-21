@@ -12,6 +12,10 @@ export const useDetailsQuery = <T>(resource: string, interval?: number) => {
 
             const mapDataArray = (data: any[]) =>
                 data.map((e: any) => {
+                    // skip mapping for primary value types (string, number)
+                    if (!(e instanceof Object)) {
+                        return e;
+                    }
                     let isNew = false;
                     const checkTimestamp = (t: number) => {
                         if (t > latestTimestamp) {

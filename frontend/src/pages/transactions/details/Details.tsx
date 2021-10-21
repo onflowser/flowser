@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import sampleData from '../data.json';
 import { useParams } from 'react-router-dom';
 import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
@@ -11,11 +10,13 @@ import ContentDetailsScript from '../../../shared/components/content-details-scr
 import Card from '../../../shared/components/card/Card';
 import TimeAgo from '../../../shared/components/time-ago/TimeAgo';
 import DateWithCalendar from '../../../shared/components/date-with-calendar/DateWithCalendar';
-import { useSearch } from '../../../shared/hooks/search';
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
 import StatusCode from '../shared/StatusCode';
 import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
-import EventDetailsTable from '../../../shared/components/event-details-table/EventDetailsTable';
+import EventDetailsTable, { EventDetail } from '../../../shared/components/event-details-table/EventDetailsTable';
+import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
+import { useDetailsQuery } from '../../../shared/hooks/details-query';
+import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 type RouteParams = {
     transactionId: string;
@@ -23,9 +24,10 @@ type RouteParams = {
 
 const Details: FunctionComponent<any> = () => {
     const { transactionId } = useParams<RouteParams>();
-    const { setPlaceholder } = useSearch();
     const { setBreadcrumbs, showSearchBar } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
+    const { data, isLoading } = useDetailsQuery(`/api/transactions/${transactionId}`);
+    const { data: events } = useTimeoutPolling(`/api/transactions/${transactionId}/events/polling`);
 
     const breadcrumbs: Breadcrumb[] = [{ to: '/transactions', label: 'Transactions' }, { label: 'Details' }];
 
@@ -36,22 +38,9 @@ const Details: FunctionComponent<any> = () => {
         showSearchBar(false);
     }, []);
 
-    const data = sampleData.find((e) => e._id === transactionId) as any;
-    const events = [
-        {
-            createdAt: 1633711711619,
-            _id: '49bc6765a7a42873bbf9775ce604fe7e66cbff69d05f7bd93d0286357772bbe2:A.f8d6e0586b0a20c7.HelloWorld.Greet',
-            transactionId: '49bc6765a7a42873bbf9775ce604fe7e66cbff69d05f7bd93d0286357772bbe2',
-            name: '49bc6765a7a42873bbf9775ce604fe7e66cbff69d05f7bd93d0286357772bbe2',
-            type: 'A.f8d6e0586b0a20c7.HelloWorld.Greet',
-            transactionIndex: 1,
-            eventIndex: 0,
-            value: 'A.f8d6e0586b0a20c7.HelloWorld.Greet',
-            data: {
-                x: 'Hello, World!',
-            },
-        },
-    ];
+    if (isLoading || !data) {
+        return <FullScreenLoading />;
+    }
 
     return (
         <div className={classes.root}>
@@ -60,7 +49,7 @@ const Details: FunctionComponent<any> = () => {
                     <>
                         <div>
                             <Label variant="large">TRANSACTION</Label>
-                            <Value variant="large">{data._id}</Value>
+                            <Value variant="large">{data.id}</Value>
                         </div>
                         <div>
                             <StatusCode statusCode={data.status.statusCode} />
@@ -167,7 +156,7 @@ const Details: FunctionComponent<any> = () => {
                         ))}
                 </DetailsTabItem>
                 <DetailsTabItem label="EVENTS" value={data.status.eventsCount}>
-                    {events && <EventDetailsTable className={classes.detailsTable} items={events} />}
+                    {events && <EventDetailsTable className={classes.detailsTable} items={events as EventDetail[]} />}
                 </DetailsTabItem>
             </DetailsTabs>
         </div>

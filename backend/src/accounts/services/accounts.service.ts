@@ -28,7 +28,7 @@ export class AccountsService {
   }
 
   async findOne(id: string) {
-    const [account] = await this.accountRepository.find({ where: {_id: id} });
+    const [account] = await this.accountRepository.find({ where: {id} });
     if (account) {
       return account;
     } else {
