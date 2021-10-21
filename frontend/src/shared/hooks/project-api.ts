@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../axios';
 
 export const useProjectApi = () => {
     const getDefaultConfiguration = () => axios.get('/api/projects/default');

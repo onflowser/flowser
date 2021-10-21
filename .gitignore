@@ -5,3 +5,4 @@ database/db
 flowdb
 flow.json
 .flowser
+.envrc
