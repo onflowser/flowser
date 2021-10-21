@@ -517,6 +517,17 @@
                     }
                 }
             }
+        },
+        "/api/common/counters": {
+            "get": {
+                "operationId": "CommonController_getCounters",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "info": {
