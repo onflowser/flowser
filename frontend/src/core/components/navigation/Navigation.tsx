@@ -16,7 +16,7 @@ import { ReactComponent as IconBackButton } from '../../../shared/assets/icons/b
 import { useNavigation } from '../../../shared/hooks/navigation';
 import Breadcrumbs from './Breadcrumbs';
 import Search from '../../../shared/components/search/Search';
-import axios from 'axios';
+import axios from '../../../shared/axios';
 
 export interface Counters {
     accounts: number;
