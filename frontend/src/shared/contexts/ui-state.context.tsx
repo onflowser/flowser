@@ -11,15 +11,15 @@ type Props = UiStateContextProps;
 export const UiStateContext: any = createContext<any>([{}, () => undefined]);
 
 export interface UiState extends LogDrawerUiState, NavigationUiState {
-    placeholder: string;
-    searchTerm: string;
+    placeholder: { [key: string]: string };
+    searchTerm: { [key: string]: string };
 
     [key: string]: any;
 }
 
 export const defaultUiState: UiState = {
-    placeholder: 'Search',
-    searchTerm: '',
+    placeholder: { default: 'Search' },
+    searchTerm: { default: '' },
     logDrawerSize: 'tiny',
     breadcrumbs: [],
     isNavigationDrawerVisible: false,
