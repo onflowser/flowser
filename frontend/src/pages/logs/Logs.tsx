@@ -8,12 +8,15 @@ import { LogDrawerSize, useLogDrawer } from '../../shared/hooks/log-drawer';
 import CaretIcon from '../../shared/components/caret-icon/CaretIcon';
 import { useSyntaxHighlighter } from '../../shared/hooks/syntax-highlighter';
 import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
+import { useSearch } from '../../shared/hooks/search';
+import { useFilterData } from '../../shared/hooks/filter-data';
 
 interface OwnProps {
     className?: any;
 }
 
 type Props = OwnProps;
+const SEARCH_CONTEXT_NAME = 'logs';
 
 const Logs: FunctionComponent<Props> = ({ className }) => {
     const { logDrawerSize, setSize } = useLogDrawer();
@@ -22,6 +25,8 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
     const bigLogRef = useRef(null);
     const { data } = useTimeoutPolling('/api/logs/polling');
     const logs = data ? data.map((log: any) => log.data) : [];
+    const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
+    const { filteredData } = useFilterData(logs, searchTerm);
 
     const scrollToBottom = (ref: any, smooth = true) => {
         if (ref.current) {
@@ -33,6 +38,11 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
             ref.current.scrollTo(options);
         }
     };
+
+    useEffect(() => {
+        console.log('%c setting placeholder', 'background-color: pink');
+        setPlaceholder('search logs');
+    }, []);
 
     useEffect(() => {
         scrollToBottom(miniLogRef);
@@ -65,7 +75,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 
                 {logDrawerSize === 'tiny' && (
                     <div className={classes.midContainer} ref={miniLogRef}>
-                        {logs.map((log, key) => (
+                        {filteredData.map((log: any, key: number) => (
                             <pre key={key}>
                                 <span dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}></span>
                             </pre>
@@ -74,7 +84,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
                 )}
 
                 <div className={classes.rightContainer}>
-                    {logDrawerSize !== 'tiny' && <Search className={classes.searchBox} />}
+                    {logDrawerSize !== 'tiny' && <Search context={SEARCH_CONTEXT_NAME} className={classes.searchBox} />}
                     <div>
                         {(logDrawerSize === 'tiny' || logDrawerSize === 'small') && (
                             <CaretIcon
@@ -96,7 +106,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 
             {logDrawerSize !== 'tiny' && (
                 <div className={classes.bigLogsContainer} ref={bigLogRef}>
-                    {logs.map((log, key) => (
+                    {filteredData.map((log: any, key: number) => (
                         <pre
                             className={classes.line}
                             key={key}

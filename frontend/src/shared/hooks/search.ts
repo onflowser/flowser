@@ -8,21 +8,22 @@ export interface UseSearchHook {
     placeholder: string;
 }
 
-export const useSearch = (): UseSearchHook => {
+export const useSearch = (context = 'default'): UseSearchHook => {
     const [state, setState] = useContext(UiStateContext);
 
-    const setSearchTerm = (term: string): void => {
-        setState((state: UiState) => ({ ...state, searchTerm: term }));
-    };
+    const setSearchTerm = (term: string) =>
+        setState((state: UiState) => ({ ...state, searchTerm: { ...state.searchTerm, [context]: term } }));
 
-    const setPlaceholder = (placeholder: string): void => {
-        setState((state: UiState) => ({ ...state, placeholder: placeholder }));
-    };
+    const setPlaceholder = (placeholder: string) =>
+        setState((state: UiState) => ({
+            ...state,
+            placeholder: { ...state.placeholder, [context]: placeholder },
+        }));
 
     return {
         setSearchTerm,
         setPlaceholder,
-        searchTerm: state.searchTerm,
-        placeholder: state.placeholder,
+        searchTerm: state.searchTerm[context] || '',
+        placeholder: state.placeholder[context] || '',
     };
 };
