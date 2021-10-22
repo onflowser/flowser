@@ -99,11 +99,12 @@ export class FlowGatewayService {
     }
 
     public async getBlockDataWithinHeightRange(fromHeight, toHeight) {
-        if (fromHeight === toHeight) return [];
-        return Promise.all(
-          Array.from({length: toHeight - fromHeight + 1})
-            .map((_, i) => this.getBlockData(fromHeight + i))
-        )
+        let promises = [];
+        for (let height = fromHeight; height <= toHeight; height++) {
+            console.log(`[Flowser] fetching block: ${height}`)
+            promises.push(this.getBlockData(height));
+        }
+        return Promise.all(promises)
     }
 
     async isConnectedToGateway() {
