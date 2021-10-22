@@ -30,9 +30,9 @@ export class Project {
     isCustom: boolean = false;
 
     // data will be fetched from this block height
-    // leave this undefined to start fetching from latest block
+    // set this undefined to start fetching from latest block
     @Column()
-    startBlockHeight?: number = 0;
+    startBlockHeight?: number | undefined = 0;
 
     static init (dto: CreateProjectDto) {
         return Object.assign(new Project(), {

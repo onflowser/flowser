@@ -2,7 +2,7 @@ const {readFlowConfig, updateFlowConfig, execute, randomString } = require("./he
 
 const [nodePath, execFile, nAccountsArg] = process.argv;
 
-const nAccounts = parseInt(nAccountsArg) | 1;
+const nAccounts = parseFloat(nAccountsArg) | 1;
 
 (async function () {
   let flowConfig = await readFlowConfig();
@@ -18,7 +18,7 @@ const nAccounts = parseInt(nAccountsArg) | 1;
 })()
 
 async function createAccount() {
-  const [msg, privateKeyLine, publicKeyLine] = await execute("flow", "keys", "generate")
+  const [msg, privateKeyLine, publicKeyLine] = await execute("flow", ["keys", "generate"])
   const [
     txInfoLine,
     addressLine
