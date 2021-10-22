@@ -58,8 +58,8 @@ const Details: FunctionComponent<any> = () => {
                 )}
                 Footer={() => (
                     <>
-                        <TimeAgo date={'2021-10-12T20:37:20.631Z'} />
-                        <DateWithCalendar date={'2021-10-12T20:37:20.631Z'} />
+                        <TimeAgo date={new Date(data.createdAt).toISOString()} />
+                        <DateWithCalendar date={new Date(data.createdAt).toISOString()} />
                     </>
                 )}
             >

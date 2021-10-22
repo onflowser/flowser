@@ -20,7 +20,8 @@ export class BlocksService {
 
     findAllNewerThanTimestamp(timestamp): Promise<Block[]> {
         return this.blockRepository.find({
-            where: {createdAt: {$gt: timestamp}}
+            where: {createdAt: {$gt: timestamp}},
+            order: {createdAt: 'DESC'}
         });
     }
 

@@ -22,7 +22,8 @@ export class EventsService {
 
   findAllNewerThanTimestamp(timestamp): Promise<Event[]> {
     return this.eventRepository.find({
-      where: {createdAt: {$gt: timestamp}}
+      where: {createdAt: {$gt: timestamp}},
+      order: {createdAt: 'DESC'}
     });
   }
 

@@ -26,6 +26,7 @@ export class ContractsService {
     async findAllNewerThanTimestamp(timestamp): Promise<AccountContract[]> {
         return this._findAll([
             {$match: {'createdAt': {$gt: timestamp}}},
+            {$sort: {createdAt: -1}}
         ])
     }
 
