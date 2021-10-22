@@ -8,10 +8,11 @@ import { MongoRepository } from "typeorm";
 @Injectable()
 export class AccountsService {
 
-  constructor (
+    constructor(
         @InjectRepository(Account)
         private accountRepository: MongoRepository<Account>
-  ) {}
+    ) {
+    }
 
     create(createAccountDto: CreateAccountDto) {
         return this.accountRepository.save(createAccountDto);
@@ -42,7 +43,12 @@ export class AccountsService {
                     as: "txCount"
                 }
             },
-            {$unwind: "$txCount"},
+            {
+                $unwind: {
+                    path: "$txCount",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $project: {
                     createdAt: 1,
@@ -55,13 +61,13 @@ export class AccountsService {
                     "txCount": "$txCount.count"
                 }
             }
-    ]).toArray()
+        ]).toArray()
 
 
     }
 
     async findOne(id: string) {
-    const [account] = await this.accountRepository.find({ where: {id} });
+        const [account] = await this.accountRepository.find({where: {id}});
         if (account) {
             return account;
         } else {
@@ -70,7 +76,7 @@ export class AccountsService {
     }
 
     async findOneByAddress(address: string) {
-    const account = await this.accountRepository.findOne({ where: { address }});
+        const account = await this.accountRepository.findOne({where: {address}});
         if (account) {
             return account;
         } else {
@@ -83,11 +89,11 @@ export class AccountsService {
         // contracts & keys can be added or removed
         // therefore collection needs to be replaced and not just updated
         return this.accountRepository.replaceOne(
-      { address },
+            {address},
             updateAccountDto,
             // TODO: why default emulator-account creation event is not logged inside a transaction ?
             // this is why we need to create new account if account doesn't exists (edge case)
-      { upsert: true }
+            {upsert: true}
         );
     }
 }
