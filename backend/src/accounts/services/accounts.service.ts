@@ -8,37 +8,39 @@ import { MongoRepository } from "typeorm";
 @Injectable()
 export class AccountsService {
 
-    constructor(
+    constructor (
         @InjectRepository(Account)
         private accountRepository: MongoRepository<Account>
     ) {
     }
 
-    create(createAccountDto: CreateAccountDto) {
+    create (createAccountDto: CreateAccountDto) {
         return this.accountRepository.save(createAccountDto);
     }
 
-    findAll() {
-        return this.accountRepository.find();
+    findAll () {
+        return this.accountRepository.find({
+            order: {createdAt: "DESC", updatedAt: "DESC"}
+        });
     }
 
-    findAllNewerThanTimestamp(timestamp): Promise<Account[]> {
+    findAllNewerThanTimestamp (timestamp): Promise<Account[]> {
         return this.accountRepository.aggregate([
-            {$match: {createdAt: {$gt: timestamp}}},
+            { $match: { createdAt: { $gt: timestamp } } },
             {
                 $lookup: {
                     from: "transactions",
-                    let: {address: "$address"},
+                    let: { address: "$address" },
                     pipeline: [
                         {
                             $match:
                                 {
                                     $expr: {
-                                        $eq: [{$concat: ["0x", "$payer"]}, "$$address"]
+                                        $eq: [{ $concat: ["0x", "$payer"] }, "$$address"]
                                     }
                                 }
                         },
-                        {$count: "count"},
+                        { $count: "count" },
                     ],
                     as: "txCount"
                 }
@@ -60,14 +62,15 @@ export class AccountsService {
                     contracts: 1,
                     "txCount": "$txCount.count"
                 }
-            }
+            },
+            // TODO: how to solve re-fetching updated entities
+            { $sort: { createdAt: -1 }}
         ]).toArray()
 
-
     }
 
-    async findOne(id: string) {
-        const [account] = await this.accountRepository.find({where: {id}});
+    async findOne (id: string) {
+        const [account] = await this.accountRepository.find({ where: { id } });
         if (account) {
             return account;
         } else {
@@ -75,8 +78,8 @@ export class AccountsService {
         }
     }
 
-    async findOneByAddress(address: string) {
-        const account = await this.accountRepository.findOne({where: {address}});
+    async findOneByAddress (address: string) {
+        const account = await this.accountRepository.findOne({ where: { address } });
         if (account) {
             return account;
         } else {
@@ -84,16 +87,16 @@ export class AccountsService {
         }
     }
 
-    update(address: string, updateAccountDto: UpdateAccountDto) {
+    update (address: string, updateAccountDto: UpdateAccountDto) {
         // we refetch and insert the whole account entity
         // contracts & keys can be added or removed
         // therefore collection needs to be replaced and not just updated
         return this.accountRepository.replaceOne(
-            {address},
-            updateAccountDto,
+            { address },
+            { ...updateAccountDto, updatedAt: new Date() },
             // TODO: why default emulator-account creation event is not logged inside a transaction ?
             // this is why we need to create new account if account doesn't exists (edge case)
-            {upsert: true}
+            { upsert: true }
         );
     }
 }

@@ -38,7 +38,7 @@ const Main: FunctionComponent<any> = () => {
         <>
             {filteredData &&
                 filteredData.map((item: any, i) => (
-                    <Card key={i} className={`${classes.card} ${i + 1 === filteredData.length ? classes.isNew : ''}`}>
+                    <Card key={i} className={`${classes.card} ${item.isNew ? classes.isNew : ''}`}>
                         <div>
                             <Label>BLOCK HEIGHT</Label>
                             <Value>{item.height}</Value>

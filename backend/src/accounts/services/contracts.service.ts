@@ -62,6 +62,7 @@ export class ContractsService {
             },
             {$unwind: "$contracts"},
             {$replaceRoot: {newRoot: "$contracts"}},
+            { $sort: { createdAt: -1 }},
             ...pipeline
         ]).toArray()
     }

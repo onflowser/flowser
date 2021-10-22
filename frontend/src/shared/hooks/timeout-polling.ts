@@ -35,7 +35,7 @@ export const useTimeoutPolling = <T>(resource: string, interval?: number): Timeo
                     return data.map((item: any) => ({ ...item, isNew }));
                 };
 
-                setData((state: any) => [...remapData(state, false), ...remapData(response.data.data, !!state.length)]);
+                setData((state: any) => [...remapData(response.data.data, !!state.length), ...remapData(state, false)]);
             }
         },
         enabled: !stop,

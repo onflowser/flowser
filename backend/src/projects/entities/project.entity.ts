@@ -3,9 +3,10 @@ import { GatewayConfigurationEntity } from './gateway-configuration.entity';
 import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
+import { PollingEntity } from "../../shared/entities/polling.entity";
 
 @Entity({name: 'projects'})
-export class Project {
+export class Project extends PollingEntity {
     @ObjectIdColumn()
     _id: string;
 

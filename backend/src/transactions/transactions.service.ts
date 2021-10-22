@@ -20,17 +20,20 @@ export class TransactionsService {
   findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
     return this.transactionRepository.find({
       where: {createdAt: {$gt: timestamp}},
-      order: {createdAt: 'DESC'}
+      order: {createdAt: "DESC"}
     });
   }
 
   findAll() {
-    return this.transactionRepository.find();
+    return this.transactionRepository.find({
+      order: {createdAt: "DESC"}
+    });
   }
 
   findAllByBlock(blockId: string) {
     return this.transactionRepository.find({
-      where: {referenceBlockId:blockId}
+      where: {referenceBlockId:blockId},
+      order: {createdAt: "DESC"}
     });
   }
 
@@ -39,7 +42,8 @@ export class TransactionsService {
       where: {
         referenceBlockId: blockId,
         createdAt: {$gt: timestamp}
-      }
+      },
+      order: {createdAt: "DESC"}
     });
   }
 

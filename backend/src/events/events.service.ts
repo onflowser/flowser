@@ -17,19 +17,22 @@ export class EventsService {
   }
 
   findAll() {
-    return this.eventRepository.find();
+    return this.eventRepository.find({
+      order: {createdAt: "DESC"}
+    });
   }
 
   findAllNewerThanTimestamp(timestamp): Promise<Event[]> {
     return this.eventRepository.find({
       where: {createdAt: {$gt: timestamp}},
-      order: {createdAt: 'DESC'}
+      order: {createdAt: "DESC"}
     });
   }
 
   findAllByTransaction(transactionId: string) {
     return this.eventRepository.find({
-      where: {transactionId}
+      where: {transactionId},
+      order: {createdAt: "DESC"}
     });
   }
 
@@ -38,7 +41,8 @@ export class EventsService {
       where: {
         createdAt: {$gt: timestamp},
         transactionId,
-      }
+      },
+      order: {createdAt: "DESC"}
     });
   }
 
