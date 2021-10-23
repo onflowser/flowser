@@ -17,6 +17,7 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import Breadcrumbs from './Breadcrumbs';
 import Search from '../../../shared/components/search/Search';
 import axios from '../../../shared/config/axios';
+import { useQuery } from 'react-query';
 
 export interface Counters {
     accounts: number;
@@ -30,6 +31,7 @@ const Navigation = (props: any) => {
     const history = useHistory();
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
     const [counters, setCounters] = useState<Counters>();
+    const { data: currentProject } = useQuery<any>('/api/projects/current');
 
     const onSwitchProject = useCallback(() => {
         history.push(`/${routes.start}`);
@@ -46,6 +48,10 @@ const Navigation = (props: any) => {
             clearInterval(intervalId);
         };
     }, []);
+
+    const onSettings = () => {
+        history.push(`/start/configure/${currentProject?.data?.id}`);
+    };
 
     const onBack = useCallback(() => {
         history.goBack();
@@ -107,9 +113,8 @@ const Navigation = (props: any) => {
                             <span>EMULATOR</span>
                         </div>
                         <div>
-                            {/*<Button disabled={true}>SAVE</Button>*/}
                             <Button onClick={onSwitchProject}>SWITCH</Button>
-                            <IconButton disabled={true} icon={<IconSettings className={classes.settingsIcon} />} />
+                            <IconButton onClick={onSettings} icon={<IconSettings className={classes.settingsIcon} />} />
                         </div>
                     </div>
                 </div>

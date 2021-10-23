@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import copy from 'copy-to-clipboard';
 import Joi from 'joi';
 import classes from './Configuration.module.scss';
 import Input from '../../../shared/components/input/Input';
@@ -173,7 +174,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
     };
 
     const onBack = useCallback(() => {
-        history.push(`/${routes.start}`);
+        history.goBack();
     }, []);
 
     const onDelete = async (event: any) => {
@@ -189,6 +190,15 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             setIsLoading(false);
             setError('Something went wrong: can not delete custom emulator');
         }
+    };
+
+    const copyAccountConfig = (event: any) => {
+        event.preventDefault();
+        copy(`"emulator-account": {
+    "address": "${formState.serviceAddress}",
+    "key": "${formState.servicePrivateKey}"
+}`);
+        toast('Service account config copied to clipboard!');
     };
 
     const closeDialog = () => {
@@ -583,16 +593,33 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                         </div>
                                     </div>
                                     <div className={classes.buttons}>
-                                        <Button onClick={openDialog} variant="middle" outlined={true} disabled={!id}>
-                                            DELETE
-                                        </Button>
-                                        <Button
-                                            variant="middle"
-                                            type="submit"
-                                            disabled={validation.error !== undefined}
-                                        >
-                                            SAVE & RUN
-                                        </Button>
+                                        <div>
+                                            <Button
+                                                onClick={copyAccountConfig}
+                                                variant="middle"
+                                                outlined={true}
+                                                style={{ width: 150 }}
+                                            >
+                                                COPY SERVICE CONFIG
+                                            </Button>
+                                        </div>
+                                        <div>
+                                            <Button
+                                                onClick={openDialog}
+                                                variant="middle"
+                                                outlined={true}
+                                                disabled={!id}
+                                            >
+                                                DELETE
+                                            </Button>
+                                            <Button
+                                                variant="middle"
+                                                type="submit"
+                                                disabled={validation.error !== undefined}
+                                            >
+                                                SAVE & RUN
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
