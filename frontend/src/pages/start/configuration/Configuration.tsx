@@ -28,6 +28,7 @@ const formSchema = Joi.object()
         transactionExpiry: Joi.number().integer().positive().required(),
         transactionMaxGasLimit: Joi.number().integer().positive().required(),
         scriptGasLimit: Joi.number().integer().positive().required(),
+        numberOfInitialAccounts: Joi.number().integer().greater(0).positive().required(),
     })
     .unknown(true);
 
@@ -408,6 +409,24 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                             <span className={classes.errorMessage}>Script Gas Limit is required</span>
                                         ) : (
                                             <span>Specify gas limit for script execution</span>
+                                        )}
+                                    </div>
+
+                                    <div className={classes.row}>
+                                        <span>Initial accounts</span>
+                                        <Input
+                                            type="text"
+                                            value={formState.numberOfInitialAccounts}
+                                            onChange={(e) =>
+                                                onFormFieldChange('numberOfInitialAccounts', e.target.value)
+                                            }
+                                        />
+                                        {getValidationError('numberOfInitialAccounts') ? (
+                                            <span className={classes.errorMessage}>
+                                                There must be at least 1 initial account.
+                                            </span>
+                                        ) : (
+                                            <span>Specify number of initial accounts created on emulator.</span>
                                         )}
                                     </div>
                                 </div>
