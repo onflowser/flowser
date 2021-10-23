@@ -14,14 +14,7 @@ import FullScreenLoading from '../../../shared/components/fullscreen-loading/Ful
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data: transactions, isFetching } = useTimeoutPolling<any>('/api/accounts/polling');
-    const [firstFetch, setFirstFetch] = useState(false);
-
-    useEffect(() => {
-        if (!isFetching && !firstFetch) {
-            setFirstFetch(true);
-        }
-    }, [isFetching]);
+    const { data: transactions, firstFetch } = useTimeoutPolling<any>('/api/accounts/polling');
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');

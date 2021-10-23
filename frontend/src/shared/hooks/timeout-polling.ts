@@ -1,11 +1,12 @@
 import { useQuery } from 'react-query';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from '../axios';
 
 export interface TimeoutPollingHook<T> {
     stopPolling: () => void;
     startPolling: () => void;
     isFetching: boolean;
+    firstFetch: boolean;
     error: Error | null;
     data: T[];
 }
@@ -14,6 +15,7 @@ export const useTimeoutPolling = <T>(resource: string, interval?: number): Timeo
     const [pollingTime, setPollingTime] = useState(0);
     const [stop, setStop] = useState(false);
     const [data, setData] = useState<any>([]);
+    const [firstFetch, setFirstFetch] = useState(false);
 
     const fetchCallback = useCallback<any>(() => {
         return axios.get(resource, {
@@ -44,6 +46,12 @@ export const useTimeoutPolling = <T>(resource: string, interval?: number): Timeo
         refetchOnWindowFocus: false,
     });
 
+    useEffect(() => {
+        if (!isFetching && !firstFetch) {
+            setFirstFetch(true);
+        }
+    }, [isFetching]);
+
     const stopPolling = (): void => {
         setStop(true);
     };
@@ -58,5 +66,6 @@ export const useTimeoutPolling = <T>(resource: string, interval?: number): Timeo
         isFetching,
         error,
         data,
+        firstFetch,
     };
 };

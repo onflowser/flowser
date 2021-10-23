@@ -24,14 +24,7 @@ const Events: FunctionComponent<Props> = (props) => {
     const [openedLog, setOpenedLog] = useState('');
     const { formatDate } = useFormattedDate();
     const { searchTerm, setPlaceholder } = useSearch();
-    const { data, isFetching } = useTimeoutPolling(`/api/events/polling`);
-    const [firstFetch, setFirstFetch] = useState(false);
-
-    useEffect(() => {
-        if (!isFetching && !firstFetch) {
-            setFirstFetch(true);
-        }
-    }, [isFetching]);
+    const { data, firstFetch } = useTimeoutPolling(`/api/events/polling`);
 
     useEffect(() => {
         setPlaceholder('Search for block id, type, transaction ...');

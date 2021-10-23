@@ -18,14 +18,7 @@ const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { formatDate } = useFormattedDate();
-    const { data: transactions, isFetching } = useTimeoutPolling('/api/blocks/polling');
-    const [firstFetch, setFirstFetch] = useState(false);
-
-    useEffect(() => {
-        if (!isFetching && !firstFetch) {
-            setFirstFetch(true);
-        }
-    }, [isFetching]);
+    const { data: transactions, firstFetch } = useTimeoutPolling('/api/blocks/polling');
 
     useEffect(() => {
         setPlaceholder('Search for block ids, parent ids, time, ...');
@@ -82,7 +75,6 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                     </Card>
                 ))}
-
             {!firstFetch && <FullScreenLoading />}
             {firstFetch && filteredData.length === 0 && <NoResults className={classes.noResults} />}
         </>
