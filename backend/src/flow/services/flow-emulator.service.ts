@@ -1,11 +1,10 @@
-import { join } from "path";
-import { mkdir, stat } from "fs/promises";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable } from "@nestjs/common";
-import config from "../../config";
 import { Project } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { EventEmitter } from "events";
+import { FlowCliConfigService } from "./flow-cli-config.service";
+import { randomString } from "../../utils";
 
 type StartCallback = (error: Error, data: string[]) => void;
 
@@ -24,32 +23,12 @@ export class FlowEmulatorService {
   private configuration: EmulatorConfigurationEntity;
   private emulatorProcess: ChildProcessWithoutNullStreams;
 
+  constructor (private flowCliConfig: FlowCliConfigService) {}
+
   configureProjectContext(project: Project) {
     this.projectId = project?.id;
     this.configuration = project.emulator;
-  }
-
-  projectDir () {
-    return join(config.flowserRootDir, this.projectId);
-  }
-
-  databaseDir () {
-    return join(this.projectDir(), "flowdb")
-  }
-
-  // create directory if it does not already exist
-  static async mkdirIfEnoent(path: string) {
-    try {
-      await stat(path)
-      console.debug(`[Flowser] directory "${path}", skipping creation.`)
-    } catch (e) {
-      if (e.code === "ENOENT") {
-        console.debug(`[Flowser] directory "${path}" not found, creating...`)
-        await mkdir(path)
-      } else {
-        throw e;
-      }
-    }
+    this.flowCliConfig.configure(this.projectId);
   }
 
   private setState(state: FlowEmulatorState) {
@@ -64,8 +43,7 @@ export class FlowEmulatorService {
 
   async init() {
     console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
-    await FlowEmulatorService.mkdirIfEnoent(config.flowserRootDir);
-    await FlowEmulatorService.mkdirIfEnoent(this.projectDir());
+    await this.flowCliConfig.init();
   }
 
   private static flag (name: string, userValue: any, defaultValue?: any) {
@@ -94,7 +72,7 @@ export class FlowEmulatorService {
       flag("service-hash-algo", this.configuration.serviceHashAlgorithm),
       flag("storage-limit", this.configuration.storageLimit),
       flag("transaction-fees", this.configuration.transactionFees),
-      flag("dbpath", this.configuration.databasePath || this.databaseDir()),
+      flag("dbpath", this.configuration.databasePath || this.flowCliConfig.databaseDirPath),
       flag("persist", this.configuration.persist),
       flag("verbose", this.configuration.verboseLogging),
       flag("init", true)
@@ -118,7 +96,7 @@ export class FlowEmulatorService {
           'emulator',
           ...flags
         ], {
-          cwd: this.projectDir()
+          cwd: this.flowCliConfig.projectDirPath
         })
       } catch (e) {
         this.setState(FlowEmulatorState.STOPPED);
@@ -169,26 +147,36 @@ export class FlowEmulatorService {
   }
 
   // called when emulator is up and running
-  onServerRunning() {
+  async onServerRunning() {
     if (this.configuration.numberOfInitialAccounts) {
-      this.initialiseAccounts(this.configuration.numberOfInitialAccounts)
+      await this.initialiseAccounts(this.configuration.numberOfInitialAccounts)
     }
   }
 
   async initialiseAccounts(n: number) {
     console.debug(`[Flowser] initialising ${n} initial flow accounts...`)
-
-    let out = [];
-    for (let i = 0; i < n; i++) {
-      out.push(await this.createAccount());
+    await this.flowCliConfig.load();
+    const diff = n - (this.flowCliConfig.totalAccounts - 1);
+    if (diff <= 0) {
+      return;
     }
-    return out;
+    for (let i = 0; i < diff; i++) {
+      const {address, privateKey} = await this.createAccount();
+      this.flowCliConfig.data.accounts[randomString()] = {
+        key: privateKey,
+        address,
+      }
+    }
+    await this.flowCliConfig.save();
   }
 
-  async createAccount(): Promise<string> {
+  async createAccount() {
     const keysOutput = await this.execute("flow", ["keys", "generate"])
+    const privateKey = keysOutput[1][1];
     const publicKey = keysOutput[2][1];
-    return await this.execute("flow", ["accounts", "create", "--key", publicKey]) as string;
+    const accountOutput = await this.execute("flow", ["accounts", "create", "--key", publicKey]);
+    const address = accountOutput[1][1];
+    return { address, publicKey, privateKey }
   }
 
   stop() {
@@ -212,7 +200,7 @@ export class FlowEmulatorService {
     return new Promise(((resolve, reject) => {
       let out = "";
       const process = spawn(bin, args, {
-        cwd: this.projectDir()
+        cwd: this.flowCliConfig.projectDirPath
       });
 
       process.stdout.on("data", data => {
