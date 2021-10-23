@@ -12,6 +12,7 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import NoResults from '../../../shared/components/no-results/NoResults';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
+import { isInitialParentId } from '../../../shared/utils';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
@@ -54,9 +55,13 @@ const Main: FunctionComponent<any> = () => {
                         <div>
                             <Label>PARENT ID</Label>
                             <Value>
-                                <NavLink to={`/blocks/details/${item.parentId}`}>
+                                {isInitialParentId(item.parentId) ? (
                                     <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
-                                </NavLink>
+                                ) : (
+                                    <NavLink to={`/blocks/details/${item.parentId}`}>
+                                        <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
+                                    </NavLink>
+                                )}
                             </Value>
                         </div>
                         <div>
