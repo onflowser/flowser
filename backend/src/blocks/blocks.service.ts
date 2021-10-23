@@ -39,4 +39,8 @@ export class BlocksService {
             throw new NotFoundException("Block not found")
         }
     }
+
+    removeAll() {
+        return this.blockRepository.delete({});
+    }
 }

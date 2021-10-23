@@ -55,4 +55,8 @@ export class TransactionsService {
       throw new NotFoundException("Transaction not found")
     }
   }
+
+  removeAll() {
+    return this.transactionRepository.delete({});
+  }
 }

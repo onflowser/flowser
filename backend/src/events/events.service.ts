@@ -54,4 +54,8 @@ export class EventsService {
       throw new NotFoundException("Event not found")
     }
   }
+
+  removeAll() {
+    return this.eventRepository.delete({});
+  }
 }

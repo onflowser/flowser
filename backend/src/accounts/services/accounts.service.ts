@@ -99,4 +99,8 @@ export class AccountsService {
             { upsert: true }
         );
     }
+
+    removeAll() {
+        return this.accountRepository.delete({});
+    }
 }

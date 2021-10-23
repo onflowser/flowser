@@ -24,4 +24,8 @@ export class LogsService {
   findAll() {
     return this.logsRepository.find({});
   }
+
+  removeAll() {
+    return this.logsRepository.delete({});
+  }
 }

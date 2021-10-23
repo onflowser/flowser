@@ -13,6 +13,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FlowGatewayService } from "../flow/services/flow-gateway.service";
 import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
 import { FlowEmulatorService } from "../flow/services/flow-emulator.service";
+import { AccountsService } from "../accounts/services/accounts.service";
+import { BlocksService } from "../blocks/blocks.service";
+import { EventsService } from "../events/events.service";
+import { LogsService } from "../logs/logs.service";
+import { TransactionsService } from "../transactions/transactions.service";
 
 @Injectable()
 export class ProjectsService {
@@ -24,7 +29,12 @@ export class ProjectsService {
         private projectRepository: MongoRepository<Project>,
         private flowGatewayService: FlowGatewayService,
         private flowAggregatorService: FlowAggregatorService,
-        private flowEmulatorService: FlowEmulatorService
+        private flowEmulatorService: FlowEmulatorService,
+        private accountsService: AccountsService,
+        private blocksService: BlocksService,
+        private eventsService: EventsService,
+        private logsService: LogsService,
+        private transactionsService: TransactionsService
     ) {
     }
 
@@ -70,7 +80,21 @@ export class ProjectsService {
             await this.unUseProject();
             throw new ServiceUnavailableException("Emulator not accessible")
         }
+
+        try {
+            await Promise.all([
+                this.accountsService.removeAll(),
+                this.blocksService.removeAll(),
+                this.eventsService.removeAll(),
+                this.logsService.removeAll(),
+                this.transactionsService.removeAll()
+            ])
+        } catch (e) {
+            throw new InternalServerErrorException("Project cleanup failed")
+        }
+
         console.debug(`[Flowser] using project: ${id}`);
+
         return this.currentProject;
     }
 
