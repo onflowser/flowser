@@ -23,7 +23,7 @@ function updateFlowConfig(data) {
   )
 }
 
-function execute(bin = "", args, parseOutput = true) {
+function execute(bin = "", args, parsedOutput = true) {
   if (!bin) {
     throw new Error("Provide a command");
   }
@@ -43,7 +43,7 @@ function execute(bin = "", args, parseOutput = true) {
     })
 
     process.on("exit", (code) => code === 0
-      ? resolve(parseOutput ? out.split("\n").map(parseLine).filter(Boolean) : out)
+      ? resolve(parsedOutput ? parseOutput(out): out)
       : reject(out)
     );
   }))
@@ -51,6 +51,10 @@ function execute(bin = "", args, parseOutput = true) {
 
 function randomString() {
   return `${Math.round(Math.random() * 10000000000)}`
+}
+
+function parseOutput(out) {
+  return out.split("\n").map(parseLine).filter(Boolean)
 }
 
 function parseLine(line) {

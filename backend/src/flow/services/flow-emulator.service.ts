@@ -185,20 +185,10 @@ export class FlowEmulatorService {
     return out;
   }
 
-  createAccount(): Promise<string> {
-    return new Promise(((resolve, reject) => {
-      let out = "";
-      spawn("flow", [
-        'accounts',
-        'create'
-      ], {
-        cwd: this.projectDir()
-      })
-        .stdout.on("data", data => {
-          out += data.toString()
-        })
-        .on("close", (code) => code > 0 ? reject(code) : resolve(out))
-    }))
+  async createAccount(): Promise<string> {
+    const keysOutput = await this.execute("flow", ["keys", "generate"])
+    const publicKey = keysOutput[2][1];
+    return await this.execute("flow", ["accounts", "create", "--key", publicKey]) as string;
   }
 
   stop() {
@@ -213,6 +203,44 @@ export class FlowEmulatorService {
         resolve(true);
       }
     })
+  }
+
+  private execute(bin = "", args, parsedOutput = true): Promise<string | string[][]> {
+    if (!bin) {
+      throw new Error("Provide a command");
+    }
+    return new Promise(((resolve, reject) => {
+      let out = "";
+      const process = spawn(bin, args, {
+        cwd: this.projectDir()
+      });
+
+      process.stdout.on("data", data => {
+        out += data.toString();
+      })
+
+      process.stderr.on("data", data => {
+        out += data.toString();
+      })
+
+      process.on("exit", (code) => code === 0
+          ? resolve(parsedOutput ? parseOutput(out): out)
+          : reject(out)
+      );
+    }))
+
+    function parseOutput(out) {
+      return out.split("\n").map(parseLine).filter(Boolean)
+    }
+
+    function parseLine(line) {
+      const value = line.trim();
+      if (/\t/.test(value)) {
+        return value.split(/[ ]*\t[ ]*/);
+      } else {
+        return value;
+      }
+    }
   }
 
 }
