@@ -7,6 +7,7 @@ import { routes } from './shared/constants/routes';
 import { UiStateContextProvider } from './shared/contexts/ui-state.context';
 import { useSearch } from './shared/hooks/search';
 import './App.scss';
+import { toastOptions } from './shared/constants/toast';
 
 const LazyAccounts = React.lazy(() => import('./pages/accounts/Accounts'));
 const LazyBlocks = React.lazy(() => import('./pages/blocks/Blocks'));
@@ -30,17 +31,6 @@ const BrowserRouterEvents = withRouter(({ children, history }) => {
     });
     return <>{children}</>;
 });
-// TODO: Move to some config
-const toastOptions = {
-    className: '',
-    duration: 2000,
-    style: {
-        background: '#88C4F2', // $color-link-blue
-        color: '#202A40', // $color-table-blue
-        padding: '12px', // $spacing-base
-        maxWidth: 'initial',
-    },
-};
 
 export const App = () => {
     return (

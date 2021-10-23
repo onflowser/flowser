@@ -40,7 +40,6 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
     };
 
     useEffect(() => {
-        console.log('%c setting placeholder', 'background-color: pink');
         setPlaceholder('search logs');
     }, []);
 
