@@ -13,6 +13,7 @@ import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
+import { isInitialParentId } from '../../../shared/utils';
 
 enum ContentDetails {
     HEIGHT = 'height',
@@ -73,7 +74,11 @@ const Details: FunctionComponent<any> = () => {
                         PARENT ID
                     </Label>
                     <Value variant="large">
-                        <NavLink to={`/blocks/details/${data.parentId}`}>{data.parentId}</NavLink>
+                        {isInitialParentId(data.parentId) ? (
+                            data.parentId
+                        ) : (
+                            <NavLink to={`/blocks/details/${data.parentId}`}>{data.parentId}</NavLink>
+                        )}
                     </Value>
                 </div>
                 <div className={classes.dateAndTimeAgo}>
