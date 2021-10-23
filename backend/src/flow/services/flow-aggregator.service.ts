@@ -46,7 +46,6 @@ export class FlowAggregatorService {
                     console.error(`[Flowser] received emulator error: `, error)
                     reject(error)
                 } else {
-                    console.log(`[Flowser] received emulator logs: `, data)
                     this.handleEmulatorLogs(data);
                 }
             })).then(resolve).catch(reject)

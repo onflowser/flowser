@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 import { useCallback, useEffect, useState } from 'react';
-import axios from '../axios';
+import axios from '../config/axios';
 
 export interface TimeoutPollingHook<T> {
     stopPolling: () => void;

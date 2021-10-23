@@ -66,16 +66,14 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                     response = await getDefaultConfiguration();
                     setFormState(response.data);
                 }
-                setTimeout(() => {
-                    setIsLoading(false);
-                }, 300);
             } catch (e) {
-                setIsLoading(false);
                 if (id) {
                     setError(`Something went wrong: Can not load emulator settings from server`);
                 } else {
                     setError('Something went wrong: Can not fetch default settings from server');
                 }
+            } finally {
+                setIsLoading(false);
             }
         }
 
@@ -178,25 +176,19 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         history.push(`/${routes.start}`);
     }, []);
 
-    const onDelete = (event: any) => {
+    const onDelete = async (event: any) => {
+        event.preventDefault();
         setLoadingText('Deleting ...');
         setIsLoading(true);
 
-        async function deleteEmulator() {
-            event.preventDefault();
-            try {
-                await deleteProject(id);
-            } catch (e) {
-                setIsLoading(false);
-                setError('Something went wrong: can not delete custom emulator');
-            }
-        }
-
-        deleteEmulator();
-        setTimeout(() => {
-            setIsLoading(false);
+        try {
+            await deleteProject(id);
+            toast(`Project "${formState.name}" deleted!`);
             onBack();
-        }, 500);
+        } catch (e) {
+            setIsLoading(false);
+            setError('Something went wrong: can not delete custom emulator');
+        }
     };
 
     const closeDialog = () => {

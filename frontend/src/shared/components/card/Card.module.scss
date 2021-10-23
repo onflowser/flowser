@@ -21,7 +21,6 @@
     justify-content: center;
     color: $color-white;
     opacity: 0.8;
-    @include pulse(1.5s);
   }
 
   &.blue {

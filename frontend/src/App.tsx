@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout from './core/components/layout/Layout';
@@ -7,7 +7,7 @@ import { routes } from './shared/constants/routes';
 import { UiStateContextProvider } from './shared/contexts/ui-state.context';
 import { useSearch } from './shared/hooks/search';
 import './App.scss';
-import { toastOptions } from './shared/constants/toast';
+import { toastOptions } from './shared/config/toast';
 
 const LazyAccounts = React.lazy(() => import('./pages/accounts/Accounts'));
 const LazyBlocks = React.lazy(() => import('./pages/blocks/Blocks'));
@@ -22,13 +22,20 @@ const RouteWithLayout = (props: any) => (
     </Layout>
 );
 
-const BrowserRouterEvents = withRouter(({ children, history }) => {
+const BrowserRouterEvents = withRouter(({ children, history, location }) => {
     const { setSearchTerm } = useSearch();
+
     history.listen((location: any, action: any) => {
         if (action === 'PUSH') {
             setSearchTerm('');
         }
     });
+
+    useEffect(() => {
+        // scroll to the top on every route change
+        window.scrollTo(0, 0);
+    }, [location]);
+
     return <>{children}</>;
 });
 

@@ -10,29 +10,8 @@ import { useProjectApi } from '../../../shared/hooks/project-api';
 
 const Main: FunctionComponent<any> = () => {
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [customProjects, setCustomProjects] = useState([]);
-    const { useProject, getAllProjects } = useProjectApi();
+    const { useProject, projects, isLoadingProjects } = useProjectApi();
     const history = useHistory();
-
-    useEffect(() => {
-        async function init() {
-            try {
-                const response = await getAllProjects();
-                if (response && response.data) {
-                    const projects = response.data.filter((project: any) => project.isCustom === true);
-                    setTimeout(() => {
-                        setCustomProjects(projects);
-                        setLoading(false);
-                    }, 1000);
-                }
-            } catch (e) {
-                setLoading(false);
-            }
-        }
-
-        init();
-    }, []);
 
     const onQuickstart = async (name: string) => {
         setError('');
@@ -93,21 +72,25 @@ const Main: FunctionComponent<any> = () => {
                     ADD CUSTOM EMULATOR
                 </IconButton>
 
-                <h2>YOUR CUSTOM EMULATORS</h2>
-                {loading && <div className={classes.loading}>loading your custom emulators ...</div>}
-
-                {!loading && (
-                    <>
-                        {customProjects.map((project: any, index: number) => (
-                            <NavLink key={index} className={classes.link} to={`/start/configure/${project.id}`}>
-                                {project.name}
-                            </NavLink>
-                        ))}
-                        {customProjects.length === 0 && (
-                            <span className={classes.noEmulators}>No custom emulators added yet</span>
+                <div className={classes.projectsWrapper}>
+                    <div className={classes.projects}>
+                        <h2>YOUR CUSTOM EMULATORS</h2>
+                        {isLoadingProjects ? (
+                            <div className={classes.loading}>loading your custom emulators ...</div>
+                        ) : (
+                            <>
+                                {projects.map((project: any, index: number) => (
+                                    <NavLink key={index} className={classes.link} to={`/start/configure/${project.id}`}>
+                                        {project.name}
+                                    </NavLink>
+                                ))}
+                                {projects.length === 0 && (
+                                    <span className={classes.noEmulators}>No custom emulators added yet</span>
+                                )}
+                            </>
                         )}
-                    </>
-                )}
+                    </div>
+                </div>
             </div>
         </>
     );
