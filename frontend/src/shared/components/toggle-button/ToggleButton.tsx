@@ -9,20 +9,10 @@ interface OwnProps {
 type Props = OwnProps;
 
 const ToggleButton: FunctionComponent<Props> = ({ value = false, onChange = () => false }) => {
-    const [state, setState] = useState(value);
-
-    useEffect(() => {
-        onChange(state);
-    }, [state]);
-
-    const onToggle = () => {
-        setState(!state);
-    };
-
     return (
         <div className={classes.root}>
-            <div onClick={onToggle}>
-                <span className={`${state ? classes.active : classes.inactive}`}></span>
+            <div onClick={() => onChange(!value)}>
+                <span className={`${value ? classes.active : classes.inactive}`} />
             </div>
         </div>
     );
