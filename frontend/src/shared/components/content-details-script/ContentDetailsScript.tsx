@@ -6,6 +6,7 @@ import Label from '../label/Label';
 import Ellipsis from '../ellipsis/Ellipsis';
 import Value from '../value/Value';
 import CopyButton from '../copy-button/CopyButton';
+import { getEventDataType, getEventDataValue } from '../../functions/events';
 
 interface TransactionArg {
     type: string;
@@ -34,14 +35,14 @@ const ContentDetailsScript: FunctionComponent<Props> = ({ script, args }) => {
                                 <Value className={classes.value}>{`{${index}}`}</Value>
 
                                 <Label>TYPE:</Label>
-                                <Value className={classes.value}>{arg.type}</Value>
+                                <Value className={classes.value}>{getEventDataType(arg)}</Value>
 
                                 <Label>VALUE:</Label>
                                 <Value className={classes.value}>
-                                    <Ellipsis className={classes.argValue}>{arg.value}</Ellipsis>
+                                    <Ellipsis className={classes.argValue}>{getEventDataValue(arg)}</Ellipsis>
                                 </Value>
 
-                                <CopyButton value={arg.value} />
+                                <CopyButton value={getEventDataValue(arg, true)} />
                             </div>
                         ))}
                     </div>

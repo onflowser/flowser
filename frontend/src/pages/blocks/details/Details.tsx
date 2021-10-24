@@ -13,7 +13,7 @@ import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
-import { isInitialParentId } from '../../../shared/utils';
+import { isInitialParentId } from '../../../shared/functions/utils';
 
 enum ContentDetails {
     HEIGHT = 'height',

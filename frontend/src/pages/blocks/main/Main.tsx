@@ -12,7 +12,7 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import NoResults from '../../../shared/components/no-results/NoResults';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
-import { isInitialParentId } from '../../../shared/utils';
+import { isInitialParentId } from '../../../shared/functions/utils';
 
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
