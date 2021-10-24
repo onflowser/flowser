@@ -71,7 +71,11 @@ export class FlowGatewayService {
             }
         })
         const events = txWithStatuses.map((tx: any) =>
-          tx.status.events.map(event => ({transactionId: tx.id, ...event}))
+          tx.status.events.map(event => ({
+              transactionId: tx.id,
+              blockId: tx.referenceBlockId,
+              ...event
+          }))
         ).flat()
         return {
             block,

@@ -74,8 +74,8 @@ const Events: FunctionComponent<Props> = (props) => {
                             <div>
                                 <Label>BLOCK ID</Label>
                                 <Value>
-                                    <NavLink to={`/blocks/details/${item.id}`}>
-                                        <Ellipsis className={classes.hash}>{item.id}</Ellipsis>
+                                    <NavLink to={`/blocks/details/${item.blockId}`}>
+                                        <Ellipsis className={classes.hash}>{item.blockId}</Ellipsis>
                                     </NavLink>
                                 </Value>
                             </div>

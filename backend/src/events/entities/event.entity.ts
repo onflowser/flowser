@@ -14,6 +14,9 @@ export class Event extends PollingEntity {
   transactionId: string;
 
   @Column()
+  blockId: string;
+
+  @Column()
   type: string;
 
   @Column()
