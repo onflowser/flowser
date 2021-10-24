@@ -6,10 +6,10 @@ export class EmulatorConfigurationEntity {
   verboseLogging: boolean;
 
   @Column()
-  httpServerPort: number;
+  httpServerPort: number | string;
 
   @Column()
-  rpcServerPort: number;
+  rpcServerPort: number | string;
 
   @Column()
   blockTime: number;
@@ -24,22 +24,22 @@ export class EmulatorConfigurationEntity {
   databasePath: string;
 
   @Column()
-  tokenSupply: number;
+  tokenSupply: number | string;
 
   @Column()
-  transactionExpiry: number;
+  transactionExpiry: number | string;
 
   @Column()
-  storagePerFlow: number;
+  storagePerFlow: number | string;
 
   @Column()
-  minAccountBalance: number;
+  minAccountBalance: number | string;
 
   @Column()
-  transactionMaxGasLimit: number;
+  transactionMaxGasLimit: number | string;
 
   @Column()
-  scriptGasLimit: number;
+  scriptGasLimit: number | string;
 
   @Column()
   serviceSignatureAlgorithm: string;
@@ -60,5 +60,5 @@ export class EmulatorConfigurationEntity {
   simpleAddresses: boolean;
 
   @Column()
-  numberOfInitialAccounts: number;
+  numberOfInitialAccounts: number | string;
 }

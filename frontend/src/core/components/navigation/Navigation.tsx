@@ -33,7 +33,8 @@ const Navigation = (props: any) => {
     const [counters, setCounters] = useState<Counters>();
     const { data: currentProject } = useQuery<any>('/api/projects/current');
 
-    const onSwitchProject = useCallback(() => {
+    const onSwitchProject = useCallback(async () => {
+        await axios.delete('/api/projects/use'); // stop current emulator
         history.push(`/${routes.start}`);
     }, []);
 
