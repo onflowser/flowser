@@ -9,9 +9,16 @@ import { ReactComponent as PlusIcon } from '../../../shared/assets/icons/plus.sv
 import { useProjectApi } from '../../../shared/hooks/project-api';
 
 const Main: FunctionComponent<any> = () => {
+    const history = useHistory();
     const [error, setError] = useState('');
     const { useProject, projects, isLoadingProjects } = useProjectApi();
-    const history = useHistory();
+    const defaultProjects = projects.filter((p: any) => !p.isCustom);
+    const customProjects = projects.filter((p: any) => p.isCustom);
+    const getDefaultProject = (id: string) => defaultProjects.find((p: any) => p.id === id);
+
+    const emulator = getDefaultProject('emulator');
+    const testnet = getDefaultProject('testnet');
+    const mainnet = getDefaultProject('mainnet');
 
     const onQuickstart = async (name: string) => {
         setError('');
@@ -41,6 +48,7 @@ const Main: FunctionComponent<any> = () => {
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"
+                    disabled={!emulator}
                 >
                     EMULATOR
                 </IconButton>
@@ -49,6 +57,7 @@ const Main: FunctionComponent<any> = () => {
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"
+                    disabled={!testnet}
                 >
                     TESTNET
                 </IconButton>
@@ -57,6 +66,7 @@ const Main: FunctionComponent<any> = () => {
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"
+                    disabled={!mainnet}
                 >
                     MAINNET
                 </IconButton>
@@ -79,12 +89,12 @@ const Main: FunctionComponent<any> = () => {
                             <div className={classes.loading}>loading your custom emulators ...</div>
                         ) : (
                             <>
-                                {projects.map((project: any, index: number) => (
+                                {customProjects.map((project: any, index: number) => (
                                     <NavLink key={index} className={classes.link} to={`/start/configure/${project.id}`}>
                                         {project.name}
                                     </NavLink>
                                 ))}
-                                {projects.length === 0 && (
+                                {customProjects.length === 0 && (
                                     <span className={classes.noEmulators}>No custom emulators added yet</span>
                                 )}
                             </>

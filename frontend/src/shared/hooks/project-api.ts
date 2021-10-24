@@ -17,7 +17,7 @@ export const useProjectApi = () => {
         getProjectDetails,
         deleteProject,
         getDefaultConfiguration,
-        projects: projectsData?.data,
+        projects: projectsData?.data || [],
         isLoadingProjects,
     };
 };
