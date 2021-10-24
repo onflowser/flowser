@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import { NavLink } from 'react-router-dom';
 import classes from './Details.module.scss';
+import eventsClasses from '../../events/Events.module.scss';
 import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 import Card from '../../../shared/components/card/Card';
@@ -13,16 +14,20 @@ import DateWithCalendar from '../../../shared/components/date-with-calendar/Date
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
 import StatusCode from '../shared/StatusCode';
 import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
-import EventDetailsTable, { EventDetail } from '../../../shared/components/event-details-table/EventDetailsTable';
+import EventDetailsTable, { EventData } from '../../../shared/components/event-details-table/EventDetailsTable';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
+import CaretIcon from '../../../shared/components/caret-icon/CaretIcon';
+import { useFormattedDate } from '../../../shared/hooks/formatted-date';
 
 type RouteParams = {
     transactionId: string;
 };
 
 const Details: FunctionComponent<any> = () => {
+    const { formatDate } = useFormattedDate();
+    const [openedLog, setOpenedLog] = useState('');
     const { transactionId } = useParams<RouteParams>();
     const { setBreadcrumbs, showSearchBar } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
@@ -37,6 +42,10 @@ const Details: FunctionComponent<any> = () => {
         setBreadcrumbs(breadcrumbs);
         showSearchBar(false);
     }, []);
+
+    const openLog = (status: boolean, id: string) => {
+        setOpenedLog(!status ? id : '');
+    };
 
     if (isLoading || !data) {
         return <FullScreenLoading />;
@@ -156,7 +165,40 @@ const Details: FunctionComponent<any> = () => {
                         ))}
                 </DetailsTabItem>
                 <DetailsTabItem label="EVENTS" value={data.status.eventsCount}>
-                    {events && <EventDetailsTable className={classes.detailsTable} items={events as EventDetail[]} />}
+                    {events &&
+                        events.map((item: any, i) => (
+                            <React.Fragment key={i}>
+                                <Card className={`${eventsClasses.card} ${item.isNew ? classes.isNew : ''}`}>
+                                    <div>
+                                        <Label>TIMESTAMP</Label>
+                                        <Value>{formatDate(new Date(item.createdAt).toISOString())}</Value>
+                                    </div>
+                                    <div>
+                                        <Label>TYPE</Label>
+                                        <Value>{item.type}</Value>
+                                    </div>
+                                    <div>
+                                        <Label>TRANSACTION INDEX</Label>
+                                        <Value>{item.transactionIndex}</Value>
+                                    </div>
+                                    <div>
+                                        <Label>EVENT INDEX</Label>
+                                        <Value>{item.eventIndex}</Value>
+                                    </div>
+                                    <div>
+                                        <CaretIcon
+                                            inverted={true}
+                                            isOpen={openedLog === item.id}
+                                            className={classes.control}
+                                            onChange={(status) => openLog(status, item.id)}
+                                        />
+                                    </div>
+                                </Card>
+                                {openedLog === item.id && (
+                                    <EventDetailsTable className={classes.detailsTable} data={item.data} />
+                                )}
+                            </React.Fragment>
+                        ))}
                 </DetailsTabItem>
             </DetailsTabs>
         </div>

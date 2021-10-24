@@ -2,24 +2,21 @@ import React, { FunctionComponent } from 'react';
 import classes from './EventDetailsTable.module.scss';
 import Ellipsis from '../ellipsis/Ellipsis';
 import CopyButton from '../copy-button/CopyButton';
+import { formatEventData } from '../../functions/events';
 
-export interface EventDetail {
-    name: string;
-    type: string;
-    value: string;
-
+export interface EventData {
     [key: string]: any;
 }
 
 interface OwnProps {
-    items: EventDetail[];
-
+    data: EventData;
     [key: string]: any;
 }
 
 type Props = OwnProps;
 
-const EventDetailsTable: FunctionComponent<Props> = ({ items, ...restProps }) => {
+const EventDetailsTable: FunctionComponent<Props> = ({ data, ...restProps }) => {
+    const items = formatEventData(data);
     return (
         <div className={`${classes.root} ${restProps.className}`}>
             <div className={classes.header}>

@@ -34,35 +34,6 @@ const Events: FunctionComponent<Props> = (props) => {
         setOpenedLog(!status ? id : '');
     };
 
-    function getType(value: any) {
-        switch (true) {
-            case typeof value === 'number':
-                return 'Number';
-            case typeof value === 'string':
-                return 'String';
-            case value instanceof Array:
-                return 'Array';
-            case value instanceof Object:
-                return 'Object';
-            case value === null:
-                return 'NULL';
-            default:
-                return 'unknown';
-        }
-    }
-
-    function formatEventData(data: { [key: string]: any }) {
-        const keys = Object.keys(data);
-        return keys.map((key) => {
-            const item = data[key];
-            return {
-                name: key,
-                type: getType(item),
-                value: `${item}`,
-            };
-        });
-    }
-
     const { filteredData } = useFilterData(data, searchTerm);
 
     return (
@@ -113,7 +84,7 @@ const Events: FunctionComponent<Props> = (props) => {
                             </div>
                         </Card>
                         {openedLog === item.id && (
-                            <EventDetailsTable className={classes.detailsTable} items={formatEventData(item.data)} />
+                            <EventDetailsTable className={classes.detailsTable} data={item.data} />
                         )}
                     </React.Fragment>
                 ))}
