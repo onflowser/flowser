@@ -29,7 +29,7 @@ export class EventsController {
   @Get("/transactions/:id/events/polling")
   @UseInterceptors(PollingResponseInterceptor)
   findAllNewByTransaction(
-    @Param("transactionId") transactionId,
+    @Param("id") transactionId,
     @Query('timestamp', ParseIntPipe) timestamp
   ) {
     return this.eventsService.findAllByTransactionNewerThanTimestamp(transactionId, timestamp);
