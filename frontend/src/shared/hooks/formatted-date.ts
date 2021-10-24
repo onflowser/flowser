@@ -1,11 +1,9 @@
 import dateFormat from 'dateformat';
+import { DATE_FORMAT } from '../constants/common';
 
 export interface UseFormattedDateHook {
     formatDate: (date: string) => string;
 }
-
-// TODO: Move to some config
-export const DATE_FORMAT = 'dS mmm yyyy, hh:MM:ss';
 
 export const useFormattedDate = (): UseFormattedDateHook => {
     const formatDate = (date: string): string => {
