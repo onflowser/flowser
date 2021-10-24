@@ -47,7 +47,7 @@ export class EventsService {
   }
 
   async findOne(id: string) {
-    const [event] = await this.eventRepository.find({ where: {_id: id} });
+    const [event] = await this.eventRepository.find({ where: {id} });
     if (event) {
       return event;
     } else {

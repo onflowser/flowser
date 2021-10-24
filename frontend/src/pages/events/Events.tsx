@@ -34,11 +34,34 @@ const Events: FunctionComponent<Props> = (props) => {
         setOpenedLog(!status ? id : '');
     };
 
-    // TODO: what will be displayed in event details table ? (event.data?)
-    const eventDetails = [
-        { name: 'amount', type: 'VFI64', value: '0.001' },
-        { name: 'from', type: 'VFI64', value: '0.002' },
-    ];
+    function getType(value: any) {
+        switch (true) {
+            case typeof value === 'number':
+                return 'Number';
+            case typeof value === 'string':
+                return 'String';
+            case value instanceof Array:
+                return 'Array';
+            case value instanceof Object:
+                return 'Object';
+            case value === null:
+                return 'NULL';
+            default:
+                return 'unknown';
+        }
+    }
+
+    function formatEventData(data: { [key: string]: any }) {
+        const keys = Object.keys(data);
+        return keys.map((key) => {
+            const item = data[key];
+            return {
+                name: key,
+                type: getType(item),
+                value: `${item}`,
+            };
+        });
+    }
 
     const { filteredData } = useFilterData(data, searchTerm);
 
@@ -51,8 +74,8 @@ const Events: FunctionComponent<Props> = (props) => {
                             <div>
                                 <Label>BLOCK ID</Label>
                                 <Value>
-                                    <NavLink to={`/blocks/details/${item._id}`}>
-                                        <Ellipsis className={classes.hash}>{item._id}</Ellipsis>
+                                    <NavLink to={`/blocks/details/${item.id}`}>
+                                        <Ellipsis className={classes.hash}>{item.id}</Ellipsis>
                                     </NavLink>
                                 </Value>
                             </div>
@@ -83,14 +106,14 @@ const Events: FunctionComponent<Props> = (props) => {
                             <div>
                                 <CaretIcon
                                     inverted={true}
-                                    isOpen={openedLog === item._id}
+                                    isOpen={openedLog === item.id}
                                     className={classes.control}
-                                    onChange={(status) => openLog(status, item._id)}
+                                    onChange={(status) => openLog(status, item.id)}
                                 />
                             </div>
                         </Card>
-                        {openedLog === item._id && (
-                            <EventDetailsTable className={classes.detailsTable} items={eventDetails} />
+                        {openedLog === item.id && (
+                            <EventDetailsTable className={classes.detailsTable} items={formatEventData(item.data)} />
                         )}
                     </React.Fragment>
                 ))}
