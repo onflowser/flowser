@@ -21,8 +21,8 @@ export function getEventDataType(arg: any): string {
     if (arg.type === 'Array') {
         return `Array<${getEventDataType(arg.value[0])}>`;
     } else if (arg.type === 'Dictionary') {
-        const keyType = getEventDataType(arg.value[0].key);
-        const valueType = getEventDataType(arg.value[0].value);
+        const keyType = getEventDataType(arg.value[0]?.key);
+        const valueType = getEventDataType(arg.value[0]?.value);
         return `Dictionary<${keyType}, ${valueType}>`;
     } else {
         return arg.type;

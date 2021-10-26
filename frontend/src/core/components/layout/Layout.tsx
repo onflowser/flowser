@@ -6,6 +6,7 @@ import SubNavigation from '../subnavigation/SubNavigation';
 import Logs from '../../../pages/logs/Logs';
 import { useLogDrawer } from '../../../shared/hooks/log-drawer';
 import { useNavigation } from '../../../shared/hooks/navigation';
+import { useProjectApi } from '../../../shared/hooks/project-api';
 
 interface OwnProps {
     children?: any;
@@ -16,6 +17,7 @@ type Props = OwnProps;
 const Layout: FunctionComponent<Props> = ({ children }) => {
     const { logDrawerSize } = useLogDrawer();
     const { isSubNavigationVisible } = useNavigation();
+    const { currentProject } = useProjectApi();
     const getLogDrawerLayoutClass = useCallback(() => {
         return logDrawerSize === 'tiny' ? '' : logDrawerSize === 'small' ? classes.opened : classes.expanded;
     }, [logDrawerSize]);
@@ -25,7 +27,7 @@ const Layout: FunctionComponent<Props> = ({ children }) => {
             <Navigation className={classes.navigation} />
             {isSubNavigationVisible && <SubNavigation className={classes.subNavigation} />}
             <Content className={classes.content}>{children} </Content>
-            <Logs className={`${classes.logs} ${getLogDrawerLayoutClass()}`} />
+            {!!currentProject?.emulator && <Logs className={`${classes.logs} ${getLogDrawerLayoutClass()}`} />}
         </div>
     );
 };
