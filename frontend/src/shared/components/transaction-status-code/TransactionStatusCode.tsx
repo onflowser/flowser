@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import classes from './StatusCode.module.scss';
+import classes from './TransactionStatusCode.module.scss';
 import { ReactComponent as UnknownIcon } from '../../../shared/assets/icons/status-unknown.svg';
 import { ReactComponent as TransactionPendingIcon } from '../../../shared/assets/icons/status-pending.svg';
 import { ReactComponent as TransactionFinalizedIcon } from '../../../shared/assets/icons/status-finalized.svg';
@@ -13,7 +13,7 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const StatusCode: FunctionComponent<Props> = ({ statusCode }) => {
+const TransactionStatusCode: FunctionComponent<Props> = ({ statusCode }) => {
     const render = (statusCode: number) => {
         switch (statusCode) {
             case 0: // Unknown
@@ -63,4 +63,4 @@ const StatusCode: FunctionComponent<Props> = ({ statusCode }) => {
     return <>{render(statusCode)}</>;
 };
 
-export default StatusCode;
+export default TransactionStatusCode;
