@@ -17,7 +17,7 @@ import { useNavigation } from '../../../shared/hooks/navigation';
 import Breadcrumbs from './Breadcrumbs';
 import Search from '../../../shared/components/search/Search';
 import axios from '../../../shared/config/axios';
-import { useQuery } from 'react-query';
+import { useProjectApi } from '../../../shared/hooks/project-api';
 
 export interface Counters {
     accounts: number;
@@ -31,7 +31,7 @@ const Navigation = (props: any) => {
     const history = useHistory();
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
     const [counters, setCounters] = useState<Counters>();
-    const { data: currentProject } = useQuery<any>('/api/projects/current');
+    const { currentProject } = useProjectApi();
 
     const onSwitchProject = useCallback(async () => {
         await axios.delete('/api/projects/use'); // stop current emulator
@@ -51,7 +51,7 @@ const Navigation = (props: any) => {
     }, []);
 
     const onSettings = () => {
-        history.push(`/start/configure/${currentProject?.data?.id}`);
+        history.push(`/start/configure/${currentProject?.id}`);
     };
 
     const onBack = useCallback(() => {

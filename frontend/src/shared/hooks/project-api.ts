@@ -9,6 +9,7 @@ export const useProjectApi = () => {
     const useProject = (id: string) => axios.post(`/api/projects/use/${id}`);
     const getProjectDetails = (id: string) => axios.get(`/api/projects/${id}`);
     const deleteProject = (id: string) => axios.delete(`/api/projects/${id}`);
+    const { data: currentProjectData } = useQuery<any>('/api/projects/current');
 
     return {
         saveConfiguration,
@@ -19,5 +20,6 @@ export const useProjectApi = () => {
         getDefaultConfiguration,
         projects: projectsData?.data || [],
         isLoadingProjects,
+        currentProject: currentProjectData?.data || null,
     };
 };
