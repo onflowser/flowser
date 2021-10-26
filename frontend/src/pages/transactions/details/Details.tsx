@@ -1,9 +1,8 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
-import { NavLink } from 'react-router-dom';
 import classes from './Details.module.scss';
 import eventsClasses from '../../events/Events.module.scss';
 import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
@@ -12,9 +11,9 @@ import Card from '../../../shared/components/card/Card';
 import TimeAgo from '../../../shared/components/time-ago/TimeAgo';
 import DateWithCalendar from '../../../shared/components/date-with-calendar/DateWithCalendar';
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
-import StatusCode from '../shared/StatusCode';
+import TransactionStatusCode from '../../../shared/components/transaction-status-code/TransactionStatusCode';
 import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
-import EventDetailsTable, { EventData } from '../../../shared/components/event-details-table/EventDetailsTable';
+import EventDetailsTable from '../../../shared/components/event-details-table/EventDetailsTable';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
@@ -61,7 +60,7 @@ const Details: FunctionComponent<any> = () => {
                             <Value variant="large">{data.id}</Value>
                         </div>
                         <div>
-                            <StatusCode statusCode={data.status.statusCode} />
+                            <TransactionStatusCode statusCode={data.status.statusCode} />
                         </div>
                     </>
                 )}

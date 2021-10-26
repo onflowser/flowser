@@ -13,6 +13,7 @@ import CollapsibleCard from '../../../shared/components/collapsible-card/Collaps
 import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useParams } from 'react-router-dom';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
+import TransactionListItem from '../../../shared/components/transaction-list-item/TransactionListItem';
 
 type RouteParams = {
     accountId: string;
@@ -56,6 +57,20 @@ const Details: FunctionComponent<any> = () => {
                 {!!data.code && (
                     <DetailsTabItem label="SCRIPTS" value="<>">
                         <ContentDetailsScript script={data.code} />
+                    </DetailsTabItem>
+                )}
+                {!!data.transactions && (
+                    <DetailsTabItem label="TRANSACTIONS" value={data.transactions.length}>
+                        {data.transactions.map((item: any, i: number) => (
+                            <TransactionListItem
+                                key={i}
+                                id={item.id}
+                                referenceBlockId={item.referenceBlockId}
+                                statusCode={item.status.statusCode}
+                                payer={item.payer}
+                                proposer={item.proposalKey.address}
+                            />
+                        ))}
                     </DetailsTabItem>
                 )}
                 <DetailsTabItem
