@@ -24,7 +24,11 @@ const formSchema = Joi.object()
         }),
         rpcServerPort: Joi.number().integer().greater(1000).less(10000).required(),
         httpServerPort: Joi.number().integer().greater(1000).less(10000).required(),
-        blockTime: Joi.string().pattern(new RegExp('(^[1-9][0-9]*(ns|us|µs|ms|s|m|h)$)|(^0{1}$)')),
+        // blockTime: Joi.string().pattern(new RegExp('(^[1-9][0-9]*(ns|us|µs|ms|s|m|h)$)|(^0{1}$)')),
+        blockTime: Joi.alternatives().try(
+            Joi.string().pattern(new RegExp('(^[1-9][0-9]*(ns|us|µs|ms|s|m|h)$)|(^0{1}$)')),
+            Joi.number().greater(-1).less(1),
+        ),
         tokenSupply: Joi.number().integer().positive().required(),
         transactionExpiry: Joi.number().integer().positive().required(),
         transactionMaxGasLimit: Joi.number().integer().positive().required(),

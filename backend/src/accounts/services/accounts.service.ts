@@ -63,6 +63,16 @@ export class AccountsService {
                     "txCount": "$txCount.count"
                 }
             },
+            {
+                $addFields: {
+                    "txCount": {
+                        $ifNull: [
+                            "$txCount",
+                            "0"
+                        ]
+                    }
+                }
+            },
             // TODO: how to solve re-fetching updated entities
             { $sort: { createdAt: -1 }}
         ]).toArray()
