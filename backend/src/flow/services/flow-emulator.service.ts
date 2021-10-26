@@ -22,6 +22,7 @@ export class FlowEmulatorService {
     private projectId: string;
     private configuration: EmulatorConfigurationEntity;
     private emulatorProcess: ChildProcessWithoutNullStreams;
+    private logs: string[] = [];
 
     constructor (private flowCliConfig: FlowCliConfigService) {}
 
@@ -29,6 +30,32 @@ export class FlowEmulatorService {
         this.projectId = project?.id;
         this.configuration = project.emulator;
         this.flowCliConfig.configure(this.projectId, this.configuration);
+    }
+
+    static parseLogLine (line: string) {
+        const keyValuePairs = [];
+        // https://regex101.com/r/gVlMZ0/1
+        // tokenizes log lines into key=value pair array
+        const matches = line.matchAll(/[a-z]+=("([^"]+"))|([^\s]+)/g);
+        for (let [match] of matches) {
+            // each match is of form key=value or key="foo bar"
+            const [key, value] = match
+                .toString()
+                .replace(/"/g, "") // remove " chars if they exist
+                .split("="); // split into [key, value] pairs
+            keyValuePairs.push({ [key]: value })
+        }
+        return keyValuePairs.reduce((p, c) => ({ ...p, ...c }), {})
+    }
+
+    public getError () {
+        for (let i = this.logs.length - 1; i > 0; i--) {
+            if (this.logs[i].includes("level=error")) {
+                const errorLine = FlowEmulatorService.parseLogLine(this.logs[i]);
+                return errorLine.error ? new Error(errorLine.error) : null
+            }
+        }
+        return null;
     }
 
     private setState (state: FlowEmulatorState) {
@@ -107,6 +134,9 @@ export class FlowEmulatorService {
             this.emulatorProcess.stdout.on("data", data => {
                 const lines = data.toString().split("\n").filter(e => !!e)
 
+                // temporarily store the logs in memory for possible examination
+                this.logs.push(...lines);
+
                 const lineMatch = (line, s) => line.toLowerCase().includes(s.toLowerCase());
                 const linesMatch = s => Boolean(lines.find(line => lineMatch(line, s)));
 
@@ -130,7 +160,7 @@ export class FlowEmulatorService {
             // this.emulatorProcess.stderr.on("data", data => {})
 
             this.emulatorProcess.on("close", code => {
-                const error = new Error(`Emulator exited with code ${code}`)
+                const error = this.getError() || new Error(`Emulator exited with code ${code}`)
                 this.setState(FlowEmulatorState.STOPPED);
                 cb(error, null)
                 reject(error);
@@ -189,10 +219,13 @@ export class FlowEmulatorService {
         return new Promise(resolve => {
             console.log(`[Flowser] stopping emulator: ${this.isRunning()}`)
             if (this.isRunning()) {
-                console.log(`[Flowser] stopped emulator process: ${this.emulatorProcess.pid}`)
+                console.log(`[Flowser] stopping emulator process: ${this.emulatorProcess.pid}`)
                 const isKilled = this.emulatorProcess.kill();
                 // resolve only when the emulator process exits
-                this.events.on(FlowEmulatorState.STOPPED, () => resolve(isKilled))
+                this.events.on(FlowEmulatorState.STOPPED, () => {
+                    console.log(`[Flowser] stopped emulator process: ${this.emulatorProcess.pid}`);
+                    resolve(isKilled)
+                })
             } else {
                 resolve(true);
             }

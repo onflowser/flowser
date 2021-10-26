@@ -126,8 +126,8 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
 
         try {
             await useProject(response.data.id);
-        } catch (e) {
-            setError('Something went wrong, can not run emulator');
+        } catch (e: any) {
+            setError(`Something went wrong, ` + e.error || e.message || ' can not run emulator');
             setIsSubmitting(false);
             window.scrollTo(0, 0);
             return false;
