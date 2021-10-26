@@ -68,9 +68,14 @@ export class FlowEmulatorService {
                     // emulator is starting (could still exit due to init error)
                     this.setState(FlowEmulatorState.STARTED)
                     // assume that if no error is thrown in 0.5s, the emulator is running
-                    setTimeout(() => this.onServerRunning(), 500)
+                    // this line is needed, because if verbose flag is not included
+                    // emulator may not emit any more logs in the near future
+                    // therefore we can't reliably tell if emulator started successfully
+                    setTimeout(() => this.onServerRunning(), 1000)
                 }
                 // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
+                // TODO: logic for determining if emulator started successfully should be improved
+                // https://github.com/bartolomej/flowser/issues/33
                 else if (this.isState(FlowEmulatorState.STARTED) && !linesMatch("server error")) {
                     // emulator successfully started
                     this.onServerRunning();
@@ -120,6 +125,10 @@ export class FlowEmulatorService {
 
     // called when emulator is up and running
     async onServerRunning () {
+        // ensure correct state transition STARTED => RUNNING
+        if (!this.isState(FlowEmulatorState.STARTED)) {
+            return;
+        }
         this.setState(FlowEmulatorState.RUNNING)
         if (this.configuration.numberOfInitialAccounts) {
             try {
@@ -158,7 +167,7 @@ export class FlowEmulatorService {
 
     isRunning () {
         return (
-            this.emulatorProcess &&
+            !this.emulatorProcess?.killed &&
             [FlowEmulatorState.STARTED, FlowEmulatorState.RUNNING].includes(this.state)
         );
     }
