@@ -4,13 +4,16 @@ import { UpdateAccountDto } from '../dto/update-account.dto';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Account } from "../entities/account.entity";
 import { MongoRepository } from "typeorm";
+import { Transaction } from '../../transactions/entities/transaction.entity';
 
 @Injectable()
 export class AccountsService {
 
     constructor (
         @InjectRepository(Account)
-        private accountRepository: MongoRepository<Account>
+        private accountRepository: MongoRepository<Account>,
+        @InjectRepository(Transaction)
+        private transactionRepository: MongoRepository<Transaction>
     ) {
     }
 
@@ -91,7 +94,14 @@ export class AccountsService {
     async findOneByAddress (address: string) {
         const account = await this.accountRepository.findOne({ where: { address } });
         if (account) {
-            return account;
+            const addressWithout0x = account.address.substr(2);
+            const transactions = await this.transactionRepository
+                .aggregate([
+                    {$match: {payer: addressWithout0x}},
+                    {$project: {_id: 0}}
+                ]).toArray();
+
+            return {...account, transactions};
         } else {
             throw new NotFoundException("Account not found")
         }
