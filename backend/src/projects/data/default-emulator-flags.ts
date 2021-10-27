@@ -1,13 +1,13 @@
 export const defaultEmulatorFlags = {
     name: 'New Emulator Configuration',
     verboseLogging: true,
-    httpServerPort: 8080,
+    httpServerPort: parseInt(process.env.FLOW_EMULATOR_PORT),
     persist: false,
     rpcServerPort: 3569,
     blockTime: 0,
-    serviceAddress: 'f8d6e0586b0a20c7', // this is the same for all emulators
-    servicePrivateKey: '680fa28962650ef346a7edf23d63967b0fcf44958488d0d48f8539ece6e92eba',
-    servicePublicKey: '5a6a7bdb81838e40fc615d4c0eed3d4caacfc7f47a89d319caa370aac6196113573738ba57e09ea5a27a192d48457ee5c0e32011bc10ef93383aabad24a9ce2a',
+    serviceAddress: process.env.FLOW_ACCOUNT_ADDRESS, // this is the same for all emulators
+    servicePrivateKey: process.env.FLOW_ACCOUNT_PRIVATE_KEY,
+    servicePublicKey: process.env.FLOW_ACCOUNT_PUBLIC_KEY,
     databasePath: './flowdb',
     tokenSupply: '1000000000.0',
     transactionExpiry: 10,
