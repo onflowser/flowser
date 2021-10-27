@@ -18,6 +18,7 @@ import Breadcrumbs from './Breadcrumbs';
 import Search from '../../../shared/components/search/Search';
 import axios from '../../../shared/config/axios';
 import { useProjectApi } from '../../../shared/hooks/project-api';
+import { useFlow } from '../../../shared/hooks/flow';
 
 export interface Counters {
     accounts: number;
@@ -32,6 +33,9 @@ const Navigation = (props: any) => {
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
     const [counters, setCounters] = useState<Counters>();
     const { currentProject } = useProjectApi();
+    const { user, login, logout } = useFlow();
+
+    console.log(user);
 
     const onSwitchProject = useCallback(async () => {
         await axios.delete('/api/projects/use'); // stop current emulator
@@ -114,6 +118,7 @@ const Navigation = (props: any) => {
                             <span>EMULATOR</span>
                         </div>
                         <div>
+                            {user ? <Button onClick={logout}>LOGOUT</Button> : <Button onClick={login}>LOGIN</Button>}
                             <Button onClick={onSwitchProject}>SWITCH</Button>
                             <IconButton onClick={onSettings} icon={<IconSettings className={classes.settingsIcon} />} />
                         </div>
