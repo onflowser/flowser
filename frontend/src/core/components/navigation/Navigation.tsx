@@ -19,6 +19,7 @@ import Search from '../../../shared/components/search/Search';
 import axios from '../../../shared/config/axios';
 import { useProjectApi } from '../../../shared/hooks/project-api';
 import { useFlow } from '../../../shared/hooks/flow';
+import TransactionDialog from '../../../shared/components/transaction-dialog/TransactionDialog';
 
 export interface Counters {
     accounts: number;
@@ -32,6 +33,7 @@ const Navigation = (props: any) => {
     const history = useHistory();
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
     const [counters, setCounters] = useState<Counters>();
+    const [showTxDialog, setShowTxDialog] = useState<any>(false);
     const { currentProject } = useProjectApi();
     const { user, login, logout } = useFlow();
 
@@ -118,6 +120,7 @@ const Navigation = (props: any) => {
                             <span>EMULATOR</span>
                         </div>
                         <div>
+                            {user && <Button onClick={() => setShowTxDialog(true)}>SEND TX</Button>}
                             {user ? <Button onClick={logout}>LOGOUT</Button> : <Button onClick={login}>LOGIN</Button>}
                             <Button onClick={onSwitchProject}>SWITCH</Button>
                             <IconButton onClick={onSettings} icon={<IconSettings className={classes.settingsIcon} />} />
@@ -132,6 +135,7 @@ const Navigation = (props: any) => {
                         {isSearchBarVisible && <Search className={classes.searchBar} />}
                     </div>
                 )}
+                {showTxDialog && <TransactionDialog />}
             </div>
         </>
     );

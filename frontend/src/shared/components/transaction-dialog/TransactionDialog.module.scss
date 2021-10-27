@@ -1,0 +1,39 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+@import 'styles/typography';
+@import 'styles/animations';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  color: $color-white;
+  padding: $spacing-l * 3 $spacing-l * 6;
+  @include fadeInAnimation(.5s);
+
+
+  h3 {
+    margin-bottom: $spacing-base * 3;
+    font-size: $font-size-xlarge;
+    text-align: center;
+  }
+
+  span {
+    margin-bottom: $spacing-base;
+    font-size: $font-size-normal;
+    text-align: center;
+  }
+
+  .actions {
+    margin-top: $spacing-base * 2;
+    display: flex;
+    align-items: center;
+
+    & > * {
+      flex: 1;
+    }
+
+    & > * + * {
+      margin-left: $spacing-base;
+    }
+  }
+}
