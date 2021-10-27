@@ -35,9 +35,7 @@ const Navigation = (props: any) => {
     const [counters, setCounters] = useState<Counters>();
     const [showTxDialog, setShowTxDialog] = useState<any>(false);
     const { currentProject } = useProjectApi();
-    const { user, login, logout } = useFlow();
-
-    console.log(user);
+    const { isLoggedIn, login, logout } = useFlow();
 
     const onSwitchProject = useCallback(async () => {
         await axios.delete('/api/projects/use'); // stop current emulator
@@ -120,8 +118,12 @@ const Navigation = (props: any) => {
                             <span>EMULATOR</span>
                         </div>
                         <div>
-                            {user && <Button onClick={() => setShowTxDialog(true)}>SEND TX</Button>}
-                            {user ? <Button onClick={logout}>LOGOUT</Button> : <Button onClick={login}>LOGIN</Button>}
+                            {isLoggedIn && <Button onClick={() => setShowTxDialog(true)}>SEND TX</Button>}
+                            {isLoggedIn ? (
+                                <Button onClick={logout}>LOGOUT</Button>
+                            ) : (
+                                <Button onClick={login}>LOGIN</Button>
+                            )}
                             <Button onClick={onSwitchProject}>SWITCH</Button>
                             <IconButton onClick={onSettings} icon={<IconSettings className={classes.settingsIcon} />} />
                         </div>

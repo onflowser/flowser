@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import '../config/flow-fcl';
 // @ts-ignore
 import * as fcl from '@onflow/fcl';
+import { toast } from 'react-hot-toast';
 
 export function useFlow() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({ loggedIn: null });
 
     useEffect(() => fcl.currentUser().subscribe(setUser), []);
 
@@ -21,10 +22,28 @@ export function useFlow() {
         console.log(transaction);
     }
 
+    function logout() {
+        try {
+            return fcl.unauthenticate();
+        } catch (e: any) {
+            console.log(e);
+            toast.error(`Logout failed: ${e.message}`);
+        }
+    }
+
+    function login() {
+        try {
+            return fcl.authenticate();
+        } catch (e: any) {
+            toast.error(`Login failed: ${e.message}`);
+        }
+    }
+
     return {
-        login: fcl.authenticate,
-        logout: fcl.unauthenticate,
+        login,
+        logout,
         user,
+        isLoggedIn: user.loggedIn,
         sendTransaction,
     };
 }

@@ -1,7 +1,7 @@
 export const defaultEmulatorFlags = {
     name: 'New Emulator Configuration',
     verboseLogging: true,
-    httpServerPort: parseInt(process.env.FLOW_EMULATOR_PORT),
+    httpServerPort: parseInt(process.env.FLOW_EMULATOR_HTTP_PORT),
     persist: false,
     rpcServerPort: 3569,
     blockTime: 0,
