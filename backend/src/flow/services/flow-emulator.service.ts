@@ -14,6 +14,12 @@ export enum FlowEmulatorState {
     RUNNING = "running", // emulator is safely running without initialisation errors
 }
 
+type FlowEmulatorLog = {
+    level: 'debug' | 'info' | 'error';
+    time: string;
+    [key: string]: string;
+}
+
 @Injectable()
 export class FlowEmulatorService {
 
@@ -24,7 +30,8 @@ export class FlowEmulatorService {
     private emulatorProcess: ChildProcessWithoutNullStreams;
     private logs: string[] = [];
 
-    constructor (private flowCliConfig: FlowCliConfigService) {}
+    constructor (private flowCliConfig: FlowCliConfigService) {
+    }
 
     configureProjectContext (project: Project) {
         this.projectId = project?.id;
@@ -73,8 +80,8 @@ export class FlowEmulatorService {
                     // therefore we can't reliably tell if emulator started successfully
                     setTimeout(() => this.onServerRunning(), 1000)
                 }
-                // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
-                // TODO: logic for determining if emulator started successfully should be improved
+                    // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
+                    // TODO: logic for determining if emulator started successfully should be improved
                 // https://github.com/bartolomej/flowser/issues/33
                 else if (this.isState(FlowEmulatorState.STARTED) && !linesMatch("server error")) {
                     // emulator successfully started
@@ -82,7 +89,7 @@ export class FlowEmulatorService {
                     resolve(true);
                 }
 
-                cb(null, lines)
+                cb(null, FlowEmulatorService.formatLogLines(lines))
             })
 
             // No data is emitted to stderr for now
@@ -259,7 +266,30 @@ export class FlowEmulatorService {
         }
     }
 
-    static parseLogLine (line: string) {
+    static formatLogLines (lines: string[]) {
+        return lines.map(line => {
+            const {
+                level,
+                time,
+                msg,
+                ...rest
+            } = FlowEmulatorService.parseLogLine(line);
+            // format example: Thu Oct 28 2021 21:20:51
+            const formattedTime = new Date(time).toString().split(" ").slice(0,5).join(" ")
+            // appends the rest of the values in key="value" format
+            return (
+                level.toUpperCase().slice(0, 4) +
+                `[${formattedTime}] ` +
+                msg +
+                Object
+                    .keys(rest)
+                    .map(key => `${key}="${rest[key]}"`)
+                    .reduce((p, c) => `${p} ${c}`, '')
+            )
+        });
+    }
+
+    static parseLogLine (line: string): FlowEmulatorLog {
         const keyValuePairs = [];
         // https://regex101.com/r/gVlMZ0/1
         // tokenizes log lines into key=value pair array
@@ -269,6 +299,8 @@ export class FlowEmulatorService {
             const [key, value] = match
                 .toString()
                 .replace(/"/g, "") // remove " chars if they exist
+                // "\\x1b" or "\u001b" are ansi escape codes
+                .replace(/(\u001b)|(\\x1b)\[[^m]*m/g, "") // remove ansi color escape codes (https://regex101.com/r/PoqKom/1)
                 .split("="); // split into [key, value] pairs
             keyValuePairs.push({ [key]: value })
         }
