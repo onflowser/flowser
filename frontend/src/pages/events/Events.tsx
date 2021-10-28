@@ -59,7 +59,7 @@ const Events: FunctionComponent<Props> = (props) => {
                                 <Value>{item.type}</Value>
                             </div>
                             <div>
-                                <Label>TRANSACTION ID</Label>
+                                <Label>TX ID</Label>
                                 <Value>
                                     <NavLink to={`/transactions/details/${item.transactionId}`}>
                                         <Ellipsis className={classes.hash}>{item.transactionId}</Ellipsis>
@@ -67,7 +67,7 @@ const Events: FunctionComponent<Props> = (props) => {
                                 </Value>
                             </div>
                             <div>
-                                <Label>TRANSACTION INDEX</Label>
+                                <Label title="TRANSACTION INDEX">TX INDEX</Label>
                                 <Value>{item.transactionIndex}</Value>
                             </div>
                             <div>

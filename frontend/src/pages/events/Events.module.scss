@@ -11,6 +11,26 @@
   & > div {
     display: flex;
     flex-direction: column;
+    padding-right: $spacing-base * 2;
+    flex: 10;
+  }
+
+  & > div:nth-child(2) {
+    flex: 8;
+  }
+
+  & > div:nth-child(3) {
+    overflow-wrap: anywhere;
+  }
+
+  & > div:nth-child(5),
+  & > div:nth-child(6) {
+    flex: 3;
+  }
+
+  & > div:last-child {
+    flex: 1;
+    padding-right: 0;
   }
 
   &.isNew {
