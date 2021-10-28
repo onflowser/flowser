@@ -4,7 +4,6 @@ import Label from '../../../shared/components/label/Label';
 import Value from '../../../shared/components/value/Value';
 import DetailsCard from '../../../shared/components/details-card/DetailsCard';
 import classes from './Details.module.scss';
-import eventsClasses from '../../events/Events.module.scss';
 import { DetailsTabItem, DetailsTabs } from '../../../shared/components/details-tabs/DetailsTabs';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 import Card from '../../../shared/components/card/Card';
@@ -167,7 +166,7 @@ const Details: FunctionComponent<any> = () => {
                     {events &&
                         events.map((item: any, i) => (
                             <React.Fragment key={i}>
-                                <Card className={`${eventsClasses.card} ${item.isNew ? classes.isNew : ''}`}>
+                                <Card className={`${classes.card} ${item.isNew ? classes.isNew : ''}`}>
                                     <div>
                                         <Label>TIMESTAMP</Label>
                                         <Value>{formatDate(new Date(item.createdAt).toISOString())}</Value>
@@ -177,7 +176,7 @@ const Details: FunctionComponent<any> = () => {
                                         <Value>{item.type}</Value>
                                     </div>
                                     <div>
-                                        <Label>TRANSACTION INDEX</Label>
+                                        <Label title="TRANSACTION INDEX">TX INDEX</Label>
                                         <Value>{item.transactionIndex}</Value>
                                     </div>
                                     <div>
