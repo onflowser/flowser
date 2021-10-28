@@ -35,7 +35,7 @@ const Details: FunctionComponent<any> = () => {
     const breadcrumbs: Breadcrumb[] = [{ to: '/blocks', label: 'Blocks' }, { label: 'Details' }];
 
     const { isLoading, data } = useDetailsQuery(`/api/blocks/${blockId}`);
-    const { data: transactions } = useTimeoutPolling(`/api/blocks/${blockId}/transactions/polling`);
+    const { data: transactions } = useTimeoutPolling(`/api/blocks/${blockId}/transactions/polling`, '_id');
     const date = data && new Date(data.timestamp).toISOString();
 
     useEffect(() => {

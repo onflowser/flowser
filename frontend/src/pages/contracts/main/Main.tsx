@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import classes from './Main.module.scss';
 import Card from '../../../shared/components/card/Card';
 import Label from '../../../shared/components/label/Label';
@@ -14,7 +14,7 @@ import FullScreenLoading from '../../../shared/components/fullscreen-loading/Ful
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data, firstFetch } = useTimeoutPolling('/api/contracts/polling');
+    const { data, firstFetch } = useTimeoutPolling('/api/contracts/polling', '_id');
 
     useEffect(() => {
         setPlaceholder('search for contracts');

@@ -17,7 +17,9 @@ export class PollingResponseInterceptor<T> implements NestInterceptor<T, Respons
         const findLatestTimestamp = (data: any[]) => {
             let latestTimestamp = 0;
             if (Array.isArray(data)) {
-                latestTimestamp = data.reduce((latest, item) => item.createdAt > latest ? item.createdAt : latest, 0)
+                const latestTimestampCreated = data.reduce((latest, item) => item.createdAt > latest ? item.createdAt : latest, 0);
+                const latestTimestampUpdated = data.reduce((latest, item) => item.updatedAt > latest ? item.updatedAt : latest, 0);
+                latestTimestamp = latestTimestampUpdated > latestTimestampCreated ? latestTimestampUpdated : latestTimestampCreated;
             }
             return latestTimestamp;
         };

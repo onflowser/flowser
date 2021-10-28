@@ -30,7 +30,7 @@ const Details: FunctionComponent<any> = () => {
     const { setBreadcrumbs, showSearchBar } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { data, isLoading } = useDetailsQuery(`/api/transactions/${transactionId}`);
-    const { data: events } = useTimeoutPolling(`/api/transactions/${transactionId}/events/polling`);
+    const { data: events } = useTimeoutPolling(`/api/transactions/${transactionId}/events/polling`, '_id');
 
     const breadcrumbs: Breadcrumb[] = [{ to: '/transactions', label: 'Transactions' }, { label: 'Details' }];
 

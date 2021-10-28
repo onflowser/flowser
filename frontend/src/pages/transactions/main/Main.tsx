@@ -11,7 +11,7 @@ import TransactionListItem from '../../../shared/components/transaction-list-ite
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data, firstFetch } = useTimeoutPolling('/api/transactions/polling');
+    const { data, firstFetch } = useTimeoutPolling('/api/transactions/polling', '_id');
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');

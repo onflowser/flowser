@@ -18,7 +18,7 @@ const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { formatDate } = useFormattedDate();
-    const { data: transactions, firstFetch } = useTimeoutPolling('/api/blocks/polling');
+    const { data: transactions, firstFetch } = useTimeoutPolling('/api/blocks/polling', '_id');
 
     useEffect(() => {
         setPlaceholder('Search for block ids, parent ids, time, ...');

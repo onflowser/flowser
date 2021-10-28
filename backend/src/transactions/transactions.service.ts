@@ -19,7 +19,12 @@ export class TransactionsService {
 
   findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
     return this.transactionRepository.find({
-      where: {createdAt: {$gt: timestamp}},
+      where: {
+        $or: [
+          {createdAt: {$gt: timestamp}},
+          {updatedAt: {$gt: timestamp}},
+        ]
+      },
       order: {createdAt: "DESC"}
     });
   }

@@ -29,7 +29,14 @@ export class AccountsService {
 
     findAllNewerThanTimestamp (timestamp): Promise<Account[]> {
         return this.accountRepository.aggregate([
-            { $match: { createdAt: { $gt: timestamp } } },
+            {
+                $match: {
+                    $or: [
+                        {createdAt: {$gt: timestamp}},
+                        {updatedAt: {$gt: timestamp}},
+                    ]
+                }
+            },
             {
                 $lookup: {
                     from: "transactions",

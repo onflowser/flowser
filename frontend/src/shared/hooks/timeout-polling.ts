@@ -11,7 +11,11 @@ export interface TimeoutPollingHook<T> {
     data: T[];
 }
 
-export const useTimeoutPolling = <T>(resource: string, interval?: number): TimeoutPollingHook<T> => {
+export const useTimeoutPolling = <T>(
+    resource: string,
+    resourceId?: string,
+    interval?: number,
+): TimeoutPollingHook<T> => {
     const [pollingTime, setPollingTime] = useState(0);
     const [stop, setStop] = useState(false);
     const [data, setData] = useState<any>([]);
@@ -33,11 +37,48 @@ export const useTimeoutPolling = <T>(resource: string, interval?: number): Timeo
                     setPollingTime(latestTimestamp);
                 }
 
-                const remapData = (data: any[], isNew: boolean): any[] => {
+                const newData = [...data];
+                // UPDATED ITEMS
+                if (resourceId) {
+                    const updatedItems = response.data.data.filter(
+                        (item: any) => !!item.updatedAt && item.updatedAt > item.createdAt,
+                    );
+
+                    if (updatedItems.length) {
+                        updatedItems.forEach((updatedItem: any, index: number) => {
+                            if (newData.length === 0) {
+                                newData.push({ ...updatedItem });
+                            } else {
+                                const i = newData.findIndex((item: any) => {
+                                    if (!item.hasOwnProperty(resourceId) || !updatedItem.hasOwnProperty(resourceId)) {
+                                        return false;
+                                    }
+                                    return item[resourceId] === updatedItem[resourceId];
+                                });
+                                if (i !== -1) {
+                                    newData[i] = { ...updatedItems[index], isUpdated: true };
+                                } else {
+                                    newData.push({ ...newData[i], isUpdated: false, isNew: true });
+                                }
+                            }
+                        });
+                        setData(newData);
+                    }
+                }
+
+                // NEW ITEMS
+                const newItems = response.data.data.filter(
+                    (item: any) => !item.updatedAt || item.updatedAt <= item.createdAt,
+                );
+
+                const remapDataIsNew = (data: any[], isNew: boolean): any[] => {
                     return data.map((item: any) => ({ ...item, isNew }));
                 };
 
-                setData((state: any) => [...remapData(response.data.data, !!state.length), ...remapData(state, false)]);
+                setData((state: any) => [
+                    ...remapDataIsNew(newItems, !!state.length),
+                    ...remapDataIsNew(newData, false),
+                ]);
             }
         },
         enabled: !stop,
