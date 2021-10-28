@@ -34,9 +34,12 @@ export const useSyntaxHighlighter = (): UseSyntaxHighlighterHook => {
 
     const highlightLogKeywords = (logLine: string) => {
         const syntax = {
-            blue: ['INFO', 'txID', 'blockID'],
+            blue: ['INFO', 'txID', 'blockID', 'blockHeight', 'address'],
             red: ['ERR'],
             yellow: ['WARN', 'DEBU'],
+            green: ['EVT'],
+            lightGrey: [],
+            darkGrey: [],
         };
 
         Object.keys(syntax).forEach((color: string) => {
