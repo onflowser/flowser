@@ -13,16 +13,17 @@ const quickStartProject = [
         },
         emulator: null
     },
-    {
-        id: "testnet",
-        name: "Testnet",
-        isCustom: false,
-        gateway: {
-            port: 443,
-            address: "https://access-testnet.onflow.org"
-        },
-        emulator: null
-    }
+    // TODO: uncomment when support for testnet is added
+    // {
+    //     id: "testnet",
+    //     name: "Testnet",
+    //     isCustom: false,
+    //     gateway: {
+    //         port: 443,
+    //         address: "https://access-testnet.onflow.org"
+    //     },
+    //     emulator: null
+    // }
     // TODO: add config for mainnet
 ];
 
