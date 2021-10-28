@@ -299,6 +299,8 @@ export class FlowEmulatorService {
             const [key, value] = match
                 .toString()
                 .replace(/"/g, "") // remove " chars if they exist
+                // "\\x1b" or "\u001b" are ansi escape codes
+                .replace(/(\u001b)|(\\x1b)\[[^m]*m/g, "") // remove ansi color escape codes (https://regex101.com/r/PoqKom/1)
                 .split("="); // split into [key, value] pairs
             keyValuePairs.push({ [key]: value })
         }
