@@ -5,6 +5,7 @@ import Label from '../../../shared/components/label/Label';
 import CopyButton from '../../../shared/components/copy-button/CopyButton';
 import { ReactComponent as KeyIcon } from '../../../shared/assets/icons/key.svg';
 import Badge from '../../../shared/components/badge/Badge';
+import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 
 interface OwnProps {
     keys: any[]; // TODO: define type
@@ -15,12 +16,14 @@ type Props = OwnProps;
 const ContentDetailsKeys: FunctionComponent<Props> = ({ keys }) => {
     return (
         <>
-            {keys.map((key, index) => (
+            {keys.map((key: any, index: number) => (
                 <Card key={index} className={classes.root} variant="black">
                     <Label variant="large">KEY</Label>
                     <div>
                         <KeyIcon className={classes.keyIcon} />
-                        <span className={classes.blueBg}>{key.publicKey}</span>
+                        <span className={classes.blueBg}>
+                            <Ellipsis className={classes.hash}>{key.publicKey}</Ellipsis>
+                        </span>
                         <CopyButton value={key.publicKey} />
                     </div>
                     <div className={classes.badges}>

@@ -24,6 +24,13 @@
       border-radius: 8px;
       color: $color-main-text;
       font-family: $font-family-oswald;
+
+      .hash {
+        max-width: 80vw;
+        min-width: 80vw;
+        display: inline-block;
+        overflow: hidden;
+      }
     }
 
     .keyIcon {
