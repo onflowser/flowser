@@ -63,6 +63,7 @@ export class AccountsService {
             },
             {
                 $project: {
+                    id: 1,
                     createdAt: 1,
                     updatedAt: 1,
                     address: 1,
@@ -114,17 +115,24 @@ export class AccountsService {
         }
     }
 
-    update (address: string, updateAccountDto: UpdateAccountDto) {
+    replace (address: string, updateAccountDto: UpdateAccountDto) {
         // we refetch and insert the whole account entity
         // contracts & keys can be added or removed
         // therefore collection needs to be replaced and not just updated
         return this.accountRepository.replaceOne(
             { address },
-            { ...updateAccountDto, updatedAt: new Date() },
+            { ...updateAccountDto, updatedAt: new Date().getTime() },
             // TODO: why default emulator-account creation event is not logged inside a transaction ?
             // this is why we need to create new account if account doesn't exists (edge case)
             { upsert: true }
         );
+    }
+
+    update(address: string, updateAccountDto: UpdateAccountDto) {
+        return this.accountRepository.update({ address }, {
+            ...updateAccountDto,
+            updatedAt: new Date().getTime()
+        })
     }
 
     removeAll() {

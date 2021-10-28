@@ -14,7 +14,7 @@ import FullScreenLoading from '../../../shared/components/fullscreen-loading/Ful
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data: transactions, firstFetch } = useTimeoutPolling<any>('/api/accounts/polling');
+    const { data: transactions, firstFetch } = useTimeoutPolling<any>('/api/accounts/polling', 'id');
 
     useEffect(() => {
         setPlaceholder('search for block numbers or tx hashes');
@@ -41,7 +41,7 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                         <div>
                             <Label>KEY COUNT</Label>
-                            <Value>{item.keys.length}</Value>
+                            <Value>{item.keys?.length}</Value>
                         </div>
                         <div>
                             <Label>TX COUNT</Label>

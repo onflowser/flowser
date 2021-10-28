@@ -28,6 +28,6 @@ transaction {
   const name = contractName.replaceAll(/[ ]+/g, "");
   const filePath = path.join(TX_DIR_PATH, `${name}.cdc`)
   await fs.writeFile(filePath, transactionTemplate(account.address, name));
-  const data = await execute("flow", ["transactions", "send", filePath], false)
+  const data = await execute("flow", ["transactions", "send", filePath, '--signer', accountName], false)
   console.log(data)
 })()

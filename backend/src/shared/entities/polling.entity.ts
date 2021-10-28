@@ -6,7 +6,7 @@ export class PollingEntity {
     createdAt: number = new Date().getTime();
 
     @Column()
-    updatedAt: number;
+    updatedAt: number = new Date().getTime();
 
     @Column()
     deletedAt: number;

@@ -112,7 +112,7 @@ export class FlowAggregatorService {
                     .catch(e => console.error(`[Flowser] block save error: `, e))
             ))
             await Promise.all(transactions.map(e =>
-                this.transactionService.create(Transaction.init(e))
+                this.handleTransactionCreated(Transaction.init(e))
                     .catch(e => console.error(`[Flowser] transaction save error: `, e))
             ))
             await Promise.all(events.map(e =>
@@ -149,6 +149,13 @@ export class FlowAggregatorService {
         }
     }
 
+    async handleTransactionCreated(tx: Transaction) {
+        return Promise.all([
+            this.transactionService.create(tx),
+            this.accountService.update(`0x${tx.payer}`, {})
+        ])
+    }
+
     async handleAccountCreated(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
         console.log("[Flow] Account created: ", account.address);
@@ -178,9 +185,9 @@ export class FlowAggregatorService {
     async updateAccount(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
         console.log("[Flow] Account updated: ", account.address);
-        return this.accountService.update(
+        return this.accountService.replace(
             address,
-            Account.init(account, {updatedAt: new Date().getTime()})
+            Account.init(account, {updatedAt: Date.now()})
         )
     }
 }

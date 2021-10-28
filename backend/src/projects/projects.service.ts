@@ -148,7 +148,7 @@ export class ProjectsService {
 
     async update (id: string, updateProjectDto: UpdateProjectDto) {
         return this.projectRepository.findOneAndUpdate({ id },
-            { $set: { ...updateProjectDto, updatedAt: new Date() } },
+            { $set: { ...updateProjectDto, updatedAt: new Date().getTime() } },
             { upsert: true, returnOriginal: false })
             .then(res => res.value).catch(this.handleMongoError);
     }
