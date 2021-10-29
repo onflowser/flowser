@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useRef } from 'react';
 import classes from './Logs.module.scss';
 import Search from '../../shared/components/search/Search';
 import { ReactComponent as ExpandIcon } from '../../shared/assets/icons/expand.svg';

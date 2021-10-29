@@ -9,7 +9,7 @@ import FullScreenLoading from '../../../shared/components/fullscreen-loading/Ful
 import TransactionListItem from '../../../shared/components/transaction-list-item/TransactionListItem';
 
 const Main: FunctionComponent<any> = () => {
-    const { searchTerm, setPlaceholder } = useSearch();
+    const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { data, firstFetch } = useTimeoutPolling('/api/transactions/polling', '_id');
 
@@ -17,7 +17,8 @@ const Main: FunctionComponent<any> = () => {
         setPlaceholder('search for block numbers or tx hashes');
         showNavigationDrawer(false);
         showSubNavigation(true);
-    }, []);
+        disableSearchBar(!data.length);
+    }, [data]);
 
     const { filteredData } = useFilterData(data, searchTerm);
 

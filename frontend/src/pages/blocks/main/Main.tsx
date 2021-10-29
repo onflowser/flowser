@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useFormattedDate } from '../../../shared/hooks/formatted-date';
 import { useFilterData } from '../../../shared/hooks/filter-data';

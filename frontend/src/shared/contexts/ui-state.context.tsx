@@ -13,6 +13,7 @@ export const UiStateContext: any = createContext<any>([{}, () => undefined]);
 export interface UiState extends LogDrawerUiState, NavigationUiState {
     placeholder: { [key: string]: string };
     searchTerm: { [key: string]: string };
+    searchDisabled: boolean;
 
     [key: string]: any;
 }
@@ -20,6 +21,7 @@ export interface UiState extends LogDrawerUiState, NavigationUiState {
 export const defaultUiState: UiState = {
     placeholder: { default: 'Search' },
     searchTerm: { default: '' },
+    searchDisabled: false,
     logDrawerSize: 'tiny',
     breadcrumbs: [],
     isNavigationDrawerVisible: false,

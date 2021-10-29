@@ -14,6 +14,7 @@ import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useParams } from 'react-router-dom';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 import TransactionListItem from '../../../shared/components/transaction-list-item/TransactionListItem';
+import Fragment from '../../../shared/components/fragment/Fragment';
 
 type RouteParams = {
     accountId: string;
@@ -21,7 +22,7 @@ type RouteParams = {
 
 const Details: FunctionComponent<any> = () => {
     const { accountId } = useParams<RouteParams>();
-    const { setPlaceholder } = useSearch();
+    const { updateSearchBar } = useSearch();
     const { setBreadcrumbs } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { data, isLoading } = useDetailsQuery<any>(`/api/accounts/${accountId}`);
@@ -56,27 +57,31 @@ const Details: FunctionComponent<any> = () => {
             <DetailsTabs>
                 {!!data.code && (
                     <DetailsTabItem label="SCRIPTS" value="<>">
-                        <ContentDetailsScript script={data.code} />
+                        <Fragment onMount={() => updateSearchBar('search for scripts', true)}>
+                            <ContentDetailsScript script={data.code} />
+                        </Fragment>
                     </DetailsTabItem>
                 )}
                 {!!data.transactions && (
                     <DetailsTabItem label="TRANSACTIONS" value={data.transactions.length}>
-                        {data.transactions.map((item: any, i: number) => (
-                            <TransactionListItem
-                                key={i}
-                                id={item.id}
-                                referenceBlockId={item.referenceBlockId}
-                                statusCode={item.status.statusCode}
-                                payer={item.payer}
-                                proposer={item.proposalKey.address}
-                            />
-                        ))}
+                        <Fragment onMount={() => updateSearchBar('search for transactions', !data.transactions.length)}>
+                            {data.transactions.map((item: any, i: number) => (
+                                <TransactionListItem
+                                    key={i}
+                                    id={item.id}
+                                    referenceBlockId={item.referenceBlockId}
+                                    statusCode={item.status.statusCode}
+                                    payer={item.payer}
+                                    proposer={item.proposalKey.address}
+                                />
+                            ))}
+                        </Fragment>
                     </DetailsTabItem>
                 )}
                 <DetailsTabItem
                     label="CONTRACTS"
                     value={data.contracts.length}
-                    onClick={() => setPlaceholder('search for contracts')}
+                    onClick={() => updateSearchBar('search for contracts', !data.contracts.length)}
                 >
                     {data.contracts.map((contract: any, index: number) => (
                         <CollapsibleCard
@@ -87,12 +92,16 @@ const Details: FunctionComponent<any> = () => {
                             variant="black"
                             className={classes.script}
                         >
-                            <ContentDetailsScript script={contract.code} />
+                            <Fragment onMount={() => updateSearchBar('search for contracts', !data.contracts.length)}>
+                                <ContentDetailsScript script={contract.code} />
+                            </Fragment>
                         </CollapsibleCard>
                     ))}
                 </DetailsTabItem>
-                <DetailsTabItem label="KEYS" value={data.keys.length} onClick={() => setPlaceholder('search for keys')}>
-                    <ContentDetailsKeys keys={data.keys} />
+                <DetailsTabItem label="KEYS" value={data.keys.length}>
+                    <Fragment onMount={() => updateSearchBar('search for keys', !data.keys.length)}>
+                        <ContentDetailsKeys keys={data.keys} />
+                    </Fragment>
                 </DetailsTabItem>
             </DetailsTabs>
         </div>

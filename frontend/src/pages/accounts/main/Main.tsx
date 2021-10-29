@@ -12,7 +12,7 @@ import NoResults from '../../../shared/components/no-results/NoResults';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 
 const Main: FunctionComponent<any> = () => {
-    const { searchTerm, setPlaceholder } = useSearch();
+    const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { data: transactions, firstFetch } = useTimeoutPolling<any>('/api/accounts/polling', 'id');
 
@@ -21,6 +21,10 @@ const Main: FunctionComponent<any> = () => {
         showNavigationDrawer(false);
         showSubNavigation(true);
     }, []);
+
+    useEffect(() => {
+        disableSearchBar(!transactions.length);
+    }, [transactions]);
 
     const { filteredData } = useFilterData(transactions, searchTerm);
 

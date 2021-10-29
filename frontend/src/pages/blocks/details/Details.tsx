@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { useSearch } from '../../../shared/hooks/search';
 import { Breadcrumb, useNavigation } from '../../../shared/hooks/navigation';
@@ -14,12 +14,7 @@ import { useDetailsQuery } from '../../../shared/hooks/details-query';
 import { useTimeoutPolling } from '../../../shared/hooks/timeout-polling';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 import { isInitialParentId } from '../../../shared/functions/utils';
-
-enum ContentDetails {
-    HEIGHT = 'height',
-    TRANSACTIONS = 'transactions',
-    COLLECTIONS = 'collections',
-}
+import Fragment from '../../../shared/components/fragment/Fragment';
 
 type RouteParams = {
     blockId: string;
@@ -27,11 +22,9 @@ type RouteParams = {
 
 const Details: FunctionComponent<any> = () => {
     const { blockId } = useParams<RouteParams>();
-    const { setPlaceholder } = useSearch();
-    const { setBreadcrumbs, showSearchBar } = useNavigation();
+    const { disableSearchBar, updateSearchBar } = useSearch();
+    const { setBreadcrumbs } = useNavigation();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const [contentDetails, setContentDetails] = useState(ContentDetails.HEIGHT);
-
     const breadcrumbs: Breadcrumb[] = [{ to: '/blocks', label: 'Blocks' }, { label: 'Details' }];
 
     const { isLoading, data } = useDetailsQuery(`/api/blocks/${blockId}`);
@@ -42,20 +35,8 @@ const Details: FunctionComponent<any> = () => {
         showNavigationDrawer(true);
         showSubNavigation(false);
         setBreadcrumbs(breadcrumbs);
-        showSearchBar(false);
+        disableSearchBar(true);
     }, []);
-
-    useEffect(() => {
-        showSearchBar(contentDetails !== ContentDetails.HEIGHT);
-        switch (contentDetails) {
-            case ContentDetails.TRANSACTIONS:
-                setPlaceholder('search for transactions');
-                break;
-            case ContentDetails.COLLECTIONS:
-                setPlaceholder('search for collections');
-                break;
-        }
-    }, [contentDetails]);
 
     if (isLoading || !data) {
         return <FullScreenLoading />;
@@ -89,23 +70,23 @@ const Details: FunctionComponent<any> = () => {
 
             <DetailsTabs>
                 <DetailsTabItem label="HEIGHT" value="1" />
-                <DetailsTabItem
-                    label="TRANSACTIONS"
-                    value={transactions.length}
-                    onClick={() => setPlaceholder('search for transactions')}
-                >
-                    {transactions &&
-                        transactions.map((transaction: any, index) => (
-                            <Card variant="black" key={index} className={classes.transactionListItem}>
-                                <Label>TRANSACTION ID</Label>
-                                <Value>
-                                    <NavLink to={`/transactions/details/${transaction.id}`}>{transaction.id}</NavLink>
-                                </Value>
-                            </Card>
-                        ))}
+                <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
+                    <Fragment onMount={() => updateSearchBar('search for transactions', !transactions.length)}>
+                        {transactions &&
+                            transactions.map((transaction: any, index) => (
+                                <Card variant="black" key={index} className={classes.transactionListItem}>
+                                    <Label>TRANSACTION ID</Label>
+                                    <Value>
+                                        <NavLink to={`/transactions/details/${transaction.id}`}>
+                                            {transaction.id}
+                                        </NavLink>
+                                    </Value>
+                                </Card>
+                            ))}
+                    </Fragment>
                 </DetailsTabItem>
 
-                <DetailsTabItem label="COLLECTIONS" value={2} />
+                <DetailsTabItem label="COLLECTIONS" value={data.collectionGuarantees?.length || 0} />
             </DetailsTabs>
         </div>
     );

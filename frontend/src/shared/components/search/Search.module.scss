@@ -34,4 +34,9 @@
     padding-left: 0;
     text-transform: uppercase;
   }
+
+  &.disabled {
+    border: 1px solid $color-not-active-button-text-grey;
+    opacity: .5;
+  }
 }
