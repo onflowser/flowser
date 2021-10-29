@@ -17,12 +17,7 @@ export class FlowGatewayService {
 
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         this.configuration = configuration;
-        fcl.config().put("accessNode.api", this.configuration ? this.url() : null)
-    }
-
-    private url() {
-        const host = `${this.configuration.address}:${this.configuration.port}`
-        return host.startsWith("http") ? host : `http://${host}`;
+        fcl.config().put("accessNode.api", this.configuration?.url())
     }
 
     public async getLatestBlock (): Promise<FlowBlock> {

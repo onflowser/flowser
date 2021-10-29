@@ -80,7 +80,7 @@ export class FlowAggregatorService {
 
         // user can specify (on a project level) what is the starting block height
         // if user provides no specification, the latest block height is used
-        const initialStartBlockHeight = this.project.startBlockHeight === undefined
+        const initialStartBlockHeight = !this.project.isStartBlockHeightDefined()
             ? latestBlock.height
             : this.project.startBlockHeight;
         // fetch from last stored block (if there are already blocks in the database)

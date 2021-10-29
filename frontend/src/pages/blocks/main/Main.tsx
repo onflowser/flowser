@@ -28,6 +28,9 @@ const Main: FunctionComponent<any> = () => {
 
     const { filteredData } = useFilterData(transactions, searchTerm);
 
+    // TODO: some items only include isUpdated and isNew fields
+    console.log(filteredData.filter((e: any) => !e.signatures));
+
     return (
         <>
             {filteredData &&
@@ -63,15 +66,15 @@ const Main: FunctionComponent<any> = () => {
                         </div>
                         <div>
                             <Label>COLLECTION GUARANTEES</Label>
-                            <Value>{item.collectionGuarantees.length}</Value>
+                            <Value>{item.collectionGuarantees?.length}</Value>
                         </div>
                         <div>
                             <Label>BLOCK SEALS</Label>
-                            <Value>{item.blockSeals.length}</Value>
+                            <Value>{item.blockSeals?.length}</Value>
                         </div>
                         <div>
                             <Label>SIGNATURES</Label>
-                            <Value>{item.signatures.length}</Value>
+                            <Value>{item.signatures?.length}</Value>
                         </div>
                     </Card>
                 ))}
