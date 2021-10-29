@@ -3,28 +3,32 @@
 @import 'styles/typography';
 @import 'styles/animations';
 
+.dialog {
+  min-width: 800px !important;
+  max-width: 800px !important;
+}
+
 .root {
   display: flex;
   flex-direction: column;
+  align-items: center;
   color: $color-white;
   padding: $spacing-l * 3 $spacing-l * 6;
   @include fadeInAnimation(.5s);
 
+  .icon {
+    width: 70px;
+  }
 
   h3 {
+    margin-top: $spacing-base;
     margin-bottom: $spacing-base * 3;
     font-size: $font-size-xlarge;
     text-align: center;
   }
 
-  span {
-    margin-bottom: $spacing-base;
-    font-size: $font-size-normal;
-    text-align: center;
-  }
-
   .actions {
-    margin-top: $spacing-base * 2;
+    margin-top: $spacing-base * 3;
     display: flex;
     align-items: center;
 
@@ -33,7 +37,7 @@
     }
 
     & > * + * {
-      margin-left: $spacing-base;
+      margin-left: $spacing-base * 3;
     }
   }
 }

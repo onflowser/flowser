@@ -5,6 +5,8 @@ import classes from './TransactionDialog.module.scss';
 import Input from '../input/Input';
 import { useFlow } from '../../hooks/flow';
 import { toast } from 'react-hot-toast';
+import { ReactComponent as TxIcon } from '../../assets/icons/flow.svg';
+import TextArea from '../text-area/TextArea'; // TODO: replace with "bottle" icon
 
 const ConfirmDialog: FunctionComponent = () => {
     const [show, setShow] = useState<any>(true);
@@ -17,9 +19,11 @@ const ConfirmDialog: FunctionComponent = () => {
 
     async function onConfirm() {
         try {
-            await sendTransaction(code);
+            const result = await sendTransaction(code);
+            console.log({ result });
+            toast('Transaction sent!');
         } catch (e: any) {
-            toast.error(`Failed to send transaction: ${e.message}`);
+            toast.error(e.message ? `Failed to send transaction: ${e.message}` : e);
         }
     }
 
@@ -28,12 +32,11 @@ const ConfirmDialog: FunctionComponent = () => {
     }
 
     return (
-        <Dialog onClose={onClose}>
+        <Dialog className={classes.dialog} onClose={onClose}>
             <div className={classes.root}>
-                <h3>Send transaction</h3>
-                <span>Send a transaction using dev-wallet. TODO: add better title & description</span>
-                {/* TODO: replace with text area input */}
-                <Input type="text" value={code} onChange={(e) => setCode(e.target.value)} />
+                <TxIcon className={classes.icon} />
+                <h3>SEND A TRANSACTION</h3>
+                <TextArea rows={10} placeholder="Cadence code" value={code} onChange={(e) => setCode(e.target.value)} />
                 <div className={classes.actions}>
                     <Button outlined={true} variant="middle" onClick={onClose}>
                         Cancel

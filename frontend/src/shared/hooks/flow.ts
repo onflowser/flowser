@@ -18,8 +18,7 @@ export function useFlow() {
             limit: 50,
         });
 
-        const transaction = await fcl.tx(transactionId).onceSealed();
-        console.log(transaction);
+        return fcl.tx(transactionId).onceSealed();
     }
 
     function logout() {
