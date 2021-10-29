@@ -3,6 +3,11 @@
 .root {
   position: relative;
 
+  .before, .after, .afterEnd {
+    display: flex;
+    align-items: center;
+  }
+
   .before svg {
     margin-right: $spacing-base;
   }
