@@ -20,9 +20,13 @@
     width: 70px;
   }
 
+  .arguments {
+    margin-top: $spacing-base * 3;
+  }
+
   h3 {
-    margin-top: $spacing-base;
-    margin-bottom: $spacing-base * 3;
+    margin-top: $spacing-base * 2;
+    margin-bottom: $spacing-base * 4;
     font-size: $font-size-xlarge;
     text-align: center;
   }

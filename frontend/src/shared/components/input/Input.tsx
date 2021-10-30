@@ -6,14 +6,21 @@ interface OwnProps {
     value?: any;
     disabled?: boolean;
     onChange?: (e: any) => void;
+    [key: string]: any;
 }
 
 type Props = OwnProps;
 
-const Input: FunctionComponent<Props> = ({ type = 'text', value = '', disabled = false, onChange = () => false }) => {
+const Input: FunctionComponent<Props> = ({
+    type = 'text',
+    value = '',
+    disabled = false,
+    onChange = () => false,
+    ...restProps
+}) => {
     return (
         <div className={classes.root}>
-            <input disabled={disabled} type={type} value={value} onChange={onChange} />
+            <input disabled={disabled} type={type} value={value} onChange={onChange} {...restProps} />
         </div>
     );
 };

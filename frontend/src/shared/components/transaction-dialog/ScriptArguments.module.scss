@@ -1,0 +1,46 @@
+@import 'styles/spacings';
+@import 'styles/colors';
+
+.root {
+  width: 100%;
+
+  .arguments {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .argument {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: $spacing-base * 1.4;
+
+    & > div:first-child {
+      margin-right: $spacing-base;
+    }
+
+    & > div:not(:last-child) {
+      flex: 1;
+    }
+
+    & > div:last-child {
+      flex: 0.1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      button {
+        padding: 0;
+      }
+    }
+  }
+
+  .removeButton {
+    background: none !important;
+    border: none !important;
+  }
+
+  .addButton {
+    margin-top: $spacing-s;
+  }
+}
