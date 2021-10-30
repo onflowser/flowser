@@ -25,9 +25,9 @@ const Main: FunctionComponent<any> = () => {
         try {
             await useProject(name);
             history.push(`/${routes.firstRouteAfterStart}`);
-        } catch (e) {
+        } catch (e: any) {
             setError(
-                'Can not use emulator. Make sure emulator is running on your local machine! You can also start emulator manually by clicking on "ADD CUSTOM EMULATOR" button',
+                `Can not connect to "${name}". If you want to connect to your local host emulator make sure it is running. You can also start new emulator manually by clicking on "ADD CUSTOM EMULATOR" button`,
             );
             return false;
         }
