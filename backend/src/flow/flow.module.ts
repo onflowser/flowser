@@ -10,6 +10,7 @@ import { FlowController } from "./flow.controller";
 import { FlowEmulatorService } from "./services/flow-emulator.service";
 import { LogsModule } from "../logs/logs.module";
 import { FlowCliConfigService } from "./services/flow-cli-config.service";
+import { StorageDataService } from './services/storage-data.service';
 
 @Module({
     imports: [
@@ -28,12 +29,14 @@ import { FlowCliConfigService } from "./services/flow-cli-config.service";
         FlowAggregatorService,
         FlowGatewayService,
         FlowEmulatorService,
-        FlowCliConfigService
+        FlowCliConfigService,
+        StorageDataService,
     ],
     exports: [
         FlowAggregatorService,
         FlowGatewayService,
-        FlowEmulatorService
+        FlowEmulatorService,
+        StorageDataService,
     ]
 })
 export class FlowModule {

@@ -19,6 +19,7 @@ import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { plainToClass } from "class-transformer";
+import { StorageDataService } from '../flow/services/storage-data.service';
 
 @Injectable()
 export class ProjectsService {
@@ -35,7 +36,8 @@ export class ProjectsService {
         private blocksService: BlocksService,
         private eventsService: EventsService,
         private logsService: LogsService,
-        private transactionsService: TransactionsService
+        private transactionsService: TransactionsService,
+        private storageDataService: StorageDataService,
     ) {
     }
 
@@ -60,6 +62,10 @@ export class ProjectsService {
         // user may have previously used a custom emulator project
         // make sure that in any running emulators are stopped
         await this.flowAggregatorService.stopEmulator();
+        try {
+            await this.storageDataService.stop();
+        } catch (e) {
+        }
 
         // update project context
         this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
@@ -74,7 +80,13 @@ export class ProjectsService {
                         `Can not start emulator with project id ${id}`,
                         e.message
                     )
-                })
+                });
+
+            try {
+                await this.storageDataService.start();
+            } catch (e) {
+                throw new ServiceUnavailableException('Data storage service error: ', e.message);
+            }
         }
 
         if (

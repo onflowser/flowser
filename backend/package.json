@@ -31,6 +31,7 @@
     "@nestjs/typeorm": "^8.0.2",
     "@onflow/fcl": "^0.0.77",
     "@onflow/types": "^0.0.5",
+    "axios": "^0.21.4",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "kebab-case": "^1.0.1",

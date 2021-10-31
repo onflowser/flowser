@@ -16,11 +16,13 @@ services:
       - MONGODB_HOST=${MONGODB_HOST}
       - MONGODB_PORT=${MONGODB_PORT}
       - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - FLOW_DATA_STORAGE_PORT=${FLOW_DATA_STORAGE_PORT}
     expose:
       - ${APP_BACKEND_PORT}
       - ${FLOW_EMULATOR_PORT}
     ports:
       - ${APP_BACKEND_PORT}:${APP_BACKEND_PORT}
+      - 127.0.0.1:8888:8888 # remove
     networks:
       - flowser-network
     volumes:

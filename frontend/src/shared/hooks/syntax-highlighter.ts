@@ -3,11 +3,23 @@ import Prism from 'prismjs';
 export interface UseSyntaxHighlighterHook {
     highlightCadenceSyntax: (source: string) => string;
     highlightLogKeywords: (logLine: string) => string;
+    highlightJsonSyntax: (json: string | any) => string;
 }
 
 export type FlowserSupportedLanguages = 'flow' | 'logs';
 
 export const useSyntaxHighlighter = (): UseSyntaxHighlighterHook => {
+    const highlightJsonSyntax = (source: any) => {
+        source = JSON.stringify(source, null, 2);
+        source = Prism.highlight(source, Prism.languages.javascript, 'json');
+        source = source.replace(
+            /(<span class="token string">"([^"]+)"<\/span>)<span class="token operator">:<\/span>/g,
+            '<span class="token property">$2</span>:',
+        );
+
+        return source;
+    };
+
     const highlightCadenceSyntax = (source: string) => {
         source = Prism.highlight(source, Prism.languages.javascript, 'javascript');
 
@@ -55,6 +67,7 @@ export const useSyntaxHighlighter = (): UseSyntaxHighlighterHook => {
     };
 
     return {
+        highlightJsonSyntax,
         highlightCadenceSyntax,
         highlightLogKeywords,
     };

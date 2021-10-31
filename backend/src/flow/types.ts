@@ -1,3 +1,5 @@
+import { AccountsStorage } from '../accounts/entities/storage.entity';
+
 export type FlowCollectionGuarantee = {
  collectionId: string;
  signatures: string[]
@@ -29,6 +31,7 @@ export type FlowAccount = {
   code: string;
   contracts: Map<string, string>;
   keys: FlowKey[];
+  storage?: AccountsStorage;
 }
 
 export type FlowCollection = {
