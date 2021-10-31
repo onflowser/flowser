@@ -53,6 +53,7 @@ export class StorageDataService {
         // TODO: Resource url
         let response;
         try {
+            // TODO: Improve once Data storage will be configurable
             response = await axios.get('http://backend:8888/storage')
         } catch (e) {
             console.error('Error fetching storage:', e.message);
