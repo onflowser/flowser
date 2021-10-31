@@ -59,7 +59,7 @@ export class ProjectsController {
 
     @Delete('/use')
     async unUseProject(@Param('id') id: string):Promise<void> {
-        return await this.projectsService.unUseProject();
+        return await this.projectsService.cleanupProject();
     }
 
     @ApiParam({ name: "id", type: String })

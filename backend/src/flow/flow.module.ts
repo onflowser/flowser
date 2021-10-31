@@ -33,7 +33,8 @@ import { FlowCliConfigService } from "./services/flow-cli-config.service";
     exports: [
         FlowAggregatorService,
         FlowGatewayService,
-        FlowEmulatorService
+        FlowEmulatorService,
+        FlowCliConfigService
     ]
 })
 export class FlowModule {

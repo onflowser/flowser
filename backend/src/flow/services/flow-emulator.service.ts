@@ -36,7 +36,6 @@ export class FlowEmulatorService {
     configureProjectContext (project: Project) {
         this.projectId = project?.id;
         this.configuration = project.emulator;
-        this.flowCliConfig.configure(this.projectId, this.configuration);
     }
 
     async init () {
@@ -221,7 +220,9 @@ export class FlowEmulatorService {
             flag("storage-limit", this.configuration.storageLimit),
             flag("transaction-fees", this.configuration.transactionFees),
             flag("dbpath", this.configuration.databasePath || this.flowCliConfig.databaseDirPath),
-            flag("persist", this.configuration.persist),
+            // flow emulator is always started with persist flag
+            // this is needed, so that storage script can index the db
+            flag("persist", true),
             flag("verbose", this.configuration.verboseLogging),
             flag("init", true)
         ].filter(Boolean);
