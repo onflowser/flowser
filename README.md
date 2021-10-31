@@ -1,5 +1,5 @@
 <div align="center">
-	<img alt="Flowser logo" src="./assets/logo.png" width="200" height="200">
+	<img alt="Flowser logo" src="./assets/logo.png" width="150" height="150">
 	<h1>Flowser</h1>
 	<p>
 		<b>Easily inspect and debug Flow blockchain ⛓</b>
@@ -13,29 +13,29 @@ This is a convenient development tool for Flow blockchain, which starts and inde
 
 ## ✨ Features
 
-### Flow emulator 🕹🎛
+### Flow emulator 🕹
 Configure and run managed flow emulator projects or start your own emulator instance on localhost
 
 ### Inspect blockchain 🕵️
 Flowser allows you to inspect the current state of the flow blockchain. 
 Every new change is automatically detected and displayed in the UI. 
 You can view & search thought the following objects:
-- **logs**<br>Only available for managed emulator projects.
-- **accounts** 
+- 📄**logs** (only available for managed emulator projects)
+- 👤**accounts** 
   - transactions
   - contracts
   - keys
   - storage
-- **blocks**
+- 📦**blocks**
   - transactions
   - collections
-- **transactions**
+- 💳**transactions**
   - script
   - signatures
   - events
-- **contracts**
+- 📝**contracts**
   - code
-- **events**
+- 📅**events**
   - data
 
 ### Dev wallet 👛
@@ -50,7 +50,7 @@ Learn how to import flowser open api specification to:
 - [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
 - [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
 
-## 🏃 Get started
+## 👋 Get started
 
 ### Clone flowser repository
 
@@ -63,3 +63,19 @@ git clone https://github.com/bartolomej/flowser
 ```bash
 docker-compose up -d
 ```
+
+## 💻 Contributing
+
+If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/bartolomej/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/bartolomej/flowser/issues/new).
+
+See [Development Guides](./DEVELOPMENT.md) for more info on setting up development environment. 
+
+## 🛠️ Build with
+
+- [Node.js](https://nodejs.org/) 
+- [Nest.js](https://nestjs.com/)
+- [React.js](https://reactjs.org/)
+- [Docker](https://www.docker.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [flow-cli](https://github.com/onflow/flow-cli)
+- [flow-fcl](https://github.com/onflow/fcl-js)
