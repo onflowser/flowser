@@ -41,6 +41,17 @@
   }
 
   .addButton {
+    padding: 0;
+    width: 100%;
+    background: $color-link-blue;
+    border-color: $color-link-blue;
     margin-top: $spacing-s;
+    span {
+      display: flex;
+      justify-content: center;
+    }
+    svg * {
+      fill: $color-background;
+    }
   }
 }

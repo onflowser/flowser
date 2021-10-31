@@ -8,6 +8,19 @@
   max-width: 800px !important;
 }
 
+.toast {
+  .transactionId {
+    max-width: 20vw;
+    display: inline-block;
+    overflow: hidden;
+  }
+  a {
+    color: $color-background;
+    font-weight: bolder;
+    vertical-align: middle;
+  }
+}
+
 .root {
   display: flex;
   flex-direction: column;

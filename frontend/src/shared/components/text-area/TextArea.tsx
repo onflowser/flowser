@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { ForwardRefRenderFunction, FunctionComponent, LegacyRef } from 'react';
 import classes from './TextArea.module.scss';
 
 interface OwnProps {
@@ -11,18 +11,16 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const TextArea: FunctionComponent<Props> = ({
-    rows = 6,
-    value = '',
-    disabled = false,
-    onChange = () => false,
-    ...restProps
-}) => {
+const TextArea: ForwardRefRenderFunction<HTMLTextAreaElement, Props> = (
+    // eslint-disable-next-line react/prop-types
+    { rows = 6, value = '', disabled = false, onChange = () => false, ...restProps },
+    ref,
+) => {
     return (
         <div className={classes.root}>
-            <textarea rows={rows} disabled={disabled} value={value} onChange={onChange} {...restProps} />
+            <textarea ref={ref} rows={rows} disabled={disabled} value={value} onChange={onChange} {...restProps} />
         </div>
     );
 };
 
-export default TextArea;
+export default React.forwardRef(TextArea);

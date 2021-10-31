@@ -21,7 +21,6 @@ import axios from '../../../shared/config/axios';
 import { useProjectApi } from '../../../shared/hooks/project-api';
 import { useFlow } from '../../../shared/hooks/flow';
 import TransactionDialog from '../../../shared/components/transaction-dialog/TransactionDialog';
-import { ReactComponent as CaretIcon } from '../../../shared/assets/icons/caret.svg';
 
 export interface Counters {
     accounts: number;
@@ -40,6 +39,7 @@ const Navigation = (props: any) => {
     const { isLoggedIn, login, logout } = useFlow();
 
     const onSwitchProject = useCallback(async () => {
+        await logout(); // logout from dev-wallet, because config may change
         await axios.delete('/api/projects/use'); // stop current emulator
         history.push(`/${routes.start}`);
     }, []);
@@ -159,7 +159,7 @@ const Navigation = (props: any) => {
                         {isSearchBarVisible && <Search className={classes.searchBar} />}
                     </div>
                 )}
-                {showTxDialog && <TransactionDialog />}
+                <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
             </div>
         </>
     );

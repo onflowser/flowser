@@ -4,10 +4,10 @@ import Input from '../input/Input';
 // @ts-ignore
 import * as t from '@onflow/types';
 import SelectInput from '../select-input/SelectInput';
-import Button from '../button/Button';
 import { FlowScriptArgument } from '../../hooks/flow';
 import IconButton from '../icon-button/IconButton';
 import { ReactComponent as DeleteIcon } from '../../assets/icons/cancel.svg';
+import { ReactComponent as PlusIcon } from '../../assets/icons/plus.svg';
 
 type Props = {
     className: string;
@@ -49,9 +49,10 @@ const ScriptArguments: FC<Props> = ({ className, onChange }) => {
                     />
                 ))}
             </div>
-            <Button className={classes.addButton} onClick={onAddArg}>
+            {/* TODO: set width to 100% and background to blue */}
+            <IconButton icon={<PlusIcon />} className={classes.addButton} onClick={onAddArg}>
                 Add argument
-            </Button>
+            </IconButton>
         </div>
     );
 };

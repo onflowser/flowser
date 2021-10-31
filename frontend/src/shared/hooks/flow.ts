@@ -24,7 +24,10 @@ export function useFlow() {
             limit: 50,
         });
 
-        return fcl.tx(transactionId).onceSealed();
+        return {
+            transactionId,
+            status: await fcl.tx(transactionId).onceSealed(),
+        };
     }
 
     async function logout() {
