@@ -17,20 +17,20 @@ type Props = {
 const ScriptArguments: FC<Props> = ({ className, onChange }) => {
     const [args, setArgs] = useState<FlowScriptArgument[]>([]);
 
-    function updateArgs(value: any, index: number) {
-        const tempArgs: any = args;
+    function updateArgs(value: FlowScriptArgument, index: number) {
+        const tempArgs = args;
         tempArgs[index] = value;
         setArgs(tempArgs);
     }
 
     function onRemove(index: number) {
-        const tempArgs: any = args;
+        const tempArgs = args;
         tempArgs.splice(index, 1);
         setArgs(tempArgs);
     }
 
     function onAddArg() {
-        setArgs([...args, { value: null, type: null }]);
+        setArgs([...args, { value: '', type: '' }]);
     }
 
     useEffect(() => {
@@ -65,6 +65,14 @@ type ArgumentItemProps = {
 
 const flowTypes = Object.keys(t).filter((type) => typeof t[type] !== 'function');
 
+const flowTypeOptions = [
+    { value: '', label: 'Choose type' },
+    ...flowTypes.map((typeName) => ({
+        label: typeName,
+        value: typeName,
+    })),
+];
+
 const ArgumentItem: FC<ArgumentItemProps> = ({ onChange, onRemove, value: { value, type } }) => (
     <div className={classes.argument}>
         <div>
@@ -74,11 +82,10 @@ const ArgumentItem: FC<ArgumentItemProps> = ({ onChange, onRemove, value: { valu
             <SelectInput
                 placeholder="Type"
                 value={type}
-                onChange={(e) => onChange({ value, type: e.target.value })}
-                options={flowTypes.map((typeName) => ({
-                    label: typeName,
-                    value: typeName,
-                }))}
+                onChange={(e) => {
+                    onChange({ value, type: e.target.value });
+                }}
+                options={flowTypeOptions}
             />
         </div>
         <div>

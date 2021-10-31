@@ -2,13 +2,14 @@ import React, { FC, useEffect, useState } from 'react';
 import Dialog from '../dialog/Dialog';
 import Button from '../button/Button';
 import classes from './TransactionDialog.module.scss';
-import { useFlow } from '../../hooks/flow';
+import { FlowScriptArgument, useFlow } from '../../hooks/flow';
 import { toast } from 'react-hot-toast';
 import { ReactComponent as TxIcon } from '../../assets/icons/bottle.svg';
 import ScriptArguments from './ScriptArguments';
 import CadenceEditor from '../cadence-editor/CadenceEditor';
 import { NavLink } from 'react-router-dom';
 import Ellipsis from '../ellipsis/Ellipsis';
+import { isValueSet } from '../../functions/utils';
 
 type Props = {
     show?: boolean;
@@ -17,7 +18,7 @@ type Props = {
 
 const TransactionDialog: FC<Props> = ({ show, setShow }) => {
     const [code, setCode] = useState<any>('');
-    const [args, setArgs] = useState<any>([]);
+    const [args, setArgs] = useState<FlowScriptArgument[]>([]);
     const [loading, setLoading] = useState(false);
     const { sendTransaction } = useFlow();
 
@@ -25,9 +26,27 @@ const TransactionDialog: FC<Props> = ({ show, setShow }) => {
         setShow(false);
     }
 
+    function validateArgs() {
+        let valid = false;
+        const unsetValues = args.filter((arg) => !isValueSet(arg.value));
+        const unsetTypes = args.filter((arg) => !isValueSet(arg.type));
+
+        if (unsetValues.length > 0) {
+            toast.error('Some values are undefined!');
+        }
+        if (unsetTypes.length > 0) {
+            toast.error('Some types are undefined!');
+        }
+        valid = unsetValues.length === 0 && unsetTypes.length === 0;
+        return valid;
+    }
+
     async function onConfirm() {
         setLoading(true);
         try {
+            if (!validateArgs()) {
+                return;
+            }
             // edge case: if dev-wallet can't retrieve accounts
             // e.g. emulator access node is not running
             // it will dim the screen, but not open the modal window

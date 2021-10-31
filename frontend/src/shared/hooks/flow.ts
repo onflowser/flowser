@@ -6,7 +6,7 @@ import * as fcl from '@onflow/fcl';
 import * as t from '@onflow/types';
 import { toast } from 'react-hot-toast';
 
-export type FlowScriptArgument = { value: any; type: any };
+export type FlowScriptArgument = { value: any; type: string };
 
 export function useFlow() {
     const [user, setUser] = useState({ loggedIn: null });
@@ -14,7 +14,6 @@ export function useFlow() {
     useEffect(() => fcl.currentUser().subscribe(setUser), []);
 
     async function sendTransaction(code: string, args: FlowScriptArgument[]) {
-        console.log(args); // TODO: test this
         const transactionId = await fcl.mutate({
             cadence: code,
             args: (arg: any, t: any) => args.map((e) => arg(e.value, t[e.type])),
