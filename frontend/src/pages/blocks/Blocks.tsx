@@ -1,16 +1,15 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import Main from './main/Main';
+import Details from './details/Details';
 
-interface OwnProps {
-    some?: string;
-}
-
-type Props = OwnProps;
-
-const Blocks: FunctionComponent<Props> = (props) => {
+const Blocks = () => {
     return (
-        <div>
-            <h2>Blocks</h2>
-        </div>
+        <Switch>
+            <Route exact path={`/blocks`} component={Main} />
+            <Route path={`/blocks/details/:blockId`} component={Details} />
+            <Redirect from="*" to={`/blocks`} />
+        </Switch>
     );
 };
 

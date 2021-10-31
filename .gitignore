@@ -1,1 +1,8 @@
 .idea
+.DS_Store
+.env
+database/db
+flowdb
+flow.json
+.flowser
+.envrc

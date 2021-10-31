@@ -1,0 +1,61 @@
+@import 'styles/typography';
+@import 'styles/spacings';
+@import 'styles/colors';
+
+.root {
+  font-family: $font-family-courier-new;
+  font-weight: lighter;
+  padding: $spacing-base * 3;
+
+  .argsTitle {
+    margin-bottom: $spacing-base * 2;
+    display: block;
+  }
+
+  .argListItem {
+    display: flex;
+    align-items: baseline;
+    font-family: $font-family-oswald;
+    font-weight: 100;
+    font-size: $font-size-small;
+
+    margin-bottom: $spacing-base;
+    margin-left: $spacing-base * 3;
+
+    & > span:not(:first-child) {
+      margin-left: $spacing-l;
+      display: inline-flex;
+    }
+
+    .argValue {
+      max-width: 20vw;
+      min-width: 10px;
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    & > span:first-child {
+      border-radius: 50%;
+      background-color: $color-main-yellow;
+      color: $color-table-black;
+      opacity: .8;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      min-height: 18px;
+      line-height: 14px;
+      text-align: center;
+      align-items: baseline;
+      justify-content: center;
+    }
+
+    & > span.value {
+      margin-left: $spacing-base * 0.5;
+    }
+  }
+
+  .codeTitle {
+    margin-top: $spacing-l * 2;
+    display: block;
+  }
+}

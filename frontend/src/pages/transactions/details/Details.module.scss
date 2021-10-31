@@ -1,0 +1,103 @@
+@import 'styles/spacings';
+@import 'styles/animations';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  max-width: 1690px;
+  width: 100%;
+  margin-top: 48px;
+
+  .firstLine {
+    margin-bottom: $spacing-l * 2;
+  }
+
+  .twoColumns {
+    display: flex;
+    .inlineValue,
+    .inlineLabel {
+      margin-left: $spacing-l * 2;
+    }
+  }
+
+  .authorizersAddress {
+    display: block;
+    margin-bottom: $spacing-s;
+  }
+
+  .authorizersLabel {
+    vertical-align: top;
+  }
+
+  .detailsItemsWrapper {
+    display: flex;
+    justify-content: space-between;
+    margin-top: $spacing-l;
+  }
+
+  .listCard {
+    display: flex;
+    justify-content: space-between;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  .hash {
+    max-width: 30vw;
+    min-width: 30vw;
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .detailsTable {
+    margin-bottom: $spacing-base;
+    position: relative;
+    margin-left: auto;
+    display: flex;
+  }
+
+  .card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-base $spacing-l;
+    margin-bottom: $spacing-base;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      padding-right: $spacing-base * 2;
+      flex: 10;
+    }
+
+    & > div:nth-child(2) {
+      flex: 16;
+      overflow-wrap: anywhere;
+    }
+
+    & > div:nth-child(3),
+    & > div:nth-child(4) {
+      flex: 4;
+    }
+
+    & > div:last-child {
+      flex: 1;
+      align-items: flex-end;
+      padding-right: 0;
+    }
+
+    &.isNew {
+      @include addNewContentAnimation(.4s);
+    }
+
+    .hash {
+      max-width: 20vw;
+      min-width: 20vw;
+      display: inline-block;
+      overflow: hidden;
+    }
+  }
+}

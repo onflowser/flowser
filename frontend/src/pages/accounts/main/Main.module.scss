@@ -1,0 +1,21 @@
+@import 'styles/spacings';
+@import 'styles/animations';
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-base $spacing-l;
+  margin-bottom: $spacing-base;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &.isNew {
+    @include addNewContentAnimation(.4s);
+  }
+}
+.noResults {
+  margin-top: $spacing-l * 6;
+}

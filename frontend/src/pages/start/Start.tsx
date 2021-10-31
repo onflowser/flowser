@@ -1,29 +1,16 @@
 import React, { FunctionComponent } from 'react';
-import classes from './Start.module.scss';
-import axios from 'axios';
-import { useQuery } from 'react-query';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import Main from './main/Main';
+import Configuration from './configuration/Configuration';
 
-interface OwnProps {
-    some: string;
-}
-
-type Props = OwnProps;
-
-const Start: FunctionComponent<Props> = (props) => {
-    const fetchData = (): Promise<any[]> => {
-        return axios.get('/api').then((response) => response.data);
-    };
-
-    const useGroups = () => {
-        return useQuery('groups', fetchData);
-    };
-
-    const { data } = useGroups();
-
+const Start: FunctionComponent<any> = () => {
     return (
-        <div className={classes.container}>
-            <h1>Start</h1>
-            <p>Data from backend is {data}</p>
+        <div>
+            <Switch>
+                <Route exact path={`/start`} component={Main} />
+                <Route path={`/start/configure/:id?`} component={Configuration} />
+                <Redirect from="*" to={`/start`} />
+            </Switch>
         </div>
     );
 };

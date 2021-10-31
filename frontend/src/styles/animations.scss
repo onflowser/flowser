@@ -1,0 +1,70 @@
+  @mixin fadeInAnimation($time) {
+  -webkit-animation: fadeIn #{$time}; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeIn #{$time}; /* Firefox < 16 */
+  -ms-animation: fadeIn #{$time}; /* Internet Explorer */
+  -o-animation: fadeIn #{$time}; /* Opera < 12.1 */
+  animation: fadeIn #{$time};
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@mixin addNewContentAnimation($time) {
+
+  // TODO: fix isNew animation / logic
+
+  //-webkit-animation: new-content-animation #{$time}; /* Safari, Chrome and Opera > 12.1 */
+  //-moz-animation: new-content-animation #{$time}; /* Firefox < 16 */
+  //-ms-animation: new-content-animation #{$time}; /* Internet Explorer */
+  //-o-animation: new-content-animation #{$time}; /* Opera < 12.1 */
+  //animation: new-content-animation #{$time};
+
+  //@keyframes new-content-animation {
+  //  from {
+  //    opacity: 0;
+  //    background-color: #496F8D;
+  //    color: #496F8D;
+  //    font-size: 95%; // Using lower percentage will break ellipsis on hashes :/
+  //  }
+  //
+  //  50% {
+  //    opacity: 0.5;
+  //    background-color: #496F8D;
+  //  }
+  //}
+}
+
+@mixin flipVertical($time, $deg: 180deg) {
+  -webkit-transition: -webkit-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
+  -ms-transition: -ms-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
+  transition: transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
+
+  transform: rotateX(#{$deg});
+  -ms-transform: rotateX(#{$deg});
+  -webkit-transform: rotateX(#{$deg});
+}
+
+@mixin pulse($time) {
+  transform: scale(1);
+  animation: pulse #{$time} infinite;
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0.9);
+    }
+
+    50% {
+      transform: scale(1);
+    }
+
+    100% {
+      transform: scale(0.9);
+    }
+  }
+}

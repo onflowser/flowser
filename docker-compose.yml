@@ -9,16 +9,25 @@ services:
       target: development
       dockerfile: ./Dockerfile
     environment:
+      - DATA_FETCH_INTERVAl=${DATA_FETCH_INTERVAl}
       - APP_BACKEND_PORT=${APP_BACKEND_PORT}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
     expose:
       - ${APP_BACKEND_PORT}
+      - ${FLOW_EMULATOR_PORT}
     ports:
       - ${APP_BACKEND_PORT}:${APP_BACKEND_PORT}
     networks:
       - flowser-network
     volumes:
-      - ./backend:/usr/src/app
+      - ./backend:/app
       - /app/node_modules
+    links:
+      - database
     command: npm run start:debug
     restart: unless-stopped
   frontend:
@@ -30,6 +39,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       - APP_FRONTEND_PORT=${APP_FRONTEND_PORT}
+      - REACT_APP_API_HOST=http://localhost:${APP_BACKEND_PORT}
     expose:
       - ${APP_FRONTEND_PORT}
     ports:
@@ -41,6 +51,21 @@ services:
       - /app/node_modules
     command: npm run start
     restart: unless-stopped
+  database:
+    build: ./database
+    container_name: database
+    volumes:
+      - ./database/db:/data/db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    ports:
+      - 27016:27017
+    networks:
+      flowser-network:
 
 networks:
   flowser-network:
+    driver: bridge

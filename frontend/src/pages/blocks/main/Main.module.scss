@@ -1,0 +1,29 @@
+@import 'styles/spacings';
+@import 'styles/animations';
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-base $spacing-l;
+  margin-bottom: $spacing-base;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &.isNew {
+    @include addNewContentAnimation(.4s);
+  }
+
+  .hash {
+    max-width: 20vw;
+    min-width: 20vw;
+    display: inline-block;
+    overflow: hidden;
+  }
+}
+
+.noResults {
+  margin-top: $spacing-l * 6;
+}

@@ -1,0 +1,29 @@
+@import 'styles/colors';
+
+.root {
+  z-index: 1000;
+  display: flex;
+  position: fixed;
+  //border: 1px solid red;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  background-color: rgba(20, 28, 45, .9);
+  justify-content: center;
+  align-items: center;
+
+
+  .dialog {
+    margin-top: -30%;
+    min-width: 100px;
+    max-width: 600px;
+    min-height: 100px;
+    max-height: 400px;
+
+    .card {
+    }
+
+  }
+}

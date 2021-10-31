@@ -1,63 +1,84 @@
-# flowser
-Flowser is Flow Browser. TODO: Add description
-### Requirements
-- Docker
-- Node.js
+<div align="center">
+	<img alt="Flowser logo" src="./assets/logo.png" width="150" height="150">
+	<h1>Flowser</h1>
+	<p>
+		<b>Easily inspect and debug Flow blockchain ⛓</b>
+	</p>
+	<br>
+	<br>
+</div>
 
-### Development
+This is a convenient development tool for [Flow blockchain](https://www.onflow.org/), which starts and indexes flow emulator or testnet blockchains.
 
-Local development stack consist of frontend Nestjs application and frontend React application.
-Each of the two is run in a separate Docker container. Use the following docker-compose commands
-to start up development stack and point your browser to http://localhost:3000
+## ✨ Features
 
-Make sure that you have .env file properly configured, for local development simply rename .env.sample to .env!
+### Flow emulator
+Configure and run managed [flow emulator](https://github.com/onflow/flow-emulator) projects or start your own emulator instance on localhost
 
-To get more information on frontend and backend respectively refer to README.md in /frontend and /backend folders.
+### Inspect blockchain 
+Flowser allows you to inspect the current state of the flow blockchain. 
+Every new change is automatically detected and displayed in the UI. 
+You can view & search thought the following objects:
+- 📄 **logs** (only available for managed emulator projects)
+- 👤 **accounts** 
+  - transactions
+  - contracts
+  - keys
+  - storage
+- 📦 **blocks**
+  - transactions
+  - collections
+- 💳 **transactions**
+  - script
+  - signatures
+  - events
+- 📝 **contracts**
+  - code
+- 📅 **events**
+  - data
 
+### Dev wallet
+Flowser natively supports [dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience. 
+You can log in using a default service account and send arbitrary transaction directly within flowser UI.
+  
+### Rest API
 
+Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification.
 
-Start local development stack. 
+Learn how to import flowser open api specification to:
+- [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
+- [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
+
+## 👋 Get started
+
+### Clone flowser repository
+
+```bash
+git clone https://github.com/bartolomej/flowser
 ```
+
+### Start flowser
+
+```bash
 docker-compose up -d
 ```
 
-Stop local development stack.
-```
-docker-compose down
-```
+## 💻 Contributing
 
-See logs.
-```
-docker-compose logs -f
-```
+If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/bartolomej/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/bartolomej/flowser/issues/new).
 
-#### Important:
+See [Development Guides](./DEVELOPMENT.md) for more info on setting up development environment. 
 
-After installing new NPM library you have to stop docker-compose, remove Docker image, and run docker-compose up again. Below example for frontend:
-1. Stop docker-compose
-```
-docker-copose down
-```
-2. Remove frontend image:
-```
-docker image ls
-```
-example output
-```
-REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
-frontend     dev       214591eba110   3 minutes ago    436MB
-backend      dev       3a9d55b4f99a   41 minutes ago   419MB
-```
-remove image (use IMAGE ID)
-```
-docker image rm 214591eba110
-```
-3. Start docker-compose
-```
-docker-comopse up
-```
+## 🛠️ Build with
 
-### Production
-TODO
+- [Node.js](https://nodejs.org/) 
+- [Nest.js](https://nestjs.com/)
+- [React.js](https://reactjs.org/)
+- [Docker](https://www.docker.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [flow-cli](https://github.com/onflow/flow-cli)
+- [flow-fcl](https://github.com/onflow/fcl-js)
 
+## 🙌 Credits
 
+- [@bluesign](https://github.com/bluesign) - provided a useful [script](https://gist.github.com/bluesign/df24b31a61bf4cd11f88efb6edd78925) for indexing flow emulator db

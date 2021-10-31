@@ -1,0 +1,12 @@
+<svg id="clock" xmlns="http://www.w3.org/2000/svg" width="11.551" height="11.551" viewBox="0 0 11.551 11.551">
+  <path id="Path_124" data-name="Path 124" d="M5.776,0a5.776,5.776,0,1,0,5.776,5.776A5.788,5.788,0,0,0,5.776,0Zm0,10.874a5.1,5.1,0,1,1,5.1-5.1A5.1,5.1,0,0,1,5.776,10.874Z" fill="#abb4b8"/>
+  <ellipse id="Ellipse_1" data-name="Ellipse 1" cx="0.338" cy="0.338" rx="0.338" ry="0.338" transform="translate(2.566 8.309)" fill="#abb4b8"/>
+  <ellipse id="Ellipse_2" data-name="Ellipse 2" cx="0.338" cy="0.338" rx="0.338" ry="0.338" transform="translate(8.309 2.566)" fill="#abb4b8"/>
+  <path id="Path_125" data-name="Path 125" d="M113.82,113.82a.338.338,0,1,0,.479,0A.338.338,0,0,0,113.82,113.82Z" transform="translate(-111.155 -111.155)" fill="#abb4b8"/>
+  <path id="Path_126" data-name="Path 126" d="M368.379,368.379a.338.338,0,1,0,.479,0A.338.338,0,0,0,368.379,368.379Z" transform="translate(-359.971 -359.971)" fill="#abb4b8"/>
+  <path id="Path_127" data-name="Path 127" d="M241.338,62.354a.338.338,0,0,0,.338-.338v-.677a.338.338,0,0,0-.677,0v.677A.338.338,0,0,0,241.338,62.354Z" transform="translate(-235.563 -59.624)" fill="#abb4b8"/>
+  <path id="Path_128" data-name="Path 128" d="M241.338,391a.338.338,0,0,0-.338.338v.677a.338.338,0,1,0,.677,0v-.677A.338.338,0,0,0,241.338,391Z" transform="translate(-235.563 -382.179)" fill="#abb4b8"/>
+  <path id="Path_129" data-name="Path 129" d="M62.354,241.338a.338.338,0,0,0-.338-.338h-.677a.338.338,0,1,0,0,.677h.677A.338.338,0,0,0,62.354,241.338Z" transform="translate(-59.624 -235.563)" fill="#abb4b8"/>
+  <path id="Path_130" data-name="Path 130" d="M391,241.338a.338.338,0,0,0,.338.338h.677a.338.338,0,0,0,0-.677h-.677A.338.338,0,0,0,391,241.338Z" transform="translate(-382.179 -235.563)" fill="#abb4b8"/>
+  <path id="Path_131" data-name="Path 131" d="M241.677,153.229v-1.89a.338.338,0,0,0-.677,0v2.031a.339.339,0,0,0,.1.239l2.031,2.03a.338.338,0,1,0,.479-.479Z" transform="translate(-235.563 -147.593)" fill="#abb4b8"/>
+</svg>

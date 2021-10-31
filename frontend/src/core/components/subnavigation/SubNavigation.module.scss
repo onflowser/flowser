@@ -1,0 +1,13 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.container {
+  display: flex;
+  align-items: center;
+  padding: $spacing-base;
+  justify-content: flex-end;
+
+  .searchBox {
+    width: 531px;
+  }
+}

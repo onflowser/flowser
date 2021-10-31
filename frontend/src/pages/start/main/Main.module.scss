@@ -1,0 +1,112 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+@import 'styles/typography';
+@import 'styles/animations';
+@import 'styles/rules';
+
+.errors {
+  background-color: darken($color-status-expired, 5%);
+  color: $color-white;
+  padding: $spacing-base $spacing-base * 2;
+  border-radius: $border-radius-card;
+  @include fadeInAnimation(.3s);
+  max-width: 40vw;
+  margin: $spacing-l * 2 auto;
+  margin-left: calc(50% - 20vw);
+  position: fixed;
+}
+
+.projectsWrapper {
+  position: relative;
+  width: 100%;
+  .projects {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+}
+
+.loaderWrapper {
+  height: 100vh;
+}
+
+.container {
+  background: $dark-blue;
+  padding: $spacing-base;
+  color: $black;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 108px;
+    margin-bottom: 50px;
+  }
+
+  h1 {
+    color: $color-white;
+    opacity: 0.74;
+    font-family: $font-family-days-one;
+    font-size: 35px;
+    font-weight: normal;
+    letter-spacing: 1.4px;
+    margin-bottom: $spacing-l * 3;
+  }
+
+  button {
+    margin-bottom: $spacing-base;
+    width: 368px;
+    height: 66px;
+  }
+
+  .caret {
+    transform: rotate(-90deg);
+  }
+
+  .noEmulators,
+  .loading {
+    margin-top: $spacing-base;
+    color: $color-grey;
+    font-weight: 100;
+  }
+  .loading {
+    @include pulse(1.8s);
+  }
+}
+
+.newProjectBtn {
+  color: $color-grey;
+  border: 2px solid $color-grey;
+}
+
+h2 {
+  margin-top: $spacing-l * 2;
+  font-size: $font-size-small;
+  color: $color-grey;
+}
+
+.link {
+  color: $color-link-blue;
+  text-decoration: none;
+  margin-top: $spacing-base;
+}
+
+@keyframes logoPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  30% {
+    transform: scale(1.2) rotate(15deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}

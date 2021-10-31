@@ -1,0 +1,26 @@
+@import 'styles/rules';
+@import 'styles/colors';
+@import 'styles/typography';
+@import 'styles/spacings';
+
+.root {
+  border: 1px solid $color-input-border;
+  border-radius: $border-radius-input;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: $color-main-yellow;
+  }
+
+  & > input {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px calc($spacing-base * 2);
+    outline: none;
+    color: $color-grey;
+    font-size: $font-size-small;
+  }
+}
