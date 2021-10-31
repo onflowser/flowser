@@ -18,6 +18,7 @@ import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
+import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class ProjectsService {
@@ -76,7 +77,10 @@ export class ProjectsService {
                 })
         }
 
-        if (!await this.flowGatewayService.isConnectedToGateway()) {
+        if (
+            !this.currentProject.isOfficialNetwork() &&
+            !await this.flowGatewayService.isConnectedToGateway()
+        ) {
             await this.unUseProject();
             throw new ServiceUnavailableException("Emulator not accessible")
         }
@@ -117,11 +121,8 @@ export class ProjectsService {
         return Promise.all(projects.map(async project => {
             if (project.gateway) {
                 const { address, port } = project.gateway;
-                const pingable = await FlowGatewayService.isPingable(address, port)
-                return {
-                    ...project,
-                    pingable
-                }
+                const pingable = project.isOfficialNetwork() || await FlowGatewayService.isPingable(address, port)
+                return plainToClass(Project, { ...project, pingable });
             } else {
                 return project
             }
@@ -136,11 +137,8 @@ export class ProjectsService {
 
         if (project.gateway) {
             const { port, address } = project.gateway;
-            const pingable = await FlowGatewayService.isPingable(address, port)
-            return {
-                ...project,
-                pingable
-            };
+            const pingable = project.isOfficialNetwork() || await FlowGatewayService.isPingable(address, port)
+            return plainToClass(Project, { ...project, pingable });
         } else {
             return project;
         }
