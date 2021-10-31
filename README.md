@@ -1,76 +1,65 @@
-# flowser
-Flowser is Flow Browser. Visit the online [documentation page](https://www.notion.so/Engineering-Wiki-07b2d4453ce24a70804e7b50b5045b6d)
+<div align="center">
+	<img alt="Flowser logo" src="./assets/logo.png" width="200" height="200">
+	<h1>Flowser</h1>
+	<p>
+		<b>Easily inspect and debug Flow blockchain ⛓</b>
+	</p>
+	<br>
+	<br>
+	<br>
+</div>
 
-### Requirements
-- Docker
-- Node.js
+This is a convenient development tool for Flow blockchain, which starts and indexes flow emulator or testnet blockchains.
 
-### Development
+## ✨ Features
 
-Application stack consist of frontend Nestjs backend API server, frontend React SPA application and Mongo database.
-Use the following docker-compose commands to start up development stack and point your browser to http://localhost:3000
+### Flow emulator 🕹🎛
+Configure and run managed flow emulator projects or start your own emulator instance on localhost
 
-Make sure that you have ```.env``` file properly configured, for local development simply rename .env.sample to .env!
+### Inspect blockchain 🕵️
+Flowser allows you to inspect the current state of the flow blockchain. 
+Every new change is automatically detected and displayed in the UI. 
+You can view & search thought the following objects:
+- **logs**<br>Only available for managed emulator projects.
+- **accounts** 
+  - transactions
+  - contracts
+  - keys
+  - storage
+- **blocks**
+  - transactions
+  - collections
+- **transactions**
+  - script
+  - signatures
+  - events
+- **contracts**
+  - code
+- **events**
+  - data
 
-To get more information on frontend and backend respectively refer to README.md in /frontend and /backend folders.
+### Dev wallet 👛
+Flowser natively supports dev-wallet tool for developer convenience. 
+You can login using a default service account and send arbitrary transaction directly within flowser UI.
+  
+### Rest API 🌐
 
+Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification.
 
+Learn how to import flowser open api specification to:
+- [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
+- [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
 
-Start local development stack. 
+## 🏃 Get started
+
+### Clone flowser repository
+
+```bash
+git clone https://github.com/bartolomej/flowser
 ```
+
+### Start flowser
+
+```bash
 docker-compose up -d
 ```
-
-Stop local development stack.
-```
-docker-compose down
-```
-
-See logs.
-```
-docker-compose logs -f
-```
-
-#### Connect to Mongo Docker instance with your local machine client ([example Robo 3T](https://robomongo.org/))
-Connect MongoDb Client using settings in ```.env``` file. Bellow example from ```.env.sample```. Keep in mind that
-in docker-compose.yml we mapped port 27017 to 27016, use ````localhost```` instead of ```database``` docker-compose internal
-host name
-```
-mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@localhost:27016/${MONGODB_DATABASE}
-
-mongodb://root:rootpassword@localhost:27016/flowser
-```
-
-
-
-
-### Development important notes:
-
-After installing new NPM library you have to stop docker-compose, remove Docker image, and run docker-compose up again. Below example for frontend:
-1. Stop docker-compose
-```
-docker-copose down
-```
-2. Remove frontend image:
-```
-docker image ls
-```
-example output
-```
-REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
-frontend     dev       214591eba110   3 minutes ago    436MB
-backend      dev       3a9d55b4f99a   41 minutes ago   419MB
-```
-remove image (use IMAGE ID)
-```
-docker image rm 214591eba110
-```
-3. Start docker-compose
-```
-docker-comopse up
-```
-
-### Production
-TODO
-
-
