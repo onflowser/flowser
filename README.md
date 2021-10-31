@@ -67,7 +67,7 @@ docker-compose up -d
 
 If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/bartolomej/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/bartolomej/flowser/issues/new).
 
-See [Development Guides](./DEVELOPMENT.md) for more info on setting up development environment. 
+See [Development Guides](./DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](./ARCHITECTURE.md) for info about high level system architecture.
 
 ## 🛠️ Build with
 
