@@ -56,8 +56,8 @@ const Details: FunctionComponent<any> = () => {
                 </div>
             </Card>
             <DetailsTabs>
-                <DetailsTabItem label="STORAGE" value={data.storage.length}>
-                    <Storage data={data.storage} />
+                <DetailsTabItem label="STORAGE" value={data.storage?.length}>
+                    {data.storage?.length && <Storage data={data.storage} />}
                 </DetailsTabItem>
                 {!!data.code && (
                     <DetailsTabItem label="SCRIPTS" value="<>">

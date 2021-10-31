@@ -22,9 +22,6 @@ export class StorageDataService {
             try {
                 this.dataStorageProcess = spawn("main_linux_x86_64", {
                     cwd: this.flowCliConfig.projectDirPath,
-                    // env: {
-                    //     FLOW_DBPATH: flowDbPath
-                    // }
                 });
                 resolve(true);
             } catch (e) {
