@@ -19,22 +19,22 @@ Configure and run managed [flow emulator](https://github.com/onflow/flow-emulato
 Flowser allows you to inspect the current state of the flow blockchain. 
 Every new change is automatically detected and displayed in the UI. 
 You can view & search thought the following objects:
-- 📄 **logs** (only available for managed emulator projects)
-- 👤 **accounts** 
+- 📄  **logs** (only available for managed emulator projects)
+- 👤  **accounts** 
   - transactions
   - contracts
   - keys
   - storage
-- 📦 **blocks**
+- 📦  **blocks**
   - transactions
   - collections
-- 💳 **transactions**
+- 💳  **transactions**
   - script
   - signatures
   - events
-- 📝 **contracts**
+- 📝  **contracts**
   - code
-- 📅 **events**
+- 📅  **events**
   - data
 
 ### Dev wallet
