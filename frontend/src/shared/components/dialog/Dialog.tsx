@@ -21,8 +21,8 @@ const Dialog: FunctionComponent<Props> = ({ children, onClose, ...restProps }) =
     };
 
     return (
-        <div className={`${classes.root} ${restProps.className}`} onClick={onOutsideClick}>
-            <div className={classes.dialog}>
+        <div className={classes.root} onClick={onOutsideClick}>
+            <div className={`${classes.dialog} ${restProps.className}`}>
                 <Card className={classes.card} onClick={onClickInside}>
                     {children}
                 </Card>

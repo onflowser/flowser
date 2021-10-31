@@ -3,6 +3,7 @@
 @import 'styles/typography';
 
 .button {
+  position: relative;
   background-color: $color-main-yellow;
   border-radius: $border-radius-button;
   color: $color-background;
@@ -16,6 +17,32 @@
 
   &:hover {
     opacity: 0.92;
+  }
+}
+
+.loaderWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  &, & > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  svg {
+    overflow: visible;
+  }
+  svg * {
+    stroke-width: 5px;
+  }
+}
+
+.hiddenChildren {
+  visibility: hidden;
+  * {
+    visibility: hidden;
   }
 }
 

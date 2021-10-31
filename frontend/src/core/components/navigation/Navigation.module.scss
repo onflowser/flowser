@@ -36,11 +36,22 @@
       display: flex;
       margin-left: auto;
 
-      & > div:first-child {
-        display: flex;
+      & > div:nth-child(1) {
         flex-direction: column;
-        padding-right: $spacing-base * 3;
+      }
 
+      & > div:nth-child(2) {
+        flex-direction: row;
+      }
+
+      & > div:nth-child(1), & > div:nth-child(2) {
+        display: flex;
+        padding-right: $spacing-base * 3;
+        margin-right: $spacing-base * 3;
+        border-right: 1px solid $color-white;
+      }
+
+      & > div:first-child {
         span {
           font-size: $font-size-small;
           height: 18px;
@@ -58,9 +69,7 @@
 
       }
 
-      & > div:last-child {
-        padding-left: $spacing-base * 3 + 4px;
-        border-left: 1px solid $color-white;
+      & > div {
         display: flex;
         align-items: center;
 
@@ -83,6 +92,42 @@
   fill: #141C2D;
   width: 18px;
   height: 18px;
+}
+
+.loginButton {
+  .flowIcon {
+    [class=flowWhite],
+    .flowWhite {
+      fill: #141C2D;
+    }
+  }
+}
+
+.logoutButton {
+  background: transparent !important;
+  border-color: $color-link-blue !important;
+  color: $color-link-blue !important;
+  .flowIcon {
+    [class=flowWhite],
+    .flowWhite {
+      fill: $color-link-blue;
+    }
+  }
+}
+
+.txButton {
+  background: $color-link-blue !important;
+  border-color: $color-link-blue !important;
+}
+
+.flowIcon {
+  height: 26px;
+  width: 26px;
+  margin-right: $spacing-s * 0.5 !important;
+  [class=flowPrimary],
+  .flowPrimary {
+    fill: transparent;
+  }
 }
 
 .breadcrumbs {

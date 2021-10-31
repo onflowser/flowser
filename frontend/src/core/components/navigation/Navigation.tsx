@@ -13,11 +13,14 @@ import { ReactComponent as IconContracts } from '../../../shared/assets/icons/co
 import { ReactComponent as IconEvents } from '../../../shared/assets/icons/events.svg';
 import { ReactComponent as IconSettings } from '../../../shared/assets/icons/settings.svg';
 import { ReactComponent as IconBackButton } from '../../../shared/assets/icons/back-button.svg';
+import { ReactComponent as FlowLogo } from '../../../shared/assets/icons/flow.svg';
 import { useNavigation } from '../../../shared/hooks/navigation';
 import Breadcrumbs from './Breadcrumbs';
 import Search from '../../../shared/components/search/Search';
 import axios from '../../../shared/config/axios';
 import { useProjectApi } from '../../../shared/hooks/project-api';
+import { useFlow } from '../../../shared/hooks/flow';
+import TransactionDialog from '../../../shared/components/transaction-dialog/TransactionDialog';
 
 export interface Counters {
     accounts: number;
@@ -31,9 +34,12 @@ const Navigation = (props: any) => {
     const history = useHistory();
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
     const [counters, setCounters] = useState<Counters>();
+    const [showTxDialog, setShowTxDialog] = useState<any>(false);
     const { currentProject } = useProjectApi();
+    const { isLoggedIn, login, logout } = useFlow();
 
     const onSwitchProject = useCallback(async () => {
+        await logout(); // logout from dev-wallet, because config may change
         await axios.delete('/api/projects/use'); // stop current emulator
         history.push(`/${routes.start}`);
     }, []);
@@ -114,6 +120,32 @@ const Navigation = (props: any) => {
                             <span>EMULATOR</span>
                         </div>
                         <div>
+                            {isLoggedIn ? (
+                                <IconButton
+                                    className={classes.logoutButton}
+                                    icon={<FlowLogo className={classes.flowIcon} />}
+                                    iconPosition="before"
+                                    onClick={logout}
+                                >
+                                    LOG OUT
+                                </IconButton>
+                            ) : (
+                                <IconButton
+                                    className={classes.loginButton}
+                                    icon={<FlowLogo className={classes.flowIcon} />}
+                                    iconPosition="before"
+                                    onClick={login}
+                                >
+                                    LOG IN
+                                </IconButton>
+                            )}
+                            {isLoggedIn && (
+                                <Button className={classes.txButton} onClick={() => setShowTxDialog(true)}>
+                                    SEND TRANSACTION
+                                </Button>
+                            )}
+                        </div>
+                        <div>
                             <Button onClick={onSwitchProject}>SWITCH</Button>
                             <IconButton onClick={onSettings} icon={<IconSettings className={classes.settingsIcon} />} />
                         </div>
@@ -127,6 +159,7 @@ const Navigation = (props: any) => {
                         {isSearchBarVisible && <Search className={classes.searchBar} />}
                     </div>
                 )}
+                <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
             </div>
         </>
     );

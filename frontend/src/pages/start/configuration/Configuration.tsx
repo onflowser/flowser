@@ -279,6 +279,12 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                     </div>
 
                                     <div className={classes.row}>
+                                        <span>Service address</span>
+                                        <Input type="text" value={formState.serviceAddress} disabled />
+                                        <span>Service account address</span>
+                                    </div>
+
+                                    <div className={classes.row}>
                                         <span>Block Time</span>
                                         <Input
                                             type="text"
