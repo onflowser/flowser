@@ -51,16 +51,23 @@ Learn how to import flowser open api specification to:
 
 ## 👋 Get started
 
-### Clone flowser repository
+### 1. Clone flowser repository
 
 ```bash
 git clone https://github.com/bartolomej/flowser
 ```
 
-### Start flowser
+### 2. Install dependencies
+
+You need to install Docker & docker-compose in order to run this app. 
+See: [Docker installation instructions](https://www.docker.com/get-started)
+
+### 2. Start flowser
+
+This command will start Flowser with default configuration (recommended).
 
 ```bash
-docker-compose up -d
+npm run start:dev
 ```
 
 ## 💻 Contributing

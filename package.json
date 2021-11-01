@@ -1,0 +1,31 @@
+{
+  "name": "flowser",
+  "version": "1.0.0",
+  "description": "Easily inspect and debug Flow blockchain ⛓",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start:dev": "docker-compose --env-file .env.sample up -d"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bartolomej/flowser.git"
+  },
+  "keywords": [
+    "flow",
+    "onflow",
+    "blockchain",
+    "development-tool"
+  ],
+  "author": "@bartolomej, @jgololicic, @monikaxh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bartolomej/flowser/issues"
+  },
+  "homepage": "https://github.com/bartolomej/flowser#readme",
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
+}
