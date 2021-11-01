@@ -1,5 +1,6 @@
 <div align="center">
-	<img alt="Flowser logo" src="docs/images/logo.png" width="150" height="150">
+	<br>
+	<img alt="Flowser logo" src="./docs/images/logo.png" width="150" height="150">
 	<h1>Flowser</h1>
 	<p>
 		<b>Easily inspect and debug Flow blockchain ⛓</b>
@@ -12,11 +13,11 @@ This is a convenient development tool for [Flow blockchain](https://www.onflow.o
 
 ## 📖 Contents
 
-- [✨ Key features](#Features)
-- [👋 Get started](#Get started)
-- [💻 Contributing](#Contributing)
-- [🛠️ Build with](#Build with)
-- [🙌 Credits](#Credits)
+- [✨ Key features](#-features)
+- [👋 Get started](#-get-started)
+- [💻 Contributing](#-contributing)
+- [🛠️ Build with](#%EF%B8%8F-build-with)
+- [🙌 Credits](#-credits)
 
 ## ✨ Features
 
