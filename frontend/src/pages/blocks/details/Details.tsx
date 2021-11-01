@@ -69,7 +69,7 @@ const Details: FunctionComponent<any> = () => {
             </Card>
 
             <DetailsTabs>
-                <DetailsTabItem label="HEIGHT" value="1" />
+                <DetailsTabItem label="HEIGHT" value={data.height} />
                 <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
                     <Fragment onMount={() => updateSearchBar('search for transactions', !transactions.length)}>
                         {transactions &&

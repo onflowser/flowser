@@ -18,6 +18,8 @@ import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
+import { plainToClass } from "class-transformer";
+import { StorageDataService } from '../flow/services/storage-data.service';
 
 @Injectable()
 export class ProjectsService {
@@ -34,7 +36,8 @@ export class ProjectsService {
         private blocksService: BlocksService,
         private eventsService: EventsService,
         private logsService: LogsService,
-        private transactionsService: TransactionsService
+        private transactionsService: TransactionsService,
+        private storageDataService: StorageDataService,
     ) {
     }
 
@@ -59,6 +62,10 @@ export class ProjectsService {
         // user may have previously used a custom emulator project
         // make sure that in any running emulators are stopped
         await this.flowAggregatorService.stopEmulator();
+        try {
+            await this.storageDataService.stop();
+        } catch (e) {
+        }
 
         // update project context
         this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
@@ -73,10 +80,19 @@ export class ProjectsService {
                         `Can not start emulator with project id ${id}`,
                         e.message
                     )
-                })
+                });
+
+            try {
+                await this.storageDataService.start();
+            } catch (e) {
+                throw new ServiceUnavailableException('Data storage service error: ', e.message);
+            }
         }
 
-        if (!await this.flowGatewayService.isConnectedToGateway()) {
+        if (
+            !this.currentProject.isOfficialNetwork() &&
+            !await this.flowGatewayService.isConnectedToGateway()
+        ) {
             await this.unUseProject();
             throw new ServiceUnavailableException("Emulator not accessible")
         }
@@ -117,11 +133,8 @@ export class ProjectsService {
         return Promise.all(projects.map(async project => {
             if (project.gateway) {
                 const { address, port } = project.gateway;
-                const pingable = await FlowGatewayService.isPingable(address, port)
-                return {
-                    ...project,
-                    pingable
-                }
+                const pingable = project.isOfficialNetwork() || await FlowGatewayService.isPingable(address, port)
+                return plainToClass(Project, { ...project, pingable });
             } else {
                 return project
             }
@@ -136,11 +149,8 @@ export class ProjectsService {
 
         if (project.gateway) {
             const { port, address } = project.gateway;
-            const pingable = await FlowGatewayService.isPingable(address, port)
-            return {
-                ...project,
-                pingable
-            };
+            const pingable = project.isOfficialNetwork() || await FlowGatewayService.isPingable(address, port)
+            return plainToClass(Project, { ...project, pingable });
         } else {
             return project;
         }

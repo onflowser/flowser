@@ -7,6 +7,7 @@
   font-weight: lighter;
   margin-bottom: $spacing-l;
   padding-left: $spacing-l * 2;
+  position: relative;
 
   > div {
     display: flex;
@@ -24,12 +25,15 @@
       border-radius: 8px;
       color: $color-main-text;
       font-family: $font-family-oswald;
+      position: relative;
+      max-width: 80%;
+      min-width: 80%;
 
       .hash {
-        max-width: 80vw;
-        min-width: 80vw;
         display: inline-block;
         overflow: hidden;
+        max-width: 100%;
+        min-width: 100%;
       }
     }
 

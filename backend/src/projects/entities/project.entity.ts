@@ -4,6 +4,13 @@ import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../shared/entities/polling.entity";
+import { Type } from "class-transformer";
+
+export enum FlowNetworks {
+    MAINNET = 'mainnet',
+    TESTNET = 'testnet',
+    EMULATOR = 'emulator'
+}
 
 @Entity({name: 'projects'})
 export class Project extends PollingEntity {
@@ -22,9 +29,11 @@ export class Project extends PollingEntity {
     pingable: boolean;
 
     @Column()
+    @Type(() => GatewayConfigurationEntity)
     gateway: GatewayConfigurationEntity;
 
     @Column()
+    @Type(() => EmulatorConfigurationEntity)
     emulator: EmulatorConfigurationEntity;
 
     @Column('boolean', {default: false})
@@ -40,6 +49,30 @@ export class Project extends PollingEntity {
             id: toKebabCase(dto.name),
             ...dto
         })
+    }
+
+    isStartBlockHeightDefined() {
+        return this.startBlockHeight !== undefined && this.startBlockHeight !== null;
+    }
+
+    isOfficialNetwork() {
+        return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
+    }
+
+    isAnyNetwork(networks: FlowNetworks[]) {
+        const officialNetworkIds = ['mainnet', 'testnet'];
+        for (let network of networks) {
+            let isMatch = false;
+            if (network === FlowNetworks.EMULATOR) {
+                isMatch = !officialNetworkIds.includes(network);
+            } else {
+                isMatch = this.id === network;
+            }
+            if (isMatch) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

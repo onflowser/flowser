@@ -8,7 +8,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get -yq install nodejs
 RUN npm install
 RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
-ENV PATH="$PATH:/root/.local/bin"
+ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
 
 COPY package*.json ./
 
@@ -32,7 +32,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get -yq install nodejs
 RUN npm install
 RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
-ENV PATH="$PATH:/root/.local/bin"
+ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
 
 COPY package*.json ./
 

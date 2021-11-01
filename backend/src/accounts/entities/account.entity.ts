@@ -3,6 +3,7 @@ import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
 import { FlowAccount } from "../../flow/types";
+import { AccountsStorage } from './storage.entity';
 
 @Entity({ name: 'accounts' })
 export class Account extends PollingEntity {
@@ -27,6 +28,9 @@ export class Account extends PollingEntity {
 
   @Column(type => AccountContract)
   contracts: AccountContract[];
+
+  @Column(type => AccountsStorage)
+  storage: AccountsStorage[];
 
   static init(flowAccountObject: FlowAccount, options?: Partial<Account>): Account {
     const {keys, contracts} = flowAccountObject;

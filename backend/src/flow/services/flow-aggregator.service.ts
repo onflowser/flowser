@@ -15,6 +15,7 @@ import { Project } from "../../projects/entities/project.entity";
 import { FlowEmulatorService } from "./flow-emulator.service";
 import { LogsService } from "../../logs/logs.service";
 import { Log } from "../../logs/entities/log.entity";
+import { StorageDataService } from './storage-data.service';
 
 @Injectable()
 export class FlowAggregatorService {
@@ -29,7 +30,8 @@ export class FlowAggregatorService {
         private eventService: EventsService,
         private flowGatewayService: FlowGatewayService,
         private flowEmulatorService: FlowEmulatorService,
-        private logsService: LogsService
+        private logsService: LogsService,
+        private storageDataService: StorageDataService,
     ) {
     }
 
@@ -80,7 +82,7 @@ export class FlowAggregatorService {
 
         // user can specify (on a project level) what is the starting block height
         // if user provides no specification, the latest block height is used
-        const initialStartBlockHeight = this.project.startBlockHeight === undefined
+        const initialStartBlockHeight = !this.project.isStartBlockHeightDefined()
             ? latestBlock.height
             : this.project.startBlockHeight;
         // fetch from last stored block (if there are already blocks in the database)
@@ -184,6 +186,10 @@ export class FlowAggregatorService {
 
     async updateAccount(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
+        console.log('getting storage data for address', address);
+        const storage = await this.storageDataService.getStorageData(address);
+        account.storage = storage;
+        console.log('storage returned ', storage)
         console.log("[Flow] Account updated: ", account.address);
         return this.accountService.replace(
             address,

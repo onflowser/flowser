@@ -13,4 +13,10 @@ export class GatewayConfigurationEntity {
         this.address = address;
     }
 
+    url() {
+        const {address, port} = this;
+        const host = `${address}${port ? `:${port}` : ''}`
+        return host.startsWith("http") ? host : `http://${host}`;
+    }
+
 }

@@ -4,6 +4,7 @@ import { useSearch } from '../../../shared/hooks/search';
 import classes from './Details.module.scss';
 import Value from '../../../shared/components/value/Value';
 import Card from '../../../shared/components/card/Card';
+import Storage from './Storage';
 import Label from '../../../shared/components/label/Label';
 import ContentDetailsScript from '../../../shared/components/content-details-script/ContentDetailsScript';
 import ContentDetailsKeys from './ContentDetailsKeys';
@@ -55,6 +56,9 @@ const Details: FunctionComponent<any> = () => {
                 </div>
             </Card>
             <DetailsTabs>
+                <DetailsTabItem label="STORAGE" value={data.storage?.length}>
+                    {data.storage?.length && <Storage data={data.storage} />}
+                </DetailsTabItem>
                 {!!data.code && (
                     <DetailsTabItem label="SCRIPTS" value="<>">
                         <Fragment onMount={() => updateSearchBar('search for scripts', true)}>
