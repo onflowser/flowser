@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "start:dev": "docker-compose --env-file .env.sample up -d"
+    "start:dev": "docker-compose --env-file .env.sample up -d",
+    "start:prod": "docker-compose --env-file .env.sample -f docker-compose.yml -f docker-compose.prod.yml up -d"
   },
   "repository": {
     "type": "git",

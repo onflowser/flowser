@@ -90,3 +90,4 @@ See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up develo
 ## 🙌 Credits
 
 - [@bluesign](https://github.com/bluesign) - provided a useful [script](https://gist.github.com/bluesign/df24b31a61bf4cd11f88efb6edd78925) for indexing flow emulator db
+- [@wmnnd](https://github.com/wmnnd) - docker production setup [guide](https://github.com/wmnnd/nginx-certbot)

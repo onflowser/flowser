@@ -37,10 +37,10 @@ ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
 COPY package*.json ./
 
 RUN npm install --silent glob rimraf
-RUN npm install --only=development
+RUN npm install
 
 COPY . .
 
-COPY --from=development /dist ./dist
+RUN npm run build
 
 CMD ["node", "dist/main"]

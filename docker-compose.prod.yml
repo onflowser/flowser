@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    image: backend:prod
+    build:
+      target: production
+  frontend:
+    image: frontend:prod
+    build:
+      target: production
+    volumes:
+      - frontend-volume:/app
+      - /app/node_modules
+  nginx:
+    container_name: nginx
+    image: nginx:1.15-alpine
+    restart: unless-stopped
+    volumes:
+      - ./server/nginx:/etc/server/conf.d
+      - ./server/certbot/conf:/etc/letsencrypt
+      - ./server/certbot/www:/var/www/certbot
+      - frontend-volume:/var/www/frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  frontend-volume:

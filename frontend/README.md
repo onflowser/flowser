@@ -6,7 +6,7 @@ Frontend is React SPA which was bootstrapped with [Create React App](https://git
 
 Some automatic tasks are running in the background:
 
-1. ESSlint (Run automatically on every commit via Git hooks & Husky)
+1. ESlint (Run automatically on every commit via Git hooks & Husky)
 2. Prettier (Run automatically on every commit via Git hooks & Husky)
 
 Git hooks and Husky setup inspired by the following articles:

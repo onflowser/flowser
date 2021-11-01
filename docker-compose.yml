@@ -73,7 +73,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
     ports:
-      - 27016:27017
+      - "27016:27017"
     networks:
       - flowser-network
   dev-wallet:
