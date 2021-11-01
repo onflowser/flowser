@@ -1,4 +1,5 @@
 <div align="center">
+	<br>
 	<img alt="Flowser logo" src="./assets/logo.png" width="150" height="150">
 	<h1>Flowser</h1>
 	<p>
@@ -12,11 +13,11 @@ This is a convenient development tool for [Flow blockchain](https://www.onflow.o
 
 ## 📖 Contents
 
-- [✨ Key features](#Features)
-- [👋 Get started](#Get started)
-- [💻 Contributing](#Contributing)
-- [🛠️ Build with](#Build with)
-- [🙌 Credits](#Credits)
+- [✨ Key features](#-features)
+- [👋 Get started](#-get-started)
+- [💻 Contributing](#-contributing)
+- [🛠️ Build with](#%EF%B8%8F-build-with)
+- [🙌 Credits](#-credits)
 
 ## ✨ Features
 
@@ -46,6 +47,7 @@ Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.js
 Learn how to import flowser open api specification to:
 - [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
 - [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
+
 
 Check out [FEATURES.md](./docs/FEATURES.md) to get a complete list of features.
 
