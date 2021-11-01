@@ -79,8 +79,6 @@ services:
   dev-wallet:
     container_name: dev-wallet
     platform: linux/amd64
-    profiles:
-      - dev
     image: ghcr.io/onflow/fcl-dev-wallet:latest
     ports:
       - "8701:8701"
