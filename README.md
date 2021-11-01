@@ -1,5 +1,5 @@
 <div align="center">
-	<img alt="Flowser logo" src="./assets/logo.png" width="150" height="150">
+	<img alt="Flowser logo" src="docs/images/logo.png" width="150" height="150">
 	<h1>Flowser</h1>
 	<p>
 		<b>Easily inspect and debug Flow blockchain ⛓</b>
