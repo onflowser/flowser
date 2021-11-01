@@ -3,8 +3,9 @@ const fs = require("fs");
 const {spawn} = require("child_process");
 
 const ROOT_DIR_PATH = path.join(__dirname, "..")
-const FLOW_CONFIG_PATH = path.join(ROOT_DIR_PATH, "flow.json");
-const TEMP_DIR_PATH = path.join(ROOT_DIR_PATH, ".temp")
+const FLOWSER_DIR_PATH = path.join(ROOT_DIR_PATH, '.flowser');
+const TEMP_DIR_PATH = path.join(FLOWSER_DIR_PATH, ".temp")
+const FLOW_CONFIG_PATH = path.join(TEMP_DIR_PATH, "flow.json");
 const TX_DIR_PATH = path.join(TEMP_DIR_PATH, "transactions")
 const CONTRACTS_DIR_PATH = path.join(TEMP_DIR_PATH, "contracts")
 
@@ -30,22 +31,26 @@ function execute(bin = "", args, parsedOutput = true) {
   console.log("executing: ", [bin, ...args].join(" "));
   return new Promise(((resolve, reject) => {
     let out = "";
-    const process = spawn(bin, args, {
+    const childProcess = spawn(bin, args, {
       cwd: ROOT_DIR_PATH
     });
 
-    process.stdout.on("data", data => {
+    childProcess.stdout.on("data", data => {
       out += data.toString();
     })
 
-    process.stderr.on("data", data => {
+    childProcess.stderr.on("data", data => {
       out += data.toString();
     })
 
-    process.on("exit", (code) => code === 0
-      ? resolve(parsedOutput ? parseOutput(out): out)
-      : reject(out)
-    );
+    childProcess.on("exit", (code) => {
+      if (code === 0) {
+        resolve(parsedOutput ? parseOutput(out): out)
+      } else {
+        console.log(out);
+        process.exit(1);
+      }
+    });
   }))
 }
 
