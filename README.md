@@ -10,6 +10,14 @@
 
 This is a convenient development tool for [Flow blockchain](https://www.onflow.org/), which starts and indexes flow emulator or testnet blockchains.
 
+## 📖 Contents
+
+- [✨ Key features](#Features)
+- [👋 Get started](#Get started)
+- [💻 Contributing](#Contributing)
+- [🛠️ Build with](#Build with)
+- [🙌 Credits](#Credits)
+
 ## ✨ Features
 
 ### Flow emulator
@@ -18,24 +26,14 @@ Configure and run managed [flow emulator](https://github.com/onflow/flow-emulato
 ### Inspect blockchain 
 Flowser allows you to inspect the current state of the flow blockchain. 
 Every new change is automatically detected and displayed in the UI. 
+
 You can view & search thought the following objects:
-- 📄  **logs** (only available for managed emulator projects)
+- 📄  **logs**
 - 👤  **accounts** 
-  - transactions
-  - contracts
-  - keys
-  - storage
 - 📦  **blocks**
-  - transactions
-  - collections
 - 💳  **transactions**
-  - script
-  - signatures
-  - events
 - 📝  **contracts**
-  - code
 - 📅  **events**
-  - data
 
 ### Dev wallet
 Flowser natively supports [dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience. 
@@ -48,6 +46,8 @@ Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.js
 Learn how to import flowser open api specification to:
 - [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
 - [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
+
+Check out [FEATURES.md](./docs/FEATURES.md) to get a complete list of features.
 
 ## 👋 Get started
 
@@ -74,7 +74,7 @@ npm run start:dev
 
 If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/bartolomej/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/bartolomej/flowser/issues/new).
 
-See [Development Guides](./DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](./ARCHITECTURE.md) for info about high level system architecture.
+See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](docs/ARCHITECTURE.md) for info about high level system architecture.
 
 ## 🛠️ Build with
 

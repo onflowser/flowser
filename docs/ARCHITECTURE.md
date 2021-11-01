@@ -8,4 +8,4 @@ Flowser (Stands for Flow Browser) consist of three main application components: 
 ## Architecture Diagram
 The following application architecture diagram comprises of a high-level overview of the components and fundamental interactions within the system: frontend client, backend API, and databases:
 
-![Application Architecture Diagram](assets/application-architecture-diagram.png)
+![Application Architecture Diagram](../assets/application-architecture-diagram.png)

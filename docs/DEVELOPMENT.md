@@ -11,7 +11,7 @@ Flowser application stack consist of frontend Nestjs backend API server, fronten
 ### 2. Configure environment
 Make sure that you have `.env` file properly configured, for local development simply rename .env.sample to .env!
 
-To get more information on frontend and backend respectively refer to [`frontend/README`](./frontend/README.md) and [`backend/README`](./backend/README.md) readmes.
+To get more information on frontend and backend respectively refer to [`frontend/README`](../frontend/README.md) and [`backend/README`](../backend/README.md) readmes.
 
 ### 3. Start local development stack
 ```
