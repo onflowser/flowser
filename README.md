@@ -13,11 +13,12 @@ This is a convenient development tool for [Flow blockchain](https://www.onflow.o
 
 ## 📖 Contents
 
-- [✨ Key features](#-features)
-- [👋 Get started](#-get-started)
-- [💻 Contributing](#-contributing)
-- [🛠️ Build with](#%EF%B8%8F-build-with)
-- [🙌 Credits](#-credits)
+- [Key features](#-features)
+- [Get started](#-get-started)
+- [Contributing](#-contributing)
+- [Build with](#%EF%B8%8F-build-with)
+- [Contributors](#-contributors)
+- [Credits](#-credits)
 
 ## ✨ Features
 
