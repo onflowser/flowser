@@ -87,6 +87,12 @@ See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up develo
 - [flow-cli](https://github.com/onflow/flow-cli)
 - [flow-fcl](https://github.com/onflow/fcl-js)
 
+## ✌️ Contributors
+
+- [`jgololicic`](http://github.com/jgololicic)
+- [`bartolomej`](http://github.com/bartolomej)
+- [`monikaxh`](http://github.com/monikaxh)
+
 ## 🙌 Credits
 
 - [@bluesign](https://github.com/bluesign) - provided a useful [script](https://gist.github.com/bluesign/df24b31a61bf4cd11f88efb6edd78925) for indexing flow emulator db
