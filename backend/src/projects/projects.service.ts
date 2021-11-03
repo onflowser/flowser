@@ -94,17 +94,9 @@ export class ProjectsService {
             }
         }
 
-        if (!await this.flowGatewayService.isConnectedToGateway()) {
-            await this.cleanupProject();
-        if (
-            !this.currentProject.isOfficialNetwork() &&
-            !await this.flowGatewayService.isConnectedToGateway()
-        ) {
-            await this.unUseProject();
-            throw new ServiceUnavailableException("Emulator not accessible")
-        }
-
         try {
+            // remove all existing data of previously used project
+            // TODO: persist data for projects with "persist" flag
             await Promise.all([
                 this.accountsService.removeAll(),
                 this.blocksService.removeAll(),
@@ -114,6 +106,16 @@ export class ProjectsService {
             ])
         } catch (e) {
             throw new InternalServerErrorException("Project cleanup failed")
+        }
+
+        if (this.currentProject.isEmulatorNetwork()) {
+            if (await this.flowGatewayService.isConnectedToGateway()) {
+                // fetch service account data after emulator is started
+                await this.flowAggregatorService.bootstrapServiceAccount();
+            } else {
+                await this.cleanupProject();
+                throw new ServiceUnavailableException("Emulator not accessible")
+            }
         }
 
         console.debug(`[Flowser] using project: ${id}`);

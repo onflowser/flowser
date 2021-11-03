@@ -23,6 +23,8 @@ export class StorageDataService {
                 this.dataStorageProcess = spawn("main_linux_x86_64", {
                     cwd: this.flowCliConfig.projectDirPath,
                 });
+                this.dataStorageProcess.on("spawn", () => resolve(true));
+                this.dataStorageProcess.on("exit", (code) => reject(`Storage process exited with code: ${code}`));
                 resolve(true);
             } catch (e) {
                 const message = `Storage data error: ${e.message}`;
@@ -58,8 +60,7 @@ export class StorageDataService {
         } catch (e) {
             console.error('Error fetching storage:', e.message);
         }
-        const storage = response.data;
+        const storage = response?.data || {};
         return account in storage ? storage[account] : [];
-
     }
 }

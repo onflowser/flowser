@@ -1,5 +1,5 @@
 import config from "../../config";
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import { FlowGatewayService } from "./flow-gateway.service";
 import { BlocksService } from "../../blocks/blocks.service";
@@ -16,6 +16,7 @@ import { FlowEmulatorService } from "./flow-emulator.service";
 import { LogsService } from "../../logs/logs.service";
 import { Log } from "../../logs/entities/log.entity";
 import { StorageDataService } from './storage-data.service';
+import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -195,5 +196,20 @@ export class FlowAggregatorService {
             address,
             Account.init(account, {updatedAt: Date.now()})
         )
+    }
+
+    async bootstrapServiceAccount() {
+        const {serviceAddress} = defaultEmulatorFlags;
+        try {
+            await this.handleAccountCreated(serviceAddress);
+        } catch (error) {
+            // ignore duplicate key error (with code 11000)
+            if (error.code !== 11000) {
+                throw new InternalServerErrorException(error.message)
+            }
+            console.log(`[Flowser] service account store error: `, error.message);
+        }
+        const storage = await this.storageDataService.getStorageData(serviceAddress);
+        console.log('service account storage: ', storage)
     }
 }
