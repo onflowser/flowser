@@ -1,4 +1,4 @@
-import { mkdir, readFile, stat, writeFile } from "fs/promises";
+import { mkdir, readFile, stat, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import config from "../../config";
 import { Injectable } from "@nestjs/common";
@@ -55,6 +55,17 @@ export class FlowCliConfigService {
         await this.save();
     }
 
+    async cleanup() {
+        if (!this.emulatorConfig.persist) {
+            // flow emulator is always started with persist flag
+            // this is needed, so that storage script can index the db
+
+            // if persist flag is not set in configuration
+            // remove dir that contains persisted flow emulator data
+            await FlowCliConfigService.rmdir(this.databaseDirPath)
+        }
+    }
+
     get projectDirPath () {
         return join(config.flowserRootDir, this.projectId);
     }
@@ -86,7 +97,7 @@ export class FlowCliConfigService {
     private static async mkdirIfEnoent (path: string) {
         try {
             await stat(path)
-            console.debug(`[Flowser] directory "${path}", skipping creation.`)
+            console.debug(`[Flowser] directory "${path}" exists, skipping creation.`)
         } catch (e) {
             if (e.code === "ENOENT") {
                 console.debug(`[Flowser] directory "${path}" not found, creating...`)
@@ -95,5 +106,9 @@ export class FlowCliConfigService {
                 throw e;
             }
         }
+    }
+
+    private static async rmdir (path: string) {
+        return rm(path, { force: true, recursive: true })
     }
 }
