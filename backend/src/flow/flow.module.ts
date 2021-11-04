@@ -36,6 +36,7 @@ import { StorageDataService } from './services/storage-data.service';
         FlowAggregatorService,
         FlowGatewayService,
         FlowEmulatorService,
+        FlowCliConfigService,
         StorageDataService,
     ]
 })

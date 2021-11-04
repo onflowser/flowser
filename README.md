@@ -13,11 +13,12 @@ This is a convenient development tool for [Flow blockchain](https://www.onflow.o
 
 ## 📖 Contents
 
-- [✨ Key features](#-features)
-- [👋 Get started](#-get-started)
-- [💻 Contributing](#-contributing)
-- [🛠️ Build with](#%EF%B8%8F-build-with)
-- [🙌 Credits](#-credits)
+- [Key features](#-features)
+- [Get started](#-get-started)
+- [Contributing](#-contributing)
+- [Build with](#%EF%B8%8F-build-with)
+- [Contributors](#-contributors)
+- [Credits](#-credits)
 
 ## ✨ Features
 
@@ -29,12 +30,12 @@ Flowser allows you to inspect the current state of the flow blockchain.
 Every new change is automatically detected and displayed in the UI. 
 
 You can view & search thought the following objects:
-- 📄  **logs**
-- 👤  **accounts** 
-- 📦  **blocks**
-- 💳  **transactions**
-- 📝  **contracts**
-- 📅  **events**
+- **logs**
+- **accounts** 
+- **blocks**
+- **transactions**
+- **contracts**
+- **events**
 
 ### Dev wallet
 Flowser natively supports [dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience. 
@@ -63,7 +64,7 @@ git clone https://github.com/bartolomej/flowser
 You need to install Docker & docker-compose in order to run this app. 
 See: [Docker installation instructions](https://www.docker.com/get-started)
 
-### 2. Start flowser
+### 3. Start flowser
 
 This command will start Flowser with default configuration (recommended).
 
@@ -79,13 +80,25 @@ See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up develo
 
 ## 🛠️ Build with
 
-- [Node.js](https://nodejs.org/) 
+![](https://img.shields.io/badge/--333?logo=Node.js)
+![](https://img.shields.io/badge/--ea2845?logo=Nestjs)
+![](https://img.shields.io/badge/--282c34?logo=react)
+![](https://img.shields.io/badge/--022044?logo=docker)
+![](https://img.shields.io/badge/--42494f?logo=mongodb)
+
+- [Node.js](https://nodejs.org/)
 - [Nest.js](https://nestjs.com/)
 - [React.js](https://reactjs.org/)
 - [Docker](https://www.docker.com/)
 - [MongoDB](https://www.mongodb.com/)
 - [flow-cli](https://github.com/onflow/flow-cli)
 - [flow-fcl](https://github.com/onflow/fcl-js)
+
+## ✌️ Contributors
+
+- [`jgololicic`](http://github.com/jgololicic)
+- [`bartolomej`](http://github.com/bartolomej)
+- [`monikaxh`](http://github.com/monikaxh)
 
 ## 🙌 Credits
 
