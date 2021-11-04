@@ -254,6 +254,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                         <span>Port</span>
                                         <Input
                                             type="text"
+                                            disabled
                                             value={formState.rpcServerPort}
                                             onChange={(e) => onFormFieldChange('rpcServerPort', e.target.value)}
                                         />
@@ -268,6 +269,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                         <span>HTTP Port</span>
                                         <Input
                                             type="text"
+                                            disabled
                                             value={formState.httpServerPort}
                                             onChange={(e) => onFormFieldChange('httpServerPort', e.target.value)}
                                         />
@@ -282,6 +284,28 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                         <span>Service address</span>
                                         <Input type="text" value={formState.serviceAddress} disabled />
                                         <span>Service account address</span>
+                                    </div>
+
+                                    <div className={classes.row}>
+                                        <span>Service Private Key</span>
+                                        <Input
+                                            type="text"
+                                            disabled
+                                            value={formState.servicePrivateKey}
+                                            onChange={(e) => onFormFieldChange('servicePrivateKey', e.target.value)}
+                                        />
+                                        <span>Private key used for the service account</span>
+                                    </div>
+
+                                    <div className={classes.row}>
+                                        <span>Service Public Key</span>
+                                        <Input
+                                            type="text"
+                                            disabled
+                                            value={formState.servicePublicKey}
+                                            onChange={(e) => onFormFieldChange('servicePublicKey', e.target.value)}
+                                        />
+                                        <span>Public key used for the service account</span>
                                     </div>
 
                                     <div className={classes.row}>
@@ -302,26 +326,6 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                                 h
                                             </span>
                                         )}
-                                    </div>
-
-                                    <div className={classes.row}>
-                                        <span>Service Private Key</span>
-                                        <Input
-                                            type="text"
-                                            value={formState.servicePrivateKey}
-                                            onChange={(e) => onFormFieldChange('servicePrivateKey', e.target.value)}
-                                        />
-                                        <span>Private key used for the service account</span>
-                                    </div>
-
-                                    <div className={classes.row}>
-                                        <span>Service Public Key</span>
-                                        <Input
-                                            type="text"
-                                            value={formState.servicePublicKey}
-                                            onChange={(e) => onFormFieldChange('servicePublicKey', e.target.value)}
-                                        />
-                                        <span>Public key used for the service account</span>
                                     </div>
 
                                     <div className={classes.row}>
