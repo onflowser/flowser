@@ -53,7 +53,7 @@ const Storage: FunctionComponent<Props> = ({ data }) => {
                 }, {}),
             };
         } catch (e) {
-            return JSON.stringify(d, null, 2);
+            return d;
         }
     }, [tabIndex]);
 
