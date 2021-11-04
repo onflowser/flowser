@@ -12,6 +12,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 
 	"log"
@@ -37,8 +38,17 @@ func main() {
 	}
 	defer storageDb.Close()
 
+	// report error if port used
+	if _, err := net.Listen("tcp", ":8888"); err != nil {
+		log.Fatal("Storage server error: ", err)
+	}
+
+	done := make(chan bool)
 	http.HandleFunc("/storage", storageHandler)
-	http.ListenAndServe(":8888", nil)
+	// TODO: handle errors returned from ListenAndServe
+	go http.ListenAndServe(":8888", nil)
+	log.Println("Storage server started") // successfully started
+	<-done
 }
 
 func analyseStorage(db *badger.DB) map[string][]interface{} {

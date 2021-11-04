@@ -56,19 +56,31 @@ export class ProjectsService {
         this.flowAggregatorService.configureProjectContext(this.currentProject);
         this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
         await this.flowAggregatorService.stopEmulator();
+        this.storageDataService.stop();
         await this.flowCliConfigService.cleanup();
     }
 
     async useProject (id: string) {
         this.currentProject = await this.findOne(id);
 
+        try {
+            // remove all existing data of previously used project
+            // TODO: persist data for projects with "persist" flag
+            await Promise.all([
+                this.accountsService.removeAll(),
+                this.blocksService.removeAll(),
+                this.eventsService.removeAll(),
+                this.logsService.removeAll(),
+                this.transactionsService.removeAll()
+            ])
+        } catch (e) {
+            throw new InternalServerErrorException("Project cleanup failed")
+        }
+
         // user may have previously used a custom emulator project
         // make sure that in any running emulators are stopped
         await this.flowAggregatorService.stopEmulator();
-        try {
-            await this.storageDataService.stop();
-        } catch (e) {
-        }
+        this.storageDataService.stop();
 
         // update project context
         this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
@@ -90,22 +102,8 @@ export class ProjectsService {
             try {
                 await this.storageDataService.start();
             } catch (e) {
-                throw new ServiceUnavailableException('Data storage service error: ', e.message);
+                throw new ServiceUnavailableException('Data storage service error', e.message);
             }
-        }
-
-        try {
-            // remove all existing data of previously used project
-            // TODO: persist data for projects with "persist" flag
-            await Promise.all([
-                this.accountsService.removeAll(),
-                this.blocksService.removeAll(),
-                this.eventsService.removeAll(),
-                this.logsService.removeAll(),
-                this.transactionsService.removeAll()
-            ])
-        } catch (e) {
-            throw new InternalServerErrorException("Project cleanup failed")
         }
 
         if (this.currentProject.isEmulatorNetwork()) {
