@@ -155,13 +155,14 @@ export class FlowAggregatorService {
     async handleTransactionCreated(tx: Transaction) {
         return Promise.all([
             this.transactionService.create(tx),
-            this.accountService.update(`0x${tx.payer}`, {})
+            this.updateAccount(`0x${tx.payer}`)
         ])
     }
 
     async handleAccountCreated(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
         console.log("[Flow] Account created: ", account.address);
+        account.storage = await this.storageDataService.getStorageData(address)
         return this.accountService.create(Account.init(account));
     }
 
@@ -187,10 +188,7 @@ export class FlowAggregatorService {
 
     async updateAccount(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
-        console.log('getting storage data for address', address);
-        const storage = await this.storageDataService.getStorageData(address);
-        account.storage = storage;
-        console.log('storage returned ', storage)
+        account.storage = await this.storageDataService.getStorageData(address);
         console.log("[Flow] Account updated: ", account.address);
         return this.accountService.replace(
             address,
@@ -207,9 +205,6 @@ export class FlowAggregatorService {
             if (error.code !== 11000) {
                 throw new InternalServerErrorException(error.message)
             }
-            console.log(`[Flowser] service account store error: `, error.message);
         }
-        const storage = await this.storageDataService.getStorageData(serviceAddress);
-        console.log('service account storage: ', storage)
     }
 }

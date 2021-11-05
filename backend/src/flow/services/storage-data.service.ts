@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, exec } from "child_process";
+import { ChildProcessWithoutNullStreams, exec, spawn } from "child_process";
 import { Injectable } from "@nestjs/common";
 import { FlowCliService } from "./flow-cli.service";
 import { AccountsStorage } from '../../accounts/entities/storage.entity';
@@ -17,29 +17,27 @@ export class StorageDataService {
         console.log(`[Flowser] expecting flow database to be inside ${flowDbPath} directory`)
 
         return new Promise(((resolve, reject) => {
-
             try {
-                // TODO: debug weird problem when (error, stdout) callback is not called on Darwin
-                // seems like stdout stream is ignored,
-                // initially I thought that the issue lies in the fact that spawn doesn't buffer stdout output,
-                // so I refactored to exec call, but that doesn't fix the issue either
-                // for now just assume that server started after 2s ?
-                this.dataStorageProcess = exec("main_linux_x86_64", {
+                this.dataStorageProcess = spawn("main_linux_x86_64", [], {
                     cwd: this.flowCliConfig.projectDirPath,
-                }, (stderr, stdout) => {
+                });
+                this.dataStorageProcess.stdout.on("data", stdout => {
                     const findLine = (pattern, std) => std
-                        .toString()
-                        .split("\n")
-                        .filter(l => l.includes(pattern))
-                    const error = findLine("Storage server error", stderr)
+                        ? std.toString()
+                            .split("\n")
+                            .filter(l => l.includes(pattern))[0]
+                        : null;
+                    // process will emit "Storage server error" when server fails to start
+                    const error = findLine("Storage server error", stdout)
                     if (error) {
-                        return reject(error)
+                        return reject(new Error(error))
                     }
                     // process will emit "Storage server started" when server starts successfully
                     if (findLine("Storage server started", stdout)) {
                         resolve(true);
                     }
-                });
+                })
+                this.dataStorageProcess.on("exit", code => reject(code))
             } catch (e) {
                 const message = `Storage data error: ${e.message}`;
                 reject(message);
@@ -57,7 +55,7 @@ export class StorageDataService {
 
     stop(): void {
         try {
-            this.dataStorageProcess.kill();
+            this.dataStorageProcess?.kill();
         } catch (e) {
             console.log("[Flowser] failed to stop storage: ", e.message)
         }
