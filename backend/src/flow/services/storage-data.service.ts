@@ -19,7 +19,7 @@ export class StorageDataService {
         return new Promise(((resolve, reject) => {
 
             try {
-                // TODO: debug weird problem when (error, stdout) callback is not called on Darwin
+                // TODO: main_linux_x86_64 script emits stdout, but exec() or spawn() doesn't intercept it
                 // seems like stdout stream is ignored,
                 // initially I thought that the issue lies in the fact that spawn doesn't buffer stdout output,
                 // so I refactored to exec call, but that doesn't fix the issue either
