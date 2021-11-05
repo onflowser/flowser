@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { Project } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { EventEmitter } from "events";
-import { FlowCliConfigService } from "./flow-cli-config.service";
+import { FlowCliService } from "./flow-cli.service";
 import { randomString } from "../../utils";
 
 type StartCallback = (error: Error, data: string[]) => void;
@@ -30,18 +30,17 @@ export class FlowEmulatorService {
     private emulatorProcess: ChildProcessWithoutNullStreams;
     private logs: string[] = [];
 
-    constructor (private flowCliConfig: FlowCliConfigService) {
+    constructor (private flowCliService: FlowCliService) {
     }
 
     configureProjectContext (project: Project) {
         this.projectId = project?.id;
         this.configuration = project.emulator;
-        this.flowCliConfig.configure(this.projectId, this.configuration);
     }
 
     async init () {
         console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
-        await this.flowCliConfig.init();
+        await this.flowCliService.init();
     }
 
     async start (cb: StartCallback = () => null) {
@@ -54,7 +53,7 @@ export class FlowEmulatorService {
                     'emulator',
                     ...flags
                 ], {
-                    cwd: this.flowCliConfig.projectDirPath
+                    cwd: this.flowCliService.projectDirPath
                 })
             } catch (e) {
                 this.setState(FlowEmulatorState.STOPPED);
@@ -148,26 +147,26 @@ export class FlowEmulatorService {
 
     async initialiseAccounts (n: number) {
         console.debug(`[Flowser] initialising ${n} initial flow accounts...`)
-        await this.flowCliConfig.load();
-        const diff = n - (this.flowCliConfig.totalAccounts - 1);
+        await this.flowCliService.load();
+        const diff = n - (this.flowCliService.totalAccounts - 1);
         if (diff <= 0) {
             return;
         }
         for (let i = 0; i < diff; i++) {
             const { address, privateKey } = await this.createAccount();
-            this.flowCliConfig.data.accounts[randomString()] = {
+            this.flowCliService.data.accounts[randomString()] = {
                 key: privateKey,
                 address,
             }
         }
-        await this.flowCliConfig.save();
+        await this.flowCliService.save();
     }
 
     async createAccount () {
-        const keysOutput = await this.execute("flow", ["keys", "generate"])
+        const keysOutput = await this.flowCliService.execute("flow", ["keys", "generate"])
         const privateKey = keysOutput[1][1];
         const publicKey = keysOutput[2][1];
-        const accountOutput = await this.execute("flow", ["accounts", "create", "--key", publicKey]);
+        const accountOutput = await this.flowCliService.execute("flow", ["accounts", "create", "--key", publicKey]);
         const address = accountOutput[1][1];
         return { address, publicKey, privateKey }
     }
@@ -220,50 +219,13 @@ export class FlowEmulatorService {
             flag("service-hash-algo", this.configuration.serviceHashAlgorithm),
             flag("storage-limit", this.configuration.storageLimit),
             flag("transaction-fees", this.configuration.transactionFees),
-            flag("dbpath", this.configuration.databasePath || this.flowCliConfig.databaseDirPath),
-            flag("persist", this.configuration.persist),
+            flag("dbpath", this.configuration.databasePath || this.flowCliService.databaseDirPath),
+            // flow emulator is always started with persist flag
+            // this is needed, so that storage script can index the db
+            flag("persist", true),
             flag("verbose", this.configuration.verboseLogging),
             flag("init", true)
         ].filter(Boolean);
-    }
-
-    private execute (bin = "", args, parsedOutput = true): Promise<string | string[][]> {
-        if (!bin) {
-            throw new Error("Provide a command");
-        }
-        console.log(`[Flowser] executing command: ${bin} ${args.join(" ")}`)
-        return new Promise(((resolve, reject) => {
-            let out = "";
-            const process = spawn(bin, args, {
-                cwd: this.flowCliConfig.projectDirPath
-            });
-
-            process.stdout.on("data", data => {
-                out += data.toString();
-            })
-
-            process.stderr.on("data", data => {
-                out += data.toString();
-            })
-
-            process.on("exit", (code) => code === 0
-                ? resolve(parsedOutput ? parseOutput(out) : out)
-                : reject(out)
-            );
-        }))
-
-        function parseOutput (out) {
-            return out.split("\n").map(parseLine).filter(Boolean)
-        }
-
-        function parseLine (line) {
-            const value = line.trim();
-            if (/\t/.test(value)) {
-                return value.split(/[ ]*\t[ ]*/);
-            } else {
-                return value;
-            }
-        }
     }
 
     static formatLogLines (lines: string[]) {

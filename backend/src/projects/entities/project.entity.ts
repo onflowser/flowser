@@ -59,6 +59,10 @@ export class Project extends PollingEntity {
         return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
     }
 
+    isEmulatorNetwork() {
+        return this.isAnyNetwork([FlowNetworks.EMULATOR]);
+    }
+
     isAnyNetwork(networks: FlowNetworks[]) {
         const officialNetworkIds = ['mainnet', 'testnet'];
         for (let network of networks) {
