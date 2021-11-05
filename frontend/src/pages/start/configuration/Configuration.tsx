@@ -16,6 +16,7 @@ import { useProjectApi } from '../../../shared/hooks/project-api';
 import ConfirmDialog from '../../../shared/components/confirm-dialog/ConfirmDialog';
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 import { toast } from 'react-hot-toast';
+import { useQuery } from 'react-query';
 
 const formSchema = Joi.object()
     .keys({
@@ -45,6 +46,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
     const [error, setError] = useState('');
     const [loadingText, setLoadingText] = useState('loading');
     const [showDialog, setShowDialog] = useState(false);
+    const { data: flowVersionInfo } = useQuery<any>('/api/flow/version');
 
     const history = useHistory();
     const { id } = useParams<any>();
@@ -636,6 +638,15 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div className={classes.versionWrapper}>
+                                <a
+                                    target="_blank"
+                                    href={`https://github.com/onflow/flow-cli/commit/${flowVersionInfo?.data?.commit}`}
+                                    rel="noreferrer"
+                                >
+                                    Emulator version: {flowVersionInfo?.data?.version || '-'}
+                                </a>
                             </div>
                         </Card>
                     </div>

@@ -64,6 +64,15 @@
         padding: $spacing-l * 4 $spacing-l * 4;
       }
 
+      .versionWrapper {
+        margin-top: $spacing-xl;
+        display: flex;
+        justify-content: center;
+        a {
+          color: $color-link-blue;
+        }
+      }
+
       .bottom1 {
         display: flex;
         align-items: baseline;
