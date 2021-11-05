@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams, exec } from "child_process";
 import { Injectable } from "@nestjs/common";
-import { FlowCliConfigService } from "./flow-cli-config.service";
+import { FlowCliService } from "./flow-cli.service";
 import { AccountsStorage } from '../../accounts/entities/storage.entity';
 import axios from 'axios';
 
@@ -8,7 +8,7 @@ import axios from 'axios';
 export class StorageDataService {
 
     private dataStorageProcess: ChildProcessWithoutNullStreams;
-    constructor (private flowCliConfig: FlowCliConfigService) {
+    constructor (private flowCliConfig: FlowCliService) {
     }
 
     async start () {

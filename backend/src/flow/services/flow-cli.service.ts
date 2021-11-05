@@ -3,6 +3,7 @@ import { join } from "path";
 import config from "../../config";
 import { Injectable } from "@nestjs/common";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
+import { spawn } from "child_process";
 
 export type FlowCliConfig = {
     emulators: {
@@ -18,7 +19,7 @@ export type FlowCliConfig = {
 }
 
 @Injectable()
-export class FlowCliConfigService {
+export class FlowCliService {
 
     private projectId: string;
     private emulatorConfig: EmulatorConfigurationEntity;
@@ -31,8 +32,8 @@ export class FlowCliConfigService {
 
     async init () {
         console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
-        await FlowCliConfigService.mkdirIfEnoent(config.flowserRootDir);
-        await FlowCliConfigService.mkdirIfEnoent(this.projectDirPath);
+        await FlowCliService.mkdirIfEnoent(config.flowserRootDir);
+        await FlowCliService.mkdirIfEnoent(this.projectDirPath);
         this.data = {
             "emulators": {
                 "default": {
@@ -62,11 +63,22 @@ export class FlowCliConfigService {
 
             // if persist flag is not set in configuration
             // remove dir that contains persisted flow emulator data
-            await FlowCliConfigService.rmdir(this.databaseDirPath)
+            await FlowCliService.rmdir(this.databaseDirPath)
+        }
+    }
+
+    async version() {
+        const [versionLine, commitLine] = await this.execute("flow", ["version"])
+        return {
+            version: versionLine[1],
+            commit: commitLine[1]
         }
     }
 
     get projectDirPath () {
+        if (!this.projectId) {
+            throw new Error("Can't retrieve project path: No project used")
+        }
         return join(config.flowserRootDir, this.projectId);
     }
 
@@ -91,6 +103,49 @@ export class FlowCliConfigService {
     async save () {
         console.log(`[Flowser] storing flow cli configuration: ${this.flowConfigPath}`)
         await writeFile(this.flowConfigPath, JSON.stringify(this.data, null, 4))
+    }
+
+    async execute (bin = "", args, parsedOutput = true): Promise<string | string[][]> {
+        if (!bin) {
+            throw new Error("Provide a command");
+        }
+        console.log(`[Flowser] executing command: ${bin} ${args.join(" ")}`)
+        return new Promise(((resolve, reject) => {
+            let out = "";
+            const process = spawn(bin, args, {
+                cwd: this.projectId ? this.projectDirPath : undefined
+            });
+
+            process.stdout.on("data", data => {
+                out += data.toString();
+            })
+
+            process.stderr.on("data", data => {
+                out += data.toString();
+            })
+
+            process.on("exit", (code) => code === 0
+                ? resolve(parsedOutput ? parseOutput(out) : out)
+                : reject(out)
+            );
+        }))
+
+        function parseOutput (out) {
+            return out.split("\n").map(parseLine).filter(Boolean)
+        }
+
+        function parseLine (line) {
+            const value = line.trim();
+            // parse multiple possible key -> value mapping formats
+            // "key: value" or "key value"
+            if (/\t/.test(value)) {
+                return value.split(/[ ]*\t[ ]*/);
+            } if (/: /.test(value)) {
+                return value.split(/: /);
+            } else {
+                return value;
+            }
+        }
     }
 
     // create directory if it does not already exist

@@ -18,7 +18,7 @@ import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
-import { FlowCliConfigService } from "../flow/services/flow-cli-config.service";
+import { FlowCliService } from "../flow/services/flow-cli.service";
 import { plainToClass } from "class-transformer";
 import { StorageDataService } from '../flow/services/storage-data.service';
 
@@ -33,7 +33,7 @@ export class ProjectsService {
         private flowGatewayService: FlowGatewayService,
         private flowAggregatorService: FlowAggregatorService,
         private flowEmulatorService: FlowEmulatorService,
-        private flowCliConfigService: FlowCliConfigService,
+        private flowCliConfigService: FlowCliService,
         private accountsService: AccountsService,
         private blocksService: BlocksService,
         private eventsService: EventsService,

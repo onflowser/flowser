@@ -198,6 +198,17 @@
                 }
             }
         },
+        "/api/flow/version": {
+            "get": {
+                "operationId": "FlowController_getVersion",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/logs": {
             "get": {
                 "operationId": "LogsController_findAll",
