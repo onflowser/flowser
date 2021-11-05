@@ -25,7 +25,7 @@ async function createAccount() {
   ] = await execute("flow", ["accounts", "create", "--key", publicKeyLine[1]]);
   return {
     name: randomString(),
-    address: addressLine[1],
+    address: addressLine[1].replace("0x", ""),
     privateKey: privateKeyLine[1],
     publicKey: publicKeyLine[1]
   }

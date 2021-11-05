@@ -33,7 +33,7 @@ export class ProjectsService {
         private flowGatewayService: FlowGatewayService,
         private flowAggregatorService: FlowAggregatorService,
         private flowEmulatorService: FlowEmulatorService,
-        private flowCliConfigService: FlowCliService,
+        private flowCliService: FlowCliService,
         private accountsService: AccountsService,
         private blocksService: BlocksService,
         private eventsService: EventsService,
@@ -57,7 +57,7 @@ export class ProjectsService {
         this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
         await this.flowAggregatorService.stopEmulator();
         this.storageDataService.stop();
-        await this.flowCliConfigService.cleanup();
+        await this.flowCliService.cleanup();
     }
 
     async useProject (id: string) {
@@ -87,9 +87,10 @@ export class ProjectsService {
         this.flowAggregatorService.configureProjectContext(this.currentProject);
 
         if (this.currentProject.emulator) {
-            this.flowCliConfigService.configure(id, this.currentProject.emulator);
+            this.flowCliService.configure(id, this.currentProject.emulator);
             this.flowEmulatorService.configureProjectContext(this.currentProject)
-            await this.flowCliConfigService.cleanup(); // ensure clean environment
+            await this.flowCliService.cleanup(); // ensure clean environment
+
             await this.flowAggregatorService.startEmulator()
                 .catch(async e => {
                     await this.cleanupProject();
