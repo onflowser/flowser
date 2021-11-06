@@ -97,6 +97,11 @@ export class FlowAggregatorService {
             : initialStartBlockHeight;
         const endBlockHeight = latestBlock.height;
 
+        if (startBlockHeight > endBlockHeight) {
+            // no new blocks will be fetched
+            return;
+        }
+
         this.logger.debug(`fetching block range (${startBlockHeight} - ${endBlockHeight})`)
 
         let data;
