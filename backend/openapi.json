@@ -1,6 +1,17 @@
 {
     "openapi": "3.0.0",
     "paths": {
+        "/api/version": {
+            "get": {
+                "operationId": "AppController_getVersion",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/projects": {
             "post": {
                 "operationId": "ProjectsController_create",

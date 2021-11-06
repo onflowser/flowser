@@ -7,6 +7,7 @@ import classes from './Main.module.scss';
 import { ReactComponent as CaretIcon } from '../../../shared/assets/icons/caret.svg';
 import { ReactComponent as PlusIcon } from '../../../shared/assets/icons/plus.svg';
 import { useProjectApi } from '../../../shared/hooks/project-api';
+import { useQuery } from 'react-query';
 
 const Main: FunctionComponent<any> = () => {
     const history = useHistory();
@@ -15,6 +16,7 @@ const Main: FunctionComponent<any> = () => {
     const defaultProjects = projects.filter((p: any) => !p.isCustom);
     const customProjects = projects.filter((p: any) => p.isCustom);
     const getDefaultProject = (id: string) => defaultProjects.find((p: any) => p.id === id);
+    const { data: flowserVersion } = useQuery<any>('/api/version');
 
     const emulator = getDefaultProject('emulator');
     const testnet = getDefaultProject('testnet');
@@ -42,7 +44,10 @@ const Main: FunctionComponent<any> = () => {
             {error && <div className={classes.errors}>{error}</div>}
             <div className={classes.container}>
                 <img src={Logo} alt="FLOWSER" />
-                <h1>FLOWSER</h1>
+                <div className={classes.header}>
+                    <h1>FLOWSER</h1>
+                    <span className={classes.version}>{flowserVersion?.data?.version}</span>
+                </div>
                 <IconButton
                     onClick={() => onQuickstart('emulator')}
                     variant="big"

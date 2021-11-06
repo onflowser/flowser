@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+const packageJsonFile = require("../package.json");
 
 @Injectable()
 export class AppService {
+
+    flowserVersion() {
+        return {
+            version: `v${packageJsonFile.version}`
+        };
+    }
 }
