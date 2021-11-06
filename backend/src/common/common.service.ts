@@ -18,13 +18,21 @@ export class CommonService {
     }
 
     async getCounters() {
+        const [log, accounts, blocks, transactions, events, contracts] = await Promise.all([
+            this.commonRepository.manager.stats(Log),
+            this.commonRepository.manager.stats(Account),
+            this.commonRepository.manager.stats(Block),
+            this.commonRepository.manager.stats(Transaction),
+            this.commonRepository.manager.stats(Event),
+            this.contractsService.findAllNewerThanTimestamp(0)
+        ])
         return {
-            log: (await this.commonRepository.manager.stats(Log)).count,
-            accounts: (await this.commonRepository.manager.stats(Account)).count,
-            blocks: (await this.commonRepository.manager.stats(Block)).count,
-            transactions: (await this.commonRepository.manager.stats(Transaction)).count,
-            events: (await this.commonRepository.manager.stats(Event)).count,
-            contracts: (await this.contractsService.findAllNewerThanTimestamp(0)).length
+            log: log.count,
+            accounts: accounts.count,
+            blocks: blocks.count,
+            transactions: transactions.count,
+            events: events.count,
+            contracts: contracts.length
         }
     }
 }

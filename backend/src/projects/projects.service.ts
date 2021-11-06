@@ -1,7 +1,7 @@
 import {
     ConflictException,
     Injectable,
-    InternalServerErrorException,
+    InternalServerErrorException, Logger,
     NotFoundException,
     ServiceUnavailableException,
 } from '@nestjs/common';
@@ -26,6 +26,7 @@ import { StorageDataService } from '../flow/services/storage-data.service';
 export class ProjectsService {
 
     private currentProject: Project;
+    private readonly logger = new Logger(ProjectsService.name);
 
     constructor (
         @InjectRepository(Project)
@@ -117,7 +118,7 @@ export class ProjectsService {
             }
         }
 
-        console.debug(`[Flowser] using project: ${id}`);
+        this.logger.debug(`using project: ${id}`);
 
         return this.currentProject;
     }

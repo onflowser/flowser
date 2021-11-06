@@ -28,7 +28,6 @@ function execute(bin = "", args, parsedOutput = true) {
   if (!bin) {
     throw new Error("Provide a command");
   }
-  console.log("executing: ", [bin, ...args].join(" "));
   return new Promise(((resolve, reject) => {
     let out = "";
     const childProcess = spawn(bin, args, {

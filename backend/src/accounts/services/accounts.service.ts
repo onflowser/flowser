@@ -84,7 +84,6 @@ export class AccountsService {
                     }
                 }
             },
-            // TODO: how to solve re-fetching updated entities
             { $sort: { createdAt: -1 }}
         ]).toArray()
 

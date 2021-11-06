@@ -21,7 +21,7 @@ async function bootstrap() {
   writeFile(
     'openapi.json',
     JSON.stringify(document, null, 4),
-    () => console.log("[Flowser] OpenAPI spec file updated!")
+    () => console.log("OpenAPI spec file updated!")
   );
   SwaggerModule.setup('api', app, document);
 

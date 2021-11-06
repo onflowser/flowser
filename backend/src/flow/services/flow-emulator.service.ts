@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Project } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { EventEmitter } from "events";
@@ -29,6 +29,7 @@ export class FlowEmulatorService {
     private configuration: EmulatorConfigurationEntity;
     private emulatorProcess: ChildProcessWithoutNullStreams;
     private logs: string[] = [];
+    private readonly logger = new Logger(FlowEmulatorService.name);
 
     constructor (private flowCliService: FlowCliService) {
     }
@@ -39,13 +40,13 @@ export class FlowEmulatorService {
     }
 
     async init () {
-        console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
+        this.logger.debug(`initialising for project: ${this.projectId}`)
         await this.flowCliService.init();
     }
 
     async start (cb: StartCallback = () => null) {
         const flags = this.getFlags();
-        console.log(`[Flowser] starting the emulator with (${flags.length}) flags: `, flags.join(" "))
+        this.logger.debug(`starting with (${flags.length}) flags: ${flags.join(" ")}`)
 
         return new Promise(((resolve, reject) => {
             try {
@@ -114,13 +115,16 @@ export class FlowEmulatorService {
 
     stop () {
         return new Promise(resolve => {
-            console.log(`[Flowser] stopping emulator: ${this.isRunning()}`)
+            this.logger.debug(
+                this.isRunning()
+                    ? `stopping pid: ${this.emulatorProcess.pid}`
+                    : `already stopped, skipping`
+            )
             if (this.isRunning()) {
-                console.log(`[Flowser] stopping emulator process: ${this.emulatorProcess.pid}`)
                 const isKilled = this.emulatorProcess.kill();
                 // resolve only when the emulator process exits
                 this.events.on(FlowEmulatorState.STOPPED, () => {
-                    console.log(`[Flowser] stopped emulator process: ${this.emulatorProcess.pid}`);
+                    this.logger.debug(`Process ${this.emulatorProcess.pid} stopped`)
                     resolve(isKilled)
                 })
             } else {
@@ -143,13 +147,13 @@ export class FlowEmulatorService {
                     parseInt(this.configuration.numberOfInitialAccounts as string) - 1
                 )
             } catch (e) {
-                console.error(`[Flowser] failed to initialise accounts: `, e)
+                this.logger.error(`failed to initialise accounts: ${e.message}`, e.stack)
             }
         }
     }
 
     async initialiseAccounts (n: number) {
-        console.debug(`[Flowser] initialising ${n} initial flow accounts...`)
+        this.logger.debug(`initialising ${n} initial flow accounts...`)
         await this.flowCliService.load();
         const diff = n - (this.flowCliService.totalAccounts - 1);
         if (diff <= 0) {
@@ -192,7 +196,7 @@ export class FlowEmulatorService {
     }
 
     private setState (state: FlowEmulatorState) {
-        console.log("[Flowser] emulator state changed: ", state)
+        this.logger.debug(`emulator state changed: ${state}`)
         this.events.emit(state);
         this.state = state;
     }
@@ -240,7 +244,7 @@ export class FlowEmulatorService {
                 ...rest
             } = FlowEmulatorService.parseLogLine(line);
             // format example: Thu Oct 28 2021 21:20:51
-            const formattedTime = new Date(time).toString().split(" ").slice(0,5).join(" ")
+            const formattedTime = new Date(time).toString().split(" ").slice(0, 5).join(" ")
             // appends the rest of the values in key="value" format
             return (
                 level.toUpperCase().slice(0, 4) +

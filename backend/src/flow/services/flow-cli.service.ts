@@ -1,7 +1,7 @@
 import { mkdir, readFile, stat, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import config from "../../config";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { spawn } from "child_process";
 
@@ -24,6 +24,7 @@ export class FlowCliService {
     private projectId: string;
     private emulatorConfig: EmulatorConfigurationEntity;
     public data: FlowCliConfig;
+    private readonly logger = new Logger(FlowCliService.name);
 
     configure (projectId: string, emulatorConfiguration: EmulatorConfigurationEntity) {
         this.projectId = projectId;
@@ -31,7 +32,7 @@ export class FlowCliService {
     }
 
     async init () {
-        console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
+        this.logger.debug(`initialising flow-cli for project: ${this.projectId}`)
         await FlowCliService.mkdirIfEnoent(config.flowserRootDir);
         await FlowCliService.mkdirIfEnoent(this.projectDirPath);
         this.data = {
@@ -95,13 +96,13 @@ export class FlowCliService {
     }
 
     async load () {
-        console.log(`[Flowser] loading flow cli configuration: ${this.flowConfigPath}`)
+        this.logger.debug(`loading flow-cli configuration: ${this.flowConfigPath}`)
         const data = await readFile(this.flowConfigPath);
         this.data = JSON.parse(data.toString());
     }
 
     async save () {
-        console.log(`[Flowser] storing flow cli configuration: ${this.flowConfigPath}`)
+        this.logger.debug(`storing flow-cli configuration: ${this.flowConfigPath}`)
         await writeFile(this.flowConfigPath, JSON.stringify(this.data, null, 4))
     }
 
@@ -109,7 +110,7 @@ export class FlowCliService {
         if (!bin) {
             throw new Error("Provide a command");
         }
-        console.log(`[Flowser] executing command: ${bin} ${args.join(" ")}`)
+        this.logger.debug(`executing command: ${bin} ${args.join(" ")}`)
         return new Promise(((resolve, reject) => {
             let out = "";
             const process = spawn(bin, args, {
@@ -152,10 +153,10 @@ export class FlowCliService {
     private static async mkdirIfEnoent (path: string) {
         try {
             await stat(path)
-            console.debug(`[Flowser] directory "${path}" exists, skipping creation.`)
+            console.debug(`directory "${path}" exists, skipping creation`)
         } catch (e) {
             if (e.code === "ENOENT") {
-                console.debug(`[Flowser] directory "${path}" not found, creating...`)
+                console.debug(`directory "${path}" not found, creating`)
                 await mkdir(path)
             } else {
                 throw e;

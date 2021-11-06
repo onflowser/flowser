@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, exec, spawn } from "child_process";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { FlowCliService } from "./flow-cli.service";
 import { AccountsStorage } from '../../accounts/entities/storage.entity';
 import axios from 'axios';
@@ -8,13 +8,13 @@ import axios from 'axios';
 export class StorageDataService {
 
     private dataStorageProcess: ChildProcessWithoutNullStreams;
+    private readonly logger = new Logger(StorageDataService.name);
+
     constructor (private flowCliConfig: FlowCliService) {
     }
 
     async start () {
-        const flowDbPath: string = this.flowCliConfig.databaseDirPath;
-        console.log(`[Flowser] starting data storage process`);
-        console.log(`[Flowser] expecting flow database to be inside ${flowDbPath} directory`)
+        this.logger.debug(`Starting process in ${this.flowCliConfig.projectDirPath}...`);
 
         return new Promise(((resolve, reject) => {
             try {
@@ -44,11 +44,11 @@ export class StorageDataService {
             }
 
             this.dataStorageProcess.on("close", code => {
-                console.log('data storage process exit code:', code);
+                this.logger.debug('data storage process exit code:', code);
             })
 
             this.dataStorageProcess.on("error", error => {
-                console.log('data storage process error:', error);
+                this.logger.error(error.message, error.stack);
             })
         }))
     }
@@ -57,7 +57,7 @@ export class StorageDataService {
         try {
             this.dataStorageProcess?.kill();
         } catch (e) {
-            console.log("[Flowser] failed to stop storage: ", e.message)
+            this.logger.error(`Failed to stop: ${e.message}`, e.stack)
         }
     }
 
@@ -67,12 +67,9 @@ export class StorageDataService {
         let response;
         try {
             // TODO: Improve once Data storage will be configurable
-            console.log("fetching storage data for: ", account)
             response = await axios.get('http://backend:8888/storage')
-            console.log("fetched storage data for: ", account)
         } catch (e) {
-            // TODO: fix storage process not starting (fetch returns ECONNRESET)
-            console.error('Error fetching storage:', e.message);
+            this.logger.error(`Error fetching storage: ${e.message}`, e.stack);
         }
         const storage = response?.data || {};
         return account in storage ? storage[account] : [];
