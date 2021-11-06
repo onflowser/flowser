@@ -34,7 +34,7 @@ const formSchema = Joi.object()
         transactionExpiry: Joi.number().integer().positive().required(),
         transactionMaxGasLimit: Joi.number().integer().positive().required(),
         scriptGasLimit: Joi.number().integer().positive().required(),
-        numberOfInitialAccounts: Joi.number().integer().greater(0).positive().required(),
+        numberOfInitialAccounts: Joi.number().integer().greater(-1).required(),
     })
     .unknown(true);
 
@@ -444,7 +444,10 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                                 There must be at least 1 initial account.
                                             </span>
                                         ) : (
-                                            <span>Specify number of initial accounts created on emulator.</span>
+                                            <span>
+                                                Specify number of additional accounts created besides the service
+                                                account.
+                                            </span>
                                         )}
                                     </div>
                                 </div>

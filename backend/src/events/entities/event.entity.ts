@@ -31,7 +31,7 @@ export class Event extends PollingEntity {
   static init(flowEventObject): Event {
     return Object.assign(new Event(), {
       ...flowEventObject,
-      id: `${flowEventObject.transactionId}:${flowEventObject.type}`
+      id: `${flowEventObject.transactionId}:${flowEventObject.type}:${flowEventObject.eventIndex}`
     });
   }
 }

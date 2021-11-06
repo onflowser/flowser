@@ -128,11 +128,8 @@ export class FlowGatewayService {
                 req.end();
                 return resolve(res.statusCode === 200);
             })
-              .on("error", (e: any) => {
+              .on("error", () => {
                   req.end();
-                  if (e.code !== "ECONNREFUSED") {
-                      FlowGatewayService.logger.error(`couldn't connect to flow emulator: ${e.message}`, e.stack)
-                  }
                   return resolve(false)
               })
             return true;

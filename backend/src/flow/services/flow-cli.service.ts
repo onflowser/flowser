@@ -95,6 +95,10 @@ export class FlowCliService {
         return Object.keys(this.data.accounts).length;
     }
 
+    get totalNonServiceAccounts () {
+        return this.totalAccounts - 1;
+    }
+
     async load () {
         this.logger.debug(`loading flow-cli configuration: ${this.flowConfigPath}`)
         const data = await readFile(this.flowConfigPath);

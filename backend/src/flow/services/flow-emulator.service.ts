@@ -98,7 +98,7 @@ export class FlowEmulatorService {
             this.emulatorProcess.on("close", code => {
                 const error = this.getError() || new Error(`Emulator exited with code ${code}`)
                 this.setState(FlowEmulatorState.STOPPED);
-                cb(error, null)
+                this.logger.debug(error.message)
                 reject(error);
             })
 
@@ -143,8 +143,7 @@ export class FlowEmulatorService {
         if (this.configuration.numberOfInitialAccounts) {
             try {
                 await this.initialiseAccounts(
-                    // subtract 1, because of initial service account
-                    parseInt(this.configuration.numberOfInitialAccounts as string) - 1
+                    parseInt(this.configuration.numberOfInitialAccounts as string)
                 )
             } catch (e) {
                 this.logger.error(`failed to initialise accounts: ${e.message}`, e.stack)
@@ -153,18 +152,16 @@ export class FlowEmulatorService {
     }
 
     async initialiseAccounts (n: number) {
-        this.logger.debug(`initialising ${n} initial flow accounts...`)
         await this.flowCliService.load();
-        const diff = n - (this.flowCliService.totalAccounts - 1);
-        if (diff <= 0) {
-            return;
-        }
+        const diff = n - this.flowCliService.totalNonServiceAccounts;
+        this.logger.debug(`generating ${diff} initial flow accounts`)
         for (let i = 0; i < diff; i++) {
             const { address, privateKey } = await this.createAccount();
             this.flowCliService.data.accounts[randomString()] = {
                 key: privateKey,
                 address,
             }
+            this.logger.debug(`generated account: ${address}`)
         }
         await this.flowCliService.save();
     }
