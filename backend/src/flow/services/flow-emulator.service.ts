@@ -138,7 +138,10 @@ export class FlowEmulatorService {
         this.setState(FlowEmulatorState.RUNNING)
         if (this.configuration.numberOfInitialAccounts) {
             try {
-                await this.initialiseAccounts(parseInt(this.configuration.numberOfInitialAccounts as string))
+                await this.initialiseAccounts(
+                    // subtract 1, because of initial service account
+                    parseInt(this.configuration.numberOfInitialAccounts as string) - 1
+                )
             } catch (e) {
                 console.error(`[Flowser] failed to initialise accounts: `, e)
             }
