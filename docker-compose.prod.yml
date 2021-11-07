@@ -18,7 +18,7 @@ services:
     image: nginx:1.15-alpine
     restart: unless-stopped
     volumes:
-      - ./server/nginx:/etc/server/conf.d
+      - ./server/nginx:/etc/nginx/conf.d
       - ./server/certbot/conf:/etc/letsencrypt
       - ./server/certbot/www:/var/www/certbot
       - frontend-volume:/var/www/frontend
