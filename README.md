@@ -72,7 +72,7 @@ This command will start Flowser with default configuration (recommended).
 bash start.sh
 
 # or use npm if you have node installed
-npm run start:dev
+npm run prod:start
 ```
 
 ## 💻 Contributing
