@@ -50,7 +50,7 @@ services:
     environment:
       - APP_FRONTEND_PORT=${APP_FRONTEND_PORT}
       - REACT_APP_FLOW_ACCESS_NODE=http://localhost:${FLOW_EMULATOR_HTTP_PORT}
-      - REACT_APP_API_HOST=http://localhost:${APP_BACKEND_PORT}
+      - REACT_APP_API_HOST=${API_HOST}
     expose:
       - ${APP_FRONTEND_PORT}
     ports:
