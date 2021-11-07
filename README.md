@@ -23,7 +23,7 @@ This is a convenient development tool for [Flow blockchain](https://www.onflow.o
 ## ✨ Features
 
 ### Flow emulator
-Configure and run managed [flow emulator](https://github.com/onflow/flow-emulator) projects or start your own emulator instance on localhost
+Configure and run managed [flow emulator](https://github.com/onflow/flow-emulator) projects or start your own emulator instance on localhost.
 
 ### Inspect blockchain 
 Flowser allows you to inspect the current state of the flow blockchain. 

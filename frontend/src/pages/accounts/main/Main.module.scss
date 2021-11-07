@@ -9,7 +9,15 @@
 
   & > div {
     display: flex;
+    flex: 4;
     flex-direction: column;
+  }
+  & > div:not(:first-child) {
+    flex: 3;
+  }
+
+  & > div:last-child {
+    flex: 1;
   }
 
   &.isNew {
