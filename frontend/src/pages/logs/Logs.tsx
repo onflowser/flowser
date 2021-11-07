@@ -75,9 +75,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
                 {logDrawerSize === 'tiny' && (
                     <div className={classes.midContainer} ref={miniLogRef}>
                         {filteredData.map((log: any, key: number) => (
-                            <pre key={key}>
-                                <span dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}></span>
-                            </pre>
+                            <pre key={key} dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}></pre>
                         ))}
                     </div>
                 )}
