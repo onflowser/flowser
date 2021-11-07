@@ -1,8 +1,5 @@
 FROM ubuntu:20.04 as production
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
 WORKDIR /app
 
 RUN apt-get update
@@ -19,7 +16,8 @@ RUN npm install --silent glob rimraf
 RUN npm install
 RUN npm i -g @nestjs/cli
 
-ENV NODE_ENV=production
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
 COPY . .
 
