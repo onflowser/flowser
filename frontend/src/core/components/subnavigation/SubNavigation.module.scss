@@ -4,7 +4,7 @@
 .container {
   display: flex;
   align-items: center;
-  padding: $spacing-base;
+  padding: $spacing-l $spacing-base;
   justify-content: flex-end;
 
   .searchBox {

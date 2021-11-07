@@ -1,9 +1,9 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Project } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { EventEmitter } from "events";
-import { FlowCliConfigService } from "./flow-cli-config.service";
+import { FlowCliService } from "./flow-cli.service";
 import { randomString } from "../../utils";
 
 type StartCallback = (error: Error, data: string[]) => void;
@@ -29,24 +29,24 @@ export class FlowEmulatorService {
     private configuration: EmulatorConfigurationEntity;
     private emulatorProcess: ChildProcessWithoutNullStreams;
     private logs: string[] = [];
+    private readonly logger = new Logger(FlowEmulatorService.name);
 
-    constructor (private flowCliConfig: FlowCliConfigService) {
+    constructor (private flowCliService: FlowCliService) {
     }
 
     configureProjectContext (project: Project) {
         this.projectId = project?.id;
         this.configuration = project.emulator;
-        this.flowCliConfig.configure(this.projectId, this.configuration);
     }
 
     async init () {
-        console.log(`[Flowser] initialising emulator for project: ${this.projectId}`)
-        await this.flowCliConfig.init();
+        this.logger.debug(`initialising for project: ${this.projectId}`)
+        await this.flowCliService.init();
     }
 
     async start (cb: StartCallback = () => null) {
         const flags = this.getFlags();
-        console.log(`[Flowser] starting the emulator with (${flags.length}) flags: `, flags.join(" "))
+        this.logger.debug(`starting with (${flags.length}) flags: ${flags.join(" ")}`)
 
         return new Promise(((resolve, reject) => {
             try {
@@ -54,7 +54,7 @@ export class FlowEmulatorService {
                     'emulator',
                     ...flags
                 ], {
-                    cwd: this.flowCliConfig.projectDirPath
+                    cwd: this.flowCliService.projectDirPath
                 })
             } catch (e) {
                 this.setState(FlowEmulatorState.STOPPED);
@@ -98,7 +98,7 @@ export class FlowEmulatorService {
             this.emulatorProcess.on("close", code => {
                 const error = this.getError() || new Error(`Emulator exited with code ${code}`)
                 this.setState(FlowEmulatorState.STOPPED);
-                cb(error, null)
+                this.logger.debug(error.message)
                 reject(error);
             })
 
@@ -115,13 +115,16 @@ export class FlowEmulatorService {
 
     stop () {
         return new Promise(resolve => {
-            console.log(`[Flowser] stopping emulator: ${this.isRunning()}`)
+            this.logger.debug(
+                this.isRunning()
+                    ? `stopping pid: ${this.emulatorProcess.pid}`
+                    : `already stopped, skipping`
+            )
             if (this.isRunning()) {
-                console.log(`[Flowser] stopping emulator process: ${this.emulatorProcess.pid}`)
                 const isKilled = this.emulatorProcess.kill();
                 // resolve only when the emulator process exits
                 this.events.on(FlowEmulatorState.STOPPED, () => {
-                    console.log(`[Flowser] stopped emulator process: ${this.emulatorProcess.pid}`);
+                    this.logger.debug(`Process ${this.emulatorProcess.pid} stopped`)
                     resolve(isKilled)
                 })
             } else {
@@ -139,35 +142,35 @@ export class FlowEmulatorService {
         this.setState(FlowEmulatorState.RUNNING)
         if (this.configuration.numberOfInitialAccounts) {
             try {
-                await this.initialiseAccounts(parseInt(this.configuration.numberOfInitialAccounts as string))
+                await this.initialiseAccounts(
+                    parseInt(this.configuration.numberOfInitialAccounts as string)
+                )
             } catch (e) {
-                console.error(`[Flowser] failed to initialise accounts: `, e)
+                this.logger.error(`failed to initialise accounts: ${e.message}`, e.stack)
             }
         }
     }
 
     async initialiseAccounts (n: number) {
-        console.debug(`[Flowser] initialising ${n} initial flow accounts...`)
-        await this.flowCliConfig.load();
-        const diff = n - (this.flowCliConfig.totalAccounts - 1);
-        if (diff <= 0) {
-            return;
-        }
+        await this.flowCliService.load();
+        const diff = n - this.flowCliService.totalNonServiceAccounts;
+        this.logger.debug(`generating ${diff} initial flow accounts`)
         for (let i = 0; i < diff; i++) {
             const { address, privateKey } = await this.createAccount();
-            this.flowCliConfig.data.accounts[randomString()] = {
+            this.flowCliService.data.accounts[randomString()] = {
                 key: privateKey,
                 address,
             }
+            this.logger.debug(`generated account: ${address}`)
         }
-        await this.flowCliConfig.save();
+        await this.flowCliService.save();
     }
 
     async createAccount () {
-        const keysOutput = await this.execute("flow", ["keys", "generate"])
+        const keysOutput = await this.flowCliService.execute("flow", ["keys", "generate"])
         const privateKey = keysOutput[1][1];
         const publicKey = keysOutput[2][1];
-        const accountOutput = await this.execute("flow", ["accounts", "create", "--key", publicKey]);
+        const accountOutput = await this.flowCliService.execute("flow", ["accounts", "create", "--key", publicKey]);
         const address = accountOutput[1][1];
         return { address, publicKey, privateKey }
     }
@@ -190,7 +193,7 @@ export class FlowEmulatorService {
     }
 
     private setState (state: FlowEmulatorState) {
-        console.log("[Flowser] emulator state changed: ", state)
+        this.logger.debug(`emulator state changed: ${state}`)
         this.events.emit(state);
         this.state = state;
     }
@@ -220,50 +223,13 @@ export class FlowEmulatorService {
             flag("service-hash-algo", this.configuration.serviceHashAlgorithm),
             flag("storage-limit", this.configuration.storageLimit),
             flag("transaction-fees", this.configuration.transactionFees),
-            flag("dbpath", this.configuration.databasePath || this.flowCliConfig.databaseDirPath),
-            flag("persist", this.configuration.persist),
+            flag("dbpath", this.configuration.databasePath || this.flowCliService.databaseDirPath),
+            // flow emulator is always started with persist flag
+            // this is needed, so that storage script can index the db
+            flag("persist", true),
             flag("verbose", this.configuration.verboseLogging),
             flag("init", true)
         ].filter(Boolean);
-    }
-
-    private execute (bin = "", args, parsedOutput = true): Promise<string | string[][]> {
-        if (!bin) {
-            throw new Error("Provide a command");
-        }
-        console.log(`[Flowser] executing command: ${bin} ${args.join(" ")}`)
-        return new Promise(((resolve, reject) => {
-            let out = "";
-            const process = spawn(bin, args, {
-                cwd: this.flowCliConfig.projectDirPath
-            });
-
-            process.stdout.on("data", data => {
-                out += data.toString();
-            })
-
-            process.stderr.on("data", data => {
-                out += data.toString();
-            })
-
-            process.on("exit", (code) => code === 0
-                ? resolve(parsedOutput ? parseOutput(out) : out)
-                : reject(out)
-            );
-        }))
-
-        function parseOutput (out) {
-            return out.split("\n").map(parseLine).filter(Boolean)
-        }
-
-        function parseLine (line) {
-            const value = line.trim();
-            if (/\t/.test(value)) {
-                return value.split(/[ ]*\t[ ]*/);
-            } else {
-                return value;
-            }
-        }
     }
 
     static formatLogLines (lines: string[]) {
@@ -275,7 +241,7 @@ export class FlowEmulatorService {
                 ...rest
             } = FlowEmulatorService.parseLogLine(line);
             // format example: Thu Oct 28 2021 21:20:51
-            const formattedTime = new Date(time).toString().split(" ").slice(0,5).join(" ")
+            const formattedTime = new Date(time).toString().split(" ").slice(0, 5).join(" ")
             // appends the rest of the values in key="value" format
             return (
                 level.toUpperCase().slice(0, 4) +

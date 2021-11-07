@@ -1,6 +1,17 @@
 {
     "openapi": "3.0.0",
     "paths": {
+        "/api/version": {
+            "get": {
+                "operationId": "AppController_getVersion",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/projects": {
             "post": {
                 "operationId": "ProjectsController_create",
@@ -190,6 +201,17 @@
         "/api/flow/status": {
             "get": {
                 "operationId": "FlowController_getStatus",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/flow/version": {
+            "get": {
+                "operationId": "FlowController_getVersion",
                 "parameters": [],
                 "responses": {
                     "200": {

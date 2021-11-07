@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FlowEmulatorService } from './flow-emulator.service';
-import { FlowCliConfigService } from "./flow-cli-config.service";
+import { FlowCliService } from "./flow-cli.service";
 
 describe('FlowEmulatorService', () => {
     let service: FlowEmulatorService;
@@ -12,7 +12,7 @@ describe('FlowEmulatorService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [FlowEmulatorService, FlowCliConfigService],
+            providers: [FlowEmulatorService, FlowCliService],
         }).compile();
 
         service = module.get<FlowEmulatorService>(FlowEmulatorService);

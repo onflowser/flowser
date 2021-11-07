@@ -5,7 +5,7 @@ const {spawn} = require("child_process");
 const ROOT_DIR_PATH = path.join(__dirname, "..")
 const FLOWSER_DIR_PATH = path.join(ROOT_DIR_PATH, '.flowser');
 const TEMP_DIR_PATH = path.join(FLOWSER_DIR_PATH, ".temp")
-const FLOW_CONFIG_PATH = path.join(TEMP_DIR_PATH, "flow.json");
+const FLOW_CONFIG_PATH = path.join(ROOT_DIR_PATH, "flow.json");
 const TX_DIR_PATH = path.join(TEMP_DIR_PATH, "transactions")
 const CONTRACTS_DIR_PATH = path.join(TEMP_DIR_PATH, "contracts")
 
@@ -28,7 +28,6 @@ function execute(bin = "", args, parsedOutput = true) {
   if (!bin) {
     throw new Error("Provide a command");
   }
-  console.log("executing: ", [bin, ...args].join(" "));
   return new Promise(((resolve, reject) => {
     let out = "";
     const childProcess = spawn(bin, args, {

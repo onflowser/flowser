@@ -1,5 +1,9 @@
 import config from "../../config";
-import { Injectable } from "@nestjs/common";
+import {
+    Injectable,
+    InternalServerErrorException,
+    Logger
+} from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import { FlowGatewayService } from "./flow-gateway.service";
 import { BlocksService } from "../../blocks/blocks.service";
@@ -16,11 +20,13 @@ import { FlowEmulatorService } from "./flow-emulator.service";
 import { LogsService } from "../../logs/logs.service";
 import { Log } from "../../logs/entities/log.entity";
 import { StorageDataService } from './storage-data.service';
+import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
 
 @Injectable()
 export class FlowAggregatorService {
 
     private project: Project;
+    private readonly logger = new Logger(FlowAggregatorService.name);
 
     constructor(
         private blockService: BlocksService,
@@ -45,7 +51,7 @@ export class FlowAggregatorService {
         return new Promise((resolve, reject) => {
             this.flowEmulatorService.start(((error, data) => {
                 if (error) {
-                    console.error(`[Flowser] received emulator error: `, error)
+                    this.logger.error(`received emulator error: ${error.message}`)
                     reject(error)
                 } else {
                     this.handleEmulatorLogs(data);
@@ -77,7 +83,7 @@ export class FlowAggregatorService {
         try {
             latestBlock = await this.flowGatewayService.getLatestBlock();
         } catch (e) {
-            return console.log(`[Flowser] failed to fetch latest block: ${e.message}`)
+            return this.logger.debug(`failed to fetch latest block: ${e.message}`)
         }
 
         // user can specify (on a project level) what is the starting block height
@@ -91,7 +97,12 @@ export class FlowAggregatorService {
             : initialStartBlockHeight;
         const endBlockHeight = latestBlock.height;
 
-        console.log(`[Flowser] fetching block range (${startBlockHeight} - ${endBlockHeight})`)
+        if (startBlockHeight > endBlockHeight) {
+            // no new blocks will be fetched
+            return;
+        }
+
+        this.logger.debug(`fetching block range (${startBlockHeight} - ${endBlockHeight})`)
 
         let data;
         try {
@@ -100,7 +111,7 @@ export class FlowAggregatorService {
                 endBlockHeight
             );
         } catch (e) {
-            return console.log(`[Flowser] failed to fetch block data: ${e.message}`)
+            return this.logger.debug(`failed to fetch block data: ${e.message}`)
         }
 
         const events = data.map(({events}) => events).flat();
@@ -111,26 +122,27 @@ export class FlowAggregatorService {
             // store fetched data
             await Promise.all(blocks.map(e =>
                 this.blockService.create(Block.init(e))
-                    .catch(e => console.error(`[Flowser] block save error: `, e))
+                    .catch(e => this.logger.error(`block save error: ${e.message}`, e.stack))
             ))
             await Promise.all(transactions.map(e =>
                 this.handleTransactionCreated(Transaction.init(e))
-                    .catch(e => console.error(`[Flowser] transaction save error: `, e))
+                    .catch(e => this.logger.error(`transaction save error: ${e.message}`, e.stack))
             ))
             await Promise.all(events.map(e =>
                 this.eventService.create(Event.init(e))
-                    .catch(e => console.error(`[Flowser] event save error: `, e))
+                    .catch(e => this.logger.error(`event save error: ${e.message}`, e.stack))
             ))
             await Promise.all(events.map(e => this.handleEvent(Event.init(e))))
         } catch (e) {
             // TODO: revert writes (wrap in db transaction)
-            console.error(`[Flowser] data store error: ${e}`, e.message)
+            // check https://github.com/onflowser/flowser/issues/6
+            this.logger.error(`data store error: ${e.message}`, e.stack)
         }
     }
 
     // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
     async handleEvent(event: Event) {
-        console.log(`[Flowser] handling event: `, event.type)
+        this.logger.debug(`handling event: ${event.type}`)
         const {data, type} = event;
         const {address, contract} = data as any;
         switch (type) {
@@ -154,14 +166,18 @@ export class FlowAggregatorService {
     async handleTransactionCreated(tx: Transaction) {
         return Promise.all([
             this.transactionService.create(tx),
-            this.accountService.update(`0x${tx.payer}`, {})
+            this.updateAccount(`0x${tx.payer}`)
         ])
     }
 
     async handleAccountCreated(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
-        console.log("[Flow] Account created: ", account.address);
-        return this.accountService.create(Account.init(account));
+        this.logger.debug(`Account ${account.address} created`);
+        account.storage = await this.storageDataService.getStorageData(address)
+        return this.accountService.replace(
+            address,
+            Account.init(account, {createdAt: Date.now()})
+        )
     }
 
     async handleAccountKeyAdded(address: string) {
@@ -186,14 +202,23 @@ export class FlowAggregatorService {
 
     async updateAccount(address: string) {
         const account = await this.flowGatewayService.getAccount(address);
-        console.log('getting storage data for address', address);
-        const storage = await this.storageDataService.getStorageData(address);
-        account.storage = storage;
-        console.log('storage returned ', storage)
-        console.log("[Flow] Account updated: ", account.address);
+        account.storage = await this.storageDataService.getStorageData(address);
+        this.logger.debug(`Account ${account.address} updated`);
         return this.accountService.replace(
             address,
             Account.init(account, {updatedAt: Date.now()})
         )
+    }
+
+    async bootstrapServiceAccount() {
+        const {serviceAddress} = defaultEmulatorFlags;
+        try {
+            await this.handleAccountCreated(serviceAddress);
+        } catch (error) {
+            // ignore duplicate key error (with code 11000)
+            if (error.code !== 11000) {
+                throw new InternalServerErrorException(error.message)
+            }
+        }
     }
 }

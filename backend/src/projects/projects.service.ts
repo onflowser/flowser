@@ -1,7 +1,7 @@
 import {
     ConflictException,
     Injectable,
-    InternalServerErrorException,
+    InternalServerErrorException, Logger,
     NotFoundException,
     ServiceUnavailableException,
 } from '@nestjs/common';
@@ -18,13 +18,16 @@ import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
+import { FlowCliService } from "../flow/services/flow-cli.service";
 import { plainToClass } from "class-transformer";
 import { StorageDataService } from '../flow/services/storage-data.service';
+import config from "../config";
 
 @Injectable()
 export class ProjectsService {
 
     private currentProject: Project;
+    private readonly logger = new Logger(ProjectsService.name);
 
     constructor (
         @InjectRepository(Project)
@@ -32,6 +35,7 @@ export class ProjectsService {
         private flowGatewayService: FlowGatewayService,
         private flowAggregatorService: FlowAggregatorService,
         private flowEmulatorService: FlowEmulatorService,
+        private flowCliService: FlowCliService,
         private accountsService: AccountsService,
         private blocksService: BlocksService,
         private eventsService: EventsService,
@@ -49,55 +53,21 @@ export class ProjectsService {
         }
     }
 
-    async unUseProject () {
+    async cleanupProject () {
         this.currentProject = undefined;
         this.flowAggregatorService.configureProjectContext(this.currentProject);
         this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
         await this.flowAggregatorService.stopEmulator();
+        this.storageDataService.stop();
+        await this.flowCliService.cleanup();
     }
 
     async useProject (id: string) {
         this.currentProject = await this.findOne(id);
 
-        // user may have previously used a custom emulator project
-        // make sure that in any running emulators are stopped
-        await this.flowAggregatorService.stopEmulator();
         try {
-            await this.storageDataService.stop();
-        } catch (e) {
-        }
-
-        // update project context
-        this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
-        this.flowAggregatorService.configureProjectContext(this.currentProject);
-
-        if (this.currentProject.emulator) {
-            this.flowEmulatorService.configureProjectContext(this.currentProject)
-            await this.flowAggregatorService.startEmulator()
-                .catch(async e => {
-                    await this.unUseProject();
-                    throw new ServiceUnavailableException(
-                        `Can not start emulator with project id ${id}`,
-                        e.message
-                    )
-                });
-
-            try {
-                await this.storageDataService.start();
-            } catch (e) {
-                throw new ServiceUnavailableException('Data storage service error: ', e.message);
-            }
-        }
-
-        if (
-            !this.currentProject.isOfficialNetwork() &&
-            !await this.flowGatewayService.isConnectedToGateway()
-        ) {
-            await this.unUseProject();
-            throw new ServiceUnavailableException("Emulator not accessible")
-        }
-
-        try {
+            // remove all existing data of previously used project
+            // TODO: persist data for projects with "persist" flag
             await Promise.all([
                 this.accountsService.removeAll(),
                 this.blocksService.removeAll(),
@@ -109,7 +79,52 @@ export class ProjectsService {
             throw new InternalServerErrorException("Project cleanup failed")
         }
 
-        console.debug(`[Flowser] using project: ${id}`);
+        if (this.currentProject.isUserManagedEmulator()) {
+            // user must run emulator on non-default flow emulator port
+            this.currentProject.gateway.port = config.userManagedEmulatorPort;
+        }
+
+        // user may have previously used a custom emulator project
+        // make sure that in any running emulators are stopped
+        await this.flowAggregatorService.stopEmulator();
+        this.storageDataService.stop();
+
+        // update project context
+        this.flowGatewayService.configureDataSourceGateway(this.currentProject?.gateway);
+        this.flowAggregatorService.configureProjectContext(this.currentProject);
+
+        if (this.currentProject.emulator) {
+            this.flowCliService.configure(id, this.currentProject.emulator);
+            this.flowEmulatorService.configureProjectContext(this.currentProject)
+            await this.flowCliService.cleanup(); // ensure clean environment
+
+            await this.flowAggregatorService.startEmulator()
+                .catch(async e => {
+                    await this.cleanupProject();
+                    throw new ServiceUnavailableException(
+                        `Can not start emulator with project id ${id}`,
+                        e.message
+                    )
+                });
+
+            try {
+                await this.storageDataService.start();
+            } catch (e) {
+                throw new ServiceUnavailableException('Data storage service error', e.message);
+            }
+        }
+
+        if (this.currentProject.isFlowserManagedEmulator()) {
+            if (await this.flowGatewayService.isConnectedToGateway()) {
+                // fetch service account data after emulator is started
+                await this.flowAggregatorService.bootstrapServiceAccount();
+            } else {
+                await this.cleanupProject();
+                throw new ServiceUnavailableException("Emulator not accessible")
+            }
+        }
+
+        this.logger.debug(`using project: ${id}`);
 
         return this.currentProject;
     }

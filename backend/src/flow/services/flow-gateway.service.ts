@@ -6,7 +6,7 @@ import {
     FlowTransactionStatus
 } from "../types";
 import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
 
@@ -14,9 +14,11 @@ import * as http from "http";
 export class FlowGatewayService {
 
     private configuration: GatewayConfigurationEntity;
+    private static readonly logger = new Logger(FlowGatewayService.name);
 
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         this.configuration = configuration;
+        FlowGatewayService.logger.debug(`@onflow/fcl listening on ${this.configuration?.url()}`);
         fcl.config().put("accessNode.api", this.configuration?.url())
     }
 
@@ -100,7 +102,7 @@ export class FlowGatewayService {
     public async getBlockDataWithinHeightRange(fromHeight, toHeight) {
         let promises = [];
         for (let height = fromHeight; height <= toHeight; height++) {
-            console.log(`[Flowser] fetching block: ${height}`)
+            FlowGatewayService.logger.debug(`fetching block: ${height}`)
             promises.push(this.getBlockData(height));
         }
         return Promise.all(promises)
@@ -127,11 +129,8 @@ export class FlowGatewayService {
                 req.end();
                 return resolve(res.statusCode === 200);
             })
-              .on("error", (error: any) => {
+              .on("error", () => {
                   req.end();
-                  if (error.code !== "ECONNREFUSED") {
-                      console.log(`[Flowser] couldn't connect to flow emulator for unknown reason: `, error)
-                  }
                   return resolve(false)
               })
             return true;

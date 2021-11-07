@@ -49,14 +49,23 @@
     margin-bottom: 50px;
   }
 
-  h1 {
-    color: $color-white;
-    opacity: 0.74;
-    font-family: $font-family-days-one;
-    font-size: 35px;
-    font-weight: normal;
-    letter-spacing: 1.4px;
+  .header {
+    text-align: center;
     margin-bottom: $spacing-l * 3;
+
+    h1 {
+      color: $color-white;
+      opacity: 0.74;
+      font-family: $font-family-days-one;
+      font-size: 35px;
+      font-weight: normal;
+      letter-spacing: 1.4px;
+      margin-bottom: $spacing-s;
+    }
+
+    .version {
+      color: $color-mid-grey;
+    }
   }
 
   button {
