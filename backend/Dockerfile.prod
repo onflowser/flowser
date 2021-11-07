@@ -12,13 +12,14 @@ RUN apt-get -yq install nodejs
 RUN npm install
 RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
 ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
-ENV NODE_ENV=production
 
 COPY package*.json ./
 
 RUN npm install --silent glob rimraf
 RUN npm install
 RUN npm i -g @nestjs/cli
+
+ENV NODE_ENV=production
 
 COPY . .
 
