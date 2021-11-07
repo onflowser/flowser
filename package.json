@@ -7,7 +7,23 @@
     "doc": "docs"
   },
   "scripts": {
-    "start:dev": "docker-compose --env-file .env.sample up -d"
+    "dev:start": "docker-compose --env-file .env.dev up -d",
+    "dev:stop": "docker-compose --env-file .env.dev down",
+    "dev:build": "docker-compose --env-file .env.dev build",
+    "dev:logs": "docker-compose --env-file .env.dev logs -f",
+    "dev:redeploy": "npm run dev:stop && npm run dev:build && npm run dev:start",
+
+    "prod:start": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "prod:stop": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down",
+    "prod:build": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml build",
+    "prod:logs": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml logs -f",
+    "prod:redeploy": "npm run prod:stop && npm run prod:build && npm run prod:start",
+
+    "hosted:start": "docker-compose --env-file .env.hosted -f docker-compose.yml -f docker-compose.hosted.yml up -d",
+    "hosted:stop": "docker-compose --env-file .env.hosted -f docker-compose.yml -f docker-compose.hosted.yml down",
+    "hosted:build": "docker-compose --env-file .env.hosted -f docker-compose.yml -f docker-compose.hosted.yml build",
+    "hosted:logs": "docker-compose --env-file .env.hosted -f docker-compose.yml -f docker-compose.hosted.yml logs -f",
+    "hosted:redeploy": "npm run hosted:stop && npm run hosted:build && npm run hosted:start"
   },
   "repository": {
     "type": "git",
@@ -22,9 +38,9 @@
   "author": "@bartolomej, @jgololicic, @monikaxh",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bartolomej/flowser/issues"
+    "url": "https://github.com/onflowser/flowser/issues"
   },
-  "homepage": "https://github.com/bartolomej/flowser#readme",
+  "homepage": "https://github.com/onflowser/flowser#readme",
   "devDependencies": {
     "lerna": "^4.0.0"
   }

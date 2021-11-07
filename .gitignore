@@ -7,3 +7,4 @@ flowdb
 flow.json
 .flowser
 .envrc
+server/certbot

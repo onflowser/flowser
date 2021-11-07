@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": false,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -7,6 +8,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2017",
+    "types": ["node"],
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -16,6 +18,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
+    "noFallthroughCasesInSwitch": false
   }
 }
