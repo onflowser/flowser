@@ -1,4 +1,4 @@
-FROM ubuntu:latest AS development
+FROM ubuntu:20:04 AS development
 
 WORKDIR /app
 
