@@ -35,6 +35,8 @@ const Main: FunctionComponent<any> = () => {
         }
     };
 
+    const isHosted = window.origin === 'https://app.flowser.dev';
+
     const onConfigure = useCallback(() => {
         history.push(`/${routes.start}/configure`);
     }, []);
@@ -47,10 +49,12 @@ const Main: FunctionComponent<any> = () => {
                 <div className={classes.header}>
                     <h1>FLOWSER</h1>
                     <span className={classes.version}>{flowserVersion?.data?.version}</span>
-                    <p className={classes.betaWarning}>
-                        Hosted version of Flowser is still in beta. In this stage, only a single project can be used at
-                        the time.{' '}
-                    </p>
+                    {isHosted && (
+                        <p className={classes.betaWarning}>
+                            Hosted version of Flowser is still in beta. In this stage, only a single project can be used
+                            at the time.{' '}
+                        </p>
+                    )}
                 </div>
                 <IconButton
                     onClick={() => onQuickstart('emulator')}
