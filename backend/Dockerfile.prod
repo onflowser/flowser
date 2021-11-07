@@ -1,4 +1,7 @@
-FROM ubuntu:latest AS development
+FROM ubuntu:20.04 as production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /app
 
@@ -9,14 +12,15 @@ RUN apt-get -yq install nodejs
 RUN npm install
 RUN sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
 ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
+ENV NODE_ENV=production
 
 COPY package*.json ./
 
 RUN npm install --silent glob rimraf
-RUN npm install --only=development
+RUN npm install
 
 COPY . .
 
 RUN npm run build
 
-CMD ["npm", "run", "start:debug"]
+CMD ["npm", "run", "start:prod"]

@@ -7,8 +7,14 @@
     "doc": "docs"
   },
   "scripts": {
-    "start:dev": "docker-compose --env-file .env.sample up -d",
-    "start:prod": "docker-compose --env-file .env.sample -f docker-compose.yml -f docker-compose.prod.yml up -d"
+    "start:dev": "docker-compose --env-file .env.dev up -d",
+    "start:prod": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "stop:dev": "docker-compose --env-file .env.dev down",
+    "stop:prod": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down",
+    "build:dev": "docker-compose --env-file .env.dev build",
+    "build:prod": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml build",
+    "redeploy:dev": "npm run stop:dev && npm run build:dev && npm run start:dev",
+    "redeploy:prod": "npm run stop:prod && npm run build:prod && npm run start:prod"
   },
   "repository": {
     "type": "git",

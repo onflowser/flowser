@@ -38,7 +38,6 @@ services:
       - /app/node_modules
     links:
       - database
-    command: npm run start:debug
     restart: unless-stopped
   frontend:
     container_name: frontend
@@ -60,7 +59,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: npm run start
     restart: unless-stopped
   database:
     build: ./database

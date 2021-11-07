@@ -5,13 +5,14 @@ services:
     image: backend:prod
     build:
       target: production
+      dockerfile: ./Dockerfile.prod
   frontend:
     image: frontend:prod
     build:
       target: production
+      dockerfile: ./Dockerfile.prod
     volumes:
       - frontend-volume:/app
-      - /app/node_modules
   nginx:
     container_name: nginx
     image: nginx:1.15-alpine
