@@ -1,6 +1,10 @@
 version: '3.8'
 
 services:
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile.hosted
   backend:
     image: backend:hosted
     build:
