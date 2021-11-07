@@ -14,7 +14,8 @@
     "build:dev": "docker-compose --env-file .env.dev build",
     "build:prod": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml build",
     "redeploy:dev": "npm run stop:dev && npm run build:dev && npm run start:dev",
-    "redeploy:prod": "npm run stop:prod && npm run build:prod && npm run start:prod"
+    "logs:dev": "docker-compose --env-file .env.dev logs -f",
+    "logs:prod": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml logs -f"
   },
   "repository": {
     "type": "git",
