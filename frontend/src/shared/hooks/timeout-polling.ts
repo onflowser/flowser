@@ -58,7 +58,7 @@ export const useTimeoutPolling = <T>(
                                 if (i !== -1) {
                                     newData[i] = { ...updatedItems[index], isUpdated: true };
                                 } else {
-                                    newData.push({ ...newData[i], isUpdated: false, isNew: true });
+                                    newData.push({ ...updatedItems[index], isUpdated: false, isNew: true });
                                 }
                             }
                         });
