@@ -1,0 +1,5 @@
+FROM mongo:5.0
+
+# Init and seed database
+ADD init-db.sh /docker-entrypoint-initdb.d/
+ADD seeds/projects.hosted.js /docker-entrypoint-initdb.d/

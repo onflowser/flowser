@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS development
+FROM ubuntu:20.04 as production
 
 WORKDIR /app
 
@@ -13,10 +13,14 @@ ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
 COPY package*.json ./
 
 RUN npm install --silent glob rimraf
-RUN npm install --only=development
+RUN npm install
+RUN npm i -g @nestjs/cli
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
 COPY . .
 
 RUN npm run build
 
-CMD ["npm", "run", "start:debug"]
+CMD ["npm", "run", "start:prod"]

@@ -69,7 +69,10 @@ See: [Docker installation instructions](https://www.docker.com/get-started)
 This command will start Flowser with default configuration (recommended).
 
 ```bash
-npm run start:dev
+bash start.sh
+
+# or use npm if you have node installed
+npm run prod:start
 ```
 
 ## 💻 Contributing
@@ -103,3 +106,4 @@ See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up develo
 ## 🙌 Credits
 
 - [@bluesign](https://github.com/bluesign) - provided a useful [script](https://gist.github.com/bluesign/df24b31a61bf4cd11f88efb6edd78925) for indexing flow emulator db
+- [@wmnnd](https://github.com/wmnnd) - docker production setup [guide](https://github.com/wmnnd/nginx-certbot)

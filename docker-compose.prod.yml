@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    image: backend:prod
+    build:
+      context: ./backend
+      target: production
+      dockerfile: ./Dockerfile.prod
+  frontend:
+    image: frontend:prod
+    build:
+      context: ./frontend
+      target: production
+      dockerfile: ./Dockerfile.prod
+    restart: "no"
+  database:
+    build:
+      context: ./database
+      dockerfile: ./Dockerfile.hosted
+    container_name: database
+  dev-wallet:
+    container_name: dev-wallet

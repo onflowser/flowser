@@ -66,6 +66,12 @@
     .version {
       color: $color-mid-grey;
     }
+
+    .betaWarning {
+      margin-top: $spacing-s;
+      color: $color-main-yellow;
+      max-width: 400px;
+    }
   }
 
   button {
