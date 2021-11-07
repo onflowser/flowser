@@ -15,7 +15,7 @@ import FullScreenLoading from '../../../shared/components/fullscreen-loading/Ful
 import { isInitialParentId } from '../../../shared/functions/utils';
 
 const Main: FunctionComponent<any> = () => {
-    const { searchTerm, setPlaceholder } = useSearch();
+    const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
     const { formatDate } = useFormattedDate();
     const { data: transactions, firstFetch } = useTimeoutPolling('/api/blocks/polling', '_id');
@@ -24,6 +24,7 @@ const Main: FunctionComponent<any> = () => {
         setPlaceholder('Search for block ids, parent ids, time, ...');
         showNavigationDrawer(false);
         showSubNavigation(true);
+        disableSearchBar(false);
     }, []);
 
     const { filteredData } = useFilterData(transactions, searchTerm);
