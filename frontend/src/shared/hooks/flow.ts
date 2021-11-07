@@ -41,8 +41,10 @@ export function useFlow() {
 
     async function login() {
         try {
-            await fcl.authenticate();
-            toast('Logged in!');
+            const result = await fcl.authenticate();
+            if (result.loggedIn) {
+                toast('Logged in!');
+            }
         } catch (e: any) {
             toast.error(`Login failed: ${e.message}`);
         }

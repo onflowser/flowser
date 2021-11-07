@@ -79,7 +79,7 @@ export class ProjectsService {
             throw new InternalServerErrorException("Project cleanup failed")
         }
 
-        if (this.currentProject.isUserManagedEmulator()) {
+        if (this.currentProject.isUserManagedEmulator() && config.userManagedEmulatorPort) {
             // user must run emulator on non-default flow emulator port
             this.currentProject.gateway.port = config.userManagedEmulatorPort;
         }

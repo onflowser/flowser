@@ -82,7 +82,7 @@ export class FlowEmulatorService {
                 }
                     // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
                     // TODO: logic for determining if emulator started successfully should be improved
-                // https://github.com/bartolomej/flowser/issues/33
+                // https://github.com/onflowser/flowser/issues/33
                 else if (this.isState(FlowEmulatorState.STARTED) && !linesMatch("server error")) {
                     // emulator successfully started
                     this.onServerRunning();
