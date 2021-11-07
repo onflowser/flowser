@@ -32,7 +32,10 @@ const Main: FunctionComponent<any> = () => {
         <>
             {filteredData &&
                 filteredData.map((item, i) => (
-                    <Card key={i} className={`${classes.card} ${item.isNew && classes.isNew}`}>
+                    <Card
+                        key={item.address + item.txCount + item.keys?.length}
+                        className={`${classes.card} ${item.isNew || item.isUpdated ? classes.isNew : ''}`}
+                    >
                         <div>
                             <Label>ADDRESS</Label>
                             <Value>

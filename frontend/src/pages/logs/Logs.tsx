@@ -23,7 +23,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
     const { highlightLogKeywords } = useSyntaxHighlighter();
     const miniLogRef = useRef(null);
     const bigLogRef = useRef(null);
-    const { data } = useTimeoutPolling('/api/logs/polling');
+    const { data } = useTimeoutPolling('/api/logs/polling', '_id', 1000, false);
     const logs = data ? data.map((log: any) => log.data) : [];
     const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
     const { filteredData } = useFilterData(logs, searchTerm);

@@ -1,4 +1,5 @@
 @import 'styles/spacings';
+@import 'styles/animations';
 
 .card {
   display: flex;
@@ -15,6 +16,10 @@
   & > div + div {
     flex: 3;
     margin-left: $spacing-l;
+  }
+
+  &.isNew {
+    @include addNewContentAnimation(.4s);
   }
 }
 .noResults {

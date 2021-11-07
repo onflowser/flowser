@@ -13,6 +13,8 @@ interface OwnProps {
     statusCode: number;
     payer: string;
     proposer: string;
+    className?: any;
+    [key: string]: any;
 }
 
 type Props = OwnProps;
@@ -23,10 +25,11 @@ const TransactionListItem: FunctionComponent<Props> = ({
     statusCode,
     payer,
     proposer,
+    className,
     ...restProps
 }) => {
     return (
-        <Card className={classes.card} {...restProps}>
+        <Card className={`${classes.card} ${className}`} {...restProps}>
             <div>
                 <Label>TRANSACTION ID</Label>
                 <Value>

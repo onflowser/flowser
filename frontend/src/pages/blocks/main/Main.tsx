@@ -34,8 +34,8 @@ const Main: FunctionComponent<any> = () => {
     return (
         <>
             {filteredData &&
-                filteredData.map((item: any, i) => (
-                    <Card key={i} className={`${classes.card} ${item.isNew ? classes.isNew : ''}`}>
+                filteredData.map((item: any) => (
+                    <Card key={item.height + item.id} className={`${classes.card} ${item.isNew ? classes.isNew : ''}`}>
                         <div>
                             <Label>BLOCK HEIGHT</Label>
                             <Value>{item.height}</Value>
