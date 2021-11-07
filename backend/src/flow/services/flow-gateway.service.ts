@@ -18,6 +18,7 @@ export class FlowGatewayService {
 
     public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
         this.configuration = configuration;
+        FlowGatewayService.logger.debug(`@onflow/fcl listening on ${this.configuration?.url()}`);
         fcl.config().put("accessNode.api", this.configuration?.url())
     }
 

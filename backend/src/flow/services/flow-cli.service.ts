@@ -58,7 +58,7 @@ export class FlowCliService {
     }
 
     async cleanup() {
-        if (!this.emulatorConfig.persist) {
+        if (!this.emulatorConfig?.persist) {
             // flow emulator is always started with persist flag
             // this is needed, so that storage script can index the db
 

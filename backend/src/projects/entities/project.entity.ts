@@ -59,8 +59,12 @@ export class Project extends PollingEntity {
         return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
     }
 
-    isEmulatorNetwork() {
-        return this.isAnyNetwork([FlowNetworks.EMULATOR]);
+    isUserManagedEmulator() {
+        return this.id === "emulator";
+    }
+
+    isFlowserManagedEmulator() {
+        return this.isAnyNetwork([FlowNetworks.EMULATOR]) && !this.isUserManagedEmulator();
     }
 
     isAnyNetwork(networks: FlowNetworks[]) {

@@ -21,6 +21,7 @@ import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/flow-cli.service";
 import { plainToClass } from "class-transformer";
 import { StorageDataService } from '../flow/services/storage-data.service';
+import config from "../config";
 
 @Injectable()
 export class ProjectsService {
@@ -78,6 +79,11 @@ export class ProjectsService {
             throw new InternalServerErrorException("Project cleanup failed")
         }
 
+        if (this.currentProject.isUserManagedEmulator()) {
+            // user must run emulator on non-default flow emulator port
+            this.currentProject.gateway.port = config.userManagedEmulatorPort;
+        }
+
         // user may have previously used a custom emulator project
         // make sure that in any running emulators are stopped
         await this.flowAggregatorService.stopEmulator();
@@ -108,7 +114,7 @@ export class ProjectsService {
             }
         }
 
-        if (this.currentProject.isEmulatorNetwork()) {
+        if (this.currentProject.isFlowserManagedEmulator()) {
             if (await this.flowGatewayService.isConnectedToGateway()) {
                 // fetch service account data after emulator is started
                 await this.flowAggregatorService.bootstrapServiceAccount();
