@@ -9,6 +9,8 @@ services:
   frontend:
     image: frontend:hosted
     build:
+      args:
+        - REACT_APP_API_HOST=https://app.flowser.dev
       target: hosted
       dockerfile: ./Dockerfile.prod
     volumes:

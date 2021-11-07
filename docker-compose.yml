@@ -44,6 +44,8 @@ services:
     container_name: frontend
     image: frontend:dev
     build:
+      args:
+        - REACT_APP_API_HOST=http://localhost:3001
       context: ./frontend
       target: development
       dockerfile: ./Dockerfile
