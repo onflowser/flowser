@@ -27,7 +27,8 @@ const Main: FunctionComponent<any> = () => {
             {filteredData &&
                 filteredData.map((item: any, i) => (
                     <TransactionListItem
-                        key={i}
+                        key={item.id + i}
+                        className={`${item.isNew || item.isUpdated ? classes.isNew : ''}`}
                         id={item.id}
                         referenceBlockId={item.referenceBlockId}
                         statusCode={item.status.statusCode}

@@ -14,7 +14,7 @@ import FullScreenLoading from '../../../shared/components/fullscreen-loading/Ful
 const Main: FunctionComponent<any> = () => {
     const { searchTerm, setPlaceholder } = useSearch();
     const { showNavigationDrawer, showSubNavigation } = useNavigation();
-    const { data, firstFetch } = useTimeoutPolling('/api/contracts/polling', '_id');
+    const { data, firstFetch } = useTimeoutPolling('/api/contracts/polling', 'id');
 
     useEffect(() => {
         setPlaceholder('search for contracts');
@@ -28,7 +28,10 @@ const Main: FunctionComponent<any> = () => {
         <>
             {filteredData &&
                 filteredData.map((item: any, i) => (
-                    <Card key={i} className={classes.card}>
+                    <Card
+                        key={item.id + i}
+                        className={`${classes.card} ${item.isNew || item.isUpdated ? classes.isNew : ''}`}
+                    >
                         <div>
                             <Label>NAME</Label>
                             <Value>

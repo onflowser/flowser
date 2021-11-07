@@ -41,8 +41,8 @@ const Events: FunctionComponent<Props> = (props) => {
         <>
             {filteredData &&
                 filteredData.map((item: any, i) => (
-                    <React.Fragment key={i}>
-                        <Card className={`${classes.card} ${i + 1 === filteredData.length ? classes.isNew : ''}`}>
+                    <React.Fragment key={i + '-' + item.blockId}>
+                        <Card className={`${classes.card} ${item.isNew || item.isUpdated ? classes.isNew : ''}`}>
                             <div>
                                 <Label>BLOCK ID</Label>
                                 <Value>
