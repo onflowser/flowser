@@ -11,6 +11,8 @@
 
 This is a convenient development tool for [Flow blockchain](https://www.onflow.org/), which starts and indexes flow emulator or testnet blockchains.
 
+Flowser is also available in hosted version (BETA) available at [app.flowser.dev](https://app.flowser.dev). You should only be use online version for demonstration purposes, as it currently supports only a single project at the time (not useful for parallel usage by many users).
+
 ## 📖 Contents
 
 - [Key features](#-features)
