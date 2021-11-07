@@ -58,7 +58,7 @@ Check out [FEATURES.md](./docs/FEATURES.md) to get a complete list of features.
 ### 1. Clone flowser repository
 
 ```bash
-git clone https://github.com/bartolomej/flowser
+git clone https://github.com/onflowser/flowser
 ```
 
 ### 2. Install dependencies
@@ -79,7 +79,7 @@ npm run prod:start
 
 ## 💻 Contributing
 
-If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/bartolomej/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/bartolomej/flowser/issues/new).
+If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/onflowser/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/onflowser/flowser/issues/new).
 
 See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](docs/ARCHITECTURE.md) for info about high level system architecture.
 
