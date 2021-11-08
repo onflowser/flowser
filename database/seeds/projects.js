@@ -4,16 +4,6 @@
 
 const quickStartProject = [
     {
-        id: "emulator",
-        name: 'Emulator',
-        isCustom: false,
-        gateway: {
-            port: 8080,
-            address: 'http://host.docker.internal',
-        },
-        emulator: null
-    },
-    {
         id: "testnet",
         name: "Testnet",
         isCustom: false,
