@@ -46,13 +46,14 @@ services:
     build:
       args:
         - REACT_APP_API_HOST=http://localhost:3001
+        - REACT_APP_FLOW_DISCOVERY_WALLET=${FLOW_DISCOVERY_WALLET}
+        - REACT_APP_FLOW_ACCESS_NODE=http://localhost:${FLOW_EMULATOR_HTTP_PORT}
+        - REACT_APP_API_HOST=${API_HOST}
       context: ./frontend
       target: development
       dockerfile: ./Dockerfile
     environment:
       - APP_FRONTEND_PORT=${APP_FRONTEND_PORT}
-      - REACT_APP_FLOW_ACCESS_NODE=http://localhost:${FLOW_EMULATOR_HTTP_PORT}
-      - REACT_APP_API_HOST=${API_HOST}
     expose:
       - ${APP_FRONTEND_PORT}
     ports:
@@ -84,7 +85,7 @@ services:
     ports:
       - "8701:8701"
     environment:
-      - FLOW_ACCESS_NODE=http://host.docker.internal:${FLOW_EMULATOR_HTTP_PORT} # dev wallet is not supported for user managed emulator
+      - FLOW_ACCESS_NODE=http://host.docker.internal:${FLOW_EMULATOR_HTTP_PORT}
       - FLOW_ACCOUNT_ADDRESS=0x${FLOW_ACCOUNT_ADDRESS}
       - FLOW_ACCOUNT_KEY_ID=0
       - FLOW_ACCOUNT_PRIVATE_KEY=${FLOW_ACCOUNT_PRIVATE_KEY}
