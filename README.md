@@ -45,7 +45,7 @@ You can log in using a default service account and send arbitrary transaction di
   
 ### Rest API
 
-Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification.
+Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification. You can also view online documentation at [`app.flowser.dev/api`](https://app.flowser.dev/api/).
 
 Learn how to import flowser open api specification to:
 - [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
