@@ -3,7 +3,7 @@
 	<img alt="Flowser logo" src="./docs/images/logo.png" width="150" height="150">
 	<h1>Flowser</h1>
 	<p>
-		<b>Easily inspect and debug Flow blockchain ⛓</b>
+		<b>Easily start you local Flow network & inspect the state.</b>
 	</p>
 	<br>
 	<br>
@@ -19,7 +19,7 @@ Flowser is also available in hosted version (BETA) available at [app.flowser.dev
 - [Get started](#-get-started)
 - [Contributing](#-contributing)
 - [Build with](#%EF%B8%8F-build-with)
-- [Contributors](#-contributors)
+- [Contributors](#%EF%B8%8F-contributors)
 - [Credits](#-credits)
 
 ## ✨ Features
@@ -84,12 +84,6 @@ If you have a feature suggestion/request, first go look through the [existing is
 See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](docs/ARCHITECTURE.md) for info about high level system architecture.
 
 ## 🛠️ Build with
-
-![](https://img.shields.io/badge/--333?logo=Node.js)
-![](https://img.shields.io/badge/--ea2845?logo=Nestjs)
-![](https://img.shields.io/badge/--282c34?logo=react)
-![](https://img.shields.io/badge/--022044?logo=docker)
-![](https://img.shields.io/badge/--42494f?logo=mongodb)
 
 - [Node.js](https://nodejs.org/)
 - [Nest.js](https://nestjs.com/)
