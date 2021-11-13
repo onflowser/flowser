@@ -10,6 +10,8 @@ export type FlowScriptArgument = { value: any; type: string };
 
 export function useFlow() {
     const [user, setUser] = useState({ loggedIn: null });
+    const [isLoggingIn, setLoggingIn] = useState(false);
+    const [isLoggingOut, setLoggingOut] = useState(false);
 
     useEffect(() => fcl.currentUser().subscribe(setUser), []);
 
@@ -30,16 +32,20 @@ export function useFlow() {
     }
 
     async function logout() {
+        setLoggingOut(true);
         try {
             await fcl.unauthenticate();
             toast('Logged out!');
         } catch (e: any) {
             console.log(e);
             toast.error(`Logout failed: ${e.message}`);
+        } finally {
+            setLoggingOut(false);
         }
     }
 
     async function login() {
+        setLoggingIn(true);
         try {
             const result = await fcl.authenticate();
             if (result.loggedIn) {
@@ -47,6 +53,8 @@ export function useFlow() {
             }
         } catch (e: any) {
             toast.error(`Login failed: ${e.message}`);
+        } finally {
+            setLoggingIn(false);
         }
     }
 
@@ -54,6 +62,8 @@ export function useFlow() {
         login,
         logout,
         user,
+        isLoggingIn,
+        isLoggingOut,
         isLoggedIn: user.loggedIn,
         sendTransaction,
     };

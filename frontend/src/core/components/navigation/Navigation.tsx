@@ -31,17 +31,23 @@ export interface Counters {
 }
 
 const Navigation = (props: any) => {
+    const [isSwitching, setIsSwitching] = useState(false);
     const history = useHistory();
     const { isShowBackButtonVisible, isNavigationDrawerVisible, isSearchBarVisible } = useNavigation();
     const [counters, setCounters] = useState<Counters>();
     const [showTxDialog, setShowTxDialog] = useState<any>(false);
     const { currentProject } = useProjectApi();
-    const { isLoggedIn, login, logout } = useFlow();
+    const { isLoggedIn, login, isLoggingIn, logout, isLoggingOut } = useFlow();
 
     const onSwitchProject = useCallback(async () => {
-        await logout(); // logout from dev-wallet, because config may change
-        await axios.delete('/api/projects/use'); // stop current emulator
-        history.push(`/${routes.start}`);
+        setIsSwitching(true);
+        try {
+            await logout(); // logout from dev-wallet, because config may change
+            await axios.delete('/api/projects/use'); // stop current emulator
+            history.push(`/${routes.start}`);
+        } finally {
+            setIsSwitching(false);
+        }
     }, []);
 
     useEffect(() => {
@@ -126,6 +132,7 @@ const Navigation = (props: any) => {
                                     icon={<FlowLogo className={classes.flowIcon} />}
                                     iconPosition="before"
                                     onClick={logout}
+                                    loading={isLoggingOut}
                                 >
                                     LOG OUT
                                 </IconButton>
@@ -135,6 +142,7 @@ const Navigation = (props: any) => {
                                     icon={<FlowLogo className={classes.flowIcon} />}
                                     iconPosition="before"
                                     onClick={login}
+                                    loading={isLoggingIn}
                                 >
                                     LOG IN
                                 </IconButton>
@@ -146,7 +154,9 @@ const Navigation = (props: any) => {
                             )}
                         </div>
                         <div>
-                            <Button onClick={onSwitchProject}>SWITCH</Button>
+                            <Button loading={isSwitching} onClick={onSwitchProject}>
+                                SWITCH
+                            </Button>
                             <IconButton onClick={onSettings} icon={<IconSettings className={classes.settingsIcon} />} />
                         </div>
                     </div>
