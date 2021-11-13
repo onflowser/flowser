@@ -15,43 +15,12 @@ Flowser is also available in hosted version (BETA) available at [app.flowser.dev
 
 ## 📖 Contents
 
-- [Key features](#-features)
 - [Get started](#-get-started)
+- [Features](#-features)
 - [Contributing](#-contributing)
 - [Build with](#%EF%B8%8F-build-with)
 - [Contributors](#%EF%B8%8F-contributors)
 - [Credits](#-credits)
-
-## ✨ Features
-
-### Flow emulator
-Configure and run managed [flow emulator](https://github.com/onflow/flow-emulator) projects or start your own emulator instance on localhost.
-
-### Inspect blockchain 
-Flowser allows you to inspect the current state of the flow blockchain. 
-Every new change is automatically detected and displayed in the UI. 
-
-You can view & search thought the following objects:
-- **logs**
-- **accounts** 
-- **blocks**
-- **transactions**
-- **contracts**
-- **events**
-
-### Dev wallet
-Flowser natively supports [dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience. 
-You can log in using a default service account and send arbitrary transaction directly within flowser UI.
-  
-### Rest API
-
-Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification. You can also view online documentation at [`app.flowser.dev/api`](https://app.flowser.dev/api/).
-
-Learn how to import flowser open api specification to:
-- [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
-- [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
-
-Check out [FEATURES.md](./docs/FEATURES.md) to get a complete list of features.
 
 ## 👋 Get started
 
@@ -76,6 +45,37 @@ bash start.sh
 # or use npm if you have node installed
 npm run prod:start
 ```
+
+## ✨ Features
+
+### Flow emulator
+Configure and run managed [flow emulator](https://github.com/onflow/flow-emulator) projects or start your own emulator instance on localhost.
+
+### Inspect blockchain
+Flowser allows you to inspect the current state of the flow blockchain.
+Every new change is automatically detected and displayed in the UI.
+
+You can view & search thought the following objects:
+- **logs**
+- **accounts**
+- **blocks**
+- **transactions**
+- **contracts**
+- **events**
+
+### Dev wallet
+Flowser natively supports [dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience.
+You can log in using a default service account and send arbitrary transaction directly within flowser UI.
+
+### Rest API
+
+Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification. You can also view online documentation at [`app.flowser.dev/api`](https://app.flowser.dev/api/).
+
+Learn how to import flowser open api specification to:
+- [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
+- [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
+
+Check out [FEATURES.md](./docs/FEATURES.md) to get a complete list of features.
 
 ## 💻 Contributing
 
