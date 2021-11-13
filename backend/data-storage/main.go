@@ -25,32 +25,40 @@ import (
 
 var storageDb *badger.DB
 
+type Config struct {
+	DbPath string
+	Port   string
+}
+
 func main() {
-	dbPath, ok := os.LookupEnv("FLOW_DBPATH")
-	if !ok {
-		dbPath = "./flowdb"
-	}
+	config := getConfig()
+
+	fmt.Printf("Running storage server (dbPath: %s, port: %s)\n", config.DbPath, config.Port)
 
 	var err error
-	storageDb, err = badger.Open(badger.DefaultOptions(dbPath).WithBypassLockGuard(true))
+	storageDb, err = badger.Open(badger.DefaultOptions(config.DbPath).WithBypassLockGuard(true))
 	if err != nil {
 		panic(err)
 	}
 	defer storageDb.Close()
 
 	http.HandleFunc("/storage", storageHandler)
-	go listenOnServerStarted()
-	if err := http.ListenAndServe(":8888", nil); err != nil {
+	http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		statusHandler(w, r, config)
+	})
+
+	go listenOnServerStarted(config)
+	if err := http.ListenAndServe(":"+config.Port, nil); err != nil {
 		fmt.Println("Storage server error: ", err)
 	}
 }
 
-func listenOnServerStarted() {
+func listenOnServerStarted(config Config) {
 	for {
 		time.Sleep(time.Millisecond * 50)
 
 		log.Println("Checking if started...")
-		resp, err := http.Get("http://localhost:8888/storage")
+		resp, err := http.Get("http://localhost:" + config.Port + "/status")
 		if err != nil {
 			fmt.Println("Storage server error: ", err)
 			continue
@@ -148,4 +156,34 @@ func storageHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Write(jsonStorage)
 	return
+}
+
+func statusHandler(w http.ResponseWriter, req *http.Request, config Config) {
+	w.Header().Set("Content-Type", "application/json")
+	jsonStorage, err := json.Marshal(config)
+	if err != nil {
+		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+	}
+	w.Write(jsonStorage)
+	return
+}
+
+func getConfig() Config {
+	config := Config{}
+
+	dbPath, ok := os.LookupEnv("FLOW_DBPATH")
+	if ok {
+		config.DbPath = dbPath
+	} else {
+		config.DbPath = "./flowdb"
+	}
+
+	port, ok := os.LookupEnv("FLOW_STORAGE_SERVER_PORT")
+	if ok {
+		config.Port = port
+	} else {
+		config.Port = "8888"
+	}
+
+	return config
 }

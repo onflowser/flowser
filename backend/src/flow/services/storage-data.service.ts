@@ -44,11 +44,11 @@ export class StorageDataService {
             }
 
             this.dataStorageProcess.on("close", code => {
-                this.logger.debug('data storage process exit code:', code);
+                this.logger.debug('Storage server exit code:', code);
             })
 
             this.dataStorageProcess.on("error", error => {
-                this.logger.error(error.message, error.stack);
+                this.logger.error(`Storage server error: ${error.message}`, error.stack);
             })
         }))
     }
