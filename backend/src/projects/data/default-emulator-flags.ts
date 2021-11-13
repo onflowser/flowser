@@ -20,5 +20,5 @@ export const defaultEmulatorFlags = {
     storageLimit: true,
     transactionFees: false,
     simpleAddresses: false,
-    numberOfInitialAccounts: 1,
+    numberOfInitialAccounts: 0,
 }

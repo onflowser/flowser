@@ -146,7 +146,7 @@ export class FlowEmulatorService {
                     parseInt(this.configuration.numberOfInitialAccounts as string)
                 )
             } catch (e) {
-                this.logger.error(`failed to initialise accounts: ${e.message}`, e.stack)
+                this.logger.error(`failed to initialise accounts: ${e.message || e}`, e.stack)
             }
         }
     }
@@ -168,11 +168,20 @@ export class FlowEmulatorService {
 
     async createAccount () {
         const keysOutput = await this.flowCliService.execute("flow", ["keys", "generate"])
-        const privateKey = keysOutput[1][1];
-        const publicKey = keysOutput[2][1];
+        const privateKey = keysOutput.findValue('Private Key');
+        const publicKey = keysOutput.findValue('Public Key');
+        if (!privateKey) {
+            throw new Error("Could not find generated private key")
+        }
+        if (!privateKey) {
+            throw new Error("Could not find generated public key")
+        }
         const accountOutput = await this.flowCliService.execute("flow", ["accounts", "create", "--key", publicKey]);
-        const address = accountOutput[1][1];
-        return { address, publicKey, privateKey }
+        return {
+            address: accountOutput.findValue("address"),
+            publicKey,
+            privateKey
+        }
     }
 
     isRunning () {

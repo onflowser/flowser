@@ -18,6 +18,59 @@ export type FlowCliConfig = {
     deployments: object;
 }
 
+export class FlowCliOutput {
+    private out: string;
+
+    constructor (out) {
+        this.out = out;
+    }
+
+    parse() {
+        return FlowCliOutput.sanitiseOutput(this.out)
+          .split("\n")
+          .map(FlowCliOutput.parseLine)
+          .filter(Boolean)
+    }
+
+    findValue(keyPattern) {
+        const lineMatch = this.parse().filter(line => new RegExp(keyPattern, 'gi').test(line[0]));
+        if (lineMatch.length > 0) {
+            return lineMatch[0][1]; // value of the first match
+        } else {
+            return null;
+        }
+    }
+
+    static sanitiseOutput(out) {
+        const removeEmptyLines = lines => lines.split("\n").filter(Boolean).join("\n");
+        // if new flow-cli version is available, most of flow-cli commands will include this text:
+        // ⚠️  Version warning: a new version of Flow CLI is available (v0.28.4).
+        // Read the installation guide for upgrade instructions: https://docs.onflow.org/flow-cli/install
+        const versionWarningFound = out.includes("Version warning");
+        const lastVersionWarningLinePrefix = "Read the installation guide";
+        if (versionWarningFound) {
+            const lines = out.split("\n");
+            const startIndex = lines.findIndex(line => line.includes(lastVersionWarningLinePrefix)) + 1;
+            out = lines.slice(startIndex, lines.length).join("\n");
+        }
+        return removeEmptyLines(out);
+    }
+
+    static parseLine (line) {
+        const value = line.trim();
+        // parse multiple possible key -> value mapping formats
+        // "key: value" or "key value"
+        if (/\t/.test(value)) {
+            return value.split(/[ ]*\t[ ]*/);
+        } if (/: /.test(value)) {
+            return value.split(/: /);
+        } else {
+            return value;
+        }
+    }
+
+}
+
 @Injectable()
 export class FlowCliService {
 
@@ -69,10 +122,11 @@ export class FlowCliService {
     }
 
     async version() {
-        const [versionLine, commitLine] = await this.execute("flow", ["version"])
+        const out = await this.execute("flow", ["version"])
+        console.log(out)
         return {
-            version: versionLine[1],
-            commit: commitLine[1]
+            version: out.findValue('version'),
+            commit: out.findValue('commit')
         }
     }
 
@@ -110,7 +164,7 @@ export class FlowCliService {
         await writeFile(this.flowConfigPath, JSON.stringify(this.data, null, 4))
     }
 
-    async execute (bin = "", args, parsedOutput = true): Promise<string | string[][]> {
+    async execute (bin = "", args): Promise<FlowCliOutput> {
         if (!bin) {
             throw new Error("Provide a command");
         }
@@ -130,27 +184,10 @@ export class FlowCliService {
             })
 
             process.on("exit", (code) => code === 0
-                ? resolve(parsedOutput ? parseOutput(out) : out)
+                ? resolve(new FlowCliOutput(out))
                 : reject(out)
             );
         }))
-
-        function parseOutput (out) {
-            return out.split("\n").map(parseLine).filter(Boolean)
-        }
-
-        function parseLine (line) {
-            const value = line.trim();
-            // parse multiple possible key -> value mapping formats
-            // "key: value" or "key value"
-            if (/\t/.test(value)) {
-                return value.split(/[ ]*\t[ ]*/);
-            } if (/: /.test(value)) {
-                return value.split(/: /);
-            } else {
-                return value;
-            }
-        }
     }
 
     // create directory if it does not already exist
