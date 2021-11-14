@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     platform: linux/amd64
-    container_name: backend
+    container_name: backend-dev
     image: backend:dev
     build:
       context: ./backend
@@ -41,7 +41,7 @@ services:
       - database
     restart: unless-stopped
   frontend:
-    container_name: frontend
+    container_name: frontend-dev
     image: frontend:dev
     build:
       args:

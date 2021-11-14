@@ -3,17 +3,21 @@ version: '3.8'
 services:
   backend:
     image: backend:prod
+    container_name: backend-prod
     build:
       context: ./backend
       target: production
       dockerfile: ./Dockerfile.prod
   frontend:
     image: frontend:prod
+    container_name: frontend-prod
     build:
       context: ./frontend
       target: production
       dockerfile: ./Dockerfile.prod
     restart: "no"
+    volumes:
+      - frontend-volume:/app
   database:
     build:
       context: ./database
@@ -21,3 +25,6 @@ services:
     container_name: database
   dev-wallet:
     container_name: dev-wallet
+
+volumes:
+  frontend-volume:

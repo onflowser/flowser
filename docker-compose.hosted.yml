@@ -7,11 +7,13 @@ services:
       dockerfile: Dockerfile.hosted
   backend:
     image: backend:hosted
+    container_name: frontend-hosted
     build:
       target: production
       dockerfile: ./Dockerfile.prod
   frontend:
     image: frontend:hosted
+    container_name: frontend-hosted
     build:
       args:
         - REACT_APP_API_HOST=https://app.flowser.dev
