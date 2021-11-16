@@ -123,7 +123,6 @@ export class FlowCliService {
 
     async version() {
         const out = await this.execute("flow", ["version"])
-        console.log(out)
         return {
             version: out.findValue('version'),
             commit: out.findValue('commit')

@@ -242,26 +242,31 @@ export class FlowEmulatorService {
     }
 
     static formatLogLines (lines: string[]) {
-        return lines.map(line => {
-            const {
-                level,
-                time,
-                msg,
-                ...rest
-            } = FlowEmulatorService.parseLogLine(line);
-            // format example: Thu Oct 28 2021 21:20:51
-            const formattedTime = new Date(time).toString().split(" ").slice(0, 5).join(" ")
-            // appends the rest of the values in key="value" format
-            return (
-                level.toUpperCase().slice(0, 4) +
-                `[${formattedTime}] ` +
-                msg +
-                Object
-                    .keys(rest)
-                    .map(key => `${key}="${rest[key]}"`)
-                    .reduce((p, c) => `${p} ${c}`, '')
-            )
-        });
+        return lines
+            .map(line => {
+                const {
+                    level,
+                    time,
+                    msg,
+                    ...rest
+                } = FlowEmulatorService.parseLogLine(line);
+                // format example: Thu Oct 28 2021 21:20:51
+                const formattedTime = new Date(time).toString().split(" ").slice(0, 5).join(" ")
+                // appends the rest of the values in key="value" format
+                return (
+                    level.toUpperCase().slice(0, 4) +
+                    `[${formattedTime}] ` +
+                    msg +
+                    Object
+                        .keys(rest)
+                        .map(key => `${key}="${rest[key]}"`)
+                        .reduce((p, c) => `${p} ${c}`, '')
+                )
+            })
+            // only include lines that do not contain API call information
+            // those lines are annoying, because they show up every second (due to our backend polling)
+            // TODO: improve log filtering solution
+            .filter(line => !line.includes("called"));
     }
 
     static parseLogLine (line: string): FlowEmulatorLog {
