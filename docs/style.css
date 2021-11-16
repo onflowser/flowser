@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
-
 :root {
 
     /* =============================================== COLORS */
@@ -43,8 +41,10 @@ a {
 
 h1, h2 {
     text-transform: uppercase;
+    margin-bottom: 20px;
     font-family: 'Oswald', sans-serif;
     margin-bottom: 40px;
+
 }
 
 h1 {
@@ -61,7 +61,7 @@ h4 {
     color: var(--body-font-color);
 }
 
-.navbar, .footer {
+.navbar,  .footer {
     background-color: var(--main-blue-color);
     display: flex;
     align-items: center;
@@ -75,6 +75,11 @@ h4 {
     max-width: 3000px;
     width: 100%;
     padding: 0px 20px 0px 20px;
+}
+
+.navbar-content-right {
+    display: flex;
+    flex-direction: row;
 }
 
 .navbar-logo {
@@ -100,17 +105,18 @@ h4 {
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-left: 20px;
 }
 
-.navbar-links a:hover {
+.navbar-links a:hover{
     color: var(--main-yellow-color);
 }
 
-.navbar-links img {
+.navbar-links img{
     margin-left: 10px;
 }
 
-.navbar-links a {
+.navbar-links a{
     color: var(--background-color);
 }
 
@@ -123,7 +129,7 @@ h4 {
     margin-bottom: 100px;
 }
 
-.background-all {
+.background-all{
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -152,8 +158,7 @@ h4 {
     width: 100%;
 }
 
-.screen-1 {
-    border-radius: var(--border-radius-small);
+.screen-1{
     margin: 0 auto;
     box-shadow: 5px 10px 10px #34343429;
 }
@@ -243,13 +248,45 @@ h4 {
 }
 
 .footer img {
-    max-width: 150px;
+    max-width: 100px;
+}
+
+.about-one-person {
+    max-width: 600px;
+    width: 100%;
+    align-items: center;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 80px;
+}
+
+.about-one-person img {
+    margin-bottom: 30px;
+    max-width: 590px;
+    width: 100%;
+}
+
+.about-one-person a {
+    text-decoration: none;
+    color: var(--main-blue-color);
+}
+
+.about-one-person a:hover {
+    text-decoration: none;
+    color: var(--main-yellow-color);
+}
+
+.about-one-person a:visited {
+    text-decoration: none;
+    color: var(--main-blue-color);
 }
 
 
 @media (max-width: 650px) {
 
     .icon-boxes-one {
+        max-width: 650px;
         max-width: 100%;
         border: solid 2px red;
     }
