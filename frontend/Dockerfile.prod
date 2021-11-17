@@ -32,4 +32,5 @@ FROM hosted as production
 
 RUN npm i -g serve
 
-CMD serve build -p ${APP_FRONTEND_PORT}
+# Rewrite all not-found requests to `index.html` with -s option
+CMD serve build -s -p ${APP_FRONTEND_PORT}
