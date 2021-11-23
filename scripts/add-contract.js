@@ -5,6 +5,7 @@ const {readFlowConfig, execute, CONTRACTS_DIR_PATH } = require("./helpers");
 const [nodePath, execFile, accountName, contractName, ...flags] = process.argv;
 
 function contractTemplate(name = "HelloWorld") {
+  // language=Cadence
   return `pub contract ${name} {
     pub let greeting: String
     pub event Greet(x: String)

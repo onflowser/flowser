@@ -6,6 +6,7 @@ const [nodePath, execFile, accountName, contractName] = process.argv;
 
 
 function transactionTemplate(accountAddress, contractName) {
+  // language=Cadence
   return `import ${contractName} from 0x${accountAddress}
 
 transaction {
