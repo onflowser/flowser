@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.hosted
   backend:
     image: backend:hosted
-    container_name: frontend-hosted
+    container_name: backend-hosted
     build:
       target: production
       dockerfile: ./Dockerfile.prod
