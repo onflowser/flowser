@@ -2,51 +2,102 @@
 
 Flowser application stack consist of frontend Nestjs backend API server, frontend React SPA application and Mongo database.
 
-### 1. Requirements
+> Check out [ARCHITECTURE.md](./ARCHITECTURE.md) for a quick overview of Flowser high-level architecture.
+
+## Requirements
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Docker](https://docs.docker.com/get-docker/)
 - [docker compose](https://docs.docker.com/compose/install/)
 - [Flow cli](https://docs.onflow.org/flow-cli/) (optional)
 
-### 2. Configure environment
-Make sure that you have `.env` file properly configured, for local development simply rename .env.sample to .env!
+## Get started
 
-To get more information on frontend and backend respectively refer to [`frontend/README`](../frontend/README.md) and [`backend/README`](../backend/README.md) readmes.
+### 1. Clone the repo
 
-### 3. Start local development stack
 ```
-docker-compose up -d
+git clone https://github.com/onflowser/flowser
 ```
 
-Stop local development stack.
-```
-docker-compose down
-```
+### 2. Install required dependencies
 
-See logs.
+To leverage the power of your favourite IDEs code completion & indexing features, as well as static code analysis with eslint, install required dependencies with `bootstrap` command (must be run from project root).
 ```
-docker-compose logs -f
+cd flowser && npm run bootstrap
 ```
 
-### 4. View flowser
+### 3. Configuration
 
-Once docker-compose successfully started all services (`backend`, `frontend`, `database` and `dev-wallet`), 
-you can visit [localhost:3000](http://localhost:3000) to view flowser UI.
+There is no need to configure development environment to get started, as Flowser uses default configuration defined in `.env.dev`. 
 
-### 5. Additional tooling
+However, if you want to use custom configuration, you can do so by defining a separate environment file (e.g. `.env.local`) and use `.env.sample` as a template.
+
+### 4. Run in development
+
+To start the Flowser app in development mode, run `dev:start` command from project root. This will pull all 3rd party docker images to your local machine, build flowser images and start all application containers.
+
+```
+npm run dev:start
+```
+
+### 5. View flowser app
+
+Good job! This is the last step, before we can actually start making code changes. Now the app should be running, you can test that by visiting http://localhost:3000.
+
+> NOTE: If something isn't working as expected, try running `npm run dev:logs` to view logs from all containers or [submit a bug report](https://github.com/onflowser/flowser/issues/new?assignees=bartolomej&labels=bug%2C+feedback&template=bug_report.md&title=).
+
+
+## Advanced configuration
+
+If you want to use custom configuration, you can do so by defining a separate environment file (e.g. `.env.local`) and use `.env.sample` as a template.
+
+You can then start the application by running `docker-compose up` command, like so:
+
+```
+docker-compose \
+    --env-file <path-to-custom-env-file> \
+    -f docker-compose.yml \
+    -f docker-compose.dev.yml \
+    up -d
+```
+
+To stop local development stack.
+```
+docker-compose \
+    --env-file <path-to-custom-env-file> \
+    -f docker-compose.yml \
+    -f docker-compose.dev.yml \
+    down
+```
+
+To see logs from all containers, run:
+```
+docker-compose \
+    --env-file <path-to-custom-env-file> \
+    -f docker-compose.yml \
+    -f docker-compose.dev.yml \
+    logs
+```
+
+## Additional tooling
+
+### MongoDB client
 
 You can use [Robo 3T](https://robomongo.org/) mongodb client app to inspect, debug and edit flowser database.
 
-Connect to Mongo Docker instance with your local machine client using settings in `.env` file. 
-Bellow example from `.env.sample`. Keep in mind that
-in docker-compose.yml we mapped port 27017 to 27016, use ````localhost```` instead of ```database``` docker-compose internal
-host name:
+Connect to Mongo Docker instance with your local machine client using settings in `.env.*` file that was used for startup - use variables in `.env.dev` if you used `dev:start` command.
+
+> Keep in mind that in docker-compose.yml we mapped port 27017 to 27016, use ````localhost```` instead of ```database``` docker-compose internal host name:
 ```
 mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@localhost:27016/${MONGODB_DATABASE}
 
 mongodb://root:rootpassword@localhost:27016/flowser
 ```
 
+### REST API client
+
+You can use [Postman](https://postman.com) or [Insomnia](https://insomnia.rest) API clients to debug and test Flowser REST APIs.
+
+> Check out https://github.com/onflowser/flowser#rest-api to learn how to import [OpenAPI](https://www.openapis.org/) API specification to your client of choice.
 
 
 
