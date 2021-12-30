@@ -19,7 +19,7 @@ import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/flow-cli.service";
-import { plainToClass } from "class-transformer";
+import { plainToInstance } from "class-transformer";
 import { StorageDataService } from '../flow/services/storage-data.service';
 import config from "../config";
 
@@ -149,7 +149,7 @@ export class ProjectsService {
             if (project.gateway) {
                 const { address, port } = project.gateway;
                 const pingable = project.isOfficialNetwork() || await FlowGatewayService.isPingable(address, port)
-                return plainToClass(Project, { ...project, pingable });
+                return plainToInstance(Project, { ...project, pingable });
             } else {
                 return project
             }
@@ -165,7 +165,7 @@ export class ProjectsService {
         if (project.gateway) {
             const { port, address } = project.gateway;
             const pingable = project.isOfficialNetwork() || await FlowGatewayService.isPingable(address, port)
-            return plainToClass(Project, { ...project, pingable });
+            return plainToInstance(Project, { ...project, pingable });
         } else {
             return project;
         }
