@@ -40,7 +40,6 @@ export class ProjectsController {
     @Get('/default')
     async default() {
         return defaultEmulatorFlags;
-
     }
 
     @ApiParam({ name: "id", type: String })

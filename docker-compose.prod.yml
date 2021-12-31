@@ -16,8 +16,6 @@ services:
       target: production
       dockerfile: ./Dockerfile.prod
     restart: "no"
-    volumes:
-      - frontend-volume:/app
   database:
     build:
       context: ./database
@@ -25,6 +23,3 @@ services:
     container_name: database
   dev-wallet:
     container_name: dev-wallet
-
-volumes:
-  frontend-volume:
