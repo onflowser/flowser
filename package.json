@@ -7,6 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
+    "bootstrap": "npm i && lerna bootstrap",
+
     "dev:start": "docker-compose --env-file .env.dev up -d",
     "dev:stop": "docker-compose --env-file .env.dev down",
     "dev:build": "docker-compose --env-file .env.dev build",
