@@ -8,6 +8,42 @@ import { toast } from 'react-hot-toast';
 
 export type FlowScriptArgument = { value: any; type: string };
 
+// https://docs.onflow.org/cadence/language/values-and-types/
+function convertToType(value: any, type: string) {
+    switch (type) {
+        case 'Address':
+        case 'Character':
+        case 'String':
+        case 'Identity':
+        case 'Word8':
+        case 'Word16':
+        case 'Word32':
+        case 'Word64':
+            return `${value}`;
+        case 'Int':
+        case 'Int8':
+        case 'Int16':
+        case 'Int32':
+        case 'Int64':
+        case 'Int128':
+        case 'Int256':
+        case 'UInt':
+        case 'UInt8':
+        case 'UInt16':
+        case 'UInt32':
+        case 'UInt64':
+        case 'UInt128':
+        case 'UInt256':
+            return parseInt(value);
+        case 'Fix64':
+        case 'UFix64':
+            return parseFloat(value);
+        // TODO: add missing type conversions
+        default:
+            return value;
+    }
+}
+
 export function useFlow() {
     const [user, setUser] = useState({ loggedIn: null });
     const [isLoggingIn, setLoggingIn] = useState(false);
@@ -18,7 +54,7 @@ export function useFlow() {
     async function sendTransaction(code: string, args: FlowScriptArgument[]) {
         const transactionId = await fcl.mutate({
             cadence: code,
-            args: (arg: any, t: any) => args.map((e) => arg(e.value, t[e.type])),
+            args: (arg: any, t: any) => args.map((e) => arg(convertToType(e.value, e.type), t[e.type])),
             payer: fcl.authz,
             proposer: fcl.authz,
             authorizations: [fcl.authz],

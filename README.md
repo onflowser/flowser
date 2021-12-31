@@ -48,6 +48,20 @@ bash start.sh
 npm run prod:start
 ```
 
+If flowser started successfully, you should see the bellow output:
+```
+Creating frontend-prod ... done
+Creating database      ... done
+Creating backend-prod  ... done
+Creating dev-wallet    ... done
+```
+
+### 4. Open in browser
+
+After flowser had successfully started, you can open the app in your favourite browser at [http://localhost:6060](http://localhost:6060) 🥳.
+
+Good job, you can now start flowsing around the flow blockchain 🏄.
+
 ## ✨ Features
 
 ### Flow emulator
