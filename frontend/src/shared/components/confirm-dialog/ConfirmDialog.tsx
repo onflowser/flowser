@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, ReactChild, ReactChildren } from 'react';
 import Dialog from '../dialog/Dialog';
 import Button from '../button/Button';
 import classes from './ConfirmDialog.module.scss';
@@ -6,10 +6,10 @@ import classes from './ConfirmDialog.module.scss';
 interface OwnProps {
     onClose: () => void;
     onConfirm: (event: any) => void;
-    title: string;
-    text: string;
     confirmBtnLabel?: string;
     cancelBtnLabel?: string;
+    className?: string;
+    children?: JSX.Element[] | JSX.Element | undefined;
 }
 
 type Props = OwnProps;
@@ -17,16 +17,15 @@ type Props = OwnProps;
 const ConfirmDialog: FunctionComponent<Props> = ({
     onConfirm,
     onClose,
-    title,
-    text,
     confirmBtnLabel = 'OK',
     cancelBtnLabel = 'CANCEL',
+    children,
+    className = '',
 }) => {
     return (
-        <Dialog onClose={onClose}>
+        <Dialog className={className} onClose={onClose}>
             <div className={classes.root}>
-                <h3>{title}</h3>
-                <span>{text}</span>
+                {children}
                 <div className={classes.actions}>
                     <Button outlined={true} variant="middle" onClick={onClose}>
                         {cancelBtnLabel}

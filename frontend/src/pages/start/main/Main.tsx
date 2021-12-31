@@ -8,10 +8,13 @@ import { ReactComponent as CaretIcon } from '../../../shared/assets/icons/caret.
 import { ReactComponent as PlusIcon } from '../../../shared/assets/icons/plus.svg';
 import { useProjectApi } from '../../../shared/hooks/project-api';
 import { useQuery } from 'react-query';
+import Code from '../../../shared/components/code/Code';
+import ConfirmDialog from '../../../shared/components/confirm-dialog/ConfirmDialog';
 
 const Main: FunctionComponent<any> = () => {
     const history = useHistory();
     const [error, setError] = useState('');
+    const [showEmulatorDialog, setEmulatorDialog] = useState(false);
     const { useProject, projects, isLoadingProjects } = useProjectApi();
     const defaultProjects = projects.filter((p: any) => !p.isCustom);
     const customProjects = projects.filter((p: any) => p.isCustom);
@@ -44,6 +47,24 @@ const Main: FunctionComponent<any> = () => {
     return (
         <>
             {error && <div className={classes.errors}>{error}</div>}
+            {showEmulatorDialog && (
+                <ConfirmDialog
+                    className={classes.emulatorDialog}
+                    onClose={() => setEmulatorDialog(false)}
+                    onConfirm={() => onQuickstart('emulator')}
+                    confirmBtnLabel="CONTINUE"
+                    cancelBtnLabel="CANCEL"
+                >
+                    <h3>Quick notice 👀</h3>
+                    <p>
+                        If you would like flowser to connect to your own emulator, you will need to start flow emulator
+                        on http port <code>8081</code>.
+                    </p>
+                    <br />
+                    <p>Here is an example command that you can use:</p>
+                    <Code code={`flow emulator --port=3569 --http-port=8081`} />
+                </ConfirmDialog>
+            )}
             <div className={classes.container}>
                 <img src={Logo} alt="FLOWSER" />
                 <div className={classes.header}>
@@ -57,7 +78,7 @@ const Main: FunctionComponent<any> = () => {
                     )}
                 </div>
                 <IconButton
-                    onClick={() => onQuickstart('emulator')}
+                    onClick={() => setEmulatorDialog(true)}
                     variant="big"
                     icon={<CaretIcon className={classes.caret} />}
                     iconPosition="after-end"

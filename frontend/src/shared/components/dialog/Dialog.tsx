@@ -5,12 +5,13 @@ import Card from '../card/Card';
 interface OwnProps {
     children: any;
     onClose: () => void;
+    className?: string;
     [key: string]: any;
 }
 
 type Props = OwnProps;
 
-const Dialog: FunctionComponent<Props> = ({ children, onClose, ...restProps }) => {
+const Dialog: FunctionComponent<Props> = ({ children, onClose, className = '', ...restProps }) => {
     const onOutsideClick = (event: any) => {
         event.stopPropagation();
         onClose();
@@ -21,7 +22,7 @@ const Dialog: FunctionComponent<Props> = ({ children, onClose, ...restProps }) =
     };
 
     return (
-        <div className={classes.root} onClick={onOutsideClick}>
+        <div className={`${classes.root} ${className}`} onClick={onOutsideClick}>
             <div className={`${classes.dialog} ${restProps.className}`}>
                 <Card className={classes.card} onClick={onClickInside}>
                     {children}

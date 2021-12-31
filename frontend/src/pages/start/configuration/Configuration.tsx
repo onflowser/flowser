@@ -661,9 +661,10 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                     onConfirm={onDelete}
                     confirmBtnLabel="DELETE"
                     cancelBtnLabel="BACK"
-                    title="Delete emulator"
-                    text="Are you sure you want to delete this emulator?"
-                />
+                >
+                    <h3>Delete emulator</h3>
+                    <span>Are you sure you want to delete this emulator?</span>
+                </ConfirmDialog>
             )}
         </>
     );

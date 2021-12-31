@@ -4,6 +4,12 @@
 @import 'styles/animations';
 @import 'styles/rules';
 
+.emulatorDialog {
+  pre {
+    margin-top: $spacing-base;
+  }
+}
+
 .errors {
   background-color: darken($color-status-expired, 5%);
   color: $color-white;
