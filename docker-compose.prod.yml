@@ -19,7 +19,7 @@ services:
   database:
     build:
       context: ./database
-      dockerfile: ./Dockerfile.hosted
+      dockerfile: ./Dockerfile
     container_name: database
   dev-wallet:
     container_name: dev-wallet

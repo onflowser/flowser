@@ -62,7 +62,7 @@ const Main: FunctionComponent<any> = () => {
                     </p>
                     <br />
                     <p>Here is an example command that you can use:</p>
-                    <Code code={`flow emulator --port=3569 --http-port=8081`} />
+                    <Code code={`flow emulator --port=3570 --http-port=8081`} />
                 </ConfirmDialog>
             )}
             <div className={classes.container}>
