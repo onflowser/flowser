@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactChild, ReactChildren } from 'react';
+import React, { FunctionComponent } from 'react';
 import Dialog from '../dialog/Dialog';
 import Button from '../button/Button';
 import classes from './ConfirmDialog.module.scss';

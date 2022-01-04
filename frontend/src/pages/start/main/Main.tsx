@@ -63,6 +63,14 @@ const Main: FunctionComponent<any> = () => {
                     <br />
                     <p>Here is an example command that you can use:</p>
                     <Code code={`flow emulator --port=3570 --http-port=8081`} />
+                    <br />
+                    <p>
+                        For more info on Flow CLI check out the{' '}
+                        <a target="_blank" href="https://docs.onflow.org/flow-cli/start-emulator/" rel="noreferrer">
+                            official docs
+                        </a>
+                        .
+                    </p>
                 </ConfirmDialog>
             )}
             <div className={classes.container}>
