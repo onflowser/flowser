@@ -43,7 +43,12 @@ const Navigation = (props: any) => {
         setIsSwitching(true);
         try {
             await logout(); // logout from dev-wallet, because config may change
-            await axios.delete('/api/projects/use'); // stop current emulator
+            try {
+                await axios.delete('/api/projects/use'); // stop current emulator
+            } catch (e) {
+                // nothing critical happened, ignore the error
+                console.warn("Couldn't stop the emulator: ", e);
+            }
             history.push(`/${routes.start}`);
         } finally {
             setIsSwitching(false);
