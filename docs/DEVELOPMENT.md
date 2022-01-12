@@ -4,13 +4,21 @@ Flowser application stack consist of frontend Nestjs backend API server, fronten
 
 > Check out [ARCHITECTURE.md](./ARCHITECTURE.md) for a quick overview of Flowser high-level architecture.
 
-## Requirements
+## 📖 Contents
+
+- [Get started](#-get-started)
+- [Advanced configuration](#-advanced-configuration)
+- [Additional tooling](#-additional-tooling)
+- [Important notes](#-important-notes)
+- [Troubleshooting](#-troubleshooting)
+
+## 📋 Requirements
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Docker](https://docs.docker.com/get-docker/)
 - [docker compose](https://docs.docker.com/compose/install/)
 - [Flow cli](https://docs.onflow.org/flow-cli/) (optional)
 
-## Get started
+## 👋 Get started
 
 ### 1. Clone the repo
 
@@ -46,7 +54,7 @@ Good job! This is the last step, before we can actually start making code change
 > NOTE: If something isn't working as expected, try running `npm run dev:logs` to view logs from all containers or [submit a bug report](https://github.com/onflowser/flowser/issues/new?assignees=bartolomej&labels=bug%2C+feedback&template=bug_report.md&title=).
 
 
-## Advanced configuration
+## 🛠️ Advanced configuration
 
 If you want to use custom configuration, you can do so by defining a separate environment file (e.g. `.env.local`) and use `.env.sample` as a template.
 
@@ -78,7 +86,7 @@ docker-compose \
     logs
 ```
 
-## Additional tooling
+## 🛠️ Additional tooling
 
 ### MongoDB client
 
@@ -99,9 +107,7 @@ You can use [Postman](https://postman.com) or [Insomnia](https://insomnia.rest) 
 
 > Check out https://github.com/onflowser/flowser#rest-api to learn how to import [OpenAPI](https://www.openapis.org/) API specification to your client of choice.
 
-
-
-## Important notes
+## ❗Important notes
 
 After installing new NPM library you have to stop docker-compose, remove Docker image, and run docker-compose up again. Below example for frontend:
 1. Stop docker-compose
@@ -125,4 +131,29 @@ docker image rm 214591eba110
 3. Start docker-compose
 ```
 docker-comopse up
+```
+
+
+## 🙋 Troubleshooting
+
+### MongoDB Error: Authentication Failed
+
+You may encounter a bellow MongoDB Authentication error in backend logs. Common root cause of this issue is incorrectly initialised MongoDB database service. 
+
+If you started flowser in development or production environment, you can easily solve this issue, by just removing the `database/db` directory. This will delete all database related files, which will force MongoDB to reinitialise on next container start. 
+```
+[Nest] 19  - 01/11/2022, 1:48:44 PM   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (7)...
+backend-prod   | MongoNetworkError: failed to connect to server [database:27017] on first connect [MongoError: Authentication failed.
+backend-prod   |     at Connection.messageHandler (/app/node_modules/mongodb/lib/core/connection/connection.js:364:19)
+backend-prod   |     at Connection.emit (events.js:400:28)
+backend-prod   |     at processMessage (/app/node_modules/mongodb/lib/core/connection/connection.js:456:10)
+backend-prod   |     at Socket.<anonymous> (/app/node_modules/mongodb/lib/core/connection/connection.js:625:15)
+backend-prod   |     at Socket.emit (events.js:400:28)
+backend-prod   |     at addChunk (internal/streams/readable.js:293:12)
+backend-prod   |     at readableAddChunk (internal/streams/readable.js:267:9)
+backend-prod   |     at Socket.Readable.push (internal/streams/readable.js:206:10)
+backend-prod   |     at TCP.onStreamRead (internal/stream_base_commons.js:188:23) {
+backend-prod   |   ok: 0,
+backend-prod   |   code: 18,
+backend-prod   |   codeName: 'AuthenticationFailed'
 ```

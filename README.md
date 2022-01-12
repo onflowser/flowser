@@ -56,6 +56,8 @@ Creating backend-prod  ... done
 Creating dev-wallet    ... done
 ```
 
+If you encounter any issues during app build or container start, check out our [Troubleshooting Guide](./docs/DEVELOPMENT.md#-troubleshooting).
+
 ### 4. Open in browser
 
 After flowser had successfully started, you can open the app in your favourite browser at [http://localhost:6060](http://localhost:6060) 🥳.
