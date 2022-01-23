@@ -42,7 +42,7 @@ See: [Docker installation instructions](https://www.docker.com/get-started)
 This command will start Flowser with default configuration (recommended).
 
 ```bash
-bash start.sh
+bash run.sh start
 
 # or use npm if you have node installed
 npm run prod:start
