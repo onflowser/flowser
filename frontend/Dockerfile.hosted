@@ -1,4 +1,4 @@
-FROM node:16-alpine3.12 as production
+FROM node:16-alpine3.12 as hosted
 
 # set the working direction
 WORKDIR /app
@@ -20,8 +20,6 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY . .
 RUN npm install
 
+# just build an image for hosting
+# as nginx will serve the static files from nginx container
 RUN npm run build
-RUN npm i -g serve
-
-# Rewrite all not-found requests to `index.html` with -s option
-CMD serve build -s -p ${APP_FRONTEND_PORT}

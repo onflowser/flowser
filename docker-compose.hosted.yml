@@ -18,7 +18,7 @@ services:
       args:
         - REACT_APP_API_HOST=https://app.flowser.dev
       target: hosted
-      dockerfile: ./Dockerfile.prod
+      dockerfile: ./Dockerfile.hosted
     volumes:
       - frontend-volume:/app
     restart: "no"

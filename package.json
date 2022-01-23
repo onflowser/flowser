@@ -9,17 +9,17 @@
   "scripts": {
     "bootstrap": "npm i && lerna bootstrap",
 
-    "dev:start": "docker-compose --env-file .env.dev up -d",
-    "dev:stop": "docker-compose --env-file .env.dev down",
-    "dev:build": "docker-compose --env-file .env.dev build",
-    "dev:logs": "docker-compose --env-file .env.dev logs -f",
-    "dev:redeploy": "npm run dev:stop && npm run dev:build && npm run dev:start",
+    "dev:start": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "dev:stop": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml down",
+    "dev:build": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml build",
+    "dev:logs": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml logs -f",
+    "dev:rebuild": "npm run dev:stop && npm run dev:build && npm run dev:start",
 
     "prod:start": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "prod:stop": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down",
     "prod:build": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml build",
     "prod:logs": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml logs -f",
-    "prod:redeploy": "npm run prod:stop && npm run prod:build && npm run prod:start",
+    "prod:rebuild": "npm run prod:stop && npm run prod:build && npm run prod:start",
 
     "hosted:start": "docker-compose --env-file .env.hosted -f docker-compose.yml -f docker-compose.hosted.yml up -d",
     "hosted:stop": "docker-compose --env-file .env.hosted -f docker-compose.yml -f docker-compose.hosted.yml down",
