@@ -59,9 +59,6 @@ services:
       - ${APP_FRONTEND_PORT}:${APP_FRONTEND_PORT}
     networks:
       - flowser-network
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     restart: unless-stopped
   database:
     build: ./database
