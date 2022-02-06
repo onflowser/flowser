@@ -10,6 +10,7 @@ import CadenceEditor from '../cadence-editor/CadenceEditor';
 import { NavLink } from 'react-router-dom';
 import Ellipsis from '../ellipsis/Ellipsis';
 import { isValueSet } from '../../functions/utils';
+import splitbee from '@splitbee/web';
 
 type Props = {
     show?: boolean;
@@ -24,6 +25,7 @@ const TransactionDialog: FC<Props> = ({ show, setShow }) => {
 
     function onClose() {
         setShow(false);
+        splitbee.track(`TransactionDialog: cancel`);
     }
 
     function validateArgs() {
@@ -65,6 +67,7 @@ const TransactionDialog: FC<Props> = ({ show, setShow }) => {
                 ),
                 { duration: 100000 },
             );
+            splitbee.track(`TransactionDialog: send`);
         } catch (e: any) {
             toast.error(e.message ? `Failed to send transaction: ${e.message}` : e, { duration: 5000 });
         } finally {

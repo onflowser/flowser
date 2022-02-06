@@ -4,6 +4,7 @@ import Card from '../card/Card';
 import Label from '../label/Label';
 import Value from '../value/Value';
 import CaretIcon from '../caret-icon/CaretIcon';
+import splitbee from '@splitbee/web';
 
 type TabItemProps = {
     label: string;
@@ -40,6 +41,7 @@ export const DetailsTabs: FunctionComponent<ContainerProps> = ({ children }) => 
                             onClick={(e: any) => {
                                 if (!isDisabled) setSelected(index);
                                 if (child.props.onClick) child.props.onClick(e);
+                                splitbee.track(`DetailsTab: click ${child.props.label || '-'}`);
                             }}
                         >
                             <div className={classes.labelValue}>

@@ -10,6 +10,7 @@ import { useProjectApi } from '../../../shared/hooks/project-api';
 import { useQuery } from 'react-query';
 import Code from '../../../shared/components/code/Code';
 import ConfirmDialog from '../../../shared/components/confirm-dialog/ConfirmDialog';
+import splitbee from '@splitbee/web';
 
 const Main: FunctionComponent<any> = () => {
     const history = useHistory();
@@ -29,6 +30,7 @@ const Main: FunctionComponent<any> = () => {
         setError('');
         try {
             await useProject(name);
+            splitbee.track(`Start: use ${name}`);
             history.push(`/${routes.firstRouteAfterStart}`);
         } catch (e: any) {
             setError(

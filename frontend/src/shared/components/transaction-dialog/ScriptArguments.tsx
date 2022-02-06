@@ -8,6 +8,7 @@ import { FlowScriptArgument } from '../../hooks/flow';
 import IconButton from '../icon-button/IconButton';
 import { ReactComponent as DeleteIcon } from '../../assets/icons/cancel.svg';
 import { ReactComponent as PlusIcon } from '../../assets/icons/plus.svg';
+import splitbee from '@splitbee/web';
 
 type Props = {
     className: string;
@@ -31,6 +32,7 @@ const ScriptArguments: FC<Props> = ({ className, onChange }) => {
 
     function onAddArg() {
         setArgs([...args, { value: '', type: '' }]);
+        splitbee.track(`ScriptArguments: add`);
     }
 
     useEffect(() => {
