@@ -48,6 +48,7 @@ services:
         - REACT_APP_FLOW_DISCOVERY_WALLET=${FLOW_DISCOVERY_WALLET}
         - REACT_APP_FLOW_ACCESS_NODE=http://localhost:${FLOW_EMULATOR_HTTP_PORT}
         - REACT_APP_API_HOST=${API_HOST}
+        - REACT_APP_URL=http://localhost:${APP_FRONTEND_PORT}
       context: ./frontend
       target: development
       dockerfile: ./Dockerfile
