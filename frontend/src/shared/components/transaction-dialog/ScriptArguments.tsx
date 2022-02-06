@@ -43,12 +43,7 @@ const ScriptArguments: FC<Props> = ({ className, onChange }) => {
         <div className={`${classes.root} ${className}`}>
             <div className={classes.arguments}>
                 {args.map((arg, i) => (
-                    <ArgumentItem
-                        key={i}
-                        onChange={(value) => updateArgs(value, i)}
-                        onRemove={() => onRemove(i)}
-                        value={arg}
-                    />
+                    <ArgumentItem key={i} onChange={(arg) => updateArgs(arg, i)} onRemove={() => onRemove(i)} />
                 ))}
             </div>
             {/* TODO: set width to 100% and background to blue */}
@@ -60,9 +55,8 @@ const ScriptArguments: FC<Props> = ({ className, onChange }) => {
 };
 
 type ArgumentItemProps = {
-    onChange: (value: FlowScriptArgument) => void;
+    onChange: (arg: FlowScriptArgument) => void;
     onRemove: () => void;
-    value: FlowScriptArgument;
 };
 
 const flowTypes = Object.keys(t).filter((type) => typeof t[type] !== 'function');
@@ -75,30 +69,39 @@ const flowTypeOptions = [
     })),
 ];
 
-const ArgumentItem: FC<ArgumentItemProps> = ({ onChange, onRemove, value: { value, type } }) => (
-    <div className={classes.argument}>
-        <div>
-            <Input placeholder="Value" value={value} onChange={(e) => onChange({ value: e.target.value, type })} />
+const ArgumentItem: FC<ArgumentItemProps> = ({ onChange, onRemove }) => {
+    const [value, setValue] = useState('');
+    const [type, setType] = useState('');
+
+    useEffect(() => {
+        onChange({ value, type });
+    }, [value, type]);
+
+    return (
+        <div className={classes.argument}>
+            <div>
+                <Input placeholder="Value" value={value} onChange={(e) => setValue(e.target.value)} />
+            </div>
+            <div>
+                <SelectInput
+                    placeholder="Type"
+                    value={type}
+                    onChange={(e) => {
+                        setType(e.target.value);
+                    }}
+                    options={flowTypeOptions}
+                />
+            </div>
+            <div>
+                <IconButton
+                    className={classes.removeButton}
+                    icon={<DeleteIcon />}
+                    onClick={onRemove}
+                    iconPosition="before"
+                />
+            </div>
         </div>
-        <div>
-            <SelectInput
-                placeholder="Type"
-                value={type}
-                onChange={(e) => {
-                    onChange({ value, type: e.target.value });
-                }}
-                options={flowTypeOptions}
-            />
-        </div>
-        <div>
-            <IconButton
-                className={classes.removeButton}
-                icon={<DeleteIcon />}
-                onClick={onRemove}
-                iconPosition="before"
-            />
-        </div>
-    </div>
-);
+    );
+};
 
 export default ScriptArguments;

@@ -7,7 +7,10 @@ import * as t from '@onflow/types';
 import { toast } from 'react-hot-toast';
 import splitbee from '@splitbee/web';
 
-export type FlowScriptArgument = { value: any; type: string };
+export type FlowScriptArgumentValue = string | number;
+export type FlowScriptArgumentType = string;
+
+export type FlowScriptArgument = { value: FlowScriptArgumentValue; type: FlowScriptArgumentType };
 
 export function useFlow() {
     const [user, setUser] = useState({ loggedIn: null });
