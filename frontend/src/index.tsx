@@ -10,7 +10,7 @@ import splitbee from '@splitbee/web';
 // init analytics
 if (process.env.NODE_ENV !== 'development') {
     splitbee.init({
-        token: 'G2JDMZK05KYZ',
+        token: 'B3B9T4Z4SRQ3',
         disableCookie: true,
     });
 }
