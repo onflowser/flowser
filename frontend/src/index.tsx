@@ -5,6 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { QueryClientProvider } from 'react-query';
 import query from './shared/config/query';
+import splitbee from '@splitbee/web';
+
+// init analytics
+if (process.env.NODE_ENV !== 'development') {
+    splitbee.init({
+        token: 'G2JDMZK05KYZ',
+        disableCookie: true,
+    });
+}
 
 ReactDOM.render(
     <React.StrictMode>

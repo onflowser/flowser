@@ -10,6 +10,7 @@ import { useSyntaxHighlighter } from '../../shared/hooks/syntax-highlighter';
 import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
 import { useSearch } from '../../shared/hooks/search';
 import { useFilterData } from '../../shared/hooks/filter-data';
+import splitbee from '@splitbee/web';
 
 interface OwnProps {
     className?: any;
@@ -51,13 +52,16 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
     const onCaretChange = useCallback((state) => {
         if (state === false) {
             changeLogDrawerSize('small');
+            splitbee.track(`Logs: size small`);
         } else {
             changeLogDrawerSize('tiny');
+            splitbee.track(`Logs: size tiny`);
         }
     }, []);
 
     const changeLogDrawerSize = useCallback((size: LogDrawerSize) => {
         setSize(size);
+        splitbee.track(`Logs: size ${size}`);
         setTimeout(() => {
             scrollToBottom(bigLogRef, false);
             scrollToBottom(miniLogRef, false);

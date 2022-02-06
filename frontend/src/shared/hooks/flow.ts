@@ -5,8 +5,12 @@ import * as fcl from '@onflow/fcl';
 // @ts-ignore
 import * as t from '@onflow/types';
 import { toast } from 'react-hot-toast';
+import splitbee from '@splitbee/web';
 
-export type FlowScriptArgument = { value: any; type: string };
+export type FlowScriptArgumentValue = string | number;
+export type FlowScriptArgumentType = string;
+
+export type FlowScriptArgument = { value: FlowScriptArgumentValue; type: FlowScriptArgumentType };
 
 export function useFlow() {
     const [user, setUser] = useState({ loggedIn: null });
@@ -36,6 +40,7 @@ export function useFlow() {
         try {
             await fcl.unauthenticate();
             toast('Logged out!');
+            splitbee.track('DevWallet: logout');
         } catch (e: any) {
             console.log(e);
             toast.error(`Logout failed: ${e.message}`);
@@ -50,6 +55,7 @@ export function useFlow() {
             const result = await fcl.authenticate();
             if (result.loggedIn) {
                 toast('Logged in!');
+                splitbee.track('DevWallet: login');
             }
         } catch (e: any) {
             toast.error(`Login failed: ${e.message}`);

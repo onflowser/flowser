@@ -17,6 +17,7 @@ import ConfirmDialog from '../../../shared/components/confirm-dialog/ConfirmDial
 import FullScreenLoading from '../../../shared/components/fullscreen-loading/FullScreenLoading';
 import { toast } from 'react-hot-toast';
 import { useQuery } from 'react-query';
+import splitbee from '@splitbee/web';
 
 const formSchema = Joi.object()
     .keys({
@@ -151,6 +152,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         };
         try {
             response = await saveConfiguration(configuration);
+            splitbee.track('Configuration: create');
         } catch (e: any) {
             setError(`Can not save the configuration. ${e.message}`);
         }
@@ -173,6 +175,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
 
         try {
             response = await updateConfiguration(id, configuration);
+            splitbee.track('Configuration: update');
         } catch (e: any) {
             setError(`Can not update the configuration. ${e.message}`);
         }
@@ -192,6 +195,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             await deleteProject(id);
             toast(`Project "${formState.name}" deleted!`);
             onBack();
+            splitbee.track('Configuration: delete');
         } catch (e) {
             setIsLoading(false);
             setError('Something went wrong: can not delete custom emulator');

@@ -11,7 +11,7 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const Dialog: FunctionComponent<Props> = ({ children, onClose, className = '', ...restProps }) => {
+const Dialog: FunctionComponent<Props> = ({ children, onClose, className = '' }) => {
     const onOutsideClick = (event: any) => {
         event.stopPropagation();
         onClose();
@@ -22,8 +22,8 @@ const Dialog: FunctionComponent<Props> = ({ children, onClose, className = '', .
     };
 
     return (
-        <div className={`${classes.root} ${className}`} onClick={onOutsideClick}>
-            <div className={`${classes.dialog} ${restProps.className}`}>
+        <div className={`${classes.root}`} onClick={onOutsideClick}>
+            <div className={`${classes.dialog} ${className}`}>
                 <Card className={classes.card} onClick={onClickInside}>
                     {children}
                 </Card>

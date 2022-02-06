@@ -3,7 +3,7 @@ import * as fcl from '@onflow/fcl';
 
 fcl.config()
     // flowser app details
-    .put('app.detail.icon', 'http://localhost:3000/favicon.ico')
+    .put('app.detail.icon', `${process.env.REACT_APP_URL}/favicon.ico`)
     .put('app.detail.title', 'Flowser')
     // Point App at Emulator
     .put('accessNode.api', process.env.REACT_APP_FLOW_ACCESS_NODE)

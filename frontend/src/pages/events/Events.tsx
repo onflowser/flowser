@@ -13,6 +13,7 @@ import EventDetailsTable from '../../shared/components/event-details-table/Event
 import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
 import NoResults from '../../shared/components/no-results/NoResults';
 import FullScreenLoading from '../../shared/components/fullscreen-loading/FullScreenLoading';
+import splitbee from '@splitbee/web';
 
 interface OwnProps {
     some?: string;
@@ -33,6 +34,7 @@ const Events: FunctionComponent<Props> = (props) => {
 
     const openLog = (status: boolean, id: string) => {
         setOpenedLog(!status ? id : '');
+        splitbee.track('Events: toggle details');
     };
 
     const { filteredData } = useFilterData(data, searchTerm);
