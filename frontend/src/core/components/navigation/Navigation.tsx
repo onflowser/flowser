@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import { routes } from '../../../shared/constants/routes';
 import classes from './Navigation.module.scss';
 import NavigationItem from './NavigationItem';
@@ -21,6 +21,8 @@ import axios from '../../../shared/config/axios';
 import { useProjectApi } from '../../../shared/hooks/project-api';
 import { useFlow } from '../../../shared/hooks/flow';
 import TransactionDialog from '../../../shared/components/transaction-dialog/TransactionDialog';
+import toast from 'react-hot-toast';
+import Ellipsis from '../../../shared/components/ellipsis/Ellipsis';
 
 export interface Counters {
     accounts: number;
@@ -37,6 +39,7 @@ const Navigation = (props: any) => {
     const [counters, setCounters] = useState<Counters>();
     const [showTxDialog, setShowTxDialog] = useState<any>(false);
     const { currentProject } = useProjectApi();
+    const isEmulatorProject = !!currentProject?.emulator;
     const { isLoggedIn, login, isLoggingIn, logout, isLoggingOut } = useFlow();
 
     const onSwitchProject = useCallback(async () => {
@@ -146,7 +149,26 @@ const Navigation = (props: any) => {
                                     className={classes.loginButton}
                                     icon={<FlowLogo className={classes.flowIcon} />}
                                     iconPosition="before"
-                                    onClick={login}
+                                    onClick={() => {
+                                        if (isEmulatorProject) {
+                                            login();
+                                        } else {
+                                            toast.error(
+                                                () => (
+                                                    <span style={{ textAlign: 'center' }}>
+                                                        fcl-dev-wallet integration is currently supported only for
+                                                        custom projects.
+                                                        <br />
+                                                        See{' '}
+                                                        <a href="https://github.com/onflowser/flowser#-caveats">
+                                                            https://github.com/onflowser/flowser#-caveats
+                                                        </a>
+                                                    </span>
+                                                ),
+                                                { duration: 5000 },
+                                            );
+                                        }
+                                    }}
                                     loading={isLoggingIn}
                                 >
                                     LOG IN
