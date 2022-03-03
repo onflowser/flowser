@@ -108,7 +108,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
         [validation],
     );
 
-    const handleSubmit = async (event: any) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         let response;
         setError('');
         event.preventDefault();
@@ -135,7 +135,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             window.scrollTo(0, 0);
             return false;
         }
-        history.push(`/${routes.firstRouteAfterStart}`);
+        history.replace(`/${routes.firstRouteAfterStart}`);
     };
 
     const createNewEmulator = async () => {

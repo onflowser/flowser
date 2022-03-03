@@ -3,6 +3,7 @@
 @import 'styles/typography';
 
 .root {
+  position: relative;
   padding: 0 $spacing-l * 2;
   padding-bottom: $spacing-l;
   border-top: 1px solid $color-logs-border;

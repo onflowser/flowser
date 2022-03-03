@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { UiState, UiStateContext } from '../contexts/ui-state.context';
 
-export type LogDrawerSize = 'tiny' | 'small' | 'big';
+export type LogDrawerSize = 'tiny' | 'small' | 'big' | 'custom';
 
 export interface LogDrawerUiState {
     logDrawerSize: LogDrawerSize;

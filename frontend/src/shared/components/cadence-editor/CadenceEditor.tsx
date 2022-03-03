@@ -9,7 +9,7 @@ type Props = {
 const CadenceEditor: FC<Props> = ({ value, onChange }) => {
     const ref = createRef<HTMLTextAreaElement>();
 
-    function onTextAreaKeyDown(e: any) {
+    function onTextAreaKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
         if (e.code === 'Tab') {
             // prevent default "focus next input" behaviour
             // to enable cadence code indentation
@@ -35,7 +35,7 @@ const CadenceEditor: FC<Props> = ({ value, onChange }) => {
             placeholder="Cadence code"
             value={value}
             onKeyDown={onTextAreaKeyDown}
-            onChange={(e: any) => onChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
         />
     );
 };

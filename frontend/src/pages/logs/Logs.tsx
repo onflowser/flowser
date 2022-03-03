@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useRef } from 'react';
+import React, { createRef, FunctionComponent, useCallback, useEffect, useState } from 'react';
 import classes from './Logs.module.scss';
 import Search from '../../shared/components/search/Search';
 import { ReactComponent as ExpandIcon } from '../../shared/assets/icons/expand.svg';
@@ -11,30 +11,33 @@ import { useTimeoutPolling } from '../../shared/hooks/timeout-polling';
 import { useSearch } from '../../shared/hooks/search';
 import { useFilterData } from '../../shared/hooks/filter-data';
 import splitbee from '@splitbee/web';
+import { useMouseMove } from '../../shared/hooks/mouse-position';
 
 interface OwnProps {
-    className?: any;
+    className?: string;
 }
 
 type Props = OwnProps;
 const SEARCH_CONTEXT_NAME = 'logs';
 
 const Logs: FunctionComponent<Props> = ({ className }) => {
+    const [trackMousePosition, setTrackMousePosition] = useState(false);
     const { logDrawerSize, setSize } = useLogDrawer();
     const { highlightLogKeywords } = useSyntaxHighlighter();
-    const miniLogRef = useRef(null);
-    const bigLogRef = useRef(null);
+    const miniLogRef = createRef<HTMLDivElement>();
+    const bigLogRef = createRef<HTMLDivElement>();
     const { data } = useTimeoutPolling('/api/logs/polling', '_id', 1000, false);
     const logs = data ? data.map((log: any) => log.data) : [];
     const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
     const { filteredData } = useFilterData(logs, searchTerm);
+    const mouseEvent = useMouseMove(trackMousePosition);
 
-    const scrollToBottom = (ref: any, smooth = true) => {
+    const scrollToBottom = (ref: React.RefObject<HTMLDivElement>, smooth = true) => {
         if (ref.current) {
-            const options = {
+            const options: ScrollToOptions = {
                 top: ref.current.scrollHeight,
                 left: 0,
-                behavior: smooth ? 'smooth' : 'instant',
+                behavior: smooth ? 'smooth' : 'auto',
             };
             ref.current.scrollTo(options);
         }
@@ -68,8 +71,32 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
         }, 100);
     }, []);
 
+    useEffect(() => {
+        // ignore collapse if user moves drawer upwards
+        if (!mouseEvent || mouseEvent.movementY <= 0) return;
+        const bottomPosition = window.innerHeight - mouseEvent.clientY;
+        // collapse if user drags drawer downwards and reaches a certain threshold
+        if (bottomPosition <= 150) {
+            setSize('tiny');
+        }
+    }, [mouseEvent]);
+
+    const startPositionDrag = useCallback(() => {
+        setTrackMousePosition(true);
+        setSize('custom');
+    }, []);
+
+    const endPositionDrag = useCallback(() => {
+        setTrackMousePosition(false);
+    }, []);
+
     return (
-        <div className={`${classes.root} ${className}`}>
+        <div
+            className={`${classes.root} ${className}`}
+            style={logDrawerSize === 'custom' ? { top: mouseEvent?.clientY } : {}}
+        >
+            <VerticalDragLine startPositionDrag={startPositionDrag} endPositionDrag={endPositionDrag} />
+
             <div className={`${classes.header} ${logDrawerSize !== 'tiny' ? classes.expanded : ''}`}>
                 <span className={classes.leftContainer}>
                     <LogsIcon />
@@ -87,7 +114,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
                 <div className={classes.rightContainer}>
                     {logDrawerSize !== 'tiny' && <Search context={SEARCH_CONTEXT_NAME} className={classes.searchBox} />}
                     <div>
-                        {(logDrawerSize === 'tiny' || logDrawerSize === 'small') && (
+                        {['tiny', 'small', 'custom'].includes(logDrawerSize) && (
                             <CaretIcon
                                 inverted={true}
                                 isOpen={logDrawerSize !== 'tiny'}
@@ -117,6 +144,29 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
                 </div>
             )}
         </div>
+    );
+};
+
+type VerticalDragLineProps = {
+    startPositionDrag: () => void;
+    endPositionDrag: () => void;
+};
+
+const VerticalDragLine = ({ startPositionDrag, endPositionDrag }: VerticalDragLineProps) => {
+    return (
+        <div
+            style={{
+                height: 5,
+                cursor: 'ns-resize',
+                left: 0,
+                right: 0,
+                top: -2,
+                position: 'absolute',
+                background: 'transparent',
+            }}
+            onMouseDown={startPositionDrag}
+            onMouseUp={endPositionDrag}
+        />
     );
 };
 
