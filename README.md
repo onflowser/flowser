@@ -9,16 +9,20 @@
 	<br>
 </div>
 
-Flowser is a convenient development tool for [Flow blockchain](https://www.onflow.org/), which starts and indexes flow emulator or testnet blockchains.
+Flowser is a convenient development tool for [Flow blockchain](https://www.onflow.org/). It does all the heavy work of managing the Flow emulator, inspecting the current blockchain state and interacting with the network for you!
 
-For a quick walk-through of Flowser app, see our [video demo](https://www.youtube.com/watch?v=yMs5awvGnlY&t=417s).
+See [features](#-features) and  [key concepts](#-key-concepts) sections for a more in-depth overview of Flowser's core concepts and components. 
+
+For a quick walk-through of the tool itself, see our [video demo](https://www.youtube.com/watch?v=yMs5awvGnlY&t=417s).
 
 ## 📖 Contents
 
 - [Get started](#-get-started)
 - [Features](#-features)
+- [Key Concepts](#-key-concepts)
+- [Caveats](#-caveats)
 - [Contributing](#-contributing)
-- [Contributors](#%EF%B8%8F-contributors)
+- [Contributors](#-contributors)
 - [Credits](#-credits)
 
 ## 👋 Get started
@@ -31,10 +35,11 @@ git clone https://github.com/onflowser/flowser
 
 ### 2. Install dependencies
 
-You need to install Docker & docker-compose in order to run this app. 
+You need to have Docker and docker-compose installed on your system in order to run Flowser. 
+
 See: [Docker installation instructions](https://www.docker.com/get-started)
 
-### 3. Start flowser
+### 3. Start Flowser
 
 This command will start Flowser with default configuration (recommended).
 
@@ -53,7 +58,7 @@ Creating backend-prod  ... done
 Creating dev-wallet    ... done
 ```
 
-If you encounter any issues during app build or container start, check out our [Troubleshooting Guide](./docs/DEVELOPMENT.md#-troubleshooting).
+If you encounter any issues during app build or container start, check out our [Troubleshooting Guide](DEVELOPMENT.md#-troubleshooting).
 
 ### 4. Open in browser
 
@@ -86,11 +91,29 @@ You can log in using a default service account and send arbitrary transaction di
 
 Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenAPI](https://www.openapis.org/) specification.
 
-Learn how to import flowser open api specification to:
-- [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
-- [Insomnia](https://docs.insomnia.rest/insomnia/import-export-data)
+## 💡 Key Concepts
 
-Check out [FEATURES.md](./docs/FEATURES.md) to get a complete list of features.
+Flowser is a tool that in its core helps you with managing the flow emulator and inspecting the current blockchain state.
+
+### Data sourcing
+
+All the interaction between Flowser and Flow blockchain is handled by the [Flow client library (fcl)](https://docs.onflow.org/fcl/).
+
+Fcl provides a single shared interface for interacting with any type of Flow blockchain network (testnet, mainnet, emulator,...). Because of that, Flowser has the ability to aggregate data from any Flow data source and currently supports Testnet and local Emulator blockchains.
+
+> See the [architectural diagram](./DEVELOPMENT.md#-architecture) in development guides to learn more.
+
+### Emulator management
+
+User of Flowser doesn't need to know what the flow emulator is or that it even exists, because Flowser handles the creation and management of emulator networks by default.
+
+If the user however does want to run and manage flow emulator by himself (from CLI), he/she has the option to do that. Note that this is not the preferred way to use Flowser, because of [this issue with fcl-dev-wallet](./README.md#fcl-dev-wallet-support).
+
+### Development wallet
+
+Usually, if you wanted an easy way to interact with the Flow emulator, you would need to run a separate [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet#start-the-dev-wallet) service manually.
+
+Flowser provides integration with [Flow's development wallet](https://github.com/onflow/fcl-dev-wallet) out of the box. That way users can conveniently interact with the Flow blockchain without leaving Flowser.
 
 ## 🚧 Caveats
 
@@ -101,11 +124,11 @@ We recommend that you do not run flow emulator by yourself and instead create a 
 
 If you do want to run the emulator by yourself (from a shell with `flow emulator` command), please leave a comment or a "thumbs up" on [this issue](https://github.com/onflowser/flowser/issues/72).
 
-## 💻 Contributing
+## 🤝 Contributing
 
 If you have a feature suggestion/request, first go look through the [existing issues](https://github.com/onflowser/flowser/issues) and if you can't find a related feature [create a new one](https://github.com/onflowser/flowser/issues/new).
 
-See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](docs/ARCHITECTURE.md) for info about high level system architecture.
+See [Development Guides](DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](docs/ARCHITECTURE.md) for info about high level system architecture.
 
 ## ✌️ Contributors
 

@@ -2,11 +2,10 @@
 
 Flowser application stack consist of frontend Nestjs backend API server, frontend React SPA application and Mongo database.
 
-> Check out [ARCHITECTURE.md](./ARCHITECTURE.md) for a quick overview of Flowser high-level architecture.
-
 ## 📖 Contents
 
 - [Get started](#-get-started)
+- [Architecture](#-architecture)
 - [Advanced configuration](#-advanced-configuration)
 - [Additional tooling](#-additional-tooling)
 - [Important notes](#-important-notes)
@@ -53,6 +52,11 @@ Good job! This is the last step, before we can actually start making code change
 
 > NOTE: If something isn't working as expected, try running `npm run dev:logs` to view logs from all containers or [submit a bug report](https://github.com/onflowser/flowser/issues/new?assignees=bartolomej&labels=bug%2C+feedback&template=bug_report.md&title=).
 
+## 🏛 Architecture
+
+The following application architecture diagram shows a high-level overview of the components and fundamental interactions within the system.
+
+![Application Architecture Diagram](https://github.com/onflowser/flowser/blob/935db7ac88abe6641686b44fb6f2a4ab4ec4a02e/docs/images/application-architecture-diagram.png?raw=true)
 
 ## 🛠️ Advanced configuration
 
@@ -107,7 +111,7 @@ You can use [Postman](https://postman.com) or [Insomnia](https://insomnia.rest) 
 
 > Check out https://github.com/onflowser/flowser#rest-api to learn how to import [OpenAPI](https://www.openapis.org/) API specification to your client of choice.
 
-## ❗Important notes
+##❗ Important notes
 
 After installing new NPM library you have to stop docker-compose, remove Docker image, and run docker-compose up again. Below example for frontend:
 1. Stop docker-compose

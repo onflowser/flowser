@@ -555,7 +555,7 @@
     "info": {
         "title": "Flowser",
         "description": "The Flowser API description",
-        "version": "0.0.1",
+        "version": "1.0.0",
         "contact": {}
     },
     "tags": [],
