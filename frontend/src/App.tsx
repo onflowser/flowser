@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Redirect, Route, Switch, withRouter } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, RouteProps, Switch, withRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout from './core/components/layout/Layout';
 import { routes } from './shared/constants/routes';
@@ -17,7 +17,7 @@ import Contracts from './pages/contracts/Contracts';
 import Events from './pages/events/Events';
 import Logs from './pages/logs/Logs';
 
-const RouteWithLayout = (props: any) => (
+const RouteWithLayout = (props: RouteProps) => (
     <Layout>
         <Route {...props} />
     </Layout>

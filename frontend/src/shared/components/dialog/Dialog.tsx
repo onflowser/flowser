@@ -1,9 +1,9 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, ReactElement } from 'react';
 import classes from './Dialog.module.scss';
 import Card from '../card/Card';
 
 interface OwnProps {
-    children: any;
+    children: ReactElement[] | ReactElement;
     onClose: () => void;
     className?: string;
     [key: string]: any;
@@ -12,12 +12,12 @@ interface OwnProps {
 type Props = OwnProps;
 
 const Dialog: FunctionComponent<Props> = ({ children, onClose, className = '' }) => {
-    const onOutsideClick = (event: any) => {
+    const onOutsideClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         onClose();
     };
 
-    const onClickInside = (event: any) => {
+    const onClickInside = (event: React.MouseEvent) => {
         event.stopPropagation();
     };
 

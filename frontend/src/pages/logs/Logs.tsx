@@ -14,7 +14,7 @@ import splitbee from '@splitbee/web';
 import { useMouseMove } from '../../shared/hooks/mouse-position';
 
 interface OwnProps {
-    className?: any;
+    className?: string;
 }
 
 type Props = OwnProps;
@@ -32,12 +32,12 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
     const { filteredData } = useFilterData(logs, searchTerm);
     const mouseEvent = useMouseMove(trackMousePosition);
 
-    const scrollToBottom = (ref: any, smooth = true) => {
+    const scrollToBottom = (ref: React.RefObject<HTMLDivElement>, smooth = true) => {
         if (ref.current) {
-            const options = {
+            const options: ScrollToOptions = {
                 top: ref.current.scrollHeight,
                 left: 0,
-                behavior: smooth ? 'smooth' : 'instant',
+                behavior: smooth ? 'smooth' : 'auto',
             };
             ref.current.scrollTo(options);
         }
