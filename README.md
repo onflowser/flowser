@@ -13,7 +13,7 @@ Flowser is a convenient development tool for [Flow blockchain](https://www.onflo
 
 See [features](#-features) and  [key concepts](#-key-concepts) sections for a more in-depth overview of Flowser's core concepts and components. 
 
-For a quick walk-through of the tool itself, see our [video demo](https://www.youtube.com/watch?v=yMs5awvGnlY&t=417s).
+For a quick walk-through of the tool itself, see [FlipFest video demo](https://www.youtube.com/watch?v=yMs5awvGnlY&t=417s) or our demo from [Flow Office Hours](https://www.youtube.com/watch?v=LSHwwX4yZJI&t=1496s).
 
 ## 📖 Contents
 
