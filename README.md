@@ -1,6 +1,6 @@
 <div align="center">
 	<br>
-	<img alt="Flowser logo" src="./docs/images/logo.png" width="150" height="150">
+	<img alt="Flowser logo" src="https://flowser.dev/images/logo.svg" width="150" height="150">
 	<h1>Flowser</h1>
 	<p>
 		<b>Easily start you local Flow network & inspect the state.</b>
