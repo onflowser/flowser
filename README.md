@@ -18,7 +18,6 @@ For a quick walk-through of Flowser app, see our [video demo](https://www.youtub
 - [Get started](#-get-started)
 - [Features](#-features)
 - [Contributing](#-contributing)
-- [Build with](#%EF%B8%8F-build-with)
 - [Contributors](#%EF%B8%8F-contributors)
 - [Credits](#-credits)
 
@@ -80,12 +79,12 @@ You can view & search thought the following objects:
 - **events**
 
 ### Dev wallet
-Flowser natively supports [dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience.
+Flowser natively supports [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) tool for developer convenience.
 You can log in using a default service account and send arbitrary transaction directly within flowser UI.
 
 ### Rest API
 
-Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenApi](https://www.openapis.org/) specification. You can also view online documentation at [`app.flowser.dev/api`](https://app.flowser.dev/api/).
+Flowser backend exposes a Restfull API, which is defined in [`backend/openapi.json`](backend/openapi.json) file that conforms to [OpenAPI](https://www.openapis.org/) specification.
 
 Learn how to import flowser open api specification to:
 - [Postman](https://learning.postman.com/docs/integrations/available-integrations/working-with-openAPI/)
@@ -108,16 +107,6 @@ If you have a feature suggestion/request, first go look through the [existing is
 
 See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up development environment, or [Architecture Overview](docs/ARCHITECTURE.md) for info about high level system architecture.
 
-## 🛠️ Build with
-
-- [Node.js](https://nodejs.org/)
-- [Nest.js](https://nestjs.com/)
-- [React.js](https://reactjs.org/)
-- [Docker](https://www.docker.com/)
-- [MongoDB](https://www.mongodb.com/)
-- [flow-cli](https://github.com/onflow/flow-cli)
-- [flow-fcl](https://github.com/onflow/fcl-js)
-
 ## ✌️ Contributors
 
 - [`jgololicic`](http://github.com/jgololicic)
@@ -127,4 +116,3 @@ See [Development Guides](docs/DEVELOPMENT.md) for more info on setting up develo
 ## 🙌 Credits
 
 - [@bluesign](https://github.com/bluesign) - provided a useful [script](https://gist.github.com/bluesign/df24b31a61bf4cd11f88efb6edd78925) for indexing flow emulator db
-- [@wmnnd](https://github.com/wmnnd) - docker production setup [guide](https://github.com/wmnnd/nginx-certbot)
