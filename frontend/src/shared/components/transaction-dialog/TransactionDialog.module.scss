@@ -44,6 +44,18 @@
     text-align: center;
   }
 
+  .errorButton {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: $color-status-expired;
+    font-size: $font-size-large;
+    margin-bottom: $spacing-base;
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
   .actions {
     margin-top: $spacing-base * 3;
     display: flex;
