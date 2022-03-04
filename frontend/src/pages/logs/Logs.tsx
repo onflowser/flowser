@@ -76,8 +76,9 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
         if (!mouseEvent || mouseEvent.movementY <= 0) return;
         const bottomPosition = window.innerHeight - mouseEvent.clientY;
         // collapse if user drags drawer downwards and reaches a certain threshold
-        if (bottomPosition <= 150) {
+        if (bottomPosition <= 130) {
             setSize('tiny');
+            setTrackMousePosition(false);
         }
     }, [mouseEvent]);
 
@@ -95,7 +96,11 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
             className={`${classes.root} ${className}`}
             style={logDrawerSize === 'custom' ? { top: mouseEvent?.clientY } : {}}
         >
-            <VerticalDragLine startPositionDrag={startPositionDrag} endPositionDrag={endPositionDrag} />
+            <VerticalDragLine
+                isActive={trackMousePosition}
+                startPositionDrag={startPositionDrag}
+                endPositionDrag={endPositionDrag}
+            />
 
             <div className={`${classes.header} ${logDrawerSize !== 'tiny' ? classes.expanded : ''}`}>
                 <span className={classes.leftContainer}>
@@ -148,21 +153,22 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 };
 
 type VerticalDragLineProps = {
-    startPositionDrag: () => void;
-    endPositionDrag: () => void;
+    startPositionDrag: (e: React.MouseEvent) => void;
+    endPositionDrag: (e: React.MouseEvent) => void;
+    isActive?: boolean;
 };
 
-const VerticalDragLine = ({ startPositionDrag, endPositionDrag }: VerticalDragLineProps) => {
+const VerticalDragLine = ({ isActive, startPositionDrag, endPositionDrag }: VerticalDragLineProps) => {
     return (
         <div
             style={{
-                height: 5,
+                height: 3,
                 cursor: 'ns-resize',
                 left: 0,
                 right: 0,
-                top: -2,
+                top: -1.5,
                 position: 'absolute',
-                background: 'transparent',
+                background: isActive ? '#FFC016' : 'transparent',
             }}
             onMouseDown={startPositionDrag}
             onMouseUp={endPositionDrag}
