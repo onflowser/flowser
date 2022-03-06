@@ -244,12 +244,20 @@ export class FlowEmulatorService {
     static formatLogLines (lines: string[]) {
         return lines
             .map(line => {
+                let parsedLog;
+                try {
+                    parsedLog = FlowEmulatorService.parseLogLine(line);
+                } catch (e) {
+                    // if parse error is thrown, just ignore the error
+                    // and return non-formatted log line
+                    return line;
+                }
                 const {
                     level,
                     time,
                     msg,
                     ...rest
-                } = FlowEmulatorService.parseLogLine(line);
+                } = parsedLog;
                 // format example: Thu Oct 28 2021 21:20:51
                 const formattedTime = new Date(time).toString().split(" ").slice(0, 5).join(" ")
                 // appends the rest of the values in key="value" format
@@ -284,7 +292,14 @@ export class FlowEmulatorService {
                 .split("="); // split into [key, value] pairs
             keyValuePairs.push({ [key]: value })
         }
-        return keyValuePairs.reduce((p, c) => ({ ...p, ...c }), {})
+        const formatted = keyValuePairs.reduce((p, c) => ({ ...p, ...c }), {})
+        // this line has invalid log format
+        // (probably due to incorrect usage of the CLI)
+        if (formatted.hasOwnProperty("level") && formatted.hasOwnProperty("level")) {
+            return formatted;
+        } else {
+            throw new Error("Invalid log format")
+        }
     }
 
     private static flag (name: string, userValue: any, defaultValue?: any) {
