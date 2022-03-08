@@ -55,6 +55,10 @@ export class Project extends PollingEntity {
         return this.startBlockHeight !== undefined && this.startBlockHeight !== null;
     }
 
+    isEmulator() {
+        return this.isAnyNetwork([FlowNetworks.EMULATOR]);
+    }
+
     isOfficialNetwork() {
         return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
     }

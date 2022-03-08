@@ -60,20 +60,19 @@ export class FlowAggregatorService {
 
     handleEmulatorLogs(data: string[]) {
         return Promise.all(data.map(line => {
-            const log = new Log();
-            log.data = line;
-            return this.logsService.create(log);
+            return this.logsService.create(new Log(line));
         }))
     }
 
     @Interval(config.dataFetchInterval)
     async fetchDataFromDataSource(): Promise<void> {
 
-        if (!this.project || !this.flowEmulatorService.isRunning()) {
+        if (!this.project) {
             return;
         }
 
-        if (!this.serviceAccountBootstrapped) {
+        // service account exist only on emulator chains
+        if (this.project.isEmulator() && !this.serviceAccountBootstrapped) {
             // TODO: storage server hangs up when using flow-cli@v0.31
             this.logger.debug("Bootstrapping service account")
             try {
@@ -178,13 +177,7 @@ export class FlowAggregatorService {
     }
 
     async handleAccountCreated(address: string) {
-        const account = await this.flowGatewayService.getAccount(address);
-        this.logger.debug(`Account ${account.address} created`);
-        account.storage = await this.storageDataService.getStorageData(address)
-        return this.accountService.replace(
-            address,
-            Account.init(account, {createdAt: Date.now()})
-        )
+        return this.updateAccount(address, {createdAt: Date.now()})
     }
 
     async handleAccountKeyAdded(address: string) {
@@ -207,13 +200,15 @@ export class FlowAggregatorService {
         return this.updateAccount(address)
     }
 
-    async updateAccount(address: string) {
+    async updateAccount(address: string, props: Partial<Account> = {updatedAt: Date.now()}) {
         const account = await this.flowGatewayService.getAccount(address);
-        account.storage = await this.storageDataService.getStorageData(address);
-        this.logger.debug(`Account ${account.address} updated`);
+        // storage data API works only for local emulator for now
+        if (this.project.isEmulator()) {
+            account.storage = await this.storageDataService.getStorageData(address)
+        }
         return this.accountService.replace(
             address,
-            Account.init(account, {updatedAt: Date.now()})
+            Account.init(account, props)
         )
     }
 
