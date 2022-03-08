@@ -27,6 +27,7 @@ export class FlowAggregatorService {
 
     private project: Project;
     private readonly logger = new Logger(FlowAggregatorService.name);
+    private serviceAccountBootstrapped = false;
 
     constructor(
         private blockService: BlocksService,
@@ -75,15 +76,22 @@ export class FlowAggregatorService {
     @Interval(config.dataFetchInterval)
     async fetchDataFromDataSource(): Promise<void> {
 
-        if (!this.project) {
+        if (!this.project || !this.flowEmulatorService.isRunning()) {
             return;
         }
+
+        if (!this.serviceAccountBootstrapped) {
+            // TODO: storage server /storage endpoint hangs up, probably because of some internal parsing error
+            await this.bootstrapServiceAccount();
+            this.serviceAccountBootstrapped = true;
+        }
+
         const lastStoredBlock = await this.blockService.findLastBlock();
         let latestBlock;
         try {
             latestBlock = await this.flowGatewayService.getLatestBlock();
         } catch (e) {
-            return this.logger.debug(`failed to fetch latest block: ${e.message}`)
+            return this.logger.debug(`failed to fetch latest block: ${e}`)
         }
 
         // user can specify (on a project level) what is the starting block height
@@ -219,6 +227,7 @@ export class FlowAggregatorService {
             if (error.code !== 11000) {
                 throw new InternalServerErrorException(error.message)
             }
+            this.logger.debug("Service account bootstrap error: ", error.message)
         }
     }
 }
