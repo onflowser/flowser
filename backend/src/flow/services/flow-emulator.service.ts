@@ -233,8 +233,10 @@ export class FlowEmulatorService {
         // keep those parameters up to date with the currently used flow-cli version
         // https://github.com/onflow/flow-emulator#configuration
         return [
-            flag("port", this.configuration.rpcServerPort),
-            flag("http-port", this.configuration.httpServerPort),
+            flag("port", this.configuration.gRpcPort),
+            flag("contracts", this.configuration.contracts),
+            flag("admin-port", this.configuration.adminPort),
+            flag("rest-port", this.configuration.restPort),
             flag("block-time", this.configuration.blockTime),
             flag("service-priv-key", this.configuration.servicePrivateKey),
             flag("service-pub-key", this.configuration.servicePublicKey),

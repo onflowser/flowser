@@ -91,13 +91,13 @@ export class FlowCliService {
         this.data = {
             "emulators": {
                 "default": {
-                    "port": parseInt(this.emulatorConfig.rpcServerPort as string),
+                    "port": parseInt(this.emulatorConfig.gRpcPort as string),
                     "serviceAccount": "emulator-account"
                 }
             },
             "contracts": {},
             "networks": {
-                "emulator": `127.0.0.1:${this.emulatorConfig.rpcServerPort}`,
+                "emulator": `127.0.0.1:${this.emulatorConfig.gRpcPort}`,
             },
             "accounts": {
                 "emulator-account": {

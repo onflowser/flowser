@@ -24,8 +24,9 @@ const formSchema = Joi.object()
         name: Joi.string().min(3).max(100).pattern(new RegExp('^[a-zA-Z0-9 ]+$')).required().messages({
             'string.pattern.base': 'Only letters, numbers and white spaces are allowed',
         }),
-        rpcServerPort: Joi.number().integer().greater(1000).less(10000).required(),
-        httpServerPort: Joi.number().integer().greater(1000).less(10000).required(),
+        gRpcPort: Joi.number().integer().greater(1000).less(10000).required(),
+        adminPort: Joi.number().integer().greater(1000).less(10000).required(),
+        restPort: Joi.number().integer().greater(1000).less(10000).required(),
         // blockTime: Joi.string().pattern(new RegExp('(^[1-9][0-9]*(ns|us|µs|ms|s|m|h)$)|(^0{1}$)')),
         blockTime: Joi.alternatives().try(
             Joi.string().pattern(new RegExp('(^[1-9][0-9]*(ns|us|µs|ms|s|m|h)$)|(^0{1}$)')),
@@ -146,7 +147,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             name,
             emulator: formState,
             gateway: {
-                port: formState.httpServerPort,
+                port: formState.adminPort,
                 address: 'http://127.0.0.1',
             },
         };
@@ -168,7 +169,7 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
             name,
             emulator: formState,
             gateway: {
-                port: formState.httpServerPort,
+                port: formState.adminPort,
                 address: 'http://127.0.0.1',
             },
         };
@@ -261,28 +262,43 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                         <Input
                                             type="text"
                                             disabled
-                                            value={formState.rpcServerPort}
-                                            onChange={(e) => onFormFieldChange('rpcServerPort', e.target.value)}
+                                            value={formState.gRpcPort}
+                                            onChange={(e) => onFormFieldChange('gRpcPort', e.target.value)}
                                         />
-                                        {getValidationError('rpcServerPort') ? (
+                                        {getValidationError('gRpcPort') ? (
                                             <span className={classes.errorMessage}>Provide a valid port number</span>
                                         ) : (
-                                            <span>RPC port to listen on</span>
+                                            <span>gRPC port to listen on</span>
                                         )}
                                     </div>
 
                                     <div className={classes.row}>
-                                        <span>HTTP Port</span>
+                                        <span>Admin Port</span>
                                         <Input
                                             type="text"
                                             disabled
-                                            value={formState.httpServerPort}
-                                            onChange={(e) => onFormFieldChange('httpServerPort', e.target.value)}
+                                            value={formState.adminPort}
+                                            onChange={(e) => onFormFieldChange('adminPort', e.target.value)}
                                         />
-                                        {getValidationError('httpServerPort') ? (
+                                        {getValidationError('adminPort') ? (
                                             <span className={classes.errorMessage}>Provide a valid port number</span>
                                         ) : (
-                                            <span>HTTP port to listen on</span>
+                                            <span>Admin API port to listen on</span>
+                                        )}
+                                    </div>
+
+                                    <div className={classes.row}>
+                                        <span>REST Port</span>
+                                        <Input
+                                            type="text"
+                                            disabled
+                                            value={formState.restPort}
+                                            onChange={(e) => onFormFieldChange('restPort', e.target.value)}
+                                        />
+                                        {getValidationError('restPort') ? (
+                                            <span className={classes.errorMessage}>Provide a valid port number</span>
+                                        ) : (
+                                            <span>REST API port to listen on</span>
                                         )}
                                     </div>
 
@@ -565,6 +581,18 @@ const Configuration: FunctionComponent<any> = ({ props }) => {
                                                 <span>True</span>
                                             </div>
                                             <span>Enable verbose logging (useful for debugging)</span>
+                                        </div>
+                                        <div className={classes.row}>
+                                            <span>Contracts</span>
+                                            <div>
+                                                <span>False</span>
+                                                <ToggleButton
+                                                    value={formState.contracts === true}
+                                                    onChange={(state) => onFormFieldChange('contracts', state)}
+                                                />
+                                                <span>True</span>
+                                            </div>
+                                            <span>Start with contracts like FUSD, NFT and an NFT Marketplace.</span>
                                         </div>
                                         <div className={classes.row}>
                                             <span>Persist</span>

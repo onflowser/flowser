@@ -8,7 +8,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get -yq install nodejs
 RUN npm install
 # version v0.28.4 breaks storage script logic
-RUN curl https://storage.googleapis.com/flow-cli/install.sh > /tmp/install.sh && sh /tmp/install.sh v0.28.3
+RUN curl https://storage.googleapis.com/flow-cli/install.sh > /tmp/install.sh && sh /tmp/install.sh v0.31.1
 ENV PATH="$PATH:/root/.local/bin:/app/data-storage"
 
 COPY package*.json ./

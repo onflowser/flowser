@@ -6,10 +6,13 @@ export class EmulatorConfigurationEntity {
   verboseLogging: boolean;
 
   @Column()
-  httpServerPort: number | string;
+  adminPort: number | string;
 
   @Column()
-  rpcServerPort: number | string;
+  restPort: number | string;
+
+  @Column()
+  gRpcPort: number | string;
 
   @Column()
   blockTime: number;
@@ -55,6 +58,9 @@ export class EmulatorConfigurationEntity {
 
   @Column()
   persist: boolean;
+
+  @Column()
+  contracts: boolean;
 
   @Column()
   simpleAddresses: boolean;

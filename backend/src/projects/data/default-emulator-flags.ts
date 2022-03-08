@@ -1,9 +1,10 @@
 export const defaultEmulatorFlags = {
     name: 'New Emulator Configuration',
     verboseLogging: true,
-    httpServerPort: parseInt(process.env.FLOW_EMULATOR_HTTP_PORT),
+    adminPort: parseInt(process.env.FLOW_EMULATOR_ADMIN_PORT) || 8080,
+    restPort: parseInt(process.env.FLOW_EMULATOR_REST_PORT) || 8888,
     persist: false,
-    rpcServerPort: 3569,
+    gRpcPort: 3569,
     blockTime: 0,
     serviceAddress: process.env.FLOW_ACCOUNT_ADDRESS, // this is the same for all emulators
     servicePrivateKey: process.env.FLOW_ACCOUNT_PRIVATE_KEY,
