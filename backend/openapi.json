@@ -198,9 +198,31 @@
                 }
             }
         },
-        "/api/flow/status": {
+        "/api/flow/gateway": {
             "get": {
-                "operationId": "FlowController_getStatus",
+                "operationId": "FlowController_getGateway",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/flow/emulator": {
+            "get": {
+                "operationId": "FlowController_getEmulator",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/flow/emulator/logs": {
+            "get": {
+                "operationId": "FlowController_getLogs",
                 "parameters": [],
                 "responses": {
                     "200": {

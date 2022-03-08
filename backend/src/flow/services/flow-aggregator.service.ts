@@ -48,16 +48,9 @@ export class FlowAggregatorService {
     async startEmulator() {
         await this.flowEmulatorService.init();
         await this.stopEmulator();
-        return new Promise((resolve, reject) => {
-            this.flowEmulatorService.start(((error, data) => {
-                if (error) {
-                    this.logger.error(`received emulator error: ${error.message}`)
-                    reject(error)
-                } else {
-                    this.handleEmulatorLogs(data);
-                }
-            })).then(resolve).catch(reject)
-        })
+        return this.flowEmulatorService.start((data => {
+            this.handleEmulatorLogs(data);
+        }))
     }
 
     stopEmulator() {
