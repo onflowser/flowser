@@ -60,10 +60,10 @@ const Main: FunctionComponent<any> = () => {
                     <h3>Quick notice 👀</h3>
                     <p>
                         If you would like flowser to connect to your own emulator, you will need to start flow emulator
-                        on http port <code>8081</code>.
+                        on different ports.
                     </p>
                     <br />
-                    <p>Here is an example command that you can use:</p>
+                    <p>Here is an example flow-cli (v0.28.*) command that you can use:</p>
                     <Code code={`flow emulator --port=3570 --http-port=8081`} />
                     <br />
                     <p>
