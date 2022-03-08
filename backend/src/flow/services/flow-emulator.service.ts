@@ -324,4 +324,11 @@ export class FlowEmulatorService {
         return value ? `--${name}=${value}` : undefined;
     }
 
+    private printLogs() {
+        if (this.logs.length > 0) {
+            this.logger.debug('Emulator stdout: ');
+            console.log(this.logs.join("\n"))
+        }
+    }
+
 }
