@@ -68,22 +68,23 @@ export class FlowEmulatorService {
                 // temporarily store the logs in memory for possible examination
                 this.logs.push(...lines);
 
-                const lineMatch = (line, s) => line.toLowerCase().includes(s.toLowerCase());
-                const linesMatch = s => Boolean(lines.find(line => lineMatch(line, s)));
 
-                if (this.isState(FlowEmulatorState.STOPPED) && linesMatch("starting http server")) {
+                if (this.isState(FlowEmulatorState.STOPPED) && this.findLog("starting admin server")) {
                     // emulator is starting (could still exit due to init error)
                     this.setState(FlowEmulatorState.STARTED)
-                    // assume that if no error is thrown in 0.5s, the emulator is running
+                    // assume that if no error is thrown in 1s, the emulator is running
                     // this line is needed, because if verbose flag is not included
                     // emulator may not emit any more logs in the near future
                     // therefore we can't reliably tell if emulator started successfully
-                    setTimeout(() => this.onServerRunning(), 1000)
+                    setTimeout(() => {
+                        this.onServerRunning();
+                        resolve(true);
+                    }, 1000)
                 }
-                    // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
-                    // TODO: logic for determining if emulator started successfully should be improved
+                // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
+                // TODO: logic for determining if emulator started successfully should be improved
                 // https://github.com/onflowser/flowser/issues/33
-                else if (this.isState(FlowEmulatorState.STARTED) && !linesMatch("server error")) {
+                else if (this.isState(FlowEmulatorState.STARTED) && !this.findLog("server error")) {
                     // emulator successfully started
                     this.onServerRunning();
                     resolve(true);
@@ -95,39 +96,47 @@ export class FlowEmulatorService {
             // No data is emitted to stderr for now
             // this.emulatorProcess.stderr.on("data", data => {})
 
-            this.emulatorProcess.on("close", code => {
-                const error = this.getError() || new Error(`Emulator exited with code ${code}`)
+            this.emulatorProcess.on("close", (code, signal) => {
+                const error = this.getError() || new Error(`Emulator closed: ${code} (${signal})`)
                 this.setState(FlowEmulatorState.STOPPED);
-                this.logger.debug(error.message)
+                this.logger.error(error.message);
+                this.printLogs()
                 reject(error);
             })
 
             this.emulatorProcess.on("error", error => {
+                this.logger.error("Emulator error: " + error);
+                this.printLogs()
                 cb(error, null)
                 reject(error)
             })
-
-            // given that no logs are emitted after "🌱  Starting HTTP server ..." line
-            // assume that the server successfully started after 2s timeout
-            setTimeout(resolve, 2000)
         }))
+    }
+
+    findLog(query) {
+        // traverse the most recent logs first (start from the end)
+        for (let i = this.logs.length - 1; i >= 0; i--) {
+            const line = this.logs[i];
+            if (line.toLowerCase().includes(query.toLowerCase())) {
+                // a log match is found
+                return line;
+            }
+        }
+        return null;
     }
 
     stop () {
         return new Promise(resolve => {
-            this.logger.debug(
-                this.isRunning()
-                    ? `stopping pid: ${this.emulatorProcess.pid}`
-                    : `already stopped, skipping`
-            )
-            if (this.isRunning()) {
-                const isKilled = this.emulatorProcess.kill();
+            if (this.isStarted()) {
+                this.logger.debug(`stopping pid: ${this.emulatorProcess.pid}`)
+                const isKilled = this.emulatorProcess.kill(); // send SIGTERM signal
                 // resolve only when the emulator process exits
                 this.events.on(FlowEmulatorState.STOPPED, () => {
                     this.logger.debug(`Process ${this.emulatorProcess.pid} stopped`)
                     resolve(isKilled)
                 })
             } else {
+                this.logger.debug(`already stopped, skipping`)
                 resolve(true);
             }
         })
@@ -184,10 +193,17 @@ export class FlowEmulatorService {
         }
     }
 
-    isRunning () {
+    isStarted () {
         return (
             !this.emulatorProcess?.killed &&
             [FlowEmulatorState.STARTED, FlowEmulatorState.RUNNING].includes(this.state)
+        );
+    }
+
+    isRunning () {
+        return (
+          !this.emulatorProcess?.killed &&
+          this.state === FlowEmulatorState.RUNNING
         );
     }
 
@@ -214,6 +230,7 @@ export class FlowEmulatorService {
     private getFlags () {
         const { flag } = FlowEmulatorService;
 
+        // keep those parameters up to date with the currently used flow-cli version
         // https://github.com/onflow/flow-emulator#configuration
         return [
             flag("port", this.configuration.rpcServerPort),
