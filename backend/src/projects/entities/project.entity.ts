@@ -68,11 +68,14 @@ export class Project extends PollingEntity {
     }
 
     isAnyNetwork(networks: FlowNetworks[]) {
+        // network type is determined by project.id
+        // only managed emulator projects can have arbitrary id values
+        // for other projects network type must equal to it's id
         const officialNetworkIds = ['mainnet', 'testnet'];
         for (let network of networks) {
             let isMatch = false;
             if (network === FlowNetworks.EMULATOR) {
-                isMatch = !officialNetworkIds.includes(network);
+                isMatch = !officialNetworkIds.includes(this.id);
             } else {
                 isMatch = this.id === network;
             }
