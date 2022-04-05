@@ -3,11 +3,17 @@
 @import 'styles/typography';
 
 .root {
+  z-index: 1000;
   position: relative;
   padding: 0 $spacing-l * 2;
   padding-bottom: $spacing-l;
   border-top: 1px solid $color-logs-border;
   background-color: $color-background;
+
+  pre {
+    white-space: nowrap;
+    line-height: 1.8;
+  }
 
   .header {
     display: flex;

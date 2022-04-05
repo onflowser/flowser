@@ -106,7 +106,9 @@ export class AccountsService {
                 .aggregate([
                     {$match: {payer: addressWithout0x}},
                     {$project: {_id: 0}}
-                ]).toArray();
+                ])
+                .sort({createdAt: -1})
+                .toArray();
 
             return {...account, transactions};
         } else {

@@ -27,6 +27,7 @@ export class FlowAggregatorService {
 
     private project: Project;
     private readonly logger = new Logger(FlowAggregatorService.name);
+    private serviceAccountBootstrapped = false;
 
     constructor(
         private blockService: BlocksService,
@@ -48,16 +49,9 @@ export class FlowAggregatorService {
     async startEmulator() {
         await this.flowEmulatorService.init();
         await this.stopEmulator();
-        return new Promise((resolve, reject) => {
-            this.flowEmulatorService.start(((error, data) => {
-                if (error) {
-                    this.logger.error(`received emulator error: ${error.message}`)
-                    reject(error)
-                } else {
-                    this.handleEmulatorLogs(data);
-                }
-            })).then(resolve).catch(reject)
-        })
+        return this.flowEmulatorService.start((data => {
+            this.handleEmulatorLogs(data);
+        }))
     }
 
     stopEmulator() {
@@ -66,9 +60,7 @@ export class FlowAggregatorService {
 
     handleEmulatorLogs(data: string[]) {
         return Promise.all(data.map(line => {
-            const log = new Log();
-            log.data = line;
-            return this.logsService.create(log);
+            return this.logsService.create(new Log(line));
         }))
     }
 
@@ -78,12 +70,26 @@ export class FlowAggregatorService {
         if (!this.project) {
             return;
         }
+
+        // service account exist only on emulator chains
+        if (this.project.isEmulator() && !this.serviceAccountBootstrapped) {
+            // TODO: storage server hangs up when using flow-cli@v0.31
+            this.logger.debug("Bootstrapping service account")
+            try {
+                await this.bootstrapServiceAccount();
+            } catch (e) {
+                this.logger.error("Service account bootstrap error: ", e.message);
+                return // retry in the next iteration
+            }
+            this.serviceAccountBootstrapped = true;
+        }
+
         const lastStoredBlock = await this.blockService.findLastBlock();
         let latestBlock;
         try {
             latestBlock = await this.flowGatewayService.getLatestBlock();
         } catch (e) {
-            return this.logger.debug(`failed to fetch latest block: ${e.message}`)
+            return this.logger.debug(`failed to fetch latest block: ${e}`)
         }
 
         // user can specify (on a project level) what is the starting block height
@@ -171,13 +177,7 @@ export class FlowAggregatorService {
     }
 
     async handleAccountCreated(address: string) {
-        const account = await this.flowGatewayService.getAccount(address);
-        this.logger.debug(`Account ${account.address} created`);
-        account.storage = await this.storageDataService.getStorageData(address)
-        return this.accountService.replace(
-            address,
-            Account.init(account, {createdAt: Date.now()})
-        )
+        return this.updateAccount(address, {createdAt: Date.now()})
     }
 
     async handleAccountKeyAdded(address: string) {
@@ -200,13 +200,15 @@ export class FlowAggregatorService {
         return this.updateAccount(address)
     }
 
-    async updateAccount(address: string) {
+    async updateAccount(address: string, props: Partial<Account> = {updatedAt: Date.now()}) {
         const account = await this.flowGatewayService.getAccount(address);
-        account.storage = await this.storageDataService.getStorageData(address);
-        this.logger.debug(`Account ${account.address} updated`);
+        // storage data API works only for local emulator for now
+        if (this.project.isEmulator()) {
+            account.storage = await this.storageDataService.getStorageData(address)
+        }
         return this.accountService.replace(
             address,
-            Account.init(account, {updatedAt: Date.now()})
+            Account.init(account, props)
         )
     }
 

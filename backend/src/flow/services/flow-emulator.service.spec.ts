@@ -18,6 +18,13 @@ describe('FlowEmulatorService', () => {
         service = module.get<FlowEmulatorService>(FlowEmulatorService);
     });
 
+    it('should failed to parse error lines', function () {
+        const parse = () => {
+            FlowEmulatorService.parseLogLine(`Error: unknown flag: --http-port`)
+        }
+        expect(parse).toThrow("Invalid log format")
+    });
+
     it('should parse log lines', function () {
         const parsedLines = rawLogLines.map(line => FlowEmulatorService.parseLogLine(line));
         expect(parsedLines).toEqual([

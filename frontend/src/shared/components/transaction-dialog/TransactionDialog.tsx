@@ -11,6 +11,7 @@ import { NavLink } from 'react-router-dom';
 import Ellipsis from '../ellipsis/Ellipsis';
 import { isValueSet } from '../../functions/utils';
 import splitbee from '@splitbee/web';
+import { useSyntaxHighlighter } from '../../hooks/syntax-highlighter';
 
 type Props = {
     show?: boolean;
@@ -18,10 +19,14 @@ type Props = {
 };
 
 const TransactionDialog: FC<Props> = ({ show, setShow }) => {
-    const [code, setCode] = useState<any>('');
+    const [code, setCode] = useState<string>('');
+    const [showLongError, setShowLongError] = useState<boolean>(false);
+    const [longError, setLongError] = useState<string>('');
     const [args, setArgs] = useState<FlowScriptArgument[]>([]);
     const [loading, setLoading] = useState(false);
     const { sendTransaction } = useFlow();
+    const { highlightCadenceSyntax } = useSyntaxHighlighter();
+    const highlightedError = highlightCadenceSyntax(longError);
 
     function onClose() {
         setShow(false);
@@ -69,7 +74,13 @@ const TransactionDialog: FC<Props> = ({ show, setShow }) => {
             );
             splitbee.track(`TransactionDialog: send`);
         } catch (e: any) {
-            toast.error(e.message ? `Failed to send transaction: ${e.message}` : e, { duration: 5000 });
+            if (e.message) {
+                toast.error(e.message, { duration: 5000 });
+            } else {
+                toast.error('Transaction error');
+                // error is too long to be shown in a toaster
+                setLongError(e);
+            }
         } finally {
             setLoading(false);
         }
@@ -79,11 +90,34 @@ const TransactionDialog: FC<Props> = ({ show, setShow }) => {
         return null;
     }
 
+    if (showLongError) {
+        return (
+            <Dialog className={classes.dialog} onClose={onClose}>
+                <div className={classes.root} style={{ padding: 0 }}>
+                    <pre
+                        style={{ height: 500, overflow: 'scroll' }}
+                        dangerouslySetInnerHTML={{ __html: highlightedError.replaceAll('\\n', '<br/>') }}
+                    />
+                    <div className={classes.actions}>
+                        <Button loading={loading} variant="middle" onClick={() => setShowLongError(false)}>
+                            Close
+                        </Button>
+                    </div>
+                </div>
+            </Dialog>
+        );
+    }
+
     return (
         <Dialog className={classes.dialog} onClose={onClose}>
             <div className={classes.root}>
                 <TxIcon className={classes.icon} />
                 <h3>SEND A TRANSACTION</h3>
+                {longError && (
+                    <button className={classes.errorButton} onClick={() => setShowLongError(true)}>
+                        Transaction error occurred, click to view!
+                    </button>
+                )}
                 <CadenceEditor value={code} onChange={setCode} />
                 <ScriptArguments className={classes.arguments} onChange={setArgs} />
                 <div className={classes.actions}>

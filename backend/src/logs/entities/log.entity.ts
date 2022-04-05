@@ -8,4 +8,9 @@ export class Log extends PollingEntity {
 
   @Column()
   data: string;
+
+  constructor (data: string) {
+    super();
+    this.data = data;
+  }
 }

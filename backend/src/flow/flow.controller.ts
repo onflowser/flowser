@@ -11,17 +11,26 @@ export class FlowController {
     private flowCliService: FlowCliService,
   ) {}
 
-  @Get("status")
-  async getStatus() {
+  @Get("gateway")
+  async getGateway() {
     const isConnected = await this.flowGatewayService.isConnectedToGateway();
     return {
-      gateway: {
-        isConnected
-      },
-      emulator: {
-        status: this.flowEmulatorService.state
-      }
+      isConnected,
     };
+  }
+
+  @Get("emulator")
+  getEmulator() {
+    return {
+      status: this.flowEmulatorService.state,
+      config: this.flowEmulatorService.configuration,
+      process: this.flowEmulatorService.emulatorProcess
+    }
+  }
+
+  @Get("emulator/logs")
+  async getLogs() {
+    return this.flowEmulatorService.logs;
   }
 
   @Get("version")

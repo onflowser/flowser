@@ -16,7 +16,7 @@ const Main: FunctionComponent<any> = () => {
     const history = useHistory();
     const [error, setError] = useState('');
     const [showEmulatorDialog, setEmulatorDialog] = useState(false);
-    const { useProject, projects, isLoadingProjects } = useProjectApi();
+    const { useProject, projects, isLoadingProjects, currentProject } = useProjectApi();
     const defaultProjects = projects.filter((p: any) => !p.isCustom);
     const customProjects = projects.filter((p: any) => p.isCustom);
     const getDefaultProject = (id: string) => defaultProjects.find((p: any) => p.id === id);
@@ -25,6 +25,14 @@ const Main: FunctionComponent<any> = () => {
     const emulator = getDefaultProject('emulator');
     const testnet = getDefaultProject('testnet');
     const mainnet = getDefaultProject('mainnet');
+
+    useEffect(() => {
+        if (currentProject) {
+            // there is a project currently in use
+            // redirect to main app screen
+            history.push('/accounts');
+        }
+    }, [currentProject]);
 
     const onQuickstart = async (name: string) => {
         setError('');
@@ -60,10 +68,10 @@ const Main: FunctionComponent<any> = () => {
                     <h3>Quick notice 👀</h3>
                     <p>
                         If you would like flowser to connect to your own emulator, you will need to start flow emulator
-                        on http port <code>8081</code>.
+                        on different ports.
                     </p>
                     <br />
-                    <p>Here is an example command that you can use:</p>
+                    <p>Here is an example flow-cli (v0.28.*) command that you can use:</p>
                     <Code code={`flow emulator --port=3570 --http-port=8081`} />
                     <br />
                     <p>
