@@ -41,6 +41,7 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+        "format": "prettier --write \"src/**/*.{ts,tsx}\"",
         "prepare": "cd ../ && husky install ./frontend/.husky"
     },
     "eslintConfig": {
