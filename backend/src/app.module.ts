@@ -13,13 +13,7 @@ import { EventsModule } from "./events/events.module";
 import { LogsModule } from "./logs/logs.module";
 import { FlowModule } from "./flow/flow.module";
 import { CommonModule } from "./common/common.module";
-
-const mongoUser = process.env.MONGODB_USERNAME;
-const mongoPassword = process.env.MONGODB_PASSWORD;
-const mongoHostname = process.env.MONGODB_HOST;
-const mongoPort = process.env.MONGODB_PORT;
-const mongoDatabase = process.env.MONGODB_DATABASE;
-const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPort}/${mongoDatabase}`;
+import { databaseConfig } from "./config";
 
 @Global()
 @Module({
@@ -27,11 +21,9 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: "mongodb",
-      url,
-      useNewUrlParser: true,
+      ...databaseConfig,
       autoLoadEntities: true,
-      // how to update db in production ?
+      // TODO: how to update db in production ?
       // synchronize: process.env.NODE_ENV !== 'production'
     }),
     ScheduleModule.forRoot(),
