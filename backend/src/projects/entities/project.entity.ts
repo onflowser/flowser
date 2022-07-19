@@ -1,4 +1,4 @@
-import { Column, Entity, Index, ObjectIdColumn } from "typeorm";
+import { Column, Entity, Index, PrimaryColumn } from "typeorm";
 import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
 import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
@@ -14,11 +14,7 @@ export enum FlowNetworks {
 
 @Entity({ name: "projects" })
 export class Project extends PollingEntity {
-  @ObjectIdColumn()
-  _id: string;
-
-  @Column()
-  @Index({ unique: true })
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -28,12 +24,10 @@ export class Project extends PollingEntity {
   @Column()
   pingable: boolean;
 
-  @Column()
-  @Type(() => GatewayConfigurationEntity)
+  @Column(() => GatewayConfigurationEntity)
   gateway: GatewayConfigurationEntity;
 
-  @Column()
-  @Type(() => EmulatorConfigurationEntity)
+  @Column(() => EmulatorConfigurationEntity)
   emulator: EmulatorConfigurationEntity;
 
   @Column("boolean", { default: false })

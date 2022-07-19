@@ -1,13 +1,10 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity } from "typeorm";
 
 @Entity({ name: "collection-guarantees" })
 export class CollectionGuarantee {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
   @Column()
   collectionId: string;
 
-  @Column()
+  @Column("simple-array")
   signatures: string[];
 }

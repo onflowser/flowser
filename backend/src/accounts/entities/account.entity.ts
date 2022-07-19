@@ -1,5 +1,5 @@
 import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
 import { FlowAccount } from "../../flow/types";
@@ -7,11 +7,7 @@ import { AccountsStorage } from "./storage.entity";
 
 @Entity({ name: "accounts" })
 export class Account extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID | any;
-
-  @Column()
-  @Index({ unique: true })
+  @PrimaryColumn()
   id: string;
 
   @Column()

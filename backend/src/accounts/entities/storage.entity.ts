@@ -1,10 +1,7 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity } from "typeorm";
 
 @Entity({ name: "storage" })
 export class AccountsStorage {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
   @Column()
   blockHeight: number;
 

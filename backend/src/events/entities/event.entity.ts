@@ -1,13 +1,9 @@
 import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({ name: "events" })
 export class Event extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
-  @Index({ unique: true })
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -25,7 +21,7 @@ export class Event extends PollingEntity {
   @Column()
   eventIndex: number;
 
-  @Column()
+  @Column("simple-json")
   data: object;
 
   static init(flowEventObject): Event {

@@ -2,7 +2,7 @@ import { join } from "path";
 import { cleanEnv, str, num } from "envalid";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 
-const env = cleanEnv(process.env, {
+export const env = cleanEnv(process.env, {
   DATABASE_TYPE: str({
     default: "mysql",
     choices: ["mysql", "mariadb", "postgres", "sqlite"],
@@ -16,6 +16,8 @@ const env = cleanEnv(process.env, {
   DATA_FETCH_INTERVAL: num({ default: 3000 }),
   USER_MANAGED_EMULATOR_PORT: num({ default: 8081 }),
   FLOW_STORAGE_SERVER_PORT: num({ default: 8889 }),
+
+  HTTP_PORT: num({ default: 3001 }),
 });
 
 export const databaseConfig: TypeOrmModuleOptions = {

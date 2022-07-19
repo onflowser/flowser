@@ -24,7 +24,7 @@ import { databaseConfig } from "./config";
       ...databaseConfig,
       autoLoadEntities: true,
       // TODO: how to update db in production ?
-      // synchronize: process.env.NODE_ENV !== 'production'
+      synchronize: true,
     }),
     ScheduleModule.forRoot(),
     ProjectsModule,

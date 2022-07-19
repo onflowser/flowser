@@ -157,7 +157,7 @@ export class FlowEmulatorService {
     if (this.configuration.numberOfInitialAccounts) {
       try {
         await this.initialiseAccounts(
-          parseInt(this.configuration.numberOfInitialAccounts as string)
+          this.configuration.numberOfInitialAccounts
         );
       } catch (e) {
         this.logger.error(
