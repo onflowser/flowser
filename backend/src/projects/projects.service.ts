@@ -61,6 +61,7 @@ export class ProjectsService {
                 this.accountsService.removeAll(),
                 this.blocksService.removeAll(),
                 this.eventsService.removeAll(),
+
                 this.logsService.removeAll(),
                 this.transactionsService.removeAll(),
             ]);

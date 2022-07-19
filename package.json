@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "bootstrap": "npm i && lerna bootstrap",
+    "bootstrap": "npm i && lerna bootstrap && npm run prepare",
+    "prepare": "husky install",
 
     "dev:start": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "dev:stop": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml down",
@@ -38,6 +39,8 @@
   },
   "homepage": "https://github.com/onflowser/flowser#readme",
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^12.4.2"
   }
 }
