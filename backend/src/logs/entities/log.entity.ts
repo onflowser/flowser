@@ -1,16 +1,16 @@
 import { PollingEntity } from '../../shared/entities/polling.entity';
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 
 @Entity()
 export class Log extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
+    @ObjectIdColumn()
+    _id: ObjectID;
 
-  @Column()
-  data: string;
+    @Column()
+    data: string;
 
-  constructor (data: string) {
-    super();
-    this.data = data;
-  }
+    constructor(data: string) {
+        super();
+        this.data = data;
+    }
 }

@@ -1,67 +1,67 @@
 import { PollingEntity } from '../../shared/entities/polling.entity';
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, Index, ObjectID, ObjectIdColumn } from 'typeorm';
 
 type TransactionArgument = {
-  type: string;
-  value: any;
-}
+    type: string;
+    value: any;
+};
 
 type TransactionProposalKey = {
-  address: string;
-  keyId: number;
-  sequenceNumber: number;
-}
+    address: string;
+    keyId: number;
+    sequenceNumber: number;
+};
 
 type TransactionEnvelopeSignature = {
-  address: string;
-  keyId: number;
-  signature: string;
-}
+    address: string;
+    keyId: number;
+    signature: string;
+};
 
 type TransactionStatus = {
-  status: number;
-  statusCode: number;
-  errorMessage: string;
-  eventsCount: number;
-}
+    status: number;
+    statusCode: number;
+    errorMessage: string;
+    eventsCount: number;
+};
 
-@Entity({name: 'transactions'})
+@Entity({ name: 'transactions' })
 export class Transaction extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
+    @ObjectIdColumn()
+    _id: ObjectID;
 
-  @Column()
-  @Index({unique: true})
-  id: string;
+    @Column()
+    @Index({ unique: true })
+    id: string;
 
-  @Column()
-  script: string;
+    @Column()
+    script: string;
 
-  @Column()
-  args: TransactionArgument[];
+    @Column()
+    args: TransactionArgument[];
 
-  @Column()
-  referenceBlockId: string;
+    @Column()
+    referenceBlockId: string;
 
-  @Column()
-  gasLimit: number;
+    @Column()
+    gasLimit: number;
 
-  @Column()
-  proposalKey: TransactionProposalKey;
+    @Column()
+    proposalKey: TransactionProposalKey;
 
-  @Column()
-  payer: string; // payer account address
+    @Column()
+    payer: string; // payer account address
 
-  @Column()
-  authorizers: string[] // authorizers account addresses
+    @Column()
+    authorizers: string[]; // authorizers account addresses
 
-  @Column()
-  envelopeSignatures: TransactionEnvelopeSignature[];
+    @Column()
+    envelopeSignatures: TransactionEnvelopeSignature[];
 
-  @Column()
-  status: TransactionStatus;
+    @Column()
+    status: TransactionStatus;
 
-  static init(flowTransactionObject): Transaction {
-    return Object.assign(new Transaction(), flowTransactionObject);
-  }
+    static init(flowTransactionObject): Transaction {
+        return Object.assign(new Transaction(), flowTransactionObject);
+    }
 }

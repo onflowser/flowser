@@ -1,28 +1,28 @@
 import { Column, Entity, Index, ObjectIdColumn } from 'typeorm';
 import { GatewayConfigurationEntity } from './gateway-configuration.entity';
-import { toKebabCase } from "../../utils";
-import { CreateProjectDto } from "../dto/create-project.dto";
-import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Type } from "class-transformer";
+import { toKebabCase } from '../../utils';
+import { CreateProjectDto } from '../dto/create-project.dto';
+import { EmulatorConfigurationEntity } from './emulator-configuration.entity';
+import { PollingEntity } from '../../shared/entities/polling.entity';
+import { Type } from 'class-transformer';
 
 export enum FlowNetworks {
     MAINNET = 'mainnet',
     TESTNET = 'testnet',
-    EMULATOR = 'emulator'
+    EMULATOR = 'emulator',
 }
 
-@Entity({name: 'projects'})
+@Entity({ name: 'projects' })
 export class Project extends PollingEntity {
     @ObjectIdColumn()
     _id: string;
 
     @Column()
-    @Index({unique: true})
+    @Index({ unique: true })
     id: string;
 
     @Column()
-    @Index({unique: true})
+    @Index({ unique: true })
     name: string;
 
     @Column()
@@ -36,7 +36,7 @@ export class Project extends PollingEntity {
     @Type(() => EmulatorConfigurationEntity)
     emulator: EmulatorConfigurationEntity;
 
-    @Column('boolean', {default: false})
+    @Column('boolean', { default: false })
     isCustom: boolean = false;
 
     // data will be fetched from this block height
@@ -44,11 +44,11 @@ export class Project extends PollingEntity {
     @Column()
     startBlockHeight?: number | undefined = 0;
 
-    static init (dto: CreateProjectDto) {
+    static init(dto: CreateProjectDto) {
         return Object.assign(new Project(), {
             id: toKebabCase(dto.name),
-            ...dto
-        })
+            ...dto,
+        });
     }
 
     isStartBlockHeightDefined() {
@@ -64,7 +64,7 @@ export class Project extends PollingEntity {
     }
 
     isUserManagedEmulator() {
-        return this.id === "emulator";
+        return this.id === 'emulator';
     }
 
     isFlowserManagedEmulator() {
@@ -89,5 +89,4 @@ export class Project extends PollingEntity {
         }
         return false;
     }
-
 }

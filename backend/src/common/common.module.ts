@@ -6,12 +6,8 @@ import { Log } from '../logs/entities/log.entity';
 import { AccountsModule } from '../accounts/accounts.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Log]),
-        AccountsModule
-    ],
+    imports: [TypeOrmModule.forFeature([Log]), AccountsModule],
     controllers: [CommonController],
-    providers: [CommonService]
+    providers: [CommonService],
 })
-export class CommonModule {
-}
+export class CommonModule {}

@@ -1,33 +1,33 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { PollingEntity } from '../../shared/entities/polling.entity';
 
-@Entity({name: 'keys'})
+@Entity({ name: 'keys' })
 export class AccountKey extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
+    @ObjectIdColumn()
+    _id: ObjectID;
 
-  @Column()
-  index: number;
+    @Column()
+    index: number;
 
-  @Column()
-  publicKey: string;
+    @Column()
+    publicKey: string;
 
-  @Column()
-  signAlgo: number;
+    @Column()
+    signAlgo: number;
 
-  @Column()
-  hashAlgo: number;
+    @Column()
+    hashAlgo: number;
 
-  @Column()
-  weight: number;
+    @Column()
+    weight: number;
 
-  @Column()
-  sequenceNumber: number;
+    @Column()
+    sequenceNumber: number;
 
-  @Column()
-  revoked: boolean;
+    @Column()
+    revoked: boolean;
 
-  static init(flowAccountKeyObject: any) {
-    return Object.assign<AccountKey, any>(new AccountKey(), flowAccountKeyObject);
-  }
+    static init(flowAccountKeyObject: any) {
+        return Object.assign<AccountKey, any>(new AccountKey(), flowAccountKeyObject);
+    }
 }

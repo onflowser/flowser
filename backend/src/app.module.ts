@@ -11,7 +11,7 @@ import { BlocksModule } from './blocks/blocks.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { EventsModule } from './events/events.module';
 import { LogsModule } from './logs/logs.module';
-import { FlowModule } from "./flow/flow.module";
+import { FlowModule } from './flow/flow.module';
 import { CommonModule } from './common/common.module';
 
 const mongoUser = process.env.MONGODB_USERNAME;
@@ -23,9 +23,7 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
 
 @Global()
 @Module({
-    providers: [
-        AppService,
-    ],
+    providers: [AppService],
     imports: [
         ConfigModule.forRoot(),
         TypeOrmModule.forRoot({
@@ -44,9 +42,8 @@ const url = `mongodb://${mongoUser}:${mongoPassword}@${mongoHostname}:${mongoPor
         EventsModule,
         LogsModule,
         FlowModule,
-        CommonModule
+        CommonModule,
     ],
-    controllers: [AppController]
+    controllers: [AppController],
 })
-export class AppModule {
-}
+export class AppModule {}

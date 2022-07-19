@@ -21,4 +21,4 @@ export const defaultEmulatorFlags = {
     transactionFees: false,
     simpleAddresses: false,
     numberOfInitialAccounts: 0,
-}
+};

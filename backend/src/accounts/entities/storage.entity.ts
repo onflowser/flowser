@@ -1,4 +1,4 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 
 @Entity({ name: 'storage' })
 export class AccountsStorage {

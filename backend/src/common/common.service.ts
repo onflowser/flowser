@@ -13,9 +13,8 @@ export class CommonService {
     constructor(
         @InjectRepository(Log)
         private commonRepository: MongoRepository<Account>,
-        private contractsService: ContractsService
-    ) {
-    }
+        private contractsService: ContractsService,
+    ) {}
 
     async getCounters() {
         const [log, accounts, blocks, transactions, events, contracts] = await Promise.all([
@@ -24,15 +23,15 @@ export class CommonService {
             this.commonRepository.manager.stats(Block),
             this.commonRepository.manager.stats(Transaction),
             this.commonRepository.manager.stats(Event),
-            this.contractsService.findAllNewerThanTimestamp(0)
-        ])
+            this.contractsService.findAllNewerThanTimestamp(0),
+        ]);
         return {
             log: log.count,
             accounts: accounts.count,
             blocks: blocks.count,
             transactions: transactions.count,
             events: events.count,
-            contracts: contracts.length
-        }
+            contracts: contracts.length,
+        };
     }
 }

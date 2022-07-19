@@ -11,5 +11,3 @@ export class PollingEntity {
     @Column()
     deletedAt: number;
 }
-
-

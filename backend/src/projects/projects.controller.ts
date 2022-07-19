@@ -8,19 +8,18 @@ import {
     Patch,
     Post,
     Query,
-    ServiceUnavailableException
+    ServiceUnavailableException,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Project } from "./entities/project.entity";
+import { Project } from './entities/project.entity';
 import { defaultEmulatorFlags } from './data/default-emulator-flags';
-import { ApiParam } from "@nestjs/swagger";
+import { ApiParam } from '@nestjs/swagger';
 
 @Controller('projects')
 export class ProjectsController {
-    constructor(private readonly projectsService: ProjectsService) {
-    }
+    constructor(private readonly projectsService: ProjectsService) {}
 
     @Post()
     async create(@Body() createProjectDto: CreateProjectDto) {
@@ -42,41 +41,39 @@ export class ProjectsController {
         return defaultEmulatorFlags;
     }
 
-    @ApiParam({ name: "id", type: String })
+    @ApiParam({ name: 'id', type: String })
     @Get(':id')
-    findOne(
-      @Param('id') id: string
-    ) {
+    findOne(@Param('id') id: string) {
         return this.projectsService.findOne(id);
     }
 
-    @ApiParam({ name: "id", type: String })
+    @ApiParam({ name: 'id', type: String })
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
         return this.projectsService.update(id, updateProjectDto);
     }
 
     @Delete('/use')
-    async unUseProject(@Param('id') id: string):Promise<void> {
+    async unUseProject(@Param('id') id: string): Promise<void> {
         // no need to wait for the completion
         this.projectsService.cleanupProject();
     }
 
-    @ApiParam({ name: "id", type: String })
+    @ApiParam({ name: 'id', type: String })
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.projectsService.remove(id);
     }
 
-    @ApiParam({ name: "id", type: String })
+    @ApiParam({ name: 'id', type: String })
     @Post('/use/:id')
-    async useProject(@Param('id') id: string):Promise<Project> {
+    async useProject(@Param('id') id: string): Promise<Project> {
         return await this.projectsService.useProject(id);
     }
 
-    @ApiParam({ name: "id", type: String })
+    @ApiParam({ name: 'id', type: String })
     @Post('/:id/seed/accounts')
-    async seed(@Param('id') id: string, @Query("n", ParseIntPipe) n: number) {
+    async seed(@Param('id') id: string, @Query('n', ParseIntPipe) n: number) {
         return this.projectsService.seedAccounts(id, n);
     }
 }

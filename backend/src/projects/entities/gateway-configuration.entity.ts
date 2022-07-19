@@ -8,15 +8,14 @@ export class GatewayConfigurationEntity {
     @Column()
     address: string;
 
-    constructor (address: string, port: number) {
+    constructor(address: string, port: number) {
         this.port = port;
         this.address = address;
     }
 
     url() {
-        const {address, port} = this;
-        const host = `${address}${port ? `:${port}` : ''}`
-        return host.startsWith("http") ? host : `http://${host}`;
+        const { address, port } = this;
+        const host = `${address}${port ? `:${port}` : ''}`;
+        return host.startsWith('http') ? host : `http://${host}`;
     }
-
 }
