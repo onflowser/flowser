@@ -1,8 +1,8 @@
-import React, { FunctionComponent } from 'react';
-import classes from './ListContainer.module.scss';
+import React, { FunctionComponent } from "react";
+import classes from "./ListContainer.module.scss";
 
 const ListContainer: FunctionComponent = ({ children }) => {
-    return <div className={classes.listContainer}>{children}</div>;
+  return <div className={classes.listContainer}>{children}</div>;
 };
 
 export default ListContainer;

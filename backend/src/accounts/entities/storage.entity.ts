@@ -1,16 +1,16 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
 
-@Entity({ name: 'storage' })
+@Entity({ name: "storage" })
 export class AccountsStorage {
-    @ObjectIdColumn()
-    _id: ObjectID;
+  @ObjectIdColumn()
+  _id: ObjectID;
 
-    @Column()
-    blockHeight: number;
+  @Column()
+  blockHeight: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    value: string;
+  @Column()
+  value: string;
 }

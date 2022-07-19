@@ -1,64 +1,64 @@
-import React, { FunctionComponent } from 'react';
-import classes from './TransactionListItem.module.scss';
-import Card from '../card/Card';
-import Label from '../label/Label';
-import Value from '../value/Value';
-import { NavLink } from 'react-router-dom';
-import Ellipsis from '../ellipsis/Ellipsis';
-import TransactionStatusCode from '../transaction-status-code/TransactionStatusCode';
+import React, { FunctionComponent } from "react";
+import classes from "./TransactionListItem.module.scss";
+import Card from "../card/Card";
+import Label from "../label/Label";
+import Value from "../value/Value";
+import { NavLink } from "react-router-dom";
+import Ellipsis from "../ellipsis/Ellipsis";
+import TransactionStatusCode from "../transaction-status-code/TransactionStatusCode";
 
 interface OwnProps {
-    id: string;
-    referenceBlockId: string;
-    statusCode: number;
-    payer: string;
-    proposer: string;
-    className?: any;
-    [key: string]: any;
+  id: string;
+  referenceBlockId: string;
+  statusCode: number;
+  payer: string;
+  proposer: string;
+  className?: any;
+  [key: string]: any;
 }
 
 type Props = OwnProps;
 
 const TransactionListItem: FunctionComponent<Props> = ({
-    id,
-    referenceBlockId,
-    statusCode,
-    payer,
-    proposer,
-    className,
-    ...restProps
+  id,
+  referenceBlockId,
+  statusCode,
+  payer,
+  proposer,
+  className,
+  ...restProps
 }) => {
-    return (
-        <Card className={`${classes.card} ${className}`} {...restProps}>
-            <div>
-                <Label>TRANSACTION ID</Label>
-                <Value>
-                    <NavLink to={`/transactions/details/${id}`}>
-                        <Ellipsis className={classes.hash}>{id}</Ellipsis>
-                    </NavLink>
-                </Value>
-            </div>
-            <div>
-                <Label>BLOCK ID</Label>
-                <Value>
-                    <NavLink to={`/blocks/details/${referenceBlockId}`}>
-                        <Ellipsis className={classes.hash}>{referenceBlockId}</Ellipsis>
-                    </NavLink>
-                </Value>
-            </div>
-            <div>
-                <TransactionStatusCode statusCode={statusCode} />
-            </div>
-            <div>
-                <Label>PAYER</Label>
-                <Value>{payer}</Value>
-            </div>
-            <div>
-                <Label>PROPOSER</Label>
-                <Value>{proposer}</Value>
-            </div>
-        </Card>
-    );
+  return (
+    <Card className={`${classes.card} ${className}`} {...restProps}>
+      <div>
+        <Label>TRANSACTION ID</Label>
+        <Value>
+          <NavLink to={`/transactions/details/${id}`}>
+            <Ellipsis className={classes.hash}>{id}</Ellipsis>
+          </NavLink>
+        </Value>
+      </div>
+      <div>
+        <Label>BLOCK ID</Label>
+        <Value>
+          <NavLink to={`/blocks/details/${referenceBlockId}`}>
+            <Ellipsis className={classes.hash}>{referenceBlockId}</Ellipsis>
+          </NavLink>
+        </Value>
+      </div>
+      <div>
+        <TransactionStatusCode statusCode={statusCode} />
+      </div>
+      <div>
+        <Label>PAYER</Label>
+        <Value>{payer}</Value>
+      </div>
+      <div>
+        <Label>PROPOSER</Label>
+        <Value>{proposer}</Value>
+      </div>
+    </Card>
+  );
 };
 
 export default TransactionListItem;

@@ -1,3 +1,3 @@
 export class CreateLogDto {
-    data: string;
+  data: string;
 }

@@ -1,21 +1,21 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity } from "typeorm";
 
 @Entity()
 export class GatewayConfigurationEntity {
-    @Column()
-    port: number;
+  @Column()
+  port: number;
 
-    @Column()
-    address: string;
+  @Column()
+  address: string;
 
-    constructor(address: string, port: number) {
-        this.port = port;
-        this.address = address;
-    }
+  constructor(address: string, port: number) {
+    this.port = port;
+    this.address = address;
+  }
 
-    url() {
-        const { address, port } = this;
-        const host = `${address}${port ? `:${port}` : ''}`;
-        return host.startsWith('http') ? host : `http://${host}`;
-    }
+  url() {
+    const { address, port } = this;
+    const host = `${address}${port ? `:${port}` : ""}`;
+    return host.startsWith("http") ? host : `http://${host}`;
+  }
 }
