@@ -2,63 +2,63 @@ import { Column, Entity } from "typeorm";
 
 @Entity()
 export class EmulatorConfigurationEntity {
-  @Column()
+  @Column({ nullable: true })
   verboseLogging: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   httpServerPort: number;
 
-  @Column()
+  @Column({ nullable: true })
   rpcServerPort: number;
 
-  @Column()
+  @Column({ nullable: true })
   blockTime: number;
 
-  @Column()
+  @Column({ nullable: true })
   servicePrivateKey: string;
 
-  @Column()
+  @Column({ nullable: true })
   servicePublicKey: string;
 
-  @Column()
+  @Column({ nullable: true })
   databasePath: string;
 
-  @Column()
+  @Column({ nullable: true })
   tokenSupply: number;
 
-  @Column()
+  @Column({ nullable: true })
   transactionExpiry: number;
 
-  @Column()
+  @Column({ nullable: true })
   storagePerFlow: number;
 
-  @Column()
+  @Column({ nullable: true })
   minAccountBalance: number;
 
-  @Column()
+  @Column({ nullable: true })
   transactionMaxGasLimit: number;
 
-  @Column()
+  @Column({ nullable: true })
   scriptGasLimit: number;
 
-  @Column()
+  @Column({ nullable: true })
   serviceSignatureAlgorithm: string;
 
-  @Column()
+  @Column({ nullable: true })
   serviceHashAlgorithm: string;
 
-  @Column()
+  @Column({ nullable: true })
   storageLimit: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   transactionFees: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   persist: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   simpleAddresses: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   numberOfInitialAccounts: number;
 }

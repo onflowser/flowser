@@ -1,10 +1,9 @@
-import { Column, Entity, Index, PrimaryColumn } from "typeorm";
+import { AfterLoad, Column, Entity, Index, PrimaryColumn } from "typeorm";
 import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
 import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Type } from "class-transformer";
 
 export enum FlowNetworks {
   MAINNET = "mainnet",
@@ -22,8 +21,9 @@ export class Project extends PollingEntity {
   name: string;
 
   @Column()
-  pingable: boolean;
+  pingable: boolean = false;
 
+  // TODO: use relations instead of embedded entities?
   @Column(() => GatewayConfigurationEntity)
   gateway: GatewayConfigurationEntity;
 
@@ -33,10 +33,10 @@ export class Project extends PollingEntity {
   @Column("boolean", { default: false })
   isCustom: boolean = false;
 
-  // data will be fetched from this block height
-  // set this undefined to start fetching from latest block
-  @Column()
-  startBlockHeight?: number | undefined = 0;
+  // Blockchain data will be fetched from this block height
+  // Set this null to start fetching from the latest block
+  @Column({ nullable: true })
+  startBlockHeight?: number | null = 0;
 
   static init(dto: CreateProjectDto) {
     return Object.assign(new Project(), {
@@ -45,10 +45,20 @@ export class Project extends PollingEntity {
     });
   }
 
+  hasGatewayConfiguration() {
+    // TypeORM embedded entity columns cannot be set to null
+    // the only way is to set all the properties of a nested entity to null
+    return getNumberOfDefinedProperties(this.gateway) > 0;
+  }
+
+  hasEmulatorConfiguration() {
+    // TypeORM embedded entity columns cannot be set to null
+    // the only way is to set all the properties of a nested entity to null
+    return getNumberOfDefinedProperties(this.emulator) > 0;
+  }
+
   isStartBlockHeightDefined() {
-    return (
-      this.startBlockHeight !== undefined && this.startBlockHeight !== null
-    );
+    return this.startBlockHeight !== null;
   }
 
   isEmulator() {
@@ -88,4 +98,8 @@ export class Project extends PollingEntity {
     }
     return false;
   }
+}
+
+function getNumberOfDefinedProperties(obj: object) {
+  return Object.keys(obj).filter((key) => obj[key] !== null).length;
 }

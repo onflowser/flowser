@@ -2,12 +2,12 @@ import { Column, Entity } from "typeorm";
 
 @Entity()
 export class PollingEntity {
-  @Column()
-  createdAt: number = new Date().getTime();
+  @Column("datetime")
+  createdAt: Date = new Date();
 
-  @Column()
-  updatedAt: number = new Date().getTime();
+  @Column("datetime")
+  updatedAt: Date = new Date();
 
-  @Column()
-  deletedAt: number;
+  @Column("datetime", { nullable: true })
+  deletedAt: Date;
 }

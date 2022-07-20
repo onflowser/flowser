@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { MongoRepository } from "typeorm";
+import { Repository } from "typeorm";
 import { Project } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/flow-gateway.service";
@@ -24,6 +24,7 @@ import { plainToClass } from "class-transformer";
 import { StorageDataService } from "../flow/services/storage-data.service";
 import config from "../config";
 import { GatewayConfigurationEntity } from "./entities/gateway-configuration.entity";
+import { defaultProjects } from "./data/seeds";
 
 @Injectable()
 export class ProjectsService {
@@ -32,7 +33,7 @@ export class ProjectsService {
 
   constructor(
     @InjectRepository(Project)
-    private projectRepository: MongoRepository<Project>,
+    private projectRepository: Repository<Project>,
     private flowGatewayService: FlowGatewayService,
     private flowAggregatorService: FlowAggregatorService,
     private flowEmulatorService: FlowEmulatorService,
@@ -44,6 +45,14 @@ export class ProjectsService {
     private transactionsService: TransactionsService,
     private storageDataService: StorageDataService
   ) {}
+
+  seedDefaultProjects() {
+    return this.projectRepository
+      .save(
+        defaultProjects.map((project) => Object.assign(new Project(), project))
+      )
+      .catch(this.handleDatabaseError);
+  }
 
   getCurrentProject() {
     if (this.currentProject) {
@@ -93,7 +102,7 @@ export class ProjectsService {
     );
     this.flowAggregatorService.configureProjectContext(this.currentProject);
 
-    if (this.currentProject.emulator) {
+    if (this.currentProject.hasEmulatorConfiguration()) {
       this.flowCliService.configure(id, this.currentProject.emulator);
       this.flowEmulatorService.configureProjectContext(this.currentProject);
       await this.flowCliService.cleanup(); // ensure clean environment
@@ -146,7 +155,7 @@ export class ProjectsService {
   create(createProjectDto: CreateProjectDto) {
     return this.projectRepository
       .save(createProjectDto)
-      .catch(this.handleMongoError);
+      .catch(this.handleDatabaseError);
   }
 
   async findAll(): Promise<Project[]> {
@@ -154,46 +163,24 @@ export class ProjectsService {
       order: { updatedAt: "DESC" },
     });
     return Promise.all(
-      projects.map(async (project) => {
-        if (project.gateway) {
-          const { address, port } = project.gateway;
-          const pingable =
-            project.isOfficialNetwork() ||
-            (await FlowGatewayService.isPingable(address, port));
-          return plainToClass(Project, { ...project, pingable });
-        } else {
-          return project;
-        }
-      })
+      projects.map(async (project) => this.setComputedFields(project))
     );
   }
 
   async findOne(id: string): Promise<Project> {
-    const project = await this.projectRepository.findOne({ id });
-    if (!project) {
-      throw new NotFoundException("Project not found");
-    }
-
-    if (project.gateway) {
-      const { port, address } = project.gateway;
-      const pingable =
-        project.isOfficialNetwork() ||
-        (await FlowGatewayService.isPingable(address, port));
-      return plainToClass(Project, { ...project, pingable });
-    } else {
-      return project;
-    }
+    const project = await this.projectRepository.findOneByOrFail({ id });
+    return this.setComputedFields(project);
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     return this.projectRepository
-      .findOneAndUpdate(
-        { id },
-        { $set: { ...updateProjectDto, updatedAt: new Date().getTime() } },
-        { upsert: true, returnOriginal: false }
+      .upsert(
+        { ...updateProjectDto, updatedAt: new Date().getTime() },
+        {
+          conflictPaths: ["id"],
+        }
       )
-      .then((res) => res.value)
-      .catch(this.handleMongoError);
+      .catch(this.handleDatabaseError);
   }
 
   async remove(id: string) {
@@ -203,7 +190,20 @@ export class ProjectsService {
     return this.projectRepository.delete({ id });
   }
 
-  private handleMongoError(error) {
+  private async setComputedFields(project: Project) {
+    if (project.hasGatewayConfiguration()) {
+      const { address, port } = project.gateway;
+      const pingable =
+        project.isOfficialNetwork() ||
+        (await FlowGatewayService.isPingable(address, port));
+      return plainToClass(Project, { ...project, pingable });
+    } else {
+      return project;
+    }
+  }
+
+  private handleDatabaseError(error) {
+    // TODO: how to handle error for SQL
     switch (error.code) {
       case 11000:
         throw new ConflictException("Project name already exists");

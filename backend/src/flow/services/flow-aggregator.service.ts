@@ -191,7 +191,7 @@ export class FlowAggregatorService {
   }
 
   async handleAccountCreated(address: string) {
-    return this.updateAccount(address, { createdAt: Date.now() });
+    return this.updateAccount(address, { createdAt: new Date() });
   }
 
   async handleAccountKeyAdded(address: string) {
@@ -216,7 +216,7 @@ export class FlowAggregatorService {
 
   async updateAccount(
     address: string,
-    props: Partial<Account> = { updatedAt: Date.now() }
+    props: Partial<Account> = { updatedAt: new Date() }
   ) {
     const account = await this.flowGatewayService.getAccount(address);
     // storage data API works only for local emulator for now

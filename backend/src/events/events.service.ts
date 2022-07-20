@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateEventDto } from "./dto/create-event.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Event } from "./entities/event.entity";
-import { MongoRepository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectRepository(Event)
-    private eventRepository: MongoRepository<Event>
+    private eventRepository: Repository<Event>
   ) {}
 
   create(createEventDto: CreateEventDto) {
@@ -23,12 +23,10 @@ export class EventsService {
 
   findAllNewerThanTimestamp(timestamp): Promise<Event[]> {
     return this.eventRepository.find({
-      where: {
-        $or: [
-          { createdAt: { $gt: timestamp } },
-          { updatedAt: { $gt: timestamp } },
-        ],
-      },
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
       order: { createdAt: "DESC" },
     });
   }
@@ -43,7 +41,7 @@ export class EventsService {
   findAllByTransactionNewerThanTimestamp(transactionId: string, timestamp) {
     return this.eventRepository.find({
       where: {
-        createdAt: { $gt: timestamp },
+        createdAt: MoreThan(timestamp),
         transactionId,
       },
       order: { createdAt: "DESC" },

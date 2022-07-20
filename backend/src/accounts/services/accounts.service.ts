@@ -25,6 +25,7 @@ export class AccountsService {
     });
   }
 
+  // TODO: refactor data model
   findAllNewerThanTimestamp(timestamp): Promise<Account[]> {
     return this.accountRepository
       .aggregate([
