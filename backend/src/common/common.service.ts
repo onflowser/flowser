@@ -17,22 +17,23 @@ export class CommonService {
   ) {}
 
   async getCounters() {
+    // FIXME: write stats queries in SQL
     const [log, accounts, blocks, transactions, events, contracts] =
       await Promise.all([
-        this.commonRepository.manager.stats(Log),
-        this.commonRepository.manager.stats(Account),
-        this.commonRepository.manager.stats(Block),
-        this.commonRepository.manager.stats(Transaction),
-        this.commonRepository.manager.stats(Event),
-        this.contractsService.findAllNewerThanTimestamp(0),
+        // this.commonRepository.manager.stats(Log),
+        // this.commonRepository.manager.stats(Account),
+        // this.commonRepository.manager.stats(Block),
+        // this.commonRepository.manager.stats(Transaction),
+        // this.commonRepository.manager.stats(Event),
+        // this.contractsService.findAllNewerThanTimestamp(0),
       ]);
     return {
-      log: log.count,
-      accounts: accounts.count,
-      blocks: blocks.count,
-      transactions: transactions.count,
-      events: events.count,
-      contracts: contracts.length,
+      log: 0,
+      accounts: 0,
+      blocks: 0,
+      transactions: 0,
+      events: 0,
+      contracts: 0,
     };
   }
 }

@@ -8,24 +8,21 @@ import { AccountsStorage } from "./storage.entity";
 @Entity({ name: "accounts" })
 export class Account extends PollingEntity {
   @PrimaryColumn()
-  id: string;
-
-  @Column()
   address: string;
 
-  @Column()
+  @Column({ type: "bigint" })
   balance: number;
 
   @Column()
   code: string;
 
-  @Column((type) => AccountKey)
+  @Column("json")
   keys: AccountKey[];
 
-  @Column((type) => AccountContract)
+  @Column("json")
   contracts: AccountContract[];
 
-  @Column((type) => AccountsStorage)
+  @Column("json", { nullable: true })
   storage: AccountsStorage[];
 
   static init(
@@ -38,7 +35,7 @@ export class Account extends PollingEntity {
       flowAccountObject,
       options
     );
-    account.id = flowAccountObject.address;
+    account.address = flowAccountObject.address;
     account.keys = keys.map((key) => AccountKey.init(key));
     account.contracts = Object.keys(contracts).map((name) =>
       AccountContract.init(flowAccountObject.address, name, contracts[name])

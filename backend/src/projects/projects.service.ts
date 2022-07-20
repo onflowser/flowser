@@ -94,7 +94,6 @@ export class ProjectsService {
     await this.cleanupProject();
 
     this.currentProject = await this.findOne(id);
-    this.configureGateway();
 
     // update project context
     this.flowGatewayService.configureDataSourceGateway(
@@ -131,19 +130,6 @@ export class ProjectsService {
     return this.currentProject;
   }
 
-  configureGateway() {
-    if (this.currentProject.isFlowserManagedEmulator()) {
-      // fcl connects to a REST API provided by accessNode.api
-      this.currentProject.gateway = new GatewayConfigurationEntity(
-        "http://127.0.0.1",
-        8080
-      );
-    } else if (this.currentProject.isUserManagedEmulator()) {
-      // user must run emulator on non-default flow emulator port
-      this.currentProject.gateway.port = config.userManagedEmulatorPort;
-    }
-  }
-
   async seedAccounts(id: string, n: number) {
     if (this.currentProject.id === id) {
       return this.flowEmulatorService.initialiseAccounts(n);
@@ -175,7 +161,7 @@ export class ProjectsService {
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     return this.projectRepository
       .upsert(
-        { ...updateProjectDto, updatedAt: new Date().getTime() },
+        { ...updateProjectDto, updatedAt: new Date() },
         {
           conflictPaths: ["id"],
         }

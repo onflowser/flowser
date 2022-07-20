@@ -28,9 +28,12 @@ export class BlocksService {
   }
 
   findLastBlock(): Promise<Block> {
-    return this.blockRepository.findOne({
-      order: { height: "DESC" },
-    });
+    return this.blockRepository
+      .createQueryBuilder("block")
+      .select()
+      .orderBy("block.height", "DESC")
+      .limit(1)
+      .getOne();
   }
 
   async findOne(id: string) {

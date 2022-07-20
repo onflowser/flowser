@@ -4,6 +4,7 @@ import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../shared/entities/polling.entity";
+import config from "../../config";
 
 export enum FlowNetworks {
   MAINNET = "mainnet",
@@ -47,6 +48,17 @@ export class Project extends PollingEntity {
       new EmulatorConfigurationEntity(),
       this.emulator
     );
+  }
+
+  @AfterLoad()
+  temporaryOverWriteGatewayConfig() {
+    if (this.isFlowserManagedEmulator()) {
+      // fcl connects to a REST API provided by accessNode.api
+      this.gateway = new GatewayConfigurationEntity("http://127.0.0.1", 8080);
+    } else if (this.isUserManagedEmulator()) {
+      // user must run emulator on non-default flow emulator port
+      this.gateway.port = config.userManagedEmulatorPort;
+    }
   }
 
   static init(dto: CreateProjectDto) {

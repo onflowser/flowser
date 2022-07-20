@@ -16,7 +16,7 @@ export class Block extends PollingEntity {
   @Column()
   timestamp: string;
 
-  @Column((type) => CollectionGuarantee)
+  @Column("simple-json")
   collectionGuarantees: CollectionGuarantee[];
 
   @Column("simple-json")

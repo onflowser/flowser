@@ -221,7 +221,9 @@ export class FlowAggregatorService {
     const account = await this.flowGatewayService.getAccount(address);
     // storage data API works only for local emulator for now
     if (this.project.isEmulator()) {
-      account.storage = await this.storageDataService.getStorageData(address);
+      // FIXME: temporary disabled storage functionality due to bellow pending task
+      // https://www.notion.so/flowser/Migrate-to-up-to-date-flow-cli-version-a2a3837d11b9451bb0df1751620bbe1d
+      // account.storage = await this.storageDataService.getStorageData(address);
     }
     return this.accountService.replace(address, Account.init(account, props));
   }
