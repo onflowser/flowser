@@ -17,7 +17,7 @@ export class BlocksService {
     return this.blockRepository.find();
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Block[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Block[]> {
     return this.blockRepository.find({
       where: [
         { createdAt: MoreThan(timestamp) },

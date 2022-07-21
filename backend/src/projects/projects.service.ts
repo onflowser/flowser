@@ -48,9 +48,7 @@ export class ProjectsService {
 
   seedDefaultProjects() {
     return this.projectRepository
-      .save(
-        defaultProjects.map((project) => Object.assign(new Project(), project))
-      )
+      .save(defaultProjects.map((project) => plainToClass(Project, project)))
       .catch(this.handleDatabaseError);
   }
 
@@ -159,13 +157,12 @@ export class ProjectsService {
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
+    const project = plainToClass(Project, updateProjectDto);
+    project.markUpdated();
     return this.projectRepository
-      .upsert(
-        { ...updateProjectDto, updatedAt: new Date() },
-        {
-          conflictPaths: ["id"],
-        }
-      )
+      .upsert(project, {
+        conflictPaths: ["id"],
+      })
       .catch(this.handleDatabaseError);
   }
 

@@ -15,7 +15,7 @@ export class TransactionsService {
     return this.transactionRepository.save(createTransactionDto);
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Transaction[]> {
     return this.transactionRepository.find({
       where: [
         { createdAt: MoreThan(timestamp) },
@@ -38,7 +38,7 @@ export class TransactionsService {
     });
   }
 
-  findAllByBlockNewerThanTimestamp(blockId: string, timestamp) {
+  findAllByBlockNewerThanTimestamp(blockId: string, timestamp: Date) {
     return this.transactionRepository.find({
       where: {
         referenceBlockId: blockId,

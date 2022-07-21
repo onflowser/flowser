@@ -20,12 +20,7 @@ import { databaseConfig } from "./config";
   providers: [AppService],
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      ...databaseConfig,
-      autoLoadEntities: true,
-      // TODO: how to update db in production ?
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(databaseConfig),
     ScheduleModule.forRoot(),
     ProjectsModule,
     AccountsModule,

@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Account } from "../entities/account.entity";
 import { Repository } from "typeorm";
 import { Transaction } from "../../transactions/entities/transaction.entity";
+import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class AccountsService {
@@ -27,7 +28,7 @@ export class AccountsService {
 
   // TODO: refactor data model
   // https://www.notion.so/flowser/Improve-relational-data-model-fc3f8b8bd60d4a76a169328e6eaf124a
-  findAllNewerThanTimestamp(timestamp): Promise<Account[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Account[]> {
     return this.accountRepository
       .createQueryBuilder("account")
       .select()
@@ -58,20 +59,17 @@ export class AccountsService {
     // Re-fetch and insert the whole account entity
     // contracts & keys can be added or removed
     // therefore collection needs to be replaced and not just updated
-    return this.accountRepository.upsert(
-      { ...updateAccountDto, updatedAt: new Date() },
-      { conflictPaths: ["address"] }
-    );
+    const account = plainToClass(Account, updateAccountDto);
+    account.markUpdated();
+    return this.accountRepository.upsert(account, {
+      conflictPaths: ["address"],
+    });
   }
 
   update(address: string, updateAccountDto: UpdateAccountDto) {
-    return this.accountRepository.update(
-      { address },
-      {
-        ...updateAccountDto,
-        updatedAt: new Date(),
-      }
-    );
+    const account = plainToClass(Account, updateAccountDto);
+    account.markUpdated();
+    return this.accountRepository.update({ address }, account);
   }
 
   removeAll() {

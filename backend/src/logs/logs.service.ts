@@ -15,7 +15,7 @@ export class LogsService {
     return this.logsRepository.insert(createLogDto);
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Log[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Log[]> {
     return this.logsRepository.find({
       where: { createdAt: MoreThan(timestamp) },
     });

@@ -1,14 +1,8 @@
-import {
-  Controller,
-  Get,
-  Param,
-  UseInterceptors,
-  Query,
-  ParseIntPipe,
-} from "@nestjs/common";
+import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
 import { ContractsService } from "../services/contracts.service";
 import { PollingResponseInterceptor } from "../../shared/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
+import { ParseUnixTimestampPipe } from "../../shared/pipes/parse-unix-timestamp.pipe";
 
 @Controller("contracts")
 export class ContractsController {
@@ -21,7 +15,7 @@ export class ContractsController {
 
   @Get("/polling")
   @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseIntPipe) timestamp) {
+  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
     return this.contractsService.findAllNewerThanTimestamp(timestamp);
   }
 

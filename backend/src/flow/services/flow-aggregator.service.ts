@@ -191,7 +191,7 @@ export class FlowAggregatorService {
   }
 
   async handleAccountCreated(address: string) {
-    return this.updateAccount(address, { createdAt: new Date() });
+    return this.updateAccount(address);
   }
 
   async handleAccountKeyAdded(address: string) {
@@ -214,18 +214,17 @@ export class FlowAggregatorService {
     return this.updateAccount(address);
   }
 
-  async updateAccount(
-    address: string,
-    props: Partial<Account> = { updatedAt: new Date() }
-  ) {
-    const account = await this.flowGatewayService.getAccount(address);
+  async updateAccount(address: string, props: Partial<Account> = {}) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
     // storage data API works only for local emulator for now
     if (this.project.isEmulator()) {
       // FIXME: temporary disabled storage functionality due to bellow pending task
       // https://www.notion.so/flowser/Migrate-to-up-to-date-flow-cli-version-a2a3837d11b9451bb0df1751620bbe1d
       // account.storage = await this.storageDataService.getStorageData(address);
     }
-    return this.accountService.replace(address, Account.init(account, props));
+    const account = Account.init(flowAccount, props);
+    account.markUpdated();
+    return this.accountService.replace(address, account);
   }
 
   async bootstrapServiceAccount() {

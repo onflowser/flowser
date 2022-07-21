@@ -41,6 +41,9 @@ export const databaseConfig: TypeOrmModuleOptions = {
   username: env.DATABASE_USERNAME,
   password: env.DATABASE_PASSWORD,
   database: env.DATABASE_NAME,
+  autoLoadEntities: true,
+  synchronize: true,
+  timezone: "Z",
 };
 
 export default {

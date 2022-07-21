@@ -21,7 +21,7 @@ export class ContractsService {
     return this._findAll();
   }
 
-  async findAllNewerThanTimestamp(timestamp): Promise<AccountContract[]> {
+  async findAllNewerThanTimestamp(timestamp: Date): Promise<AccountContract[]> {
     return this._findAll([
       {
         $match: {

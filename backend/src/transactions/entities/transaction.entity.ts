@@ -30,7 +30,7 @@ export class Transaction extends PollingEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column()
+  @Column("text")
   script: string;
 
   @Column("simple-json")

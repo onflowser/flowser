@@ -1,14 +1,8 @@
-import {
-  Controller,
-  Get,
-  Param,
-  UseInterceptors,
-  Query,
-  ParseIntPipe,
-} from "@nestjs/common";
+import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
+import { ParseUnixTimestampPipe } from "../shared/pipes/parse-unix-timestamp.pipe";
 
 @Controller()
 export class TransactionsController {
@@ -21,7 +15,7 @@ export class TransactionsController {
 
   @Get("/transactions/polling")
   @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseIntPipe) timestamp) {
+  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
     return this.transactionsService.findAllNewerThanTimestamp(timestamp);
   }
 
@@ -37,7 +31,7 @@ export class TransactionsController {
   @UseInterceptors(PollingResponseInterceptor)
   findAllNewByBlock(
     @Param("id") blockId,
-    @Query("timestamp", ParseIntPipe) timestamp
+    @Query("timestamp", ParseUnixTimestampPipe) timestamp
   ) {
     return this.transactionsService.findAllByBlockNewerThanTimestamp(
       blockId,
