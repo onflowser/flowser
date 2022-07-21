@@ -10,7 +10,7 @@ export class ContractsController {
 
   @Get()
   findAll() {
-    return this.contractsService._findAll();
+    return this.contractsService.findAll();
   }
 
   @Get("/polling")

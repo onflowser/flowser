@@ -22,9 +22,8 @@ import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/flow-cli.service";
 import { plainToClass } from "class-transformer";
 import { StorageDataService } from "../flow/services/storage-data.service";
-import config from "../config";
-import { GatewayConfigurationEntity } from "./entities/gateway-configuration.entity";
 import { defaultProjects } from "./data/seeds";
+import { ContractsService } from "../accounts/services/contracts.service";
 
 @Injectable()
 export class ProjectsService {
@@ -39,6 +38,7 @@ export class ProjectsService {
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private accountsService: AccountsService,
+    private contractsService: ContractsService,
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private logsService: LogsService,
@@ -64,11 +64,13 @@ export class ProjectsService {
     try {
       // remove all existing data of previously used project
       // TODO: persist data for projects with "persist" flag
+
+      // Remove contracts before removing accounts, because of the foreign key constraint.
+      await this.contractsService.removeAll();
       await Promise.all([
         this.accountsService.removeAll(),
         this.blocksService.removeAll(),
         this.eventsService.removeAll(),
-
         this.logsService.removeAll(),
         this.transactionsService.removeAll(),
       ]);

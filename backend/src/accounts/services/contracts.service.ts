@@ -1,71 +1,66 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateContractDto } from "../dto/create-contract.dto";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MongoRepository } from "typeorm";
-import { Account } from "../entities/account.entity";
+import { Repository } from "typeorm";
 import { AccountContract } from "../entities/contract.entity";
-import { ObjectLiteral } from "typeorm/common/ObjectLiteral";
 
 @Injectable()
 export class ContractsService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: MongoRepository<Account>
+    @InjectRepository(AccountContract)
+    private contractRepository: Repository<AccountContract>
   ) {}
 
-  create(createContractDto: CreateContractDto) {
-    return this.accountRepository.save(createContractDto);
-  }
-
   async findAll() {
-    return this._findAll();
+    return this.contractRepository.find({
+      order: { createdAt: "DESC" },
+    });
   }
 
   async findAllNewerThanTimestamp(timestamp: Date): Promise<AccountContract[]> {
-    return this._findAll([
-      {
-        $match: {
-          $or: [
-            { createdAt: { $gt: timestamp } },
-            { updatedAt: { $gt: timestamp } },
-          ],
-        },
-      },
-      { $sort: { createdAt: -1 } },
-    ]);
+    return this.contractRepository
+      .createQueryBuilder("contract")
+      .select()
+      .where("contract.updatedAt > :timestamp", { timestamp })
+      .orWhere("contract.createdAt > :timestamp", { timestamp })
+      .orderBy("contract.createdAt", "DESC")
+      .getMany();
+  }
+
+  async getContractsByAccountAddress(address: string) {
+    return this.contractRepository
+      .createQueryBuilder("contract")
+      .where("contract.accountAddress = :accountAddress", {
+        accountAddress: address,
+      })
+      .getMany();
   }
 
   async findOne(id: string) {
-    const [contract] = await this._findAll([{ $match: { id: { $eq: id } } }]);
-    if (contract) {
-      return contract;
-    } else {
-      throw new NotFoundException("Contract not found");
-    }
+    const { accountAddress, name } = AccountContract.parseId(id);
+    return this.contractRepository.findOneByOrFail({
+      accountAddress,
+      name,
+    });
   }
 
-  async _findAll(pipeline: ObjectLiteral[] = []) {
-    return this.accountRepository
-      .aggregate([
-        {
-          $project: {
-            address: 1,
-            contracts: {
-              $map: {
-                input: "$contracts",
-                as: "contract",
-                in: {
-                  $mergeObjects: ["$$contract", { accountAddress: "$address" }],
-                },
-              },
-            },
-          },
-        },
-        { $unwind: "$contracts" },
-        { $replaceRoot: { newRoot: "$contracts" } },
-        { $sort: { createdAt: -1 } },
-        ...pipeline,
-      ])
-      .toArray();
+  async replace(contract: AccountContract) {
+    return this.contractRepository.upsert(contract, {
+      conflictPaths: ["accountAddress", "name"],
+    });
+  }
+
+  async create(contract: AccountContract) {
+    return this.contractRepository.insert(contract);
+  }
+
+  async delete(accountAddress: string, contractName: string) {
+    return this.contractRepository.delete({
+      accountAddress,
+      name: contractName,
+    });
+  }
+
+  removeAll() {
+    return this.contractRepository.delete({});
   }
 }

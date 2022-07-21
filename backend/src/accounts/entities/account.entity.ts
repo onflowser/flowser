@@ -1,5 +1,5 @@
 import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
 import { FlowAccount } from "../../flow/types";
@@ -19,11 +19,11 @@ export class Account extends PollingEntity {
   @Column("json")
   keys: AccountKey[];
 
-  @Column("json")
-  contracts: AccountContract[];
-
   @Column("json", { nullable: true })
   storage: AccountsStorage[];
+
+  @OneToMany(() => AccountContract, (contract) => contract.account)
+  contracts: AccountContract[];
 
   static init(
     flowAccountObject: FlowAccount,

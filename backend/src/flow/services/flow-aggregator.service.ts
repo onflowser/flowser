@@ -21,6 +21,9 @@ import { LogsService } from "../../logs/logs.service";
 import { Log } from "../../logs/entities/log.entity";
 import { StorageDataService } from "./storage-data.service";
 import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
+import { FlowAccount } from "../types";
+import { AccountContract } from "../../accounts/entities/contract.entity";
+import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -224,7 +227,43 @@ export class FlowAggregatorService {
     }
     const account = Account.init(flowAccount, props);
     account.markUpdated();
-    return this.accountService.replace(address, account);
+    await this.accountService.replace(address, account);
+    await this.updateAccountContracts(flowAccount);
+  }
+
+  async updateAccountContracts(flowAccount: FlowAccount) {
+    const accountAddress = flowAccount.address;
+    const storedAccountContracts =
+      await this.contractService.getContractsByAccountAddress(accountAddress);
+    const providedAccountContractsLookup = new Map(
+      Object.entries(flowAccount.contracts)
+    );
+    const storedAccountContractsLookup = new Map(
+      storedAccountContracts.map((contract) => [contract.name, contract])
+    );
+
+    const promises = [];
+    for (const [contractName, contractCode] of providedAccountContractsLookup) {
+      const contract = plainToClass(AccountContract, {
+        accountAddress,
+        name: contractName,
+        code: contractCode,
+      });
+      const storedContract = storedAccountContractsLookup.get(contractName);
+      if (storedContract) {
+        promises.push(this.contractService.replace(contract));
+      } else {
+        promises.push(this.contractService.create(contract));
+      }
+    }
+    for (const contract of storedAccountContracts) {
+      if (!providedAccountContractsLookup.has(contract.name)) {
+        promises.push(
+          this.contractService.delete(accountAddress, contract.name)
+        );
+      }
+    }
+    return Promise.all(promises);
   }
 
   async bootstrapServiceAccount() {
