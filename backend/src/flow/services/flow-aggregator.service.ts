@@ -128,34 +128,42 @@ export class FlowAggregatorService {
     const transactions = data.map(({ transactions }) => transactions).flat();
     const blocks = data.map(({ block }) => block);
 
-    try {
-      // store fetched data
-      await Promise.all(
-        blocks.map((e) =>
-          this.blockService
-            .create(Block.init(e))
-            .catch((e) =>
-              this.logger.error(`block save error: ${e.message}`, e.stack)
-            )
-        )
-      );
-      await Promise.all(
-        transactions.map((e) =>
-          this.handleTransactionCreated(Transaction.init(e)).catch((e) =>
-            this.logger.error(`transaction save error: ${e.message}`, e.stack)
+    const blockPromises = Promise.all(
+      blocks.map((e) =>
+        this.blockService
+          .create(Block.init(e))
+          .catch((e) =>
+            this.logger.error(`block save error: ${e.message}`, e.stack)
           )
+      )
+    );
+    const transactionPromises = Promise.all(
+      transactions.map((e) =>
+        this.handleTransactionCreated(Transaction.init(e)).catch((e) =>
+          this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
-      );
-      await Promise.all(
-        events.map((e) =>
-          this.eventService
-            .create(Event.init(e))
-            .catch((e) =>
-              this.logger.error(`event save error: ${e.message}`, e.stack)
-            )
-        )
-      );
-      await Promise.all(events.map((e) => this.handleEvent(Event.init(e))));
+      )
+    );
+    const eventPromises = Promise.all(
+      events.map((e) =>
+        this.eventService
+          .create(Event.init(e))
+          .catch((e) =>
+            this.logger.error(`event save error: ${e.message}`, e.stack)
+          )
+      )
+    );
+    const eventHandlingPromises = Promise.all(
+      events.map((e) => this.handleEvent(Event.init(e)))
+    );
+
+    try {
+      await Promise.all([
+        blockPromises,
+        transactionPromises,
+        eventPromises,
+        eventHandlingPromises,
+      ]);
     } catch (e) {
       // TODO: revert writes (wrap in db transaction)
       // check https://github.com/onflowser/flowser/issues/6
