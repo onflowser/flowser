@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { CreateAccountDto } from "../dto/create-account.dto";
 import { UpdateAccountDto } from "../dto/update-account.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -26,10 +26,15 @@ export class AccountsService {
   }
 
   // TODO: refactor data model
+  // https://www.notion.so/flowser/Improve-relational-data-model-fc3f8b8bd60d4a76a169328e6eaf124a
   findAllNewerThanTimestamp(timestamp): Promise<Account[]> {
-    // Finds all accounts that have been updated or created after the given timestamp
-    // and returns them as an array of Account objects
-    return Promise.resolve([]); // TODO: write SQL query
+    return this.accountRepository
+      .createQueryBuilder("account")
+      .select()
+      .where("account.updatedAt > :timestamp", { timestamp })
+      .orWhere("account.createdAt > :timestamp", { timestamp })
+      .orderBy("account.createdAt", "DESC")
+      .getMany();
   }
 
   async findOne(address: string) {
@@ -38,15 +43,13 @@ export class AccountsService {
 
   async findOneByAddress(address: string) {
     const account = await this.findOne(address);
-    const addressWithout0x = account.address.substr(2);
-    const transactions = []; // TODO: Write SQL query
-    // const transactions = await this.transactionRepository
-    //   .aggregate([
-    //     { $match: { payer: addressWithout0x } },
-    //     { $project: { _id: 0 } },
-    //   ])
-    //   .sort({ createdAt: -1 })
-    //   .toArray();
+    const addressWithout0xPrefix = account.address.substr(2);
+    const transactions = this.transactionRepository
+      .createQueryBuilder("transaction")
+      .where("transaction.payer = :address", {
+        address: addressWithout0xPrefix,
+      })
+      .getMany();
 
     return { ...account, transactions };
   }
