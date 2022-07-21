@@ -6,6 +6,7 @@ import { Account } from "../entities/account.entity";
 import { Repository } from "typeorm";
 import { Transaction } from "../../transactions/entities/transaction.entity";
 import { plainToClass } from "class-transformer";
+import { ContractsService } from "./contracts.service";
 
 @Injectable()
 export class AccountsService {
@@ -13,7 +14,8 @@ export class AccountsService {
     @InjectRepository(Account)
     private accountRepository: Repository<Account>,
     @InjectRepository(Transaction)
-    private transactionRepository: Repository<Transaction>
+    private transactionRepository: Repository<Transaction>,
+    private contractsService: ContractsService
   ) {}
 
   create(createAccountDto: CreateAccountDto) {
@@ -43,16 +45,24 @@ export class AccountsService {
   }
 
   async findOneByAddress(address: string) {
-    const account = await this.findOne(address);
-    const addressWithout0xPrefix = account.address.substr(2);
-    const transactions = this.transactionRepository
+    const addressWithout0xPrefix = address.substr(2);
+    const accountPromise = this.findOne(address);
+    const transactionsPromise = this.transactionRepository
       .createQueryBuilder("transaction")
       .where("transaction.payer = :address", {
         address: addressWithout0xPrefix,
       })
       .getMany();
+    const contractsPromise =
+      this.contractsService.getContractsByAccountAddress(address);
 
-    return { ...account, transactions };
+    const [account, transactions, contracts] = await Promise.all([
+      accountPromise,
+      transactionsPromise,
+      contractsPromise,
+    ]);
+
+    return { ...account, transactions, contracts };
   }
 
   replace(address: string, updateAccountDto: UpdateAccountDto) {
