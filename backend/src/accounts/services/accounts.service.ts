@@ -5,8 +5,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Account } from "../entities/account.entity";
 import { Repository } from "typeorm";
 import { Transaction } from "../../transactions/entities/transaction.entity";
-import { plainToClass } from "class-transformer";
 import { ContractsService } from "./contracts.service";
+import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class AccountsService {
@@ -18,10 +18,6 @@ export class AccountsService {
     private contractsService: ContractsService
   ) {}
 
-  create(createAccountDto: CreateAccountDto) {
-    return this.accountRepository.save(createAccountDto);
-  }
-
   async countAll() {
     return this.accountRepository.count();
   }
@@ -32,8 +28,6 @@ export class AccountsService {
     });
   }
 
-  // TODO: refactor data model
-  // https://www.notion.so/flowser/Improve-relational-data-model-fc3f8b8bd60d4a76a169328e6eaf124a
   findAllNewerThanTimestamp(timestamp: Date): Promise<Account[]> {
     return this.accountRepository
       .createQueryBuilder("account")
@@ -69,21 +63,22 @@ export class AccountsService {
     return { ...account, transactions, contracts };
   }
 
-  replace(address: string, updateAccountDto: UpdateAccountDto) {
-    // Re-fetch and insert the whole account entity
-    // contracts & keys can be added or removed
-    // therefore collection needs to be replaced and not just updated
-    const account = plainToClass(Account, updateAccountDto);
-    account.markUpdated();
-    return this.accountRepository.upsert(account, {
-      conflictPaths: ["address"],
-    });
+  async create(createAccountDto: CreateAccountDto) {
+    const account = plainToClass(Account, createAccountDto);
+    return this.accountRepository.insert(account);
   }
 
-  update(address: string, updateAccountDto: UpdateAccountDto) {
-    const account = plainToClass(Account, updateAccountDto);
+  async update(address: string, updateAccountDto: UpdateAccountDto) {
+    const account = await this.findOne(address);
+    const updatedAccount = Object.assign(account, updateAccountDto);
     account.markUpdated();
-    return this.accountRepository.update({ address }, account);
+    return this.accountRepository.update({ address }, updatedAccount);
+  }
+
+  async markUpdated(address: string) {
+    const account = await this.findOne(address);
+    account.markUpdated();
+    return this.update(address, account);
   }
 
   removeAll() {

@@ -173,70 +173,70 @@ export class FlowAggregatorService {
 
   // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
   async handleEvent(event: Event) {
-    this.logger.debug(`handling event: ${event.type}`);
     const { data, type } = event;
+    this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
     const { address, contract } = data as any;
+    // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
       case "flow.AccountCreated":
-        return this.handleAccountCreated(address);
+        return this.createAccountAndContracts(address);
       case "flow.AccountKeyAdded":
-        return this.handleAccountKeyAdded(address);
+        return this.updateAccount(address);
       case "flow.AccountKeyRemoved":
-        return this.handleAccountKeyRemoved(address);
+        return this.updateAccount(address);
       case "flow.AccountContractAdded":
-        return this.handleAccountContractAdded(address, contract);
+        return this.updateAccountAndContracts(address);
       case "flow.AccountContractUpdated":
-        return this.handleAccountContractUpdated(address, contract);
+        return this.updateAccountAndContracts(address);
       case "flow.AccountContractRemoved":
-        return this.handleAccountContractRemoved(address, contract);
+        return this.updateAccountAndContracts(address);
       default:
         return null; // not a core event, ignore it
     }
   }
 
   async handleTransactionCreated(tx: Transaction) {
+    console.log(`handling transaction: `, tx);
+    // TODO: Should we also mark all tx.authorizers as updated?
+    const payerAddress = `0x${tx.payer}`;
     return Promise.all([
       this.transactionService.create(tx),
-      this.updateAccount(`0x${tx.payer}`),
+      this.accountService.markUpdated(payerAddress),
     ]);
   }
 
-  async handleAccountCreated(address: string) {
-    return this.updateAccount(address);
-  }
-
-  async handleAccountKeyAdded(address: string) {
-    return this.updateAccount(address);
-  }
-
-  async handleAccountKeyRemoved(address: string) {
-    return this.handleAccountKeyAdded(address);
-  }
-
-  async handleAccountContractAdded(address: string, contractName: string) {
-    return this.updateAccount(address);
-  }
-
-  async handleAccountContractUpdated(address: string, contractName: string) {
-    return this.updateAccount(address);
-  }
-
-  async handleAccountContractRemoved(address: string, contractName: string) {
-    return this.updateAccount(address);
-  }
-
-  async updateAccount(address: string, props: Partial<Account> = {}) {
+  async createAccountAndContracts(address) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
+    const account = Account.init(flowAccount);
+    await this.setUpdatedAccountStorage(account);
+    await this.accountService.create(account);
+    await this.updateAccountContracts(flowAccount);
+  }
+
+  async updateAccount(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    const account = Account.init(flowAccount);
+    await this.setUpdatedAccountStorage(account);
+    await this.accountService.update(address, account);
+  }
+
+  async updateAccountAndContracts(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    const account = Account.init(flowAccount);
+    await this.setUpdatedAccountStorage(account);
+    await Promise.all([
+      this.accountService.update(address, account),
+      this.updateAccountContracts(flowAccount),
+    ]);
+  }
+
+  async setUpdatedAccountStorage(account: Account) {
     // storage data API works only for local emulator for now
     if (this.project.isEmulator()) {
       // FIXME: temporary disabled storage functionality due to bellow pending task
       // https://www.notion.so/flowser/Migrate-to-up-to-date-flow-cli-version-a2a3837d11b9451bb0df1751620bbe1d
       // account.storage = await this.storageDataService.getStorageData(address);
     }
-    const account = Account.init(flowAccount, props);
-    account.markUpdated();
-    await this.accountService.replace(address, account);
-    await this.updateAccountContracts(flowAccount);
   }
 
   async updateAccountContracts(flowAccount: FlowAccount) {
@@ -277,7 +277,7 @@ export class FlowAggregatorService {
   async bootstrapServiceAccount() {
     const { serviceAddress } = defaultEmulatorFlags;
     try {
-      await this.handleAccountCreated(serviceAddress);
+      await this.createAccountAndContracts(serviceAddress);
     } catch (error) {
       // ignore duplicate key error (with code 11000)
       if (error.code !== 11000) {
