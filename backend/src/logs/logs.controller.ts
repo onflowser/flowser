@@ -1,7 +1,7 @@
 import { Controller, Get, UseInterceptors, Query } from "@nestjs/common";
 import { LogsService } from "./logs.service";
-import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
-import { ParseUnixTimestampPipe } from "../shared/pipes/parse-unix-timestamp.pipe";
+import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller("logs")
 export class LogsController {

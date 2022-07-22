@@ -1,4 +1,4 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

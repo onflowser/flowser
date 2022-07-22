@@ -3,7 +3,7 @@ import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
 import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { PollingEntity } from "../../common/entities/polling.entity";
 import config from "../../config";
 
 export enum FlowNetworks {

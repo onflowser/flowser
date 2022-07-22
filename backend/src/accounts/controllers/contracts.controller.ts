@@ -1,8 +1,8 @@
 import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
 import { ContractsService } from "../services/contracts.service";
-import { PollingResponseInterceptor } from "../../shared/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
-import { ParseUnixTimestampPipe } from "../../shared/pipes/parse-unix-timestamp.pipe";
+import { ParseUnixTimestampPipe } from "../../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller("contracts")
 export class ContractsController {

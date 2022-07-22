@@ -1,4 +1,4 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";

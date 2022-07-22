@@ -1,4 +1,4 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { Account } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";

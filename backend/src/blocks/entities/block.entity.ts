@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { PollingEntity } from "../../common/entities/polling.entity";
 import { CollectionGuarantee } from "./collection-guarantee.entity";
 
 @Entity({ name: "blocks" })
