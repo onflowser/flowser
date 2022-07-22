@@ -10,3 +10,13 @@ export function toKebabCase(string) {
 export function randomString() {
   return `${Math.round(Math.random() * Math.pow(10, 20))}`;
 }
+
+/**
+ * Serializes non-null values to provided class object.
+ */
+export function serializeEmbeddedTypeORMEntity<T>(
+  classObject: T,
+  value: null | T
+) {
+  return value === null ? null : Object.assign(classObject, value);
+}

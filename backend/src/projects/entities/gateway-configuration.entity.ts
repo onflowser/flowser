@@ -1,16 +1,15 @@
-import { Column, Entity } from "typeorm";
-
-@Entity()
 export class GatewayConfigurationEntity {
-  @Column()
   port: number;
 
-  @Column()
   address: string;
 
-  constructor(address: string, port: number) {
-    this.port = port;
-    this.address = address;
+  constructor(address?: string, port?: number) {
+    if (address) {
+      this.address = address;
+    }
+    if (port) {
+      this.port = port;
+    }
   }
 
   url() {

@@ -2,29 +2,31 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Transaction } from "./entities/transaction.entity";
-import { MongoRepository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
-    private transactionRepository: MongoRepository<Transaction>
+    private transactionRepository: Repository<Transaction>
   ) {}
 
   create(createTransactionDto: CreateTransactionDto) {
     return this.transactionRepository.save(createTransactionDto);
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Transaction[]> {
     return this.transactionRepository.find({
-      where: {
-        $or: [
-          { createdAt: { $gt: timestamp } },
-          { updatedAt: { $gt: timestamp } },
-        ],
-      },
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
       order: { createdAt: "DESC" },
     });
+  }
+
+  async countAll() {
+    return this.transactionRepository.count();
   }
 
   findAll() {
@@ -40,11 +42,11 @@ export class TransactionsService {
     });
   }
 
-  findAllByBlockNewerThanTimestamp(blockId: string, timestamp) {
+  findAllByBlockNewerThanTimestamp(blockId: string, timestamp: Date) {
     return this.transactionRepository.find({
       where: {
         referenceBlockId: blockId,
-        createdAt: { $gt: timestamp },
+        createdAt: MoreThan(timestamp),
       },
       order: { createdAt: "DESC" },
     });

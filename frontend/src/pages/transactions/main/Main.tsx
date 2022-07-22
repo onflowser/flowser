@@ -11,9 +11,10 @@ import TransactionListItem from "../../../shared/components/transaction-list-ite
 const Main: FunctionComponent<any> = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data, firstFetch } = useTimeoutPolling(
+  // TODO: fix types
+  const { data, firstFetch } = useTimeoutPolling<any>(
     "/api/transactions/polling",
-    "_id"
+    "id"
   );
 
   useEffect(() => {

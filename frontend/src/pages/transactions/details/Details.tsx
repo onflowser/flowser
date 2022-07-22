@@ -35,9 +35,10 @@ const Details: FunctionComponent<any> = () => {
   const { data, isLoading } = useDetailsQuery(
     `/api/transactions/${transactionId}`
   );
-  const { data: events } = useTimeoutPolling(
+  // TODO: fix types
+  const { data: events } = useTimeoutPolling<any>(
     `/api/transactions/${transactionId}/events/polling`,
-    "_id"
+    "id"
   );
 
   const breadcrumbs: Breadcrumb[] = [

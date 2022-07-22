@@ -1,11 +1,8 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { Column, Entity } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
 
 @Entity({ name: "keys" })
 export class AccountKey extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
   @Column()
   index: number;
 

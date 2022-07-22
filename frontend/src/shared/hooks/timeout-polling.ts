@@ -1,8 +1,9 @@
 import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
 import axios from "../config/axios";
+import { AxiosResponse } from "axios";
 
-export interface TimeoutPollingHook<T> {
+export interface TimeoutPollingHook<T extends PollingEntity> {
   stopPolling: () => void;
   startPolling: () => void;
   isFetching: boolean;
@@ -11,112 +12,78 @@ export interface TimeoutPollingHook<T> {
   data: T[];
 }
 
-export const useTimeoutPolling = <T>(
+// TODO: define shared types between frontend/backend
+export interface PollingEntity {
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DecoratedPollingEntity<T> = T & {
+  isNew: boolean;
+  isUpdated: boolean;
+};
+
+export type PollingResponse<T extends PollingEntity> = {
+  data: T[];
+  meta: {
+    latestTimestamp: number;
+  };
+};
+
+// TODO: redefine arguments in object form
+export const useTimeoutPolling = <T extends PollingEntity>(
   resource: string,
-  resourceId?: string,
+  resourceIdKey: keyof T, // TODO: should this be required?
   interval?: number,
   newestFirst = true
 ): TimeoutPollingHook<T> => {
-  const [pollingTime, setPollingTime] = useState(0);
+  const [lastPollingTime, setLastPollingTime] = useState(0);
   const [stop, setStop] = useState(false);
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<T[]>([]);
   const [firstFetch, setFirstFetch] = useState(false);
 
-  const fetchCallback = useCallback<any>(() => {
+  const fetchCallback = useCallback(() => {
     return axios.get(resource, {
       params: {
-        timestamp: pollingTime,
+        timestamp: lastPollingTime,
       },
     });
-  }, [pollingTime]);
+  }, [lastPollingTime]);
 
-  const { isFetching, error } = useQuery<{ data: T[] }, Error>(
-    resource,
-    fetchCallback,
-    {
-      onSuccess: (response: any) => {
-        if (response.status === 200 && response.data?.data?.length) {
-          const latestTimestamp = response.data?.meta?.latestTimestamp;
-          if (latestTimestamp > 0) {
-            setPollingTime(latestTimestamp);
-          }
+  const { isFetching, error } = useQuery<
+    AxiosResponse<PollingResponse<T>>,
+    Error
+  >(resource, fetchCallback, {
+    onSuccess: (response) => {
+      if (response.status === 200 && response.data?.data?.length) {
+        const latestTimestamp = response.data?.meta?.latestTimestamp;
+        if (latestTimestamp > 0) {
+          setLastPollingTime(latestTimestamp);
+        }
 
-          const remapDataIsNew = (data: any[], isNew: boolean): any[] => {
-            return data.map((item: any) => ({ ...item, isNew }));
-          };
+        const newItems = mergeAndDecorateItems(
+          data,
+          response.data.data,
+          resourceIdKey
+        );
 
-          const newData = [...remapDataIsNew(data, false)];
-          // UPDATED ITEMS
-          if (resourceId) {
-            const updatedItems = response.data.data.filter(
-              (item: any) =>
-                !!item.updatedAt && item.updatedAt >= item.createdAt
-            );
-
-            if (updatedItems.length) {
-              updatedItems.forEach((updatedItem: any, index: number) => {
-                if (newData.length === 0) {
-                  newData.push({
-                    ...updatedItem,
-                    isUpdated: false,
-                    isNew: false,
-                  });
-                } else {
-                  const i = newData.findIndex((item: any) => {
-                    if (
-                      !item.hasOwnProperty(resourceId) ||
-                      !updatedItem.hasOwnProperty(resourceId)
-                    ) {
-                      return false;
-                    }
-                    return item[resourceId] === updatedItem[resourceId];
-                  });
-                  if (i !== -1) {
-                    newData[i] = {
-                      ...updatedItems[index],
-                      isUpdated: !!data.length,
-                      isNew: false,
-                    };
-                  } else {
-                    newData.push({
-                      ...updatedItems[index],
-                      isUpdated: false,
-                      isNew: !!data.length,
-                    });
-                  }
-                }
-              });
-              setData(newData);
-            }
-          }
-
-          // NEW ITEMS
-          const newItems = response.data.data.filter(
-            (item: any) => !item.updatedAt || item.updatedAt < item.createdAt
+        if (newestFirst) {
+          const sortedNewItems = newItems.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
 
-          if (newestFirst) {
-            const sortedData = [
-              ...newData,
-              ...remapDataIsNew(newItems, !!data.length),
-            ].sort((a, b) => {
-              return b.createdAt - a.createdAt;
-            });
-            setData(sortedData);
-          } else {
-            setData((state: any) => [
-              ...newData,
-              ...remapDataIsNew(newItems, !!state.length),
-            ]);
-          }
+          setData(sortedNewItems);
+        } else {
+          setData(newItems);
         }
-      },
-      enabled: !stop,
-      refetchInterval: interval || 1000,
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: false,
-    }
-  );
+      }
+    },
+    enabled: !stop,
+    refetchInterval: interval || 1000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     if (!isFetching && !firstFetch) {
@@ -141,3 +108,44 @@ export const useTimeoutPolling = <T>(
     firstFetch,
   };
 };
+
+function remapDataIsNew<T extends PollingEntity>(
+  data: T[],
+  isNew: boolean
+): DecoratedPollingEntity<T>[] {
+  return data.map((item) => ({
+    ...item,
+    isNew,
+    isUpdated: false,
+  }));
+}
+
+function mergeAndDecorateItems<T extends PollingEntity>(
+  oldItems: T[],
+  newItems: T[],
+  resourceIdKey: keyof T
+) {
+  const items = [...remapDataIsNew(oldItems, false)];
+
+  newItems.forEach((newItem) => {
+    const existingItemIndex = items.findIndex(
+      (item) => item[resourceIdKey] === newItem[resourceIdKey]
+    );
+    const isExistingItem = existingItemIndex !== -1;
+    if (isExistingItem) {
+      items[existingItemIndex] = {
+        ...newItem,
+        isUpdated: Boolean(oldItems.length),
+        isNew: false,
+      };
+    } else {
+      items.push({
+        ...newItem,
+        isUpdated: false,
+        isNew: Boolean(oldItems.length),
+      });
+    }
+  });
+
+  return items;
+}

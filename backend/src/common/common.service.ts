@@ -1,38 +1,39 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { MongoRepository } from "typeorm";
-import { Log } from "../logs/entities/log.entity";
-import { Account } from "../accounts/entities/account.entity";
-import { Block } from "../blocks/entities/block.entity";
-import { Transaction } from "../transactions/entities/transaction.entity";
-import { Event } from "../events/entities/event.entity";
 import { ContractsService } from "../accounts/services/contracts.service";
+import { AccountsService } from "../accounts/services/accounts.service";
+import { TransactionsService } from "../transactions/transactions.service";
+import { BlocksService } from "../blocks/blocks.service";
+import { EventsService } from "../events/events.service";
+import { LogsService } from "../logs/logs.service";
 
 @Injectable()
 export class CommonService {
   constructor(
-    @InjectRepository(Log)
-    private commonRepository: MongoRepository<Account>,
-    private contractsService: ContractsService
+    private contractsService: ContractsService,
+    private accountsService: AccountsService,
+    private blocksService: BlocksService,
+    private transactionsService: TransactionsService,
+    private eventsService: EventsService,
+    private logsService: LogsService
   ) {}
 
   async getCounters() {
     const [log, accounts, blocks, transactions, events, contracts] =
       await Promise.all([
-        this.commonRepository.manager.stats(Log),
-        this.commonRepository.manager.stats(Account),
-        this.commonRepository.manager.stats(Block),
-        this.commonRepository.manager.stats(Transaction),
-        this.commonRepository.manager.stats(Event),
-        this.contractsService.findAllNewerThanTimestamp(0),
+        this.logsService.countAll(),
+        this.accountsService.countAll(),
+        this.blocksService.countAll(),
+        this.transactionsService.countAll(),
+        this.eventsService.countAll(),
+        this.contractsService.countAll(),
       ]);
     return {
-      log: log.count,
-      accounts: accounts.count,
-      blocks: blocks.count,
-      transactions: transactions.count,
-      events: events.count,
-      contracts: contracts.length,
+      log,
+      accounts,
+      blocks,
+      transactions,
+      events,
+      contracts,
     };
   }
 }

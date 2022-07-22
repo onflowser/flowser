@@ -1,5 +1,5 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
 import { FlowAccount } from "../../flow/types";
@@ -7,30 +7,23 @@ import { AccountsStorage } from "./storage.entity";
 
 @Entity({ name: "accounts" })
 export class Account extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID | any;
-
-  @Column()
-  @Index({ unique: true })
-  id: string;
-
-  @Column()
+  @PrimaryColumn()
   address: string;
 
-  @Column()
+  @Column({ type: "bigint" })
   balance: number;
 
   @Column()
   code: string;
 
-  @Column((type) => AccountKey)
+  @Column("json")
   keys: AccountKey[];
 
-  @Column((type) => AccountContract)
-  contracts: AccountContract[];
-
-  @Column((type) => AccountsStorage)
+  @Column("json", { nullable: true })
   storage: AccountsStorage[];
+
+  @OneToMany(() => AccountContract, (contract) => contract.account)
+  contracts: AccountContract[];
 
   static init(
     flowAccountObject: FlowAccount,
@@ -42,7 +35,7 @@ export class Account extends PollingEntity {
       flowAccountObject,
       options
     );
-    account.id = flowAccountObject.address;
+    account.address = flowAccountObject.address;
     account.keys = keys.map((key) => AccountKey.init(key));
     account.contracts = Object.keys(contracts).map((name) =>
       AccountContract.init(flowAccountObject.address, name, contracts[name])
