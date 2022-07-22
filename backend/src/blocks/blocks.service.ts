@@ -13,6 +13,10 @@ export class BlocksService {
     return this.blockRepository.save(createBlockDto);
   }
 
+  async countAll() {
+    return this.blockRepository.count();
+  }
+
   findAll(): Promise<Block[]> {
     return this.blockRepository.find();
   }

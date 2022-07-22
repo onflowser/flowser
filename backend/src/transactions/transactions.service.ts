@@ -25,6 +25,10 @@ export class TransactionsService {
     });
   }
 
+  async countAll() {
+    return this.transactionRepository.count();
+  }
+
   findAll() {
     return this.transactionRepository.find({
       order: { createdAt: "DESC" },

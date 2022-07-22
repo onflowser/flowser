@@ -15,6 +15,10 @@ export class EventsService {
     return this.eventRepository.save(createEventDto);
   }
 
+  async countAll() {
+    return this.eventRepository.count();
+  }
+
   findAll() {
     return this.eventRepository.find({
       order: { createdAt: "DESC" },

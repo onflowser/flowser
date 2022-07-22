@@ -22,6 +22,10 @@ export class AccountsService {
     return this.accountRepository.save(createAccountDto);
   }
 
+  async countAll() {
+    return this.accountRepository.count();
+  }
+
   findAll() {
     return this.accountRepository.find({
       order: { createdAt: "DESC", updatedAt: "DESC" },

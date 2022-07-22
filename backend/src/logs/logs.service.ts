@@ -21,6 +21,10 @@ export class LogsService {
     });
   }
 
+  async countAll() {
+    return this.logsRepository.count();
+  }
+
   findAll() {
     return this.logsRepository.find({});
   }

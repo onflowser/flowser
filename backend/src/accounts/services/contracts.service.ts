@@ -10,6 +10,10 @@ export class ContractsService {
     private contractRepository: Repository<AccountContract>
   ) {}
 
+  async countAll() {
+    return this.contractRepository.count();
+  }
+
   async findAll() {
     return this.contractRepository.find({
       order: { createdAt: "DESC" },

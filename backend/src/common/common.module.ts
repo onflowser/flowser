@@ -1,12 +1,20 @@
 import { Module } from "@nestjs/common";
 import { CommonService } from "./common.service";
 import { CommonController } from "./common.controller";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Log } from "../logs/entities/log.entity";
 import { AccountsModule } from "../accounts/accounts.module";
+import { BlocksModule } from "../blocks/blocks.module";
+import { TransactionsModule } from "../transactions/transactions.module";
+import { LogsModule } from "../logs/logs.module";
+import { EventsModule } from "../events/events.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Log]), AccountsModule],
+  imports: [
+    AccountsModule,
+    BlocksModule,
+    TransactionsModule,
+    LogsModule,
+    EventsModule,
+  ],
   controllers: [CommonController],
   providers: [CommonService],
 })
