@@ -138,10 +138,12 @@ export class ProjectsService {
     }
   }
 
-  create(createProjectDto: CreateProjectDto) {
-    return this.projectRepository
-      .save(createProjectDto)
+  async create(createProjectDto: CreateProjectDto) {
+    const project = plainToClass(Project, createProjectDto);
+    await this.projectRepository
+      .insert(project)
       .catch(this.handleDatabaseError);
+    return project;
   }
 
   async findAll(): Promise<Project[]> {
@@ -161,11 +163,10 @@ export class ProjectsService {
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     const project = plainToClass(Project, updateProjectDto);
     project.markUpdated();
-    return this.projectRepository
-      .upsert(project, {
-        conflictPaths: ["id"],
-      })
+    await this.projectRepository
+      .update({ id }, updateProjectDto)
       .catch(this.handleDatabaseError);
+    return project;
   }
 
   async remove(id: string) {
