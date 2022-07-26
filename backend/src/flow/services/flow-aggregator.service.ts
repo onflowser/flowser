@@ -139,7 +139,6 @@ export class FlowAggregatorService {
           )
       )
     );
-    // TODO: transaction.payer can reference an account that may not be created yet
     const transactionPromises = Promise.all(
       transactions.map((e) =>
         this.handleTransactionCreated(Transaction.init(e)).catch((e) =>
@@ -165,12 +164,9 @@ export class FlowAggregatorService {
     );
 
     try {
-      await Promise.all([
-        blockPromises,
-        transactionPromises,
-        eventPromises,
-        eventHandlingPromises,
-      ]);
+      // Process events first, so that transactions can reference created users.
+      await eventHandlingPromises;
+      await Promise.all([blockPromises, transactionPromises, eventPromises]);
     } catch (e) {
       // TODO: revert writes (wrap in db transaction)
       // check https://github.com/onflowser/flowser/issues/6

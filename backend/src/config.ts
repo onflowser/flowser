@@ -17,7 +17,7 @@ export const env = cleanEnv(process.env, {
   DATABASE_USERNAME: str({ default: "" }),
   DATABASE_PASSWORD: str({ default: "" }),
 
-  DATA_FETCH_INTERVAL: num({ default: 3000 }),
+  DATA_FETCH_INTERVAL: num({ default: 1000 }),
   USER_MANAGED_EMULATOR_PORT: num({ default: 8081 }),
   FLOW_STORAGE_SERVER_PORT: num({ default: 8889 }),
 
