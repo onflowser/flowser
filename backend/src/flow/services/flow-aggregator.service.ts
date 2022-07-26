@@ -25,6 +25,7 @@ import { AccountContract } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKey } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -42,7 +43,8 @@ export class FlowAggregatorService {
     private flowGatewayService: FlowGatewayService,
     private flowEmulatorService: FlowEmulatorService,
     private logsService: LogsService,
-    private storageDataService: StorageDataService
+    private storageDataService: StorageDataService,
+    private dataSource: DataSource
   ) {}
 
   configureProjectContext(project?: Project) {
@@ -75,15 +77,25 @@ export class FlowAggregatorService {
       return;
     }
 
+    const queryRunner = this.dataSource.createQueryRunner();
+
     // service account exist only on emulator chains
     if (this.project.isEmulator() && !this.serviceAccountBootstrapped) {
       // TODO: storage server hangs up when using flow-cli@v0.31
       this.logger.debug("Bootstrapping service account");
+
+      await queryRunner.startTransaction();
       try {
         await this.bootstrapServiceAccount();
+
+        await queryRunner.commitTransaction();
       } catch (e) {
+        await queryRunner.rollbackTransaction();
+
         this.logger.error("Service account bootstrap error", e);
         return; // retry in the next iteration
+      } finally {
+        await queryRunner.release();
       }
       this.serviceAccountBootstrapped = true;
     }
@@ -164,13 +176,19 @@ export class FlowAggregatorService {
     );
 
     try {
+      await queryRunner.startTransaction();
+
       // Process events first, so that transactions can reference created users.
       await eventHandlingPromises;
       await Promise.all([blockPromises, transactionPromises, eventPromises]);
+
+      await queryRunner.commitTransaction();
     } catch (e) {
-      // TODO: revert writes (wrap in db transaction)
-      // check https://github.com/onflowser/flowser/issues/6
-      this.logger.error(`Failed to store latest data`, e, e.stack);
+      await queryRunner.rollbackTransaction();
+
+      await this.logger.error(`Failed to store latest data`, e, e.stack);
+    } finally {
+      await queryRunner.release();
     }
   }
 
