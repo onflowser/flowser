@@ -37,10 +37,4 @@ export class EventsController {
   findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
     return this.eventsService.findAllNewerThanTimestamp(timestamp);
   }
-
-  @ApiParam({ name: "id", type: String })
-  @Get("/events/:id")
-  findOne(@Param("id") id: string) {
-    return this.eventsService.findOne(id);
-  }
 }

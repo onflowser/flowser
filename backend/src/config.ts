@@ -1,6 +1,5 @@
 import { join } from "path";
 import { cleanEnv, str, num } from "envalid";
-import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 
 const defaultServiceAccountPubKey =
   "5a6a7bdb81838e40fc615d4c0eed3d4caacfc7f47a89d319caa370aac6196113573738ba57e09ea5a27a192d48457ee5c0e32011bc10ef93383aabad24a9ce2a";
@@ -10,13 +9,13 @@ const defaultServiceAccountPrivKey =
 export const env = cleanEnv(process.env, {
   DATABASE_TYPE: str({
     default: "mysql",
-    choices: ["mysql", "mariadb", "postgres", "sqlite"],
+    choices: ["mysql", "mariadb", "sqlite", "better-sqlite3"],
   }),
+  DATABASE_NAME: str(),
   DATABASE_HOST: str({ default: "localhost" }),
   DATABASE_PORT: num({ default: 3306 }),
-  DATABASE_USERNAME: str(),
-  DATABASE_PASSWORD: str(),
-  DATABASE_NAME: str(),
+  DATABASE_USERNAME: str({ default: "" }),
+  DATABASE_PASSWORD: str({ default: "" }),
 
   DATA_FETCH_INTERVAL: num({ default: 3000 }),
   USER_MANAGED_EMULATOR_PORT: num({ default: 8081 }),
@@ -33,18 +32,6 @@ export const env = cleanEnv(process.env, {
     default: defaultServiceAccountPubKey,
   }),
 });
-
-export const databaseConfig: TypeOrmModuleOptions = {
-  type: env.DATABASE_TYPE,
-  host: env.DATABASE_HOST,
-  port: env.DATABASE_PORT,
-  username: env.DATABASE_USERNAME,
-  password: env.DATABASE_PASSWORD,
-  database: env.DATABASE_NAME,
-  autoLoadEntities: true,
-  synchronize: true,
-  timezone: "Z",
-};
 
 export default {
   dataFetchInterval: env.DATA_FETCH_INTERVAL,

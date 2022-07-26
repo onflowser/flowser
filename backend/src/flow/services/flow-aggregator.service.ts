@@ -21,9 +21,10 @@ import { LogsService } from "../../logs/logs.service";
 import { Log } from "../../logs/entities/log.entity";
 import { StorageDataService } from "./storage-data.service";
 import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
-import { FlowAccount } from "../types";
 import { AccountContract } from "../../accounts/entities/contract.entity";
-import { plainToClass } from "class-transformer";
+import { KeysService } from "../../accounts/services/keys.service";
+import { AccountKey } from "../../accounts/entities/key.entity";
+import { ensurePrefixedAddress } from "../../utils";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -35,6 +36,7 @@ export class FlowAggregatorService {
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
+    private accountKeysService: KeysService,
     private contractService: ContractsService,
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
@@ -80,7 +82,7 @@ export class FlowAggregatorService {
       try {
         await this.bootstrapServiceAccount();
       } catch (e) {
-        this.logger.error("Service account bootstrap error: ", e.message);
+        this.logger.error("Service account bootstrap error", e);
         return; // retry in the next iteration
       }
       this.serviceAccountBootstrapped = true;
@@ -137,6 +139,7 @@ export class FlowAggregatorService {
           )
       )
     );
+    // TODO: transaction.payer can reference an account that may not be created yet
     const transactionPromises = Promise.all(
       transactions.map((e) =>
         this.handleTransactionCreated(Transaction.init(e)).catch((e) =>
@@ -154,7 +157,11 @@ export class FlowAggregatorService {
       )
     );
     const eventHandlingPromises = Promise.all(
-      events.map((e) => this.handleEvent(Event.init(e)))
+      events.map((e) =>
+        this.handleEvent(Event.init(e)).catch((e) => {
+          this.logger.error(`event handling error: ${e.message}`, e.stack);
+        })
+      )
     );
 
     try {
@@ -167,7 +174,7 @@ export class FlowAggregatorService {
     } catch (e) {
       // TODO: revert writes (wrap in db transaction)
       // check https://github.com/onflowser/flowser/issues/6
-      this.logger.error(`data store error: ${e.message}`, e.stack);
+      this.logger.error(`Failed to store latest data`, e, e.stack);
     }
   }
 
@@ -179,57 +186,81 @@ export class FlowAggregatorService {
     // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
       case "flow.AccountCreated":
-        return this.createAccountAndContracts(address);
+        return this.storeNewAccountWithContractsAndKeys(address);
       case "flow.AccountKeyAdded":
-        return this.updateAccount(address);
+        return this.updateStoredAccountKeys(address);
       case "flow.AccountKeyRemoved":
-        return this.updateAccount(address);
+        return this.updateStoredAccountKeys(address);
       case "flow.AccountContractAdded":
-        return this.updateAccountAndContracts(address);
+        return this.updateStoredAccountContracts(address);
       case "flow.AccountContractUpdated":
-        return this.updateAccountAndContracts(address);
+        return this.updateStoredAccountContracts(address);
       case "flow.AccountContractRemoved":
-        return this.updateAccountAndContracts(address);
+        return this.updateStoredAccountContracts(address);
       default:
         return null; // not a core event, ignore it
     }
   }
 
   async handleTransactionCreated(tx: Transaction) {
-    console.log(`handling transaction: `, tx);
     // TODO: Should we also mark all tx.authorizers as updated?
-    const payerAddress = `0x${tx.payer}`;
+    const payerAddress = ensurePrefixedAddress(tx.payer);
     return Promise.all([
       this.transactionService.create(tx),
       this.accountService.markUpdated(payerAddress),
     ]);
   }
 
-  async createAccountAndContracts(address) {
+  async storeNewAccountWithContractsAndKeys(address) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     const account = Account.init(flowAccount);
-    await this.setUpdatedAccountStorage(account);
+    const newContracts = Object.keys(flowAccount.contracts).map((name) =>
+      AccountContract.init(
+        flowAccount.address,
+        name,
+        flowAccount.contracts[name]
+      )
+    );
+    const newKeys = flowAccount.keys.map((key) =>
+      AccountKey.init(address, key)
+    );
     await this.accountService.create(account);
-    await this.updateAccountContracts(flowAccount);
-  }
-
-  async updateAccount(address: string) {
-    const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = Account.init(flowAccount);
-    await this.setUpdatedAccountStorage(account);
-    await this.accountService.update(address, account);
-  }
-
-  async updateAccountAndContracts(address: string) {
-    const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = Account.init(flowAccount);
-    await this.setUpdatedAccountStorage(account);
     await Promise.all([
-      this.accountService.update(address, account),
-      this.updateAccountContracts(flowAccount),
+      this.accountKeysService.updateAccountKeys(address, newKeys),
+      this.contractService.updateAccountContracts(
+        account.address,
+        newContracts
+      ),
     ]);
   }
 
+  async updateStoredAccountKeys(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    await Promise.all([
+      this.accountService.markUpdated(address),
+      this.accountKeysService.updateAccountKeys(
+        address,
+        flowAccount.keys.map((key) => AccountKey.init(address, key))
+      ),
+    ]);
+  }
+
+  async updateStoredAccountContracts(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    const account = Account.init(flowAccount);
+    const newContracts = Object.keys(flowAccount.contracts).map((name) =>
+      AccountContract.init(flowAccount.address, name, flowAccount[name])
+    );
+    await Promise.all([
+      this.accountService.markUpdated(address),
+      this.contractService.updateAccountContracts(
+        account.address,
+        newContracts
+      ),
+    ]);
+  }
+
+  // TODO: when do we need to update the account storage?
   async setUpdatedAccountStorage(account: Account) {
     // storage data API works only for local emulator for now
     if (this.project.isEmulator()) {
@@ -239,45 +270,10 @@ export class FlowAggregatorService {
     }
   }
 
-  async updateAccountContracts(flowAccount: FlowAccount) {
-    const accountAddress = flowAccount.address;
-    const storedAccountContracts =
-      await this.contractService.getContractsByAccountAddress(accountAddress);
-    const providedAccountContractsLookup = new Map(
-      Object.entries(flowAccount.contracts)
-    );
-    const storedAccountContractsLookup = new Map(
-      storedAccountContracts.map((contract) => [contract.name, contract])
-    );
-
-    const promises = [];
-    for (const [contractName, contractCode] of providedAccountContractsLookup) {
-      const contract = plainToClass(AccountContract, {
-        accountAddress,
-        name: contractName,
-        code: contractCode,
-      });
-      const storedContract = storedAccountContractsLookup.get(contractName);
-      if (storedContract) {
-        promises.push(this.contractService.replace(contract));
-      } else {
-        promises.push(this.contractService.create(contract));
-      }
-    }
-    for (const contract of storedAccountContracts) {
-      if (!providedAccountContractsLookup.has(contract.name)) {
-        promises.push(
-          this.contractService.delete(accountAddress, contract.name)
-        );
-      }
-    }
-    return Promise.all(promises);
-  }
-
   async bootstrapServiceAccount() {
     const { serviceAddress } = defaultEmulatorFlags;
     try {
-      await this.createAccountAndContracts(serviceAddress);
+      await this.storeNewAccountWithContractsAndKeys(serviceAddress);
     } catch (error) {
       // ignore duplicate key error (with code 11000)
       if (error.code !== 11000) {

@@ -52,15 +52,6 @@ export class EventsService {
     });
   }
 
-  async findOne(id: string) {
-    const [event] = await this.eventRepository.find({ where: { id } });
-    if (event) {
-      return event;
-    } else {
-      throw new NotFoundException("Event not found");
-    }
-  }
-
   removeAll() {
     return this.eventRepository.delete({});
   }

@@ -13,14 +13,14 @@ import { EventsModule } from "./events/events.module";
 import { LogsModule } from "./logs/logs.module";
 import { FlowModule } from "./flow/flow.module";
 import { CommonModule } from "./common/common.module";
-import { databaseConfig } from "./config";
+import { getDatabaseOptions } from "./database";
 
 @Global()
 @Module({
   providers: [AppService],
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot(databaseConfig),
+    TypeOrmModule.forRootAsync({ useFactory: getDatabaseOptions }),
     ScheduleModule.forRoot(),
     ProjectsModule,
     AccountsModule,

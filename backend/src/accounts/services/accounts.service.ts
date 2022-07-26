@@ -39,7 +39,10 @@ export class AccountsService {
   }
 
   async findOne(address: string) {
-    return this.accountRepository.findOneByOrFail({ address });
+    return this.accountRepository.findOneOrFail({
+      where: { address },
+      relations: ["keys", "storage"],
+    });
   }
 
   async findOneByAddress(address: string) {
@@ -69,14 +72,19 @@ export class AccountsService {
   }
 
   async update(address: string, updateAccountDto: UpdateAccountDto) {
-    const account = await this.findOne(address);
+    const account = await this.accountRepository.findOneByOrFail({ address });
     const updatedAccount = Object.assign(account, updateAccountDto);
     account.markUpdated();
     return this.accountRepository.update({ address }, updatedAccount);
   }
 
   async markUpdated(address: string) {
-    const account = await this.findOne(address);
+    const account = await this.accountRepository
+      .findOneByOrFail({ address })
+      .catch((e) => {
+        console.log("Mark updated error", e);
+        throw e;
+      });
     account.markUpdated();
     return this.update(address, account);
   }

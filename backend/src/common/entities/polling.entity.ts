@@ -2,13 +2,13 @@ import { Column, Entity } from "typeorm";
 
 @Entity()
 export class PollingEntity {
-  @Column("timestamp")
+  @Column("datetime")
   createdAt = new Date();
 
-  @Column("timestamp")
+  @Column("datetime")
   updatedAt = new Date();
 
-  @Column("timestamp", { nullable: true })
+  @Column("datetime", { nullable: true })
   deletedAt = null;
 
   public markUpdated() {

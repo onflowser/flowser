@@ -16,30 +16,21 @@ export class Account extends PollingEntity {
   @Column()
   code: string;
 
-  @Column("json")
+  @OneToMany(() => AccountKey, (key) => key.account)
   keys: AccountKey[];
 
-  @Column("json", { nullable: true })
+  @OneToMany(() => AccountsStorage, (storage) => storage.account)
   storage: AccountsStorage[];
 
   @OneToMany(() => AccountContract, (contract) => contract.account)
   contracts: AccountContract[];
 
-  static init(
-    flowAccountObject: FlowAccount,
-    options?: Partial<Account>
-  ): Account {
-    const { keys, contracts } = flowAccountObject;
-    const account = Object.assign<Account, FlowAccount, Partial<Account>>(
+  static init(flowAccountObject: FlowAccount): Account {
+    const account = Object.assign<Account, FlowAccount>(
       new Account(),
-      flowAccountObject,
-      options
+      flowAccountObject
     );
     account.address = flowAccountObject.address;
-    account.keys = keys.map((key) => AccountKey.init(key));
-    account.contracts = Object.keys(contracts).map((name) =>
-      AccountContract.init(flowAccountObject.address, name, contracts[name])
-    ) as AccountContract[] & Map<string, string>;
     return account;
   }
 }

@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AccountContract } from "../entities/contract.entity";
+import { FlowAccount } from "../../flow/types";
+import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()
 export class ContractsService {
@@ -47,9 +49,30 @@ export class ContractsService {
     });
   }
 
-  async replace(contract: AccountContract) {
-    return this.contractRepository.upsert(contract, {
-      conflictPaths: ["accountAddress", "name"],
+  async update(contract: AccountContract) {
+    return this.contractRepository.update(
+      { accountAddress: contract.accountAddress, name: contract.name },
+      contract
+    );
+  }
+
+  async updateAccountContracts(
+    accountAddress: string,
+    newContracts: AccountContract[]
+  ) {
+    const oldContracts = await this.getContractsByAccountAddress(
+      accountAddress
+    );
+    const contractsDiff = computeEntitiesDiff({
+      primaryKey: "name",
+      oldEntities: oldContracts,
+      newEntities: newContracts,
+    });
+    return processEntitiesDiff<AccountContract>({
+      create: (e) => this.create(e),
+      update: (e) => this.update(e),
+      delete: (e) => this.delete(e.accountAddress, e.name),
+      diff: contractsDiff,
     });
   }
 

@@ -2,6 +2,8 @@ import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { Account } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
+import { env } from "../../config";
+import { ensurePrefixedAddress } from "../../utils";
 
 @Entity({ name: "contracts" })
 export class AccountContract extends PollingEntity {
@@ -14,7 +16,7 @@ export class AccountContract extends PollingEntity {
   @PrimaryColumn()
   name: string;
 
-  @Column("mediumtext")
+  @Column(getCodeFieldType())
   code: string;
 
   @ManyToOne(() => Account, (account) => account.contracts)
@@ -37,8 +39,15 @@ export class AccountContract extends PollingEntity {
   static init(accountAddress: string, name: string, code: string) {
     return Object.assign<AccountContract, any>(new AccountContract(), {
       id: `${accountAddress}.${name}`,
+      accountAddress: ensurePrefixedAddress(accountAddress),
       name,
       code,
     });
   }
+}
+
+function getCodeFieldType() {
+  return ["mariadb", "mysql"].includes(env.DATABASE_TYPE)
+    ? "mediumtext"
+    : "text";
 }
