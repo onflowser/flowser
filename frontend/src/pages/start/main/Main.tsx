@@ -13,14 +13,11 @@ import { ReactComponent as CaretIcon } from "../../../shared/assets/icons/caret.
 import { ReactComponent as PlusIcon } from "../../../shared/assets/icons/plus.svg";
 import { useProjectApi } from "../../../shared/hooks/project-api";
 import { useQuery } from "react-query";
-import Code from "../../../shared/components/code/Code";
-import ConfirmDialog from "../../../shared/components/confirm-dialog/ConfirmDialog";
 import splitbee from "@splitbee/web";
 
 const Main: FunctionComponent<any> = () => {
   const history = useHistory();
   const [error, setError] = useState("");
-  const [showEmulatorDialog, setEmulatorDialog] = useState(false);
   const { useProject, projects, isLoadingProjects, currentProject } =
     useProjectApi();
   const defaultProjects = projects.filter((p: any) => !p.isCustom);
@@ -31,7 +28,6 @@ const Main: FunctionComponent<any> = () => {
 
   const emulator = getDefaultProject("emulator");
   const testnet = getDefaultProject("testnet");
-  const mainnet = getDefaultProject("mainnet");
 
   useEffect(() => {
     if (currentProject) {
@@ -64,36 +60,6 @@ const Main: FunctionComponent<any> = () => {
   return (
     <>
       {error && <div className={classes.errors}>{error}</div>}
-      {showEmulatorDialog && (
-        <ConfirmDialog
-          className={classes.emulatorDialog}
-          onClose={() => setEmulatorDialog(false)}
-          onConfirm={() => onQuickstart("emulator")}
-          confirmBtnLabel="CONTINUE"
-          cancelBtnLabel="CANCEL"
-        >
-          <h3>Quick notice 👀</h3>
-          <p>
-            If you would like flowser to connect to your own emulator, you will
-            need to start flow emulator on different ports.
-          </p>
-          <br />
-          <p>Here is an example flow-cli (v0.28.*) command that you can use:</p>
-          <Code code={`flow emulator --port=3570 --http-port=8081`} />
-          <br />
-          <p>
-            For more info on Flow CLI check out the{" "}
-            <a
-              target="_blank"
-              href="https://docs.onflow.org/flow-cli/start-emulator/"
-              rel="noreferrer"
-            >
-              official docs
-            </a>
-            .
-          </p>
-        </ConfirmDialog>
-      )}
       <div className={classes.container}>
         <img src={Logo} alt="FLOWSER" />
         <div className={classes.header}>
@@ -109,7 +75,7 @@ const Main: FunctionComponent<any> = () => {
           )}
         </div>
         <IconButton
-          onClick={() => setEmulatorDialog(true)}
+          onClick={() => onQuickstart("emulator")}
           variant="big"
           icon={<CaretIcon className={classes.caret} />}
           iconPosition="after-end"
@@ -125,15 +91,6 @@ const Main: FunctionComponent<any> = () => {
           disabled={!testnet}
         >
           TESTNET
-        </IconButton>
-        <IconButton
-          onClick={() => onQuickstart("mainnet")}
-          variant="big"
-          icon={<CaretIcon className={classes.caret} />}
-          iconPosition="after-end"
-          disabled={!mainnet}
-        >
-          MAINNET
         </IconButton>
 
         <IconButton

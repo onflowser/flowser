@@ -38,7 +38,6 @@ export class AccountContract extends PollingEntity {
 
   static init(accountAddress: string, name: string, code: string) {
     return Object.assign<AccountContract, any>(new AccountContract(), {
-      id: `${accountAddress}.${name}`,
       accountAddress: ensurePrefixedAddress(accountAddress),
       name,
       code,

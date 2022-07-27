@@ -184,9 +184,10 @@ export class ProjectsService {
   private async setComputedFields(project: Project) {
     if (project.hasGatewayConfiguration()) {
       const { address, port } = project.gateway;
-      const pingable =
-        project.isOfficialNetwork() ||
-        (await FlowGatewayService.isPingable(address, port));
+      // Assume non emulator networks are pingable
+      const pingable = project.hasEmulatorGateway()
+        ? await FlowGatewayService.isPingable(address, port)
+        : true;
       return plainToClass(Project, { ...project, pingable });
     } else {
       return project;

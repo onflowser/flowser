@@ -6,12 +6,6 @@ import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import config from "../../config";
 
-export enum FlowNetworks {
-  MAINNET = "mainnet",
-  TESTNET = "testnet",
-  EMULATOR = "emulator",
-}
-
 @Entity({ name: "projects" })
 export class Project extends PollingEntity {
   @PrimaryColumn()
@@ -50,17 +44,6 @@ export class Project extends PollingEntity {
     );
   }
 
-  @AfterLoad()
-  temporaryOverWriteGatewayConfig() {
-    if (this.isFlowserManagedEmulator()) {
-      // fcl connects to a REST API provided by accessNode.api
-      this.gateway = new GatewayConfigurationEntity("http://127.0.0.1", 8080);
-    } else if (this.isUserManagedEmulator()) {
-      // user must run emulator on non-default flow emulator port
-      this.gateway.port = config.userManagedEmulatorPort;
-    }
-  }
-
   static init(dto: CreateProjectDto) {
     return Object.assign(new Project(), {
       id: toKebabCase(dto.name),
@@ -80,41 +63,9 @@ export class Project extends PollingEntity {
     return this.startBlockHeight !== null;
   }
 
-  isEmulator() {
-    return this.isAnyNetwork([FlowNetworks.EMULATOR]);
-  }
-
-  isOfficialNetwork() {
-    return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
-  }
-
-  isUserManagedEmulator() {
-    return this.id === "emulator";
-  }
-
-  isFlowserManagedEmulator() {
-    return (
-      this.isAnyNetwork([FlowNetworks.EMULATOR]) &&
-      !this.isUserManagedEmulator()
-    );
-  }
-
-  isAnyNetwork(networks: FlowNetworks[]) {
-    // network type is determined by project.id
-    // only managed emulator projects can have arbitrary id values
-    // for other projects network type must equal to it's id
-    const officialNetworkIds = ["mainnet", "testnet"];
-    for (let network of networks) {
-      let isMatch = false;
-      if (network === FlowNetworks.EMULATOR) {
-        isMatch = !officialNetworkIds.includes(this.id);
-      } else {
-        isMatch = this.id === network;
-      }
-      if (isMatch) {
-        return true;
-      }
-    }
-    return false;
+  hasEmulatorGateway() {
+    // Testnet usage is in beta, main-net won't be support
+    // TODO: better handle emulator gateway detection (address could also be an IP)
+    return this.gateway.address.includes("localhost");
   }
 }
