@@ -81,7 +81,7 @@ export class FlowAggregatorService {
 
     // service account exist only on emulator chains
     if (this.project.isEmulator() && !this.serviceAccountBootstrapped) {
-      // TODO: storage server hangs up when using flow-cli@v0.31
+      // FIXME(milestone-2): storage server hangs up when using flow-cli@v0.31
       this.logger.debug("Bootstrapping service account");
 
       await queryRunner.startTransaction();
@@ -274,12 +274,11 @@ export class FlowAggregatorService {
     ]);
   }
 
-  // TODO: when do we need to update the account storage?
+  // TODO(milestone-2): when do we need to update the account storage?
   async setUpdatedAccountStorage(account: Account) {
     // storage data API works only for local emulator for now
     if (this.project.isEmulator()) {
-      // FIXME: temporary disabled storage functionality due to bellow pending task
-      // https://www.notion.so/flowser/Migrate-to-up-to-date-flow-cli-version-a2a3837d11b9451bb0df1751620bbe1d
+      // TODO(milestone-2): enable this when we integrate the storage data API
       // account.storage = await this.storageDataService.getStorageData(address);
     }
   }

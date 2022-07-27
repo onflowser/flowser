@@ -4,9 +4,8 @@ export const defaultProjects = [
     name: "Emulator",
     isCustom: false,
     gateway: {
-      // TODO: extract this to env variable to support docker/non-docker environments
-      // gateway port is defined at run-time with USER_MANAGED_EMULATOR_PORT env variable
       address: "http://localhost",
+      // gateway port is defined at run-time with USER_MANAGED_EMULATOR_PORT env variable
       port: 8080,
     },
     emulator: null,

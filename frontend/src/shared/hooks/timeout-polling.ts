@@ -12,7 +12,7 @@ export interface TimeoutPollingHook<T extends PollingEntity> {
   data: T[];
 }
 
-// TODO: define shared types between frontend/backend
+// TODO(milestone-2): define shared types between frontend/backend
 export interface PollingEntity {
   createdAt: string;
   updatedAt: string;
@@ -30,10 +30,10 @@ export type PollingResponse<T extends PollingEntity> = {
   };
 };
 
-// TODO: redefine arguments in object form
+// TODO(milestone-2): redefine arguments in object form
 export const useTimeoutPolling = <T extends PollingEntity>(
   resource: string,
-  resourceIdKey: keyof T, // TODO: should this be required?
+  resourceIdKey: keyof T, // TODO(milestone-2): should this be required?
   interval?: number,
   newestFirst = true
 ): TimeoutPollingHook<T> => {

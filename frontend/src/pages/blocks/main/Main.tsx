@@ -18,7 +18,7 @@ const Main: FunctionComponent<any> = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
   const { formatDate } = useFormattedDate();
-  // TODO: fix types
+  // TODO(milestone-2): fix types
   const { data: transactions, firstFetch } = useTimeoutPolling<any>(
     "/api/blocks/polling",
     "id"

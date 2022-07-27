@@ -32,7 +32,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
   const { highlightLogKeywords } = useSyntaxHighlighter();
   const miniLogRef = createRef<HTMLDivElement>();
   const bigLogRef = createRef<HTMLDivElement>();
-  // TODO: fix types
+  // TODO(milestone-2): fix types
   const { data } = useTimeoutPolling<any>(
     "/api/logs/polling",
     "id",

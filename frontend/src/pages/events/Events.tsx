@@ -25,7 +25,7 @@ const Events: FunctionComponent<Props> = (props) => {
   const [openedLog, setOpenedLog] = useState("");
   const { formatDate } = useFormattedDate();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
-  // TODO: fix types
+  // TODO(milestone-2): fix types
   const { data, firstFetch } = useTimeoutPolling<any>(
     `/api/events/polling`,
     "id"

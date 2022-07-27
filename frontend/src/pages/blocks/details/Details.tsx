@@ -34,7 +34,7 @@ const Details: FunctionComponent<any> = () => {
   ];
 
   const { isLoading, data } = useDetailsQuery(`/api/blocks/${blockId}`);
-  // TODO: fix types
+  // TODO(milestone-2): fix types
   const { data: transactions } = useTimeoutPolling<any>(
     `/api/blocks/${blockId}/transactions/polling`,
     "id"

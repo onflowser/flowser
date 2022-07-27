@@ -65,7 +65,7 @@ export class ProjectsService {
   async cleanupProject() {
     try {
       // remove all existing data of previously used project
-      // TODO: persist data for projects with "persist" flag
+      // TODO(milestone-2): persist data for projects by default?
 
       // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([
@@ -194,7 +194,7 @@ export class ProjectsService {
   }
 
   private handleDatabaseError(error) {
-    // TODO: how to handle error for SQL
+    // TODO(milestone-1): how to handle errors for SQL
     switch (error.code) {
       case 11000:
         throw new ConflictException("Project name already exists");

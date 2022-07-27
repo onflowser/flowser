@@ -3,6 +3,7 @@ import { AccountsStorage } from "../entities/storage.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+// TODO(milestone-2): implement this class
 @Injectable()
 export class StorageService {
   constructor(
@@ -17,8 +18,6 @@ export class StorageService {
   }
 
   async updateAccountStorage(address: string, newStorage: AccountsStorage[]) {
-    // TODO: implement in later milestone
-    // https://www.notion.so/flowser/Migrate-to-up-to-date-flow-cli-version-a2a3837d11b9451bb0df1751620bbe1d
     throw new NotImplementedException();
   }
 
