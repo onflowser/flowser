@@ -7,10 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "source .envrc && lerna run start:dev --parallel",
     "bootstrap": "npm i && lerna bootstrap && npm run prepare && flow init",
     "prepare": "husky install",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\"",
-    "start:dev": "concurrently --kill-others --names backend,frontend,flow-emulator,flow-dev-wallet \"npm:backend:start:dev\" \"npm:frontend:start:dev\" \"npm:flow-cli:emulator:start\" \"npm:flow-cli:dev-wallet:start\"",
     "backend:start:dev": "cd backend && npm run start:debug",
     "frontend:start:dev": "cd frontend && npm run start",
     "flow-cli:emulator:start": "flow emulator --port=3570 --admin-port=8081",
@@ -33,7 +33,6 @@
   },
   "homepage": "https://github.com/onflowser/flowser#readme",
   "devDependencies": {
-    "concurrently": "^7.3.0",
     "husky": "^8.0.1",
     "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"

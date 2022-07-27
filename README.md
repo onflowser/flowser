@@ -27,7 +27,7 @@ git clone https://github.com/onflowser/flowser
 ### 2. Install dependencies
 
 The following system dependencies are required:
-- Node.js (tested on v16.7)
+- Node.js (tested on v14)
 - npm
 - [flow-cli](https://docs.onflow.org/flow-cli/install/) (works with < v0.28.3)
 
@@ -41,7 +41,7 @@ npm run bootstrap
 
 The following command will start Flowser along with Flow emulator and development wallet.
 ```bash
-npm run start:dev
+npm start
 ```
 
 ### 4. Open in browser
