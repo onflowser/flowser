@@ -138,48 +138,48 @@ export class FlowAggregatorService {
       return this.logger.debug(`failed to fetch block data: ${e.message}`);
     }
 
-    const events = data.map(({ events }) => events).flat();
-    const transactions = data.map(({ transactions }) => transactions).flat();
-    const blocks = data.map(({ block }) => block);
+    const events = data
+      .map(({ events }) => events)
+      .flat()
+      .map((event) => Event.init(event));
+    const transactions = data
+      .map(({ transactions }) => transactions)
+      .flat()
+      .map((transaction) => Transaction.init(transaction));
+    const blocks = data.map(({ block }) => Block.init(block));
+
+    // Process events first, so that transactions & events can reference created users.
+    await this.processEvents(events);
 
     const blockPromises = Promise.all(
-      blocks.map((e) =>
+      blocks.map((block) =>
         this.blockService
-          .create(Block.init(e))
+          .create(block)
           .catch((e) =>
             this.logger.error(`block save error: ${e.message}`, e.stack)
           )
       )
     );
     const transactionPromises = Promise.all(
-      transactions.map((e) =>
-        this.handleTransactionCreated(Transaction.init(e)).catch((e) =>
+      transactions.map((transaction) =>
+        this.handleTransactionCreated(transaction).catch((e) =>
           this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
     const eventPromises = Promise.all(
-      events.map((e) =>
+      events.map((event) =>
         this.eventService
-          .create(Event.init(e))
+          .create(event)
           .catch((e) =>
             this.logger.error(`event save error: ${e.message}`, e.stack)
           )
-      )
-    );
-    const eventHandlingPromises = Promise.all(
-      events.map((e) =>
-        this.handleEvent(Event.init(e)).catch((e) => {
-          this.logger.error(`event handling error: ${e.message}`, e.stack);
-        })
       )
     );
 
     try {
       await queryRunner.startTransaction();
 
-      // Process events first, so that transactions can reference created users.
-      await eventHandlingPromises;
       await Promise.all([blockPromises, transactionPromises, eventPromises]);
 
       await queryRunner.commitTransaction();
@@ -190,6 +190,32 @@ export class FlowAggregatorService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async processEvents(events: Event[]) {
+    const accountCreatedEvents = events.filter(
+      (event) => event.type === "flow.AccountCreated"
+    );
+    const restEvents = events.filter(
+      (event) => event.type !== "flow.AccountCreated"
+    );
+    await Promise.all(
+      accountCreatedEvents.map((event) =>
+        this.handleEvent(event).catch((e) => {
+          this.logger.error(
+            `flow.AccountCreated event handling error: ${e.message}`,
+            e.stack
+          );
+        })
+      )
+    );
+    await Promise.all(
+      restEvents.map((event) =>
+        this.handleEvent(event).catch((e) => {
+          this.logger.error(`event handling error: ${e.message}`, e.stack);
+        })
+      )
+    );
   }
 
   // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
@@ -239,6 +265,7 @@ export class FlowAggregatorService {
       AccountKey.init(address, key)
     );
     await this.accountService.create(account);
+    console.log(`Account ${address} created`);
     await Promise.all([
       this.accountKeysService.updateAccountKeys(address, newKeys),
       this.contractService.updateAccountContracts(

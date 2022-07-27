@@ -20,6 +20,7 @@ export class Event extends PollingEntity {
   @Column()
   transactionIndex: number;
 
+  // TODO(milestone-2): define type
   @Column("simple-json")
   data: object;
 

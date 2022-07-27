@@ -19,6 +19,7 @@ export class Block extends PollingEntity {
   @Column("simple-json")
   collectionGuarantees: CollectionGuarantee[];
 
+  // TODO(milestone-2): define type
   @Column("simple-json")
   blockSeals: any[];
 
