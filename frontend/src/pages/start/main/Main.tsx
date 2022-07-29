@@ -51,7 +51,8 @@ const Main: FunctionComponent<any> = () => {
     }
   };
 
-  const isHosted = window.origin === "https://app.flowser.dev";
+  const isEmulatorAvailable = Boolean(emulator?.pingable);
+  const isTestnetAvailable = Boolean(testnet?.pingable);
 
   const onConfigure = useCallback(() => {
     history.push(`/${routes.start}/configure`);
@@ -67,19 +68,13 @@ const Main: FunctionComponent<any> = () => {
           <span className={classes.version}>
             {flowserVersion?.data?.version}
           </span>
-          {isHosted && (
-            <p className={classes.betaWarning}>
-              Hosted version of Flowser is still in beta. In this stage, only a
-              single project can be used at the time.{" "}
-            </p>
-          )}
         </div>
         <IconButton
           onClick={() => onQuickstart("emulator")}
           variant="big"
           icon={<CaretIcon className={classes.caret} />}
           iconPosition="after-end"
-          disabled={!emulator}
+          disabled={!isEmulatorAvailable}
         >
           EMULATOR
         </IconButton>
@@ -88,7 +83,7 @@ const Main: FunctionComponent<any> = () => {
           variant="big"
           icon={<CaretIcon className={classes.caret} />}
           iconPosition="after-end"
-          disabled={!testnet}
+          disabled={!isTestnetAvailable}
         >
           TESTNET
         </IconButton>

@@ -48,15 +48,15 @@ const Navigation = (props: any) => {
 
   const onSwitchProject = useCallback(async () => {
     setIsSwitching(true);
+    history.replace(`/${routes.start}`);
+    try {
+      await axios.delete("/api/projects/use"); // stop current emulator
+    } catch (e) {
+      // nothing critical happened, ignore the error
+      console.warn("Couldn't stop the emulator: ", e);
+    }
     try {
       await logout(); // logout from dev-wallet, because config may change
-      try {
-        await axios.delete("/api/projects/use"); // stop current emulator
-      } catch (e) {
-        // nothing critical happened, ignore the error
-        console.warn("Couldn't stop the emulator: ", e);
-      }
-      history.push(`/${routes.start}`);
     } finally {
       setIsSwitching(false);
     }
