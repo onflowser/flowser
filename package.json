@@ -7,21 +7,14 @@
     "doc": "docs"
   },
   "scripts": {
-    "bootstrap": "npm i && lerna bootstrap && npm run prepare",
+    "start": "source .envrc && lerna run start:dev --parallel",
+    "bootstrap": "npm i && lerna bootstrap && npm run prepare && flow init",
     "prepare": "husky install",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\"",
-
-    "dev:start": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d",
-    "dev:stop": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml down",
-    "dev:build": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml build",
-    "dev:logs": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml logs -f",
-    "dev:rebuild": "npm run dev:stop && npm run dev:build && npm run dev:start",
-
-    "prod:start": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d",
-    "prod:stop": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down",
-    "prod:build": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml build",
-    "prod:logs": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml logs -f",
-    "prod:rebuild": "npm run prod:stop && npm run prod:build && npm run prod:start"
+    "backend:start:dev": "cd backend && npm run start:debug",
+    "frontend:start:dev": "cd frontend && npm run start",
+    "flow-cli:emulator:start": "flow emulator --port=3570 --admin-port=8081",
+    "flow-cli:dev-wallet:start": "flow dev-wallet"
   },
   "repository": {
     "type": "git",
@@ -40,8 +33,8 @@
   },
   "homepage": "https://github.com/onflowser/flowser#readme",
   "devDependencies": {
-    "lerna": "^4.0.0",
     "husky": "^8.0.1",
+    "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"
   }
 }

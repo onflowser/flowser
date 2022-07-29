@@ -32,7 +32,13 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
   const { highlightLogKeywords } = useSyntaxHighlighter();
   const miniLogRef = createRef<HTMLDivElement>();
   const bigLogRef = createRef<HTMLDivElement>();
-  const { data } = useTimeoutPolling("/api/logs/polling", "_id", 1000, false);
+  // TODO(milestone-2): fix types
+  const { data } = useTimeoutPolling<any>(
+    "/api/logs/polling",
+    "id",
+    1000,
+    false
+  );
   const logs = data ? data.map((log: any) => log.data) : [];
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { filteredData } = useFilterData(logs, searchTerm);

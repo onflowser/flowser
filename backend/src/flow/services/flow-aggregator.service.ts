@@ -21,6 +21,11 @@ import { LogsService } from "../../logs/logs.service";
 import { Log } from "../../logs/entities/log.entity";
 import { StorageDataService } from "./storage-data.service";
 import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
+import { AccountContract } from "../../accounts/entities/contract.entity";
+import { KeysService } from "../../accounts/services/keys.service";
+import { AccountKey } from "../../accounts/entities/key.entity";
+import { ensurePrefixedAddress } from "../../utils";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -32,12 +37,14 @@ export class FlowAggregatorService {
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
+    private accountKeysService: KeysService,
     private contractService: ContractsService,
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
     private flowEmulatorService: FlowEmulatorService,
     private logsService: LogsService,
-    private storageDataService: StorageDataService
+    private storageDataService: StorageDataService,
+    private dataSource: DataSource
   ) {}
 
   configureProjectContext(project?: Project) {
@@ -70,15 +77,25 @@ export class FlowAggregatorService {
       return;
     }
 
+    const queryRunner = this.dataSource.createQueryRunner();
+
     // service account exist only on emulator chains
-    if (this.project.isEmulator() && !this.serviceAccountBootstrapped) {
-      // TODO: storage server hangs up when using flow-cli@v0.31
+    if (this.project.hasEmulatorGateway() && !this.serviceAccountBootstrapped) {
+      // FIXME(milestone-2): storage server hangs up when using flow-cli@v0.31
       this.logger.debug("Bootstrapping service account");
+
+      await queryRunner.startTransaction();
       try {
         await this.bootstrapServiceAccount();
+
+        await queryRunner.commitTransaction();
       } catch (e) {
-        this.logger.error("Service account bootstrap error: ", e.message);
+        await queryRunner.rollbackTransaction();
+
+        this.logger.error("Service account bootstrap error", e);
         return; // retry in the next iteration
+      } finally {
+        await queryRunner.release();
       }
       this.serviceAccountBootstrapped = true;
     }
@@ -121,115 +138,182 @@ export class FlowAggregatorService {
       return this.logger.debug(`failed to fetch block data: ${e.message}`);
     }
 
-    const events = data.map(({ events }) => events).flat();
-    const transactions = data.map(({ transactions }) => transactions).flat();
-    const blocks = data.map(({ block }) => block);
+    const events = data
+      .map(({ events }) => events)
+      .flat()
+      .map((event) => Event.init(event));
+    const transactions = data
+      .map(({ transactions }) => transactions)
+      .flat()
+      .map((transaction) => Transaction.init(transaction));
+    const blocks = data.map(({ block }) => Block.init(block));
+
+    // Process events first, so that transactions & events can reference created users.
+    await this.processEvents(events);
+
+    const blockPromises = Promise.all(
+      blocks.map((block) =>
+        this.blockService
+          .create(block)
+          .catch((e) =>
+            this.logger.error(`block save error: ${e.message}`, e.stack)
+          )
+      )
+    );
+    const transactionPromises = Promise.all(
+      transactions.map((transaction) =>
+        this.handleTransactionCreated(transaction).catch((e) =>
+          this.logger.error(`transaction save error: ${e.message}`, e.stack)
+        )
+      )
+    );
+    const eventPromises = Promise.all(
+      events.map((event) =>
+        this.eventService
+          .create(event)
+          .catch((e) =>
+            this.logger.error(`event save error: ${e.message}`, e.stack)
+          )
+      )
+    );
 
     try {
-      // store fetched data
-      await Promise.all(
-        blocks.map((e) =>
-          this.blockService
-            .create(Block.init(e))
-            .catch((e) =>
-              this.logger.error(`block save error: ${e.message}`, e.stack)
-            )
-        )
-      );
-      await Promise.all(
-        transactions.map((e) =>
-          this.handleTransactionCreated(Transaction.init(e)).catch((e) =>
-            this.logger.error(`transaction save error: ${e.message}`, e.stack)
-          )
-        )
-      );
-      await Promise.all(
-        events.map((e) =>
-          this.eventService
-            .create(Event.init(e))
-            .catch((e) =>
-              this.logger.error(`event save error: ${e.message}`, e.stack)
-            )
-        )
-      );
-      await Promise.all(events.map((e) => this.handleEvent(Event.init(e))));
+      await queryRunner.startTransaction();
+
+      await Promise.all([blockPromises, transactionPromises, eventPromises]);
+
+      await queryRunner.commitTransaction();
     } catch (e) {
-      // TODO: revert writes (wrap in db transaction)
-      // check https://github.com/onflowser/flowser/issues/6
-      this.logger.error(`data store error: ${e.message}`, e.stack);
+      await queryRunner.rollbackTransaction();
+
+      await this.logger.error(`Failed to store latest data`, e, e.stack);
+    } finally {
+      await queryRunner.release();
     }
+  }
+
+  async processEvents(events: Event[]) {
+    const accountCreatedEvents = events.filter(
+      (event) => event.type === "flow.AccountCreated"
+    );
+    const restEvents = events.filter(
+      (event) => event.type !== "flow.AccountCreated"
+    );
+    await Promise.all(
+      accountCreatedEvents.map((event) =>
+        this.handleEvent(event).catch((e) => {
+          this.logger.error(
+            `flow.AccountCreated event handling error: ${e.message}`,
+            e.stack
+          );
+        })
+      )
+    );
+    await Promise.all(
+      restEvents.map((event) =>
+        this.handleEvent(event).catch((e) => {
+          this.logger.error(`event handling error: ${e.message}`, e.stack);
+        })
+      )
+    );
   }
 
   // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
   async handleEvent(event: Event) {
-    this.logger.debug(`handling event: ${event.type}`);
     const { data, type } = event;
+    this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
     const { address, contract } = data as any;
+    // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
       case "flow.AccountCreated":
-        return this.handleAccountCreated(address);
+        return this.storeNewAccountWithContractsAndKeys(address);
       case "flow.AccountKeyAdded":
-        return this.handleAccountKeyAdded(address);
+        return this.updateStoredAccountKeys(address);
       case "flow.AccountKeyRemoved":
-        return this.handleAccountKeyRemoved(address);
+        return this.updateStoredAccountKeys(address);
       case "flow.AccountContractAdded":
-        return this.handleAccountContractAdded(address, contract);
+        return this.updateStoredAccountContracts(address);
       case "flow.AccountContractUpdated":
-        return this.handleAccountContractUpdated(address, contract);
+        return this.updateStoredAccountContracts(address);
       case "flow.AccountContractRemoved":
-        return this.handleAccountContractRemoved(address, contract);
+        return this.updateStoredAccountContracts(address);
       default:
         return null; // not a core event, ignore it
     }
   }
 
   async handleTransactionCreated(tx: Transaction) {
+    // TODO: Should we also mark all tx.authorizers as updated?
+    const payerAddress = ensurePrefixedAddress(tx.payer);
     return Promise.all([
       this.transactionService.create(tx),
-      this.updateAccount(`0x${tx.payer}`),
+      this.accountService.markUpdated(payerAddress),
     ]);
   }
 
-  async handleAccountCreated(address: string) {
-    return this.updateAccount(address, { createdAt: Date.now() });
+  async storeNewAccountWithContractsAndKeys(address) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    const account = Account.init(flowAccount);
+    const newContracts = Object.keys(flowAccount.contracts).map((name) =>
+      AccountContract.init(
+        flowAccount.address,
+        name,
+        flowAccount.contracts[name]
+      )
+    );
+    const newKeys = flowAccount.keys.map((key) =>
+      AccountKey.init(address, key)
+    );
+    await this.accountService.create(account);
+    console.log(`Account ${address} created`);
+    await Promise.all([
+      this.accountKeysService.updateAccountKeys(address, newKeys),
+      this.contractService.updateAccountContracts(
+        account.address,
+        newContracts
+      ),
+    ]);
   }
 
-  async handleAccountKeyAdded(address: string) {
-    return this.updateAccount(address);
+  async updateStoredAccountKeys(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    await Promise.all([
+      this.accountService.markUpdated(address),
+      this.accountKeysService.updateAccountKeys(
+        address,
+        flowAccount.keys.map((key) => AccountKey.init(address, key))
+      ),
+    ]);
   }
 
-  async handleAccountKeyRemoved(address: string) {
-    return this.handleAccountKeyAdded(address);
+  async updateStoredAccountContracts(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    const account = Account.init(flowAccount);
+    const newContracts = Object.keys(flowAccount.contracts).map((name) =>
+      AccountContract.init(flowAccount.address, name, flowAccount[name])
+    );
+    await Promise.all([
+      this.accountService.markUpdated(address),
+      this.contractService.updateAccountContracts(
+        account.address,
+        newContracts
+      ),
+    ]);
   }
 
-  async handleAccountContractAdded(address: string, contractName: string) {
-    return this.updateAccount(address);
-  }
-
-  async handleAccountContractUpdated(address: string, contractName: string) {
-    return this.updateAccount(address);
-  }
-
-  async handleAccountContractRemoved(address: string, contractName: string) {
-    return this.updateAccount(address);
-  }
-
-  async updateAccount(
-    address: string,
-    props: Partial<Account> = { updatedAt: Date.now() }
-  ) {
-    const account = await this.flowGatewayService.getAccount(address);
+  // TODO(milestone-2): when do we need to update the account storage?
+  async setUpdatedAccountStorage(account: Account) {
     // storage data API works only for local emulator for now
-    if (this.project.isEmulator()) {
-      account.storage = await this.storageDataService.getStorageData(address);
+    if (this.project.hasEmulatorGateway()) {
+      // TODO(milestone-2): enable this when we integrate the storage data API
+      // account.storage = await this.storageDataService.getStorageData(address);
     }
-    return this.accountService.replace(address, Account.init(account, props));
   }
 
   async bootstrapServiceAccount() {
     const { serviceAddress } = defaultEmulatorFlags;
     try {
-      await this.handleAccountCreated(serviceAddress);
+      await this.storeNewAccountWithContractsAndKeys(serviceAddress);
     } catch (error) {
       // ignore duplicate key error (with code 11000)
       if (error.code !== 11000) {

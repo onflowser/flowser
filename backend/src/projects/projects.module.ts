@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { ProjectsService } from "./projects.service";
 import { ProjectsController } from "./projects.controller";
 import { Project } from "./entities/project.entity";
@@ -24,4 +24,16 @@ import { TransactionsModule } from "../transactions/transactions.module";
   providers: [ProjectsService],
   exports: [ProjectsService],
 })
-export class ProjectsModule {}
+export class ProjectsModule {
+  private readonly logger = new Logger(ProjectsModule.name);
+  constructor(private readonly projectsService: ProjectsService) {
+    projectsService
+      .seedDefaultProjects()
+      .then(() => {
+        this.logger.debug("Projects seeded!");
+      })
+      .catch((error) => {
+        this.logger.debug("Failed to seed projects", error);
+      });
+  }
+}

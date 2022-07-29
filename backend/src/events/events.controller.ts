@@ -1,14 +1,8 @@
-import {
-  Controller,
-  Get,
-  Param,
-  UseInterceptors,
-  Query,
-  ParseIntPipe,
-} from "@nestjs/common";
+import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
 import { EventsService } from "./events.service";
-import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
+import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller()
 export class EventsController {
@@ -30,7 +24,7 @@ export class EventsController {
   @UseInterceptors(PollingResponseInterceptor)
   findAllNewByTransaction(
     @Param("id") transactionId,
-    @Query("timestamp", ParseIntPipe) timestamp
+    @Query("timestamp", ParseUnixTimestampPipe) timestamp
   ) {
     return this.eventsService.findAllByTransactionNewerThanTimestamp(
       transactionId,
@@ -40,13 +34,7 @@ export class EventsController {
 
   @Get("/events/polling")
   @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseIntPipe) timestamp) {
+  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
     return this.eventsService.findAllNewerThanTimestamp(timestamp);
-  }
-
-  @ApiParam({ name: "id", type: String })
-  @Get("/events/:id")
-  findOne(@Param("id") id: string) {
-    return this.eventsService.findOne(id);
   }
 }

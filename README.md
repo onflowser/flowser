@@ -26,34 +26,27 @@ git clone https://github.com/onflowser/flowser
 
 ### 2. Install dependencies
 
-You need to have Docker and docker-compose installed on your system in order to run Flowser. 
+The following system dependencies are required:
+- Node.js (tested on v14)
+- npm
+- [flow-cli](https://docs.onflow.org/flow-cli/install/) (works with < v0.28.3)
 
-See: [Docker installation instructions](https://www.docker.com/get-started)
+After prerequisites are installed, you can run the following command to set up local environment:
+
+```bash
+npm run bootstrap
+```
 
 ### 3. Start Flowser
 
-This command will start Flowser with default configuration (recommended).
-
+The following command will start Flowser along with Flow emulator and development wallet.
 ```bash
-bash run.sh start
-
-# or use npm if you have node already installed
-npm run prod:start
+npm start
 ```
-
-If flowser started successfully, you should see the bellow output:
-```
-Creating frontend-prod ... done
-Creating database      ... done
-Creating backend-prod  ... done
-Creating dev-wallet    ... done
-```
-
-If you encounter any issues during app build or container start, check out our [Troubleshooting Guide](https://docs.flowser.dev/resources/development/#troubleshooting).
 
 ### 4. Open in browser
 
-After flowser had successfully started, you can open the app in your favourite browser at [http://localhost:6060](http://localhost:6060) 🥳.
+Flowser should automatically open in your default browser.
 
 Good job, you can now start flowsing around the flow blockchain 🏄.
 

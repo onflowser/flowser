@@ -98,7 +98,7 @@ export class FlowCliService {
     this.data = {
       emulators: {
         default: {
-          port: parseInt(this.emulatorConfig.rpcServerPort as string),
+          port: this.emulatorConfig.rpcServerPort,
           serviceAccount: "emulator-account",
         },
       },

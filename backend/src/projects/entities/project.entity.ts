@@ -1,24 +1,14 @@
-import { Column, Entity, Index, ObjectIdColumn } from "typeorm";
+import { AfterLoad, Column, Entity, Index, PrimaryColumn } from "typeorm";
 import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
-import { toKebabCase } from "../../utils";
+import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Type } from "class-transformer";
-
-export enum FlowNetworks {
-  MAINNET = "mainnet",
-  TESTNET = "testnet",
-  EMULATOR = "emulator",
-}
+import { PollingEntity } from "../../common/entities/polling.entity";
+import config from "../../config";
 
 @Entity({ name: "projects" })
 export class Project extends PollingEntity {
-  @ObjectIdColumn()
-  _id: string;
-
-  @Column()
-  @Index({ unique: true })
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -26,23 +16,33 @@ export class Project extends PollingEntity {
   name: string;
 
   @Column()
-  pingable: boolean;
+  pingable: boolean = false;
 
-  @Column()
-  @Type(() => GatewayConfigurationEntity)
+  @Column("simple-json", { nullable: true })
   gateway: GatewayConfigurationEntity;
 
-  @Column()
-  @Type(() => EmulatorConfigurationEntity)
+  @Column("simple-json", { nullable: true })
   emulator: EmulatorConfigurationEntity;
 
   @Column("boolean", { default: false })
   isCustom: boolean = false;
 
-  // data will be fetched from this block height
-  // set this undefined to start fetching from latest block
-  @Column()
-  startBlockHeight?: number | undefined = 0;
+  // Blockchain data will be fetched from this block height
+  // Set this null to start fetching from the latest block
+  @Column({ nullable: true })
+  startBlockHeight?: number | null = 0;
+
+  @AfterLoad()
+  unSerializeJsonFields() {
+    this.gateway = serializeEmbeddedTypeORMEntity(
+      new GatewayConfigurationEntity(),
+      this.gateway
+    );
+    this.emulator = serializeEmbeddedTypeORMEntity(
+      new EmulatorConfigurationEntity(),
+      this.emulator
+    );
+  }
 
   static init(dto: CreateProjectDto) {
     return Object.assign(new Project(), {
@@ -51,47 +51,21 @@ export class Project extends PollingEntity {
     });
   }
 
+  hasGatewayConfiguration() {
+    return this.gateway !== null;
+  }
+
+  hasEmulatorConfiguration() {
+    return this.emulator !== null;
+  }
+
   isStartBlockHeightDefined() {
-    return (
-      this.startBlockHeight !== undefined && this.startBlockHeight !== null
-    );
+    return this.startBlockHeight !== null;
   }
 
-  isEmulator() {
-    return this.isAnyNetwork([FlowNetworks.EMULATOR]);
-  }
-
-  isOfficialNetwork() {
-    return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
-  }
-
-  isUserManagedEmulator() {
-    return this.id === "emulator";
-  }
-
-  isFlowserManagedEmulator() {
-    return (
-      this.isAnyNetwork([FlowNetworks.EMULATOR]) &&
-      !this.isUserManagedEmulator()
-    );
-  }
-
-  isAnyNetwork(networks: FlowNetworks[]) {
-    // network type is determined by project.id
-    // only managed emulator projects can have arbitrary id values
-    // for other projects network type must equal to it's id
-    const officialNetworkIds = ["mainnet", "testnet"];
-    for (let network of networks) {
-      let isMatch = false;
-      if (network === FlowNetworks.EMULATOR) {
-        isMatch = !officialNetworkIds.includes(this.id);
-      } else {
-        isMatch = this.id === network;
-      }
-      if (isMatch) {
-        return true;
-      }
-    }
-    return false;
+  hasEmulatorGateway() {
+    // Testnet usage is in beta, main-net won't be support
+    // TODO: better handle emulator gateway detection (address could also be an IP)
+    return this.gateway.address.includes("localhost");
   }
 }

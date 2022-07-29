@@ -1,13 +1,15 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
+import { Account } from "./account.entity";
+import { ensurePrefixedAddress } from "../../utils";
 
 @Entity({ name: "keys" })
 export class AccountKey extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
+  @PrimaryColumn()
   index: number;
+
+  @PrimaryColumn()
+  accountAddress: string;
 
   @Column()
   publicKey: string;
@@ -27,10 +29,13 @@ export class AccountKey extends PollingEntity {
   @Column()
   revoked: boolean;
 
-  static init(flowAccountKeyObject: any) {
-    return Object.assign<AccountKey, any>(
-      new AccountKey(),
-      flowAccountKeyObject
-    );
+  @ManyToOne(() => Account, (account) => account.storage)
+  account: Account;
+
+  static init(accountAddress: string, flowAccountKeyObject: any) {
+    return Object.assign<AccountKey, any>(new AccountKey(), {
+      ...flowAccountKeyObject,
+      accountAddress: ensurePrefixedAddress(accountAddress),
+    });
   }
 }

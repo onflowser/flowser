@@ -1,14 +1,10 @@
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
-import { PollingEntity } from "../../shared/entities/polling.entity";
+import { Column, Entity, PrimaryColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
 import { CollectionGuarantee } from "./collection-guarantee.entity";
 
 @Entity({ name: "blocks" })
 export class Block extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
-  @Index({ unique: true })
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -20,13 +16,14 @@ export class Block extends PollingEntity {
   @Column()
   timestamp: string;
 
-  @Column((type) => CollectionGuarantee)
+  @Column("simple-json")
   collectionGuarantees: CollectionGuarantee[];
 
-  @Column()
+  // TODO(milestone-2): define type
+  @Column("simple-json")
   blockSeals: any[];
 
-  @Column()
+  @Column("simple-array")
   signatures: string[];
 
   static init(flowBlockObject): Block {

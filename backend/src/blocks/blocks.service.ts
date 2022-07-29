@@ -1,48 +1,47 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { MongoRepository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { Block } from "./entities/block.entity";
 import { CreateBlockDto } from "./dto/create-block.dto";
-import { NotFoundException } from "@nestjs/common";
 
 export class BlocksService {
   constructor(
     @InjectRepository(Block)
-    private blockRepository: MongoRepository<Block>
+    private blockRepository: Repository<Block>
   ) {}
 
   async create(createBlockDto: CreateBlockDto): Promise<Block> {
     return this.blockRepository.save(createBlockDto);
   }
 
+  async countAll() {
+    return this.blockRepository.count();
+  }
+
   findAll(): Promise<Block[]> {
     return this.blockRepository.find();
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Block[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Block[]> {
     return this.blockRepository.find({
-      where: {
-        $or: [
-          { createdAt: { $gt: timestamp } },
-          { updatedAt: { $gt: timestamp } },
-        ],
-      },
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
       order: { height: "DESC" },
     });
   }
 
   findLastBlock(): Promise<Block> {
-    return this.blockRepository.findOne({
-      order: { height: "DESC" },
-    });
+    return this.blockRepository
+      .createQueryBuilder("block")
+      .select()
+      .orderBy("block.height", "DESC")
+      .limit(1)
+      .getOne();
   }
 
   async findOne(id: string) {
-    const [block] = await this.blockRepository.find({ where: { id: id } });
-    if (block) {
-      return block;
-    } else {
-      throw new NotFoundException("Block not found");
-    }
+    return this.blockRepository.findOneByOrFail({ id });
   }
 
   removeAll() {

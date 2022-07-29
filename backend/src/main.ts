@@ -3,6 +3,7 @@ import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { writeFile } from "fs";
+import { env } from "./config";
 const packageJson = require("../package.json");
 
 declare const module: any;
@@ -24,7 +25,7 @@ async function bootstrap() {
   SwaggerModule.setup("api", app, document);
 
   app.enableCors();
-  await app.listen(process.env.PORT || 3001);
+  await app.listen(env.HTTP_PORT);
 
   if (module.hot) {
     module.hot.accept();

@@ -34,9 +34,10 @@ const Details: FunctionComponent<any> = () => {
   ];
 
   const { isLoading, data } = useDetailsQuery(`/api/blocks/${blockId}`);
-  const { data: transactions } = useTimeoutPolling(
+  // TODO(milestone-2): fix types
+  const { data: transactions } = useTimeoutPolling<any>(
     `/api/blocks/${blockId}/transactions/polling`,
-    "_id"
+    "id"
   );
   const date = data && new Date(data.timestamp).toISOString();
 

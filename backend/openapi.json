@@ -1,727 +1,697 @@
 {
-    "openapi": "3.0.0",
-    "paths": {
-        "/api/version": {
-            "get": {
-                "operationId": "AppController_getVersion",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects": {
-            "post": {
-                "operationId": "ProjectsController_create",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateProjectDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                }
-            },
-            "get": {
-                "operationId": "ProjectsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/current": {
-            "get": {
-                "operationId": "ProjectsController_findCurrent",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/default": {
-            "get": {
-                "operationId": "ProjectsController_default",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/{id}": {
-            "get": {
-                "operationId": "ProjectsController_findOne",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            },
-            "patch": {
-                "operationId": "ProjectsController_update",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateProjectDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            },
-            "delete": {
-                "operationId": "ProjectsController_remove",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/use": {
-            "delete": {
-                "operationId": "ProjectsController_unUseProject",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/use/{id}": {
-            "post": {
-                "operationId": "ProjectsController_useProject",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/projects/{id}/seed/accounts": {
-            "post": {
-                "operationId": "ProjectsController_seed",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "n",
-                        "required": true,
-                        "in": "query",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/flow/gateway": {
-            "get": {
-                "operationId": "FlowController_getGateway",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/flow/emulator": {
-            "get": {
-                "operationId": "FlowController_getEmulator",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/flow/emulator/logs": {
-            "get": {
-                "operationId": "FlowController_getLogs",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/flow/version": {
-            "get": {
-                "operationId": "FlowController_getVersion",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/logs": {
-            "get": {
-                "operationId": "LogsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/logs/polling": {
-            "get": {
-                "operationId": "LogsController_findAllNew",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/blocks": {
-            "get": {
-                "operationId": "BlocksController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/blocks/polling": {
-            "get": {
-                "operationId": "BlocksController_findAllNew",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/blocks/{id}": {
-            "get": {
-                "operationId": "BlocksController_findOne",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/accounts": {
-            "get": {
-                "operationId": "AccountsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/accounts/polling": {
-            "get": {
-                "operationId": "AccountsController_findAllNew",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/accounts/{address}": {
-            "get": {
-                "operationId": "AccountsController_findOne",
-                "parameters": [
-                    {
-                        "name": "address",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/contracts": {
-            "get": {
-                "operationId": "ContractsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/contracts/polling": {
-            "get": {
-                "operationId": "ContractsController_findAllNew",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/contracts/{id}": {
-            "get": {
-                "operationId": "ContractsController_findOne",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/events": {
-            "get": {
-                "operationId": "EventsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/transactions/{id}/events": {
-            "get": {
-                "operationId": "EventsController_findAllByTransaction",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/transactions/{id}/events/polling": {
-            "get": {
-                "operationId": "EventsController_findAllNewByTransaction",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/events/polling": {
-            "get": {
-                "operationId": "EventsController_findAllNew",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/events/{id}": {
-            "get": {
-                "operationId": "EventsController_findOne",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/transactions": {
-            "get": {
-                "operationId": "TransactionsController_findAll",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/transactions/polling": {
-            "get": {
-                "operationId": "TransactionsController_findAllNew",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/blocks/{id}/transactions": {
-            "get": {
-                "operationId": "TransactionsController_findAllByBlock",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/blocks/{id}/transactions/polling": {
-            "get": {
-                "operationId": "TransactionsController_findAllNewByBlock",
-                "parameters": [
-                    {
-                        "name": "timestamp",
-                        "required": true,
-                        "in": "query",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/transactions/{id}": {
-            "get": {
-                "operationId": "TransactionsController_findOne",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/common/counters": {
-            "get": {
-                "operationId": "CommonController_getCounters",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/version": {
+      "get": {
+        "operationId": "AppController_getVersion",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
         }
+      }
     },
-    "info": {
-        "title": "Flowser",
-        "description": "The Flowser API description",
-        "version": "1.0.0",
-        "contact": {}
-    },
-    "tags": [],
-    "servers": [],
-    "components": {
-        "schemas": {
-            "GatewayConfigurationDto": {
-                "type": "object",
-                "properties": {
-                    "port": {
-                        "type": "number"
-                    },
-                    "address": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "port",
-                    "address"
-                ]
-            },
-            "EmulatorConfigurationDto": {
-                "type": "object",
-                "properties": {
-                    "verboseLogging": {
-                        "type": "boolean"
-                    },
-                    "persist": {
-                        "type": "boolean"
-                    },
-                    "httpServerPort": {
-                        "type": "number"
-                    },
-                    "rpcServerPort": {
-                        "type": "number"
-                    },
-                    "blockTime": {
-                        "type": "number"
-                    },
-                    "servicePrivateKey": {
-                        "type": "string"
-                    },
-                    "servicePublicKey": {
-                        "type": "string"
-                    },
-                    "databasePath": {
-                        "type": "string"
-                    },
-                    "tokenSupply": {
-                        "type": "number"
-                    },
-                    "transactionExpiry": {
-                        "type": "number"
-                    },
-                    "storagePerFlow": {
-                        "type": "number"
-                    },
-                    "minAccountBalance": {
-                        "type": "number"
-                    },
-                    "transactionMaxGasLimit": {
-                        "type": "number"
-                    },
-                    "scriptGasLimit": {
-                        "type": "number"
-                    },
-                    "serviceSignatureAlgorithm": {
-                        "type": "string"
-                    },
-                    "serviceHashAlgorithm": {
-                        "type": "string"
-                    },
-                    "storageLimit": {
-                        "type": "boolean"
-                    },
-                    "transactionFees": {
-                        "type": "boolean"
-                    },
-                    "numberOfInitialAccounts": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "verboseLogging",
-                    "persist",
-                    "httpServerPort",
-                    "rpcServerPort",
-                    "blockTime",
-                    "servicePrivateKey",
-                    "servicePublicKey",
-                    "databasePath",
-                    "tokenSupply",
-                    "transactionExpiry",
-                    "storagePerFlow",
-                    "minAccountBalance",
-                    "transactionMaxGasLimit",
-                    "scriptGasLimit",
-                    "serviceSignatureAlgorithm",
-                    "serviceHashAlgorithm",
-                    "storageLimit",
-                    "transactionFees",
-                    "numberOfInitialAccounts"
-                ]
-            },
-            "CreateProjectDto": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "startBlockHeight": {
-                        "type": "number",
-                        "description": "Data will be fetched from this block height forward."
-                    },
-                    "gateway": {
-                        "$ref": "#/components/schemas/GatewayConfigurationDto"
-                    },
-                    "emulator": {
-                        "description": "Custom emulator configuration, used to start a flowser managed emulator.",
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/EmulatorConfigurationDto"
-                            }
-                        ]
-                    }
-                },
-                "required": [
-                    "name",
-                    "startBlockHeight",
-                    "gateway",
-                    "emulator"
-                ]
-            },
-            "UpdateProjectDto": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "id"
-                ]
+    "/api/projects": {
+      "post": {
+        "operationId": "ProjectsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectDto"
+              }
             }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
         }
+      },
+      "get": {
+        "operationId": "ProjectsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/projects/current": {
+      "get": {
+        "operationId": "ProjectsController_findCurrent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/projects/default": {
+      "get": {
+        "operationId": "ProjectsController_default",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "operationId": "ProjectsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "operationId": "ProjectsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ProjectsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/projects/use": {
+      "delete": {
+        "operationId": "ProjectsController_unUseProject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/projects/use/{id}": {
+      "post": {
+        "operationId": "ProjectsController_useProject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/projects/{id}/seed/accounts": {
+      "post": {
+        "operationId": "ProjectsController_seed",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "n",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/flow/gateway": {
+      "get": {
+        "operationId": "FlowController_getGateway",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/flow/emulator": {
+      "get": {
+        "operationId": "FlowController_getEmulator",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/flow/emulator/logs": {
+      "get": {
+        "operationId": "FlowController_getLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/flow/version": {
+      "get": {
+        "operationId": "FlowController_getVersion",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/logs": {
+      "get": {
+        "operationId": "LogsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/logs/polling": {
+      "get": {
+        "operationId": "LogsController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/blocks": {
+      "get": {
+        "operationId": "BlocksController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/blocks/polling": {
+      "get": {
+        "operationId": "BlocksController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/blocks/{id}": {
+      "get": {
+        "operationId": "BlocksController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts": {
+      "get": {
+        "operationId": "AccountsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts/polling": {
+      "get": {
+        "operationId": "AccountsController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts/{address}": {
+      "get": {
+        "operationId": "AccountsController_findOne",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/contracts": {
+      "get": {
+        "operationId": "ContractsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/contracts/polling": {
+      "get": {
+        "operationId": "ContractsController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/contracts/{id}": {
+      "get": {
+        "operationId": "ContractsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/events": {
+      "get": {
+        "operationId": "EventsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/transactions/{id}/events": {
+      "get": {
+        "operationId": "EventsController_findAllByTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/transactions/{id}/events/polling": {
+      "get": {
+        "operationId": "EventsController_findAllNewByTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/events/polling": {
+      "get": {
+        "operationId": "EventsController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/transactions": {
+      "get": {
+        "operationId": "TransactionsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/transactions/polling": {
+      "get": {
+        "operationId": "TransactionsController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/blocks/{id}/transactions": {
+      "get": {
+        "operationId": "TransactionsController_findAllByBlock",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/blocks/{id}/transactions/polling": {
+      "get": {
+        "operationId": "TransactionsController_findAllNewByBlock",
+        "parameters": [
+          {
+            "name": "timestamp",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/transactions/{id}": {
+      "get": {
+        "operationId": "TransactionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/common/counters": {
+      "get": {
+        "operationId": "CommonController_getCounters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
     }
+  },
+  "info": {
+    "title": "Flowser",
+    "description": "The Flowser API description",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "GatewayConfigurationDto": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": ["port", "address"]
+      },
+      "EmulatorConfigurationDto": {
+        "type": "object",
+        "properties": {
+          "verboseLogging": {
+            "type": "boolean"
+          },
+          "persist": {
+            "type": "boolean"
+          },
+          "httpServerPort": {
+            "type": "number"
+          },
+          "rpcServerPort": {
+            "type": "number"
+          },
+          "blockTime": {
+            "type": "number"
+          },
+          "servicePrivateKey": {
+            "type": "string"
+          },
+          "servicePublicKey": {
+            "type": "string"
+          },
+          "databasePath": {
+            "type": "string"
+          },
+          "tokenSupply": {
+            "type": "number"
+          },
+          "transactionExpiry": {
+            "type": "number"
+          },
+          "storagePerFlow": {
+            "type": "number"
+          },
+          "minAccountBalance": {
+            "type": "number"
+          },
+          "transactionMaxGasLimit": {
+            "type": "number"
+          },
+          "scriptGasLimit": {
+            "type": "number"
+          },
+          "serviceSignatureAlgorithm": {
+            "type": "string"
+          },
+          "serviceHashAlgorithm": {
+            "type": "string"
+          },
+          "storageLimit": {
+            "type": "boolean"
+          },
+          "transactionFees": {
+            "type": "boolean"
+          },
+          "numberOfInitialAccounts": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "verboseLogging",
+          "persist",
+          "httpServerPort",
+          "rpcServerPort",
+          "blockTime",
+          "servicePrivateKey",
+          "servicePublicKey",
+          "databasePath",
+          "tokenSupply",
+          "transactionExpiry",
+          "storagePerFlow",
+          "minAccountBalance",
+          "transactionMaxGasLimit",
+          "scriptGasLimit",
+          "serviceSignatureAlgorithm",
+          "serviceHashAlgorithm",
+          "storageLimit",
+          "transactionFees",
+          "numberOfInitialAccounts"
+        ]
+      },
+      "CreateProjectDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "startBlockHeight": {
+            "type": "number",
+            "description": "Data will be fetched from this block height forward."
+          },
+          "gateway": {
+            "$ref": "#/components/schemas/GatewayConfigurationDto"
+          },
+          "emulator": {
+            "description": "Custom emulator configuration, used to start a flowser managed emulator.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmulatorConfigurationDto"
+              }
+            ]
+          }
+        },
+        "required": ["name", "startBlockHeight", "gateway", "emulator"]
+      },
+      "UpdateProjectDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      }
+    }
+  }
 }

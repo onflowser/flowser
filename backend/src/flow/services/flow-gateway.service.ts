@@ -137,7 +137,7 @@ export class FlowGatewayService {
             return resolve(res.statusCode === 200);
           }
         )
-        .on("error", () => {
+        .on("error", (err) => {
           req.end();
           return resolve(false);
         });

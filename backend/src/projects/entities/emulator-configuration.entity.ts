@@ -1,64 +1,41 @@
-import { Column, Entity } from "typeorm";
-
-@Entity()
 export class EmulatorConfigurationEntity {
-  @Column()
   verboseLogging: boolean;
 
-  @Column()
-  httpServerPort: number | string;
+  httpServerPort: number;
 
-  @Column()
-  rpcServerPort: number | string;
+  rpcServerPort: number;
 
-  @Column()
   blockTime: number;
 
-  @Column()
   servicePrivateKey: string;
 
-  @Column()
   servicePublicKey: string;
 
-  @Column()
   databasePath: string;
 
-  @Column()
-  tokenSupply: number | string;
+  tokenSupply: number;
 
-  @Column()
-  transactionExpiry: number | string;
+  transactionExpiry: number;
 
-  @Column()
-  storagePerFlow: number | string;
+  storagePerFlow: number;
 
-  @Column()
-  minAccountBalance: number | string;
+  minAccountBalance: number;
 
-  @Column()
-  transactionMaxGasLimit: number | string;
+  transactionMaxGasLimit: number;
 
-  @Column()
-  scriptGasLimit: number | string;
+  scriptGasLimit: number;
 
-  @Column()
   serviceSignatureAlgorithm: string;
 
-  @Column()
   serviceHashAlgorithm: string;
 
-  @Column()
   storageLimit: boolean;
 
-  @Column()
   transactionFees: boolean;
 
-  @Column()
   persist: boolean;
 
-  @Column()
   simpleAddresses: boolean;
 
-  @Column()
-  numberOfInitialAccounts: number | string;
+  numberOfInitialAccounts: number;
 }

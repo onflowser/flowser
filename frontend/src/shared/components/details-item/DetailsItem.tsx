@@ -28,7 +28,7 @@ const DetailsItem: FunctionComponent<Props> = ({
     <Value>{value}</Value>
     {onClick && (
       <div className={classes.icon}>
-        {/* TODO: add close icon */}
+        {/* TODO(milestone-2): add close icon */}
         {open ? <OpenIcon /> : <OpenIcon />}
       </div>
     )}

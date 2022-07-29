@@ -1,5 +1,5 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 type TransactionArgument = {
   type: string;
@@ -27,17 +27,13 @@ type TransactionStatus = {
 
 @Entity({ name: "transactions" })
 export class Transaction extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
-  @Index({ unique: true })
+  @PrimaryColumn()
   id: string;
 
-  @Column()
+  @Column("text")
   script: string;
 
-  @Column()
+  @Column("simple-json")
   args: TransactionArgument[];
 
   @Column()
@@ -46,19 +42,19 @@ export class Transaction extends PollingEntity {
   @Column()
   gasLimit: number;
 
-  @Column()
+  @Column("simple-json")
   proposalKey: TransactionProposalKey;
 
   @Column()
   payer: string; // payer account address
 
-  @Column()
+  @Column("simple-array")
   authorizers: string[]; // authorizers account addresses
 
-  @Column()
+  @Column("simple-json")
   envelopeSignatures: TransactionEnvelopeSignature[];
 
-  @Column()
+  @Column("simple-json")
   status: TransactionStatus;
 
   static init(flowTransactionObject): Transaction {

@@ -1,22 +1,25 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { CreateAccountDto } from "../dto/create-account.dto";
 import { UpdateAccountDto } from "../dto/update-account.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Account } from "../entities/account.entity";
-import { MongoRepository } from "typeorm";
+import { Repository } from "typeorm";
 import { Transaction } from "../../transactions/entities/transaction.entity";
+import { ContractsService } from "./contracts.service";
+import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectRepository(Account)
-    private accountRepository: MongoRepository<Account>,
+    private accountRepository: Repository<Account>,
     @InjectRepository(Transaction)
-    private transactionRepository: MongoRepository<Transaction>
+    private transactionRepository: Repository<Transaction>,
+    private contractsService: ContractsService
   ) {}
 
-  create(createAccountDto: CreateAccountDto) {
-    return this.accountRepository.save(createAccountDto);
+  async countAll() {
+    return this.accountRepository.count();
   }
 
   findAll() {
@@ -25,114 +28,65 @@ export class AccountsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Account[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<Account[]> {
     return this.accountRepository
-      .aggregate([
-        {
-          $match: {
-            $or: [
-              { createdAt: { $gt: timestamp } },
-              { updatedAt: { $gt: timestamp } },
-            ],
-          },
-        },
-        {
-          $lookup: {
-            from: "transactions",
-            let: { address: "$address" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: [{ $concat: ["0x", "$payer"] }, "$$address"],
-                  },
-                },
-              },
-              { $count: "count" },
-            ],
-            as: "txCount",
-          },
-        },
-        {
-          $unwind: {
-            path: "$txCount",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $project: {
-            id: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            address: 1,
-            balance: 1,
-            code: 1,
-            keys: 1,
-            contracts: 1,
-            txCount: "$txCount.count",
-          },
-        },
-        {
-          $addFields: {
-            txCount: {
-              $ifNull: ["$txCount", "0"],
-            },
-          },
-        },
-        { $sort: { createdAt: -1 } },
-      ])
-      .toArray();
+      .createQueryBuilder("account")
+      .select()
+      .where("account.updatedAt > :timestamp", { timestamp })
+      .orWhere("account.createdAt > :timestamp", { timestamp })
+      .orderBy("account.createdAt", "DESC")
+      .getMany();
   }
 
-  async findOne(id: string) {
-    const [account] = await this.accountRepository.find({ where: { id } });
-    if (account) {
-      return account;
-    } else {
-      throw new NotFoundException("Account not found");
-    }
+  async findOne(address: string) {
+    return this.accountRepository.findOneOrFail({
+      where: { address },
+      relations: ["keys", "storage"],
+    });
   }
 
   async findOneByAddress(address: string) {
-    const account = await this.accountRepository.findOne({
-      where: { address },
-    });
-    if (account) {
-      const addressWithout0x = account.address.substr(2);
-      const transactions = await this.transactionRepository
-        .aggregate([
-          { $match: { payer: addressWithout0x } },
-          { $project: { _id: 0 } },
-        ])
-        .sort({ createdAt: -1 })
-        .toArray();
+    const addressWithout0xPrefix = address.substr(2);
+    const accountPromise = this.findOne(address);
+    const transactionsPromise = this.transactionRepository
+      .createQueryBuilder("transaction")
+      .where("transaction.payer = :address", {
+        address: addressWithout0xPrefix,
+      })
+      .getMany();
+    const contractsPromise =
+      this.contractsService.getContractsByAccountAddress(address);
 
-      return { ...account, transactions };
-    } else {
-      throw new NotFoundException("Account not found");
-    }
+    const [account, transactions, contracts] = await Promise.all([
+      accountPromise,
+      transactionsPromise,
+      contractsPromise,
+    ]);
+
+    return { ...account, transactions, contracts };
   }
 
-  replace(address: string, updateAccountDto: UpdateAccountDto) {
-    // refetch and insert the whole account entity
-    // contracts & keys can be added or removed
-    // therefore collection needs to be replaced and not just updated
-    return this.accountRepository.replaceOne(
-      { address },
-      { ...updateAccountDto, updatedAt: new Date().getTime() },
-      // create new account if account doesn't exists
-      { upsert: true }
-    );
+  async create(createAccountDto: CreateAccountDto) {
+    const account = plainToClass(Account, createAccountDto);
+    return this.accountRepository.insert(account);
   }
 
-  update(address: string, updateAccountDto: UpdateAccountDto) {
-    return this.accountRepository.update(
-      { address },
-      {
-        ...updateAccountDto,
-        updatedAt: new Date().getTime(),
-      }
-    );
+  async update(address: string, updateAccountDto: UpdateAccountDto) {
+    const account = await this.accountRepository.findOneByOrFail({ address });
+    const updatedAccount = Object.assign(account, updateAccountDto);
+    account.markUpdated();
+    return this.accountRepository.update({ address }, updatedAccount);
+  }
+
+  async markUpdated(address: string) {
+    const account = await this.accountRepository
+      .findOneByOrFail({ address })
+      .catch((e) => {
+        console.log("Mark updated error", e);
+        throw e;
+      });
+    account.markUpdated();
+    return this.update(address, account);
   }
 
   removeAll() {

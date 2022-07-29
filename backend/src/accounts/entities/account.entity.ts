@@ -1,5 +1,5 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
 import { FlowAccount } from "../../flow/types";
@@ -7,46 +7,30 @@ import { AccountsStorage } from "./storage.entity";
 
 @Entity({ name: "accounts" })
 export class Account extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID | any;
-
-  @Column()
-  @Index({ unique: true })
-  id: string;
-
-  @Column()
+  @PrimaryColumn()
   address: string;
 
-  @Column()
+  @Column({ type: "bigint" })
   balance: number;
 
   @Column()
   code: string;
 
-  @Column((type) => AccountKey)
+  @OneToMany(() => AccountKey, (key) => key.account)
   keys: AccountKey[];
 
-  @Column((type) => AccountContract)
-  contracts: AccountContract[];
-
-  @Column((type) => AccountsStorage)
+  @OneToMany(() => AccountsStorage, (storage) => storage.account)
   storage: AccountsStorage[];
 
-  static init(
-    flowAccountObject: FlowAccount,
-    options?: Partial<Account>
-  ): Account {
-    const { keys, contracts } = flowAccountObject;
-    const account = Object.assign<Account, FlowAccount, Partial<Account>>(
+  @OneToMany(() => AccountContract, (contract) => contract.account)
+  contracts: AccountContract[];
+
+  static init(flowAccountObject: FlowAccount): Account {
+    const account = Object.assign<Account, FlowAccount>(
       new Account(),
-      flowAccountObject,
-      options
+      flowAccountObject
     );
-    account.id = flowAccountObject.address;
-    account.keys = keys.map((key) => AccountKey.init(key));
-    account.contracts = Object.keys(contracts).map((name) =>
-      AccountContract.init(flowAccountObject.address, name, contracts[name])
-    ) as AccountContract[] & Map<string, string>;
+    account.address = flowAccountObject.address;
     return account;
   }
 }

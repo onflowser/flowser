@@ -14,7 +14,8 @@ import FullScreenLoading from "../../../shared/components/fullscreen-loading/Ful
 const Main: FunctionComponent<any> = () => {
   const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data, firstFetch } = useTimeoutPolling(
+  // TODO(milestone-2): fix types
+  const { data, firstFetch } = useTimeoutPolling<any>(
     "/api/contracts/polling",
     "id"
   );

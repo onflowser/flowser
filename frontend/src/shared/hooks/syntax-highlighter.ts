@@ -42,14 +42,14 @@ export const useSyntaxHighlighter = (): UseSyntaxHighlighterHook => {
     ];
 
     cadenceKeywords.forEach((keyword: string) => {
-      // TODO: Improve, skip keywords in comments
+      // TODO(milestone-2): Improve, skip keywords in comments or use some lib
       const regStr = `\\b(${keyword})\\b`;
       const regex = new RegExp(regStr, "g");
       source = source.replace(regex, '<span class="token inserted">$1</span>');
     });
 
     importantCadenceKeywords.forEach((keyword: string) => {
-      // TODO: Improve, skip keywords in comments
+      // TODO(milestone-2): Improve, skip keywords in comments or use some lib
       const regStr = `\\b(${keyword})\\b`;
       const regex = new RegExp(regStr, "g");
       source = source.replace(regex, '<span class="token cadence">$1</span>');

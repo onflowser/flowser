@@ -1,20 +1,18 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
+import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({ name: "events" })
 export class Event extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
-  @Index({ unique: true })
   id: string;
 
-  @Column()
+  @PrimaryColumn()
   transactionId: string;
 
-  @Column()
+  @PrimaryColumn()
   blockId: string;
+
+  @PrimaryColumn()
+  eventIndex: number;
 
   @Column()
   type: string;
@@ -22,16 +20,16 @@ export class Event extends PollingEntity {
   @Column()
   transactionIndex: number;
 
-  @Column()
-  eventIndex: number;
-
-  @Column()
+  // TODO(milestone-2): define type
+  @Column("simple-json")
   data: object;
 
+  @AfterLoad()
+  private computeId() {
+    this.id = `${this.transactionId}.${this.blockId}.${this.eventIndex}`;
+  }
+
   static init(flowEventObject): Event {
-    return Object.assign(new Event(), {
-      ...flowEventObject,
-      id: `${flowEventObject.transactionId}:${flowEventObject.type}:${flowEventObject.eventIndex}`,
-    });
+    return Object.assign(new Event(), flowEventObject);
   }
 }

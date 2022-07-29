@@ -8,7 +8,7 @@ import Badge from "../../../shared/components/badge/Badge";
 import Ellipsis from "../../../shared/components/ellipsis/Ellipsis";
 
 interface OwnProps {
-  keys: any[]; // TODO: define type
+  keys: any[]; // TODO(milestone-2): define type
 }
 
 type Props = OwnProps;
@@ -30,9 +30,9 @@ const ContentDetailsKeys: FunctionComponent<Props> = ({ keys }) => {
             <Badge>WEIGHT: {key.weight}</Badge>
             <Badge>SEQ. NUMBER: {key.sequenceNumber}</Badge>
             <Badge>INDEX: {key.index}</Badge>
-            {/*TODO: Here should be SHA_265 etc. instead of number */}
+            {/*TODO(milestone-2): Here should be SHA_265 etc. instead of number */}
             <Badge>SIGN ALGO.: {key.signAlgo} (SHA_265)!</Badge>
-            {/*TODO: Here should be SHA_265 etc. instead of number */}
+            {/*TODO(milestone-2): Here should be SHA_265 etc. instead of number */}
             <Badge>HASH ALGO.: {key.hashAlgo} (SHA_265)!</Badge>
             <Badge>REVOKED: {key.revoked ? "YES" : "NO"}</Badge>
           </div>

@@ -1,22 +1,52 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../common/entities/polling.entity";
+import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Account } from "./account.entity";
+import { BadRequestException } from "@nestjs/common";
+import { env } from "../../config";
+import { ensurePrefixedAddress } from "../../utils";
 
 @Entity({ name: "contracts" })
 export class AccountContract extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
+  // Encodes both accountAddress and name into the id.
+  id: string;
 
-  @Column()
+  @PrimaryColumn()
+  accountAddress: string;
+
+  @PrimaryColumn()
   name: string;
 
-  @Column()
+  @Column(getCodeFieldType())
   code: string;
+
+  @ManyToOne(() => Account, (account) => account.contracts)
+  account: Account;
+
+  public static parseId(id: string) {
+    const idParts = id.split(".");
+    if (idParts.length !== 2) {
+      throw new BadRequestException("Invalid contract id");
+    }
+    const [accountAddress, name] = idParts;
+    return { accountAddress, name };
+  }
+
+  @AfterLoad()
+  private computeId() {
+    this.id = `${this.accountAddress}.${this.name}`;
+  }
 
   static init(accountAddress: string, name: string, code: string) {
     return Object.assign<AccountContract, any>(new AccountContract(), {
-      id: `${accountAddress}.${name}`,
+      accountAddress: ensurePrefixedAddress(accountAddress),
       name,
       code,
     });
   }
+}
+
+function getCodeFieldType() {
+  return ["mariadb", "mysql"].includes(env.DATABASE_TYPE)
+    ? "mediumtext"
+    : "text";
 }

@@ -8,3 +8,4 @@ flow.json
 .flowser
 .envrc
 server/certbot
+.envrc

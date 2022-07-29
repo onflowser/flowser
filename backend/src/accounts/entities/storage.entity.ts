@@ -1,16 +1,21 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Account } from "./account.entity";
 
 @Entity({ name: "storage" })
 export class AccountsStorage {
-  @ObjectIdColumn()
-  _id: ObjectID;
+  // TODO(milestone-2): Which attributes should be considered a primary key?
+  @PrimaryColumn()
+  name: string;
+
+  @PrimaryColumn()
+  accountAddress: string;
 
   @Column()
   blockHeight: number;
 
   @Column()
-  name: string;
-
-  @Column()
   value: string;
+
+  @ManyToOne(() => Account, (account) => account.storage)
+  account: Account;
 }
