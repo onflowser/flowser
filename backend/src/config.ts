@@ -18,7 +18,6 @@ export const env = cleanEnv(process.env, {
   DATABASE_PASSWORD: str({ default: "" }),
 
   DATA_FETCH_INTERVAL: num({ default: 1000 }),
-  USER_MANAGED_EMULATOR_PORT: num({ default: 8081 }),
   FLOW_STORAGE_SERVER_PORT: num({ default: 8889 }),
 
   HTTP_PORT: num({ default: 6061 }),
@@ -37,6 +36,5 @@ export default {
   dataFetchInterval: env.DATA_FETCH_INTERVAL,
   // __dirname is <project-root>/dist folder
   flowserRootDir: join(__dirname, "..", ".flowser"),
-  userManagedEmulatorPort: env.USER_MANAGED_EMULATOR_PORT,
   storageServerPort: env.FLOW_STORAGE_SERVER_PORT,
 };
