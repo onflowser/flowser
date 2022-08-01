@@ -1,8 +1,9 @@
 {
-  "name": "frontend",
+  "name": "@flowser/frontend",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@flowser/types": "^0.0.1",
     "@onflow/fcl": "^0.0.77",
     "@onflow/types": "^0.0.5",
     "@splitbee/web": "^0.3.0",

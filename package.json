@@ -1,5 +1,6 @@
 {
   "name": "flowser",
+  "private": true,
   "version": "1.0.0",
   "description": "Easily inspect and debug Flow blockchain ⛓",
   "main": "index.js",
@@ -36,5 +37,10 @@
     "husky": "^8.0.1",
     "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"
-  }
+  },
+  "workspaces": [
+    "./backend",
+    "./frontend",
+    "./types"
+  ]
 }

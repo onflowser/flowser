@@ -15,6 +15,11 @@ import { useSearch } from "./shared/hooks/search";
 import "./App.scss";
 import { toastOptions } from "./shared/config/toast";
 
+// TODO: remove bellow example
+import { FirstFlowserType } from "@flowser/types";
+const hello: FirstFlowserType = "Hello World";
+console.log(hello);
+
 // pages
 import Start from "./pages/start/Start";
 import Accounts from "./pages/accounts/Accounts";
