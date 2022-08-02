@@ -25,7 +25,7 @@ import { AccountContract } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKey } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
-import { DataSource } from "typeorm";
+import { getDataSourceInstance } from "../../database";
 
 @Injectable()
 export class FlowAggregatorService {
@@ -43,8 +43,7 @@ export class FlowAggregatorService {
     private flowGatewayService: FlowGatewayService,
     private flowEmulatorService: FlowEmulatorService,
     private logsService: LogsService,
-    private storageDataService: StorageDataService,
-    private dataSource: DataSource
+    private storageDataService: StorageDataService
   ) {}
 
   configureProjectContext(project?: Project) {
@@ -76,8 +75,8 @@ export class FlowAggregatorService {
     if (!this.project) {
       return;
     }
-
-    const queryRunner = this.dataSource.createQueryRunner();
+    const dataSource = await getDataSourceInstance();
+    const queryRunner = dataSource.createQueryRunner();
 
     // service account exist only on emulator chains
     if (this.project.hasEmulatorGateway() && !this.serviceAccountBootstrapped) {

@@ -1,8 +1,8 @@
-import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { env } from "./config";
 import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionOptions";
+import { DataSource, DataSourceOptions } from "typeorm";
 
-export function getDatabaseOptions(): TypeOrmModuleOptions {
+export function getDatabaseOptions(): DataSourceOptions {
   const commonOptions = {
     autoLoadEntities: true,
     synchronize: true,
@@ -28,4 +28,16 @@ export function getDatabaseOptions(): TypeOrmModuleOptions {
     default:
       throw new Error(`Database type ${env.DATABASE_TYPE} not supported`);
   }
+}
+
+// TODO: reuse the existing instance created by @nestjs/typeorm
+let dataSourceInstance: DataSource;
+export async function getDataSourceInstance() {
+  if (!dataSourceInstance) {
+    dataSourceInstance = new DataSource(getDatabaseOptions());
+  }
+  if (!dataSourceInstance.isInitialized) {
+    await dataSourceInstance.initialize();
+  }
+  return dataSourceInstance;
 }

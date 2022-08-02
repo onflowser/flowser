@@ -37,6 +37,8 @@ After prerequisites are installed, you can run the following command to set up l
 npm run bootstrap
 ```
 
+> It's recommended that you don't use your global installation of @nestjs/cli, because that can cause some unexpected issues.
+
 ### 3. Start Flowser
 
 The following command will start Flowser along with Flow emulator and development wallet.
