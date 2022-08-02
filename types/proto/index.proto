@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+enum FirstFlowserEnum {
+    FIRST_FLOWSER_ENUM_UNKNOWN = 0;
+    FIRST_FLOWSER_ENUM_FIRST = 1;
+    FIRST_FLOWSER_ENUM_SECOND = 2;
+    FIRST_FLOWSER_ENUM_THIRD = 3;
+};

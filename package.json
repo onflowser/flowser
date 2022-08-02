@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "source .envrc && lerna run start:dev --parallel",
+    "start": "source .envrc && lerna run start --parallel",
     "cleanup": "lerna run cleanup --parallel",
     "bootstrap": "yarn install && lerna bootstrap && husky install && flow init",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""

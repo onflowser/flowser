@@ -6,6 +6,11 @@ import { writeFile } from "fs";
 import { env } from "./config";
 const packageJson = require("../package.json");
 
+// TODO: remove this example file
+import { FirstFlowserEnum } from "@flowser/types";
+const hello: FirstFlowserEnum = FirstFlowserEnum.FIRST_FLOWSER_ENUM_FIRST;
+console.log(hello);
+
 declare const module: any;
 
 async function bootstrap() {

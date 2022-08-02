@@ -16,8 +16,8 @@ import "./App.scss";
 import { toastOptions } from "./shared/config/toast";
 
 // TODO: remove bellow example
-import { FirstFlowserType } from "@flowser/types";
-const hello: FirstFlowserType = "Hello World";
+import { FirstFlowserEnum } from "@flowser/types";
+const hello: FirstFlowserEnum = FirstFlowserEnum.FIRST_FLOWSER_ENUM_THIRD;
 console.log(hello);
 
 // pages
