@@ -37,6 +37,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
+    "cleanup": "rm -rf node_modules",
     "start:dev": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",

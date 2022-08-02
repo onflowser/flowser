@@ -27,7 +27,7 @@ git clone https://github.com/onflowser/flowser
 ### 2. Install dependencies
 
 The following system dependencies are required:
-- Node.js (tested on v14)
+- Node.js (tested on v14.19.1)
 - npm
 - [flow-cli](https://docs.onflow.org/flow-cli/install/) (works with < v0.28.3)
 

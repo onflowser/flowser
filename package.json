@@ -9,13 +9,9 @@
   },
   "scripts": {
     "start": "source .envrc && lerna run start:dev --parallel",
-    "bootstrap": "yarn install && lerna bootstrap && yarn run prepare && flow init",
-    "prepare": "husky install",
-    "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\"",
-    "backend:start:dev": "cd backend && yarn run start:debug",
-    "frontend:start:dev": "cd frontend && yarn run start",
-    "flow-cli:emulator:start": "flow emulator --port=3570 --admin-port=8081",
-    "flow-cli:dev-wallet:start": "flow dev-wallet"
+    "cleanup": "lerna run cleanup --parallel",
+    "bootstrap": "yarn install && lerna bootstrap && husky install && flow init",
+    "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {
     "type": "git",

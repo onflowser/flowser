@@ -20,7 +20,7 @@ import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/flow-cli.service";
-import { plainToClass } from "class-transformer";
+import { plainToInstance } from "class-transformer";
 import { StorageDataService } from "../flow/services/storage-data.service";
 import { defaultProjects } from "./data/seeds";
 import { ContractsService } from "../accounts/services/contracts.service";
@@ -50,7 +50,7 @@ export class ProjectsService {
 
   seedDefaultProjects() {
     return this.projectRepository
-      .save(defaultProjects.map((project) => plainToClass(Project, project)))
+      .save(defaultProjects.map((project) => plainToInstance(Project, project)))
       .catch(this.handleDatabaseError);
   }
 
@@ -144,7 +144,7 @@ export class ProjectsService {
   }
 
   async create(createProjectDto: CreateProjectDto) {
-    const project = plainToClass(Project, createProjectDto);
+    const project = plainToInstance(Project, createProjectDto);
     await this.projectRepository
       .insert(project)
       .catch(this.handleDatabaseError);
@@ -166,7 +166,7 @@ export class ProjectsService {
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
-    const project = plainToClass(Project, updateProjectDto);
+    const project = plainToInstance(Project, updateProjectDto);
     project.markUpdated();
     await this.projectRepository
       .update({ id }, updateProjectDto)
@@ -188,7 +188,7 @@ export class ProjectsService {
       const pingable = project.hasEmulatorGateway()
         ? await FlowGatewayService.isPingable(address, port)
         : true;
-      return plainToClass(Project, { ...project, pingable });
+      return plainToInstance(Project, { ...project, pingable });
     } else {
       return project;
     }

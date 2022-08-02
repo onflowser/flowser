@@ -6,7 +6,7 @@ import { Account } from "../entities/account.entity";
 import { Repository } from "typeorm";
 import { Transaction } from "../../transactions/entities/transaction.entity";
 import { ContractsService } from "./contracts.service";
-import { plainToClass } from "class-transformer";
+import { plainToInstance } from "class-transformer";
 
 @Injectable()
 export class AccountsService {
@@ -67,7 +67,7 @@ export class AccountsService {
   }
 
   async create(createAccountDto: CreateAccountDto) {
-    const account = plainToClass(Account, createAccountDto);
+    const account = plainToInstance(Account, createAccountDto);
     return this.accountRepository.insert(account);
   }
 
