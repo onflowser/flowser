@@ -45,7 +45,6 @@
     "typeorm": "^0.3.6"
   },
   "devDependencies": {
-    "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
     "@types/cron": "^1.7.3",
@@ -92,7 +91,7 @@
     }
   },
   "lint-staged": {
-    "*": [
+    "*.{ts,js,json}": [
       "prettier --write"
     ]
   }
