@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+enum SignCurve {
+  SIGN_CURVE_UNSPECIFIED = 0;
+  SIGN_CURVE_ECDSA_P256 = 2;
+  SIGN_CURVE_ECDSA_secp256k1 = 3;
+}
+
+enum HashAlgo {
+  HASH_ALGO_UNSPECIFIED = 0;
+  HASH_ALGO_SHA2_256 = 1;
+  HASH_ALGO_SHA3_256 = 3;
+}
+
+message Account {
+  string address = 1;
+  float balance = 2;
+  string code = 3;
+  repeated AccountKey keys = 4;
+  repeated AccountStorage storage = 5;
+  repeated AccountContract contracts = 6;
+}
+
+message AccountKey {
+    int32 index = 1;
+    string account_address = 2;
+    string public_key = 3;
+    SignCurve sign_algo = 4;
+    HashAlgo hash_algo = 5;
+    int32 weight = 6;
+    int32 sequence_number = 7;
+    bool revoked = 8;
+}
+
+message AccountStorage {
+    string name = 1;
+    string account_address = 2;
+    int32 block_height = 3;
+    string value = 4;
+}
+
+message AccountContract {
+    string id = 1;
+    string account_address = 2;
+    string name = 3;
+    string code = 4;
+}

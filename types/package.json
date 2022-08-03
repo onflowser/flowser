@@ -2,8 +2,8 @@
   "name": "@flowser/types",
   "version": "0.0.1",
   "description": "",
-  "main": "./dist/generated/index.js",
-  "types": "./generated/index.ts",
+  "main": "./dist/generated/*.js",
+  "types": "./generated/*.ts",
   "scripts": {
     "cleanup": "rm -rf node_modules",
     "generate": "sh build.sh",

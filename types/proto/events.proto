@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+
+message Event {
+    string id = 1;
+    string transaction_id = 2;
+    string block_id = 3;
+    int32 event_index = 4;
+    string type = 5;
+    int32 transaction_index = 6;
+    google.protobuf.Struct data = 7;
+}

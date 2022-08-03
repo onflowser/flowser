@@ -4,7 +4,6 @@ import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import config from "../../config";
 
 @Entity({ name: "projects" })
 export class Project extends PollingEntity {

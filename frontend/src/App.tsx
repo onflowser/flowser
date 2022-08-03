@@ -15,11 +15,6 @@ import { useSearch } from "./shared/hooks/search";
 import "./App.scss";
 import { toastOptions } from "./shared/config/toast";
 
-// TODO: remove bellow example
-import { FirstFlowserEnum } from "@flowser/types";
-const hello: FirstFlowserEnum = FirstFlowserEnum.FIRST_FLOWSER_ENUM_THIRD;
-console.log(hello);
-
 // pages
 import Start from "./pages/start/Start";
 import Accounts from "./pages/accounts/Accounts";
