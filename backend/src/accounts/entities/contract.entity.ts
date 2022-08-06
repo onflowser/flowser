@@ -4,6 +4,7 @@ import { Account } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
 import { env } from "../../config";
 import { ensurePrefixedAddress } from "../../utils";
+import { FlowAccount } from "../../flow/services/flow-gateway.service";
 
 @Entity({ name: "contracts" })
 export class AccountContract extends PollingEntity {
@@ -36,9 +37,9 @@ export class AccountContract extends PollingEntity {
     this.id = `${this.accountAddress}.${this.name}`;
   }
 
-  static init(accountAddress: string, name: string, code: string) {
+  static create(account: FlowAccount, name: string, code: string) {
     return Object.assign<AccountContract, any>(new AccountContract(), {
-      accountAddress: ensurePrefixedAddress(accountAddress),
+      accountAddress: ensurePrefixedAddress(account.address),
       name,
       code,
     });

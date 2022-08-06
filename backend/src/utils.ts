@@ -1,6 +1,6 @@
 const kebabCase = require("kebab-case");
 
-export function toKebabCase(string) {
+export function toKebabCase(string: string) {
   const kebab = kebabCase(string);
   // kebabCase("WebkitTransform"); => "-webkit-transform"
   // remove "-" prefix

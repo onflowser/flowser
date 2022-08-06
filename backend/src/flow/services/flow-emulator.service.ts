@@ -159,7 +159,7 @@ export class FlowEmulatorService {
         await this.initialiseAccounts(
           this.configuration.numberOfInitialAccounts
         );
-      } catch (e) {
+      } catch (e: any) {
         this.logger.error(
           `failed to initialise accounts: ${e.message || e}`,
           e.stack

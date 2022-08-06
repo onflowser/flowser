@@ -2,6 +2,9 @@ syntax = "proto3";
 
 import "google/protobuf/struct.proto";
 
+// TODO: define flow core events enum
+// https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
+
 message Event {
     string id = 1;
     string transaction_id = 2;

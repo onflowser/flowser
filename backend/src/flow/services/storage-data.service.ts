@@ -30,7 +30,7 @@ export class StorageDataService {
             PATH: process.env.PATH, // main_linux_x86_64 is present in path
           },
         });
-      } catch (e) {
+      } catch (e: any) {
         const message = `Storage data error: ${e.message}`;
         reject(message);
       }
@@ -79,7 +79,7 @@ export class StorageDataService {
     try {
       this.logger.debug("Stopping storage server");
       this.dataStorageProcess?.kill(); // send SIGTERM signal
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Failed to stop: ${e.message}`, e.stack);
     }
   }
@@ -91,7 +91,7 @@ export class StorageDataService {
       response = await axios.get(
         `http://localhost:${config.storageServerPort}/storage`
       );
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Error fetching storage: ${e.message}`, e.stack);
       this.printStdout();
       throw e;

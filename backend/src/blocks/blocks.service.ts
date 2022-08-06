@@ -9,8 +9,8 @@ export class BlocksService {
     private blockRepository: Repository<Block>
   ) {}
 
-  async create(createBlockDto: CreateBlockDto): Promise<Block> {
-    return this.blockRepository.save(createBlockDto);
+  async create(block: Block): Promise<Block> {
+    return this.blockRepository.save(block);
   }
 
   async countAll() {

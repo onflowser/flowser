@@ -1,5 +1,6 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
+import { ExtendedFlowEvent } from "../../flow/services/flow-aggregator.service";
 
 @Entity({ name: "events" })
 export class Event extends PollingEntity {
@@ -26,10 +27,10 @@ export class Event extends PollingEntity {
 
   @AfterLoad()
   private computeId() {
-    this.id = `${this.transactionId}.${this.blockId}.${this.eventIndex}`;
+    this.id = `${this.transactionId}.${this.eventIndex}`;
   }
 
-  static init(flowEventObject): Event {
-    return Object.assign(new Event(), flowEventObject);
+  static create(flowEvent: ExtendedFlowEvent): Event {
+    return Object.assign(new Event(), flowEvent);
   }
 }

@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { CollectionGuarantee } from "./collection-guarantee.entity";
+import { FlowBlock } from "../../flow/services/flow-gateway.service";
 
 @Entity({ name: "blocks" })
 export class Block extends PollingEntity {
@@ -26,7 +27,7 @@ export class Block extends PollingEntity {
   @Column("simple-array")
   signatures: string[];
 
-  static init(flowBlockObject): Block {
-    return Object.assign(new Block(), flowBlockObject);
+  static create(flowBlock: FlowBlock): Block {
+    return Object.assign(new Block(), flowBlock);
   }
 }

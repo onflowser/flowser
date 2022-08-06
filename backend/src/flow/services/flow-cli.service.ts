@@ -200,7 +200,7 @@ export class FlowCliService {
     try {
       await stat(path);
       console.debug(`directory "${path}" exists, skipping creation`);
-    } catch (e) {
+    } catch (e: any) {
       if (e.code === "ENOENT") {
         console.debug(`directory "${path}" not found, creating`);
         await mkdir(path);

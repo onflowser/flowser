@@ -1,14 +1,91 @@
-import {
-  FlowAccount,
-  FlowBlock,
-  FlowCollection,
-  FlowTransaction,
-  FlowTransactionStatus,
-} from "../types";
 import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
+import { AccountsStorage } from "../../accounts/entities/storage.entity";
+
+export type FlowCollectionGuarantee = {
+  collectionId: string;
+  signatures: string[];
+};
+
+export type FlowBlock = {
+  id: string;
+  parentId: string;
+  height: number;
+  timestamp: number;
+  collectionGuarantees: FlowCollectionGuarantee[];
+  blockSeals: any[];
+  signatures: string[];
+};
+
+export type FlowKey = {
+  index: number;
+  publicKey: string;
+  signAlgo: number;
+  hashAlgo: number;
+  weight: number;
+  sequenceNumber: number;
+  revoked: boolean;
+};
+
+export type FlowAccount = {
+  address: string;
+  balance: number;
+  code: string;
+  contracts: Record<string, string>;
+  keys: FlowKey[];
+  storage?: AccountsStorage;
+};
+
+export type FlowCollection = {
+  id: string;
+  transactionIds: string[];
+};
+
+export type FlowTransactionArgument = {
+  type: string;
+  value: any;
+};
+
+export type FlowTransactionProposalKey = {
+  address: string;
+  keyId: number;
+  sequenceNumber: number;
+};
+
+export type FlowTransactionEnvelopeSignature = {
+  address: string;
+  keyId: number;
+  signature: string;
+};
+
+export type FlowTransactionStatus = {
+  status: number;
+  statusCode: number;
+  errorMessage: string;
+  events: FlowEvent[];
+};
+
+export type FlowTransaction = {
+  id: string;
+  script: string;
+  args: FlowTransactionArgument[];
+  referenceBlockId: string;
+  gasLimit: number;
+  proposalKey: FlowTransactionProposalKey;
+  payer: string; // payer account address
+  authorizers: string[]; // authorizers account addresses
+  envelopeSignatures: FlowTransactionEnvelopeSignature[];
+};
+
+export type FlowEvent = {
+  transactionId: string;
+  type: string;
+  transactionIndex: number;
+  eventIndex: number;
+  data: Record<string, any>;
+};
 
 @Injectable()
 export class FlowGatewayService {
@@ -37,79 +114,22 @@ export class FlowGatewayService {
     return fcl.send([fcl.getCollection(id)]).then(fcl.decode);
   }
 
-  public async getTransactionById(id: string): Promise<{
-    data: FlowTransaction;
-    status: FlowTransactionStatus;
-  }> {
-    const [data, status] = await Promise.all([
-      fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
-      fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode),
-    ]);
-    return { ...data, status };
+  public async getTransactionById(id: string): Promise<FlowTransaction> {
+    const transaction = await fcl
+      .send([fcl.getTransaction(id)])
+      .then(fcl.decode);
+    return { ...transaction, id };
+  }
+
+  public async getTransactionStatusById(
+    transactionId: string
+  ): Promise<FlowTransactionStatus> {
+    return fcl.send([fcl.getTransactionStatus(transactionId)]).then(fcl.decode);
   }
 
   public async getAccount(address: string): Promise<FlowAccount> {
-    return fcl.send([fcl.getAccount(address)]).then(fcl.decode);
-  }
-
-  public async getBlockData(height) {
-    const block = await this.getBlockByHeight(height);
-    const collections = await this.fetchCollectionGuarantees(block);
-    const txWithStatuses = await this.fetchTransactionsWithStatuses(
-      collections
-    );
-    const transactions = txWithStatuses.map((tx: any) => {
-      const { events, ...status } = tx.status;
-      return {
-        ...tx,
-        status: { ...status, eventsCount: tx.status.events.length },
-      };
-    });
-    const events = txWithStatuses
-      .map((tx: any) =>
-        tx.status.events.map((event) => ({
-          transactionId: tx.id,
-          blockId: tx.referenceBlockId,
-          ...event,
-        }))
-      )
-      .flat();
-    return {
-      block,
-      collections,
-      transactions,
-      events,
-    };
-  }
-
-  private async fetchCollectionGuarantees(block: FlowBlock) {
-    return Promise.all(
-      block.collectionGuarantees.map(async (guarantee) => ({
-        blockId: block.id,
-        ...(await this.getCollectionById(guarantee.collectionId)),
-      }))
-    );
-  }
-
-  private async fetchTransactionsWithStatuses(collections: any[]) {
-    const txIds = collections
-      .map((collection) => collection.transactionIds)
-      .flat();
-    return await Promise.all(
-      txIds.map(async (txId) => ({
-        id: txId,
-        ...(await this.getTransactionById(txId)),
-      }))
-    );
-  }
-
-  public async getBlockDataWithinHeightRange(fromHeight, toHeight) {
-    let promises = [];
-    for (let height = fromHeight; height <= toHeight; height++) {
-      FlowGatewayService.logger.debug(`fetching block: ${height}`);
-      promises.push(this.getBlockData(height));
-    }
-    return Promise.all(promises);
+    const account = await fcl.send([fcl.getAccount(address)]).then(fcl.decode);
+    return { ...account, address };
   }
 
   async isConnectedToGateway() {

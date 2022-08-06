@@ -29,7 +29,7 @@ export class Project extends PollingEntity {
   // Blockchain data will be fetched from this block height
   // Set this null to start fetching from the latest block
   @Column({ nullable: true })
-  startBlockHeight?: number | null = 0;
+  startBlockHeight: number | null = 0;
 
   @AfterLoad()
   unSerializeJsonFields() {

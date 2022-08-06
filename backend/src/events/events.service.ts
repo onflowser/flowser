@@ -11,8 +11,8 @@ export class EventsService {
     private eventRepository: Repository<Event>
   ) {}
 
-  create(createEventDto: CreateEventDto) {
-    return this.eventRepository.save(createEventDto);
+  create(event: Event) {
+    return this.eventRepository.save(event);
   }
 
   async countAll() {

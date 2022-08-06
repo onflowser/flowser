@@ -2,8 +2,9 @@ import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKey } from "./key.entity";
 import { AccountContract } from "./contract.entity";
-import { FlowAccount } from "../../flow/types";
 import { AccountsStorage } from "./storage.entity";
+import { ensurePrefixedAddress } from "../../utils";
+import { FlowAccount } from "../../flow/services/flow-gateway.service";
 
 @Entity({ name: "accounts" })
 export class Account extends PollingEntity {
@@ -25,12 +26,12 @@ export class Account extends PollingEntity {
   @OneToMany(() => AccountContract, (contract) => contract.account)
   contracts: AccountContract[];
 
-  static init(flowAccountObject: FlowAccount): Account {
+  static create(flowAccount: FlowAccount): Account {
     const account = Object.assign<Account, FlowAccount>(
       new Account(),
-      flowAccountObject
+      flowAccount
     );
-    account.address = flowAccountObject.address;
+    account.address = ensurePrefixedAddress(flowAccount.address);
     return account;
   }
 }

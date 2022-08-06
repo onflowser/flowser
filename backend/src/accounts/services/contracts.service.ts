@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AccountContract } from "../entities/contract.entity";
-import { FlowAccount } from "../../flow/types";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()

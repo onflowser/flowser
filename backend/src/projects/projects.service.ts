@@ -113,7 +113,7 @@ export class ProjectsService {
 
       try {
         await this.flowAggregatorService.startEmulator();
-      } catch (e) {
+      } catch (e: any) {
         throw new ServiceUnavailableException(
           `Can not start emulator with project ${id}`,
           e.message
@@ -122,7 +122,7 @@ export class ProjectsService {
 
       try {
         await this.storageDataService.start();
-      } catch (e) {
+      } catch (e: any) {
         throw new ServiceUnavailableException(
           "Data storage service error",
           e.message
