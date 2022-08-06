@@ -1,32 +1,16 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, PrimaryColumn } from "typeorm";
-
-type TransactionArgument = {
-  type: string;
-  value: any;
-};
-
-type TransactionProposalKey = {
-  address: string;
-  keyId: number;
-  sequenceNumber: number;
-};
-
-type TransactionEnvelopeSignature = {
-  address: string;
-  keyId: number;
-  signature: string;
-};
-
-type TransactionStatus = {
-  status: number;
-  statusCode: number;
-  errorMessage: string;
-  eventsCount: number;
-};
+import {
+  Transaction,
+  TransactionArgument,
+  TransactionProposalKey,
+  TransactionEnvelopeSignature,
+  TransactionStatus,
+} from "@flowser/types/generated/transactions";
+import { FlowTransaction } from "../../flow/services/flow-gateway.service";
 
 @Entity({ name: "transactions" })
-export class Transaction extends PollingEntity {
+export class TransactionEntity extends PollingEntity implements Transaction {
   @PrimaryColumn()
   id: string;
 
@@ -57,7 +41,10 @@ export class Transaction extends PollingEntity {
   @Column("simple-json")
   status: TransactionStatus;
 
-  static init(flowTransactionObject): Transaction {
-    return Object.assign(new Transaction(), flowTransactionObject);
+  static create(flowTransaction: FlowTransaction): TransactionEntity {
+    return Object.assign(
+      new TransactionEntity(),
+      Transaction.fromJSON(flowTransaction)
+    );
   }
 }

@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
 import { FlowCliService } from "./flow-cli.service";
-import { AccountsStorage } from "../../accounts/entities/storage.entity";
+import { AccountsStorageEntity } from "../../accounts/entities/storage.entity";
 import config from "../../config";
 import axios from "axios";
 
@@ -84,7 +84,7 @@ export class StorageDataService {
     }
   }
 
-  async getStorageData(account: string): Promise<AccountsStorage> {
+  async getStorageData(account: string): Promise<AccountsStorageEntity> {
     account = account.indexOf("0x") === 0 ? account.substr(2) : account;
     let response;
     try {

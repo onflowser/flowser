@@ -2,7 +2,7 @@
   "name": "@flowser/types",
   "version": "0.0.1",
   "description": "",
-  "main": "./dist/generated/*.js",
+  "main": "./generated/*.js",
   "types": "./generated/*.ts",
   "scripts": {
     "cleanup": "rm -rf node_modules",

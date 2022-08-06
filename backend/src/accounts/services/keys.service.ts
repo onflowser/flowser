@@ -1,24 +1,24 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AccountKey } from "../entities/key.entity";
+import { AccountKeyEntity } from "../entities/key.entity";
 import { Repository } from "typeorm";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()
 export class KeysService {
   constructor(
-    @InjectRepository(AccountKey)
-    private keyRepository: Repository<AccountKey>
+    @InjectRepository(AccountKeyEntity)
+    private keyRepository: Repository<AccountKeyEntity>
   ) {}
 
-  async updateAccountKeys(address: string, newKeys: AccountKey[]) {
+  async updateAccountKeys(address: string, newKeys: AccountKeyEntity[]) {
     const oldKeys = await this.findKeysByAccount(address);
-    const entitiesDiff = computeEntitiesDiff<AccountKey>({
+    const entitiesDiff = computeEntitiesDiff<AccountKeyEntity>({
       primaryKey: "index",
       newEntities: newKeys,
       oldEntities: oldKeys,
     });
-    return processEntitiesDiff<AccountKey>({
+    return processEntitiesDiff<AccountKeyEntity>({
       create: (e) => this.create(e),
       update: (e) => this.update(e),
       delete: (e) => this.delete(e.accountAddress, e.index),
@@ -39,11 +39,11 @@ export class KeysService {
     });
   }
 
-  async create(accountKey: AccountKey) {
+  async create(accountKey: AccountKeyEntity) {
     return this.keyRepository.insert(accountKey);
   }
 
-  async update(accountKey: AccountKey) {
+  async update(accountKey: AccountKeyEntity) {
     return this.keyRepository.update(
       {
         accountAddress: accountKey.accountAddress,

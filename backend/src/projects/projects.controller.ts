@@ -13,7 +13,7 @@ import {
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { Project } from "./entities/project.entity";
+import { ProjectEntity } from "./entities/project.entity";
 import { defaultEmulatorFlags } from "./data/default-emulator-flags";
 import { ApiParam } from "@nestjs/swagger";
 
@@ -23,7 +23,7 @@ export class ProjectsController {
 
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(Project.init(createProjectDto));
+    return this.projectsService.create(ProjectEntity.create(createProjectDto));
   }
 
   @Get()
@@ -67,7 +67,7 @@ export class ProjectsController {
 
   @ApiParam({ name: "id", type: String })
   @Post("/use/:id")
-  async useProject(@Param("id") id: string): Promise<Project> {
+  async useProject(@Param("id") id: string): Promise<ProjectEntity> {
     return await this.projectsService.useProject(id);
   }
 

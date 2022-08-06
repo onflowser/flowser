@@ -1,4 +1,6 @@
-export class GatewayConfigurationEntity {
+import { Gateway } from "@flowser/types/generated/projects";
+
+export class GatewayConfigurationEntity implements Gateway {
   port: number;
 
   address: string;

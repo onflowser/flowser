@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+enum CadenceType {
+  TX_ARG_UNSPECIFIED = 0;
+  UInt = 1;
+  UInt8 = 2;
+  UInt16 = 3;
+  UInt32 = 4;
+  UInt64 = 5;
+  UInt128 = 6;
+  UInt256 = 7;
+  Int = 8;
+  Int8 = 9;
+  Int16 = 10;
+  Int32 = 11;
+  Int64 = 12;
+  Int128 = 13;
+  Int256 = 14;
+  Word8 = 15;
+  Word16 = 16;
+  Word32 = 17;
+  Word64 = 18;
+  UFix64 = 19;
+  Fix64 = 20;
+  String = 21;
+  Character = 22;
+  Bool = 23;
+  Address = 24;
+  Optional = 25;
+  Array = 26;
+  Dictionary = 27;
+  Path = 28;
+}

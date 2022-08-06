@@ -1,13 +1,17 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { Account } from "./account.entity";
+import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
 import { env } from "../../config";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount } from "../../flow/services/flow-gateway.service";
+import { AccountContract } from "@flowser/types/generated/accounts";
 
 @Entity({ name: "contracts" })
-export class AccountContract extends PollingEntity {
+export class AccountContractEntity
+  extends PollingEntity
+  implements AccountContract
+{
   // Encodes both accountAddress and name into the id.
   id: string;
 
@@ -20,8 +24,8 @@ export class AccountContract extends PollingEntity {
   @Column(getCodeFieldType())
   code: string;
 
-  @ManyToOne(() => Account, (account) => account.contracts)
-  account: Account;
+  @ManyToOne(() => AccountEntity, (account) => account.contracts)
+  account: AccountEntity;
 
   public static parseId(id: string) {
     const idParts = id.split(".");
@@ -38,11 +42,14 @@ export class AccountContract extends PollingEntity {
   }
 
   static create(account: FlowAccount, name: string, code: string) {
-    return Object.assign<AccountContract, any>(new AccountContract(), {
-      accountAddress: ensurePrefixedAddress(account.address),
-      name,
-      code,
-    });
+    return Object.assign<AccountContractEntity, any>(
+      new AccountContractEntity(),
+      {
+        accountAddress: ensurePrefixedAddress(account.address),
+        name,
+        code,
+      }
+    );
   }
 }
 

@@ -34,8 +34,8 @@ message Emulator {
     uint32 script_gas_limit = 13;
     string service_signature_algorithm = 14;
     string service_hash_algorithm = 15;
-    uint32 storage_limit = 16;
-    uint32 transaction_fees = 17;
+    bool storage_limit = 16;
+    bool transaction_fees = 17;
     uint32 number_of_initial_accounts = 18;
     bool simple_addresses = 19;
     bool persist = 20;

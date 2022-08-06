@@ -1,11 +1,12 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { Account } from "./account.entity";
+import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount, FlowKey } from "../../flow/services/flow-gateway.service";
+import { AccountKey } from "@flowser/types/generated/accounts";
 
 @Entity({ name: "keys" })
-export class AccountKey extends PollingEntity {
+export class AccountKeyEntity extends PollingEntity implements AccountKey {
   @PrimaryColumn()
   index: number;
 
@@ -30,11 +31,11 @@ export class AccountKey extends PollingEntity {
   @Column()
   revoked: boolean;
 
-  @ManyToOne(() => Account, (account) => account.storage)
-  account: Account;
+  @ManyToOne(() => AccountEntity, (account) => account.storage)
+  account: AccountEntity;
 
   static create(flowAccount: FlowAccount, flowKey: FlowKey) {
-    return Object.assign<AccountKey, any>(new AccountKey(), {
+    return Object.assign<AccountKeyEntity, any>(new AccountKeyEntity(), {
       ...flowKey,
       accountAddress: ensurePrefixedAddress(flowAccount.address),
     });

@@ -4,9 +4,10 @@ import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../common/entities/polling.entity";
+import { Project } from "@flowser/types/generated/projects";
 
 @Entity({ name: "projects" })
-export class Project extends PollingEntity {
+export class ProjectEntity extends PollingEntity implements Project {
   @PrimaryColumn()
   id: string;
 
@@ -43,13 +44,6 @@ export class Project extends PollingEntity {
     );
   }
 
-  static init(dto: CreateProjectDto) {
-    return Object.assign(new Project(), {
-      id: toKebabCase(dto.name),
-      ...dto,
-    });
-  }
-
   hasGatewayConfiguration() {
     return this.gateway !== null;
   }
@@ -66,5 +60,12 @@ export class Project extends PollingEntity {
     // Testnet usage is in beta, main-net won't be support
     // TODO: better handle emulator gateway detection (address could also be an IP)
     return this.gateway.address.includes("localhost");
+  }
+
+  static create(projectDto: CreateProjectDto) {
+    return Object.assign(new ProjectEntity(), {
+      id: toKebabCase(projectDto.name),
+      ...Project.fromJSON(projectDto),
+    });
   }
 }

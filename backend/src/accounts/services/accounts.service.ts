@@ -2,19 +2,19 @@ import { Injectable } from "@nestjs/common";
 import { CreateAccountDto } from "../dto/create-account.dto";
 import { UpdateAccountDto } from "../dto/update-account.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Account } from "../entities/account.entity";
+import { AccountEntity } from "../entities/account.entity";
 import { Repository } from "typeorm";
-import { Transaction } from "../../transactions/entities/transaction.entity";
+import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { ContractsService } from "./contracts.service";
 import { plainToInstance } from "class-transformer";
 
 @Injectable()
 export class AccountsService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
-    @InjectRepository(Transaction)
-    private transactionRepository: Repository<Transaction>,
+    @InjectRepository(AccountEntity)
+    private accountRepository: Repository<AccountEntity>,
+    @InjectRepository(TransactionEntity)
+    private transactionRepository: Repository<TransactionEntity>,
     private contractsService: ContractsService
   ) {}
 
@@ -28,7 +28,7 @@ export class AccountsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<Account[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<AccountEntity[]> {
     return this.accountRepository
       .createQueryBuilder("account")
       .select()
@@ -67,7 +67,7 @@ export class AccountsService {
   }
 
   async create(createAccountDto: CreateAccountDto) {
-    const account = plainToInstance(Account, createAccountDto);
+    const account = plainToInstance(AccountEntity, createAccountDto);
     return this.accountRepository.insert(account);
   }
 

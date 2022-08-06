@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { AccountContract } from "../entities/contract.entity";
+import { AccountContractEntity } from "../entities/contract.entity";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()
 export class ContractsService {
   constructor(
-    @InjectRepository(AccountContract)
-    private contractRepository: Repository<AccountContract>
+    @InjectRepository(AccountContractEntity)
+    private contractRepository: Repository<AccountContractEntity>
   ) {}
 
   async countAll() {
@@ -21,7 +21,9 @@ export class ContractsService {
     });
   }
 
-  async findAllNewerThanTimestamp(timestamp: Date): Promise<AccountContract[]> {
+  async findAllNewerThanTimestamp(
+    timestamp: Date
+  ): Promise<AccountContractEntity[]> {
     return this.contractRepository
       .createQueryBuilder("contract")
       .select()
@@ -41,14 +43,14 @@ export class ContractsService {
   }
 
   async findOne(id: string) {
-    const { accountAddress, name } = AccountContract.parseId(id);
+    const { accountAddress, name } = AccountContractEntity.parseId(id);
     return this.contractRepository.findOneByOrFail({
       accountAddress,
       name,
     });
   }
 
-  async update(contract: AccountContract) {
+  async update(contract: AccountContractEntity) {
     return this.contractRepository.update(
       { accountAddress: contract.accountAddress, name: contract.name },
       contract
@@ -57,7 +59,7 @@ export class ContractsService {
 
   async updateAccountContracts(
     accountAddress: string,
-    newContracts: AccountContract[]
+    newContracts: AccountContractEntity[]
   ) {
     const oldContracts = await this.getContractsByAccountAddress(
       accountAddress
@@ -67,7 +69,7 @@ export class ContractsService {
       oldEntities: oldContracts,
       newEntities: newContracts,
     });
-    return processEntitiesDiff<AccountContract>({
+    return processEntitiesDiff<AccountContractEntity>({
       create: (e) => this.create(e),
       update: (e) => this.update(e),
       delete: (e) => this.delete(e.accountAddress, e.name),
@@ -75,7 +77,7 @@ export class ContractsService {
     });
   }
 
-  async create(contract: AccountContract) {
+  async create(contract: AccountContractEntity) {
     return this.contractRepository.insert(contract);
   }
 

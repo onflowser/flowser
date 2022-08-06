@@ -1,13 +1,14 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { AccountKey } from "./key.entity";
-import { AccountContract } from "./contract.entity";
-import { AccountsStorage } from "./storage.entity";
+import { AccountKeyEntity } from "./key.entity";
+import { AccountContractEntity } from "./contract.entity";
+import { AccountsStorageEntity } from "./storage.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount } from "../../flow/services/flow-gateway.service";
+import { Account } from "@flowser/types/generated/accounts";
 
 @Entity({ name: "accounts" })
-export class Account extends PollingEntity {
+export class AccountEntity extends PollingEntity implements Account {
   @PrimaryColumn()
   address: string;
 
@@ -17,19 +18,19 @@ export class Account extends PollingEntity {
   @Column()
   code: string;
 
-  @OneToMany(() => AccountKey, (key) => key.account)
-  keys: AccountKey[];
+  @OneToMany(() => AccountKeyEntity, (key) => key.account)
+  keys: AccountKeyEntity[];
 
-  @OneToMany(() => AccountsStorage, (storage) => storage.account)
-  storage: AccountsStorage[];
+  @OneToMany(() => AccountsStorageEntity, (storage) => storage.account)
+  storage: AccountsStorageEntity[];
 
-  @OneToMany(() => AccountContract, (contract) => contract.account)
-  contracts: AccountContract[];
+  @OneToMany(() => AccountContractEntity, (contract) => contract.account)
+  contracts: AccountContractEntity[];
 
-  static create(flowAccount: FlowAccount): Account {
-    const account = Object.assign<Account, FlowAccount>(
-      new Account(),
-      flowAccount
+  static create(flowAccount: FlowAccount): AccountEntity {
+    const account = Object.assign(
+      new AccountEntity(),
+      Account.fromJSON(flowAccount)
     );
     account.address = ensurePrefixedAddress(flowAccount.address);
     return account;

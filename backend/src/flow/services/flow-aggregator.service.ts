@@ -14,19 +14,19 @@ import { TransactionsService } from "../../transactions/transactions.service";
 import { AccountsService } from "../../accounts/services/accounts.service";
 import { ContractsService } from "../../accounts/services/contracts.service";
 import { EventsService } from "../../events/events.service";
-import { Account } from "../../accounts/entities/account.entity";
-import { Event } from "../../events/entities/event.entity";
-import { Transaction } from "../../transactions/entities/transaction.entity";
-import { Block } from "../../blocks/entities/block.entity";
-import { Project } from "../../projects/entities/project.entity";
+import { AccountEntity } from "../../accounts/entities/account.entity";
+import { EventEntity } from "../../events/entities/event.entity";
+import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { BlockEntity } from "../../blocks/entities/block.entity";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowEmulatorService } from "./flow-emulator.service";
 import { LogsService } from "../../logs/logs.service";
-import { Log } from "../../logs/entities/log.entity";
+import { LogEntity } from "../../logs/entities/log.entity";
 import { StorageDataService } from "./storage-data.service";
 import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
-import { AccountContract } from "../../accounts/entities/contract.entity";
+import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
-import { AccountKey } from "../../accounts/entities/key.entity";
+import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
 import { plainToInstance } from "class-transformer";
@@ -49,7 +49,7 @@ export type ExtendedFlowEvent = FlowEvent & {
 
 @Injectable()
 export class FlowAggregatorService {
-  private project: Project;
+  private project: ProjectEntity;
   private readonly logger = new Logger(FlowAggregatorService.name);
   private serviceAccountBootstrapped = false;
 
@@ -66,7 +66,7 @@ export class FlowAggregatorService {
     private storageDataService: StorageDataService
   ) {}
 
-  configureProjectContext(project?: Project) {
+  configureProjectContext(project?: ProjectEntity) {
     this.project = project;
   }
 
@@ -85,7 +85,7 @@ export class FlowAggregatorService {
   handleEmulatorLogs(data: string[]) {
     return Promise.all(
       data.map((line) => {
-        return this.logsService.create(Log.create(line));
+        return this.logsService.create(LogEntity.create(line));
       })
     );
   }
@@ -174,7 +174,7 @@ export class FlowAggregatorService {
 
   async storeBlockData(data: BlockData) {
     const blockPromises = this.blockService
-      .create(Block.create(data.block))
+      .create(BlockEntity.create(data.block))
       .catch((e) =>
         this.logger.error(`block save error: ${e.message}`, e.stack)
       );
@@ -188,7 +188,7 @@ export class FlowAggregatorService {
     const eventPromises = Promise.all(
       data.events.map((event) =>
         this.eventService
-          .create(Event.create(event))
+          .create(EventEntity.create(event))
           .catch((e) =>
             this.logger.error(`event save error: ${e.message}`, e.stack)
           )
@@ -303,19 +303,25 @@ export class FlowAggregatorService {
     // TODO: Should we also mark all tx.authorizers as updated?
     const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
-      this.transactionService.create(plainToInstance(Transaction, transaction)),
+      this.transactionService.create(
+        plainToInstance(TransactionEntity, transaction)
+      ),
       this.accountService.markUpdated(payerAddress),
     ]);
   }
 
   async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const unSerializedAccount = Account.create(flowAccount);
+    const unSerializedAccount = AccountEntity.create(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      AccountContract.create(flowAccount, name, flowAccount.contracts[name])
+      AccountContractEntity.create(
+        flowAccount,
+        name,
+        flowAccount.contracts[name]
+      )
     );
     const newKeys = flowAccount.keys.map((flowKey) =>
-      AccountKey.create(flowAccount, flowKey)
+      AccountKeyEntity.create(flowAccount, flowKey)
     );
     await this.accountService.create(unSerializedAccount);
     console.log(`Account ${address} created`);
@@ -335,7 +341,7 @@ export class FlowAggregatorService {
       this.accountKeysService.updateAccountKeys(
         address,
         flowAccount.keys.map((flowKey) =>
-          AccountKey.create(flowAccount, flowKey)
+          AccountKeyEntity.create(flowAccount, flowKey)
         )
       ),
     ]);
@@ -344,9 +350,13 @@ export class FlowAggregatorService {
   async updateStoredAccountContracts(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
 
-    const account = Account.create(flowAccount);
+    const account = AccountEntity.create(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      AccountContract.create(flowAccount, name, flowAccount.contracts[name])
+      AccountContractEntity.create(
+        flowAccount,
+        name,
+        flowAccount.contracts[name]
+      )
     );
 
     await Promise.all([
@@ -359,7 +369,7 @@ export class FlowAggregatorService {
   }
 
   // TODO(milestone-3): when do we need to update the account storage?
-  async setUpdatedAccountStorage(account: Account) {
+  async setUpdatedAccountStorage(account: AccountEntity) {
     // storage data API works only for local emulator for now
     if (this.project.hasEmulatorGateway()) {
       // TODO(milestone-3): enable this when we integrate the storage data API

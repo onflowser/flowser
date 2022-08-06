@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
-import { Project } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { EventEmitter } from "events";
 import { FlowCliService } from "./flow-cli.service";
@@ -33,7 +33,7 @@ export class FlowEmulatorService {
 
   constructor(private flowCliService: FlowCliService) {}
 
-  configureProjectContext(project: Project) {
+  configureProjectContext(project: ProjectEntity) {
     this.projectId = project?.id;
     this.configuration = project.emulator;
   }

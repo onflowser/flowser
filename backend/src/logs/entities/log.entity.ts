@@ -1,8 +1,9 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Log } from "@flowser/types/generated/logs";
 
 @Entity()
-export class Log extends PollingEntity {
+export class LogEntity extends PollingEntity implements Log {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -10,8 +11,6 @@ export class Log extends PollingEntity {
   data: string;
 
   static create(lineData: string) {
-    const log = new Log();
-    log.data = lineData;
-    return log;
+    return Object.assign(new LogEntity(), Log.fromJSON({ data: lineData }));
   }
 }

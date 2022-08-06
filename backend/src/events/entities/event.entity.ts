@@ -1,9 +1,10 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
 import { ExtendedFlowEvent } from "../../flow/services/flow-aggregator.service";
+import { Event } from "@flowser/types/generated/events";
 
 @Entity({ name: "events" })
-export class Event extends PollingEntity {
+export class EventEntity extends PollingEntity implements Event {
   id: string;
 
   @PrimaryColumn()
@@ -30,7 +31,7 @@ export class Event extends PollingEntity {
     this.id = `${this.transactionId}.${this.eventIndex}`;
   }
 
-  static create(flowEvent: ExtendedFlowEvent): Event {
-    return Object.assign(new Event(), flowEvent);
+  static create(flowEvent: ExtendedFlowEvent): EventEntity {
+    return Object.assign(new EventEntity(), Event.fromJSON(flowEvent));
   }
 }

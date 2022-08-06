@@ -1,7 +1,7 @@
 import { Logger, Module } from "@nestjs/common";
 import { ProjectsService } from "./projects.service";
 import { ProjectsController } from "./projects.controller";
-import { Project } from "./entities/project.entity";
+import { ProjectEntity } from "./entities/project.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FlowModule } from "../flow/flow.module";
 import { AccountsModule } from "../accounts/accounts.module";
@@ -12,7 +12,7 @@ import { TransactionsModule } from "../transactions/transactions.module";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Project]),
+    TypeOrmModule.forFeature([ProjectEntity]),
     FlowModule,
     AccountsModule,
     BlocksModule,

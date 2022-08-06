@@ -1,37 +1,6 @@
 syntax = "proto3";
 
-// TODO: Does it make sense to define types as enum?
-enum TransactionArgumentType {
-  TX_ARG_UNSPECIFIED = 0;
-  UInt = 1;
-  UInt8 = 2;
-  UInt16 = 3;
-  UInt32 = 4;
-  UInt64 = 5;
-  UInt128 = 6;
-  UInt256 = 7;
-  Int = 8;
-  Int8 = 9;
-  Int16 = 10;
-  Int32 = 11;
-  Int64 = 12;
-  Int128 = 13;
-  Int256 = 14;
-  Word8 = 15;
-  Word16 = 16;
-  Word32 = 17;
-  Word64 = 18;
-  UFix64 = 19;
-  Fix64 = 20;
-  String = 21;
-  Character = 22;
-  Bool = 23;
-  Address = 24;
-  Optional = 25;
-  Array = 26;
-  Dictionary = 27;
-  Path = 28;
-}
+import "common.proto";
 
 enum TransactionStatusCode {
   UNKNOWN = 0;
@@ -60,7 +29,7 @@ enum TransactionStatusCode {
 
 message Transaction {
   string id = 1;
-  string text = 2;
+  string script = 2;
   string reference_block_id = 3;
   uint32 gas_limit = 4;
   string payer = 5;
@@ -72,14 +41,14 @@ message Transaction {
 }
 
 message TransactionArgument {
-  TransactionArgumentType type = 1;
+  CadenceType type = 1;
   string value = 2;
 }
 
 message TransactionProposalKey {
   string address = 1;
   int32 key_id = 2;
-  string sequence_number = 3;
+  int32 sequence_number = 3;
 }
 
 message TransactionEnvelopeSignature {

@@ -1,10 +1,11 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { CollectionGuarantee } from "./collection-guarantee.entity";
+import { CollectionGuaranteeEntity } from "./collection-guarantee.entity";
 import { FlowBlock } from "../../flow/services/flow-gateway.service";
+import { Block } from "@flowser/types/generated/blocks";
 
 @Entity({ name: "blocks" })
-export class Block extends PollingEntity {
+export class BlockEntity extends PollingEntity implements Block {
   @PrimaryColumn()
   id: string;
 
@@ -18,7 +19,7 @@ export class Block extends PollingEntity {
   timestamp: string;
 
   @Column("simple-json")
-  collectionGuarantees: CollectionGuarantee[];
+  collectionGuarantees: CollectionGuaranteeEntity[];
 
   // TODO(milestone-2): define type
   @Column("simple-json")
@@ -27,7 +28,7 @@ export class Block extends PollingEntity {
   @Column("simple-array")
   signatures: string[];
 
-  static create(flowBlock: FlowBlock): Block {
-    return Object.assign(new Block(), flowBlock);
+  static create(flowBlock: FlowBlock): BlockEntity {
+    return Object.assign(new BlockEntity(), Block.fromJSON(flowBlock));
   }
 }

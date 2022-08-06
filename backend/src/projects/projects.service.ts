@@ -9,7 +9,7 @@ import {
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { Repository } from "typeorm";
-import { Project } from "./entities/project.entity";
+import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/flow-gateway.service";
 import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
@@ -28,12 +28,12 @@ import { KeysService } from "../accounts/services/keys.service";
 
 @Injectable()
 export class ProjectsService {
-  private currentProject: Project;
+  private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
   constructor(
-    @InjectRepository(Project)
-    private projectRepository: Repository<Project>,
+    @InjectRepository(ProjectEntity)
+    private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
     private flowAggregatorService: FlowAggregatorService,
     private flowEmulatorService: FlowEmulatorService,
@@ -50,7 +50,11 @@ export class ProjectsService {
 
   seedDefaultProjects() {
     return this.projectRepository
-      .save(defaultProjects.map((project) => plainToInstance(Project, project)))
+      .save(
+        defaultProjects.map((project) =>
+          plainToInstance(ProjectEntity, project)
+        )
+      )
       .catch(this.handleDatabaseError);
   }
 
@@ -144,14 +148,14 @@ export class ProjectsService {
   }
 
   async create(createProjectDto: CreateProjectDto) {
-    const project = plainToInstance(Project, createProjectDto);
+    const project = plainToInstance(ProjectEntity, createProjectDto);
     await this.projectRepository
       .insert(project)
       .catch(this.handleDatabaseError);
     return project;
   }
 
-  async findAll(): Promise<Project[]> {
+  async findAll(): Promise<ProjectEntity[]> {
     const projects = await this.projectRepository.find({
       order: { updatedAt: "DESC" },
     });
@@ -160,13 +164,13 @@ export class ProjectsService {
     );
   }
 
-  async findOne(id: string): Promise<Project> {
+  async findOne(id: string): Promise<ProjectEntity> {
     const project = await this.projectRepository.findOneByOrFail({ id });
     return this.setComputedFields(project);
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
-    const project = plainToInstance(Project, updateProjectDto);
+    const project = plainToInstance(ProjectEntity, updateProjectDto);
     project.markUpdated();
     await this.projectRepository
       .update({ id }, updateProjectDto)
@@ -181,14 +185,14 @@ export class ProjectsService {
     return this.projectRepository.delete({ id });
   }
 
-  private async setComputedFields(project: Project) {
+  private async setComputedFields(project: ProjectEntity) {
     if (project.hasGatewayConfiguration()) {
       const { address, port } = project.gateway;
       // Assume non emulator networks are pingable
       const pingable = project.hasEmulatorGateway()
         ? await FlowGatewayService.isPingable(address, port)
         : true;
-      return plainToInstance(Project, { ...project, pingable });
+      return plainToInstance(ProjectEntity, { ...project, pingable });
     } else {
       return project;
     }

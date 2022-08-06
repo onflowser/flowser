@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Transaction } from "./entities/transaction.entity";
+import { TransactionEntity } from "./entities/transaction.entity";
 import { MoreThan, Repository } from "typeorm";
 
 @Injectable()
 export class TransactionsService {
   constructor(
-    @InjectRepository(Transaction)
-    private transactionRepository: Repository<Transaction>
+    @InjectRepository(TransactionEntity)
+    private transactionRepository: Repository<TransactionEntity>
   ) {}
 
   create(createTransactionDto: CreateTransactionDto) {
     return this.transactionRepository.save(createTransactionDto);
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<Transaction[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<TransactionEntity[]> {
     return this.transactionRepository.find({
       where: [
         { createdAt: MoreThan(timestamp) },

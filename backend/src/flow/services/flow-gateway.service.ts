@@ -2,7 +2,7 @@ import { GatewayConfigurationEntity } from "../../projects/entities/gateway-conf
 import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
-import { AccountsStorage } from "../../accounts/entities/storage.entity";
+import { AccountsStorageEntity } from "../../accounts/entities/storage.entity";
 
 export type FlowCollectionGuarantee = {
   collectionId: string;
@@ -35,7 +35,7 @@ export type FlowAccount = {
   code: string;
   contracts: Record<string, string>;
   keys: FlowKey[];
-  storage?: AccountsStorage;
+  storage?: AccountsStorageEntity;
 };
 
 export type FlowCollection = {

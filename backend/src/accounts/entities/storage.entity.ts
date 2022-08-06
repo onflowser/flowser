@@ -1,8 +1,9 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { Account } from "./account.entity";
+import { AccountEntity } from "./account.entity";
+import { AccountStorage } from "@flowser/types/generated/accounts";
 
 @Entity({ name: "storage" })
-export class AccountsStorage {
+export class AccountsStorageEntity implements AccountStorage {
   // TODO(milestone-2): Which attributes should be considered a primary key?
   @PrimaryColumn()
   name: string;
@@ -16,6 +17,6 @@ export class AccountsStorage {
   @Column()
   value: string;
 
-  @ManyToOne(() => Account, (account) => account.storage)
-  account: Account;
+  @ManyToOne(() => AccountEntity, (account) => account.storage)
+  account: AccountEntity;
 }

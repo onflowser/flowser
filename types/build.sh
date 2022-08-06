@@ -8,3 +8,6 @@ protoc -I=./proto \
   ./proto/*
 
 tsc -p tsconfig.json
+mv -v dist/generated/*.js generated/
+mv -v dist/generated/google/protobuf/*.js generated/google/protobuf
+rm -r dist

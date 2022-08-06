@@ -1,4 +1,6 @@
-export class EmulatorConfigurationEntity {
+import { Emulator } from "@flowser/types/generated/projects";
+
+export class EmulatorConfigurationEntity implements Emulator {
   verboseLogging: boolean;
 
   httpServerPort: number;
