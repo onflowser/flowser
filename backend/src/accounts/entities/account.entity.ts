@@ -18,13 +18,19 @@ export class AccountEntity extends PollingEntity implements Account {
   @Column()
   code: string;
 
-  @OneToMany(() => AccountKeyEntity, (key) => key.account)
+  @OneToMany(() => AccountKeyEntity, (key) => key.account, {
+    eager: true,
+  })
   keys: AccountKeyEntity[];
 
-  @OneToMany(() => AccountsStorageEntity, (storage) => storage.account)
+  @OneToMany(() => AccountsStorageEntity, (storage) => storage.account, {
+    eager: true,
+  })
   storage: AccountsStorageEntity[];
 
-  @OneToMany(() => AccountContractEntity, (contract) => contract.account)
+  @OneToMany(() => AccountContractEntity, (contract) => contract.account, {
+    eager: true,
+  })
   contracts: AccountContractEntity[];
 
   static create(flowAccount: FlowAccount): AccountEntity {

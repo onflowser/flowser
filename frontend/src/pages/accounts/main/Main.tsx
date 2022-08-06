@@ -56,11 +56,11 @@ const Main: FunctionComponent<any> = () => {
             </div>
             <div>
               <Label>KEY COUNT</Label>
-              <Value>{item.keys?.length}</Value>
+              <Value>{item.keys?.length ?? 0}</Value>
             </div>
             <div>
               <Label>TX COUNT</Label>
-              <Value>{item.txCount}</Value>
+              <Value>{item.transactions?.length ?? 0}</Value>
             </div>
           </Card>
         ))}

@@ -3,7 +3,11 @@ import { PollingEntity } from "../../common/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount, FlowKey } from "../../flow/services/flow-gateway.service";
-import { AccountKey } from "@flowser/types/generated/accounts";
+import {
+  AccountKey,
+  HashAlgo,
+  SignCurve,
+} from "@flowser/types/generated/accounts";
 
 @Entity({ name: "keys" })
 export class AccountKeyEntity extends PollingEntity implements AccountKey {
@@ -17,10 +21,10 @@ export class AccountKeyEntity extends PollingEntity implements AccountKey {
   publicKey: string;
 
   @Column()
-  signAlgo: number;
+  signAlgo: SignCurve;
 
   @Column()
-  hashAlgo: number;
+  hashAlgo: HashAlgo;
 
   @Column()
   weight: number;

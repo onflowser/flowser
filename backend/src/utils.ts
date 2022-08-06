@@ -1,5 +1,25 @@
 const kebabCase = require("kebab-case");
 
+export type ProtobufLikeObject = {
+  toJSON: (value: any) => any;
+  fromJSON: (value: any) => any;
+};
+
+export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
+  return {
+    from: (value: any) => {
+      return value["map"] !== undefined
+        ? value.map(protobuf.fromJSON)
+        : protobuf.fromJSON(value);
+    },
+    to: (value: any) => {
+      return value["map"] !== undefined
+        ? value.map(protobuf.toJSON)
+        : protobuf.toJSON(value);
+    },
+  };
+}
+
 export function toKebabCase(string: string) {
   const kebab = kebabCase(string);
   // kebabCase("WebkitTransform"); => "-webkit-transform"

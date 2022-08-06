@@ -9,8 +9,10 @@ export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Get("/transactions")
-  findAll() {
-    return this.transactionsService.findAll();
+  async findAll() {
+    const c = await this.transactionsService.findAll();
+    console.log(c[0].args);
+    return c;
   }
 
   @Get("/transactions/polling")

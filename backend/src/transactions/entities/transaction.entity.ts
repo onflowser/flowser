@@ -8,6 +8,7 @@ import {
   TransactionStatus,
 } from "@flowser/types/generated/transactions";
 import { FlowTransaction } from "../../flow/services/flow-gateway.service";
+import { typeOrmProtobufTransformer } from "../../utils";
 
 @Entity({ name: "transactions" })
 export class TransactionEntity extends PollingEntity implements Transaction {
@@ -17,17 +18,11 @@ export class TransactionEntity extends PollingEntity implements Transaction {
   @Column("text")
   script: string;
 
-  @Column("simple-json")
-  args: TransactionArgument[];
-
   @Column()
   referenceBlockId: string;
 
   @Column()
   gasLimit: number;
-
-  @Column("simple-json")
-  proposalKey: TransactionProposalKey;
 
   @Column()
   payer: string; // payer account address
@@ -35,10 +30,24 @@ export class TransactionEntity extends PollingEntity implements Transaction {
   @Column("simple-array")
   authorizers: string[]; // authorizers account addresses
 
-  @Column("simple-json")
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(TransactionArgument),
+  })
+  args: TransactionArgument[];
+
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(TransactionProposalKey),
+  })
+  proposalKey: TransactionProposalKey;
+
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(TransactionEnvelopeSignature),
+  })
   envelopeSignatures: TransactionEnvelopeSignature[];
 
-  @Column("simple-json")
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(TransactionStatus),
+  })
   status: TransactionStatus;
 
   static create(flowTransaction: FlowTransaction): TransactionEntity {

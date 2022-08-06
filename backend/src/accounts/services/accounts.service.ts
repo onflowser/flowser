@@ -3,7 +3,7 @@ import { CreateAccountDto } from "../dto/create-account.dto";
 import { UpdateAccountDto } from "../dto/update-account.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountEntity } from "../entities/account.entity";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { ContractsService } from "./contracts.service";
 import { plainToInstance } from "class-transformer";
@@ -29,13 +29,15 @@ export class AccountsService {
   }
 
   findAllNewerThanTimestamp(timestamp: Date): Promise<AccountEntity[]> {
-    return this.accountRepository
-      .createQueryBuilder("account")
-      .select()
-      .where("account.updatedAt > :timestamp", { timestamp })
-      .orWhere("account.createdAt > :timestamp", { timestamp })
-      .orderBy("account.createdAt", "DESC")
-      .getMany();
+    return this.accountRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp) },
+        { createdAt: MoreThan(timestamp) },
+      ],
+      order: {
+        createdAt: "DESC",
+      },
+    });
   }
 
   async findOne(address: string) {
@@ -79,12 +81,7 @@ export class AccountsService {
   }
 
   async markUpdated(address: string) {
-    const account = await this.accountRepository
-      .findOneByOrFail({ address })
-      .catch((e) => {
-        console.log("Mark updated error", e);
-        throw e;
-      });
+    const account = await this.accountRepository.findOneByOrFail({ address });
     account.markUpdated();
     return this.update(address, account);
   }
