@@ -3,25 +3,39 @@ import { ContractsService } from "../services/contracts.service";
 import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
 import { ParseUnixTimestampPipe } from "../../common/pipes/parse-unix-timestamp.pipe";
+import {
+  GetSingleContractResponse,
+  GetPollingContractsResponse,
+  GetAllContractsResponse,
+} from "@flowser/types/generated/responses/contracts";
 
 @Controller("contracts")
 export class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
 
   @Get()
-  findAll() {
-    return this.contractsService.findAll();
+  async findAll() {
+    const contracts = await this.contractsService.findAll();
+    return GetAllContractsResponse.toJSON({
+      contracts: contracts.map((contract) => contract.toProto()),
+    });
   }
 
   @Get("/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
-    return this.contractsService.findAllNewerThanTimestamp(timestamp);
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
+  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+    const contracts = await this.contractsService.findAllNewerThanTimestamp(
+      timestamp
+    );
+    return contracts.map((contract) => contract.toProto());
   }
 
   @ApiParam({ name: "id", type: String })
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.contractsService.findOne(id);
+  async findOne(@Param("id") id: string) {
+    const contract = await this.contractsService.findOne(id);
+    return GetSingleContractResponse.toJSON({
+      contract: contract.toProto(),
+    });
   }
 }

@@ -1,18 +1,11 @@
-import { useQuery } from "react-query";
-import axios from "../config/axios";
+import { TimeoutPollingHook, useTimeoutPolling } from "./timeout-polling";
+import { AccountsService } from "../services/accounts.service";
+import { Account } from "@flowser/types/generated/accounts";
 
-export const useApi = () => {
-  const get = <T>(url: string) =>
-    useQuery<{ data: T }, Error>("get", async () => axios.get(url), {
-      refetchOnWindowFocus: false,
-    });
-  const post = <T>(url: string, data: any) =>
-    useQuery<{ data: T }, Error>("get", async () => axios.post(url, data), {
-      refetchOnWindowFocus: false,
-    });
-
-  return {
-    get,
-    post,
-  };
-};
+export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
+  return useTimeoutPolling<Account>({
+    resourceKey: "/accounts/polling",
+    resourceIdKey: "address",
+    fetcher: AccountsService.getInstance().getAllWithPolling,
+  });
+}

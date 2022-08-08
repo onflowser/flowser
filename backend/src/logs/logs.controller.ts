@@ -2,19 +2,27 @@ import { Controller, Get, UseInterceptors, Query } from "@nestjs/common";
 import { LogsService } from "./logs.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
+import {
+  GetAllLogsResponse,
+  GetPollingLogsResponse,
+} from "@flowser/types/generated/responses/logs";
 
 @Controller("logs")
 export class LogsController {
   constructor(private readonly logsService: LogsService) {}
 
   @Get()
-  findAll() {
-    return this.logsService.findAll();
+  async findAll() {
+    const logs = await this.logsService.findAll();
+    return GetAllLogsResponse.toJSON({
+      logs: logs.map((log) => log.toProto()),
+    });
   }
 
   @Get("/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
-    return this.logsService.findAllNewerThanTimestamp(timestamp);
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingLogsResponse))
+  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+    const logs = await this.logsService.findAllNewerThanTimestamp(timestamp);
+    return logs.map((log) => log.toProto());
   }
 }

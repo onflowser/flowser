@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "entities/blocks.proto";
+import "responses/common.proto";
+
+message GetAllBlocksResponse {
+  repeated Block blocks = 1;
+}
+
+message GetPollingBlocksResponse {
+  repeated Block data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetSingleBlockResponse {
+  Block block = 1;
+}

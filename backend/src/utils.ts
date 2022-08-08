@@ -1,4 +1,33 @@
+import { FlowCadenceObject } from "./flow/services/flow-gateway.service";
+import { CadenceObject } from "@flowser/types/generated/entities/common";
+
 const kebabCase = require("kebab-case");
+
+export function deserializeCadenceObject(
+  cadenceObject: FlowCadenceObject
+): CadenceObject {
+  if (typeof cadenceObject.value === "string") {
+    return CadenceObject.fromJSON({
+      type: cadenceObject.type,
+      value: cadenceObject.value,
+    });
+  }
+  if (cadenceObject.value instanceof Array) {
+    return CadenceObject.fromJSON({
+      type: cadenceObject.type,
+      children: cadenceObject.value.map((value) =>
+        deserializeCadenceObject(value)
+      ),
+    });
+  }
+  if (cadenceObject.value instanceof Object) {
+    return CadenceObject.fromJSON({
+      type: cadenceObject.type,
+      children: deserializeCadenceObject(cadenceObject.value),
+    });
+  }
+  throw new Error("Unimplemented cadence type");
+}
 
 export type ProtobufLikeObject = {
   toJSON: (value: any) => any;
@@ -7,13 +36,19 @@ export type ProtobufLikeObject = {
 
 export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
   return {
-    from: (value: any) => {
-      return value["map"] !== undefined
+    from: (value: any | null) => {
+      if (value === null) {
+        return null;
+      }
+      return value?.["map"] !== undefined
         ? value.map(protobuf.fromJSON)
         : protobuf.fromJSON(value);
     },
-    to: (value: any) => {
-      return value["map"] !== undefined
+    to: (value: any | null) => {
+      if (value === null) {
+        return null;
+      }
+      return value?.["map"] !== undefined
         ? value.map(protobuf.toJSON)
         : protobuf.toJSON(value);
     },

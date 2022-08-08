@@ -14,6 +14,9 @@ message Block {
   // See: https://github.com/onflow/fcl-js/blob/master/packages/protobuf/src/proto/flow/entities/block_seal.proto
   repeated google.protobuf.Struct block_seals = 6;
   repeated string signatures = 7;
+
+  string created_at = 8;
+  string updated_at = 9;
 }
 
 message CollectionGuarantee {

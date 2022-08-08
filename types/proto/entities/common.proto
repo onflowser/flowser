@@ -31,3 +31,9 @@ enum CadenceType {
   Dictionary = 27;
   Path = 28;
 }
+
+message CadenceObject {
+  CadenceType type = 1;
+  optional string value = 2;
+  repeated CadenceObject children = 3;
+}

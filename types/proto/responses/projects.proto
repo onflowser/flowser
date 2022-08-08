@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "entities/projects.proto";
+
+message GetAllProjectsResponse {
+  repeated Project projects = 1;
+}
+
+message GetSingleProjectResponse {
+  Project project = 1;
+}

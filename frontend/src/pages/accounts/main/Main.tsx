@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import classes from "./Main.module.scss";
 import Card from "../../../shared/components/card/Card";
 import Label from "../../../shared/components/label/Label";
@@ -7,18 +7,14 @@ import { useNavigation } from "../../../shared/hooks/navigation";
 import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../shared/hooks/search";
 import { useFilterData } from "../../../shared/hooks/filter-data";
-import { useTimeoutPolling } from "../../../shared/hooks/timeout-polling";
 import NoResults from "../../../shared/components/no-results/NoResults";
 import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
+import { useGetPollingAccounts } from "../../../shared/hooks/api";
 
-const Main: FunctionComponent<any> = () => {
+const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  // TODO(milestone-2): fix types
-  const { data: transactions, firstFetch } = useTimeoutPolling<any>(
-    "/api/accounts/polling",
-    "address"
-  );
+  const { data: transactions, firstFetch } = useGetPollingAccounts();
 
   useEffect(() => {
     setPlaceholder("search for block numbers or tx hashes");
@@ -35,9 +31,9 @@ const Main: FunctionComponent<any> = () => {
   return (
     <>
       {filteredData &&
-        filteredData.map((item, i) => (
+        filteredData.map((item) => (
           <Card
-            key={item.address + item.txCount + item.keys?.length}
+            key={item.address}
             className={`${classes.card} ${
               item.isNew || item.isUpdated ? classes.isNew : ""
             }`}
@@ -60,7 +56,7 @@ const Main: FunctionComponent<any> = () => {
             </div>
             <div>
               <Label>TX COUNT</Label>
-              <Value>{item.transactions?.length ?? 0}</Value>
+              <Value>{item.transactionCount ?? 0}</Value>
             </div>
           </Card>
         ))}

@@ -1,11 +1,14 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { FlowBlock } from "../../flow/services/flow-gateway.service";
-import { Block, CollectionGuarantee } from "@flowser/types/generated/blocks";
+import {
+  Block,
+  CollectionGuarantee,
+} from "@flowser/types/generated/entities/blocks";
 import { typeOrmProtobufTransformer } from "../../utils";
 
 @Entity({ name: "blocks" })
-export class BlockEntity extends PollingEntity implements Block {
+export class BlockEntity extends PollingEntity {
   @PrimaryColumn()
   id: string;
 
@@ -15,8 +18,8 @@ export class BlockEntity extends PollingEntity implements Block {
   @Column()
   height: number;
 
-  @Column()
-  timestamp: string;
+  @Column("datetime")
+  timestamp: Date;
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(CollectionGuarantee),
@@ -31,6 +34,27 @@ export class BlockEntity extends PollingEntity implements Block {
   signatures: string[];
 
   static create(flowBlock: FlowBlock): BlockEntity {
-    return Object.assign(new BlockEntity(), Block.fromJSON(flowBlock));
+    const block = new BlockEntity();
+    block.id = flowBlock.id;
+    block.collectionGuarantees = flowBlock.collectionGuarantees;
+    block.blockSeals = flowBlock.blockSeals;
+    block.signatures = flowBlock.signatures;
+    block.timestamp = new Date(flowBlock.timestamp);
+    block.height = flowBlock.height;
+    block.parentId = flowBlock.parentId;
+    return block;
+  }
+
+  toProto() {
+    return Block.fromPartial({
+      id: this.id,
+      parentId: this.parentId,
+      height: this.height,
+      timestamp: this.timestamp.toISOString(),
+      blockSeals: this.blockSeals,
+      signatures: this.signatures,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    });
   }
 }

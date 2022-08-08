@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TransactionEntity } from "./entities/transaction.entity";
 import { MoreThan, Repository } from "typeorm";
@@ -11,8 +10,8 @@ export class TransactionsService {
     private transactionRepository: Repository<TransactionEntity>
   ) {}
 
-  create(createTransactionDto: CreateTransactionDto) {
-    return this.transactionRepository.save(createTransactionDto);
+  create(transaction: TransactionEntity) {
+    return this.transactionRepository.save(transaction);
   }
 
   findAllNewerThanTimestamp(timestamp: Date): Promise<TransactionEntity[]> {

@@ -13,4 +13,6 @@ message Event {
     string type = 5;
     int32 transaction_index = 6;
     google.protobuf.Struct data = 7;
+    string created_at = 8;
+    string updated_at = 9;
 }

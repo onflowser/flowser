@@ -1,4 +1,4 @@
-import config from "../../config";
+import config, { env } from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import {
@@ -30,6 +30,7 @@ import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
 import { plainToInstance } from "class-transformer";
+import { TransactionStatus } from "@flowser/types/generated/entities/transactions";
 
 type BlockData = {
   block: FlowBlock;
@@ -180,8 +181,9 @@ export class FlowAggregatorService {
       );
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
-        this.handleTransactionCreated(transaction).catch((e) =>
-          this.logger.error(`transaction save error: ${e.message}`, e.stack)
+        this.handleTransactionCreated(transaction, transaction.status).catch(
+          (e) =>
+            this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
@@ -299,12 +301,15 @@ export class FlowAggregatorService {
     }
   }
 
-  async handleTransactionCreated(transaction: FlowTransaction) {
+  async handleTransactionCreated(
+    transaction: FlowTransaction,
+    status: FlowTransactionStatus
+  ) {
     // TODO: Should we also mark all tx.authorizers as updated?
     const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
       this.transactionService.create(
-        plainToInstance(TransactionEntity, transaction)
+        TransactionEntity.create(transaction, status)
       ),
       this.accountService.markUpdated(payerAddress),
     ]);
@@ -349,7 +354,6 @@ export class FlowAggregatorService {
 
   async updateStoredAccountContracts(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-
     const account = AccountEntity.create(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
       AccountContractEntity.create(
@@ -379,7 +383,8 @@ export class FlowAggregatorService {
   }
 
   async bootstrapServiceAccount() {
-    const { serviceAddress } = defaultEmulatorFlags;
+    // TODO(milestone-2): provide this in project config entity
+    const serviceAddress = env.FLOW_ACCOUNT_ADDRESS;
 
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();

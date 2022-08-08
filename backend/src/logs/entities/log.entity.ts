@@ -1,16 +1,25 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { Log } from "@flowser/types/generated/logs";
+import { Log } from "@flowser/types/generated/entities/logs";
 
 @Entity()
-export class LogEntity extends PollingEntity implements Log {
+export class LogEntity extends PollingEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   data: string;
 
+  toProto() {
+    return Log.fromPartial({
+      id: this.id,
+      data: this.data,
+    });
+  }
+
   static create(lineData: string) {
-    return Object.assign(new LogEntity(), Log.fromJSON({ data: lineData }));
+    const log = new LogEntity();
+    log.data = lineData;
+    return log;
   }
 }

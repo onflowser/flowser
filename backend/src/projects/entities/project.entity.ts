@@ -4,10 +4,11 @@ import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { Project } from "@flowser/types/generated/projects";
+import { Project } from "@flowser/types/generated/entities/projects";
+import { plainToInstance } from "class-transformer";
 
 @Entity({ name: "projects" })
-export class ProjectEntity extends PollingEntity implements Project {
+export class ProjectEntity extends PollingEntity {
   @PrimaryColumn()
   id: string;
 
@@ -22,7 +23,7 @@ export class ProjectEntity extends PollingEntity implements Project {
   gateway: GatewayConfigurationEntity;
 
   @Column("simple-json", { nullable: true })
-  emulator: EmulatorConfigurationEntity;
+  emulator: EmulatorConfigurationEntity | null;
 
   @Column("boolean", { default: false })
   isCustom: boolean = false;
@@ -62,10 +63,32 @@ export class ProjectEntity extends PollingEntity implements Project {
     return this.gateway.address.includes("localhost");
   }
 
-  static create(projectDto: CreateProjectDto) {
-    return Object.assign(new ProjectEntity(), {
-      id: toKebabCase(projectDto.name),
-      ...Project.fromJSON(projectDto),
+  toProto() {
+    return Project.fromPartial({
+      id: this.id,
+      name: this.name,
+      pingable: this.pingable,
+      isCustom: this.isCustom,
+      startBlockHeight: this.startBlockHeight,
+      gateway: this.gateway?.toProto(),
+      emulator: this.emulator?.toProto(),
     });
+  }
+
+  static create(projectDto: CreateProjectDto) {
+    const project = new ProjectEntity();
+    project.id = toKebabCase(projectDto.name);
+    project.name = projectDto.name;
+    project.startBlockHeight = projectDto.startBlockHeight;
+    project.isCustom = projectDto.isCustom;
+    project.gateway = plainToInstance(
+      GatewayConfigurationEntity,
+      projectDto.gateway
+    );
+    project.emulator = plainToInstance(
+      EmulatorConfigurationEntity,
+      projectDto.emulator
+    );
+    return project;
   }
 }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "entities/accounts.proto";
+import "responses/common.proto";
+
+message GetAllContractsResponse {
+  repeated AccountContract contracts = 1;
+}
+
+message GetPollingContractsResponse {
+  repeated AccountContract data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetSingleContractResponse {
+  AccountContract contract = 1;
+}

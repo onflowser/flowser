@@ -1,7 +1,10 @@
 import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
-import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import {
+  PollingResponse,
+  PollingEntity,
+} from "@flowser/types/generated/common";
 
 export interface TimeoutPollingHook<T extends PollingEntity> {
   stopPolling: () => void;
@@ -9,13 +12,7 @@ export interface TimeoutPollingHook<T extends PollingEntity> {
   isFetching: boolean;
   firstFetch: boolean;
   error: Error | null;
-  data: T[];
-}
-
-// TODO(milestone-2): define shared types between frontend/backend
-export interface PollingEntity {
-  createdAt: string;
-  updatedAt: string;
+  data: DecoratedPollingEntity<T>[];
 }
 
 export type DecoratedPollingEntity<T> = T & {
@@ -23,19 +20,20 @@ export type DecoratedPollingEntity<T> = T & {
   isUpdated: boolean;
 };
 
-export type PollingResponse<T extends PollingEntity> = {
-  data: T[];
-  meta: {
-    latestTimestamp: number;
-  };
+type UseTimeoutPollingProps<T extends PollingEntity> = {
+  resourceKey: string;
+  resourceIdKey: keyof T;
+  fetcher: ({
+    timestamp,
+  }: {
+    timestamp: number;
+  }) => Promise<AxiosResponse<PollingResponse<T>>>;
+  interval?: number;
+  newestFirst?: boolean;
 };
 
-// TODO(milestone-2): redefine arguments in object form
 export const useTimeoutPolling = <T extends PollingEntity>(
-  resource: string,
-  resourceIdKey: keyof T, // TODO(milestone-2): should this be required?
-  interval?: number,
-  newestFirst = true
+  props: UseTimeoutPollingProps<T>
 ): TimeoutPollingHook<T> => {
   const [lastPollingTime, setLastPollingTime] = useState(0);
   const [stop, setStop] = useState(false);
@@ -43,17 +41,13 @@ export const useTimeoutPolling = <T extends PollingEntity>(
   const [firstFetch, setFirstFetch] = useState(false);
 
   const fetchCallback = useCallback(() => {
-    return axios.get(resource, {
-      params: {
-        timestamp: lastPollingTime,
-      },
-    });
+    return props.fetcher({ timestamp: lastPollingTime });
   }, [lastPollingTime]);
 
   const { isFetching, error } = useQuery<
     AxiosResponse<PollingResponse<T>>,
     Error
-  >(resource, fetchCallback, {
+  >(props.resourceKey, fetchCallback, {
     onSuccess: (response) => {
       if (response.status === 200 && response.data?.data?.length) {
         const latestTimestamp = response.data?.meta?.latestTimestamp;
@@ -64,10 +58,10 @@ export const useTimeoutPolling = <T extends PollingEntity>(
         const newItems = mergeAndDecorateItems(
           data,
           response.data.data,
-          resourceIdKey
+          props.resourceIdKey
         );
 
-        if (newestFirst) {
+        if (props.newestFirst ?? true) {
           const sortedNewItems = newItems.sort(
             (a, b) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -80,7 +74,7 @@ export const useTimeoutPolling = <T extends PollingEntity>(
       }
     },
     enabled: !stop,
-    refetchInterval: interval || 1000,
+    refetchInterval: props.interval || 1000,
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: false,
   });

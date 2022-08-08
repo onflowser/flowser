@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { CreateLogDto } from "./dto/create-log.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LogEntity } from "./entities/log.entity";
 import { MoreThan, Repository } from "typeorm";
@@ -11,8 +10,8 @@ export class LogsService {
     private logsRepository: Repository<LogEntity>
   ) {}
 
-  create(createLogDto: CreateLogDto) {
-    return this.logsRepository.insert(createLogDto);
+  create(log: LogEntity) {
+    return this.logsRepository.insert(log);
   }
 
   findAllNewerThanTimestamp(timestamp: Date): Promise<LogEntity[]> {

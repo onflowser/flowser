@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "common.proto";
+import "entities/common.proto";
 
 enum TransactionStatusCode {
   UNKNOWN = 0;
@@ -35,14 +35,11 @@ message Transaction {
   string payer = 5;
   TransactionProposalKey proposal_key = 6;
   TransactionStatus status = 7;
-  repeated TransactionArgument args = 8;
+  repeated CadenceObject args = 8;
   repeated string authorizers = 9;
   repeated TransactionEnvelopeSignature envelope_signatures = 10;
-}
-
-message TransactionArgument {
-  CadenceType type = 1;
-  string value = 2;
+  string created_at = 11;
+  string updated_at = 12;
 }
 
 message TransactionProposalKey {

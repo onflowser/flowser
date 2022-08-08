@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "entities/transactions.proto";
+import "responses/common.proto";
+
+message GetAllTransactionsResponse {
+  repeated Transaction transactions = 1;
+}
+
+message GetPollingTransactionsResponse {
+  repeated Transaction data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetSingleTransactionResponse {
+  Transaction transaction = 1;
+}

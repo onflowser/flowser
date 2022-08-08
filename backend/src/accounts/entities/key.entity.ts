@@ -7,10 +7,10 @@ import {
   AccountKey,
   HashAlgo,
   SignCurve,
-} from "@flowser/types/generated/accounts";
+} from "@flowser/types/generated/entities/accounts";
 
 @Entity({ name: "keys" })
-export class AccountKeyEntity extends PollingEntity implements AccountKey {
+export class AccountKeyEntity extends PollingEntity {
   @PrimaryColumn()
   index: number;
 
@@ -38,10 +38,29 @@ export class AccountKeyEntity extends PollingEntity implements AccountKey {
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
 
-  static create(flowAccount: FlowAccount, flowKey: FlowKey) {
-    return Object.assign<AccountKeyEntity, any>(new AccountKeyEntity(), {
-      ...flowKey,
-      accountAddress: ensurePrefixedAddress(flowAccount.address),
+  toProto() {
+    return AccountKey.fromPartial({
+      index: this.index,
+      accountAddress: this.accountAddress,
+      publicKey: this.publicKey,
+      signAlgo: this.signAlgo,
+      hashAlgo: this.hashAlgo,
+      weight: this.weight,
+      sequenceNumber: this.sequenceNumber,
+      revoked: this.revoked,
     });
+  }
+
+  static create(flowAccount: FlowAccount, flowKey: FlowKey) {
+    const key = new AccountKeyEntity();
+    key.index = flowKey.index;
+    key.accountAddress = ensurePrefixedAddress(flowAccount.address);
+    key.publicKey = flowKey.publicKey;
+    key.signAlgo = flowKey.signAlgo;
+    key.hashAlgo = flowKey.hashAlgo;
+    key.weight = flowKey.weight;
+    key.sequenceNumber = flowKey.sequenceNumber;
+    key.revoked = flowKey.revoked;
+    return key;
   }
 }

@@ -1,7 +1,6 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
 import { BlockEntity } from "./entities/block.entity";
-import { CreateBlockDto } from "./dto/create-block.dto";
 
 export class BlocksService {
   constructor(

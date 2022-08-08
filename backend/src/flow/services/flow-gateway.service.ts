@@ -43,9 +43,10 @@ export type FlowCollection = {
   transactionIds: string[];
 };
 
-export type FlowTransactionArgument = {
+export type FlowCadenceObject = {
   type: string;
-  value: any;
+  // TODO: not sure about this, check the structure for more complex types
+  value: string | FlowCadenceObject | FlowCadenceObject[];
 };
 
 export type FlowTransactionProposalKey = {
@@ -70,7 +71,7 @@ export type FlowTransactionStatus = {
 export type FlowTransaction = {
   id: string;
   script: string;
-  args: FlowTransactionArgument[];
+  args: FlowCadenceObject[];
   referenceBlockId: string;
   gasLimit: number;
   proposalKey: FlowTransactionProposalKey;

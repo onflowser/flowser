@@ -5,10 +5,11 @@ import { AccountContractEntity } from "./contract.entity";
 import { AccountsStorageEntity } from "./storage.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { Account } from "@flowser/types/generated/accounts";
+import { Account } from "@flowser/types/generated/entities/accounts";
+import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 
 @Entity({ name: "accounts" })
-export class AccountEntity extends PollingEntity implements Account {
+export class AccountEntity extends PollingEntity {
   @PrimaryColumn()
   address: string;
 
@@ -33,12 +34,35 @@ export class AccountEntity extends PollingEntity implements Account {
   })
   contracts: AccountContractEntity[];
 
+  @OneToMany(() => TransactionEntity, (key) => key.payer, {
+    eager: true,
+  })
+  transactions: TransactionEntity[];
+
   static create(flowAccount: FlowAccount): AccountEntity {
-    const account = Object.assign(
-      new AccountEntity(),
-      Account.fromJSON(flowAccount)
-    );
+    const account = new AccountEntity();
     account.address = ensurePrefixedAddress(flowAccount.address);
+    account.balance = flowAccount.balance;
+    account.code = flowAccount.code;
+    account.keys = flowAccount.keys.map((key) =>
+      AccountKeyEntity.create(flowAccount, key)
+    );
     return account;
+  }
+
+  toProto() {
+    return Account.fromPartial({
+      address: this.address,
+      balance: this.balance,
+      code: this.code,
+      keys: this.keys.map((key) => key.toProto()),
+      storage: this.storage.map((storage) => storage.toProto()),
+      contracts: this.contracts.map((contract) => contract.toProto()),
+      transactions: this.transactions.map((transaction) =>
+        transaction.toProto()
+      ),
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    });
   }
 }

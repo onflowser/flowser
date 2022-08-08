@@ -5,13 +5,10 @@ import { BadRequestException } from "@nestjs/common";
 import { env } from "../../config";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { AccountContract } from "@flowser/types/generated/accounts";
+import { AccountContract } from "@flowser/types/generated/entities/accounts";
 
 @Entity({ name: "contracts" })
-export class AccountContractEntity
-  extends PollingEntity
-  implements AccountContract
-{
+export class AccountContractEntity extends PollingEntity {
   // Encodes both accountAddress and name into the id.
   id: string;
 
@@ -21,7 +18,7 @@ export class AccountContractEntity
   @PrimaryColumn()
   name: string;
 
-  @Column(getCodeFieldType())
+  @Column(AccountContractEntity.getCodeFieldType())
   code: string;
 
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
@@ -41,20 +38,28 @@ export class AccountContractEntity
     this.id = `${this.accountAddress}.${this.name}`;
   }
 
-  static create(account: FlowAccount, name: string, code: string) {
-    return Object.assign<AccountContractEntity, any>(
-      new AccountContractEntity(),
-      {
-        accountAddress: ensurePrefixedAddress(account.address),
-        name,
-        code,
-      }
-    );
+  toProto() {
+    return AccountContract.fromPartial({
+      id: this.id,
+      accountAddress: this.accountAddress,
+      name: this.name,
+      code: this.code,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    });
   }
-}
 
-function getCodeFieldType() {
-  return ["mariadb", "mysql"].includes(env.DATABASE_TYPE)
-    ? "mediumtext"
-    : "text";
+  static create(account: FlowAccount, name: string, code: string) {
+    const contract = new AccountContractEntity();
+    contract.accountAddress = ensurePrefixedAddress(account.address);
+    contract.name = name;
+    contract.code = code;
+    return contract;
+  }
+
+  private static getCodeFieldType() {
+    return ["mariadb", "mysql"].includes(env.DATABASE_TYPE)
+      ? "mediumtext"
+      : "text";
+  }
 }

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "entities/events.proto";
+import "responses/common.proto";
+
+message GetAllEventsResponse {
+  repeated Event events = 1;
+}
+
+message GetPollingEventsResponse {
+  repeated Event data = 1;
+  PollingMetaData meta = 2;
+}

@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message PollingMetaData {
+  int32 latest_timestamp = 1;
+}

@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "entities/transactions.proto";
+
 enum SignCurve {
   SIGN_CURVE_UNSPECIFIED = 0;
   SIGN_CURVE_ECDSA_P256 = 2;
@@ -19,6 +21,9 @@ message Account {
   repeated AccountKey keys = 4;
   repeated AccountStorage storage = 5;
   repeated AccountContract contracts = 6;
+  repeated Transaction transactions = 7;
+  string created_at = 8;
+  string updated_at = 9;
 }
 
 message AccountKey {
@@ -44,4 +49,6 @@ message AccountContract {
     string account_address = 2;
     string name = 3;
     string code = 4;
+    string created_at = 8;
+    string updated_at = 9;
 }
