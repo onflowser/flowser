@@ -55,8 +55,7 @@ export class ProjectsService {
   createProject(
     data: Exclude<Project, "id">
   ): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.post("/api/projects", {
-      data,
+    return axios.post("/api/projects", Project.toJSON(data), {
       transformResponse: (data: string) =>
         GetSingleProjectResponse.fromJSON(JSON.parse(data)),
     });
@@ -65,11 +64,18 @@ export class ProjectsService {
   updateProject(
     data: Project
   ): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.post(`/api/projects/${data.id}`, {
-      data,
+    return axios.patch(`/api/projects/${data.id}`, Project.toJSON(data), {
       transformResponse: (data: string) =>
         GetSingleProjectResponse.fromJSON(JSON.parse(data)),
     });
+  }
+
+  async unUseCurrentProject(): Promise<void> {
+    await axios.delete(`/api/projects/use`);
+  }
+
+  async removeProject(id: string): Promise<void> {
+    await axios.delete(`/api/projects/${id}`);
   }
 
   getCurrentProject(): Promise<AxiosResponse<GetSingleProjectResponse>> {

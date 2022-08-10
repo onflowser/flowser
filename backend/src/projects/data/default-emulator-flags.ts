@@ -1,8 +1,13 @@
 import { env } from "../../config";
-import { Emulator, Project } from "@flowser/types/generated/entities/projects";
+import {
+  Emulator,
+  HashAlgorithm,
+  Project,
+  SignatureAlgorithm,
+} from "@flowser/types/generated/entities/projects";
 
 export const defaultEmulatorFlags = Project.fromPartial({
-  name: "New Emulator Configuration",
+  name: "New Project",
   emulator: Emulator.fromPartial({
     verboseLogging: true,
     httpServerPort: env.FLOW_EMULATOR_HTTP_PORT,
@@ -18,8 +23,8 @@ export const defaultEmulatorFlags = Project.fromPartial({
     minAccountBalance: undefined,
     transactionMaxGasLimit: 9999,
     scriptGasLimit: 100000,
-    serviceSignatureAlgorithm: "ECDSA_P256",
-    serviceHashAlgorithm: "SHA3_256",
+    serviceSignatureAlgorithm: SignatureAlgorithm.ECDSA_P256,
+    serviceHashAlgorithm: HashAlgorithm.SHA3_256,
     storageLimit: true,
     transactionFees: false,
     simpleAddresses: false,

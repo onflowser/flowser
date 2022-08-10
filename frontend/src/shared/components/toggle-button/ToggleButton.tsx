@@ -1,21 +1,23 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent } from "react";
 import classes from "./ToggleButton.module.scss";
 
-interface OwnProps {
+type ToggleButtonProps = {
   value?: boolean;
   onChange?: (state: boolean) => void;
-}
+};
 
-type Props = OwnProps;
-
-const ToggleButton: FunctionComponent<Props> = ({
+const ToggleButton: FunctionComponent<ToggleButtonProps> = ({
   value = false,
   onChange = () => false,
 }) => {
   return (
     <div className={classes.root}>
       <div onClick={() => onChange(!value)}>
-        <span className={`${value ? classes.active : classes.inactive}`} />
+        {/* FIXME: max-width is applied on Configuration screen and breaks this layout */}
+        <span
+          style={{ margin: 0 }}
+          className={`${value ? classes.active : classes.inactive}`}
+        />
       </div>
     </div>
   );

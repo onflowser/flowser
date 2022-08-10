@@ -7,3 +7,12 @@ message PollingMetaData {
 message GetFlowserVersionResponse {
   string version = 1;
 }
+
+message GetAllObjectsCountsResponse {
+  int32 logs = 1;
+  int32 accounts = 2;
+  int32 blocks = 3;
+  int32 transactions = 4;
+  int32 events = 5;
+  int32 contracts = 6;
+}

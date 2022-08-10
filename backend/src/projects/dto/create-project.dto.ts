@@ -16,10 +16,9 @@ export class CreateProjectDto {
   isCustom: boolean;
 
   @ApiProperty()
-  @IsNotEmpty()
   @ValidateNested()
   @Type(() => GatewayConfigurationDto)
-  gateway: GatewayConfigurationDto;
+  gateway: GatewayConfigurationDto | undefined;
 
   @ApiProperty({
     description:

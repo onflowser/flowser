@@ -1,8 +1,7 @@
-import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
-import { AccountsStorageEntity } from "../../accounts/entities/storage.entity";
+import { Gateway } from "@flowser/types/generated/entities/projects";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -100,15 +99,23 @@ export type FlowEvent = {
 
 @Injectable()
 export class FlowGatewayService {
-  private configuration: GatewayConfigurationEntity;
+  private gatewayConfig: Gateway | undefined;
   private static readonly logger = new Logger(FlowGatewayService.name);
 
-  public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
-    this.configuration = configuration;
-    FlowGatewayService.logger.debug(
-      `@onflow/fcl listening on ${this.configuration?.url()}`
-    );
-    fcl.config().put("accessNode.api", this.configuration?.url());
+  public configureDataSourceGateway(configuration: Gateway | undefined) {
+    this.gatewayConfig = configuration;
+    if (this.gatewayConfig) {
+      FlowGatewayService.logger.debug(
+        `@onflow/fcl listening on ${this.getGatewayUrl()}`
+      );
+      fcl.config().put("accessNode.api", this.getGatewayUrl());
+    }
+  }
+
+  private getGatewayUrl() {
+    const { address, port } = this.gatewayConfig;
+    const host = `${address}${port ? `:${port}` : ""}`;
+    return host.startsWith("http") ? host : `http://${host}`;
   }
 
   public async getLatestBlock(): Promise<FlowBlock> {
@@ -144,11 +151,11 @@ export class FlowGatewayService {
   }
 
   async isConnectedToGateway() {
-    if (!this.configuration) {
+    if (!this.gatewayConfig) {
       return false;
     }
 
-    const { address, port } = this.configuration;
+    const { address, port } = this.gatewayConfig;
     return FlowGatewayService.isPingable(address, port);
   }
 

@@ -1,11 +1,13 @@
 import { AfterLoad, Column, Entity, Index, PrimaryColumn } from "typeorm";
-import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
-import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
+import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
-import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { Project } from "@flowser/types/generated/entities/projects";
-import { plainToInstance } from "class-transformer";
+import {
+  Emulator,
+  Gateway,
+  Project,
+} from "@flowser/types/generated/entities/projects";
+import { UpdateProjectDto } from "../dto/update-project.dto";
 
 @Entity({ name: "projects" })
 export class ProjectEntity extends PollingEntity {
@@ -20,10 +22,10 @@ export class ProjectEntity extends PollingEntity {
   pingable: boolean = false;
 
   @Column("simple-json", { nullable: true })
-  gateway: GatewayConfigurationEntity;
+  gateway: Gateway;
 
   @Column("simple-json", { nullable: true })
-  emulator: EmulatorConfigurationEntity | null;
+  emulator: Emulator | null;
 
   @Column("boolean", { default: false })
   isCustom: boolean = false;
@@ -35,14 +37,8 @@ export class ProjectEntity extends PollingEntity {
 
   @AfterLoad()
   unSerializeJsonFields() {
-    this.gateway = serializeEmbeddedTypeORMEntity(
-      new GatewayConfigurationEntity(),
-      this.gateway
-    );
-    this.emulator = serializeEmbeddedTypeORMEntity(
-      new EmulatorConfigurationEntity(),
-      this.emulator
-    );
+    this.gateway = this.gateway ? Gateway.fromJSON(this.gateway) : null;
+    this.emulator = this.emulator ? Emulator.fromJSON(this.emulator) : null;
   }
 
   hasGatewayConfiguration() {
@@ -70,27 +66,26 @@ export class ProjectEntity extends PollingEntity {
       pingable: this.pingable,
       isCustom: this.isCustom,
       startBlockHeight: this.startBlockHeight,
-      gateway: this.gateway?.toProto(),
-      emulator: this.emulator?.toProto(),
+      gateway: this.gateway,
+      emulator: this.emulator,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     });
   }
 
-  static create(projectDto: CreateProjectDto) {
+  static create(projectDto: CreateProjectDto | UpdateProjectDto) {
     const project = new ProjectEntity();
     project.id = toKebabCase(projectDto.name);
     project.name = projectDto.name;
     project.startBlockHeight = projectDto.startBlockHeight;
     project.isCustom = projectDto.isCustom;
-    project.gateway = plainToInstance(
-      GatewayConfigurationEntity,
-      projectDto.gateway
-    );
-    project.emulator = plainToInstance(
-      EmulatorConfigurationEntity,
-      projectDto.emulator
-    );
+    project.gateway = projectDto.gateway
+      ? Gateway.fromJSON(projectDto.gateway)
+      : Gateway.fromPartial({
+          port: 8080,
+          address: "localhost",
+        });
+    project.emulator = Emulator.fromJSON(projectDto.emulator);
     return project;
   }
 }

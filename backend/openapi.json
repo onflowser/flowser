@@ -181,35 +181,18 @@
         }
       }
     },
-    "/api/projects/{id}/seed/accounts": {
-      "post": {
-        "operationId": "ProjectsController_seed",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "n",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
+    "/api/flow/version": {
+      "get": {
+        "operationId": "FlowController_getVersion",
+        "parameters": [],
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         }
       }
     },
-    "/api/flow/gateway": {
+    "/api/flow/debug/gateway": {
       "get": {
         "operationId": "FlowController_getGateway",
         "parameters": [],
@@ -220,7 +203,7 @@
         }
       }
     },
-    "/api/flow/emulator": {
+    "/api/flow/debug/emulator": {
       "get": {
         "operationId": "FlowController_getEmulator",
         "parameters": [],
@@ -231,20 +214,9 @@
         }
       }
     },
-    "/api/flow/emulator/logs": {
+    "/api/flow/debug/emulator/logs": {
       "get": {
         "operationId": "FlowController_getLogs",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/flow/version": {
-      "get": {
-        "operationId": "FlowController_getVersion",
         "parameters": [],
         "responses": {
           "200": {

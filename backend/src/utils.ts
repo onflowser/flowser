@@ -70,16 +70,6 @@ export function ensurePrefixedAddress(address: string) {
   return address.startsWith("0x") ? address : `0x${address}`;
 }
 
-/**
- * Serializes non-null values to provided class object.
- */
-export function serializeEmbeddedTypeORMEntity<T>(
-  classObject: T,
-  value: null | T
-) {
-  return value === null ? null : Object.assign(classObject, value);
-}
-
 export type EntitiesDiff<T> = {
   created: T[];
   updated: T[];

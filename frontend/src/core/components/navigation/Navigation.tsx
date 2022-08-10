@@ -1,5 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import { useHistory } from "react-router-dom";
 import { routes } from "../../../shared/constants/routes";
 import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
@@ -17,22 +22,16 @@ import { ReactComponent as FlowLogo } from "../../../shared/assets/icons/flow.sv
 import { useNavigation } from "../../../shared/hooks/navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../../../shared/components/search/Search";
-import axios from "../../../shared/config/axios";
-import { useProjectApi } from "../../../shared/hooks/project-api";
 import { useFlow } from "../../../shared/hooks/flow";
 import TransactionDialog from "../../../shared/components/transaction-dialog/TransactionDialog";
 import toast from "react-hot-toast";
-import Ellipsis from "../../../shared/components/ellipsis/Ellipsis";
+import {
+  useGetAllObjectsCounts,
+  useGetCurrentProject,
+} from "../../../shared/hooks/api";
+import { ProjectsService } from "../../../shared/services/projects.service";
 
-export interface Counters {
-  accounts: number;
-  blocks: number;
-  transactions: number;
-  contracts: number;
-  events: number;
-}
-
-const Navigation = (props: any) => {
+const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const [isSwitching, setIsSwitching] = useState(false);
   const history = useHistory();
   const {
@@ -40,38 +39,28 @@ const Navigation = (props: any) => {
     isNavigationDrawerVisible,
     isSearchBarVisible,
   } = useNavigation();
-  const [counters, setCounters] = useState<Counters>();
-  const [showTxDialog, setShowTxDialog] = useState<any>(false);
-  const { currentProject } = useProjectApi();
+  const projectService = ProjectsService.getInstance();
+  const { data: counters } = useGetAllObjectsCounts();
+  const [showTxDialog, setShowTxDialog] = useState(false);
+  const { data } = useGetCurrentProject();
+  const { project: currentProject } = data ?? {};
   const isEmulatorProject = !!currentProject?.emulator;
   const { isLoggedIn, login, isLoggingIn, logout, isLoggingOut } = useFlow();
 
   const onSwitchProject = useCallback(async () => {
     setIsSwitching(true);
-    history.replace(`/${routes.start}`);
     try {
-      await axios.delete("/api/projects/use"); // stop current emulator
+      await projectService.unUseCurrentProject();
     } catch (e) {
       // nothing critical happened, ignore the error
       console.warn("Couldn't stop the emulator: ", e);
     }
+    history.replace(`/${routes.start}`);
     try {
       await logout(); // logout from dev-wallet, because config may change
     } finally {
       setIsSwitching(false);
     }
-  }, []);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      axios.get("/api/common/counters").then((response: any) => {
-        setCounters(response.data);
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
   }, []);
 
   const onSettings = () => {

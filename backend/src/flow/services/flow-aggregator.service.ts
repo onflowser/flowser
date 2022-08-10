@@ -23,14 +23,11 @@ import { FlowEmulatorService } from "./flow-emulator.service";
 import { LogsService } from "../../logs/logs.service";
 import { LogEntity } from "../../logs/entities/log.entity";
 import { StorageDataService } from "./storage-data.service";
-import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
-import { plainToInstance } from "class-transformer";
-import { TransactionStatus } from "@flowser/types/generated/entities/transactions";
 
 type BlockData = {
   block: FlowBlock;

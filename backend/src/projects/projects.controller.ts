@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -13,7 +12,6 @@ import {
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { ProjectEntity } from "./entities/project.entity";
 import { defaultEmulatorFlags } from "./data/default-emulator-flags";
 import { ApiParam } from "@nestjs/swagger";
 import {
@@ -30,9 +28,7 @@ export class ProjectsController {
 
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
-    const project = await this.projectsService.create(
-      ProjectEntity.create(createProjectDto)
-    );
+    const project = await this.projectsService.create(createProjectDto);
     return GetSingleProjectResponse.toJSON({
       project: project.toProto(),
     });
@@ -65,13 +61,18 @@ export class ProjectsController {
 
   @Get("/default")
   async default() {
-    return defaultEmulatorFlags;
+    return GetSingleProjectResponse.fromPartial({
+      project: defaultEmulatorFlags,
+    });
   }
 
   @ApiParam({ name: "id", type: String })
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.projectsService.findOne(id);
+  async findOne(@Param("id") id: string) {
+    const project = await this.projectsService.findOne(id);
+    return GetSingleProjectResponse.fromPartial({
+      project: project.toProto(),
+    });
   }
 
   @ApiParam({ name: "id", type: String })
@@ -94,8 +95,8 @@ export class ProjectsController {
 
   @ApiParam({ name: "id", type: String })
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.projectsService.remove(id);
+  async remove(@Param("id") id: string) {
+    await this.projectsService.remove(id);
   }
 
   @ApiParam({ name: "id", type: String })
@@ -105,11 +106,5 @@ export class ProjectsController {
     return GetSingleProjectResponse.toJSON({
       project: project.toProto(),
     });
-  }
-
-  @ApiParam({ name: "id", type: String })
-  @Post("/:id/seed/accounts")
-  async seed(@Param("id") id: string, @Query("n", ParseIntPipe) n: number) {
-    return this.projectsService.seedAccounts(id, n);
   }
 }

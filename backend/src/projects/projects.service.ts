@@ -20,7 +20,7 @@ import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/flow-cli.service";
-import { plainToInstance } from "class-transformer";
+import { plainToClass } from "class-transformer";
 import { StorageDataService } from "../flow/services/storage-data.service";
 import { defaultProjects } from "./data/seeds";
 import { ContractsService } from "../accounts/services/contracts.service";
@@ -51,9 +51,7 @@ export class ProjectsService {
   seedDefaultProjects() {
     return this.projectRepository
       .save(
-        defaultProjects.map((project) =>
-          plainToInstance(ProjectEntity, project)
-        )
+        defaultProjects.map((project) => plainToClass(ProjectEntity, project))
       )
       .catch(this.handleDatabaseError);
   }
@@ -148,7 +146,9 @@ export class ProjectsService {
   }
 
   async create(createProjectDto: CreateProjectDto) {
-    const project = plainToInstance(ProjectEntity, createProjectDto);
+    const project = ProjectEntity.create(createProjectDto);
+    // TODO(milestone-3): remove isCustom field
+    project.isCustom = true;
     await this.projectRepository
       .insert(project)
       .catch(this.handleDatabaseError);
@@ -180,10 +180,10 @@ export class ProjectsService {
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
-    const project = plainToInstance(ProjectEntity, updateProjectDto);
+    const project = ProjectEntity.create(updateProjectDto);
     project.markUpdated();
     await this.projectRepository
-      .update({ id }, updateProjectDto)
+      .update({ id }, project)
       .catch(this.handleDatabaseError);
     return project;
   }
@@ -202,7 +202,7 @@ export class ProjectsService {
       const pingable = project.hasEmulatorGateway()
         ? await FlowGatewayService.isPingable(address, port)
         : true;
-      return plainToInstance(ProjectEntity, { ...project, pingable });
+      return plainToClass(ProjectEntity, { ...project, pingable });
     } else {
       return project;
     }

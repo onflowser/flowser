@@ -2,8 +2,8 @@ import { mkdir, readFile, stat, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import config from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
-import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
 import { spawn } from "child_process";
+import { Emulator } from "@flowser/types/generated/entities/projects";
 
 export type FlowCliConfig = {
   emulators: {
@@ -79,14 +79,11 @@ export class FlowCliOutput {
 @Injectable()
 export class FlowCliService {
   private projectId: string;
-  private emulatorConfig: EmulatorConfigurationEntity;
+  private emulatorConfig: Emulator;
   public data: FlowCliConfig;
   private readonly logger = new Logger(FlowCliService.name);
 
-  configure(
-    projectId: string,
-    emulatorConfiguration: EmulatorConfigurationEntity
-  ) {
+  configure(projectId: string, emulatorConfiguration: Emulator) {
     this.projectId = projectId;
     this.emulatorConfig = emulatorConfiguration;
   }
@@ -132,7 +129,7 @@ export class FlowCliService {
     const out = await this.execute("flow", ["version"]);
     return {
       version: out.findValue("version"),
-      commit: out.findValue("commit"),
+      commitHash: out.findValue("commit"),
     };
   }
 

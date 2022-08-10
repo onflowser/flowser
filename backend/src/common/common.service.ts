@@ -18,7 +18,7 @@ export class CommonService {
   ) {}
 
   async getCounters() {
-    const [log, accounts, blocks, transactions, events, contracts] =
+    const [logs, accounts, blocks, transactions, events, contracts] =
       await Promise.all([
         this.logsService.countAll(),
         this.accountsService.countAll(),
@@ -28,7 +28,7 @@ export class CommonService {
         this.contractsService.countAll(),
       ]);
     return {
-      log,
+      logs,
       accounts,
       blocks,
       transactions,

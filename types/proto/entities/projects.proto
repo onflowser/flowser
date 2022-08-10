@@ -21,6 +21,23 @@ message Gateway {
   string address = 2;
 }
 
+enum SignatureAlgorithm {
+  SIGNATURE_ALGORITHM_UNSPECIFIED = 0;
+  ECDSA_P256 = 1;
+  ECDSA_secp256k1 = 2;
+  BLS_BLS12_381 = 3;
+}
+
+enum HashAlgorithm {
+  HASH_ALGORITHM_UNSPECIFIED = 0;
+  SHA2_256 = 1;
+  SHA2_384 = 2;
+  SHA3_256 = 3;
+  SHA3_384 = 4;
+  KMAC128_BLS_BLS12_381 = 5;
+  KECCAK_256 = 6;
+}
+
 message Emulator {
     bool verbose_logging = 1;
     uint32 http_server_port = 2;
@@ -35,8 +52,8 @@ message Emulator {
     uint32 min_account_balance = 11;
     uint32 transaction_max_gas_limit = 12;
     uint32 script_gas_limit = 13;
-    string service_signature_algorithm = 14;
-    string service_hash_algorithm = 15;
+    SignatureAlgorithm service_signature_algorithm = 14;
+    HashAlgorithm service_hash_algorithm = 15;
     bool storage_limit = 16;
     bool transaction_fees = 17;
     uint32 number_of_initial_accounts = 18;

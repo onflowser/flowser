@@ -16,7 +16,10 @@ import { LogsService } from "../services/logs.service";
 import { useGetAxiosQuery } from "./use-get-axios-query";
 import { ProjectsService } from "../services/projects.service";
 import { CommonService } from "../services/common.service";
-import { GetFlowserVersionResponse } from "@flowser/types/generated/responses/common";
+import {
+  GetAllObjectsCountsResponse,
+  GetFlowserVersionResponse,
+} from "@flowser/types/generated/responses/common";
 import {
   GetAllProjectsResponse,
   GetSingleProjectResponse,
@@ -39,6 +42,7 @@ import {
   GetPollingAccountsResponse,
   GetSingleAccountResponse,
 } from "@flowser/types/generated/responses/accounts";
+import { GetFlowCliInfoResponse } from "@flowser/types/generated/responses/flow";
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
@@ -163,5 +167,20 @@ export function useGetFlowserVersion() {
   return useGetAxiosQuery<GetFlowserVersionResponse>({
     resourceKey: "/version",
     fetcher: CommonService.getInstance().getFlowserVersion,
+  });
+}
+
+export function useGetFlowCliInfo() {
+  return useGetAxiosQuery<GetFlowCliInfoResponse>({
+    resourceKey: "/version",
+    fetcher: CommonService.getInstance().getFlowCliInfo,
+  });
+}
+
+export function useGetAllObjectsCounts() {
+  return useGetAxiosQuery<GetAllObjectsCountsResponse>({
+    resourceKey: "/counts",
+    fetcher: CommonService.getInstance().getAllObjectsCounts,
+    refetchInterval: 1000,
   });
 }

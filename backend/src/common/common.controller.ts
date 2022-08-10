@@ -1,5 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { CommonService } from "./common.service";
+import { GetAllObjectsCountsResponse } from "@flowser/types/generated/responses/common";
 
 @Controller("common")
 export class CommonController {
@@ -7,6 +8,7 @@ export class CommonController {
 
   @Get("counters")
   async getCounters() {
-    return await this.commonService.getCounters();
+    const counts = await this.commonService.getCounters();
+    return GetAllObjectsCountsResponse.toJSON(counts);
   }
 }
