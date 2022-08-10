@@ -13,17 +13,19 @@ import {
   DetailsTabItem,
   DetailsTabs,
 } from "../../../shared/components/details-tabs/DetailsTabs";
-import { useDetailsQuery } from "../../../shared/hooks/details-query";
-import { useTimeoutPolling } from "../../../shared/hooks/timeout-polling";
 import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
 import { isInitialParentId } from "../../../shared/functions/utils";
 import Fragment from "../../../shared/components/fragment/Fragment";
+import {
+  useGetBlock,
+  useGetPollingTransactionsByBlock,
+} from "../../../shared/hooks/api";
 
 type RouteParams = {
   blockId: string;
 };
 
-const Details: FunctionComponent<any> = () => {
+const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
   const { disableSearchBar, updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
@@ -33,13 +35,10 @@ const Details: FunctionComponent<any> = () => {
     { label: "Details" },
   ];
 
-  const { isLoading, data } = useDetailsQuery(`/api/blocks/${blockId}`);
-  // TODO(milestone-2): fix types
-  const { data: transactions } = useTimeoutPolling<any>(
-    `/api/blocks/${blockId}/transactions/polling`,
-    "id"
-  );
-  const date = data && new Date(data.timestamp).toISOString();
+  const { isLoading, data } = useGetBlock(blockId);
+  const { block } = data ?? {};
+  const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
+  const createdDate = block ? new Date(block.timestamp).toISOString() : "-";
 
   useEffect(() => {
     showNavigationDrawer(true);
@@ -48,7 +47,7 @@ const Details: FunctionComponent<any> = () => {
     disableSearchBar(true);
   }, []);
 
-  if (isLoading || !data) {
+  if (isLoading || !block) {
     return <FullScreenLoading />;
   }
 
@@ -56,8 +55,8 @@ const Details: FunctionComponent<any> = () => {
     <div className={classes.root}>
       <div className={classes.firstRow}>
         <Label variant="large">BLOCK ID</Label>
-        <Value variant="large">{data.id}</Value>
-        <CopyButton value={data.id} />
+        <Value variant="large">{block.id}</Value>
+        <CopyButton value={block.id} />
       </div>
       <Card className={classes.bigCard}>
         <div>
@@ -65,23 +64,23 @@ const Details: FunctionComponent<any> = () => {
             PARENT ID
           </Label>
           <Value variant="large">
-            {isInitialParentId(data.parentId) ? (
-              data.parentId
+            {isInitialParentId(block.parentId) ? (
+              block.parentId
             ) : (
-              <NavLink to={`/blocks/details/${data.parentId}`}>
-                {data.parentId}
+              <NavLink to={`/blocks/details/${block.parentId}`}>
+                {block.parentId}
               </NavLink>
             )}
           </Value>
         </div>
         <div className={classes.dateAndTimeAgo}>
-          <TimeAgo date={date} />
-          <DateWithCalendar date={date} />
+          <TimeAgo date={createdDate} />
+          <DateWithCalendar date={createdDate} />
         </div>
       </Card>
 
       <DetailsTabs>
-        <DetailsTabItem label="HEIGHT" value={data.height} />
+        <DetailsTabItem label="HEIGHT" value={block.height} />
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
           <Fragment
             onMount={() =>
@@ -89,7 +88,7 @@ const Details: FunctionComponent<any> = () => {
             }
           >
             {transactions &&
-              transactions.map((transaction: any, index) => (
+              transactions.map((transaction, index) => (
                 <Card
                   variant="black"
                   key={index}
@@ -108,7 +107,7 @@ const Details: FunctionComponent<any> = () => {
 
         <DetailsTabItem
           label="COLLECTIONS"
-          value={data.collectionGuarantees?.length || 0}
+          value={block.collectionGuarantees?.length ?? 0}
         />
       </DetailsTabs>
     </div>

@@ -11,6 +11,9 @@ message Project {
 
   Gateway gateway = 6;
   Emulator emulator = 7;
+
+  string created_at = 8;
+  string updated_at = 9;
 }
 
 message Gateway {

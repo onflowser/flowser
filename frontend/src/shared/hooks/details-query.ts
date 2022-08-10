@@ -1,57 +1,86 @@
 import { useQuery } from "react-query";
+import { AxiosResponse } from "axios";
+import { useCallback, useState } from "react";
+import { PollingEntity } from "@flowser/types/shared/polling";
+import { DecoratedPollingEntity } from "./timeout-polling";
 import axios from "../config/axios";
-import { useState } from "react";
 
-export const useDetailsQuery = <T>(resource: string, interval?: number) => {
+export type DetailsEntity<T extends PollingEntity> =
+  | { [p: string]: DecoratedPollingEntity<PollingEntity>[] }
+  | { [p: string]: T[keyof T] };
+
+export function useDetailsQuery<T extends PollingEntity>(
+  resourceKey: string,
+  fetcher?: (resourceId: string) => Promise<AxiosResponse<T>>
+) {
   const [pollingTime, setPollingTime] = useState(0);
-  const [data, setData] = useState<any>();
+  const [data, setData] = useState<DetailsEntity<T>>();
 
-  const query = useQuery<T>(
-    resource,
-    () => axios.get(resource).then(({ data }) => data),
-    {
-      onSuccess(data: any) {
-        let latestTimestamp = 0;
+  const fetchCallback = useCallback(() => {
+    return fetcher ? fetcher(resourceKey) : axios.get(resourceKey);
+  }, [resourceKey]);
 
-        const mapDataArray = (data: any[]) =>
-          data.map((e: any) => {
-            // skip mapping for primary value types (string, number)
-            if (!(e instanceof Object)) {
-              return e;
-            }
-            let isNew = false;
-            const checkTimestamp = (t: number) => {
-              if (t > latestTimestamp) {
-                latestTimestamp = t;
-              }
-              if (t >= pollingTime) {
-                isNew = true;
-              }
-            };
-            [e.createdAt, e.updatedAt].forEach(checkTimestamp);
-            return { ...e, isNew };
-          });
+  const query = useQuery<AxiosResponse<T>>(resourceKey, fetchCallback, {
+    onSuccess(response) {
+      let latestTimestamp = 0;
 
-        const formattedData = Object.keys(data)
-          .map((key) => {
-            if (data[key] instanceof Array) {
-              return { [key]: mapDataArray(data[key]) };
-            } else {
-              return { [key]: data[key] };
-            }
-          })
-          .reduce((p, c) => ({ ...p, ...c }), {});
-
-        setData(formattedData);
-
-        if (latestTimestamp > 0) {
-          setPollingTime(latestTimestamp);
+      const checkTimestampAndIsLaterThanPollingTime = (date: string) => {
+        const time = new Date(date).getTime();
+        if (time > latestTimestamp) {
+          latestTimestamp = time;
         }
-      },
-      refetchInterval: interval || 1000,
-      refetchOnWindowFocus: "always",
-    }
-  );
+        return time >= pollingTime;
+      };
+
+      const mapDataArray = (
+        data: PollingEntity[]
+      ): DecoratedPollingEntity<PollingEntity>[] =>
+        data.map((item) => {
+          let isNew = false;
+          let isUpdated = false;
+
+          if (checkTimestampAndIsLaterThanPollingTime(item.createdAt)) {
+            isNew = true;
+          }
+
+          if (checkTimestampAndIsLaterThanPollingTime(item.updatedAt)) {
+            isUpdated = true;
+          }
+
+          return { ...item, isNew, isUpdated };
+        });
+
+      const formattedData = (
+        Object.keys(response.data) as unknown as (keyof T)[]
+      )
+        .map((key) => {
+          const propertyValue = response.data[key];
+          const isPollingEntity =
+            propertyValue instanceof Array &&
+            propertyValue[0]["createdAt"] &&
+            propertyValue[0]["updatedAt"];
+
+          if (isPollingEntity) {
+            return {
+              [key]: mapDataArray(
+                response.data[key] as unknown as PollingEntity[]
+              ),
+            };
+          } else {
+            return { [key]: response.data[key] };
+          }
+        })
+        .reduce((builder, item) => Object.assign(builder, item), {});
+
+      setData(formattedData);
+
+      if (latestTimestamp > 0) {
+        setPollingTime(latestTimestamp);
+      }
+    },
+    refetchInterval: 1000,
+    refetchOnWindowFocus: "always",
+  });
 
   return { ...query, data };
-};
+}

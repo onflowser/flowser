@@ -42,6 +42,17 @@
         }
       }
     },
+    "/api/projects/polling": {
+      "get": {
+        "operationId": "ProjectsController_findAllNew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/projects/current": {
       "get": {
         "operationId": "ProjectsController_findCurrent",

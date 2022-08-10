@@ -72,6 +72,8 @@ export class ProjectEntity extends PollingEntity {
       startBlockHeight: this.startBlockHeight,
       gateway: this.gateway?.toProto(),
       emulator: this.emulator?.toProto(),
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     });
   }
 

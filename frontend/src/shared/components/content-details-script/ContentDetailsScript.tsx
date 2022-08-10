@@ -7,23 +7,20 @@ import Ellipsis from "../ellipsis/Ellipsis";
 import Value from "../value/Value";
 import CopyButton from "../copy-button/CopyButton";
 import { getEventDataType, getEventDataValue } from "../../functions/events";
+import { CadenceObject } from "@flowser/types/generated/entities/common";
 
-interface TransactionArg {
-  type: string;
-  value: string;
-}
-
-interface OwnProps {
+export type ContentDetailsScriptProps = {
   script: string;
-  args?: TransactionArg[];
-}
+  args?: CadenceObject[];
+};
 
-type Props = OwnProps;
-
-const ContentDetailsScript: FunctionComponent<Props> = ({ script, args }) => {
+const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
+  script,
+  args,
+}) => {
   return (
     <Card variant="black" className={classes.root}>
-      {!!args?.length && (
+      {args?.length && (
         <>
           <div className={classes.params}>
             <Label className={classes.argsTitle}>ARGS:</Label>

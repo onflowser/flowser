@@ -5,21 +5,19 @@ import Label from "../label/Label";
 import Value from "../value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
-import TransactionStatusCode from "../transaction-status-code/TransactionStatusCode";
+import TransactionStatusBadge from "../transaction-status-code/TransactionStatusBadge";
+import { TransactionStatusCode } from "@flowser/types/generated/entities/transactions";
 
-interface OwnProps {
+type TransactionListItemProps = {
   id: string;
   referenceBlockId: string;
-  statusCode: number;
+  statusCode: TransactionStatusCode | undefined;
   payer: string;
   proposer: string;
-  className?: any;
-  [key: string]: any;
-}
+  className?: string;
+};
 
-type Props = OwnProps;
-
-const TransactionListItem: FunctionComponent<Props> = ({
+const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
   id,
   referenceBlockId,
   statusCode,
@@ -47,7 +45,7 @@ const TransactionListItem: FunctionComponent<Props> = ({
         </Value>
       </div>
       <div>
-        <TransactionStatusCode statusCode={statusCode} />
+        <TransactionStatusBadge statusCode={statusCode} />
       </div>
       <div>
         <Label>PAYER</Label>

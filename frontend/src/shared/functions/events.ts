@@ -14,6 +14,7 @@ export function getEventDataValue(arg: any, indent = false) {
   return indent ? JSON.stringify(out, null, 4) : JSON.stringify(out);
 }
 
+// TODO: refactor this to utility class?
 export function getEventDataType(arg: any): string {
   if (!arg) {
     return "";

@@ -14,6 +14,7 @@ import { useTimeoutPolling } from "../../shared/hooks/timeout-polling";
 import NoResults from "../../shared/components/no-results/NoResults";
 import FullScreenLoading from "../../shared/components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
+import { useGetPollingEvents } from "../../shared/hooks/api";
 
 interface OwnProps {
   some?: string;
@@ -25,11 +26,8 @@ const Events: FunctionComponent<Props> = (props) => {
   const [openedLog, setOpenedLog] = useState("");
   const { formatDate } = useFormattedDate();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
-  // TODO(milestone-2): fix types
-  const { data, firstFetch } = useTimeoutPolling<any>(
-    `/api/events/polling`,
-    "id"
-  );
+  const { data, firstFetch } = useGetPollingEvents();
+  const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
     setPlaceholder("Search for block id, type, transaction ...");
@@ -41,71 +39,68 @@ const Events: FunctionComponent<Props> = (props) => {
     splitbee.track("Events: toggle details");
   };
 
-  const { filteredData } = useFilterData(data, searchTerm);
-
   return (
     <>
-      {filteredData &&
-        filteredData.map((item: any, i) => (
-          <React.Fragment key={i + "-" + item.blockId}>
-            <Card
-              className={`${classes.card} ${
-                item.isNew || item.isUpdated ? classes.isNew : ""
-              }`}
-            >
-              <div>
-                <Label>BLOCK ID</Label>
-                <Value>
-                  <NavLink to={`/blocks/details/${item.blockId}`}>
-                    <Ellipsis className={classes.hash}>{item.blockId}</Ellipsis>
-                  </NavLink>
-                </Value>
-              </div>
-              <div>
-                <Label>TIMESTAMP</Label>
-                <Value>
-                  {formatDate(new Date(item.createdAt).toISOString())}
-                </Value>
-              </div>
-              <div>
-                <Label>TYPE</Label>
-                <Value>{item.type}</Value>
-              </div>
-              <div>
-                <Label>TX ID</Label>
-                <Value>
-                  <NavLink to={`/transactions/details/${item.transactionId}`}>
-                    <Ellipsis className={classes.hash}>
-                      {item.transactionId}
-                    </Ellipsis>
-                  </NavLink>
-                </Value>
-              </div>
-              <div>
-                <Label title="TRANSACTION INDEX">TX INDEX</Label>
-                <Value>{item.transactionIndex}</Value>
-              </div>
-              <div>
-                <Label>EVENT INDEX</Label>
-                <Value>{item.eventIndex}</Value>
-              </div>
-              <div>
-                <CaretIcon
-                  inverted={true}
-                  isOpen={openedLog === item.id}
-                  className={classes.control}
-                  onChange={(status) => openLog(status, item.id)}
-                />
-              </div>
-            </Card>
-            {openedLog === item.id && (
-              <EventDetailsTable
-                className={classes.detailsTable}
-                data={item.data}
+      {filteredData.map((item, i) => (
+        <React.Fragment key={i + "-" + item.blockId}>
+          <Card
+            className={`${classes.card} ${
+              item.isNew || item.isUpdated ? classes.isNew : ""
+            }`}
+          >
+            <div>
+              <Label>BLOCK ID</Label>
+              <Value>
+                <NavLink to={`/blocks/details/${item.blockId}`}>
+                  <Ellipsis className={classes.hash}>{item.blockId}</Ellipsis>
+                </NavLink>
+              </Value>
+            </div>
+            <div>
+              <Label>TIMESTAMP</Label>
+              <Value>
+                {formatDate(new Date(item.createdAt).toISOString())}
+              </Value>
+            </div>
+            <div>
+              <Label>TYPE</Label>
+              <Value>{item.type}</Value>
+            </div>
+            <div>
+              <Label>TX ID</Label>
+              <Value>
+                <NavLink to={`/transactions/details/${item.transactionId}`}>
+                  <Ellipsis className={classes.hash}>
+                    {item.transactionId}
+                  </Ellipsis>
+                </NavLink>
+              </Value>
+            </div>
+            <div>
+              <Label title="TRANSACTION INDEX">TX INDEX</Label>
+              <Value>{item.transactionIndex}</Value>
+            </div>
+            <div>
+              <Label>EVENT INDEX</Label>
+              <Value>{item.eventIndex}</Value>
+            </div>
+            <div>
+              <CaretIcon
+                inverted={true}
+                isOpen={openedLog === item.id}
+                className={classes.control}
+                onChange={(status) => openLog(status, item.id)}
               />
-            )}
-          </React.Fragment>
-        ))}
+            </div>
+          </Card>
+          {openedLog === item.id && item.data && (
+            <EventDetailsTable
+              className={classes.detailsTable}
+              data={item.data}
+            />
+          )}
+        </React.Fragment>
+      ))}
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />

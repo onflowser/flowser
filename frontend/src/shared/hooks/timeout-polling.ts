@@ -1,10 +1,7 @@
 import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
 import { AxiosResponse } from "axios";
-import {
-  PollingResponse,
-  PollingEntity,
-} from "@flowser/types/generated/common";
+import { PollingResponse, PollingEntity } from "@flowser/types/shared/polling";
 
 export interface TimeoutPollingHook<T extends PollingEntity> {
   stopPolling: () => void;
@@ -20,24 +17,26 @@ export type DecoratedPollingEntity<T> = T & {
   isUpdated: boolean;
 };
 
-type UseTimeoutPollingProps<T extends PollingEntity> = {
+type UseTimeoutPollingProps<
+  T extends PollingEntity,
+  R extends PollingResponse<T[]>
+> = {
   resourceKey: string;
   resourceIdKey: keyof T;
-  fetcher: ({
-    timestamp,
-  }: {
-    timestamp: number;
-  }) => Promise<AxiosResponse<PollingResponse<T>>>;
+  fetcher: ({ timestamp }: { timestamp: number }) => Promise<AxiosResponse<R>>;
   interval?: number;
   newestFirst?: boolean;
 };
 
-export const useTimeoutPolling = <T extends PollingEntity>(
-  props: UseTimeoutPollingProps<T>
+export const useTimeoutPolling = <
+  T extends PollingEntity,
+  R extends PollingResponse<T[]>
+>(
+  props: UseTimeoutPollingProps<T, R>
 ): TimeoutPollingHook<T> => {
   const [lastPollingTime, setLastPollingTime] = useState(0);
   const [stop, setStop] = useState(false);
-  const [data, setData] = useState<T[]>([]);
+  const [data, setData] = useState<DecoratedPollingEntity<T>[]>([]);
   const [firstFetch, setFirstFetch] = useState(false);
 
   const fetchCallback = useCallback(() => {
@@ -45,12 +44,12 @@ export const useTimeoutPolling = <T extends PollingEntity>(
   }, [lastPollingTime]);
 
   const { isFetching, error } = useQuery<
-    AxiosResponse<PollingResponse<T>>,
+    AxiosResponse<PollingResponse<T[]>>,
     Error
   >(props.resourceKey, fetchCallback, {
     onSuccess: (response) => {
-      if (response.status === 200 && response.data?.data?.length) {
-        const latestTimestamp = response.data?.meta?.latestTimestamp;
+      if (response.status === 200 && response.data.data.length) {
+        const latestTimestamp = response.data?.meta?.latestTimestamp ?? 0;
         if (latestTimestamp > 0) {
           setLastPollingTime(latestTimestamp);
         }

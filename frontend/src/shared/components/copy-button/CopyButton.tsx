@@ -4,12 +4,11 @@ import toast from "react-hot-toast";
 import { ReactComponent as CopyIcon } from "../../assets/icons/copy.svg";
 import classes from "./CopyButton.module.scss";
 
-interface OwnProps {
+type CopyButtonProps = {
   value: string;
-}
-type Props = OwnProps;
+};
 
-const CopyButton: FunctionComponent<Props> = ({ value }) => {
+const CopyButton: FunctionComponent<CopyButtonProps> = ({ value }) => {
   const MAX_CHARS_DISPLAY = 60;
 
   const displayValue =

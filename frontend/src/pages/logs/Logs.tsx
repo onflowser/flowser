@@ -13,11 +13,11 @@ import { ReactComponent as LogsIcon } from "../../shared/assets/icons/logs.svg";
 import { LogDrawerSize, useLogDrawer } from "../../shared/hooks/log-drawer";
 import CaretIcon from "../../shared/components/caret-icon/CaretIcon";
 import { useSyntaxHighlighter } from "../../shared/hooks/syntax-highlighter";
-import { useTimeoutPolling } from "../../shared/hooks/timeout-polling";
 import { useSearch } from "../../shared/hooks/search";
 import { useFilterData } from "../../shared/hooks/filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../shared/hooks/mouse-position";
+import { useGetPollingLogs } from "../../shared/hooks/api";
 
 interface OwnProps {
   className?: string;
@@ -32,14 +32,8 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
   const { highlightLogKeywords } = useSyntaxHighlighter();
   const miniLogRef = createRef<HTMLDivElement>();
   const bigLogRef = createRef<HTMLDivElement>();
-  // TODO(milestone-2): fix types
-  const { data } = useTimeoutPolling<any>(
-    "/api/logs/polling",
-    "id",
-    1000,
-    false
-  );
-  const logs = data ? data.map((log: any) => log.data) : [];
+  const { data } = useGetPollingLogs();
+  const logs = data ? data.map((log) => log.data) : [];
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { filteredData } = useFilterData(logs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);

@@ -1,3 +1,5 @@
+import { PollingMetaData } from "@flowser/types/generated/responses/common";
+
 export interface PollingEntity {
   createdAt: string;
   updatedAt: string;
@@ -5,7 +7,5 @@ export interface PollingEntity {
 
 export type PollingResponse<T extends PollingEntity[]> = {
   data: T;
-  meta: {
-    latestTimestamp: number;
-  };
+  meta: PollingMetaData | undefined;
 };

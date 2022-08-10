@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
@@ -18,7 +19,10 @@ import { ApiParam } from "@nestjs/swagger";
 import {
   GetAllProjectsResponse,
   GetSingleProjectResponse,
+  GetPollingProjectsResponse,
 } from "@flowser/types/generated/responses/projects";
+import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller("projects")
 export class ProjectsController {
@@ -40,6 +44,15 @@ export class ProjectsController {
     return GetAllProjectsResponse.fromPartial({
       projects: projects.map((project) => project.toProto()),
     });
+  }
+
+  @Get("/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingProjectsResponse))
+  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+    const projects = await this.projectsService.findAllNewerThanTimestamp(
+      timestamp
+    );
+    return projects.map((project) => project.toProto());
   }
 
   @Get("current")

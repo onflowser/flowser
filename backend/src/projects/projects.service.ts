@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/flow-gateway.service";
@@ -162,6 +162,16 @@ export class ProjectsService {
     return Promise.all(
       projects.map(async (project) => this.setComputedFields(project))
     );
+  }
+
+  findAllNewerThanTimestamp(timestamp: Date): Promise<ProjectEntity[]> {
+    return this.projectRepository.find({
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
+      order: { updatedAt: "DESC" },
+    });
   }
 
   async findOne(id: string): Promise<ProjectEntity> {

@@ -4,11 +4,13 @@ const fcl = require("@onflow/fcl");
 import * as http from "http";
 import { AccountsStorageEntity } from "../../accounts/entities/storage.entity";
 
+// https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
   collectionId: string;
   signatures: string[];
 };
 
+// https://docs.onflow.org/fcl/reference/api/#blockobject
 export type FlowBlock = {
   id: string;
   parentId: string;
@@ -19,6 +21,7 @@ export type FlowBlock = {
   signatures: string[];
 };
 
+// https://docs.onflow.org/fcl/reference/api/#keyobject
 export type FlowKey = {
   index: number;
   publicKey: string;
@@ -29,15 +32,16 @@ export type FlowKey = {
   revoked: boolean;
 };
 
+// https://docs.onflow.org/fcl/reference/api/#accountobject
 export type FlowAccount = {
   address: string;
   balance: number;
   code: string;
   contracts: Record<string, string>;
   keys: FlowKey[];
-  storage?: AccountsStorageEntity;
 };
 
+// https://docs.onflow.org/fcl/reference/api/#collectionobject
 export type FlowCollection = {
   id: string;
   transactionIds: string[];
@@ -49,18 +53,21 @@ export type FlowCadenceObject = {
   value: string | FlowCadenceObject | FlowCadenceObject[];
 };
 
-export type FlowTransactionProposalKey = {
+// https://docs.onflow.org/fcl/reference/api/#proposalkeyobject
+export type FlowProposalKey = {
   address: string;
   keyId: number;
   sequenceNumber: number;
 };
 
-export type FlowTransactionEnvelopeSignature = {
-  address: string;
+// https://docs.onflow.org/fcl/reference/api/#signableobject
+export type FlowSignableObject = {
+  addr: string;
   keyId: number;
   signature: string;
 };
 
+// https://docs.onflow.org/fcl/reference/api/#transactionstatusobject
 export type FlowTransactionStatus = {
   status: number;
   statusCode: number;
@@ -68,18 +75,21 @@ export type FlowTransactionStatus = {
   events: FlowEvent[];
 };
 
+// https://docs.onflow.org/fcl/reference/api/#transactionobject
 export type FlowTransaction = {
   id: string;
   script: string;
   args: FlowCadenceObject[];
   referenceBlockId: string;
   gasLimit: number;
-  proposalKey: FlowTransactionProposalKey;
+  proposalKey: FlowProposalKey;
   payer: string; // payer account address
   authorizers: string[]; // authorizers account addresses
-  envelopeSignatures: FlowTransactionEnvelopeSignature[];
+  envelopeSignatures: FlowSignableObject[];
+  payloadSignatures: FlowSignableObject[];
 };
 
+// https://docs.onflow.org/fcl/reference/api/#event-object
 export type FlowEvent = {
   transactionId: string;
   type: string;

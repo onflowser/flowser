@@ -14,7 +14,7 @@ import { useGetPollingAccounts } from "../../../shared/hooks/api";
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data: transactions, firstFetch } = useGetPollingAccounts();
+  const { data: accounts, firstFetch } = useGetPollingAccounts();
 
   useEffect(() => {
     setPlaceholder("search for block numbers or tx hashes");
@@ -23,10 +23,10 @@ const Main: FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    disableSearchBar(!transactions.length);
-  }, [transactions]);
+    disableSearchBar(!accounts.length);
+  }, [accounts]);
 
-  const { filteredData } = useFilterData(transactions, searchTerm);
+  const { filteredData } = useFilterData(accounts, searchTerm);
 
   return (
     <>
@@ -56,7 +56,7 @@ const Main: FunctionComponent = () => {
             </div>
             <div>
               <Label>TX COUNT</Label>
-              <Value>{item.transactionCount ?? 0}</Value>
+              <Value>{item.transactions.length ?? 0}</Value>
             </div>
           </Card>
         ))}

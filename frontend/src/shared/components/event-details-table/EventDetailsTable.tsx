@@ -4,18 +4,16 @@ import Ellipsis from "../ellipsis/Ellipsis";
 import CopyButton from "../copy-button/CopyButton";
 import { formatEventData } from "../../functions/events";
 
-export interface EventData {
+export type EventData = {
   [key: string]: any;
-}
+};
 
-interface OwnProps {
+export type EventDetailsTableProps = {
   data: EventData;
-  [key: string]: any;
-}
+  className?: string;
+};
 
-type Props = OwnProps;
-
-const EventDetailsTable: FunctionComponent<Props> = ({
+const EventDetailsTable: FunctionComponent<EventDetailsTableProps> = ({
   data,
   ...restProps
 }) => {

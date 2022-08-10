@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "entities/common.proto";
 
+// https://docs.onflow.org/fcl/reference/api/#transaction-statuses
 enum TransactionStatusCode {
   UNKNOWN = 0;
   /**
@@ -37,9 +38,10 @@ message Transaction {
   TransactionStatus status = 7;
   repeated CadenceObject args = 8;
   repeated string authorizers = 9;
-  repeated TransactionEnvelopeSignature envelope_signatures = 10;
-  string created_at = 11;
-  string updated_at = 12;
+  repeated SignableObject envelope_signatures = 10;
+  repeated SignableObject payload_signatures = 11;
+  string created_at = 12;
+  string updated_at = 13;
 }
 
 message TransactionProposalKey {
@@ -48,7 +50,7 @@ message TransactionProposalKey {
   int32 sequence_number = 3;
 }
 
-message TransactionEnvelopeSignature {
+message SignableObject {
   string address = 1;
   int32 key_id = 2;
   string signature = 3;

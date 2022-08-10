@@ -3,11 +3,12 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import {
   Transaction,
   TransactionProposalKey,
-  TransactionEnvelopeSignature,
+  SignableObject,
   TransactionStatus,
 } from "@flowser/types/generated/entities/transactions";
 import { CadenceObject } from "@flowser/types/generated/entities/common";
 import {
+  FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
 } from "../../flow/services/flow-gateway.service";
@@ -52,9 +53,14 @@ export class TransactionEntity extends PollingEntity {
   proposalKey: TransactionProposalKey;
 
   @Column("simple-json", {
-    transformer: typeOrmProtobufTransformer(TransactionEnvelopeSignature),
+    transformer: typeOrmProtobufTransformer(SignableObject),
   })
-  envelopeSignatures: TransactionEnvelopeSignature[];
+  envelopeSignatures: SignableObject[];
+
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(SignableObject),
+  })
+  payloadSignatures: SignableObject[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(TransactionStatus),
@@ -73,6 +79,8 @@ export class TransactionEntity extends PollingEntity {
       proposalKey: this.proposalKey,
       envelopeSignatures: this.envelopeSignatures,
       status: this.status,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     });
   }
 
@@ -93,8 +101,17 @@ export class TransactionEntity extends PollingEntity {
       deserializeCadenceObject(arg)
     );
     transaction.proposalKey = flowTransaction.proposalKey;
-    transaction.envelopeSignatures = flowTransaction.envelopeSignatures;
+    transaction.envelopeSignatures = deserializeSignableObjects(
+      flowTransaction.envelopeSignatures
+    );
+    transaction.payloadSignatures = deserializeSignableObjects(
+      flowTransaction.payloadSignatures
+    );
     transaction.status = TransactionStatus.fromJSON(flowTransactionStatus);
     return transaction;
   }
+}
+
+function deserializeSignableObjects(signableObjects: FlowSignableObject[]) {
+  return signableObjects.map((signable) => SignableObject.fromJSON(signable));
 }

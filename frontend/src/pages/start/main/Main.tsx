@@ -11,20 +11,27 @@ import Logo from "../../../shared/assets/images/logo.svg";
 import classes from "./Main.module.scss";
 import { ReactComponent as CaretIcon } from "../../../shared/assets/icons/caret.svg";
 import { ReactComponent as PlusIcon } from "../../../shared/assets/icons/plus.svg";
-import { useProjectApi } from "../../../shared/hooks/project-api";
-import { useQuery } from "react-query";
 import splitbee from "@splitbee/web";
+import { ProjectsService } from "../../../shared/services/projects.service";
+import {
+  useGetAllProjects,
+  useGetCurrentProject,
+  useGetFlowserVersion,
+} from "../../../shared/hooks/api";
 
-const Main: FunctionComponent<any> = () => {
+const Main: FunctionComponent = () => {
   const history = useHistory();
   const [error, setError] = useState("");
-  const { useProject, projects, isLoadingProjects, currentProject } =
-    useProjectApi();
-  const defaultProjects = projects.filter((p: any) => !p.isCustom);
-  const customProjects = projects.filter((p: any) => p.isCustom);
+  const projectService = ProjectsService.getInstance();
+  const { data: projectData, isLoading: isLoadingProjects } =
+    useGetAllProjects();
+  const { data: currentProject } = useGetCurrentProject();
+  const defaultProjects =
+    projectData?.projects.filter((p) => !p.isCustom) ?? [];
+  const customProjects = projectData?.projects.filter((p) => p.isCustom) ?? [];
   const getDefaultProject = (id: string) =>
-    defaultProjects.find((p: any) => p.id === id);
-  const { data: flowserVersion } = useQuery<any>("/api/version");
+    defaultProjects.find((p) => p.id === id);
+  const { data: flowserVersion } = useGetFlowserVersion();
 
   const emulator = getDefaultProject("emulator");
   const testnet = getDefaultProject("testnet");
@@ -40,7 +47,7 @@ const Main: FunctionComponent<any> = () => {
   const onQuickstart = async (name: string) => {
     setError("");
     try {
-      await useProject(name);
+      await projectService.useProject(name);
       splitbee.track(`Start: use ${name}`);
       history.push(`/${routes.firstRouteAfterStart}`);
     } catch (e: any) {
@@ -65,9 +72,7 @@ const Main: FunctionComponent<any> = () => {
         <img src={Logo} alt="FLOWSER" />
         <div className={classes.header}>
           <h1>FLOWSER</h1>
-          <span className={classes.version}>
-            {flowserVersion?.data?.version}
-          </span>
+          <span className={classes.version}>{flowserVersion?.version}</span>
         </div>
         <IconButton
           onClick={() => onQuickstart("emulator")}
@@ -108,7 +113,7 @@ const Main: FunctionComponent<any> = () => {
               </div>
             ) : (
               <>
-                {customProjects.map((project: any, index: number) => (
+                {customProjects.map((project, index) => (
                   <NavLink
                     key={index}
                     className={classes.link}

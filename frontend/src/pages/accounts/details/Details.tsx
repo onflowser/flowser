@@ -14,24 +14,23 @@ import {
   DetailsTabs,
 } from "../../../shared/components/details-tabs/DetailsTabs";
 import CollapsibleCard from "../../../shared/components/collapsible-card/CollapsibleCard";
-import { useDetailsQuery } from "../../../shared/hooks/details-query";
 import { useParams } from "react-router-dom";
 import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
 import TransactionListItem from "../../../shared/components/transaction-list-item/TransactionListItem";
 import Fragment from "../../../shared/components/fragment/Fragment";
+import { useGetAccount } from "../../../shared/hooks/api";
 
 type RouteParams = {
   accountId: string;
 };
 
-const Details: FunctionComponent<any> = () => {
+const Details: FunctionComponent = () => {
   const { accountId } = useParams<RouteParams>();
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data, isLoading } = useDetailsQuery<any>(
-    `/api/accounts/${accountId}`
-  );
+  const { data, isLoading } = useGetAccount(accountId);
+  const { account } = data ?? {};
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -44,7 +43,7 @@ const Details: FunctionComponent<any> = () => {
     setBreadcrumbs(breadcrumbs);
   }, []);
 
-  if (isLoading || !data) {
+  if (isLoading || !account) {
     return <FullScreenLoading />;
   }
 
@@ -52,41 +51,44 @@ const Details: FunctionComponent<any> = () => {
     <div className={classes.root}>
       <div className={classes.firstRow}>
         <Label variant="large">ADDRESS</Label>
-        <Value variant="large">{data.address}</Value>
-        <CopyButton value={data.address} />
+        <Value variant="large">{account.address}</Value>
+        <CopyButton value={account.address} />
       </div>
       <Card className={classes.bigCard}>
         <div>
           <Label variant="large" className={classes.label}>
             BALANCE
           </Label>
-          <Value variant="large">{data.balance} FLOW</Value>
+          <Value variant="large">{account.balance} FLOW</Value>
         </div>
       </Card>
       <DetailsTabs>
-        <DetailsTabItem label="STORAGE" value={data.storage?.length}>
-          {data.storage?.length && <Storage data={data.storage} />}
+        <DetailsTabItem label="STORAGE" value={account.storage?.length}>
+          {account.storage?.length && <Storage data={account.storage} />}
         </DetailsTabItem>
-        {!!data.code && (
+        {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">
             <Fragment
               onMount={() => updateSearchBar("search for scripts", true)}
             >
-              <ContentDetailsScript script={data.code} />
+              <ContentDetailsScript script={account.code} />
             </Fragment>
           </DetailsTabItem>
         )}
-        {!!data.transactions && (
-          <DetailsTabItem label="TRANSACTIONS" value={data.transactions.length}>
+        {!!account.transactions && (
+          <DetailsTabItem
+            label="TRANSACTIONS"
+            value={account.transactions.length}
+          >
             <Fragment
               onMount={() =>
                 updateSearchBar(
                   "search for transactions",
-                  !data.transactions.length
+                  !account.transactions.length
                 )
               }
             >
-              {data.transactions.map((item: any, i: number) => (
+              {account.transactions.map((item: any, i: number) => (
                 <TransactionListItem
                   key={i}
                   id={item.id}
@@ -101,12 +103,12 @@ const Details: FunctionComponent<any> = () => {
         )}
         <DetailsTabItem
           label="CONTRACTS"
-          value={data.contracts.length}
+          value={account.contracts.length}
           onClick={() =>
-            updateSearchBar("search for contracts", !data.contracts.length)
+            updateSearchBar("search for contracts", !account.contracts.length)
           }
         >
-          {data.contracts.map((contract: any, index: number) => (
+          {account.contracts.map((contract: any, index: number) => (
             <CollapsibleCard
               key={index}
               isNew={contract.isNew}
@@ -119,7 +121,7 @@ const Details: FunctionComponent<any> = () => {
                 onMount={() =>
                   updateSearchBar(
                     "search for contracts",
-                    !data.contracts.length
+                    !account.contracts.length
                   )
                 }
               >
@@ -128,13 +130,13 @@ const Details: FunctionComponent<any> = () => {
             </CollapsibleCard>
           ))}
         </DetailsTabItem>
-        <DetailsTabItem label="KEYS" value={data.keys.length}>
+        <DetailsTabItem label="KEYS" value={account.keys.length}>
           <Fragment
             onMount={() =>
-              updateSearchBar("search for keys", !data.keys.length)
+              updateSearchBar("search for keys", !account.keys.length)
             }
           >
-            <ContentDetailsKeys keys={data.keys} />
+            <ContentDetailsKeys keys={account.keys} />
           </Fragment>
         </DetailsTabItem>
       </DetailsTabs>
