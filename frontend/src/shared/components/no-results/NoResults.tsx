@@ -2,15 +2,13 @@ import React, { FunctionComponent } from "react";
 import { ReactComponent as NoResultsIcon } from "../../assets/icons/no-results.svg";
 import classes from "./NoResults.module.scss";
 
-interface OwnProps {
-  [key: string]: any;
-}
+type NoResultsProps = {
+  className?: string;
+};
 
-type Props = OwnProps;
-
-const NoResults: FunctionComponent<Props> = ({ ...restProps }) => {
+const NoResults: FunctionComponent<NoResultsProps> = ({ className }) => {
   return (
-    <div className={`${classes.root} ${restProps.className}`}>
+    <div className={`${classes.root} ${className}`}>
       <NoResultsIcon />
       <h3>It looks like there is nothing here.</h3>
       <p>No results found</p>

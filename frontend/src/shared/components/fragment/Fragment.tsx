@@ -1,13 +1,10 @@
 import React, { FunctionComponent, useEffect } from "react";
 
-interface OwnProps {
+type FragmentProps = {
   onMount: () => void;
-  children: any;
-}
+};
 
-type Props = OwnProps;
-
-const Fragment: FunctionComponent<Props> = ({ onMount, children }) => {
+const Fragment: FunctionComponent<FragmentProps> = ({ onMount, children }) => {
   useEffect(() => onMount(), []);
   return <React.Fragment>{children}</React.Fragment>;
 };

@@ -15,7 +15,6 @@ import splitbee from "@splitbee/web";
 type TabItemProps = {
   label: string;
   value: string | number;
-  children?: any;
   onClick?: MouseEventHandler;
 };
 
@@ -77,5 +76,6 @@ export const DetailsTabs: FunctionComponent<ContainerProps> = ({
   );
 };
 
-export const DetailsTabItem: FunctionComponent<TabItemProps> = ({ children }) =>
-  children;
+export const DetailsTabItem: FunctionComponent<TabItemProps> = ({
+  children,
+}) => <>{children}</>;

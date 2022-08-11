@@ -10,12 +10,12 @@ import { ReactComponent as DeleteIcon } from "../../assets/icons/cancel.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
 import splitbee from "@splitbee/web";
 
-type Props = {
+type ScriptArgumentsProps = {
   className: string;
   onChange: (value: FlowScriptArgument[]) => void;
 };
 
-const ScriptArguments: FC<Props> = ({ className, onChange }) => {
+const ScriptArguments: FC<ScriptArgumentsProps> = ({ className, onChange }) => {
   const [args, setArgs] = useState<FlowScriptArgument[]>([]);
 
   function updateArgs(value: FlowScriptArgument, index: number) {
@@ -43,7 +43,7 @@ const ScriptArguments: FC<Props> = ({ className, onChange }) => {
     <div className={`${classes.root} ${className}`}>
       <div className={classes.arguments}>
         {args.map((arg, i) => (
-          <ArgumentItem
+          <ScriptArgumentItem
             key={i}
             onChange={(arg) => updateArgs(arg, i)}
             onRemove={() => onRemove(i)}
@@ -62,7 +62,7 @@ const ScriptArguments: FC<Props> = ({ className, onChange }) => {
   );
 };
 
-type ArgumentItemProps = {
+type ScriptArgumentItemProps = {
   onChange: (arg: FlowScriptArgument) => void;
   onRemove: () => void;
 };
@@ -79,7 +79,10 @@ const flowTypeOptions = [
   })),
 ];
 
-const ArgumentItem: FC<ArgumentItemProps> = ({ onChange, onRemove }) => {
+const ScriptArgumentItem: FC<ScriptArgumentItemProps> = ({
+  onChange,
+  onRemove,
+}) => {
   const [value, setValue] = useState("");
   const [type, setType] = useState("");
 

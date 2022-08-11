@@ -1,16 +1,13 @@
 import React, { FunctionComponent } from "react";
 import classes from "./Label.module.scss";
 
-interface LabelProps {
-  children: any;
-  className?: any;
+type LabelProps = {
+  className?: string;
   variant?: "small" | "normal" | "medium" | "large" | "xlarge";
   title?: string;
-}
+};
 
-type Props = LabelProps;
-
-const Label: FunctionComponent<Props> = ({
+const Label: FunctionComponent<LabelProps> = ({
   children,
   className,
   variant = "normal",

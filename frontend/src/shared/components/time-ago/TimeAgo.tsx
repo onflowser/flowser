@@ -3,13 +3,11 @@ import ReactTimeAgo from "react-timeago";
 import { ReactComponent as ClockIcon } from "../../assets/icons/clock.svg";
 import classes from "./TimeAgo.module.scss";
 
-interface OwnProps {
+type TimeAgoProps = {
   date: string;
-}
+};
 
-type Props = OwnProps;
-
-const TimeAgo: FunctionComponent<Props> = ({ date }) => {
+const TimeAgo: FunctionComponent<TimeAgoProps> = ({ date }) => {
   return (
     <span className={classes.root}>
       <ClockIcon className={classes.icon} />

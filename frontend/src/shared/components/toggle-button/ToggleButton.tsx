@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./ToggleButton.module.scss";
 
-type ToggleButtonProps = {
+export type ToggleButtonProps = {
   value?: boolean;
   onChange?: (state: boolean) => void;
 };

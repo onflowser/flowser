@@ -1,14 +1,12 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import classes from "./RadioButton.module.scss";
 
-interface OwnProps {
+type RadioButtonProps = {
   checked: boolean;
   onChange: (checked: boolean) => void;
-}
+};
 
-type Props = OwnProps;
-
-const RadioButton: FunctionComponent<Props> = ({
+const RadioButton: FunctionComponent<RadioButtonProps> = ({
   checked = false,
   onChange,
 }) => {

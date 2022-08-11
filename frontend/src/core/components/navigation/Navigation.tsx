@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { routes } from "../../../shared/constants/routes";
 import classes from "./Navigation.module.scss";

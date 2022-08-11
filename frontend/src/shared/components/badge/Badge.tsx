@@ -1,8 +1,18 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Badge.module.scss";
 
-const Badge: FunctionComponent<any> = ({ className, children }) => {
-  return <span className={`${classes.root} ${className}`}>{children}</span>;
+export type BadgeProps = HTMLAttributes<HTMLSpanElement>;
+
+const Badge: FunctionComponent<BadgeProps> = ({
+  className,
+  children,
+  ...restProps
+}) => {
+  return (
+    <span {...restProps} className={`${classes.root} ${className}`}>
+      {children}
+    </span>
+  );
 };
 
 export default Badge;

@@ -4,9 +4,7 @@ import Ellipsis from "../ellipsis/Ellipsis";
 import CopyButton from "../copy-button/CopyButton";
 import { formatEventData } from "../../functions/events";
 
-export type EventData = {
-  [key: string]: any;
-};
+export type EventData = Record<string, any>;
 
 export type EventDetailsTableProps = {
   data: EventData;

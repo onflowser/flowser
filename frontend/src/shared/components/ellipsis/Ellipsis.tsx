@@ -1,31 +1,24 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from "react";
 
-interface OwnProps {
+export type EllipsisProps = {
   children: string;
   ellipsis?: string;
+  className?: string;
+};
 
-  [key: string]: any;
-}
-
-type Props = OwnProps;
-
-const Ellipsis: FunctionComponent<Props> = ({
+const Ellipsis: FunctionComponent<EllipsisProps> = ({
   children,
   ellipsis = "...",
   ...restProps
 }) => {
-  const elRef = useRef(null);
+  const elRef = useRef<HTMLSpanElement>(null);
   const [state, setState] = useState(children);
 
   useEffect(() => {
     const resize = () => {
       setState(children);
-      const offsetWidth = elRef.current
-        ? (elRef.current as any).offsetWidth
-        : 0;
-      const scrollWidth = elRef.current
-        ? (elRef.current as any).scrollWidth
-        : 0;
+      const offsetWidth = elRef.current ? elRef.current.offsetWidth : 0;
+      const scrollWidth = elRef.current ? elRef.current.scrollWidth : 0;
       if (offsetWidth < scrollWidth) {
         const charWidth = Math.ceil(scrollWidth / children.length);
         const textHalf = Math.ceil(offsetWidth / charWidth / 2);

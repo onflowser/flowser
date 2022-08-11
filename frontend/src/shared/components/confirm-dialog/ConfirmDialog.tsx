@@ -1,20 +1,17 @@
-import React, { FunctionComponent } from "react";
-import Dialog from "../dialog/Dialog";
+import React, { FunctionComponent, MouseEventHandler } from "react";
+import Dialog, { DialogProps } from "../dialog/Dialog";
 import Button from "../button/Button";
 import classes from "./ConfirmDialog.module.scss";
 
-interface OwnProps {
-  onClose: () => void;
-  onConfirm: (event: any) => void;
+type ConfirmDialogProps = Pick<DialogProps, "onClose"> & {
+  onClose: React.MouseEventHandler<HTMLButtonElement>;
+  onConfirm: MouseEventHandler<HTMLButtonElement>;
   confirmBtnLabel?: string;
   cancelBtnLabel?: string;
   className?: string;
-  children?: JSX.Element[] | JSX.Element | undefined;
-}
+};
 
-type Props = OwnProps;
-
-const ConfirmDialog: FunctionComponent<Props> = ({
+const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
   onConfirm,
   onClose,
   confirmBtnLabel = "OK",

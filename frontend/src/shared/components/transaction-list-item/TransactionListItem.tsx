@@ -8,7 +8,7 @@ import Ellipsis from "../ellipsis/Ellipsis";
 import TransactionStatusBadge from "../transaction-status-code/TransactionStatusBadge";
 import { TransactionStatusCode } from "@flowser/types/generated/entities/transactions";
 
-type TransactionListItemProps = {
+export type TransactionListItemProps = {
   id: string;
   referenceBlockId: string;
   statusCode: TransactionStatusCode | undefined;

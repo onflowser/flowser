@@ -1,10 +1,9 @@
 import { env } from "../../config";
+import { Emulator, Project } from "@flowser/types/generated/entities/projects";
 import {
-  Emulator,
   HashAlgorithm,
-  Project,
   SignatureAlgorithm,
-} from "@flowser/types/generated/entities/projects";
+} from "@flowser/types/generated/entities/common";
 
 export const defaultEmulatorFlags = Project.fromPartial({
   name: "New Project",

@@ -3,18 +3,15 @@ import Card from "../card/Card";
 import classes from "./Collapsible.module.scss";
 import CaretIcon from "../caret-icon/CaretIcon";
 
-interface OwnProps {
-  children: any;
+type CollapsibleCardProps = {
   header: string;
   subheader?: string;
   variant?: "blue" | "black";
   isNew?: boolean;
-  [key: string]: any;
-}
+  className?: string;
+};
 
-type Props = OwnProps;
-
-const CollapsibleCard: FunctionComponent<Props> = ({
+const CollapsibleCard: FunctionComponent<CollapsibleCardProps> = ({
   children,
   variant,
   header,

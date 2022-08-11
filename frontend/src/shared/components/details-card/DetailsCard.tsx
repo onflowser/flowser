@@ -2,13 +2,12 @@ import React, { FunctionComponent } from "react";
 import Card from "../card/Card";
 import classes from "./DetailsCard.module.scss";
 
-interface Props {
-  children: any;
-  Header?: any;
-  Footer?: any;
-}
+type DetailsCardProps = {
+  Header?: FunctionComponent;
+  Footer?: FunctionComponent;
+};
 
-const DetailsCard: FunctionComponent<Props> = ({
+const DetailsCard: FunctionComponent<DetailsCardProps> = ({
   children,
   Header,
   Footer,

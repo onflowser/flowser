@@ -1,23 +1,15 @@
-import React, {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { ReactComponent as CaretIconSvg } from "../../assets/icons/caret.svg";
 import classes from "./CaretIcon.module.scss";
 
-interface OwnProps {
+type CaretIconProps = {
   isOpen?: boolean;
   onChange?: (isOpen: boolean) => void;
+  className?: string;
   inverted?: boolean; // Close state is upside orientated instead of downside orientated
+};
 
-  [key: string]: any;
-}
-
-type Props = OwnProps;
-
-const CaretIcon: FunctionComponent<Props> = ({
+const CaretIcon: FunctionComponent<CaretIconProps> = ({
   isOpen = false,
   onChange = () => false,
   inverted = false,

@@ -1,9 +1,11 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, HTMLAttributes } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigation } from "../../../shared/hooks/navigation";
 import classes from "./Breadcrumbs.module.scss";
 
-const Breadcrumbs: FunctionComponent<any> = ({ className }) => {
+export type BreadCrumbsProps = HTMLAttributes<HTMLDivElement>;
+
+const Breadcrumbs: FunctionComponent<BreadCrumbsProps> = ({ className }) => {
   const { breadcrumbs } = useNavigation();
 
   if (breadcrumbs.length === 0) {

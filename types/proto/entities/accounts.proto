@@ -1,18 +1,7 @@
 syntax = "proto3";
 
 import "entities/transactions.proto";
-
-enum SignCurve {
-  SIGN_CURVE_UNSPECIFIED = 0;
-  SIGN_CURVE_ECDSA_P256 = 2;
-  SIGN_CURVE_ECDSA_secp256k1 = 3;
-}
-
-enum HashAlgo {
-  HASH_ALGO_UNSPECIFIED = 0;
-  HASH_ALGO_SHA2_256 = 1;
-  HASH_ALGO_SHA3_256 = 3;
-}
+import "entities/common.proto";
 
 message Account {
   string address = 1;
@@ -30,8 +19,8 @@ message AccountKey {
     int32 index = 1;
     string account_address = 2;
     string public_key = 3;
-    SignCurve sign_algo = 4;
-    HashAlgo hash_algo = 5;
+    SignatureAlgorithm sign_algo = 4;
+    HashAlgorithm hash_algo = 5;
     int32 weight = 6;
     int32 sequence_number = 7;
     bool revoked = 8;

@@ -1,21 +1,21 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Button.module.scss";
 import Loader from "react-loader-spinner";
 
-export interface ButtonProps {
-  onClick?: (event: any) => void;
-  variant?: "big" | "middle" | "normal";
-  disabled?: boolean;
-  outlined?: boolean;
-  loading?: boolean;
-  loaderColor?: string;
-  [key: string]: any;
-}
+export type ButtonProps = React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> &
+  HTMLAttributes<HTMLButtonElement> & {
+    variant?: "big" | "middle" | "normal";
+    disabled?: boolean;
+    outlined?: boolean;
+    loading?: boolean;
+    loaderColor?: string;
+  };
 
-type Props = ButtonProps;
-
-const Button: FunctionComponent<Props> = ({
-  onClick = () => true,
+const Button: FunctionComponent<ButtonProps> = ({
+  onClick,
   disabled = false,
   variant = "normal",
   outlined = false,
@@ -25,9 +25,9 @@ const Button: FunctionComponent<Props> = ({
 }) => {
   return (
     <button
+      {...restProps}
       onClick={onClick}
       disabled={disabled}
-      {...restProps}
       className={`${classes.button} ${classes[variant]} ${
         disabled ? classes.disabled : ""
       } ${restProps.className} ${outlined ? classes.outlined : ""}`}

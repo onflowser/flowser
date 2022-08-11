@@ -1,19 +1,15 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import classes from "./NavigationItem.module.scss";
 
-interface OwnProps {
+type NavigationItemProps = {
   to: string;
-  children: any;
-  icon?: any;
+  icon?: ReactNode;
   counter?: number;
+  activeClassName?: string;
+};
 
-  [key: string]: any;
-}
-
-type Props = OwnProps;
-
-const NavigationItem: FunctionComponent<Props> = ({
+const NavigationItem: FunctionComponent<NavigationItemProps> = ({
   to,
   children,
   icon,

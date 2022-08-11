@@ -1,12 +1,12 @@
 import React, { createRef, FC } from "react";
 import TextArea from "../text-area/TextArea";
 
-type Props = {
+type CadenceEditorProps = {
   value: string;
   onChange: (value: string) => void;
 };
 
-const CadenceEditor: FC<Props> = ({ value, onChange }) => {
+const CadenceEditor: FC<CadenceEditorProps> = ({ value, onChange }) => {
   const ref = createRef<HTMLTextAreaElement>();
 
   function onTextAreaKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {

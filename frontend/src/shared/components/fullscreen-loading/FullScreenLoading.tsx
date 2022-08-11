@@ -2,12 +2,15 @@ import React, { FC, useEffect, useState } from "react";
 import Logo from "../../assets/images/logo.svg";
 import classes from "./FullScreenLoading.module.scss";
 
-type Props = {
+type FullScreenLoadingProps = {
   dotInterval?: number;
   className?: string;
 };
 
-const FullScreenLoading: FC<Props> = ({ dotInterval = 300, className }) => {
+const FullScreenLoading: FC<FullScreenLoadingProps> = ({
+  dotInterval = 300,
+  className,
+}) => {
   const [dots, setDots] = useState("");
 
   useEffect(() => {

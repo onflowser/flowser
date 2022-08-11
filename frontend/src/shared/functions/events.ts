@@ -1,3 +1,4 @@
+// TODO(milestone-2): refactor this function to use the new CadenceObject type
 export function getEventDataValue(arg: any, indent = false) {
   const _getValue = (arg: any) => {
     if (arg.type === "Array") {
@@ -14,7 +15,8 @@ export function getEventDataValue(arg: any, indent = false) {
   return indent ? JSON.stringify(out, null, 4) : JSON.stringify(out);
 }
 
-// TODO: refactor this to utility class?
+// TODO(milestone-2): refactor this to utility class?
+// TODO(milestone-2): refactor this function to use the new CadenceObject type
 export function getEventDataType(arg: any): string {
   if (!arg) {
     return "";
@@ -30,7 +32,7 @@ export function getEventDataType(arg: any): string {
   }
 }
 
-export function formatEventData(data: { [key: string]: any }) {
+export function formatEventData(data: Record<string, any>) {
   const keys = Object.keys(data);
   return keys.map((key) => {
     const item = data[key];

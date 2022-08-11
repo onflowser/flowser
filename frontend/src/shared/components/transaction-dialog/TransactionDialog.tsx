@@ -13,12 +13,12 @@ import { isValueSet } from "../../functions/utils";
 import splitbee from "@splitbee/web";
 import { useSyntaxHighlighter } from "../../hooks/syntax-highlighter";
 
-type Props = {
+export type TransactionDialogProps = {
   show?: boolean;
   setShow: (value: boolean) => void;
 };
 
-const TransactionDialog: FC<Props> = ({ show, setShow }) => {
+const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   const [code, setCode] = useState<string>("");
   const [showLongError, setShowLongError] = useState<boolean>(false);
   const [longError, setLongError] = useState<string>("");
@@ -61,7 +61,7 @@ const TransactionDialog: FC<Props> = ({ show, setShow }) => {
       const { transactionId } = await sendTransaction(code, args);
       setShow(false);
       toast(
-        (t) => (
+        () => (
           <span className={classes.toast}>
             Transaction {` `}
             <NavLink to={`/transactions/details/${transactionId}`}>

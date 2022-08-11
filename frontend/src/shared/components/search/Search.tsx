@@ -4,14 +4,12 @@ import classes from "./Search.module.scss";
 import { ReactComponent as SearchIcon } from "../../assets/icons/search.svg";
 import { ReactComponent as CancelIcon } from "../../assets/icons/cancel.svg";
 
-interface SearchProps {
-  className?: any;
+export type SearchProps = {
+  className?: string;
   context?: string;
-}
+};
 
-type Props = SearchProps;
-
-const Search: FunctionComponent<Props> = ({
+const Search: FunctionComponent<SearchProps> = ({
   className,
   context = "default",
 }) => {

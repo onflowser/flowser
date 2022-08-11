@@ -1,21 +1,23 @@
-import React, { FunctionComponent } from "react";
+import React, { ChangeEventHandler, FunctionComponent } from "react";
 import classes from "./SelectInput.module.scss";
 
-interface OwnProps {
-  value?: any;
+type SelectInputValue = string | number;
+
+export type SelectInputOption = { label: string; value: SelectInputValue };
+
+type SelectInputProps = {
+  placeholder?: string;
+  value?: SelectInputValue;
   disabled?: boolean;
-  onChange?: (e: any) => void;
-  options: { label: any; value: any }[];
-  [key: string]: any;
-}
+  options: SelectInputOption[];
+  onChange: ChangeEventHandler<HTMLSelectElement>;
+};
 
-type Props = OwnProps;
-
-const SelectInput: FunctionComponent<Props> = ({
+const SelectInput: FunctionComponent<SelectInputProps> = ({
   options = [],
   value = "",
   disabled = false,
-  onChange = () => false,
+  onChange,
   ...restProps
 }) => {
   return (

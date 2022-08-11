@@ -1,15 +1,12 @@
 import React, { FunctionComponent } from "react";
 import classes from "./Value.module.scss";
 
-interface ValueProps {
-  children: any;
-  className?: any;
+type ValueProps = {
+  className?: string;
   variant?: "small" | "normal" | "medium" | "large";
-}
+};
 
-type Props = ValueProps;
-
-const Value: FunctionComponent<Props> = ({
+const Value: FunctionComponent<ValueProps> = ({
   children,
   className,
   variant = "normal",

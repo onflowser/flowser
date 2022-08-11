@@ -2,13 +2,13 @@ import React, { FunctionComponent } from "react";
 import { useSyntaxHighlighter } from "../../hooks/syntax-highlighter";
 import "./CadenceSourceCode.module.scss";
 
-interface OwnProps {
+type CadenceSourceCodeProps = {
   script: string;
-}
+};
 
-type Props = OwnProps;
-
-const CadenceSourceCode: FunctionComponent<Props> = ({ script }) => {
+const CadenceSourceCode: FunctionComponent<CadenceSourceCodeProps> = ({
+  script,
+}) => {
   const { highlightCadenceSyntax } = useSyntaxHighlighter();
   const highlighted = highlightCadenceSyntax(script);
 

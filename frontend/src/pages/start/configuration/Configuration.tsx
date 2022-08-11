@@ -25,12 +25,18 @@ import { useGetFlowCliInfo } from "../../../shared/hooks/api";
 import {
   Emulator,
   Gateway,
-  HashAlgorithm,
   Project,
-  SignatureAlgorithm,
 } from "@flowser/types/generated/entities/projects";
-import { getNestedValue } from "../../../shared/functions/utils";
+import {
+  getHashAlgoName,
+  getNestedValue,
+  getSignatureAlgoName,
+} from "../../../shared/functions/utils";
 import { FormikErrors } from "formik/dist/types";
+import {
+  HashAlgorithm,
+  SignatureAlgorithm,
+} from "@flowser/types/generated/entities/common";
 
 const Configuration: FunctionComponent = () => {
   const projectService = ProjectsService.getInstance();
@@ -310,51 +316,24 @@ const Configuration: FunctionComponent = () => {
                         label="Service Signature Algorithm"
                         path="emulator.serviceSignatureAlgorithm"
                         formik={formik}
-                        options={[
-                          {
-                            label: "ECDSA_P256",
-                            value: SignatureAlgorithm.ECDSA_P256,
-                          },
-                          {
-                            label: "ECDSA_secp256k1",
-                            value: SignatureAlgorithm.ECDSA_secp256k1,
-                          },
-                          {
-                            label: "BLS_BLS12_381",
-                            value: SignatureAlgorithm.BLS_BLS12_381,
-                          },
-                        ]}
+                        options={getSignatureAlgorithmRadioOptions([
+                          SignatureAlgorithm.ECDSA_P256,
+                          SignatureAlgorithm.ECDSA_secp256k1,
+                          SignatureAlgorithm.BLS_BLS12_381,
+                        ])}
                       />
                       <RadioField
                         label="Service Hash Algorithm"
                         path="emulator.serviceHashAlgorithm"
                         formik={formik}
-                        options={[
-                          {
-                            label: "SHA2_256",
-                            value: HashAlgorithm.SHA2_256,
-                          },
-                          {
-                            label: "SHA2_384",
-                            value: HashAlgorithm.SHA2_384,
-                          },
-                          {
-                            label: "SHA3_256",
-                            value: HashAlgorithm.SHA3_256,
-                          },
-                          {
-                            label: "SHA3_384",
-                            value: HashAlgorithm.SHA3_384,
-                          },
-                          {
-                            label: "KMAC128_BLS_BLS12_381",
-                            value: HashAlgorithm.KMAC128_BLS_BLS12_381,
-                          },
-                          {
-                            label: "KECCAK_256",
-                            value: HashAlgorithm.KECCAK_256,
-                          },
-                        ]}
+                        options={getHashAlgorithmRadioOptions([
+                          HashAlgorithm.SHA2_256,
+                          HashAlgorithm.SHA2_384,
+                          HashAlgorithm.SHA3_256,
+                          HashAlgorithm.SHA3_384,
+                          HashAlgorithm.KMAC128_BLS_BLS12_381,
+                          HashAlgorithm.KECCAK_256,
+                        ])}
                       />
                     </div>
                     <div className={classes.secondPart}>
@@ -454,6 +433,22 @@ const Configuration: FunctionComponent = () => {
     </>
   );
 };
+
+function getHashAlgorithmRadioOptions(hashAlgorithms: HashAlgorithm[]) {
+  return hashAlgorithms.map((algo) => ({
+    label: getHashAlgoName(algo),
+    value: algo,
+  }));
+}
+
+function getSignatureAlgorithmRadioOptions(
+  sigAlgorithms: SignatureAlgorithm[]
+) {
+  return sigAlgorithms.map((algo) => ({
+    label: getSignatureAlgoName(algo),
+    value: algo,
+  }));
+}
 
 type FieldProps = {
   label?: string;

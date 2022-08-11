@@ -1,17 +1,17 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Content.module.scss";
 
-interface OwnProps {
-  children?: any;
-  className?: any;
-  [key: string]: any;
-}
+type ContentProps = HTMLAttributes<HTMLDivElement>;
 
-type Props = OwnProps;
-
-const Content: FunctionComponent<Props> = ({ children, className }) => {
+const Content: FunctionComponent<ContentProps> = ({
+  children,
+  className,
+  ...restProps
+}) => {
   return (
-    <div className={`${classes.contentContainer} ${className}`}>{children}</div>
+    <div {...restProps} className={`${classes.contentContainer} ${className}`}>
+      {children}
+    </div>
   );
 };
 

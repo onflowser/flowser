@@ -3,13 +3,13 @@ import { ReactComponent as CalendarIcon } from "../../assets/icons/calendar.svg"
 import classes from "./DateWithCalendar.module.scss";
 import { useFormattedDate } from "../../hooks/formatted-date";
 
-interface OwnProps {
+type DateWithCalendarProps = {
   date: string;
-}
+};
 
-type Props = OwnProps;
-
-const DateWithCalendar: FunctionComponent<Props> = ({ date }) => {
+const DateWithCalendar: FunctionComponent<DateWithCalendarProps> = ({
+  date,
+}) => {
   const { formatDate } = useFormattedDate();
   return (
     <span className={classes.root}>

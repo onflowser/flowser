@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { ReactComponent as CopyIcon } from "../../assets/icons/copy.svg";
 import classes from "./CopyButton.module.scss";
 
-type CopyButtonProps = {
+export type CopyButtonProps = {
   value: string;
 };
 

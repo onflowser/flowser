@@ -1,17 +1,9 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, InputHTMLAttributes } from "react";
 import classes from "./Input.module.scss";
 
-interface OwnProps {
-  type?: string;
-  value?: any;
-  disabled?: boolean;
-  onChange?: (e: any) => void;
-  [key: string]: any;
-}
+type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
-type Props = OwnProps;
-
-const Input: FunctionComponent<Props> = ({
+const Input: FunctionComponent<InputProps> = ({
   type = "text",
   value = "",
   disabled = false,

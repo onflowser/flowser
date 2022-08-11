@@ -1,19 +1,15 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Card.module.scss";
 
-interface OwnProps {
-  children?: any;
-  className?: any;
+type CardProps = HTMLAttributes<HTMLDivElement> & {
+  className?: string;
   variant?: "blue" | "black";
   active?: boolean;
   loading?: boolean;
   loadingText?: string;
-  [key: string]: any;
-}
+};
 
-type Props = OwnProps;
-
-const Card: FunctionComponent<Props> = ({
+const Card: FunctionComponent<CardProps> = ({
   children,
   className,
   variant = "blue",

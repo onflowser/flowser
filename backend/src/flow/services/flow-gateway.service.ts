@@ -94,6 +94,8 @@ export type FlowEvent = {
   type: string;
   transactionIndex: number;
   eventIndex: number;
+  // Data contains arbitrary key-value pairs emitted from transactions.
+  // Information about cadence types is not returned from fcl-js.
   data: Record<string, any>;
 };
 

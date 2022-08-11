@@ -1,16 +1,13 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactElement } from "react";
 import Button, { ButtonProps } from "../button/Button";
 import classes from "./IconButton.module.scss";
 
 interface IconButtonProps extends ButtonProps {
-  icon: React.Component | any;
+  icon: ReactElement;
   iconPosition?: "before" | "after" | "after-end";
-  [key: string]: any;
 }
 
-type Props = IconButtonProps;
-
-const IconButton: FunctionComponent<Props> = ({
+const IconButton: FunctionComponent<IconButtonProps> = ({
   icon,
   iconPosition = "before",
   ...restProps

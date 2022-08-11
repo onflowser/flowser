@@ -1,27 +1,28 @@
-import React, { FunctionComponent, ReactElement } from "react";
+import React, {
+  FunctionComponent,
+  MouseEventHandler,
+  ReactElement,
+} from "react";
 import classes from "./Dialog.module.scss";
 import Card from "../card/Card";
 
-interface OwnProps {
+export type DialogProps = {
   children: ReactElement[] | ReactElement;
-  onClose: () => void;
+  onClose: MouseEventHandler<HTMLDivElement>;
   className?: string;
-  [key: string]: any;
-}
+};
 
-type Props = OwnProps;
-
-const Dialog: FunctionComponent<Props> = ({
+const Dialog: FunctionComponent<DialogProps> = ({
   children,
   onClose,
   className = "",
 }) => {
-  const onOutsideClick = (event: React.MouseEvent) => {
+  const onOutsideClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    onClose();
+    onClose(event);
   };
 
-  const onClickInside = (event: React.MouseEvent) => {
+  const onClickInside = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
   };
 

@@ -5,14 +5,14 @@ import Value from "../value/Value";
 import classes from "./DetailsItem.module.scss";
 import { ReactComponent as OpenIcon } from "../../assets/icons/open.svg";
 
-type Props = {
+export type DetailsItemProps = {
   label: string;
   value: string | number;
   open?: boolean;
   onClick?: MouseEventHandler<HTMLDivElement> | undefined;
 };
 
-const DetailsItem: FunctionComponent<Props> = ({
+const DetailsItem: FunctionComponent<DetailsItemProps> = ({
   label,
   value,
   onClick,
