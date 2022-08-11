@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountKeyEntity } from "../entities/key.entity";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()
@@ -23,6 +23,19 @@ export class KeysService {
       update: (e) => this.update(e),
       delete: (e) => this.delete(e.accountAddress, e.index),
       diff: entitiesDiff,
+    });
+  }
+
+  async findAllNewerThanTimestampByAccount(
+    accountAddress: string,
+    timestamp: Date
+  ) {
+    return this.keyRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), accountAddress },
+        { createdAt: MoreThan(timestamp), accountAddress },
+      ],
+      order: { createdAt: "DESC" },
     });
   }
 

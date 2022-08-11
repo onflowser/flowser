@@ -12,6 +12,11 @@ message GetPollingAccountsResponse {
   PollingMetaData meta = 2;
 }
 
+message GetPollingKeysResponse {
+  repeated AccountKey data = 1;
+  PollingMetaData meta = 2;
+}
+
 message GetSingleAccountResponse {
   Account account = 1;
 }

@@ -24,6 +24,8 @@ message AccountKey {
     int32 weight = 6;
     int32 sequence_number = 7;
     bool revoked = 8;
+    string created_at = 9;
+    string updated_at = 10;
 }
 
 message AccountStorage {

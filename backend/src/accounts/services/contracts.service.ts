@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { AccountContractEntity } from "../entities/contract.entity";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
@@ -24,13 +24,26 @@ export class ContractsService {
   async findAllNewerThanTimestamp(
     timestamp: Date
   ): Promise<AccountContractEntity[]> {
-    return this.contractRepository
-      .createQueryBuilder("contract")
-      .select()
-      .where("contract.updatedAt > :timestamp", { timestamp })
-      .orWhere("contract.createdAt > :timestamp", { timestamp })
-      .orderBy("contract.createdAt", "DESC")
-      .getMany();
+    return this.contractRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp) },
+        { createdAt: MoreThan(timestamp) },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  async findAllNewerThanTimestampByAccount(
+    accountAddress: string,
+    timestamp: Date
+  ) {
+    return this.contractRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), accountAddress },
+        { createdAt: MoreThan(timestamp), accountAddress },
+      ],
+      order: { createdAt: "DESC" },
+    });
   }
 
   async getContractsByAccountAddress(address: string) {

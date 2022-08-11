@@ -29,6 +29,22 @@ export class ContractsService {
     });
   }
 
+  getAllByAccountWithPolling({
+    accountAddress,
+    timestamp,
+  }: {
+    accountAddress: string;
+    timestamp: number;
+  }): Promise<AxiosResponse<GetPollingContractsResponse>> {
+    return axios.get(`/api/accounts/${accountAddress}/contracts/polling`, {
+      params: {
+        timestamp,
+      },
+      transformResponse: (data) =>
+        GetPollingContractsResponse.fromJSON(JSON.parse(data)),
+    });
+  }
+
   getSingle(id: string): Promise<AxiosResponse<GetSingleContractResponse>> {
     return axios.get(`/api/contracts/${id}`, {
       transformResponse: (data) =>

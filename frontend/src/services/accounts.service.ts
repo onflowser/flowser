@@ -1,6 +1,7 @@
 import {
   GetSingleAccountResponse,
   GetPollingAccountsResponse,
+  GetPollingKeysResponse,
 } from "@flowser/types/generated/responses/accounts";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
@@ -26,6 +27,22 @@ export class AccountsService {
       },
       transformResponse: (data) =>
         GetPollingAccountsResponse.fromJSON(JSON.parse(data)),
+    });
+  }
+
+  getAllKeysByAccountWithPolling({
+    accountAddress,
+    timestamp,
+  }: {
+    accountAddress: string;
+    timestamp: number;
+  }): Promise<AxiosResponse<GetPollingKeysResponse>> {
+    return axios.get(`/api/accounts/${accountAddress}/keys/polling`, {
+      params: {
+        timestamp,
+      },
+      transformResponse: (data) =>
+        GetPollingKeysResponse.fromJSON(JSON.parse(data)),
     });
   }
 

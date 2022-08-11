@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TransactionEntity } from "./entities/transaction.entity";
 import { MoreThan, Repository } from "typeorm";
@@ -22,16 +22,6 @@ export class TransactionsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<TransactionEntity[]> {
-    return this.transactionRepository.find({
-      where: [
-        { createdAt: MoreThan(timestamp) },
-        { updatedAt: MoreThan(timestamp) },
-      ],
-      order: { createdAt: "DESC" },
-    });
-  }
-
   async countAll() {
     return this.transactionRepository.count();
   }
@@ -49,25 +39,40 @@ export class TransactionsService {
     });
   }
 
-  findAllByBlockNewerThanTimestamp(blockId: string, timestamp: Date) {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<TransactionEntity[]> {
     return this.transactionRepository.find({
-      where: {
-        referenceBlockId: blockId,
-        createdAt: MoreThan(timestamp),
-      },
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  findAllNewerThanTimestampByBlock(referenceBlockId: string, timestamp: Date) {
+    return this.transactionRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), referenceBlockId },
+        { createdAt: MoreThan(timestamp), referenceBlockId },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  findAllNewerThanTimestampByAccount(payerAddress: string, timestamp: Date) {
+    return this.transactionRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), payerAddress },
+        { createdAt: MoreThan(timestamp), payerAddress },
+      ],
       order: { createdAt: "DESC" },
     });
   }
 
   async findOne(id: string) {
-    const [transaction] = await this.transactionRepository.find({
+    return this.transactionRepository.findOneOrFail({
       where: { id },
     });
-    if (transaction) {
-      return transaction;
-    } else {
-      throw new NotFoundException("Transaction not found");
-    }
   }
 
   removeAll() {

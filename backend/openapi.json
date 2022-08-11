@@ -303,7 +303,44 @@
     "/api/accounts/polling": {
       "get": {
         "operationId": "AccountsController_findAllNew",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "timestamp",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts/{address}/keys/polling": {
+      "get": {
+        "operationId": "AccountsController_findAllNewKeysByAccount",
+        "parameters": [
+          {
+            "name": "timestamp",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -346,6 +383,34 @@
       "get": {
         "operationId": "ContractsController_findAllNew",
         "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts/{address}/contracts/polling": {
+      "get": {
+        "operationId": "ContractsController_findAllNewByAccount",
+        "parameters": [
+          {
+            "name": "timestamp",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -480,6 +545,34 @@
     "/api/blocks/{id}/transactions/polling": {
       "get": {
         "operationId": "TransactionsController_findAllNewByBlock",
+        "parameters": [
+          {
+            "name": "timestamp",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts/{address}/transactions/polling": {
+      "get": {
+        "operationId": "TransactionsController_findAllNewByAccount",
         "parameters": [
           {
             "name": "timestamp",

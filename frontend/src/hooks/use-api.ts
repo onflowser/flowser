@@ -2,6 +2,7 @@ import { TimeoutPollingHook, useTimeoutPolling } from "./use-timeout-polling";
 import {
   Account,
   AccountContract,
+  AccountKey,
 } from "@flowser/types/generated/entities/accounts";
 import { Transaction } from "@flowser/types/generated/entities/transactions";
 import { Block } from "@flowser/types/generated/entities/blocks";
@@ -40,6 +41,7 @@ import {
 } from "@flowser/types/generated/responses/contracts";
 import {
   GetPollingAccountsResponse,
+  GetPollingKeysResponse,
   GetSingleAccountResponse,
 } from "@flowser/types/generated/responses/accounts";
 import { GetFlowCliInfoResponse } from "@flowser/types/generated/responses/flow";
@@ -56,6 +58,48 @@ export function useGetAccount(address: string) {
   return useGetAxiosQuery<GetSingleAccountResponse>({
     resourceKey: `/accounts/${address}`,
     fetcher: () => AccountsService.getInstance().getSingle(address),
+  });
+}
+
+export function useGetPollingTransactionsByAccount(
+  accountAddress: string
+): TimeoutPollingHook<Transaction> {
+  return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
+    resourceKey: `/accounts/${accountAddress}/transactions/polling`,
+    resourceIdKey: "id",
+    fetcher: ({ timestamp }) =>
+      TransactionsService.getInstance().getAllByAccountWithPolling({
+        accountAddress,
+        timestamp,
+      }),
+  });
+}
+
+export function useGetPollingContractsByAccount(
+  accountAddress: string
+): TimeoutPollingHook<AccountContract> {
+  return useTimeoutPolling<AccountContract, GetPollingContractsResponse>({
+    resourceKey: `/accounts/${accountAddress}/contracts/polling`,
+    resourceIdKey: "id",
+    fetcher: ({ timestamp }) =>
+      ContractsService.getInstance().getAllByAccountWithPolling({
+        accountAddress,
+        timestamp,
+      }),
+  });
+}
+
+export function useGetPollingKeysByAccount(
+  accountAddress: string
+): TimeoutPollingHook<AccountKey> {
+  return useTimeoutPolling<AccountKey, GetPollingKeysResponse>({
+    resourceKey: `/accounts/${accountAddress}/keys/polling`,
+    resourceIdKey: "index",
+    fetcher: ({ timestamp }) =>
+      AccountsService.getInstance().getAllKeysByAccountWithPolling({
+        accountAddress,
+        timestamp,
+      }),
   });
 }
 

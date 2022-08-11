@@ -48,6 +48,8 @@ export class AccountKeyEntity extends PollingEntity {
       weight: this.weight,
       sequenceNumber: this.sequenceNumber,
       revoked: this.revoked,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     });
   }
 

@@ -1,7 +1,7 @@
 import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
 import { ContractsService } from "../services/contracts.service";
 import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
-import { ApiParam } from "@nestjs/swagger";
+import { ApiParam, ApiQuery } from "@nestjs/swagger";
 import { ParseUnixTimestampPipe } from "../../common/pipes/parse-unix-timestamp.pipe";
 import {
   GetSingleContractResponse,
@@ -9,11 +9,11 @@ import {
   GetAllContractsResponse,
 } from "@flowser/types/generated/responses/contracts";
 
-@Controller("contracts")
+@Controller()
 export class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
 
-  @Get()
+  @Get("contracts")
   async findAll() {
     const contracts = await this.contractsService.findAll();
     return GetAllContractsResponse.toJSON({
@@ -21,7 +21,7 @@ export class ContractsController {
     });
   }
 
-  @Get("/polling")
+  @Get("contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
   async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
     const contracts = await this.contractsService.findAllNewerThanTimestamp(
@@ -31,7 +31,23 @@ export class ContractsController {
   }
 
   @ApiParam({ name: "id", type: String })
-  @Get(":id")
+  @ApiQuery({ name: "timestamp", type: Number })
+  @Get("/accounts/:address/contracts/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
+  async findAllNewByAccount(
+    @Param("address") accountAddress,
+    @Query("timestamp", ParseUnixTimestampPipe) timestamp
+  ) {
+    const contracts =
+      await this.contractsService.findAllNewerThanTimestampByAccount(
+        accountAddress,
+        timestamp
+      );
+    return contracts.map((transaction) => transaction.toProto());
+  }
+
+  @ApiParam({ name: "id", type: String })
+  @Get("contracts/:id")
   async findOne(@Param("id") id: string) {
     const contract = await this.contractsService.findOne(id);
     return GetSingleContractResponse.toJSON({

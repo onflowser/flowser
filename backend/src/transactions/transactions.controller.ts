@@ -52,8 +52,26 @@ export class TransactionsController {
     @Query("timestamp", ParseUnixTimestampPipe) timestamp
   ) {
     const transactions =
-      await this.transactionsService.findAllByBlockNewerThanTimestamp(
+      await this.transactionsService.findAllNewerThanTimestampByBlock(
         blockId,
+        timestamp
+      );
+    return transactions.map((transaction) => transaction.toProto());
+  }
+
+  @ApiParam({ name: "id", type: String })
+  @ApiQuery({ name: "timestamp", type: Number })
+  @Get("/accounts/:address/transactions/polling")
+  @UseInterceptors(
+    new PollingResponseInterceptor(GetPollingTransactionsResponse)
+  )
+  async findAllNewByAccount(
+    @Param("address") accountAddress,
+    @Query("timestamp", ParseUnixTimestampPipe) timestamp
+  ) {
+    const transactions =
+      await this.transactionsService.findAllNewerThanTimestampByAccount(
+        accountAddress,
         timestamp
       );
     return transactions.map((transaction) => transaction.toProto());

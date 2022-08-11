@@ -45,6 +45,22 @@ export class TransactionsService {
     });
   }
 
+  getAllByAccountWithPolling({
+    timestamp,
+    accountAddress,
+  }: {
+    timestamp: number;
+    accountAddress: string;
+  }): Promise<AxiosResponse<GetPollingTransactionsResponse>> {
+    return axios.get(`/api/accounts/${accountAddress}/transactions/polling`, {
+      params: {
+        timestamp,
+      },
+      transformResponse: (data) =>
+        GetPollingTransactionsResponse.fromJSON(JSON.parse(data)),
+    });
+  }
+
   getSingle(id: string): Promise<AxiosResponse<GetSingleTransactionResponse>> {
     return axios.get(`/api/transactions/${id}`, {
       transformResponse: (data) =>
