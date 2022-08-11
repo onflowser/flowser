@@ -6,8 +6,8 @@ import Label from "../label/Label";
 import Ellipsis from "../ellipsis/Ellipsis";
 import Value from "../value/Value";
 import CopyButton from "../copy-button/CopyButton";
-import { getEventDataType, getEventDataValue } from "../../utils/events";
 import { CadenceObject } from "@flowser/types/generated/entities/common";
+import { CadenceUtils } from "../../utils/cadence-utils";
 
 export type ContentDetailsScriptProps = {
   script: string;
@@ -32,16 +32,19 @@ const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
                 <Value className={classes.value}>{`{${index}}`}</Value>
 
                 <Label>TYPE:</Label>
-                <Value className={classes.value}>{getEventDataType(arg)}</Value>
+                <Value className={classes.value}>
+                  {CadenceUtils.getDisplayType(arg)}
+                </Value>
 
                 <Label>VALUE:</Label>
                 <Value className={classes.value}>
                   <Ellipsis className={classes.argValue}>
-                    {getEventDataValue(arg)}
+                    {CadenceUtils.getDisplayValue(arg)}
                   </Ellipsis>
                 </Value>
 
-                <CopyButton value={getEventDataValue(arg, true)} />
+                {/* FIXME: fix getEventDataValue function */}
+                {/*<CopyButton value={getEventDataValue(arg, true)} />*/}
               </div>
             ))}
           </div>

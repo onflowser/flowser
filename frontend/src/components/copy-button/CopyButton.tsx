@@ -11,6 +11,8 @@ export type CopyButtonProps = {
 const CopyButton: FunctionComponent<CopyButtonProps> = ({ value }) => {
   const MAX_CHARS_DISPLAY = 60;
 
+  console.log({ value });
+
   const displayValue =
     value.length > MAX_CHARS_DISPLAY
       ? value.substr(0, MAX_CHARS_DISPLAY) + "..."

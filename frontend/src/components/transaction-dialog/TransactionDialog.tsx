@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import Dialog from "../dialog/Dialog";
 import Button from "../button/Button";
 import classes from "./TransactionDialog.module.scss";
@@ -9,7 +9,7 @@ import ScriptArguments from "./ScriptArguments";
 import CadenceEditor from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
-import { isNotEmpty } from "../../utils/common";
+import { CommonUtils } from "../../utils/common-utils";
 import splitbee from "@splitbee/web";
 import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 
@@ -34,9 +34,10 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   }
 
   function validateArgs() {
-    let valid = false;
-    const unsetValues = args.filter((arg) => !isNotEmpty(arg.value));
-    const unsetTypes = args.filter((arg) => !isNotEmpty(arg.type));
+    const unsetValues = args.filter(
+      (arg) => !CommonUtils.isNotEmpty(arg.value)
+    );
+    const unsetTypes = args.filter((arg) => !CommonUtils.isNotEmpty(arg.type));
 
     if (unsetValues.length > 0) {
       toast.error("Some values are undefined!");
@@ -44,8 +45,8 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
     if (unsetTypes.length > 0) {
       toast.error("Some types are undefined!");
     }
-    valid = unsetValues.length === 0 && unsetTypes.length === 0;
-    return valid;
+    const isValid = unsetValues.length === 0 && unsetTypes.length === 0;
+    return isValid;
   }
 
   async function onConfirm() {

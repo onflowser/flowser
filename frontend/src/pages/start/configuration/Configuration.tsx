@@ -27,7 +27,7 @@ import {
   Gateway,
   Project,
 } from "@flowser/types/generated/entities/projects";
-import { getNestedValue } from "../../../utils/common";
+import { CommonUtils } from "../../../utils/common-utils";
 import { FormikErrors } from "formik/dist/types";
 import {
   HashAlgorithm,
@@ -464,14 +464,14 @@ type FieldProps = {
 };
 
 function Field({ label, description, formik, path }: FieldProps) {
-  const error = getNestedValue(formik.errors, path) as string;
+  const error = CommonUtils.getNestedValue(formik.errors, path) as string;
   return (
     <>
       {label && <span>{label}</span>}
       <Input
         type="text"
         name={path}
-        value={getNestedValue(formik.values, path) as string}
+        value={CommonUtils.getNestedValue(formik.values, path) as string}
         onChange={formik.handleChange}
       />
       {error ? (
@@ -499,7 +499,7 @@ function RadioField({
   path,
   options,
 }: RadioFieldProps) {
-  const value = getNestedValue(formik.values, path);
+  const value = CommonUtils.getNestedValue(formik.values, path);
 
   return (
     <div>
@@ -523,7 +523,7 @@ function RadioField({
 }
 
 function ToggleField({ label, description, formik, path }: FieldProps) {
-  const value = getNestedValue(formik.values, path) as boolean;
+  const value = CommonUtils.getNestedValue(formik.values, path) as boolean;
 
   return (
     <>

@@ -55,9 +55,10 @@ export class AccountsService {
   }
 
   async markUpdated(address: string) {
-    const account = await this.accountRepository.findOneByOrFail({ address });
-    account.markUpdated();
-    return this.update(address, account);
+    return this.accountRepository.update(
+      { address },
+      { updatedAt: new Date() }
+    );
   }
 
   removeAll() {

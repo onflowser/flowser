@@ -4,12 +4,14 @@ export type EllipsisProps = {
   children: string;
   ellipsis?: string;
   className?: string;
+  style?: React.CSSProperties;
 };
 
 const Ellipsis: FunctionComponent<EllipsisProps> = ({
   children,
   ellipsis = "...",
-  ...restProps
+  className,
+  style,
 }) => {
   const elRef = useRef<HTMLSpanElement>(null);
   const [state, setState] = useState(children);
@@ -40,7 +42,7 @@ const Ellipsis: FunctionComponent<EllipsisProps> = ({
   }, []);
 
   return (
-    <span ref={elRef} className={`${restProps.className}`}>
+    <span ref={elRef} className={`${className}`} style={style}>
       {state}
     </span>
   );
