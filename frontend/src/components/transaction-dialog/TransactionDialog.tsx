@@ -9,7 +9,7 @@ import ScriptArguments from "./ScriptArguments";
 import CadenceEditor from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
-import { isValueSet } from "../../utils/common";
+import { isNotEmpty } from "../../utils/common";
 import splitbee from "@splitbee/web";
 import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 
@@ -35,8 +35,8 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
 
   function validateArgs() {
     let valid = false;
-    const unsetValues = args.filter((arg) => !isValueSet(arg.value));
-    const unsetTypes = args.filter((arg) => !isValueSet(arg.type));
+    const unsetValues = args.filter((arg) => !isNotEmpty(arg.value));
+    const unsetTypes = args.filter((arg) => !isNotEmpty(arg.type));
 
     if (unsetValues.length > 0) {
       toast.error("Some values are undefined!");

@@ -11,8 +11,8 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import { isInitialParentId } from "../../../utils/common";
 import { useGetPollingBlocks } from "../../../hooks/use-api";
+import { FlowUtils } from "../../../utils/flow-utils";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -51,7 +51,7 @@ const Main: FunctionComponent = () => {
           <div>
             <Label>PARENT ID</Label>
             <Value>
-              {isInitialParentId(item.parentId) ? (
+              {FlowUtils.isInitialBlockId(item.parentId) ? (
                 <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
               ) : (
                 <NavLink to={`/blocks/details/${item.parentId}`}>

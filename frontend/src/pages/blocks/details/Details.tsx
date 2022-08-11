@@ -14,12 +14,12 @@ import {
   DetailsTabs,
 } from "../../../components/details-tabs/DetailsTabs";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import { isInitialParentId } from "../../../utils/common";
 import Fragment from "../../../components/fragment/Fragment";
 import {
   useGetBlock,
   useGetPollingTransactionsByBlock,
 } from "../../../hooks/use-api";
+import { FlowUtils } from "../../../utils/flow-utils";
 
 type RouteParams = {
   blockId: string;
@@ -64,7 +64,7 @@ const Details: FunctionComponent = () => {
             PARENT ID
           </Label>
           <Value variant="large">
-            {isInitialParentId(block.parentId) ? (
+            {FlowUtils.isInitialBlockId(block.parentId) ? (
               block.parentId
             ) : (
               <NavLink to={`/blocks/details/${block.parentId}`}>

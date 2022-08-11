@@ -1,9 +1,9 @@
 import axios from "./axios";
-import { QueryClient } from "react-query";
+import { QueryClient, QueryFunction } from "react-query";
 
-const defaultQueryFn = async ({ queryKey }: any) => {
-  const path = queryKey.filter((e: any) => typeof e !== "object");
-  const params = queryKey.find((e: any) => typeof e === "object");
+const defaultQueryFn: QueryFunction = async ({ queryKey }) => {
+  const path = queryKey.filter((e) => typeof e !== "object");
+  const params = queryKey.find((e) => typeof e === "object");
   return axios.get(path.join("/"), { params });
 };
 

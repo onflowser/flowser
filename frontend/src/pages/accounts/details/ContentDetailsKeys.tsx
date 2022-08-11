@@ -7,7 +7,7 @@ import { ReactComponent as KeyIcon } from "../../../assets/icons/key.svg";
 import Badge from "../../../components/badge/Badge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { AccountKey } from "@flowser/types/generated/entities/accounts";
-import { getHashAlgoName, getSignatureAlgoName } from "../../../utils/common";
+import { FlowUtils } from "../../../utils/flow-utils";
 
 type ContentDetailsKeysProps = {
   keys: AccountKey[];
@@ -32,8 +32,10 @@ const ContentDetailsKeys: FunctionComponent<ContentDetailsKeysProps> = ({
             <Badge>WEIGHT: {key.weight}</Badge>
             <Badge>SEQ. NUMBER: {key.sequenceNumber}</Badge>
             <Badge>INDEX: {key.index}</Badge>
-            <Badge>SIGN CURVE: {getSignatureAlgoName(key.signAlgo)}</Badge>
-            <Badge>HASH ALGO.: {getHashAlgoName(key.hashAlgo)}</Badge>
+            <Badge>
+              SIGN CURVE: {FlowUtils.getSignatureAlgoName(key.signAlgo)}
+            </Badge>
+            <Badge>HASH ALGO.: {FlowUtils.getHashAlgoName(key.hashAlgo)}</Badge>
             <Badge>REVOKED: {key.revoked ? "YES" : "NO"}</Badge>
           </div>
         </Card>

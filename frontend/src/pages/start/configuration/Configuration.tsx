@@ -27,16 +27,13 @@ import {
   Gateway,
   Project,
 } from "@flowser/types/generated/entities/projects";
-import {
-  getHashAlgoName,
-  getNestedValue,
-  getSignatureAlgoName,
-} from "../../../utils/common";
+import { getNestedValue } from "../../../utils/common";
 import { FormikErrors } from "formik/dist/types";
 import {
   HashAlgorithm,
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
+import { FlowUtils } from "../../../utils/flow-utils";
 
 const Configuration: FunctionComponent = () => {
   const projectService = ProjectsService.getInstance();
@@ -436,7 +433,7 @@ const Configuration: FunctionComponent = () => {
 
 function getHashAlgorithmRadioOptions(hashAlgorithms: HashAlgorithm[]) {
   return hashAlgorithms.map((algo) => ({
-    label: getHashAlgoName(algo),
+    label: FlowUtils.getHashAlgoName(algo),
     value: algo,
   }));
 }
@@ -445,7 +442,7 @@ function getSignatureAlgorithmRadioOptions(
   sigAlgorithms: SignatureAlgorithm[]
 ) {
   return sigAlgorithms.map((algo) => ({
-    label: getSignatureAlgoName(algo),
+    label: FlowUtils.getSignatureAlgoName(algo),
     value: algo,
   }));
 }
@@ -460,21 +457,21 @@ type FieldProps = {
     errors: FormikErrors<Project>;
     setFieldValue: (
       field: string,
-      value: any,
+      value: unknown,
       shouldValidate?: boolean
     ) => void;
   };
 };
 
 function Field({ label, description, formik, path }: FieldProps) {
-  const error = getNestedValue(formik.errors, path);
+  const error = getNestedValue(formik.errors, path) as string;
   return (
     <>
       {label && <span>{label}</span>}
       <Input
         type="text"
         name={path}
-        value={getNestedValue(formik.values, path)}
+        value={getNestedValue(formik.values, path) as string}
         onChange={formik.handleChange}
       />
       {error ? (
@@ -526,7 +523,7 @@ function RadioField({
 }
 
 function ToggleField({ label, description, formik, path }: FieldProps) {
-  const value = getNestedValue(formik.values, path);
+  const value = getNestedValue(formik.values, path) as boolean;
 
   return (
     <>
