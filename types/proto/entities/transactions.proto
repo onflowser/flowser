@@ -57,7 +57,9 @@ message SignableObject {
 }
 
 message TransactionStatus {
-  int32 status = 1;
-  TransactionStatusCode status_code = 2;
+  TransactionStatusCode status = 1;
+  // I think status_code represents GRCP status code
+  // https://grpc.github.io/grpc/core/md_doc_statuscodes.html
+  int32 status_code = 2;
   string error_message = 3;
 }

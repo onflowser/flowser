@@ -88,14 +88,15 @@ const Details: FunctionComponent = () => {
                 )
               }
             >
-              {account.transactions.map((item: any, i: number) => (
+              {/* TODO(milestone-2): get data from transaction polling endpoint */}
+              {account.transactions.map((item, i: number) => (
                 <TransactionListItem
                   key={i}
                   id={item.id}
                   referenceBlockId={item.referenceBlockId}
-                  statusCode={item.status.statusCode}
+                  statusCode={item.status?.status}
                   payer={item.payer}
-                  proposer={item.proposalKey.address}
+                  proposer={item.proposalKey?.address ?? "-"}
                 />
               ))}
             </Fragment>

@@ -11,6 +11,7 @@ import { FlowEmulatorService } from "./services/flow-emulator.service";
 import { LogsModule } from "../logs/logs.module";
 import { FlowCliService } from "./services/flow-cli.service";
 import { StorageDataService } from "./services/storage-data.service";
+import { FlowSubscriptionService } from "./services/flow-subscription.service";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StorageDataService } from "./services/storage-data.service";
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,
+    FlowSubscriptionService,
     StorageDataService,
   ],
   exports: [

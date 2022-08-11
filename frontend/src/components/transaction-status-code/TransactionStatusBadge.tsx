@@ -15,6 +15,7 @@ type TransactionStatusCodeProps = {
 const TransactionStatusBadge: FunctionComponent<TransactionStatusCodeProps> = ({
   statusCode,
 }) => {
+  // TODO(milestone-3): add tooltip for each status code
   switch (statusCode) {
     case TransactionStatusCode.UNKNOWN:
       return (
@@ -27,28 +28,28 @@ const TransactionStatusBadge: FunctionComponent<TransactionStatusCodeProps> = ({
       return (
         <span className={`${classes.status} ${classes.pending}`}>
           <TransactionPendingIcon />
-          <span>PENDING - Awaiting Finalization</span>
+          <span>PENDING</span>
         </span>
       );
     case TransactionStatusCode.FINALIZED:
       return (
         <span className={`${classes.status} ${classes.finalized}`}>
           <TransactionFinalizedIcon />
-          <span>FINALIZED - Awaiting Execution</span>
+          <span>FINALIZED</span>
         </span>
       );
     case TransactionStatusCode.EXECUTED:
       return (
         <span className={`${classes.status} ${classes.executed}`}>
           <TransactionExecutedIcon />
-          <span>EXECUTED - Awaiting Sealing</span>
+          <span>EXECUTED</span>
         </span>
       );
     case TransactionStatusCode.SEALED:
       return (
         <span className={`${classes.status} ${classes.sealed}`}>
           <TransactionSealedIcon />
-          <span>SEALED - Transaction Complete</span>
+          <span>SEALED</span>
         </span>
       );
     case TransactionStatusCode.EXPIRED:

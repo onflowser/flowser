@@ -29,7 +29,7 @@ const Main: FunctionComponent = () => {
           className={`${item.isNew || item.isUpdated ? classes.isNew : ""}`}
           id={item.id}
           referenceBlockId={item.referenceBlockId}
-          statusCode={item.status?.statusCode}
+          statusCode={item.status?.status}
           payer={item.payer}
           proposer={item.proposalKey?.address ?? "-"}
         />

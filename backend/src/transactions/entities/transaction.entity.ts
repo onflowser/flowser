@@ -33,7 +33,7 @@ export class TransactionEntity extends PollingEntity {
   @Column()
   gasLimit: number;
 
-  @PrimaryColumn()
+  @Column()
   payerAddress: string; // payer account address
 
   @ManyToOne(() => AccountEntity, (account) => account.transactions)

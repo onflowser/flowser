@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TransactionEntity } from "./entities/transaction.entity";
 import { MoreThan, Repository } from "typeorm";
+import { TransactionStatus } from "@flowser/types/generated/entities/transactions";
 
 @Injectable()
 export class TransactionsService {
@@ -12,6 +13,13 @@ export class TransactionsService {
 
   create(transaction: TransactionEntity) {
     return this.transactionRepository.save(transaction);
+  }
+
+  updateStatus(transactionId: string, status: TransactionStatus) {
+    return this.transactionRepository.update(transactionId, {
+      status,
+      updatedAt: new Date(),
+    });
   }
 
   findAllNewerThanTimestamp(timestamp: Date): Promise<TransactionEntity[]> {

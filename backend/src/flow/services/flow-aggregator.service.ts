@@ -28,6 +28,7 @@ import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
+import { FlowSubscriptionService } from "./flow-subscription.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -60,6 +61,7 @@ export class FlowAggregatorService {
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
     private flowEmulatorService: FlowEmulatorService,
+    private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
     private storageDataService: StorageDataService
   ) {}
@@ -155,6 +157,8 @@ export class FlowAggregatorService {
     // Process events first, so that transactions can reference created users.
     await this.processEvents(blockData.events);
 
+    this.subscribeTxStatusUpdates(blockData.transactions);
+
     try {
       await queryRunner.startTransaction();
 
@@ -168,6 +172,12 @@ export class FlowAggregatorService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  subscribeTxStatusUpdates(transactions: FlowTransactionWithStatus[]) {
+    transactions.forEach((transaction) => {
+      this.flowSubscriptionService.addTransactionSubscription(transaction.id);
+    });
   }
 
   async storeBlockData(data: BlockData) {

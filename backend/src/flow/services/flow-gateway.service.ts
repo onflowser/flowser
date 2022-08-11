@@ -120,6 +120,10 @@ export class FlowGatewayService {
     return host.startsWith("http") ? host : `http://${host}`;
   }
 
+  public getTxStatusSubscription(transactionId: string) {
+    return fcl.tx(transactionId);
+  }
+
   public async getLatestBlock(): Promise<FlowBlock> {
     return fcl.latestBlock();
   }
