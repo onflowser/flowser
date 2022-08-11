@@ -1,25 +1,25 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { useSearch } from "../../../shared/hooks/search";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
-import CopyButton from "../../../shared/components/copy-button/CopyButton";
-import Card from "../../../shared/components/card/Card";
-import TimeAgo from "../../../shared/components/time-ago/TimeAgo";
-import DateWithCalendar from "../../../shared/components/date-with-calendar/DateWithCalendar";
+import { useSearch } from "../../../hooks/use-search";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
+import CopyButton from "../../../components/copy-button/CopyButton";
+import Card from "../../../components/card/Card";
+import TimeAgo from "../../../components/time-ago/TimeAgo";
+import DateWithCalendar from "../../../components/date-with-calendar/DateWithCalendar";
 import classes from "./Details.module.scss";
 import {
   DetailsTabItem,
   DetailsTabs,
-} from "../../../shared/components/details-tabs/DetailsTabs";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import { isInitialParentId } from "../../../shared/functions/utils";
-import Fragment from "../../../shared/components/fragment/Fragment";
+} from "../../../components/details-tabs/DetailsTabs";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import { isInitialParentId } from "../../../utils/common";
+import Fragment from "../../../components/fragment/Fragment";
 import {
   useGetBlock,
   useGetPollingTransactionsByBlock,
-} from "../../../shared/hooks/api";
+} from "../../../hooks/use-api";
 
 type RouteParams = {
   blockId: string;

@@ -1,6 +1,6 @@
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import { NavLink } from "react-router-dom";
-import { useNavigation } from "../../../shared/hooks/navigation";
+import { useNavigation } from "../../hooks/use-navigation";
 import classes from "./Breadcrumbs.module.scss";
 
 export type BreadCrumbsProps = HTMLAttributes<HTMLDivElement>;

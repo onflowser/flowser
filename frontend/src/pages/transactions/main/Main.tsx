@@ -1,12 +1,12 @@
 import React, { FunctionComponent, useEffect } from "react";
 import classes from "./Main.module.scss";
-import { useNavigation } from "../../../shared/hooks/navigation";
-import { useSearch } from "../../../shared/hooks/search";
-import { useFilterData } from "../../../shared/hooks/filter-data";
-import NoResults from "../../../shared/components/no-results/NoResults";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import TransactionListItem from "../../../shared/components/transaction-list-item/TransactionListItem";
-import { useGetPollingTransactions } from "../../../shared/hooks/api";
+import { useNavigation } from "../../../hooks/use-navigation";
+import { useSearch } from "../../../hooks/use-search";
+import { useFilterData } from "../../../hooks/use-filter-data";
+import NoResults from "../../../components/no-results/NoResults";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";
+import { useGetPollingTransactions } from "../../../hooks/use-api";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();

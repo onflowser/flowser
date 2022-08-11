@@ -6,7 +6,7 @@ import Label from "../label/Label";
 import Ellipsis from "../ellipsis/Ellipsis";
 import Value from "../value/Value";
 import CopyButton from "../copy-button/CopyButton";
-import { getEventDataType, getEventDataValue } from "../../functions/events";
+import { getEventDataType, getEventDataValue } from "../../utils/events";
 import { CadenceObject } from "@flowser/types/generated/entities/common";
 
 export type ContentDetailsScriptProps = {

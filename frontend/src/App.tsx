@@ -9,12 +9,12 @@ import {
   withRouter,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Layout from "./core/components/layout/Layout";
-import { routes } from "./shared/constants/routes";
-import { UiStateContextProvider } from "./shared/contexts/ui-state.context";
-import { useSearch } from "./shared/hooks/search";
+import Layout from "./components/layout/Layout";
+import { routes } from "./constants/routes";
+import { UiStateContextProvider } from "./contexts/ui-state.context";
+import { useSearch } from "./hooks/use-search";
 import "./App.scss";
-import { toastOptions } from "./shared/config/toast";
+import { toastOptions } from "./config/toast";
 
 // pages
 import Start from "./pages/start/Start";

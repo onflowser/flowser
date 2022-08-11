@@ -1,11 +1,11 @@
 import React, { FunctionComponent } from "react";
 import classes from "./TransactionStatusCode.module.scss";
-import { ReactComponent as UnknownIcon } from "../../../shared/assets/icons/status-unknown.svg";
-import { ReactComponent as TransactionPendingIcon } from "../../../shared/assets/icons/status-pending.svg";
-import { ReactComponent as TransactionFinalizedIcon } from "../../../shared/assets/icons/status-finalized.svg";
-import { ReactComponent as TransactionExecutedIcon } from "../../../shared/assets/icons/status-executed.svg";
-import { ReactComponent as TransactionSealedIcon } from "../../../shared/assets/icons/status-sealed.svg";
-import { ReactComponent as TransactionExpiredIcon } from "../../../shared/assets/icons/status-expired.svg";
+import { ReactComponent as UnknownIcon } from "../../assets/icons/status-unknown.svg";
+import { ReactComponent as TransactionPendingIcon } from "../../assets/icons/status-pending.svg";
+import { ReactComponent as TransactionFinalizedIcon } from "../../assets/icons/status-finalized.svg";
+import { ReactComponent as TransactionExecutedIcon } from "../../assets/icons/status-executed.svg";
+import { ReactComponent as TransactionSealedIcon } from "../../assets/icons/status-sealed.svg";
+import { ReactComponent as TransactionExpiredIcon } from "../../assets/icons/status-expired.svg";
 import { TransactionStatusCode } from "@flowser/types/generated/entities/transactions";
 
 type TransactionStatusCodeProps = {

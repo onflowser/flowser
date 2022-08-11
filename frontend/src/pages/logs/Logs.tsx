@@ -6,18 +6,18 @@ import React, {
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
-import Search from "../../shared/components/search/Search";
-import { ReactComponent as ExpandIcon } from "../../shared/assets/icons/expand.svg";
-import { ReactComponent as ShrinkIcon } from "../../shared/assets/icons/shrink.svg";
-import { ReactComponent as LogsIcon } from "../../shared/assets/icons/logs.svg";
-import { LogDrawerSize, useLogDrawer } from "../../shared/hooks/log-drawer";
-import CaretIcon from "../../shared/components/caret-icon/CaretIcon";
-import { useSyntaxHighlighter } from "../../shared/hooks/syntax-highlighter";
-import { useSearch } from "../../shared/hooks/search";
-import { useFilterData } from "../../shared/hooks/filter-data";
+import Search from "../../components/search/Search";
+import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
+import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
+import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
+import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
+import CaretIcon from "../../components/caret-icon/CaretIcon";
+import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
+import { useSearch } from "../../hooks/use-search";
+import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
-import { useMouseMove } from "../../shared/hooks/mouse-position";
-import { useGetPollingLogs } from "../../shared/hooks/api";
+import { useMouseMove } from "../../hooks/use-mouse-move";
+import { useGetPollingLogs } from "../../hooks/use-api";
 
 interface OwnProps {
   className?: string;

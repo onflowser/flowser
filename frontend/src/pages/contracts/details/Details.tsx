@@ -1,12 +1,12 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
-import DetailsCard from "../../../shared/components/details-card/DetailsCard";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import { useGetContract } from "../../../shared/hooks/api";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
+import DetailsCard from "../../../components/details-card/DetailsCard";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import { useGetContract } from "../../../hooks/use-api";
 
 type RouteParams = {
   contractId: string;

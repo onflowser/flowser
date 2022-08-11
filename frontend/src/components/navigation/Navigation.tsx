@@ -1,30 +1,30 @@
 import React, { FunctionComponent, useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { routes } from "../../../shared/constants/routes";
+import { routes } from "../../constants/routes";
 import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
-import Button from "../../../shared/components/button/Button";
-import IconButton from "../../../shared/components/icon-button/IconButton";
-import Logo from "../../../shared/assets/images/logo.svg";
-import { ReactComponent as IconUser } from "../../../shared/assets/icons/user.svg";
-import { ReactComponent as IconBlocks } from "../../../shared/assets/icons/blocks.svg";
-import { ReactComponent as IconTransactions } from "../../../shared/assets/icons/transactions.svg";
-import { ReactComponent as IconContracts } from "../../../shared/assets/icons/contracts.svg";
-import { ReactComponent as IconEvents } from "../../../shared/assets/icons/events.svg";
-import { ReactComponent as IconSettings } from "../../../shared/assets/icons/settings.svg";
-import { ReactComponent as IconBackButton } from "../../../shared/assets/icons/back-button.svg";
-import { ReactComponent as FlowLogo } from "../../../shared/assets/icons/flow.svg";
-import { useNavigation } from "../../../shared/hooks/navigation";
+import Button from "../button/Button";
+import IconButton from "../icon-button/IconButton";
+import Logo from "../../assets/images/logo.svg";
+import { ReactComponent as IconUser } from "../../assets/icons/user.svg";
+import { ReactComponent as IconBlocks } from "../../assets/icons/blocks.svg";
+import { ReactComponent as IconTransactions } from "../../assets/icons/transactions.svg";
+import { ReactComponent as IconContracts } from "../../assets/icons/contracts.svg";
+import { ReactComponent as IconEvents } from "../../assets/icons/events.svg";
+import { ReactComponent as IconSettings } from "../../assets/icons/settings.svg";
+import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
+import { ReactComponent as FlowLogo } from "../../assets/icons/flow.svg";
+import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
-import Search from "../../../shared/components/search/Search";
-import { useFlow } from "../../../shared/hooks/flow";
-import TransactionDialog from "../../../shared/components/transaction-dialog/TransactionDialog";
+import Search from "../search/Search";
+import { useFlow } from "../../hooks/use-flow";
+import TransactionDialog from "../transaction-dialog/TransactionDialog";
 import toast from "react-hot-toast";
 import {
   useGetAllObjectsCounts,
   useGetCurrentProject,
-} from "../../../shared/hooks/api";
-import { ProjectsService } from "../../../shared/services/projects.service";
+} from "../../hooks/use-api";
+import { ProjectsService } from "../../services/projects.service";
 
 const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const [isSwitching, setIsSwitching] = useState(false);

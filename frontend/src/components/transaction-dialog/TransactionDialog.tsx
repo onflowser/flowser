@@ -2,16 +2,16 @@ import React, { FC, useEffect, useState } from "react";
 import Dialog from "../dialog/Dialog";
 import Button from "../button/Button";
 import classes from "./TransactionDialog.module.scss";
-import { FlowScriptArgument, useFlow } from "../../hooks/flow";
+import { FlowScriptArgument, useFlow } from "../../hooks/use-flow";
 import { toast } from "react-hot-toast";
 import { ReactComponent as TxIcon } from "../../assets/icons/bottle.svg";
 import ScriptArguments from "./ScriptArguments";
 import CadenceEditor from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
-import { isValueSet } from "../../functions/utils";
+import { isValueSet } from "../../utils/common";
 import splitbee from "@splitbee/web";
-import { useSyntaxHighlighter } from "../../hooks/syntax-highlighter";
+import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 
 export type TransactionDialogProps = {
   show?: boolean;

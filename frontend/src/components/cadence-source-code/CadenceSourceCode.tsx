@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { useSyntaxHighlighter } from "../../hooks/syntax-highlighter";
+import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 import "./CadenceSourceCode.module.scss";
 
 type CadenceSourceCodeProps = {

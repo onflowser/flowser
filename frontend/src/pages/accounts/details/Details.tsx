@@ -1,24 +1,24 @@
 import React, { FunctionComponent, useEffect } from "react";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import { useSearch } from "../../../shared/hooks/search";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
-import Value from "../../../shared/components/value/Value";
-import Card from "../../../shared/components/card/Card";
+import Value from "../../../components/value/Value";
+import Card from "../../../components/card/Card";
 import Storage from "./Storage";
-import Label from "../../../shared/components/label/Label";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
+import Label from "../../../components/label/Label";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import ContentDetailsKeys from "./ContentDetailsKeys";
-import CopyButton from "../../../shared/components/copy-button/CopyButton";
+import CopyButton from "../../../components/copy-button/CopyButton";
 import {
   DetailsTabItem,
   DetailsTabs,
-} from "../../../shared/components/details-tabs/DetailsTabs";
-import CollapsibleCard from "../../../shared/components/collapsible-card/CollapsibleCard";
+} from "../../../components/details-tabs/DetailsTabs";
+import CollapsibleCard from "../../../components/collapsible-card/CollapsibleCard";
 import { useParams } from "react-router-dom";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import TransactionListItem from "../../../shared/components/transaction-list-item/TransactionListItem";
-import Fragment from "../../../shared/components/fragment/Fragment";
-import { useGetAccount } from "../../../shared/hooks/api";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";
+import Fragment from "../../../components/fragment/Fragment";
+import { useGetAccount } from "../../../hooks/use-api";
 
 type RouteParams = {
   accountId: string;

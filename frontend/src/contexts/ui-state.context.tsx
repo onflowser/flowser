@@ -1,6 +1,6 @@
 import React, { createContext, FunctionComponent, useState } from "react";
-import { LogDrawerUiState } from "../hooks/log-drawer";
-import { NavigationUiState } from "../hooks/navigation";
+import { LogDrawerUiState } from "../hooks/use-log-drawer";
+import { NavigationUiState } from "../hooks/use-navigation";
 
 interface UiStateContextProps {
   children: any;

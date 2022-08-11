@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import classes from "./EventDetailsTable.module.scss";
 import Ellipsis from "../ellipsis/Ellipsis";
 import CopyButton from "../copy-button/CopyButton";
-import { formatEventData } from "../../functions/events";
+import { formatEventData } from "../../utils/events";
 
 export type EventData = Record<string, any>;
 

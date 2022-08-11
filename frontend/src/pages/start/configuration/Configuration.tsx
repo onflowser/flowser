@@ -8,20 +8,20 @@ import { useHistory, useParams } from "react-router-dom";
 
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
-import Input from "../../../shared/components/input/Input";
-import ToggleButton from "../../../shared/components/toggle-button/ToggleButton";
-import RadioButton from "../../../shared/components/radio-button/RadioButton";
-import { ReactComponent as IconBackButton } from "../../../shared/assets/icons/back-button.svg";
-import Card from "../../../shared/components/card/Card";
-import Label from "../../../shared/components/label/Label";
-import Button from "../../../shared/components/button/Button";
-import { routes } from "../../../shared/constants/routes";
-import ConfirmDialog from "../../../shared/components/confirm-dialog/ConfirmDialog";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
+import Input from "../../../components/input/Input";
+import ToggleButton from "../../../components/toggle-button/ToggleButton";
+import RadioButton from "../../../components/radio-button/RadioButton";
+import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
+import Card from "../../../components/card/Card";
+import Label from "../../../components/label/Label";
+import Button from "../../../components/button/Button";
+import { routes } from "../../../constants/routes";
+import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
-import { ProjectsService } from "../../../shared/services/projects.service";
-import { useGetFlowCliInfo } from "../../../shared/hooks/api";
+import { ProjectsService } from "../../../services/projects.service";
+import { useGetFlowCliInfo } from "../../../hooks/use-api";
 import {
   Emulator,
   Gateway,
@@ -31,7 +31,7 @@ import {
   getHashAlgoName,
   getNestedValue,
   getSignatureAlgoName,
-} from "../../../shared/functions/utils";
+} from "../../../utils/common";
 import { FormikErrors } from "formik/dist/types";
 import {
   HashAlgorithm,

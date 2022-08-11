@@ -1,4 +1,4 @@
-import { TimeoutPollingHook, useTimeoutPolling } from "./timeout-polling";
+import { TimeoutPollingHook, useTimeoutPolling } from "./use-timeout-polling";
 import {
   Account,
   AccountContract,

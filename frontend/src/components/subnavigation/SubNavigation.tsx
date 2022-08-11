@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./SubNavigation.module.scss";
-import Search from "../../../shared/components/search/Search";
-import Card from "../../../shared/components/card/Card";
+import Search from "../search/Search";
+import Card from "../card/Card";
 
 const SubNavigation: FunctionComponent<{ className: string }> = (props) => {
   return (

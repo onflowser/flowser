@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useCallback, useState } from "react";
-import Card from "../../../shared/components/card/Card";
+import Card from "../../../components/card/Card";
 import classes from "./Storage.module.scss";
-import Value from "../../../shared/components/value/Value";
-import { useSyntaxHighlighter } from "../../../shared/hooks/syntax-highlighter";
+import Value from "../../../components/value/Value";
+import { useSyntaxHighlighter } from "../../../hooks/use-syntax-highlighter";
 
 export interface StorageData {
   blockHeight: number;

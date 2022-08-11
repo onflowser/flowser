@@ -1,20 +1,20 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import classes from "./Events.module.scss";
-import Card from "../../shared/components/card/Card";
-import Label from "../../shared/components/label/Label";
-import Value from "../../shared/components/value/Value";
+import Card from "../../components/card/Card";
+import Label from "../../components/label/Label";
+import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import Ellipsis from "../../shared/components/ellipsis/Ellipsis";
-import { useFilterData } from "../../shared/hooks/filter-data";
-import { useFormattedDate } from "../../shared/hooks/formatted-date";
-import { useSearch } from "../../shared/hooks/search";
-import CaretIcon from "../../shared/components/caret-icon/CaretIcon";
-import EventDetailsTable from "../../shared/components/event-details-table/EventDetailsTable";
-import { useTimeoutPolling } from "../../shared/hooks/timeout-polling";
-import NoResults from "../../shared/components/no-results/NoResults";
-import FullScreenLoading from "../../shared/components/fullscreen-loading/FullScreenLoading";
+import Ellipsis from "../../components/ellipsis/Ellipsis";
+import { useFilterData } from "../../hooks/use-filter-data";
+import { useFormattedDate } from "../../hooks/use-formatted-date";
+import { useSearch } from "../../hooks/use-search";
+import CaretIcon from "../../components/caret-icon/CaretIcon";
+import EventDetailsTable from "../../components/event-details-table/EventDetailsTable";
+import { useTimeoutPolling } from "../../hooks/use-timeout-polling";
+import NoResults from "../../components/no-results/NoResults";
+import FullScreenLoading from "../../components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
-import { useGetPollingEvents } from "../../shared/hooks/api";
+import { useGetPollingEvents } from "../../hooks/use-api";
 
 interface OwnProps {
   some?: string;

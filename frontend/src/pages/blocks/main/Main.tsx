@@ -1,18 +1,18 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { useFormattedDate } from "../../../shared/hooks/formatted-date";
-import { useFilterData } from "../../../shared/hooks/filter-data";
-import { useSearch } from "../../../shared/hooks/search";
-import Card from "../../../shared/components/card/Card";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
+import { useFormattedDate } from "../../../hooks/use-formatted-date";
+import { useFilterData } from "../../../hooks/use-filter-data";
+import { useSearch } from "../../../hooks/use-search";
+import Card from "../../../components/card/Card";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
-import Ellipsis from "../../../shared/components/ellipsis/Ellipsis";
-import { useNavigation } from "../../../shared/hooks/navigation";
-import NoResults from "../../../shared/components/no-results/NoResults";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import { isInitialParentId } from "../../../shared/functions/utils";
-import { useGetPollingBlocks } from "../../../shared/hooks/api";
+import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import { useNavigation } from "../../../hooks/use-navigation";
+import NoResults from "../../../components/no-results/NoResults";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import { isInitialParentId } from "../../../utils/common";
+import { useGetPollingBlocks } from "../../../hooks/use-api";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();

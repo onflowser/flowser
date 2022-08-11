@@ -5,19 +5,19 @@ import React, {
   useState,
 } from "react";
 import { NavLink, useHistory } from "react-router-dom";
-import { routes } from "../../../shared/constants/routes";
-import IconButton from "../../../shared/components/icon-button/IconButton";
-import Logo from "../../../shared/assets/images/logo.svg";
+import { routes } from "../../../constants/routes";
+import IconButton from "../../../components/icon-button/IconButton";
+import Logo from "../../../assets/images/logo.svg";
 import classes from "./Main.module.scss";
-import { ReactComponent as CaretIcon } from "../../../shared/assets/icons/caret.svg";
-import { ReactComponent as PlusIcon } from "../../../shared/assets/icons/plus.svg";
+import { ReactComponent as CaretIcon } from "../../../assets/icons/caret.svg";
+import { ReactComponent as PlusIcon } from "../../../assets/icons/plus.svg";
 import splitbee from "@splitbee/web";
-import { ProjectsService } from "../../../shared/services/projects.service";
+import { ProjectsService } from "../../../services/projects.service";
 import {
   useGetAllProjects,
   useGetCurrentProject,
   useGetFlowserVersion,
-} from "../../../shared/hooks/api";
+} from "../../../hooks/use-api";
 
 const Main: FunctionComponent = () => {
   const history = useHistory();

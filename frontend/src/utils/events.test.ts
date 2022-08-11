@@ -26,7 +26,7 @@ const complexArg = {
   ],
 };
 
-describe("Event helper functions test", () => {
+describe("Event helper utils test", () => {
   it("should return nested arg type", function () {
     const type = getEventDataType(complexArg);
     expect(type).toEqual("Array<Array<Dictionary<String, Number>>>");

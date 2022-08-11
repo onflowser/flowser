@@ -1,28 +1,28 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
-import DetailsCard from "../../../shared/components/details-card/DetailsCard";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
+import DetailsCard from "../../../components/details-card/DetailsCard";
 import classes from "./Details.module.scss";
 import {
   DetailsTabItem,
   DetailsTabs,
-} from "../../../shared/components/details-tabs/DetailsTabs";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
-import Card from "../../../shared/components/card/Card";
-import TimeAgo from "../../../shared/components/time-ago/TimeAgo";
-import DateWithCalendar from "../../../shared/components/date-with-calendar/DateWithCalendar";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import TransactionStatusBadge from "../../../shared/components/transaction-status-code/TransactionStatusBadge";
-import Ellipsis from "../../../shared/components/ellipsis/Ellipsis";
-import EventDetailsTable from "../../../shared/components/event-details-table/EventDetailsTable";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import CaretIcon from "../../../shared/components/caret-icon/CaretIcon";
-import { useFormattedDate } from "../../../shared/hooks/formatted-date";
+} from "../../../components/details-tabs/DetailsTabs";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import Card from "../../../components/card/Card";
+import TimeAgo from "../../../components/time-ago/TimeAgo";
+import DateWithCalendar from "../../../components/date-with-calendar/DateWithCalendar";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import TransactionStatusBadge from "../../../components/transaction-status-code/TransactionStatusBadge";
+import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import EventDetailsTable from "../../../components/event-details-table/EventDetailsTable";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import CaretIcon from "../../../components/caret-icon/CaretIcon";
+import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
-} from "../../../shared/hooks/api";
+} from "../../../hooks/use-api";
 
 type RouteParams = {
   transactionId: string;
