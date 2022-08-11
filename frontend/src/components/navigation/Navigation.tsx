@@ -19,7 +19,6 @@ import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
 import { useFlow } from "../../hooks/use-flow";
 import TransactionDialog from "../transaction-dialog/TransactionDialog";
-import toast from "react-hot-toast";
 import {
   useGetAllObjectsCounts,
   useGetCurrentProject,
@@ -39,7 +38,6 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const [showTxDialog, setShowTxDialog] = useState(false);
   const { data } = useGetCurrentProject();
   const { project: currentProject } = data ?? {};
-  const isEmulatorProject = !!currentProject?.emulator;
   const { isLoggedIn, login, isLoggingIn, logout, isLoggingOut } = useFlow();
 
   const onSwitchProject = useCallback(async () => {
@@ -137,26 +135,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
                   className={classes.loginButton}
                   icon={<FlowLogo className={classes.flowIcon} />}
                   iconPosition="before"
-                  onClick={() => {
-                    if (isEmulatorProject) {
-                      login();
-                    } else {
-                      toast.error(
-                        () => (
-                          <span style={{ textAlign: "center" }}>
-                            fcl-dev-wallet integration is currently supported
-                            only for custom projects.
-                            <br />
-                            See{" "}
-                            <a href="https://github.com/onflowser/flowser#-caveats">
-                              https://github.com/onflowser/flowser#-caveats
-                            </a>
-                          </span>
-                        ),
-                        { duration: 5000 }
-                      );
-                    }
-                  }}
+                  onClick={login}
                   loading={isLoggingIn}
                 >
                   LOG IN
