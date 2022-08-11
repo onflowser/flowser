@@ -10,7 +10,7 @@
   "scripts": {
     "start": "lerna run start --parallel",
     "cleanup": "lerna run cleanup --parallel",
-    "bootstrap": "yarn install && lerna bootstrap && husky install && flow init",
+    "bootstrap": "yarn install && lerna bootstrap && husky install && lerna run generate && flow init",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {
