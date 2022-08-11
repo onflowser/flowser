@@ -390,7 +390,7 @@ export class FlowAggregatorService {
   }
 
   async bootstrapServiceAccount() {
-    // TODO(milestone-2): provide this in project config entity
+    // TODO(milestone-3): provide this in project config entity
     const serviceAddress = env.FLOW_ACCOUNT_ADDRESS;
 
     const dataSource = await getDataSourceInstance();

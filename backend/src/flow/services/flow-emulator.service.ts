@@ -84,7 +84,7 @@ export class FlowEmulatorService {
           }, 1000);
         }
         // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
-        // TODO(milestone-2): logic for determining if emulator started successfully could be improved
+        // TODO(milestone-x): logic for determining if emulator started successfully could be improved
         // https://github.com/onflowser/flowser/issues/33
         else if (
           this.isState(FlowEmulatorState.STARTED) &&
@@ -312,7 +312,7 @@ export class FlowEmulatorService {
         })
         // only include lines that do not contain API call information
         // those lines are annoying, because they show up every second (due to our backend polling)
-        // TODO(milestone-2): improve API calls log filtering logic
+        // TODO(milestone-3): improve API calls log filtering logic
         .filter((line) => !line.includes("called"))
     );
   }

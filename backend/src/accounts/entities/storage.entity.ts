@@ -4,7 +4,7 @@ import { AccountStorage } from "@flowser/types/generated/entities/accounts";
 
 @Entity({ name: "storage" })
 export class AccountsStorageEntity {
-  // TODO(milestone-2): Which attributes should be considered a primary key?
+  // TODO(milestone-3): Which attributes should be considered a primary key?
   @PrimaryColumn()
   name: string;
 

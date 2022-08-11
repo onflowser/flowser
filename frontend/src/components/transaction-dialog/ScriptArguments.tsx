@@ -50,7 +50,6 @@ const ScriptArguments: FC<ScriptArgumentsProps> = ({ className, onChange }) => {
           />
         ))}
       </div>
-      {/* TODO(milestone-2): set width to 100% and background to blue */}
       <IconButton
         icon={<PlusIcon />}
         className={classes.addButton}

@@ -3,7 +3,7 @@ import { AccountsStorageEntity } from "../entities/storage.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
-// TODO(milestone-2): implement this class
+// TODO(milestone-3): implement this class
 @Injectable()
 export class StorageService {
   constructor(

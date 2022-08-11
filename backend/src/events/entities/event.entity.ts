@@ -22,7 +22,6 @@ export class EventEntity extends PollingEntity {
   @Column()
   transactionIndex: number;
 
-  // TODO(milestone-2): define type
   @Column("simple-json")
   data: object;
 

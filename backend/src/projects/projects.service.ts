@@ -67,7 +67,7 @@ export class ProjectsService {
   async cleanupProject() {
     try {
       // remove all existing data of previously used project
-      // TODO(milestone-2): persist data for projects by default?
+      // TODO(milestone-3): persist data for projects by default?
 
       // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([

@@ -26,7 +26,7 @@ export class BlockEntity extends PollingEntity {
   })
   collectionGuarantees: CollectionGuarantee[];
 
-  // TODO(milestone-2): define type
+  // TODO(milestone-x): Define type (Note: we aren't showing blockSeals anywhere)
   @Column("simple-json")
   blockSeals: any[];
 
