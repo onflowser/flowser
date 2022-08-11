@@ -10,7 +10,7 @@
     "cleanup": "rm -rf node_modules",
     "build": "nest build --path ./tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "source .env.development && nest start --debug --watch --preserveWatchOutput",
+    "start": "nest start --debug --watch --preserveWatchOutput",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",

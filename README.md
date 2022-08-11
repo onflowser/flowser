@@ -28,13 +28,13 @@ git clone https://github.com/onflowser/flowser
 
 The following system dependencies are required:
 - Node.js (tested on v14.19.1)
-- npm
+- yarn (tested on v1.22.19)
 - [flow-cli](https://docs.onflow.org/flow-cli/install/) (works with < v0.28.3)
 
 After prerequisites are installed, you can run the following command to set up local environment:
 
 ```bash
-npm run bootstrap
+yarn run bootstrap
 ```
 
 > It's recommended that you don't use your global installation of @nestjs/cli, because that can cause some unexpected issues.
@@ -43,7 +43,7 @@ npm run bootstrap
 
 The following command will start Flowser along with Flow emulator and development wallet.
 ```bash
-npm start
+yarn run start
 ```
 
 ### 4. Open in browser
