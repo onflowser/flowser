@@ -9,6 +9,10 @@
   border: 1px solid transparent;
   position: relative;
 
+  &.introAnimation {
+    @include addNewContentAnimation(.4s);
+  }
+
   .loading {
     position: absolute;
     display: flex;

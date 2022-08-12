@@ -19,21 +19,19 @@ import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetPollingLogs } from "../../hooks/use-api";
 
-interface OwnProps {
+type LogsProps = {
   className?: string;
-}
+};
 
-type Props = OwnProps;
 const SEARCH_CONTEXT_NAME = "logs";
 
-const Logs: FunctionComponent<Props> = ({ className }) => {
+const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
   const { highlightLogKeywords } = useSyntaxHighlighter();
   const miniLogRef = createRef<HTMLDivElement>();
   const bigLogRef = createRef<HTMLDivElement>();
-  const { data } = useGetPollingLogs();
-  const logs = data ? data.map((log) => log.data) : [];
+  const { data: logs } = useGetPollingLogs();
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { filteredData } = useFilterData(logs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
@@ -59,7 +57,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
   useEffect(() => {
     scrollToBottom(miniLogRef);
     scrollToBottom(bigLogRef);
-  }, [data]);
+  }, [logs]);
 
   const onCaretChange = useCallback((state) => {
     if (state === false) {
@@ -123,10 +121,12 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 
         {logDrawerSize === "tiny" && (
           <div className={classes.midContainer} ref={miniLogRef}>
-            {filteredData.map((log: any, key: number) => (
+            {filteredData.map((log) => (
               <pre
-                key={key}
-                dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}
+                key={log.id}
+                dangerouslySetInnerHTML={{
+                  __html: highlightLogKeywords(log.data),
+                }}
               ></pre>
             ))}
           </div>
@@ -166,11 +166,13 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 
       {logDrawerSize !== "tiny" && (
         <div className={classes.bigLogsContainer} ref={bigLogRef}>
-          {filteredData.map((log: any, key: number) => (
+          {filteredData.map((log) => (
             <pre
+              key={log.id}
               className={classes.line}
-              key={key}
-              dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}
+              dangerouslySetInnerHTML={{
+                __html: highlightLogKeywords(log.data),
+              }}
             />
           ))}
         </div>

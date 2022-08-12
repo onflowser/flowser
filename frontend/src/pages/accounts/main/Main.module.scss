@@ -19,10 +19,6 @@
   & > div:last-child {
     flex: 1;
   }
-
-  &.isNew {
-    @include addNewContentAnimation(.4s);
-  }
 }
 .noResults {
   margin-top: $spacing-l * 6;

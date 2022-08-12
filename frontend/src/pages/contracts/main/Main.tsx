@@ -25,12 +25,11 @@ const Main: FunctionComponent = () => {
 
   return (
     <>
-      {filteredData.map((item, i) => (
+      {filteredData.map((item) => (
         <Card
-          key={item.id + i}
-          className={`${classes.card} ${
-            item.isNew || item.isUpdated ? classes.isNew : ""
-          }`}
+          key={item.id}
+          className={classes.card}
+          showIntroAnimation={item.isNew || item.isUpdated}
         >
           <div>
             <Label>NAME</Label>

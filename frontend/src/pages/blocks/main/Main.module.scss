@@ -12,10 +12,6 @@
     flex-direction: column;
   }
 
-  &.isNew {
-    @include addNewContentAnimation(.4s);
-  }
-
   .hash {
     max-width: 20vw;
     min-width: 20vw;

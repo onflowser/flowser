@@ -17,10 +17,6 @@
     flex: 3;
     margin-left: $spacing-l;
   }
-
-  &.isNew {
-    @include addNewContentAnimation(.4s);
-  }
 }
 .noResults {
   margin-top: $spacing-l * 6;

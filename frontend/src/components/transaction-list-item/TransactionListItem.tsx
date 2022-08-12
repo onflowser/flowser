@@ -6,28 +6,29 @@ import Value from "../value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
 import TransactionStatusBadge from "../transaction-status-code/TransactionStatusBadge";
-import { TransactionStatusCode } from "@flowser/types/generated/entities/transactions";
+import {
+  Transaction,
+  TransactionStatusCode,
+} from "@flowser/types/generated/entities/transactions";
+import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 
 export type TransactionListItemProps = {
-  id: string;
-  referenceBlockId: string;
-  statusCode: TransactionStatusCode | undefined;
-  payer: string;
-  proposer: string;
   className?: string;
+  transaction: DecoratedPollingEntity<Transaction>;
 };
 
 const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
-  id,
-  referenceBlockId,
-  statusCode,
-  payer,
-  proposer,
+  transaction,
   className,
   ...restProps
 }) => {
+  const { id, referenceBlockId, status, payer, proposalKey } = transaction;
   return (
-    <Card className={`${classes.card} ${className}`} {...restProps}>
+    <Card
+      className={`${classes.card} ${className}`}
+      showIntroAnimation={transaction.isNew || transaction.isUpdated}
+      {...restProps}
+    >
       <div>
         <Label>TRANSACTION ID</Label>
         <Value>
@@ -45,7 +46,9 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
         </Value>
       </div>
       <div>
-        <TransactionStatusBadge statusCode={statusCode} />
+        <TransactionStatusBadge
+          statusCode={status?.status ?? TransactionStatusCode.UNKNOWN}
+        />
       </div>
       <div>
         <Label>PAYER</Label>
@@ -53,7 +56,7 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
       </div>
       <div>
         <Label>PROPOSER</Label>
-        <Value>{proposer}</Value>
+        <Value>{proposalKey?.address ?? "-"}</Value>
       </div>
     </Card>
   );

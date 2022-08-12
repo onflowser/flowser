@@ -7,7 +7,7 @@ import Card from "../../../components/card/Card";
 import Storage from "./Storage";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
-import ContentDetailsKeys from "./ContentDetailsKeys";
+import KeyListItem from "./KeyListItem";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import {
   DetailsTabItem,
@@ -35,8 +35,6 @@ const Details: FunctionComponent = () => {
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
-  // FIXME(milestone-2): When new transactions are created, they are added to the end of the list
-  // FIXME(milestone-2): Test polling of account objects (transactions, contracts, keys)
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
@@ -85,29 +83,20 @@ const Details: FunctionComponent = () => {
             </Fragment>
           </DetailsTabItem>
         )}
-        {transactions.length > 0 && (
-          <DetailsTabItem
-            label="TRANSACTIONS"
-            value={account.transactions.length}
+        <DetailsTabItem
+          label="TRANSACTIONS"
+          value={account.transactions.length}
+        >
+          <Fragment
+            onMount={() =>
+              updateSearchBar("search for transactions", !transactions.length)
+            }
           >
-            <Fragment
-              onMount={() =>
-                updateSearchBar("search for transactions", !transactions.length)
-              }
-            >
-              {transactions.map((item, i: number) => (
-                <TransactionListItem
-                  key={i}
-                  id={item.id}
-                  referenceBlockId={item.referenceBlockId}
-                  statusCode={item.status?.status}
-                  payer={item.payer}
-                  proposer={item.proposalKey?.address ?? "-"}
-                />
-              ))}
-            </Fragment>
-          </DetailsTabItem>
-        )}
+            {transactions.map((item) => (
+              <TransactionListItem key={item.id} transaction={item} />
+            ))}
+          </Fragment>
+        </DetailsTabItem>
         <DetailsTabItem
           label="CONTRACTS"
           value={contracts.length}
@@ -115,10 +104,10 @@ const Details: FunctionComponent = () => {
             updateSearchBar("search for contracts", !contracts.length)
           }
         >
-          {contracts.map((contract, index: number) => (
+          {contracts.map((contract) => (
             <CollapsibleCard
-              key={index}
-              isNew={contract.isNew}
+              key={contract.id}
+              showIntroAnimation={contract.isNew || contract.isUpdated}
               header="CONTRACT NAME"
               subheader={contract.name}
               variant="black"
@@ -138,7 +127,9 @@ const Details: FunctionComponent = () => {
           <Fragment
             onMount={() => updateSearchBar("search for keys", !keys.length)}
           >
-            <ContentDetailsKeys keys={keys} />
+            {keys.map((key) => (
+              <KeyListItem key={key.index} accountKey={key} />
+            ))}
           </Fragment>
         </DetailsTabItem>
       </DetailsTabs>

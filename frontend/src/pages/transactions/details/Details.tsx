@@ -204,7 +204,8 @@ const Details: FunctionComponent = () => {
           {events.map((item, i) => (
             <React.Fragment key={i}>
               <Card
-                className={`${classes.card} ${item.isNew ? classes.isNew : ""}`}
+                showIntroAnimation={item.isNew || item.isUpdated}
+                className={classes.card}
               >
                 <div>
                   <Label>TIMESTAMP</Label>

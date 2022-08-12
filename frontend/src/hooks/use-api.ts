@@ -189,6 +189,7 @@ export function useGetTransaction(transactionId: string) {
   return useGetAxiosQuery<GetSingleTransactionResponse>({
     resourceKey: `/transactions/${transactionId}`,
     fetcher: () => TransactionsService.getInstance().getSingle(transactionId),
+    refetchInterval: 1000,
   });
 }
 

@@ -19,7 +19,6 @@ const Main: FunctionComponent = () => {
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
   const { formatDate } = useFormattedDate();
   const { data: blocks, firstFetch } = useGetPollingBlocks();
-  // TODO: some items only include isUpdated and isNew fields
   const { filteredData } = useFilterData(blocks, searchTerm);
 
   useEffect(() => {
@@ -33,8 +32,9 @@ const Main: FunctionComponent = () => {
     <>
       {filteredData.map((item) => (
         <Card
-          key={item.height + item.id}
-          className={`${classes.card} ${item.isNew ? classes.isNew : ""}`}
+          key={item.id}
+          showIntroAnimation={item.isNew || item.isUpdated}
+          className={classes.card}
         >
           <div>
             <Label>BLOCK HEIGHT</Label>

@@ -30,36 +30,34 @@ const Main: FunctionComponent = () => {
 
   return (
     <>
-      {filteredData &&
-        filteredData.map((item) => (
-          <Card
-            key={item.address}
-            className={`${classes.card} ${
-              item.isNew || item.isUpdated ? classes.isNew : ""
-            }`}
-          >
-            <div>
-              <Label>ADDRESS</Label>
-              <Value>
-                <NavLink to={`/accounts/details/${item.address}`}>
-                  {item.address}
-                </NavLink>
-              </Value>
-            </div>
-            <div>
-              <Label>BALANCE</Label>
-              <Value>{item.balance}</Value>
-            </div>
-            <div>
-              <Label>KEY COUNT</Label>
-              <Value>{item.keys?.length ?? 0}</Value>
-            </div>
-            <div>
-              <Label>TX COUNT</Label>
-              <Value>{item.transactions.length ?? 0}</Value>
-            </div>
-          </Card>
-        ))}
+      {filteredData.map((item) => (
+        <Card
+          key={item.address}
+          className={classes.card}
+          showIntroAnimation={item.isNew || item.isUpdated}
+        >
+          <div>
+            <Label>ADDRESS</Label>
+            <Value>
+              <NavLink to={`/accounts/details/${item.address}`}>
+                {item.address}
+              </NavLink>
+            </Value>
+          </div>
+          <div>
+            <Label>BALANCE</Label>
+            <Value>{item.balance}</Value>
+          </div>
+          <div>
+            <Label>KEY COUNT</Label>
+            <Value>{item.keys?.length ?? 0}</Value>
+          </div>
+          <div>
+            <Label>TX COUNT</Label>
+            <Value>{item.transactions.length ?? 0}</Value>
+          </div>
+        </Card>
+      ))}
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />

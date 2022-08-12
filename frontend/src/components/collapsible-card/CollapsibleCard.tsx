@@ -7,7 +7,7 @@ type CollapsibleCardProps = {
   header: string;
   subheader?: string;
   variant?: "blue" | "black";
-  isNew?: boolean;
+  showIntroAnimation?: boolean;
   className?: string;
 };
 
@@ -16,7 +16,7 @@ const CollapsibleCard: FunctionComponent<CollapsibleCardProps> = ({
   variant,
   header,
   subheader,
-  isNew,
+  showIntroAnimation,
   ...restProps
 }) => {
   const [state, setState] = useState(false);
@@ -29,7 +29,7 @@ const CollapsibleCard: FunctionComponent<CollapsibleCardProps> = ({
     <Card
       variant={variant}
       className={`${classes.root} ${restProps.className} ${
-        isNew && classes.isNew
+        showIntroAnimation && classes.showIntroAnimation
       }`}
     >
       <div className={`${classes.header} ${state ? classes.expanded : ""}`}>

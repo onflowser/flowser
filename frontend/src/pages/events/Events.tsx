@@ -10,19 +10,12 @@ import { useFormattedDate } from "../../hooks/use-formatted-date";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
 import EventDetailsTable from "../../components/event-details-table/EventDetailsTable";
-import { useTimeoutPolling } from "../../hooks/use-timeout-polling";
 import NoResults from "../../components/no-results/NoResults";
 import FullScreenLoading from "../../components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
 import { useGetPollingEvents } from "../../hooks/use-api";
 
-interface OwnProps {
-  some?: string;
-}
-
-type Props = OwnProps;
-
-const Events: FunctionComponent<Props> = (props) => {
+const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
   const { formatDate } = useFormattedDate();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -41,12 +34,11 @@ const Events: FunctionComponent<Props> = (props) => {
 
   return (
     <>
-      {filteredData.map((item, i) => (
-        <React.Fragment key={i + "-" + item.blockId}>
+      {filteredData.map((item) => (
+        <React.Fragment key={item.blockId}>
           <Card
-            className={`${classes.card} ${
-              item.isNew || item.isUpdated ? classes.isNew : ""
-            }`}
+            className={classes.card}
+            showIntroAnimation={item.isNew || item.isUpdated}
           >
             <div>
               <Label>BLOCK ID</Label>

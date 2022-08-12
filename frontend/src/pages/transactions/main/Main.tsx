@@ -23,16 +23,8 @@ const Main: FunctionComponent = () => {
 
   return (
     <>
-      {filteredData.map((item, i) => (
-        <TransactionListItem
-          key={item.id + i}
-          className={`${item.isNew || item.isUpdated ? classes.isNew : ""}`}
-          id={item.id}
-          referenceBlockId={item.referenceBlockId}
-          statusCode={item.status?.status}
-          payer={item.payer}
-          proposer={item.proposalKey?.address ?? "-"}
-        />
+      {filteredData.map((item) => (
+        <TransactionListItem key={item.id} transaction={item} />
       ))}
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
