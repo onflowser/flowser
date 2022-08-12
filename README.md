@@ -27,9 +27,12 @@ git clone https://github.com/onflowser/flowser
 ### 2. Install dependencies
 
 The following system dependencies are required:
-- Node.js (tested on v14.19.1)
-- yarn (tested on v1.22.19)
+- Node.js (tested on v14.19)
+- Yarn (tested on v1.22)
+- Protocol Buffers compiler - [protoc](https://grpc.io/docs/protoc-installation/) (tested on v3.21)
 - [flow-cli](https://docs.onflow.org/flow-cli/install/) (works with < v0.28.3)
+
+> If you're using [nvm](https://github.com/nvm-sh/nvm) for Node.js version management, then just run `nvm use` in project root.
 
 After prerequisites are installed, you can run the following command to set up local environment:
 
