@@ -4,37 +4,53 @@ import { PollingResponseInterceptor } from "../common/interceptors/polling-respo
 import { ApiParam } from "@nestjs/swagger";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
+import {
+  GetAllEventsResponse,
+  GetPollingEventsResponse,
+} from "@flowser/types/generated/responses/events";
+
 @Controller()
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get("/events")
-  findAll() {
-    return this.eventsService.findAll();
+  async findAll() {
+    const events = await this.eventsService.findAll();
+    return GetAllEventsResponse.fromPartial({
+      events: events.map((event) => event.toProto()),
+    });
   }
 
   @ApiParam({ name: "id", type: String })
   @Get("/transactions/:id/events")
-  findAllByTransaction(@Param("id") transactionId) {
-    return this.eventsService.findAllByTransaction(transactionId);
+  async findAllByTransaction(@Param("id") transactionId) {
+    const events = await this.eventsService.findAllByTransaction(transactionId);
+    return GetAllEventsResponse.fromPartial({
+      events: events.map((event) => event.toProto()),
+    });
   }
 
   @ApiParam({ name: "id", type: String })
   @Get("/transactions/:id/events/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNewByTransaction(
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
+  async findAllNewByTransaction(
     @Param("id") transactionId,
     @Query("timestamp", ParseUnixTimestampPipe) timestamp
   ) {
-    return this.eventsService.findAllByTransactionNewerThanTimestamp(
-      transactionId,
-      timestamp
-    );
+    const events =
+      await this.eventsService.findAllByTransactionNewerThanTimestamp(
+        transactionId,
+        timestamp
+      );
+    return events.map((event) => event.toProto());
   }
 
   @Get("/events/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
-    return this.eventsService.findAllNewerThanTimestamp(timestamp);
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
+  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+    const events = await this.eventsService.findAllNewerThanTimestamp(
+      timestamp
+    );
+    return events.map((event) => event.toProto());
   }
 }

@@ -8,8 +8,8 @@ import {
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { Repository } from "typeorm";
-import { Project } from "./entities/project.entity";
+import { MoreThan, Repository } from "typeorm";
+import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/flow-gateway.service";
 import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
@@ -28,12 +28,12 @@ import { KeysService } from "../accounts/services/keys.service";
 
 @Injectable()
 export class ProjectsService {
-  private currentProject: Project;
+  private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
   constructor(
-    @InjectRepository(Project)
-    private projectRepository: Repository<Project>,
+    @InjectRepository(ProjectEntity)
+    private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
     private flowAggregatorService: FlowAggregatorService,
     private flowEmulatorService: FlowEmulatorService,
@@ -50,7 +50,9 @@ export class ProjectsService {
 
   seedDefaultProjects() {
     return this.projectRepository
-      .save(defaultProjects.map((project) => plainToClass(Project, project)))
+      .save(
+        defaultProjects.map((project) => plainToClass(ProjectEntity, project))
+      )
       .catch(this.handleDatabaseError);
   }
 
@@ -65,7 +67,7 @@ export class ProjectsService {
   async cleanupProject() {
     try {
       // remove all existing data of previously used project
-      // TODO(milestone-2): persist data for projects by default?
+      // TODO(milestone-3): persist data for projects by default?
 
       // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([
@@ -113,7 +115,7 @@ export class ProjectsService {
 
       try {
         await this.flowAggregatorService.startEmulator();
-      } catch (e) {
+      } catch (e: any) {
         throw new ServiceUnavailableException(
           `Can not start emulator with project ${id}`,
           e.message
@@ -122,7 +124,7 @@ export class ProjectsService {
 
       try {
         await this.storageDataService.start();
-      } catch (e) {
+      } catch (e: any) {
         throw new ServiceUnavailableException(
           "Data storage service error",
           e.message
@@ -144,14 +146,16 @@ export class ProjectsService {
   }
 
   async create(createProjectDto: CreateProjectDto) {
-    const project = plainToClass(Project, createProjectDto);
+    const project = ProjectEntity.create(createProjectDto);
+    // TODO(milestone-3): remove isCustom field
+    project.isCustom = true;
     await this.projectRepository
       .insert(project)
       .catch(this.handleDatabaseError);
     return project;
   }
 
-  async findAll(): Promise<Project[]> {
+  async findAll(): Promise<ProjectEntity[]> {
     const projects = await this.projectRepository.find({
       order: { updatedAt: "DESC" },
     });
@@ -160,16 +164,26 @@ export class ProjectsService {
     );
   }
 
-  async findOne(id: string): Promise<Project> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<ProjectEntity[]> {
+    return this.projectRepository.find({
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
+      order: { updatedAt: "DESC" },
+    });
+  }
+
+  async findOne(id: string): Promise<ProjectEntity> {
     const project = await this.projectRepository.findOneByOrFail({ id });
     return this.setComputedFields(project);
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
-    const project = plainToClass(Project, updateProjectDto);
+    const project = ProjectEntity.create(updateProjectDto);
     project.markUpdated();
     await this.projectRepository
-      .update({ id }, updateProjectDto)
+      .update({ id }, project)
       .catch(this.handleDatabaseError);
     return project;
   }
@@ -181,14 +195,14 @@ export class ProjectsService {
     return this.projectRepository.delete({ id });
   }
 
-  private async setComputedFields(project: Project) {
+  private async setComputedFields(project: ProjectEntity) {
     if (project.hasGatewayConfiguration()) {
       const { address, port } = project.gateway;
       // Assume non emulator networks are pingable
       const pingable = project.hasEmulatorGateway()
         ? await FlowGatewayService.isPingable(address, port)
         : true;
-      return plainToClass(Project, { ...project, pingable });
+      return plainToClass(ProjectEntity, { ...project, pingable });
     } else {
       return project;
     }

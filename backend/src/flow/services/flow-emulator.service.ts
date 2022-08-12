@@ -1,10 +1,10 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
-import { Project } from "../../projects/entities/project.entity";
-import { EmulatorConfigurationEntity } from "../../projects/entities/emulator-configuration.entity";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 import { EventEmitter } from "events";
 import { FlowCliService } from "./flow-cli.service";
 import { randomString } from "../../utils";
+import { Emulator } from "@flowser/types/generated/entities/projects";
 
 type StartCallback = (data: string[]) => void;
 
@@ -27,15 +27,15 @@ export class FlowEmulatorService {
 
   public events: EventEmitter = new EventEmitter();
   public state: FlowEmulatorState = FlowEmulatorState.STOPPED;
-  public configuration: EmulatorConfigurationEntity;
+  public emulatorConfig: Emulator;
   public emulatorProcess: ChildProcessWithoutNullStreams;
   public logs: string[] = [];
 
   constructor(private flowCliService: FlowCliService) {}
 
-  configureProjectContext(project: Project) {
+  configureProjectContext(project: ProjectEntity) {
     this.projectId = project?.id;
-    this.configuration = project.emulator;
+    this.emulatorConfig = project.emulator;
   }
 
   async init() {
@@ -84,7 +84,7 @@ export class FlowEmulatorService {
           }, 1000);
         }
         // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
-        // TODO(milestone-2): logic for determining if emulator started successfully could be improved
+        // TODO(milestone-x): logic for determining if emulator started successfully could be improved
         // https://github.com/onflowser/flowser/issues/33
         else if (
           this.isState(FlowEmulatorState.STARTED) &&
@@ -154,12 +154,12 @@ export class FlowEmulatorService {
       return;
     }
     this.setState(FlowEmulatorState.RUNNING);
-    if (this.configuration.numberOfInitialAccounts) {
+    if (this.emulatorConfig.numberOfInitialAccounts) {
       try {
         await this.initialiseAccounts(
-          this.configuration.numberOfInitialAccounts
+          this.emulatorConfig.numberOfInitialAccounts
         );
-      } catch (e) {
+      } catch (e: any) {
         this.logger.error(
           `failed to initialise accounts: ${e.message || e}`,
           e.stack
@@ -250,33 +250,33 @@ export class FlowEmulatorService {
     // keep those parameters up to date with the currently used flow-cli version
     // https://github.com/onflow/flow-emulator#configuration
     return [
-      flag("port", this.configuration.rpcServerPort),
-      flag("http-port", this.configuration.httpServerPort),
-      flag("block-time", this.configuration.blockTime),
-      flag("service-priv-key", this.configuration.servicePrivateKey),
-      flag("service-pub-key", this.configuration.servicePublicKey),
-      flag("dbpath", this.configuration.databasePath),
-      flag("token-supply", this.configuration.tokenSupply),
-      flag("transaction-expiry", this.configuration.transactionExpiry),
-      flag("storage-per-flow", this.configuration.storagePerFlow),
-      flag("min-account-balance", this.configuration.minAccountBalance),
+      flag("port", this.emulatorConfig.rpcServerPort),
+      flag("http-port", this.emulatorConfig.httpServerPort),
+      flag("block-time", this.emulatorConfig.blockTime),
+      flag("service-priv-key", this.emulatorConfig.servicePrivateKey),
+      flag("service-pub-key", this.emulatorConfig.servicePublicKey),
+      flag("dbpath", this.emulatorConfig.databasePath),
+      flag("token-supply", this.emulatorConfig.tokenSupply),
+      flag("transaction-expiry", this.emulatorConfig.transactionExpiry),
+      flag("storage-per-flow", this.emulatorConfig.storagePerFlow),
+      flag("min-account-balance", this.emulatorConfig.minAccountBalance),
       flag(
         "transaction-max-gas-limit",
-        this.configuration.transactionMaxGasLimit
+        this.emulatorConfig.transactionMaxGasLimit
       ),
-      flag("script-gas-limit", this.configuration.scriptGasLimit),
-      flag("service-sig-algo", this.configuration.serviceSignatureAlgorithm),
-      flag("service-hash-algo", this.configuration.serviceHashAlgorithm),
-      flag("storage-limit", this.configuration.storageLimit),
-      flag("transaction-fees", this.configuration.transactionFees),
+      flag("script-gas-limit", this.emulatorConfig.scriptGasLimit),
+      flag("service-sig-algo", this.emulatorConfig.serviceSignatureAlgorithm),
+      flag("service-hash-algo", this.emulatorConfig.serviceHashAlgorithm),
+      flag("storage-limit", this.emulatorConfig.storageLimit),
+      flag("transaction-fees", this.emulatorConfig.transactionFees),
       flag(
         "dbpath",
-        this.configuration.databasePath || this.flowCliService.databaseDirPath
+        this.emulatorConfig.databasePath || this.flowCliService.databaseDirPath
       ),
       // flow emulator is always started with persist flag
       // this is needed, so that storage script can index the db
       flag("persist", true),
-      flag("verbose", this.configuration.verboseLogging),
+      flag("verbose", this.emulatorConfig.verboseLogging),
       flag("init", true),
     ].filter(Boolean);
   }
@@ -312,7 +312,7 @@ export class FlowEmulatorService {
         })
         // only include lines that do not contain API call information
         // those lines are annoying, because they show up every second (due to our backend polling)
-        // TODO(milestone-2): improve API calls log filtering logic
+        // TODO(milestone-3): improve API calls log filtering logic
         .filter((line) => !line.includes("called"))
     );
   }

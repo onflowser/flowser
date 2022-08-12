@@ -1,9 +1,14 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { CollectionGuarantee } from "./collection-guarantee.entity";
+import { FlowBlock } from "../../flow/services/flow-gateway.service";
+import {
+  Block,
+  CollectionGuarantee,
+} from "@flowser/types/generated/entities/blocks";
+import { typeOrmProtobufTransformer } from "../../utils";
 
 @Entity({ name: "blocks" })
-export class Block extends PollingEntity {
+export class BlockEntity extends PollingEntity {
   @PrimaryColumn()
   id: string;
 
@@ -13,20 +18,43 @@ export class Block extends PollingEntity {
   @Column()
   height: number;
 
-  @Column()
-  timestamp: string;
+  @Column("datetime")
+  timestamp: Date;
 
-  @Column("simple-json")
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(CollectionGuarantee),
+  })
   collectionGuarantees: CollectionGuarantee[];
 
-  // TODO(milestone-2): define type
+  // TODO(milestone-x): Define type (Note: we aren't showing blockSeals anywhere)
   @Column("simple-json")
   blockSeals: any[];
 
   @Column("simple-array")
   signatures: string[];
 
-  static init(flowBlockObject): Block {
-    return Object.assign(new Block(), flowBlockObject);
+  static create(flowBlock: FlowBlock): BlockEntity {
+    const block = new BlockEntity();
+    block.id = flowBlock.id;
+    block.collectionGuarantees = flowBlock.collectionGuarantees;
+    block.blockSeals = flowBlock.blockSeals;
+    block.signatures = flowBlock.signatures;
+    block.timestamp = new Date(flowBlock.timestamp);
+    block.height = flowBlock.height;
+    block.parentId = flowBlock.parentId;
+    return block;
+  }
+
+  toProto() {
+    return Block.fromPartial({
+      id: this.id,
+      parentId: this.parentId,
+      height: this.height,
+      timestamp: this.timestamp.toISOString(),
+      blockSeals: this.blockSeals,
+      signatures: this.signatures,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    });
   }
 }

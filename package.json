@@ -1,5 +1,6 @@
 {
   "name": "flowser",
+  "private": true,
   "version": "1.0.0",
   "description": "Easily inspect and debug Flow blockchain ⛓",
   "main": "index.js",
@@ -7,14 +8,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "source .envrc && lerna run start:dev --parallel",
-    "bootstrap": "yarn install && lerna bootstrap && yarn run prepare && flow init",
-    "prepare": "husky install",
-    "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\"",
-    "backend:start:dev": "cd backend && yarn run start:debug",
-    "frontend:start:dev": "cd frontend && yarn run start",
-    "flow-cli:emulator:start": "flow emulator --port=3570 --admin-port=8081",
-    "flow-cli:dev-wallet:start": "flow dev-wallet"
+    "start": "lerna run start --parallel",
+    "cleanup": "lerna run cleanup --parallel",
+    "bootstrap": "yarn install && lerna bootstrap && husky install && lerna run generate && flow init",
+    "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {
     "type": "git",
@@ -36,5 +33,10 @@
     "husky": "^8.0.1",
     "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"
-  }
+  },
+  "workspaces": [
+    "./backend",
+    "./frontend",
+    "./types"
+  ]
 }

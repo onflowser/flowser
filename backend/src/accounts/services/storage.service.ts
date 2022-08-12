@@ -1,14 +1,14 @@
 import { Injectable, NotImplementedException } from "@nestjs/common";
-import { AccountsStorage } from "../entities/storage.entity";
+import { AccountsStorageEntity } from "../entities/storage.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
-// TODO(milestone-2): implement this class
+// TODO(milestone-3): implement this class
 @Injectable()
 export class StorageService {
   constructor(
-    @InjectRepository(AccountsStorage)
-    private storageRepository: Repository<AccountsStorage>
+    @InjectRepository(AccountsStorageEntity)
+    private storageRepository: Repository<AccountsStorageEntity>
   ) {}
 
   async findStorageByAccount(address: string) {
@@ -17,15 +17,18 @@ export class StorageService {
     });
   }
 
-  async updateAccountStorage(address: string, newStorage: AccountsStorage[]) {
+  async updateAccountStorage(
+    address: string,
+    newStorage: AccountsStorageEntity[]
+  ) {
     throw new NotImplementedException();
   }
 
-  async create(accountStorage: AccountsStorage) {
+  async create(accountStorage: AccountsStorageEntity) {
     throw new NotImplementedException();
   }
 
-  async update(accountStorage: AccountsStorage) {
+  async update(accountStorage: AccountsStorageEntity) {
     throw new NotImplementedException();
   }
 

@@ -3,25 +3,39 @@ import { BlocksService } from "./blocks.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
+import {
+  GetAllBlocksResponse,
+  GetPollingBlocksResponse,
+  GetSingleBlockResponse,
+} from "@flowser/types/generated/responses/blocks";
 
 @Controller("blocks")
 export class BlocksController {
   constructor(private readonly blocksService: BlocksService) {}
 
   @Get()
-  findAll() {
-    return this.blocksService.findAll();
+  async findAll() {
+    const blocks = await this.blocksService.findAll();
+    return GetAllBlocksResponse.fromPartial({
+      blocks: blocks.map((block) => block.toProto()),
+    });
   }
 
   @Get("/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
-    return this.blocksService.findAllNewerThanTimestamp(timestamp);
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingBlocksResponse))
+  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+    const blocks = await this.blocksService.findAllNewerThanTimestamp(
+      timestamp
+    );
+    return blocks.map((block) => block.toProto());
   }
 
   @ApiParam({ name: "id", type: String })
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.blocksService.findOne(id);
+  async findOne(@Param("id") id: string) {
+    const block = await this.blocksService.findOne(id);
+    return GetSingleBlockResponse.fromPartial({
+      block: block.toProto(),
+    });
   }
 }

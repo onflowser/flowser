@@ -1,8 +1,9 @@
 {
-  "name": "frontend",
+  "name": "@flowser/frontend",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@flowser/types": "^0.0.1",
     "@onflow/fcl": "^0.0.77",
     "@onflow/types": "^0.0.5",
     "@splitbee/web": "^0.3.0",
@@ -21,6 +22,7 @@
     "axios": "^0.21.4",
     "copy-to-clipboard": "^3.3.1",
     "dateformat": "^5.0.1",
+    "formik": "^2.2.9",
     "husky": "^7.0.2",
     "joi": "^17.4.2",
     "prismjs": "^1.25.0",
@@ -36,7 +38,8 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start:dev": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "cleanup": "rm -rf node_modules",
+    "start": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

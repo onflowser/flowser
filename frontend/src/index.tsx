@@ -4,7 +4,7 @@ import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { QueryClientProvider } from "react-query";
-import query from "./shared/config/query";
+import query from "./config/query";
 import splitbee from "@splitbee/web";
 
 // init analytics

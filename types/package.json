@@ -1,0 +1,27 @@
+{
+  "name": "@flowser/types",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./generated/*.js",
+  "types": "./generated/*.ts",
+  "scripts": {
+    "cleanup": "rm -rf node_modules",
+    "generate": "sh build.sh",
+    "start": "chokidar \"**/*.proto\" -c \"yarn run generate\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onflowser/flowser.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/onflowser/flowser/issues"
+  },
+  "homepage": "https://github.com/onflowser/flowser#readme",
+  "dependencies": {
+    "chokidar-cli": "^3.0.0",
+    "ts-proto": "^1.121.1",
+    "ts-protoc-gen": "^0.15.0"
+  }
+}

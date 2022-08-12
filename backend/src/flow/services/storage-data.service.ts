@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
 import { FlowCliService } from "./flow-cli.service";
-import { AccountsStorage } from "../../accounts/entities/storage.entity";
+import { AccountsStorageEntity } from "../../accounts/entities/storage.entity";
 import config from "../../config";
 import axios from "axios";
 
@@ -30,7 +30,7 @@ export class StorageDataService {
             PATH: process.env.PATH, // main_linux_x86_64 is present in path
           },
         });
-      } catch (e) {
+      } catch (e: any) {
         const message = `Storage data error: ${e.message}`;
         reject(message);
       }
@@ -79,19 +79,19 @@ export class StorageDataService {
     try {
       this.logger.debug("Stopping storage server");
       this.dataStorageProcess?.kill(); // send SIGTERM signal
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Failed to stop: ${e.message}`, e.stack);
     }
   }
 
-  async getStorageData(account: string): Promise<AccountsStorage> {
+  async getStorageData(account: string): Promise<AccountsStorageEntity> {
     account = account.indexOf("0x") === 0 ? account.substr(2) : account;
     let response;
     try {
       response = await axios.get(
         `http://localhost:${config.storageServerPort}/storage`
       );
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Error fetching storage: ${e.message}`, e.stack);
       this.printStdout();
       throw e;

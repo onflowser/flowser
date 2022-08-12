@@ -1,6 +1,61 @@
+import { FlowCadenceObject } from "./flow/services/flow-gateway.service";
+import { CadenceObject } from "@flowser/types/generated/entities/common";
+
 const kebabCase = require("kebab-case");
 
-export function toKebabCase(string) {
+export function deserializeCadenceObject(
+  cadenceObject: FlowCadenceObject
+): CadenceObject {
+  if (typeof cadenceObject.value === "string") {
+    return CadenceObject.fromJSON({
+      type: cadenceObject.type,
+      value: cadenceObject.value,
+    });
+  }
+  if (cadenceObject.value instanceof Array) {
+    return CadenceObject.fromJSON({
+      type: cadenceObject.type,
+      children: cadenceObject.value.map((value) =>
+        deserializeCadenceObject(value)
+      ),
+    });
+  }
+  if (cadenceObject.value instanceof Object) {
+    return CadenceObject.fromJSON({
+      type: cadenceObject.type,
+      children: deserializeCadenceObject(cadenceObject.value),
+    });
+  }
+  throw new Error("Unimplemented cadence type");
+}
+
+export type ProtobufLikeObject = {
+  toJSON: (value: any) => any;
+  fromJSON: (value: any) => any;
+};
+
+export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
+  return {
+    from: (value: any | null) => {
+      if (value === null) {
+        return null;
+      }
+      return value?.["map"] !== undefined
+        ? value.map(protobuf.fromJSON)
+        : protobuf.fromJSON(value);
+    },
+    to: (value: any | null) => {
+      if (value === null) {
+        return null;
+      }
+      return value?.["map"] !== undefined
+        ? value.map(protobuf.toJSON)
+        : protobuf.toJSON(value);
+    },
+  };
+}
+
+export function toKebabCase(string: string) {
   const kebab = kebabCase(string);
   // kebabCase("WebkitTransform"); => "-webkit-transform"
   // remove "-" prefix
@@ -13,16 +68,6 @@ export function randomString() {
 
 export function ensurePrefixedAddress(address: string) {
   return address.startsWith("0x") ? address : `0x${address}`;
-}
-
-/**
- * Serializes non-null values to provided class object.
- */
-export function serializeEmbeddedTypeORMEntity<T>(
-  classObject: T,
-  value: null | T
-) {
-  return value === null ? null : Object.assign(classObject, value);
 }
 
 export type EntitiesDiff<T> = {

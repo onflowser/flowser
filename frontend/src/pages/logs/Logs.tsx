@@ -6,40 +6,32 @@ import React, {
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
-import Search from "../../shared/components/search/Search";
-import { ReactComponent as ExpandIcon } from "../../shared/assets/icons/expand.svg";
-import { ReactComponent as ShrinkIcon } from "../../shared/assets/icons/shrink.svg";
-import { ReactComponent as LogsIcon } from "../../shared/assets/icons/logs.svg";
-import { LogDrawerSize, useLogDrawer } from "../../shared/hooks/log-drawer";
-import CaretIcon from "../../shared/components/caret-icon/CaretIcon";
-import { useSyntaxHighlighter } from "../../shared/hooks/syntax-highlighter";
-import { useTimeoutPolling } from "../../shared/hooks/timeout-polling";
-import { useSearch } from "../../shared/hooks/search";
-import { useFilterData } from "../../shared/hooks/filter-data";
+import Search from "../../components/search/Search";
+import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
+import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
+import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
+import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
+import CaretIcon from "../../components/caret-icon/CaretIcon";
+import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
+import { useSearch } from "../../hooks/use-search";
+import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
-import { useMouseMove } from "../../shared/hooks/mouse-position";
+import { useMouseMove } from "../../hooks/use-mouse-move";
+import { useGetPollingLogs } from "../../hooks/use-api";
 
-interface OwnProps {
+type LogsProps = {
   className?: string;
-}
+};
 
-type Props = OwnProps;
 const SEARCH_CONTEXT_NAME = "logs";
 
-const Logs: FunctionComponent<Props> = ({ className }) => {
+const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
   const { highlightLogKeywords } = useSyntaxHighlighter();
   const miniLogRef = createRef<HTMLDivElement>();
   const bigLogRef = createRef<HTMLDivElement>();
-  // TODO(milestone-2): fix types
-  const { data } = useTimeoutPolling<any>(
-    "/api/logs/polling",
-    "id",
-    1000,
-    false
-  );
-  const logs = data ? data.map((log: any) => log.data) : [];
+  const { data: logs } = useGetPollingLogs();
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { filteredData } = useFilterData(logs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
@@ -65,7 +57,7 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
   useEffect(() => {
     scrollToBottom(miniLogRef);
     scrollToBottom(bigLogRef);
-  }, [data]);
+  }, [logs]);
 
   const onCaretChange = useCallback((state) => {
     if (state === false) {
@@ -129,10 +121,12 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 
         {logDrawerSize === "tiny" && (
           <div className={classes.midContainer} ref={miniLogRef}>
-            {filteredData.map((log: any, key: number) => (
+            {filteredData.map((log) => (
               <pre
-                key={key}
-                dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}
+                key={log.id}
+                dangerouslySetInnerHTML={{
+                  __html: highlightLogKeywords(log.data),
+                }}
               ></pre>
             ))}
           </div>
@@ -172,11 +166,13 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
 
       {logDrawerSize !== "tiny" && (
         <div className={classes.bigLogsContainer} ref={bigLogRef}>
-          {filteredData.map((log: any, key: number) => (
+          {filteredData.map((log) => (
             <pre
+              key={log.id}
               className={classes.line}
-              key={key}
-              dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}
+              dangerouslySetInnerHTML={{
+                __html: highlightLogKeywords(log.data),
+              }}
             />
           ))}
         </div>

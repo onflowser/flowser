@@ -1,19 +1,20 @@
-import React, { useEffect } from "react";
+import React, { ReactElement, useEffect } from "react";
 import {
   BrowserRouter,
   Redirect,
   Route,
+  RouteComponentProps,
   RouteProps,
   Switch,
   withRouter,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Layout from "./core/components/layout/Layout";
-import { routes } from "./shared/constants/routes";
-import { UiStateContextProvider } from "./shared/contexts/ui-state.context";
-import { useSearch } from "./shared/hooks/search";
+import Layout from "./components/layout/Layout";
+import { routes } from "./constants/routes";
+import { UiStateContextProvider } from "./contexts/ui-state.context";
+import { useSearch } from "./hooks/use-search";
 import "./App.scss";
-import { toastOptions } from "./shared/config/toast";
+import { toastOptions } from "./config/toast";
 
 // pages
 import Start from "./pages/start/Start";
@@ -30,22 +31,28 @@ const RouteWithLayout = (props: RouteProps) => (
   </Layout>
 );
 
-const BrowserRouterEvents = withRouter(({ children, history, location }) => {
-  const { setSearchTerm } = useSearch();
+const BrowserRouterEvents = withRouter(
+  ({
+    children,
+    history,
+    location,
+  }: RouteComponentProps & { children: ReactElement[] }) => {
+    const { setSearchTerm } = useSearch();
 
-  history.listen((location: any, action: any) => {
-    if (action === "PUSH") {
-      setSearchTerm("");
-    }
-  });
+    history.listen((location, action) => {
+      if (action === "PUSH") {
+        setSearchTerm("");
+      }
+    });
 
-  useEffect(() => {
-    // scroll to the top on every route change
-    window.scrollTo(0, 0);
-  }, [location]);
+    useEffect(() => {
+      // scroll to the top on every route change
+      window.scrollTo(0, 0);
+    }, [location]);
 
-  return <>{children}</>;
-});
+    return <>{children}</>;
+  }
+);
 
 export const App = () => {
   return (

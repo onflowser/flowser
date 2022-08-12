@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "module": "commonjs",
+    "rootDir": ".",
+    "target": "es2017",
+    "outDir": "dist",
+    "checkJs": false
+  },
+  "include": [
+    "generated"
+  ]
+}

@@ -6,30 +6,33 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { PollingEntity } from "../entities/polling.entity";
+import { PollingResponse, PollingEntity } from "@flowser/types/shared/polling";
 
-export interface PollingResponseMeta {
-  latestTimestamp: number;
-}
-
-export interface Response<T> {
-  data: T;
-  meta: PollingResponseMeta;
+interface ProtoSerializer<T extends PollingEntity[]> {
+  toJSON: (message: any) => unknown;
+  fromPartial: (message: any) => PollingResponse<T>;
 }
 
 @Injectable()
-export class PollingResponseInterceptor<T extends PollingEntity[]>
-  implements NestInterceptor<T, Response<T>>
+export class PollingResponseInterceptor<T extends PollingEntity[], P>
+  implements NestInterceptor<T, PollingResponse<T>>
 {
+  constructor(private readonly serializer: ProtoSerializer<T>) {}
+
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>
-  ): Observable<Response<T>> {
+  ): Observable<PollingResponse<T>> {
     return next.handle().pipe(
-      map((data) => ({
-        data,
-        meta: { latestTimestamp: findLatestTimestamp(data) },
-      }))
+      map(
+        (data): PollingResponse<T> =>
+          this.serializer.fromPartial({
+            data,
+            meta: {
+              latestTimestamp: findLatestTimestamp(data),
+            },
+          })
+      )
     );
   }
 }
@@ -39,12 +42,16 @@ function findLatestTimestamp<T extends PollingEntity[]>(data: T) {
   if (Array.isArray(data)) {
     const latestTimestampCreated = data.reduce(
       (latest, item) =>
-        item.createdAt.getTime() > latest ? item.createdAt.getTime() : latest,
+        getUnixTime(item.createdAt) > latest
+          ? getUnixTime(item.createdAt)
+          : latest,
       0
     );
     const latestTimestampUpdated = data.reduce(
       (latest, item) =>
-        item.updatedAt.getTime() > latest ? item.updatedAt.getTime() : latest,
+        getUnixTime(item.updatedAt) > latest
+          ? getUnixTime(item.updatedAt)
+          : latest,
       0
     );
     latestTimestamp =
@@ -53,4 +60,8 @@ function findLatestTimestamp<T extends PollingEntity[]>(data: T) {
         : latestTimestampCreated;
   }
   return latestTimestamp;
+}
+
+function getUnixTime(date: string): number {
+  return new Date(date).getTime();
 }

@@ -1,13 +1,16 @@
 import { AfterLoad, Column, Entity, Index, PrimaryColumn } from "typeorm";
-import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
-import { serializeEmbeddedTypeORMEntity, toKebabCase } from "../../utils";
+import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
-import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import config from "../../config";
+import {
+  Emulator,
+  Gateway,
+  Project,
+} from "@flowser/types/generated/entities/projects";
+import { UpdateProjectDto } from "../dto/update-project.dto";
 
 @Entity({ name: "projects" })
-export class Project extends PollingEntity {
+export class ProjectEntity extends PollingEntity {
   @PrimaryColumn()
   id: string;
 
@@ -19,10 +22,10 @@ export class Project extends PollingEntity {
   pingable: boolean = false;
 
   @Column("simple-json", { nullable: true })
-  gateway: GatewayConfigurationEntity;
+  gateway: Gateway;
 
   @Column("simple-json", { nullable: true })
-  emulator: EmulatorConfigurationEntity;
+  emulator: Emulator | null;
 
   @Column("boolean", { default: false })
   isCustom: boolean = false;
@@ -30,25 +33,12 @@ export class Project extends PollingEntity {
   // Blockchain data will be fetched from this block height
   // Set this null to start fetching from the latest block
   @Column({ nullable: true })
-  startBlockHeight?: number | null = 0;
+  startBlockHeight: number | null = 0;
 
   @AfterLoad()
   unSerializeJsonFields() {
-    this.gateway = serializeEmbeddedTypeORMEntity(
-      new GatewayConfigurationEntity(),
-      this.gateway
-    );
-    this.emulator = serializeEmbeddedTypeORMEntity(
-      new EmulatorConfigurationEntity(),
-      this.emulator
-    );
-  }
-
-  static init(dto: CreateProjectDto) {
-    return Object.assign(new Project(), {
-      id: toKebabCase(dto.name),
-      ...dto,
-    });
+    this.gateway = this.gateway ? Gateway.fromJSON(this.gateway) : null;
+    this.emulator = this.emulator ? Emulator.fromJSON(this.emulator) : null;
   }
 
   hasGatewayConfiguration() {
@@ -67,5 +57,35 @@ export class Project extends PollingEntity {
     // Testnet usage is in beta, main-net won't be support
     // TODO: better handle emulator gateway detection (address could also be an IP)
     return this.gateway.address.includes("localhost");
+  }
+
+  toProto() {
+    return Project.fromPartial({
+      id: this.id,
+      name: this.name,
+      pingable: this.pingable,
+      isCustom: this.isCustom,
+      startBlockHeight: this.startBlockHeight,
+      gateway: this.gateway,
+      emulator: this.emulator,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    });
+  }
+
+  static create(projectDto: CreateProjectDto | UpdateProjectDto) {
+    const project = new ProjectEntity();
+    project.id = toKebabCase(projectDto.name);
+    project.name = projectDto.name;
+    project.startBlockHeight = projectDto.startBlockHeight;
+    project.isCustom = projectDto.isCustom;
+    project.gateway = projectDto.gateway
+      ? Gateway.fromJSON(projectDto.gateway)
+      : Gateway.fromPartial({
+          port: 8080,
+          address: "localhost",
+        });
+    project.emulator = Emulator.fromJSON(projectDto.emulator);
+    return project;
   }
 }

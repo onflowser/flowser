@@ -1,18 +1,17 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateEventDto } from "./dto/create-event.dto";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Event } from "./entities/event.entity";
+import { EventEntity } from "./entities/event.entity";
 import { MoreThan, Repository } from "typeorm";
 
 @Injectable()
 export class EventsService {
   constructor(
-    @InjectRepository(Event)
-    private eventRepository: Repository<Event>
+    @InjectRepository(EventEntity)
+    private eventRepository: Repository<EventEntity>
   ) {}
 
-  create(createEventDto: CreateEventDto) {
-    return this.eventRepository.save(createEventDto);
+  create(event: EventEntity) {
+    return this.eventRepository.save(event);
   }
 
   async countAll() {
@@ -25,7 +24,7 @@ export class EventsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Event[]> {
+  findAllNewerThanTimestamp(timestamp): Promise<EventEntity[]> {
     return this.eventRepository.find({
       where: [
         { createdAt: MoreThan(timestamp) },

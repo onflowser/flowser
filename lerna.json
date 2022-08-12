@@ -1,8 +1,10 @@
 {
   "packages": [
     "./backend",
-    "./frontend"
+    "./frontend",
+    "./types"
   ],
-  "version": "0.0.1",
-  "npmClient": "yarn"
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "0.0.1"
 }

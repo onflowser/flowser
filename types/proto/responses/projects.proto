@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "entities/projects.proto";
+import "responses/common.proto";
+
+message GetAllProjectsResponse {
+  repeated Project projects = 1;
+}
+
+message GetPollingProjectsResponse {
+  repeated Project data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetSingleProjectResponse {
+  Project project = 1;
+}

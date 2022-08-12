@@ -1,27 +1,26 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
-import { Block } from "./entities/block.entity";
-import { CreateBlockDto } from "./dto/create-block.dto";
+import { BlockEntity } from "./entities/block.entity";
 
 export class BlocksService {
   constructor(
-    @InjectRepository(Block)
-    private blockRepository: Repository<Block>
+    @InjectRepository(BlockEntity)
+    private blockRepository: Repository<BlockEntity>
   ) {}
 
-  async create(createBlockDto: CreateBlockDto): Promise<Block> {
-    return this.blockRepository.save(createBlockDto);
+  async create(block: BlockEntity): Promise<BlockEntity> {
+    return this.blockRepository.save(block);
   }
 
   async countAll() {
     return this.blockRepository.count();
   }
 
-  findAll(): Promise<Block[]> {
+  findAll(): Promise<BlockEntity[]> {
     return this.blockRepository.find();
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<Block[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<BlockEntity[]> {
     return this.blockRepository.find({
       where: [
         { createdAt: MoreThan(timestamp) },
@@ -31,7 +30,7 @@ export class BlocksService {
     });
   }
 
-  findLastBlock(): Promise<Block> {
+  findLastBlock(): Promise<BlockEntity> {
     return this.blockRepository
       .createQueryBuilder("block")
       .select()

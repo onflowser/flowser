@@ -8,10 +8,10 @@ const defaultServiceAccountPrivKey =
 
 export const env = cleanEnv(process.env, {
   DATABASE_TYPE: str({
-    default: "mysql",
-    choices: ["mysql", "mariadb", "sqlite", "better-sqlite3"],
+    default: "sqlite",
+    choices: ["mysql", "mariadb", "sqlite"],
   }),
-  DATABASE_NAME: str(),
+  DATABASE_NAME: str({ default: ":memory:" }),
   DATABASE_HOST: str({ default: "localhost" }),
   DATABASE_PORT: num({ default: 3306 }),
   DATABASE_USERNAME: str({ default: "" }),

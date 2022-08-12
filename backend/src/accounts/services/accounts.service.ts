@@ -1,20 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { CreateAccountDto } from "../dto/create-account.dto";
-import { UpdateAccountDto } from "../dto/update-account.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Account } from "../entities/account.entity";
-import { Repository } from "typeorm";
-import { Transaction } from "../../transactions/entities/transaction.entity";
+import { AccountEntity } from "../entities/account.entity";
+import { MoreThan, Repository } from "typeorm";
+import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { ContractsService } from "./contracts.service";
-import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class AccountsService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
-    @InjectRepository(Transaction)
-    private transactionRepository: Repository<Transaction>,
+    @InjectRepository(AccountEntity)
+    private accountRepository: Repository<AccountEntity>,
+    @InjectRepository(TransactionEntity)
+    private transactionRepository: Repository<TransactionEntity>,
     private contractsService: ContractsService
   ) {}
 
@@ -28,65 +25,40 @@ export class AccountsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<Account[]> {
-    return this.accountRepository
-      .createQueryBuilder("account")
-      .select()
-      .where("account.updatedAt > :timestamp", { timestamp })
-      .orWhere("account.createdAt > :timestamp", { timestamp })
-      .orderBy("account.createdAt", "DESC")
-      .getMany();
-  }
-
-  async findOne(address: string) {
-    return this.accountRepository.findOneOrFail({
-      where: { address },
-      relations: ["keys", "storage"],
+  findAllNewerThanTimestamp(timestamp: Date): Promise<AccountEntity[]> {
+    return this.accountRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp) },
+        { createdAt: MoreThan(timestamp) },
+      ],
+      order: {
+        createdAt: "DESC",
+      },
     });
   }
 
   async findOneByAddress(address: string) {
-    const addressWithout0xPrefix = address.substr(2);
-    const accountPromise = this.findOne(address);
-    const transactionsPromise = this.transactionRepository
-      .createQueryBuilder("transaction")
-      .where("transaction.payer = :address", {
-        address: addressWithout0xPrefix,
-      })
-      .getMany();
-    const contractsPromise =
-      this.contractsService.getContractsByAccountAddress(address);
-
-    const [account, transactions, contracts] = await Promise.all([
-      accountPromise,
-      transactionsPromise,
-      contractsPromise,
-    ]);
-
-    return { ...account, transactions, contracts };
+    return this.accountRepository.findOneOrFail({
+      where: { address },
+      relations: ["keys", "storage", "contracts", "transactions"],
+    });
   }
 
-  async create(createAccountDto: CreateAccountDto) {
-    const account = plainToClass(Account, createAccountDto);
+  async create(account: AccountEntity) {
     return this.accountRepository.insert(account);
   }
 
-  async update(address: string, updateAccountDto: UpdateAccountDto) {
+  async update(address: string, updatedAccount: AccountEntity) {
     const account = await this.accountRepository.findOneByOrFail({ address });
-    const updatedAccount = Object.assign(account, updateAccountDto);
     account.markUpdated();
     return this.accountRepository.update({ address }, updatedAccount);
   }
 
   async markUpdated(address: string) {
-    const account = await this.accountRepository
-      .findOneByOrFail({ address })
-      .catch((e) => {
-        console.log("Mark updated error", e);
-        throw e;
-      });
-    account.markUpdated();
-    return this.update(address, account);
+    return this.accountRepository.update(
+      { address },
+      { updatedAt: new Date() }
+    );
   }
 
   removeAll() {

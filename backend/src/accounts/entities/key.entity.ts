@@ -1,10 +1,16 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { Account } from "./account.entity";
+import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
+import { FlowAccount, FlowKey } from "../../flow/services/flow-gateway.service";
+import { AccountKey } from "@flowser/types/generated/entities/accounts";
+import {
+  HashAlgorithm,
+  SignatureAlgorithm,
+} from "@flowser/types/generated/entities/common";
 
 @Entity({ name: "keys" })
-export class AccountKey extends PollingEntity {
+export class AccountKeyEntity extends PollingEntity {
   @PrimaryColumn()
   index: number;
 
@@ -15,10 +21,10 @@ export class AccountKey extends PollingEntity {
   publicKey: string;
 
   @Column()
-  signAlgo: number;
+  signAlgo: SignatureAlgorithm;
 
   @Column()
-  hashAlgo: number;
+  hashAlgo: HashAlgorithm;
 
   @Column()
   weight: number;
@@ -29,13 +35,34 @@ export class AccountKey extends PollingEntity {
   @Column()
   revoked: boolean;
 
-  @ManyToOne(() => Account, (account) => account.storage)
-  account: Account;
+  @ManyToOne(() => AccountEntity, (account) => account.storage)
+  account: AccountEntity;
 
-  static init(accountAddress: string, flowAccountKeyObject: any) {
-    return Object.assign<AccountKey, any>(new AccountKey(), {
-      ...flowAccountKeyObject,
-      accountAddress: ensurePrefixedAddress(accountAddress),
+  toProto() {
+    return AccountKey.fromPartial({
+      index: this.index,
+      accountAddress: this.accountAddress,
+      publicKey: this.publicKey,
+      signAlgo: this.signAlgo,
+      hashAlgo: this.hashAlgo,
+      weight: this.weight,
+      sequenceNumber: this.sequenceNumber,
+      revoked: this.revoked,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     });
+  }
+
+  static create(flowAccount: FlowAccount, flowKey: FlowKey) {
+    const key = new AccountKeyEntity();
+    key.index = flowKey.index;
+    key.accountAddress = ensurePrefixedAddress(flowAccount.address);
+    key.publicKey = flowKey.publicKey;
+    key.signAlgo = flowKey.signAlgo;
+    key.hashAlgo = flowKey.hashAlgo;
+    key.weight = flowKey.weight;
+    key.sequenceNumber = flowKey.sequenceNumber;
+    key.revoked = flowKey.revoked;
+    return key;
   }
 }

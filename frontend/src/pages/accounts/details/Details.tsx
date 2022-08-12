@@ -1,37 +1,44 @@
 import React, { FunctionComponent, useEffect } from "react";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import { useSearch } from "../../../shared/hooks/search";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
-import Value from "../../../shared/components/value/Value";
-import Card from "../../../shared/components/card/Card";
+import Value from "../../../components/value/Value";
+import Card from "../../../components/card/Card";
 import Storage from "./Storage";
-import Label from "../../../shared/components/label/Label";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
-import ContentDetailsKeys from "./ContentDetailsKeys";
-import CopyButton from "../../../shared/components/copy-button/CopyButton";
+import Label from "../../../components/label/Label";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import KeyListItem from "./KeyListItem";
+import CopyButton from "../../../components/copy-button/CopyButton";
 import {
   DetailsTabItem,
   DetailsTabs,
-} from "../../../shared/components/details-tabs/DetailsTabs";
-import CollapsibleCard from "../../../shared/components/collapsible-card/CollapsibleCard";
-import { useDetailsQuery } from "../../../shared/hooks/details-query";
+} from "../../../components/details-tabs/DetailsTabs";
+import CollapsibleCard from "../../../components/collapsible-card/CollapsibleCard";
 import { useParams } from "react-router-dom";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import TransactionListItem from "../../../shared/components/transaction-list-item/TransactionListItem";
-import Fragment from "../../../shared/components/fragment/Fragment";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";
+import Fragment from "../../../components/fragment/Fragment";
+import {
+  useGetAccount,
+  useGetPollingContractsByAccount,
+  useGetPollingKeysByAccount,
+  useGetPollingTransactionsByAccount,
+} from "../../../hooks/use-api";
 
 type RouteParams = {
   accountId: string;
 };
 
-const Details: FunctionComponent<any> = () => {
+const Details: FunctionComponent = () => {
   const { accountId } = useParams<RouteParams>();
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data, isLoading } = useDetailsQuery<any>(
-    `/api/accounts/${accountId}`
-  );
+  const { data, isLoading } = useGetAccount(accountId);
+  const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
+  const { data: contracts } = useGetPollingContractsByAccount(accountId);
+  const { data: keys } = useGetPollingKeysByAccount(accountId);
+  const { account } = data ?? {};
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -44,7 +51,7 @@ const Details: FunctionComponent<any> = () => {
     setBreadcrumbs(breadcrumbs);
   }, []);
 
-  if (isLoading || !data) {
+  if (isLoading || !account) {
     return <FullScreenLoading />;
   }
 
@@ -52,64 +59,55 @@ const Details: FunctionComponent<any> = () => {
     <div className={classes.root}>
       <div className={classes.firstRow}>
         <Label variant="large">ADDRESS</Label>
-        <Value variant="large">{data.address}</Value>
-        <CopyButton value={data.address} />
+        <Value variant="large">{account.address}</Value>
+        <CopyButton value={account.address} />
       </div>
       <Card className={classes.bigCard}>
         <div>
           <Label variant="large" className={classes.label}>
             BALANCE
           </Label>
-          <Value variant="large">{data.balance} FLOW</Value>
+          <Value variant="large">{account.balance} FLOW</Value>
         </div>
       </Card>
       <DetailsTabs>
-        <DetailsTabItem label="STORAGE" value={data.storage?.length}>
-          {data.storage?.length && <Storage data={data.storage} />}
+        <DetailsTabItem label="STORAGE" value={account.storage?.length}>
+          {account.storage?.length && <Storage data={account.storage} />}
         </DetailsTabItem>
-        {!!data.code && (
+        {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">
             <Fragment
               onMount={() => updateSearchBar("search for scripts", true)}
             >
-              <ContentDetailsScript script={data.code} />
-            </Fragment>
-          </DetailsTabItem>
-        )}
-        {!!data.transactions && (
-          <DetailsTabItem label="TRANSACTIONS" value={data.transactions.length}>
-            <Fragment
-              onMount={() =>
-                updateSearchBar(
-                  "search for transactions",
-                  !data.transactions.length
-                )
-              }
-            >
-              {data.transactions.map((item: any, i: number) => (
-                <TransactionListItem
-                  key={i}
-                  id={item.id}
-                  referenceBlockId={item.referenceBlockId}
-                  statusCode={item.status.statusCode}
-                  payer={item.payer}
-                  proposer={item.proposalKey.address}
-                />
-              ))}
+              <ContentDetailsScript script={account.code} />
             </Fragment>
           </DetailsTabItem>
         )}
         <DetailsTabItem
+          label="TRANSACTIONS"
+          value={account.transactions.length}
+        >
+          <Fragment
+            onMount={() =>
+              updateSearchBar("search for transactions", !transactions.length)
+            }
+          >
+            {transactions.map((item) => (
+              <TransactionListItem key={item.id} transaction={item} />
+            ))}
+          </Fragment>
+        </DetailsTabItem>
+        <DetailsTabItem
           label="CONTRACTS"
-          value={data.contracts.length}
+          value={contracts.length}
           onClick={() =>
-            updateSearchBar("search for contracts", !data.contracts.length)
+            updateSearchBar("search for contracts", !contracts.length)
           }
         >
-          {data.contracts.map((contract: any, index: number) => (
+          {contracts.map((contract) => (
             <CollapsibleCard
-              key={index}
-              isNew={contract.isNew}
+              key={contract.id}
+              showIntroAnimation={contract.isNew || contract.isUpdated}
               header="CONTRACT NAME"
               subheader={contract.name}
               variant="black"
@@ -117,10 +115,7 @@ const Details: FunctionComponent<any> = () => {
             >
               <Fragment
                 onMount={() =>
-                  updateSearchBar(
-                    "search for contracts",
-                    !data.contracts.length
-                  )
+                  updateSearchBar("search for contracts", !contracts.length)
                 }
               >
                 <ContentDetailsScript script={contract.code} />
@@ -128,13 +123,13 @@ const Details: FunctionComponent<any> = () => {
             </CollapsibleCard>
           ))}
         </DetailsTabItem>
-        <DetailsTabItem label="KEYS" value={data.keys.length}>
+        <DetailsTabItem label="KEYS" value={keys.length}>
           <Fragment
-            onMount={() =>
-              updateSearchBar("search for keys", !data.keys.length)
-            }
+            onMount={() => updateSearchBar("search for keys", !keys.length)}
           >
-            <ContentDetailsKeys keys={data.keys} />
+            {keys.map((key) => (
+              <KeyListItem key={key.index} accountKey={key} />
+            ))}
           </Fragment>
         </DetailsTabItem>
       </DetailsTabs>

@@ -1,26 +1,127 @@
-import {
-  FlowAccount,
-  FlowBlock,
-  FlowCollection,
-  FlowTransaction,
-  FlowTransactionStatus,
-} from "../types";
-import { GatewayConfigurationEntity } from "../../projects/entities/gateway-configuration.entity";
 import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
+import { Gateway } from "@flowser/types/generated/entities/projects";
+
+// https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
+export type FlowCollectionGuarantee = {
+  collectionId: string;
+  signatures: string[];
+};
+
+// https://docs.onflow.org/fcl/reference/api/#blockobject
+export type FlowBlock = {
+  id: string;
+  parentId: string;
+  height: number;
+  timestamp: number;
+  collectionGuarantees: FlowCollectionGuarantee[];
+  blockSeals: any[];
+  signatures: string[];
+};
+
+// https://docs.onflow.org/fcl/reference/api/#keyobject
+export type FlowKey = {
+  index: number;
+  publicKey: string;
+  signAlgo: number;
+  hashAlgo: number;
+  weight: number;
+  sequenceNumber: number;
+  revoked: boolean;
+};
+
+// https://docs.onflow.org/fcl/reference/api/#accountobject
+export type FlowAccount = {
+  address: string;
+  balance: number;
+  code: string;
+  contracts: Record<string, string>;
+  keys: FlowKey[];
+};
+
+// https://docs.onflow.org/fcl/reference/api/#collectionobject
+export type FlowCollection = {
+  id: string;
+  transactionIds: string[];
+};
+
+export type FlowCadenceObject = {
+  type: string;
+  // TODO: not sure about this, check the structure for more complex types
+  value: string | FlowCadenceObject | FlowCadenceObject[];
+};
+
+// https://docs.onflow.org/fcl/reference/api/#proposalkeyobject
+export type FlowProposalKey = {
+  address: string;
+  keyId: number;
+  sequenceNumber: number;
+};
+
+// https://docs.onflow.org/fcl/reference/api/#signableobject
+export type FlowSignableObject = {
+  addr: string;
+  keyId: number;
+  signature: string;
+};
+
+// https://docs.onflow.org/fcl/reference/api/#transactionstatusobject
+export type FlowTransactionStatus = {
+  status: number;
+  statusCode: number;
+  errorMessage: string;
+  events: FlowEvent[];
+};
+
+// https://docs.onflow.org/fcl/reference/api/#transactionobject
+export type FlowTransaction = {
+  id: string;
+  script: string;
+  args: FlowCadenceObject[];
+  referenceBlockId: string;
+  gasLimit: number;
+  proposalKey: FlowProposalKey;
+  payer: string; // payer account address
+  authorizers: string[]; // authorizers account addresses
+  envelopeSignatures: FlowSignableObject[];
+  payloadSignatures: FlowSignableObject[];
+};
+
+// https://docs.onflow.org/fcl/reference/api/#event-object
+export type FlowEvent = {
+  transactionId: string;
+  type: string;
+  transactionIndex: number;
+  eventIndex: number;
+  // Data contains arbitrary key-value pairs emitted from transactions.
+  // Information about cadence types is not returned from fcl-js.
+  data: Record<string, any>;
+};
 
 @Injectable()
 export class FlowGatewayService {
-  private configuration: GatewayConfigurationEntity;
+  private gatewayConfig: Gateway | undefined;
   private static readonly logger = new Logger(FlowGatewayService.name);
 
-  public configureDataSourceGateway(configuration: GatewayConfigurationEntity) {
-    this.configuration = configuration;
-    FlowGatewayService.logger.debug(
-      `@onflow/fcl listening on ${this.configuration?.url()}`
-    );
-    fcl.config().put("accessNode.api", this.configuration?.url());
+  public configureDataSourceGateway(configuration: Gateway | undefined) {
+    this.gatewayConfig = configuration;
+    if (this.gatewayConfig) {
+      FlowGatewayService.logger.debug(
+        `@onflow/fcl listening on ${this.getGatewayUrl()}`
+      );
+      fcl.config().put("accessNode.api", this.getGatewayUrl());
+    }
+  }
+
+  private getGatewayUrl() {
+    const { address, port } = this.gatewayConfig;
+    const host = `${address}${port ? `:${port}` : ""}`;
+    return host.startsWith("http") ? host : `http://${host}`;
+  }
+
+  public getTxStatusSubscription(transactionId: string) {
+    return fcl.tx(transactionId);
   }
 
   public async getLatestBlock(): Promise<FlowBlock> {
@@ -37,87 +138,30 @@ export class FlowGatewayService {
     return fcl.send([fcl.getCollection(id)]).then(fcl.decode);
   }
 
-  public async getTransactionById(id: string): Promise<{
-    data: FlowTransaction;
-    status: FlowTransactionStatus;
-  }> {
-    const [data, status] = await Promise.all([
-      fcl.send([fcl.getTransaction(id)]).then(fcl.decode),
-      fcl.send([fcl.getTransactionStatus(id)]).then(fcl.decode),
-    ]);
-    return { ...data, status };
+  public async getTransactionById(id: string): Promise<FlowTransaction> {
+    const transaction = await fcl
+      .send([fcl.getTransaction(id)])
+      .then(fcl.decode);
+    return { ...transaction, id };
+  }
+
+  public async getTransactionStatusById(
+    transactionId: string
+  ): Promise<FlowTransactionStatus> {
+    return fcl.send([fcl.getTransactionStatus(transactionId)]).then(fcl.decode);
   }
 
   public async getAccount(address: string): Promise<FlowAccount> {
-    return fcl.send([fcl.getAccount(address)]).then(fcl.decode);
-  }
-
-  public async getBlockData(height) {
-    const block = await this.getBlockByHeight(height);
-    const collections = await this.fetchCollectionGuarantees(block);
-    const txWithStatuses = await this.fetchTransactionsWithStatuses(
-      collections
-    );
-    const transactions = txWithStatuses.map((tx: any) => {
-      const { events, ...status } = tx.status;
-      return {
-        ...tx,
-        status: { ...status, eventsCount: tx.status.events.length },
-      };
-    });
-    const events = txWithStatuses
-      .map((tx: any) =>
-        tx.status.events.map((event) => ({
-          transactionId: tx.id,
-          blockId: tx.referenceBlockId,
-          ...event,
-        }))
-      )
-      .flat();
-    return {
-      block,
-      collections,
-      transactions,
-      events,
-    };
-  }
-
-  private async fetchCollectionGuarantees(block: FlowBlock) {
-    return Promise.all(
-      block.collectionGuarantees.map(async (guarantee) => ({
-        blockId: block.id,
-        ...(await this.getCollectionById(guarantee.collectionId)),
-      }))
-    );
-  }
-
-  private async fetchTransactionsWithStatuses(collections: any[]) {
-    const txIds = collections
-      .map((collection) => collection.transactionIds)
-      .flat();
-    return await Promise.all(
-      txIds.map(async (txId) => ({
-        id: txId,
-        ...(await this.getTransactionById(txId)),
-      }))
-    );
-  }
-
-  public async getBlockDataWithinHeightRange(fromHeight, toHeight) {
-    let promises = [];
-    for (let height = fromHeight; height <= toHeight; height++) {
-      FlowGatewayService.logger.debug(`fetching block: ${height}`);
-      promises.push(this.getBlockData(height));
-    }
-    return Promise.all(promises);
+    const account = await fcl.send([fcl.getAccount(address)]).then(fcl.decode);
+    return { ...account, address };
   }
 
   async isConnectedToGateway() {
-    if (!this.configuration) {
+    if (!this.gatewayConfig) {
       return false;
     }
 
-    const { address, port } = this.configuration;
+    const { address, port } = this.gatewayConfig;
     return FlowGatewayService.isPingable(address, port);
   }
 

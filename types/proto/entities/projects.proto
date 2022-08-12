@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "entities/common.proto";
+
+message Project {
+  string id = 1;
+  string name = 2;
+  bool pingable = 3;
+  bool is_custom = 4; // TODO: should this be removed?
+  // Blockchain data will be fetched from this block height
+  // Set this null to start fetching from the latest block
+  int32 start_block_height = 5;
+
+  Gateway gateway = 6;
+  Emulator emulator = 7;
+
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message Gateway {
+  uint32 port = 1;
+  string address = 2;
+}
+
+message Emulator {
+    bool verbose_logging = 1;
+    uint32 http_server_port = 2;
+    uint32 rpc_server_port = 3;
+    uint32 block_time = 4;
+    string service_private_key = 5;
+    string service_public_key = 6;
+    string database_path = 7;
+    uint32 token_supply = 8;
+    uint32 transaction_expiry = 9;
+    uint32 storage_per_flow = 10;
+    uint32 min_account_balance = 11;
+    uint32 transaction_max_gas_limit = 12;
+    uint32 script_gas_limit = 13;
+    SignatureAlgorithm service_signature_algorithm = 14;
+    HashAlgorithm service_hash_algorithm = 15;
+    bool storage_limit = 16;
+    bool transaction_fees = 17;
+    uint32 number_of_initial_accounts = 18;
+    bool simple_addresses = 19;
+    bool persist = 20;
+}

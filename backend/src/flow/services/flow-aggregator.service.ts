@@ -1,35 +1,54 @@
-import config from "../../config";
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from "@nestjs/common";
+import config, { env } from "../../config";
+import { Injectable, Logger } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
-import { FlowGatewayService } from "./flow-gateway.service";
+import {
+  FlowBlock,
+  FlowCollection,
+  FlowEvent,
+  FlowGatewayService,
+  FlowTransaction,
+  FlowTransactionStatus,
+} from "./flow-gateway.service";
 import { BlocksService } from "../../blocks/blocks.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { AccountsService } from "../../accounts/services/accounts.service";
 import { ContractsService } from "../../accounts/services/contracts.service";
 import { EventsService } from "../../events/events.service";
-import { Account } from "../../accounts/entities/account.entity";
-import { Event } from "../../events/entities/event.entity";
-import { Transaction } from "../../transactions/entities/transaction.entity";
-import { Block } from "../../blocks/entities/block.entity";
-import { Project } from "../../projects/entities/project.entity";
+import { AccountEntity } from "../../accounts/entities/account.entity";
+import { EventEntity } from "../../events/entities/event.entity";
+import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { BlockEntity } from "../../blocks/entities/block.entity";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowEmulatorService } from "./flow-emulator.service";
 import { LogsService } from "../../logs/logs.service";
-import { Log } from "../../logs/entities/log.entity";
+import { LogEntity } from "../../logs/entities/log.entity";
 import { StorageDataService } from "./storage-data.service";
-import { defaultEmulatorFlags } from "../../projects/data/default-emulator-flags";
-import { AccountContract } from "../../accounts/entities/contract.entity";
+import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
-import { AccountKey } from "../../accounts/entities/key.entity";
+import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
-import { DataSource } from "typeorm";
+import { getDataSourceInstance } from "../../database";
+import { FlowSubscriptionService } from "./flow-subscription.service";
+
+type BlockData = {
+  block: FlowBlock;
+  transactions: FlowTransactionWithStatus[];
+  collections: FlowCollection[];
+  events: ExtendedFlowEvent[];
+};
+
+export type FlowTransactionWithStatus = FlowTransaction & {
+  status: FlowTransactionStatus;
+};
+
+export type ExtendedFlowEvent = FlowEvent & {
+  blockId: string;
+  transactionId: string;
+};
 
 @Injectable()
 export class FlowAggregatorService {
-  private project: Project;
+  private project: ProjectEntity;
   private readonly logger = new Logger(FlowAggregatorService.name);
   private serviceAccountBootstrapped = false;
 
@@ -42,12 +61,12 @@ export class FlowAggregatorService {
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
     private flowEmulatorService: FlowEmulatorService,
+    private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
-    private storageDataService: StorageDataService,
-    private dataSource: DataSource
+    private storageDataService: StorageDataService
   ) {}
 
-  configureProjectContext(project?: Project) {
+  configureProjectContext(project?: ProjectEntity) {
     this.project = project;
   }
 
@@ -66,7 +85,7 @@ export class FlowAggregatorService {
   handleEmulatorLogs(data: string[]) {
     return Promise.all(
       data.map((line) => {
-        return this.logsService.create(new Log(line));
+        return this.logsService.create(LogEntity.create(line));
       })
     );
   }
@@ -77,122 +96,169 @@ export class FlowAggregatorService {
       return;
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-
     // service account exist only on emulator chains
     if (this.project.hasEmulatorGateway() && !this.serviceAccountBootstrapped) {
-      // FIXME(milestone-2): storage server hangs up when using flow-cli@v0.31
-      this.logger.debug("Bootstrapping service account");
-
-      await queryRunner.startTransaction();
-      try {
-        await this.bootstrapServiceAccount();
-
-        await queryRunner.commitTransaction();
-      } catch (e) {
-        await queryRunner.rollbackTransaction();
-
-        this.logger.error("Service account bootstrap error", e);
-        return; // retry in the next iteration
-      } finally {
-        await queryRunner.release();
-      }
-      this.serviceAccountBootstrapped = true;
+      await this.bootstrapServiceAccount();
     }
 
-    const lastStoredBlock = await this.blockService.findLastBlock();
-    let latestBlock;
+    const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
+    const hasBlocksToProcess = startBlockHeight <= endBlockHeight;
+    if (!hasBlocksToProcess) {
+      return;
+    }
+
     try {
-      latestBlock = await this.flowGatewayService.getLatestBlock();
+      await this.processBlocksWithinHeightRange(
+        startBlockHeight,
+        endBlockHeight
+      );
     } catch (e) {
-      return this.logger.debug(`failed to fetch latest block: ${e}`);
+      return this.logger.debug(`failed to fetch block data: ${e}`);
     }
+  }
+
+  async getBlockRange() {
+    const [lastStoredBlock, latestBlock] = await Promise.all([
+      this.blockService.findLastBlock(),
+      this.flowGatewayService.getLatestBlock(),
+    ]);
 
     // user can specify (on a project level) what is the starting block height
     // if user provides no specification, the latest block height is used
     const initialStartBlockHeight = !this.project.isStartBlockHeightDefined()
       ? latestBlock.height
       : this.project.startBlockHeight;
+
     // fetch from last stored block (if there are already blocks in the database)
     const startBlockHeight = lastStoredBlock
       ? lastStoredBlock.height + 1
       : initialStartBlockHeight;
     const endBlockHeight = latestBlock.height;
 
-    if (startBlockHeight > endBlockHeight) {
-      // no new blocks will be fetched
-      return;
+    return { startBlockHeight, endBlockHeight };
+  }
+
+  public async processBlocksWithinHeightRange(
+    fromHeight: number,
+    toHeight: number
+  ) {
+    for (let height = fromHeight; height <= toHeight; height++) {
+      this.logger.debug(`fetching block: ${height}`);
+      await this.processBlockWithHeight(height);
     }
+  }
 
-    this.logger.debug(
-      `fetching block range (${startBlockHeight} - ${endBlockHeight})`
-    );
+  async processBlockWithHeight(height: number) {
+    const dataSource = await getDataSourceInstance();
+    const queryRunner = dataSource.createQueryRunner();
 
-    let data;
+    const blockData = await this.getBlockData(height);
+
+    // Process events first, so that transactions can reference created users.
+    await this.processEvents(blockData.events);
+
+    this.subscribeTxStatusUpdates(blockData.transactions);
+
     try {
-      data = await this.flowGatewayService.getBlockDataWithinHeightRange(
-        startBlockHeight,
-        endBlockHeight
-      );
+      await queryRunner.startTransaction();
+
+      await this.storeBlockData(blockData);
+
+      await queryRunner.commitTransaction();
     } catch (e) {
-      return this.logger.debug(`failed to fetch block data: ${e.message}`);
+      await queryRunner.rollbackTransaction();
+
+      await this.logger.error(`Failed to store latest data`, e);
+    } finally {
+      await queryRunner.release();
     }
+  }
 
-    const events = data
-      .map(({ events }) => events)
-      .flat()
-      .map((event) => Event.init(event));
-    const transactions = data
-      .map(({ transactions }) => transactions)
-      .flat()
-      .map((transaction) => Transaction.init(transaction));
-    const blocks = data.map(({ block }) => Block.init(block));
+  subscribeTxStatusUpdates(transactions: FlowTransactionWithStatus[]) {
+    transactions.forEach((transaction) => {
+      this.flowSubscriptionService.addTransactionSubscription(transaction.id);
+    });
+  }
 
-    // Process events first, so that transactions & events can reference created users.
-    await this.processEvents(events);
-
-    const blockPromises = Promise.all(
-      blocks.map((block) =>
-        this.blockService
-          .create(block)
-          .catch((e) =>
-            this.logger.error(`block save error: ${e.message}`, e.stack)
-          )
-      )
-    );
+  async storeBlockData(data: BlockData) {
+    const blockPromises = this.blockService
+      .create(BlockEntity.create(data.block))
+      .catch((e) =>
+        this.logger.error(`block save error: ${e.message}`, e.stack)
+      );
     const transactionPromises = Promise.all(
-      transactions.map((transaction) =>
-        this.handleTransactionCreated(transaction).catch((e) =>
-          this.logger.error(`transaction save error: ${e.message}`, e.stack)
+      data.transactions.map((transaction) =>
+        this.handleTransactionCreated(transaction, transaction.status).catch(
+          (e) =>
+            this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
     const eventPromises = Promise.all(
-      events.map((event) =>
+      data.events.map((event) =>
         this.eventService
-          .create(event)
+          .create(EventEntity.create(event))
           .catch((e) =>
             this.logger.error(`event save error: ${e.message}`, e.stack)
           )
       )
     );
 
-    try {
-      await queryRunner.startTransaction();
-
-      await Promise.all([blockPromises, transactionPromises, eventPromises]);
-
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-
-      await this.logger.error(`Failed to store latest data`, e, e.stack);
-    } finally {
-      await queryRunner.release();
-    }
+    return Promise.all([blockPromises, transactionPromises, eventPromises]);
   }
 
-  async processEvents(events: Event[]) {
+  public async getBlockData(height: number): Promise<BlockData> {
+    const block = await this.flowGatewayService.getBlockByHeight(height);
+    const collections = await Promise.all(
+      block.collectionGuarantees.map(async (guarantee) =>
+        this.flowGatewayService.getCollectionById(guarantee.collectionId)
+      )
+    );
+    const transactionIds = collections
+      .map((collection) => collection.transactionIds)
+      .flat();
+
+    const transactionFutures = Promise.all(
+      transactionIds.map((txId) =>
+        this.flowGatewayService.getTransactionById(txId)
+      )
+    );
+    const transactionStatusesFutures = Promise.all(
+      transactionIds.map((txId) =>
+        this.flowGatewayService.getTransactionStatusById(txId)
+      )
+    );
+
+    const [transactions, statuses] = await Promise.all([
+      transactionFutures,
+      transactionStatusesFutures,
+    ]);
+
+    const transactionsWithStatuses = transactions.map((transaction, index) => ({
+      ...transaction,
+      status: statuses[index],
+    }));
+
+    const events = transactionsWithStatuses
+      .map((tx) =>
+        tx.status.events.map((event) => ({
+          ...event,
+          transactionId: tx.id,
+          blockId: tx.referenceBlockId,
+        }))
+      )
+      .flat();
+
+    return {
+      block,
+      collections,
+      transactions: transactionsWithStatuses,
+      events,
+    };
+  }
+
+  async processEvents(events: FlowEvent[]) {
+    // Process new accounts first, so other events can reference them.
     const accountCreatedEvents = events.filter(
       (event) => event.type === "flow.AccountCreated"
     );
@@ -219,7 +285,7 @@ export class FlowAggregatorService {
   }
 
   // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
-  async handleEvent(event: Event) {
+  async handleEvent(event: FlowEvent) {
     const { data, type } = event;
     this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
     const { address, contract } = data as any;
@@ -242,34 +308,39 @@ export class FlowAggregatorService {
     }
   }
 
-  async handleTransactionCreated(tx: Transaction) {
+  async handleTransactionCreated(
+    transaction: FlowTransaction,
+    status: FlowTransactionStatus
+  ) {
     // TODO: Should we also mark all tx.authorizers as updated?
-    const payerAddress = ensurePrefixedAddress(tx.payer);
+    const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
-      this.transactionService.create(tx),
+      this.transactionService.create(
+        TransactionEntity.create(transaction, status)
+      ),
       this.accountService.markUpdated(payerAddress),
     ]);
   }
 
-  async storeNewAccountWithContractsAndKeys(address) {
+  async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = Account.init(flowAccount);
+    const unSerializedAccount = AccountEntity.create(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      AccountContract.init(
-        flowAccount.address,
+      AccountContractEntity.create(
+        flowAccount,
         name,
         flowAccount.contracts[name]
       )
     );
-    const newKeys = flowAccount.keys.map((key) =>
-      AccountKey.init(address, key)
+    const newKeys = flowAccount.keys.map((flowKey) =>
+      AccountKeyEntity.create(flowAccount, flowKey)
     );
-    await this.accountService.create(account);
+    await this.accountService.create(unSerializedAccount);
     console.log(`Account ${address} created`);
     await Promise.all([
       this.accountKeysService.updateAccountKeys(address, newKeys),
       this.contractService.updateAccountContracts(
-        account.address,
+        unSerializedAccount.address,
         newContracts
       ),
     ]);
@@ -281,17 +352,24 @@ export class FlowAggregatorService {
       this.accountService.markUpdated(address),
       this.accountKeysService.updateAccountKeys(
         address,
-        flowAccount.keys.map((key) => AccountKey.init(address, key))
+        flowAccount.keys.map((flowKey) =>
+          AccountKeyEntity.create(flowAccount, flowKey)
+        )
       ),
     ]);
   }
 
   async updateStoredAccountContracts(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = Account.init(flowAccount);
+    const account = AccountEntity.create(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      AccountContract.init(flowAccount.address, name, flowAccount[name])
+      AccountContractEntity.create(
+        flowAccount,
+        name,
+        flowAccount.contracts[name]
+      )
     );
+
     await Promise.all([
       this.accountService.markUpdated(address),
       this.contractService.updateAccountContracts(
@@ -301,24 +379,32 @@ export class FlowAggregatorService {
     ]);
   }
 
-  // TODO(milestone-2): when do we need to update the account storage?
-  async setUpdatedAccountStorage(account: Account) {
+  // TODO(milestone-3): when do we need to update the account storage?
+  async setUpdatedAccountStorage(account: AccountEntity) {
     // storage data API works only for local emulator for now
     if (this.project.hasEmulatorGateway()) {
-      // TODO(milestone-2): enable this when we integrate the storage data API
+      // TODO(milestone-3): enable this when we integrate the storage data API
+      // FIXME(milestone-3): storage server hangs up when using flow-cli@v0.31
       // account.storage = await this.storageDataService.getStorageData(address);
     }
   }
 
   async bootstrapServiceAccount() {
-    const { serviceAddress } = defaultEmulatorFlags;
+    // TODO(milestone-3): provide this in project config entity
+    const serviceAddress = env.FLOW_ACCOUNT_ADDRESS;
+
+    const dataSource = await getDataSourceInstance();
+    const queryRunner = dataSource.createQueryRunner();
+
+    await queryRunner.startTransaction();
     try {
       await this.storeNewAccountWithContractsAndKeys(serviceAddress);
+      await queryRunner.commitTransaction();
+      this.serviceAccountBootstrapped = true;
     } catch (error) {
-      // ignore duplicate key error (with code 11000)
-      if (error.code !== 11000) {
-        throw new InternalServerErrorException(error.message);
-      }
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
     }
   }
 }
