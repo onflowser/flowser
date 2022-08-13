@@ -1,17 +1,17 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { FlowAggregatorService } from "./services/flow-aggregator.service";
+import { FlowAggregatorService } from "./services/aggregator.service";
 import { BlocksModule } from "../blocks/blocks.module";
 import { AccountsModule } from "../accounts/accounts.module";
 import { EventsModule } from "../events/events.module";
 import { TransactionsModule } from "../transactions/transactions.module";
-import { FlowGatewayService } from "./services/flow-gateway.service";
+import { FlowGatewayService } from "./services/gateway.service";
 import { FlowController } from "./flow.controller";
-import { FlowEmulatorService } from "./services/flow-emulator.service";
+import { FlowEmulatorService } from "./services/emulator.service";
 import { LogsModule } from "../logs/logs.module";
-import { FlowCliService } from "./services/flow-cli.service";
-import { StorageDataService } from "./services/storage-data.service";
-import { FlowSubscriptionService } from "./services/flow-subscription.service";
+import { FlowCliService } from "./services/cli.service";
+import { StorageService } from "./services/storage.service";
+import { FlowSubscriptionService } from "./services/subscription.service";
 
 @Module({
   imports: [
@@ -30,14 +30,14 @@ import { FlowSubscriptionService } from "./services/flow-subscription.service";
     FlowEmulatorService,
     FlowCliService,
     FlowSubscriptionService,
-    StorageDataService,
+    StorageService,
   ],
   exports: [
     FlowAggregatorService,
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,
-    StorageDataService,
+    StorageService,
   ],
 })
 export class FlowModule {}

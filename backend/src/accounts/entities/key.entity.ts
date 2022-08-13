@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount, FlowKey } from "../../flow/services/flow-gateway.service";
+import { FlowAccount, FlowKey } from "../../flow/services/gateway.service";
 import { AccountKey } from "@flowser/types/generated/entities/accounts";
 import {
   HashAlgorithm,

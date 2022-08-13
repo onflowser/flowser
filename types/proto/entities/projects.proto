@@ -5,6 +5,7 @@ import "entities/common.proto";
 message Project {
   string id = 1;
   string name = 2;
+  string filesystem_path = 10;
   bool pingable = 3;
   bool is_custom = 4; // TODO: should this be removed?
   // Blockchain data will be fetched from this block height

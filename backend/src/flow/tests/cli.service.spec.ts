@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { FlowCliOutput, FlowCliService } from "./flow-cli.service";
+import { FlowCliOutput, FlowCliService } from "../services/cli.service";
 
 const versionRegex = /v[0-9]+\.[0-9]+\.[0-9]+/;
 

@@ -8,7 +8,7 @@ import {
   FlowGatewayService,
   FlowTransaction,
   FlowTransactionStatus,
-} from "./flow-gateway.service";
+} from "./gateway.service";
 import { BlocksService } from "../../blocks/blocks.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { AccountsService } from "../../accounts/services/accounts.service";
@@ -19,16 +19,16 @@ import { EventEntity } from "../../events/entities/event.entity";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { BlockEntity } from "../../blocks/entities/block.entity";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { FlowEmulatorService } from "./flow-emulator.service";
+import { FlowEmulatorService } from "./emulator.service";
 import { LogsService } from "../../logs/logs.service";
 import { LogEntity } from "../../logs/entities/log.entity";
-import { StorageDataService } from "./storage-data.service";
+import { StorageService } from "./storage.service";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
-import { FlowSubscriptionService } from "./flow-subscription.service";
+import { FlowSubscriptionService } from "./subscription.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -63,7 +63,7 @@ export class FlowAggregatorService {
     private flowEmulatorService: FlowEmulatorService,
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
-    private storageDataService: StorageDataService
+    private storageDataService: StorageService
   ) {}
 
   configureProjectContext(project?: ProjectEntity) {

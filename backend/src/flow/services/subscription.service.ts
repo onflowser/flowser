@@ -1,8 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import {
-  FlowGatewayService,
-  FlowTransactionStatus,
-} from "./flow-gateway.service";
+import { FlowGatewayService, FlowTransactionStatus } from "./gateway.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { TransactionStatus } from "@flowser/types/generated/entities/transactions";
 

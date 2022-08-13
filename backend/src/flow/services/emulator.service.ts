@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { EventEmitter } from "events";
-import { FlowCliService } from "./flow-cli.service";
+import { FlowCliService } from "./cli.service";
 import { randomString } from "../../utils";
 import { Emulator } from "@flowser/types/generated/entities/projects";
 import {

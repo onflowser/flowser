@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { FlowEmulatorService } from "./flow-emulator.service";
-import { FlowCliService } from "./flow-cli.service";
+import { FlowEmulatorService } from "../services/emulator.service";
+import { FlowCliService } from "../services/cli.service";
 
 describe("FlowEmulatorService", () => {
   let service: FlowEmulatorService;

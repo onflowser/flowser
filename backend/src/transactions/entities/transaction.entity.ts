@@ -11,7 +11,7 @@ import {
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
-} from "../../flow/services/flow-gateway.service";
+} from "../../flow/services/gateway.service";
 import {
   deserializeCadenceObject,
   ensurePrefixedAddress,

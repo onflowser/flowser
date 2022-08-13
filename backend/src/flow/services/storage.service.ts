@@ -1,14 +1,14 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
-import { FlowCliService } from "./flow-cli.service";
+import { FlowCliService } from "./cli.service";
 import { AccountsStorageEntity } from "../../accounts/entities/storage.entity";
 import config from "../../config";
 import axios from "axios";
 
 @Injectable()
-export class StorageDataService {
+export class StorageService {
   private dataStorageProcess: ChildProcessWithoutNullStreams;
-  private readonly logger = new Logger(StorageDataService.name);
+  private readonly logger = new Logger(StorageService.name);
   private data: string[] = [];
 
   constructor(private flowCliConfig: FlowCliService) {}

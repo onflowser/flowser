@@ -1,6 +1,6 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
-import { ExtendedFlowEvent } from "../../flow/services/flow-aggregator.service";
+import { ExtendedFlowEvent } from "../../flow/services/aggregator.service";
 import { Event } from "@flowser/types/generated/entities/events";
 
 @Entity({ name: "events" })

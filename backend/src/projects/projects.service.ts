@@ -11,17 +11,17 @@ import { UpdateProjectDto } from "./dto/update-project.dto";
 import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FlowGatewayService } from "../flow/services/flow-gateway.service";
-import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
-import { FlowEmulatorService } from "../flow/services/flow-emulator.service";
+import { FlowGatewayService } from "../flow/services/gateway.service";
+import { FlowAggregatorService } from "../flow/services/aggregator.service";
+import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
-import { FlowCliService } from "../flow/services/flow-cli.service";
+import { FlowCliService } from "../flow/services/cli.service";
 import { plainToClass } from "class-transformer";
-import { StorageDataService } from "../flow/services/storage-data.service";
+import { StorageService } from "../flow/services/storage.service";
 import { defaultProjects } from "./data/seeds";
 import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
@@ -45,7 +45,7 @@ export class ProjectsService {
     private eventsService: EventsService,
     private logsService: LogsService,
     private transactionsService: TransactionsService,
-    private storageDataService: StorageDataService
+    private storageDataService: StorageService
   ) {}
 
   seedDefaultProjects() {
