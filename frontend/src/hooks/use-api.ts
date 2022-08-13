@@ -194,10 +194,17 @@ export function useGetTransaction(transactionId: string) {
 }
 
 export function useGetCurrentProject() {
-  return useGetAxiosQuery<GetSingleProjectResponse>({
+  const { data, error, ...rest } = useGetAxiosQuery<GetSingleProjectResponse>({
     resourceKey: `/projects/current`,
     fetcher: ProjectsService.getInstance().getCurrentProject,
   });
+
+  // In case there is no current project, 404 error is thrown
+  return {
+    data: error ? undefined : data,
+    error,
+    ...rest,
+  };
 }
 
 export function useGetAllProjects() {

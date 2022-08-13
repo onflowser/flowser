@@ -32,7 +32,7 @@ export class ProjectsService {
 
   // It would be better to set up a different mechanism for sharing project context
   // But for now let's remember to put all services that need project context in this array
-  private readonly servicesWithContext = [
+  private readonly servicesWithProjectContext = [
     this.flowCliService,
     this.flowGatewayService,
     this.flowConfigService,
@@ -101,7 +101,7 @@ export class ProjectsService {
     // TODO(milestone-3): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
-    this.servicesWithContext.forEach((service) => {
+    this.servicesWithProjectContext.forEach((service) => {
       service.setProjectContext(this.currentProject);
     });
 
@@ -116,7 +116,7 @@ export class ProjectsService {
       }
 
       try {
-        // TODO(milestone-3): deprecate/update storage service
+        // TODO(milestone-3): start new storage service that uses Emulator storage API
         // await this.storageDataService.start();
       } catch (e: any) {
         throw new ServiceUnavailableException(

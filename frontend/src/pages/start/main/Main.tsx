@@ -16,33 +16,25 @@ import { toast } from "react-hot-toast";
 import { ProjectsService } from "../../../services/projects.service";
 import {
   useGetAllProjects,
-  useGetCurrentProject,
   useGetFlowserVersion,
 } from "../../../hooks/use-api";
+import { Project } from "@flowser/types/generated/entities/projects";
 
 const Main: FunctionComponent = () => {
   const history = useHistory();
   const projectService = ProjectsService.getInstance();
   const { data: projectData } = useGetAllProjects();
   const { projects } = projectData ?? {};
-  const { data: currentProject } = useGetCurrentProject();
   const { data: flowserVersion } = useGetFlowserVersion();
 
-  useEffect(() => {
-    if (currentProject) {
-      // there is a project currently in use
-      // redirect to main app screen
-      history.push("/accounts");
-    }
-  }, [currentProject]);
-
-  const onQuickstart = async (name: string) => {
+  const onQuickstart = async (project: Project) => {
     try {
-      await projectService.useProject(name);
-      splitbee.track(`Start: use ${name}`);
+      await projectService.useProject(project.id);
+      splitbee.track(`Start: use ${project}`);
       history.push(`/${routes.firstRouteAfterStart}`);
     } catch (e: unknown) {
-      toast.error("Can't open project: " + e);
+      console.error("Can't open project:", e);
+      toast.error("Can't open project");
     }
   };
 
@@ -60,7 +52,7 @@ const Main: FunctionComponent = () => {
       {projects?.map((project) => (
         <IconButton
           key={project.id}
-          onClick={() => onQuickstart(project.id)}
+          onClick={() => onQuickstart(project)}
           variant="big"
           icon={<CaretIcon className={classes.caret} />}
           iconPosition="after-end"
