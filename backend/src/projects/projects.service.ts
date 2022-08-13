@@ -21,7 +21,6 @@ import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/cli.service";
 import { plainToClass } from "class-transformer";
-import { defaultProjects } from "./data/seeds";
 import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
 import { FlowConfigService } from "../flow/services/config.service";
@@ -57,14 +56,6 @@ export class ProjectsService {
     private logsService: LogsService,
     private transactionsService: TransactionsService
   ) {}
-
-  seedDefaultProjects() {
-    return this.projectRepository
-      .save(
-        defaultProjects.map((project) => plainToClass(ProjectEntity, project))
-      )
-      .catch(this.handleDatabaseError);
-  }
 
   getCurrentProject() {
     if (this.currentProject) {
@@ -142,8 +133,6 @@ export class ProjectsService {
 
   async create(createProjectDto: CreateProjectDto) {
     const project = ProjectEntity.create(createProjectDto);
-    // TODO(milestone-3): remove isCustom field
-    project.isCustom = true;
     await this.projectRepository
       .insert(project)
       .catch(this.handleDatabaseError);
@@ -204,7 +193,7 @@ export class ProjectsService {
   }
 
   private handleDatabaseError(error) {
-    // TODO(milestone-1): how to handle errors for SQL
+    // TODO(milestone-3): how to handle errors for SQL
     switch (error.code) {
       case 11000:
         throw new ConflictException("Project name already exists");

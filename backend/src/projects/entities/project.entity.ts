@@ -24,14 +24,14 @@ export class ProjectEntity extends PollingEntity {
   @Column()
   pingable: boolean = false;
 
+  // TODO(milestone-3): gateway should be synced with network settings in flow.json
+  // Gateway could represent the currently selected network
   @Column("simple-json", { nullable: true })
   gateway: Gateway;
 
+  // TODO(milestone-3): emulator should be synced with settings in flow.json
   @Column("simple-json", { nullable: true })
   emulator: Emulator | null;
-
-  @Column("boolean", { default: false })
-  isCustom: boolean = false;
 
   // Blockchain data will be fetched from this block height
   // Set this null to start fetching from the latest block
@@ -68,7 +68,6 @@ export class ProjectEntity extends PollingEntity {
       name: this.name,
       pingable: this.pingable,
       filesystemPath: this.filesystemPath,
-      isCustom: this.isCustom,
       startBlockHeight: this.startBlockHeight,
       gateway: this.gateway,
       emulator: this.emulator,
@@ -82,7 +81,6 @@ export class ProjectEntity extends PollingEntity {
     project.id = toKebabCase(projectDto.name);
     project.name = projectDto.name;
     project.startBlockHeight = projectDto.startBlockHeight;
-    project.isCustom = projectDto.isCustom;
     // TODO(milestone-3): set filesystemPath
     project.gateway = projectDto.gateway
       ? Gateway.fromJSON(projectDto.gateway)

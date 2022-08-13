@@ -12,7 +12,7 @@ import {
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { defaultEmulatorFlags } from "./data/default-emulator-flags";
+import { defaultProject } from "./data/default-project";
 import { ApiParam } from "@nestjs/swagger";
 import {
   GetAllProjectsResponse,
@@ -62,7 +62,7 @@ export class ProjectsController {
   @Get("/default")
   async default() {
     return GetSingleProjectResponse.fromPartial({
-      project: defaultEmulatorFlags,
+      project: defaultProject,
     });
   }
 

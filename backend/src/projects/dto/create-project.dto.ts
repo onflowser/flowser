@@ -13,7 +13,6 @@ export class CreateProjectDto {
     description: "Data will be fetched from this block height forward.",
   })
   startBlockHeight: number;
-  isCustom: boolean;
 
   @ApiProperty()
   @ValidateNested()

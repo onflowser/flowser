@@ -24,16 +24,4 @@ import { TransactionsModule } from "../transactions/transactions.module";
   providers: [ProjectsService],
   exports: [ProjectsService],
 })
-export class ProjectsModule {
-  private readonly logger = new Logger(ProjectsModule.name);
-  constructor(private readonly projectsService: ProjectsService) {
-    projectsService
-      .seedDefaultProjects()
-      .then(() => {
-        this.logger.debug("Projects seeded!");
-      })
-      .catch((error) => {
-        this.logger.debug("Failed to seed projects", error);
-      });
-  }
-}
+export class ProjectsModule {}

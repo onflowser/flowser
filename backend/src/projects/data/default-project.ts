@@ -4,7 +4,7 @@ import {
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
 
-export const defaultEmulatorFlags = Project.fromPartial({
+export const defaultProject = Project.fromPartial({
   name: "New Project",
   emulator: Emulator.fromPartial({
     verboseLogging: true,
