@@ -5,6 +5,10 @@ import { EventEmitter } from "events";
 import { FlowCliService } from "./flow-cli.service";
 import { randomString } from "../../utils";
 import { Emulator } from "@flowser/types/generated/entities/projects";
+import {
+  HashAlgorithm,
+  SignatureAlgorithm,
+} from "@flowser/types/generated/entities/common";
 
 type StartCallback = (data: string[]) => void;
 
@@ -55,6 +59,7 @@ export class FlowEmulatorService {
           cwd: this.flowCliService.projectDirPath,
         });
       } catch (e) {
+        this.logger.debug("Failed to run emulator", e);
         this.setState(FlowEmulatorState.STOPPED);
         reject(e);
       }
@@ -250,35 +255,86 @@ export class FlowEmulatorService {
     // keep those parameters up to date with the currently used flow-cli version
     // https://github.com/onflow/flow-emulator#configuration
     return [
-      flag("port", this.emulatorConfig.rpcServerPort),
-      flag("http-port", this.emulatorConfig.httpServerPort),
+      flag("port", this.emulatorConfig.grpcServerPort),
+      flag("rest-port", this.emulatorConfig.restServerPort),
+      flag("admin-port", this.emulatorConfig.adminServerPort),
+      flag("verbose", this.emulatorConfig.verboseLogging),
+      flag("log-format", this.emulatorConfig.logFormat),
       flag("block-time", this.emulatorConfig.blockTime),
+      flag("contracts", this.emulatorConfig.withContracts),
       flag("service-priv-key", this.emulatorConfig.servicePrivateKey),
       flag("service-pub-key", this.emulatorConfig.servicePublicKey),
-      flag("dbpath", this.emulatorConfig.databasePath),
-      flag("token-supply", this.emulatorConfig.tokenSupply),
+      flag(
+        "service-sig-algo",
+        FlowEmulatorService.formatSignatureAlgo(
+          this.emulatorConfig.serviceSignatureAlgorithm
+        )
+      ),
+      flag(
+        "service-hash-algo",
+        FlowEmulatorService.formatHashAlgo(
+          this.emulatorConfig.serviceHashAlgorithm
+        )
+      ),
+      flag("init", this.emulatorConfig.performInit),
+      flag("rest-debug", this.emulatorConfig.enableRestDebug),
+      flag("grpc-debug", this.emulatorConfig.enableGrpcDebug),
+      flag("persist", this.emulatorConfig.persist),
+      flag(
+        "dbpath",
+        this.emulatorConfig.databasePath || this.flowCliService.databaseDirPath
+      ),
+      flag("simple-addresses", this.emulatorConfig.useSimpleAddresses),
+      flag(
+        "token-supply",
+        FlowEmulatorService.formatTokenSupply(this.emulatorConfig.tokenSupply)
+      ),
       flag("transaction-expiry", this.emulatorConfig.transactionExpiry),
+      flag("storage-limit", this.emulatorConfig.storageLimit),
       flag("storage-per-flow", this.emulatorConfig.storagePerFlow),
       flag("min-account-balance", this.emulatorConfig.minAccountBalance),
+      flag("transaction-fees", this.emulatorConfig.transactionFees),
       flag(
         "transaction-max-gas-limit",
         this.emulatorConfig.transactionMaxGasLimit
       ),
       flag("script-gas-limit", this.emulatorConfig.scriptGasLimit),
-      flag("service-sig-algo", this.emulatorConfig.serviceSignatureAlgorithm),
-      flag("service-hash-algo", this.emulatorConfig.serviceHashAlgorithm),
-      flag("storage-limit", this.emulatorConfig.storageLimit),
-      flag("transaction-fees", this.emulatorConfig.transactionFees),
-      flag(
-        "dbpath",
-        this.emulatorConfig.databasePath || this.flowCliService.databaseDirPath
-      ),
-      // flow emulator is always started with persist flag
-      // this is needed, so that storage script can index the db
-      flag("persist", true),
-      flag("verbose", this.emulatorConfig.verboseLogging),
-      flag("init", true),
     ].filter(Boolean);
+  }
+
+  static formatTokenSupply(tokenSupply: number) {
+    // format to 1 decimal place precision
+    return tokenSupply.toFixed(1);
+  }
+
+  static formatHashAlgo(hashAlgo: HashAlgorithm): string {
+    switch (hashAlgo) {
+      case HashAlgorithm.SHA2_256:
+        return "SHA2_256";
+      case HashAlgorithm.SHA2_384:
+        return "SHA2_384";
+      case HashAlgorithm.SHA3_256:
+        return "SHA3_256";
+      case HashAlgorithm.SHA3_384:
+        return "SHA3_384";
+      case HashAlgorithm.KECCAK_256:
+        return "KECCAK_256";
+      default:
+        throw new Error("Hash algorithm not supported");
+    }
+  }
+
+  static formatSignatureAlgo(signAlgo: SignatureAlgorithm): string {
+    switch (signAlgo) {
+      case SignatureAlgorithm.ECDSA_P256:
+        return "ECDSA_P256";
+      case SignatureAlgorithm.ECDSA_secp256k1:
+        return "ECDSA_secp256k1";
+      case SignatureAlgorithm.BLS_BLS12_381:
+        return "BLS_BLS12_381";
+      default:
+        throw new Error("Signature algorithm not supported");
+    }
   }
 
   static formatLogLines(lines: string[]) {

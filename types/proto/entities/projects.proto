@@ -25,8 +25,10 @@ message Gateway {
 
 message Emulator {
     bool verbose_logging = 1;
-    uint32 http_server_port = 2;
-    uint32 rpc_server_port = 3;
+    string log_format = 22;
+    uint32 rest_server_port = 2;
+    uint32 grpc_server_port = 3;
+    uint32 admin_server_port = 21;
     uint32 block_time = 4;
     string service_private_key = 5;
     string service_public_key = 6;
@@ -44,4 +46,9 @@ message Emulator {
     uint32 number_of_initial_accounts = 18;
     bool simple_addresses = 19;
     bool persist = 20;
+    bool with_contracts = 23;
+    bool perform_init = 24;
+    bool enable_grpc_debug = 25;
+    bool enable_rest_debug = 26;
+    bool use_simple_addresses = 27;
 }

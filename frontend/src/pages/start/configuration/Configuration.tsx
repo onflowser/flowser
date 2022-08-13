@@ -180,128 +180,126 @@ const Configuration: FunctionComponent = () => {
               <div className={classes.bottom2}>
                 <div className={classes.left}>
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="RPC Port"
-                      path="emulator.rpcServerPort"
-                      description="RPC port to listen on"
+                      path="grpcServerPort"
+                      description="gRPC port to listen on"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="HTTP Port"
-                      path="emulator.httpServerPort"
-                      description="HTTP port to listen on"
+                      path="restServerPort"
+                      description="REST API port to listen on"
                       formik={formik}
                     />
                   </div>
 
-                  {/* TODO(milestone-3): Provide service address config */}
-                  {/*<div className={classes.row}>*/}
-                  {/*  <span>Service address</span>*/}
-                  {/*  <Input*/}
-                  {/*    type="text"*/}
-                  {/*    value={formState.serviceAddress}*/}
-                  {/*    disabled*/}
-                  {/*  />*/}
-                  {/*  <span>Service account address</span>*/}
-                  {/*</div>*/}
+                  <div className={classes.row}>
+                    <EmulatorTextField
+                      label="Admin Port"
+                      path="adminServerPort"
+                      description="Admin API port to listen on"
+                      formik={formik}
+                    />
+                  </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Service Private Key"
-                      path="emulator.servicePrivateKey"
-                      description="Private key of the service account"
+                      path="servicePrivateKey"
+                      description="Private key used for the service account"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Service Public Key"
-                      path="emulator.servicePublicKey"
-                      description="Public key of the service account"
+                      path="servicePublicKey"
+                      description="Public key used for the service account"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Block time"
-                      path="emulator.blockTime"
-                      description="Time between sealed blocks. Valid units are: ns, us (or µs), ms, s, m or h"
+                      path="blockTime"
+                      description="Time between sealed blocks. Valid units are ns, us (or µs), ms, s, m, h"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Database path"
-                      path="emulator.databasePath"
+                      path="databasePath"
                       description="Specify path for the database file persisting the state"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Token supply"
-                      path="emulator.tokenSupply"
+                      path="tokenSupply"
                       description="Initial FLOW token supply"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Transaction Expiry"
-                      path="emulator.transactionExpiry"
+                      path="transactionExpiry"
                       description="Transaction expiry, measured in blocks"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Transaction Expiry"
-                      path="emulator.storagePerFlow"
+                      path="storagePerFlow"
                       description="Specify size of the storage in MB for each FLOW in account balance. Default value from the flow-go"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Minimum Account Balance"
-                      path="emulator.minAccountBalance"
+                      path="minAccountBalance"
                       description="Specify minimum balance the account must have. Default value from the flow-go"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Transaction Max Gas Limit"
-                      path="emulator.transactionMaxGasLimit"
+                      path="transactionMaxGasLimit"
                       description="Maximum gas limit for transactions"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Script Gas Limit"
-                      path="emulator.scriptGasLimit"
+                      path="scriptGasLimit"
                       description="Specify gas limit for script execution"
                       formik={formik}
                     />
                   </div>
 
                   <div className={classes.row}>
-                    <Field
+                    <EmulatorTextField
                       label="Initial accounts"
-                      path="emulator.numberOfInitialAccounts"
+                      path="numberOfInitialAccounts"
                       description="Specify number of initial accounts"
                       formik={formik}
                     />
@@ -309,9 +307,9 @@ const Configuration: FunctionComponent = () => {
 
                   <div className={classes.right}>
                     <div className={classes.firstPart}>
-                      <RadioField
+                      <EmulatorRadioField
                         label="Service Signature Algorithm"
-                        path="emulator.serviceSignatureAlgorithm"
+                        path="serviceSignatureAlgorithm"
                         formik={formik}
                         options={getSignatureAlgorithmRadioOptions([
                           SignatureAlgorithm.ECDSA_P256,
@@ -319,9 +317,9 @@ const Configuration: FunctionComponent = () => {
                           SignatureAlgorithm.BLS_BLS12_381,
                         ])}
                       />
-                      <RadioField
+                      <EmulatorRadioField
                         label="Service Hash Algorithm"
-                        path="emulator.serviceHashAlgorithm"
+                        path="serviceHashAlgorithm"
                         formik={formik}
                         options={getHashAlgorithmRadioOptions([
                           HashAlgorithm.SHA2_256,
@@ -335,42 +333,58 @@ const Configuration: FunctionComponent = () => {
                     </div>
                     <div className={classes.secondPart}>
                       <div className={classes.row}>
-                        <ToggleField
+                        <EmulatorToggleField
                           label="Verbose"
-                          path="emulator.verboseLogging"
+                          path="verboseLogging"
                           description="Enable verbose logging"
                           formik={formik}
                         />
                       </div>
                       <div className={classes.row}>
-                        <ToggleField
+                        <EmulatorToggleField
                           label="Persist"
-                          path="emulator.persist"
+                          path="persist"
                           description="Enable persistence of the state between restarts"
                           formik={formik}
                         />
                       </div>
                       <div className={classes.row}>
-                        <ToggleField
+                        <EmulatorToggleField
                           label="Simple Addresses"
-                          path="emulator.simpleAddresses"
+                          path="simpleAddresses"
                           description="Use sequential addresses starting with 0x1"
                           formik={formik}
                         />
                       </div>
                       <div className={classes.row}>
-                        <ToggleField
+                        <EmulatorToggleField
                           label="Storage Limit"
-                          path="emulator.storageLimit"
+                          path="storageLimit"
                           description="Enable account storage limit"
                           formik={formik}
                         />
                       </div>
                       <div className={classes.row}>
-                        <ToggleField
+                        <EmulatorToggleField
                           label="Transaction Fees"
-                          path="emulator.transactionFees"
+                          path="transactionFees"
                           description="Enable transaction fees"
+                          formik={formik}
+                        />
+                      </div>
+                      <div className={classes.row}>
+                        <EmulatorToggleField
+                          label="Init"
+                          path="performInit"
+                          description="Generate and set a new service account"
+                          formik={formik}
+                        />
+                      </div>
+                      <div className={classes.row}>
+                        <EmulatorToggleField
+                          label="Contracts"
+                          path="withContracts"
+                          description="Start with contracts like FUSD, NFT and an NFT Marketplace, when the emulator starts"
                           formik={formik}
                         />
                       </div>
@@ -431,6 +445,27 @@ const Configuration: FunctionComponent = () => {
   );
 };
 
+function EmulatorTextField({
+  path,
+  ...restProps
+}: FieldProps & { path: keyof Emulator }) {
+  return <TextField path={`emulator.${path}`} {...restProps} />;
+}
+
+function EmulatorRadioField({
+  path,
+  ...restProps
+}: RadioFieldProps & { path: keyof Emulator }) {
+  return <RadioField path={`emulator.${path}`} {...restProps} />;
+}
+
+function EmulatorToggleField({
+  path,
+  ...restProps
+}: FieldProps & { path: keyof Emulator }) {
+  return <ToggleField path={`emulator.${path}`} {...restProps} />;
+}
+
 function getHashAlgorithmRadioOptions(hashAlgorithms: HashAlgorithm[]) {
   return hashAlgorithms.map((algo) => ({
     label: FlowUtils.getHashAlgoName(algo),
@@ -463,7 +498,7 @@ type FieldProps = {
   };
 };
 
-function Field({ label, description, formik, path }: FieldProps) {
+function TextField({ label, description, formik, path }: FieldProps) {
   const error = CommonUtils.getNestedValue(formik.errors, path) as string;
   return (
     <>

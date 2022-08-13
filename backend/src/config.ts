@@ -22,7 +22,6 @@ export const env = cleanEnv(process.env, {
 
   HTTP_PORT: num({ default: 6061 }),
 
-  FLOW_EMULATOR_HTTP_PORT: num({ default: 8080 }),
   FLOW_ACCOUNT_ADDRESS: str({ default: "f8d6e0586b0a20c7" }),
   FLOW_ACCOUNT_PRIVATE_KEY: str({
     default: defaultServiceAccountPrivKey,

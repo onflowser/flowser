@@ -123,7 +123,8 @@ export class ProjectsService {
       }
 
       try {
-        await this.storageDataService.start();
+        // TODO(milestone-3): deprecate/update storage service
+        // await this.storageDataService.start();
       } catch (e: any) {
         throw new ServiceUnavailableException(
           "Data storage service error",
