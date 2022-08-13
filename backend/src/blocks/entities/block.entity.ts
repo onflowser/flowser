@@ -38,7 +38,8 @@ export class BlockEntity extends PollingEntity {
     block.id = flowBlock.id;
     block.collectionGuarantees = flowBlock.collectionGuarantees;
     block.blockSeals = flowBlock.blockSeals;
-    block.signatures = flowBlock.signatures;
+    // TODO(milestone-3): why is "signatures" field not present in block response?
+    block.signatures = flowBlock.signatures ?? [];
     block.timestamp = new Date(flowBlock.timestamp);
     block.height = flowBlock.height;
     block.parentId = flowBlock.parentId;

@@ -19,6 +19,8 @@ export type FlowBlock = {
   timestamp: number;
   collectionGuarantees: FlowCollectionGuarantee[];
   blockSeals: any[];
+  // TODO(milestone-3): why is "signatures" field not present in block response (fcl-js@1.0)?
+  // See issue that I submitted: https://github.com/onflow/fcl-js/issues/1355
   signatures: string[];
 };
 
@@ -111,7 +113,8 @@ export class FlowGatewayService extends ProjectContext {
       FlowGatewayService.logger.debug(
         `@onflow/fcl listening on ${this.getGatewayUrl()}`
       );
-      fcl.config().put("accessNode.api", this.getGatewayUrl());
+      // TODO: temp
+      fcl.config().put("accessNode.api", "http://localhost:8888");
     }
   }
 
@@ -126,7 +129,11 @@ export class FlowGatewayService extends ProjectContext {
   }
 
   public async getLatestBlock(): Promise<FlowBlock> {
-    return fcl.latestBlock();
+    return fcl
+      .send([
+        fcl.getBlock(true), // Get latest sealed block
+      ])
+      .then(fcl.decode);
   }
 
   public async getBlockByHeight(height: number): Promise<FlowBlock> {
