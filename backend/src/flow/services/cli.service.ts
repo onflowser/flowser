@@ -1,11 +1,20 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { spawn } from "child_process";
-import { ProjectContext } from "../utils/project-context";
+import { ProjectContextLifecycle } from "../utils/project-context";
 import { FlowCliOutput } from "../utils/cli-output";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 
 @Injectable()
-export class FlowCliService extends ProjectContext {
+export class FlowCliService implements ProjectContextLifecycle {
   private readonly logger = new Logger(FlowCliService.name);
+  private projectContext: ProjectEntity | undefined;
+
+  onEnterProjectContext(project: ProjectEntity): void {
+    this.projectContext = project;
+  }
+  onExitProjectContext(): void {
+    this.projectContext = undefined;
+  }
 
   async version() {
     const out = await this.execute("flow", ["version"]);

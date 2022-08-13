@@ -24,15 +24,19 @@ import { plainToClass } from "class-transformer";
 import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
 import { FlowConfigService } from "../flow/services/config.service";
+import {
+  hasProjectContextInterface,
+  ProjectContextLifecycle,
+} from "../flow/utils/project-context";
 
 @Injectable()
 export class ProjectsService {
   private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
-  // It would be better to set up a different mechanism for sharing project context
-  // But for now let's remember to put all services that need project context in this array
-  private readonly servicesWithProjectContext = [
+  // TODO: Find a way to automatically retrieve all services
+  // For now let's not forget to manually add services with ProjectContextLifecycle interface
+  private readonly projectContextLifecycles: ProjectContextLifecycle[] = [
     this.flowCliService,
     this.flowGatewayService,
     this.flowConfigService,
@@ -87,6 +91,9 @@ export class ProjectsService {
     }
 
     this.currentProject = undefined;
+    this.projectContextLifecycles.forEach((service) => {
+      service.onExitProjectContext();
+    });
 
     // user may have previously used a custom emulator project
     // make sure that in any running emulators are stopped
@@ -101,8 +108,8 @@ export class ProjectsService {
     // TODO(milestone-3): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
-    this.servicesWithProjectContext.forEach((service) => {
-      service.setProjectContext(this.currentProject);
+    this.projectContextLifecycles.forEach((service) => {
+      service.onEnterProjectContext(this.currentProject);
     });
 
     if (this.currentProject.hasEmulatorConfiguration()) {

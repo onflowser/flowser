@@ -1,8 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
-import { Gateway } from "@flowser/types/generated/entities/projects";
-import { ProjectContext } from "../utils/project-context";
+import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
@@ -104,11 +103,12 @@ export type FlowEvent = {
 };
 
 @Injectable()
-export class FlowGatewayService extends ProjectContext {
+export class FlowGatewayService implements ProjectContextLifecycle {
   private static readonly logger = new Logger(FlowGatewayService.name);
+  private projectContext: ProjectEntity | undefined;
 
-  setProjectContext(project: ProjectEntity) {
-    super.setProjectContext(project);
+  onEnterProjectContext(project: ProjectEntity): void {
+    this.projectContext = project;
     if (this.projectContext?.gateway) {
       FlowGatewayService.logger.debug(
         `@onflow/fcl listening on ${this.getGatewayUrl()}`
@@ -116,6 +116,9 @@ export class FlowGatewayService extends ProjectContext {
       // TODO: temp
       fcl.config().put("accessNode.api", "http://localhost:8888");
     }
+  }
+  onExitProjectContext(): void {
+    this.projectContext = undefined;
   }
 
   private getGatewayUrl() {

@@ -31,15 +31,6 @@ export class FlowController {
     };
   }
 
-  @Get("debug/emulator")
-  getEmulator() {
-    return {
-      status: this.flowEmulatorService.state,
-      config: this.flowEmulatorService.projectContext?.emulator,
-      process: this.flowEmulatorService.emulatorProcess,
-    };
-  }
-
   @Get("debug/emulator/logs")
   async getLogs() {
     return this.flowEmulatorService.logs;

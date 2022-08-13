@@ -1,13 +1,12 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter } from "events";
-import { FlowCliService } from "./cli.service";
-import { Emulator } from "@flowser/types/generated/entities/projects";
 import {
   HashAlgorithm,
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
-import { ProjectContext } from "../utils/project-context";
+import { ProjectContextLifecycle } from "../utils/project-context";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 
 type StartCallback = (data: string[]) => void;
 
@@ -24,13 +23,21 @@ type FlowEmulatorLog = {
 };
 
 @Injectable()
-export class FlowEmulatorService extends ProjectContext {
+export class FlowEmulatorService implements ProjectContextLifecycle {
   private readonly logger = new Logger(FlowEmulatorService.name);
+  private projectContext: ProjectEntity | undefined;
 
   public events: EventEmitter = new EventEmitter();
   public state: FlowEmulatorState = FlowEmulatorState.STOPPED;
   public emulatorProcess: ChildProcessWithoutNullStreams;
   public logs: string[] = [];
+
+  onEnterProjectContext(project: ProjectEntity): void {
+    this.projectContext = project;
+  }
+  onExitProjectContext(): void {
+    this.projectContext = undefined;
+  }
 
   async start(cb: StartCallback = () => null) {
     const flags = this.getFlags();

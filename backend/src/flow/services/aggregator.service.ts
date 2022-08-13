@@ -28,7 +28,8 @@ import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
 import { FlowSubscriptionService } from "./subscription.service";
 import { FlowConfigService } from "./config.service";
-import { ProjectContext } from "../utils/project-context";
+import { ProjectContextLifecycle } from "../utils/project-context";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 
 type BlockData = {
   block: FlowBlock;
@@ -47,7 +48,8 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService extends ProjectContext {
+export class FlowAggregatorService implements ProjectContextLifecycle {
+  private projectContext: ProjectEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
   private serviceAccountBootstrapped = false;
 
@@ -63,11 +65,18 @@ export class FlowAggregatorService extends ProjectContext {
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
     private configService: FlowConfigService
-  ) {
-    super();
+  ) {}
+
+  onEnterProjectContext(project: ProjectEntity): void {
+    this.projectContext = project;
+  }
+  onExitProjectContext(): void {
+    this.serviceAccountBootstrapped = false;
+    this.projectContext = undefined;
   }
 
   async startEmulator() {
+    // TODO(milestone-3): move emulator start call to project service?
     await this.stopEmulator();
     return this.flowEmulatorService.start((data) => {
       this.handleEmulatorLogs(data);
