@@ -13,6 +13,7 @@ import { FlowCliService } from "./services/cli.service";
 import { FlowSubscriptionService } from "./services/subscription.service";
 import { FlowConfigService } from "./services/config.service";
 import { FlowActionsService } from "./services/actions.service";
+import { FlowAccountStorageService } from "./services/storage.service";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { FlowActionsService } from "./services/actions.service";
     FlowSubscriptionService,
     FlowConfigService,
     FlowActionsService,
+    FlowAccountStorageService,
   ],
   exports: [
     FlowAggregatorService,

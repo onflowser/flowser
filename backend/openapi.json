@@ -225,6 +225,17 @@
         }
       }
     },
+    "/api/flow/storage/{address}": {
+      "get": {
+        "operationId": "FlowController_getAccountStorage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/logs": {
       "get": {
         "operationId": "LogsController_findAll",

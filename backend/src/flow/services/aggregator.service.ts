@@ -294,6 +294,7 @@ export class FlowAggregatorService extends ProjectContext {
     const { address, contract } = data as any;
     // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
+      // TODO(milestone-3): define core event types in enum object
       case "flow.AccountCreated":
         return this.storeNewAccountWithContractsAndKeys(address);
       case "flow.AccountKeyAdded":
