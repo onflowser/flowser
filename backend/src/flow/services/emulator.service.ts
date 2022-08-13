@@ -1,14 +1,13 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Injectable, Logger } from "@nestjs/common";
-import { ProjectEntity } from "../../projects/entities/project.entity";
 import { EventEmitter } from "events";
 import { FlowCliService } from "./cli.service";
-import { randomString } from "../../utils";
 import { Emulator } from "@flowser/types/generated/entities/projects";
 import {
   HashAlgorithm,
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
+import { ProjectContext } from "../utils/project-context";
 
 type StartCallback = (data: string[]) => void;
 
@@ -25,27 +24,13 @@ type FlowEmulatorLog = {
 };
 
 @Injectable()
-export class FlowEmulatorService {
-  private projectId: string;
+export class FlowEmulatorService extends ProjectContext {
   private readonly logger = new Logger(FlowEmulatorService.name);
 
   public events: EventEmitter = new EventEmitter();
   public state: FlowEmulatorState = FlowEmulatorState.STOPPED;
-  public emulatorConfig: Emulator;
   public emulatorProcess: ChildProcessWithoutNullStreams;
   public logs: string[] = [];
-
-  constructor(private flowCliService: FlowCliService) {}
-
-  configureProjectContext(project: ProjectEntity) {
-    this.projectId = project?.id;
-    this.emulatorConfig = project.emulator;
-  }
-
-  async init() {
-    this.logger.debug(`initialising for project: ${this.projectId}`);
-    await this.flowCliService.init();
-  }
 
   async start(cb: StartCallback = () => null) {
     const flags = this.getFlags();
@@ -56,7 +41,7 @@ export class FlowEmulatorService {
     return new Promise((resolve, reject) => {
       try {
         this.emulatorProcess = spawn("flow", ["emulator", ...flags], {
-          cwd: this.flowCliService.projectDirPath,
+          cwd: this.projectContext.filesystemPath,
         });
       } catch (e) {
         this.logger.debug("Failed to run emulator", e);
@@ -159,59 +144,6 @@ export class FlowEmulatorService {
       return;
     }
     this.setState(FlowEmulatorState.RUNNING);
-    if (this.emulatorConfig.numberOfInitialAccounts) {
-      try {
-        await this.initialiseAccounts(
-          this.emulatorConfig.numberOfInitialAccounts
-        );
-      } catch (e: any) {
-        this.logger.error(
-          `failed to initialise accounts: ${e.message || e}`,
-          e.stack
-        );
-      }
-    }
-  }
-
-  async initialiseAccounts(n: number) {
-    await this.flowCliService.load();
-    const diff = n - this.flowCliService.totalNonServiceAccounts;
-    this.logger.debug(`generating ${diff} initial flow accounts`);
-    for (let i = 0; i < diff; i++) {
-      const { address, privateKey } = await this.createAccount();
-      this.flowCliService.data.accounts[randomString()] = {
-        key: privateKey,
-        address,
-      };
-      this.logger.debug(`generated account: ${address}`);
-    }
-    await this.flowCliService.save();
-  }
-
-  async createAccount() {
-    const keysOutput = await this.flowCliService.execute("flow", [
-      "keys",
-      "generate",
-    ]);
-    const privateKey = keysOutput.findValue("Private Key");
-    const publicKey = keysOutput.findValue("Public Key");
-    if (!privateKey) {
-      throw new Error("Could not find generated private key");
-    }
-    if (!privateKey) {
-      throw new Error("Could not find generated public key");
-    }
-    const accountOutput = await this.flowCliService.execute("flow", [
-      "accounts",
-      "create",
-      "--key",
-      publicKey,
-    ]);
-    return {
-      address: accountOutput.findValue("address"),
-      publicKey,
-      privateKey,
-    };
   }
 
   isStarted() {
@@ -251,54 +183,47 @@ export class FlowEmulatorService {
 
   private getFlags() {
     const { flag } = FlowEmulatorService;
+    const { emulator } = this.projectContext ?? {};
 
     // keep those parameters up to date with the currently used flow-cli version
     // https://github.com/onflow/flow-emulator#configuration
     return [
-      flag("port", this.emulatorConfig.grpcServerPort),
-      flag("rest-port", this.emulatorConfig.restServerPort),
-      flag("admin-port", this.emulatorConfig.adminServerPort),
-      flag("verbose", this.emulatorConfig.verboseLogging),
-      flag("log-format", this.emulatorConfig.logFormat),
-      flag("block-time", this.emulatorConfig.blockTime),
-      flag("contracts", this.emulatorConfig.withContracts),
-      flag("service-priv-key", this.emulatorConfig.servicePrivateKey),
-      flag("service-pub-key", this.emulatorConfig.servicePublicKey),
+      flag("port", emulator.grpcServerPort),
+      flag("rest-port", emulator.restServerPort),
+      flag("admin-port", emulator.adminServerPort),
+      flag("verbose", emulator.verboseLogging),
+      flag("log-format", emulator.logFormat),
+      flag("block-time", emulator.blockTime),
+      flag("contracts", emulator.withContracts),
+      flag("service-priv-key", emulator.servicePrivateKey),
+      flag("service-pub-key", emulator.servicePublicKey),
       flag(
         "service-sig-algo",
         FlowEmulatorService.formatSignatureAlgo(
-          this.emulatorConfig.serviceSignatureAlgorithm
+          emulator.serviceSignatureAlgorithm
         )
       ),
       flag(
         "service-hash-algo",
-        FlowEmulatorService.formatHashAlgo(
-          this.emulatorConfig.serviceHashAlgorithm
-        )
+        FlowEmulatorService.formatHashAlgo(emulator.serviceHashAlgorithm)
       ),
-      flag("init", this.emulatorConfig.performInit),
-      flag("rest-debug", this.emulatorConfig.enableRestDebug),
-      flag("grpc-debug", this.emulatorConfig.enableGrpcDebug),
-      flag("persist", this.emulatorConfig.persist),
-      flag(
-        "dbpath",
-        this.emulatorConfig.databasePath || this.flowCliService.databaseDirPath
-      ),
-      flag("simple-addresses", this.emulatorConfig.useSimpleAddresses),
+      flag("init", emulator.performInit),
+      flag("rest-debug", emulator.enableRestDebug),
+      flag("grpc-debug", emulator.enableGrpcDebug),
+      flag("persist", emulator.persist),
+      flag("dbpath", emulator.databasePath),
+      flag("simple-addresses", emulator.useSimpleAddresses),
       flag(
         "token-supply",
-        FlowEmulatorService.formatTokenSupply(this.emulatorConfig.tokenSupply)
+        FlowEmulatorService.formatTokenSupply(emulator.tokenSupply)
       ),
-      flag("transaction-expiry", this.emulatorConfig.transactionExpiry),
-      flag("storage-limit", this.emulatorConfig.storageLimit),
-      flag("storage-per-flow", this.emulatorConfig.storagePerFlow),
-      flag("min-account-balance", this.emulatorConfig.minAccountBalance),
-      flag("transaction-fees", this.emulatorConfig.transactionFees),
-      flag(
-        "transaction-max-gas-limit",
-        this.emulatorConfig.transactionMaxGasLimit
-      ),
-      flag("script-gas-limit", this.emulatorConfig.scriptGasLimit),
+      flag("transaction-expiry", emulator.transactionExpiry),
+      flag("storage-limit", emulator.storageLimit),
+      flag("storage-per-flow", emulator.storagePerFlow),
+      flag("min-account-balance", emulator.minAccountBalance),
+      flag("transaction-fees", emulator.transactionFees),
+      flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
+      flag("script-gas-limit", emulator.scriptGasLimit),
     ].filter(Boolean);
   }
 

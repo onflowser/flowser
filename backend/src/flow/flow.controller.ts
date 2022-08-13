@@ -35,7 +35,7 @@ export class FlowController {
   getEmulator() {
     return {
       status: this.flowEmulatorService.state,
-      config: this.flowEmulatorService.emulatorConfig,
+      config: this.flowEmulatorService.projectContext?.emulator,
       process: this.flowEmulatorService.emulatorProcess,
     };
   }

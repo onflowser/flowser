@@ -21,15 +21,25 @@ import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/cli.service";
 import { plainToClass } from "class-transformer";
-import { StorageService } from "../flow/services/storage.service";
 import { defaultProjects } from "./data/seeds";
 import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
+import { FlowConfigService } from "../flow/services/config.service";
 
 @Injectable()
 export class ProjectsService {
   private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
+
+  // It would be better to set up a different mechanism for sharing project context
+  // But for now let's remember to put all services that need project context in this array
+  private readonly servicesWithContext = [
+    this.flowCliService,
+    this.flowGatewayService,
+    this.flowConfigService,
+    this.flowAggregatorService,
+    this.flowEmulatorService,
+  ];
 
   constructor(
     @InjectRepository(ProjectEntity)
@@ -38,14 +48,14 @@ export class ProjectsService {
     private flowAggregatorService: FlowAggregatorService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
+    private flowConfigService: FlowConfigService,
     private accountsService: AccountsService,
     private accountKeysService: KeysService,
     private contractsService: ContractsService,
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private logsService: LogsService,
-    private transactionsService: TransactionsService,
-    private storageDataService: StorageService
+    private transactionsService: TransactionsService
   ) {}
 
   seedDefaultProjects() {
@@ -86,15 +96,10 @@ export class ProjectsService {
     }
 
     this.currentProject = undefined;
-    this.flowAggregatorService.configureProjectContext(this.currentProject);
-    this.flowGatewayService.configureDataSourceGateway(
-      this.currentProject?.gateway
-    );
 
     // user may have previously used a custom emulator project
     // make sure that in any running emulators are stopped
     await this.flowAggregatorService.stopEmulator();
-    this.storageDataService.stop();
   }
 
   async useProject(id: string) {
@@ -102,17 +107,14 @@ export class ProjectsService {
 
     this.currentProject = await this.findOne(id);
 
-    // update project context
-    this.flowGatewayService.configureDataSourceGateway(
-      this.currentProject?.gateway
-    );
-    this.flowAggregatorService.configureProjectContext(this.currentProject);
+    // TODO(milestone-3): validate that project has a valid flow.json config
+
+    // Provide project context to services that need it
+    this.servicesWithContext.forEach((service) => {
+      service.setProjectContext(this.currentProject);
+    });
 
     if (this.currentProject.hasEmulatorConfiguration()) {
-      this.flowCliService.configure(id, this.currentProject.emulator);
-      this.flowEmulatorService.configureProjectContext(this.currentProject);
-      await this.flowCliService.cleanup(); // ensure clean environment
-
       try {
         await this.flowAggregatorService.startEmulator();
       } catch (e: any) {
@@ -136,14 +138,6 @@ export class ProjectsService {
     this.logger.debug(`using project: ${id}`);
 
     return this.currentProject;
-  }
-
-  async seedAccounts(id: string, n: number) {
-    if (this.currentProject.id === id) {
-      return this.flowEmulatorService.initialiseAccounts(n);
-    } else {
-      throw new ConflictException("This project is not currently used.");
-    }
   }
 
   async create(createProjectDto: CreateProjectDto) {

@@ -1,7 +1,26 @@
 import { FlowCadenceObject } from "./flow/services/gateway.service";
 import { CadenceObject } from "@flowser/types/generated/entities/common";
-
+import { mkdir, rm, stat } from "fs/promises";
 const kebabCase = require("kebab-case");
+
+// create directory if it does not already exist
+export async function mkdirIfEnoent(path: string) {
+  try {
+    await stat(path);
+    console.debug(`directory "${path}" exists, skipping creation`);
+  } catch (e: any) {
+    if (e.code === "ENOENT") {
+      console.debug(`directory "${path}" not found, creating`);
+      await mkdir(path);
+    } else {
+      throw e;
+    }
+  }
+}
+
+export async function rmdir(path: string) {
+  return rm(path, { force: true, recursive: true });
+}
 
 export function deserializeCadenceObject(
   cadenceObject: FlowCadenceObject

@@ -1,3 +1,4 @@
+// TODO(milestone-3): remove seeds and the concept of "custom" project
 export const defaultProjects = [
   {
     id: "emulator",

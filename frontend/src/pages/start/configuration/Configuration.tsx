@@ -296,15 +296,6 @@ const Configuration: FunctionComponent = () => {
                     />
                   </div>
 
-                  <div className={classes.row}>
-                    <EmulatorTextField
-                      label="Initial accounts"
-                      path="numberOfInitialAccounts"
-                      description="Specify number of initial accounts"
-                      formik={formik}
-                    />
-                  </div>
-
                   <div className={classes.right}>
                     <div className={classes.firstPart}>
                       <EmulatorRadioField

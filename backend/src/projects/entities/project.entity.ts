@@ -18,6 +18,9 @@ export class ProjectEntity extends PollingEntity {
   @Index({ unique: true })
   name: string;
 
+  // TODO(milestone-3): this is a default test path that should be removed
+  filesystemPath: string = "/Users/bartkozorog/Projects/flowser";
+
   @Column()
   pingable: boolean = false;
 
@@ -64,6 +67,7 @@ export class ProjectEntity extends PollingEntity {
       id: this.id,
       name: this.name,
       pingable: this.pingable,
+      filesystemPath: this.filesystemPath,
       isCustom: this.isCustom,
       startBlockHeight: this.startBlockHeight,
       gateway: this.gateway,
@@ -79,6 +83,7 @@ export class ProjectEntity extends PollingEntity {
     project.name = projectDto.name;
     project.startBlockHeight = projectDto.startBlockHeight;
     project.isCustom = projectDto.isCustom;
+    // TODO(milestone-3): set filesystemPath
     project.gateway = projectDto.gateway
       ? Gateway.fromJSON(projectDto.gateway)
       : Gateway.fromPartial({

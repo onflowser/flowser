@@ -2,6 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
 import { Gateway } from "@flowser/types/generated/entities/projects";
+import { ProjectContext } from "../utils/project-context";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -100,13 +102,12 @@ export type FlowEvent = {
 };
 
 @Injectable()
-export class FlowGatewayService {
-  private gatewayConfig: Gateway | undefined;
+export class FlowGatewayService extends ProjectContext {
   private static readonly logger = new Logger(FlowGatewayService.name);
 
-  public configureDataSourceGateway(configuration: Gateway | undefined) {
-    this.gatewayConfig = configuration;
-    if (this.gatewayConfig) {
+  setProjectContext(project: ProjectEntity) {
+    super.setProjectContext(project);
+    if (this.projectContext?.gateway) {
       FlowGatewayService.logger.debug(
         `@onflow/fcl listening on ${this.getGatewayUrl()}`
       );
@@ -115,7 +116,7 @@ export class FlowGatewayService {
   }
 
   private getGatewayUrl() {
-    const { address, port } = this.gatewayConfig;
+    const { address, port } = this.projectContext?.gateway;
     const host = `${address}${port ? `:${port}` : ""}`;
     return host.startsWith("http") ? host : `http://${host}`;
   }
@@ -157,11 +158,11 @@ export class FlowGatewayService {
   }
 
   async isConnectedToGateway() {
-    if (!this.gatewayConfig) {
+    if (!this.projectContext?.gateway) {
       return false;
     }
 
-    const { address, port } = this.gatewayConfig;
+    const { address, port } = this.projectContext?.gateway;
     return FlowGatewayService.isPingable(address, port);
   }
 

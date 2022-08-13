@@ -29,6 +29,5 @@ export const defaultEmulatorFlags = Project.fromPartial({
     storageLimit: true,
     transactionFees: false,
     simpleAddresses: false,
-    numberOfInitialAccounts: 0,
   }),
 });

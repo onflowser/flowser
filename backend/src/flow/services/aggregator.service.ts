@@ -1,4 +1,4 @@
-import config, { env } from "../../config";
+import config from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import {
@@ -18,17 +18,17 @@ import { AccountEntity } from "../../accounts/entities/account.entity";
 import { EventEntity } from "../../events/entities/event.entity";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { BlockEntity } from "../../blocks/entities/block.entity";
-import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowEmulatorService } from "./emulator.service";
 import { LogsService } from "../../logs/logs.service";
 import { LogEntity } from "../../logs/entities/log.entity";
-import { StorageService } from "./storage.service";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
 import { FlowSubscriptionService } from "./subscription.service";
+import { FlowConfigService } from "./config.service";
+import { ProjectContext } from "../utils/project-context";
 
 type BlockData = {
   block: FlowBlock;
@@ -47,8 +47,7 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService {
-  private project: ProjectEntity;
+export class FlowAggregatorService extends ProjectContext {
   private readonly logger = new Logger(FlowAggregatorService.name);
   private serviceAccountBootstrapped = false;
 
@@ -63,15 +62,12 @@ export class FlowAggregatorService {
     private flowEmulatorService: FlowEmulatorService,
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
-    private storageDataService: StorageService
-  ) {}
-
-  configureProjectContext(project?: ProjectEntity) {
-    this.project = project;
+    private configService: FlowConfigService
+  ) {
+    super();
   }
 
   async startEmulator() {
-    await this.flowEmulatorService.init();
     await this.stopEmulator();
     return this.flowEmulatorService.start((data) => {
       this.handleEmulatorLogs(data);
@@ -92,12 +88,15 @@ export class FlowAggregatorService {
 
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
-    if (!this.project) {
+    if (!this.projectContext) {
       return;
     }
 
     // service account exist only on emulator chains
-    if (this.project.hasEmulatorGateway() && !this.serviceAccountBootstrapped) {
+    if (
+      this.projectContext.hasEmulatorGateway() &&
+      !this.serviceAccountBootstrapped
+    ) {
       await this.bootstrapServiceAccount();
     }
 
@@ -125,9 +124,10 @@ export class FlowAggregatorService {
 
     // user can specify (on a project level) what is the starting block height
     // if user provides no specification, the latest block height is used
-    const initialStartBlockHeight = !this.project.isStartBlockHeightDefined()
-      ? latestBlock.height
-      : this.project.startBlockHeight;
+    const initialStartBlockHeight =
+      !this.projectContext.isStartBlockHeightDefined()
+        ? latestBlock.height
+        : this.projectContext.startBlockHeight;
 
     // fetch from last stored block (if there are already blocks in the database)
     const startBlockHeight = lastStoredBlock
@@ -382,7 +382,7 @@ export class FlowAggregatorService {
   // TODO(milestone-3): when do we need to update the account storage?
   async setUpdatedAccountStorage(account: AccountEntity) {
     // storage data API works only for local emulator for now
-    if (this.project.hasEmulatorGateway()) {
+    if (this.projectContext.hasEmulatorGateway()) {
       // TODO(milestone-3): enable this when we integrate the storage data API
       // FIXME(milestone-3): storage server hangs up when using flow-cli@v0.31
       // account.storage = await this.storageDataService.getStorageData(address);
@@ -390,15 +390,14 @@ export class FlowAggregatorService {
   }
 
   async bootstrapServiceAccount() {
-    // TODO(milestone-3): read this from flow.json
-    const serviceAddress = "f8d6e0586b0a20c7";
-
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
 
     await queryRunner.startTransaction();
     try {
-      await this.storeNewAccountWithContractsAndKeys(serviceAddress);
+      await this.storeNewAccountWithContractsAndKeys(
+        this.configService.getServiceAccountAddress()
+      );
       await queryRunner.commitTransaction();
       this.serviceAccountBootstrapped = true;
     } catch (error) {

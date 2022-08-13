@@ -44,7 +44,6 @@ message Emulator {
     HashAlgorithm service_hash_algorithm = 15;
     bool storage_limit = 16;
     bool transaction_fees = 17;
-    uint32 number_of_initial_accounts = 18;
     bool simple_addresses = 19;
     bool persist = 20;
     bool with_contracts = 23;
