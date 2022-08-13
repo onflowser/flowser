@@ -10,14 +10,14 @@ export class FlowCliService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   public devWalletProcess: ChildProcessWithoutNullStreams;
 
-  onEnterProjectContext(project: ProjectEntity): void {
+  async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    // TODO(milestone-3): manage process lifecycle (e.g. emulator, dev-wallet) just by using this interface?
-    this.startDevWallet();
+    await this.startDevWallet();
   }
-  onExitProjectContext(): void {
+
+  async onExitProjectContext() {
     this.projectContext = undefined;
-    this.stopDevWallet();
+    await this.stopDevWallet();
   }
 
   async getVersion() {

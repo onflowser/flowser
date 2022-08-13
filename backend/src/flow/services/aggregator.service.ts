@@ -61,7 +61,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private contractService: ContractsService,
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
-    private flowEmulatorService: FlowEmulatorService,
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
     private configService: FlowConfigService
@@ -70,31 +69,13 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
   }
+
   onExitProjectContext(): void {
     this.serviceAccountBootstrapped = false;
     this.projectContext = undefined;
   }
 
-  async startEmulator() {
-    // TODO(milestone-3): move emulator start call to project service?
-    await this.stopEmulator();
-    return this.flowEmulatorService.start((data) => {
-      this.handleEmulatorLogs(data);
-    });
-  }
-
-  stopEmulator() {
-    return this.flowEmulatorService.stop();
-  }
-
-  handleEmulatorLogs(data: string[]) {
-    return Promise.all(
-      data.map((line) => {
-        return this.logsService.create(LogEntity.create(line));
-      })
-    );
-  }
-
+  // TODO(milestone-3): Next interval shouldn't start before this function resolves
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {

@@ -24,10 +24,7 @@ import { plainToClass } from "class-transformer";
 import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
 import { FlowConfigService } from "../flow/services/config.service";
-import {
-  hasProjectContextInterface,
-  ProjectContextLifecycle,
-} from "../flow/utils/project-context";
+import { ProjectContextLifecycle } from "../flow/utils/project-context";
 
 @Injectable()
 export class ProjectsService {
@@ -74,6 +71,7 @@ export class ProjectsService {
       // remove all existing data of previously used project
       // TODO(milestone-3): persist data for projects by default?
 
+      // TODO(milestone-3): Instead of calling removeAll() directly, let those services implement ProjectContextLifecycle interface and call those methods themselves?
       // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([
         this.contractsService.removeAll(),
@@ -91,13 +89,11 @@ export class ProjectsService {
     }
 
     this.currentProject = undefined;
-    this.projectContextLifecycles.forEach((service) => {
-      service.onExitProjectContext();
-    });
-
-    // user may have previously used a custom emulator project
-    // make sure that in any running emulators are stopped
-    await this.flowAggregatorService.stopEmulator();
+    await Promise.all(
+      this.projectContextLifecycles.map((service) =>
+        service.onExitProjectContext()
+      )
+    );
   }
 
   async useProject(id: string) {
@@ -108,30 +104,11 @@ export class ProjectsService {
     // TODO(milestone-3): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
-    this.projectContextLifecycles.forEach((service) => {
-      service.onEnterProjectContext(this.currentProject);
-    });
-
-    if (this.currentProject.hasEmulatorConfiguration()) {
-      try {
-        await this.flowAggregatorService.startEmulator();
-      } catch (e: any) {
-        throw new ServiceUnavailableException(
-          `Can not start emulator with project ${id}`,
-          e.message
-        );
-      }
-
-      try {
-        // TODO(milestone-3): start new storage service that uses Emulator storage API
-        // await this.storageDataService.start();
-      } catch (e: any) {
-        throw new ServiceUnavailableException(
-          "Data storage service error",
-          e.message
-        );
-      }
-    }
+    await Promise.all(
+      this.projectContextLifecycles.map((service) =>
+        service.onEnterProjectContext(this.currentProject)
+      )
+    );
 
     this.logger.debug(`using project: ${id}`);
 

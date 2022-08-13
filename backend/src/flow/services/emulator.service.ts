@@ -1,5 +1,9 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from "@nestjs/common";
 import { EventEmitter } from "events";
 import {
   HashAlgorithm,
@@ -7,8 +11,8 @@ import {
 } from "@flowser/types/generated/entities/common";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-
-type StartCallback = (data: string[]) => void;
+import { LogEntity } from "../../logs/entities/log.entity";
+import { LogsService } from "../../logs/logs.service";
 
 export enum FlowEmulatorState {
   STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)
@@ -32,14 +36,29 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   public emulatorProcess: ChildProcessWithoutNullStreams;
   public logs: string[] = [];
 
-  onEnterProjectContext(project: ProjectEntity): void {
+  constructor(private logsService: LogsService) {}
+
+  async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-  }
-  onExitProjectContext(): void {
-    this.projectContext = undefined;
+    if (this.projectContext.hasEmulatorConfiguration()) {
+      await this.stop();
+      try {
+        await this.start();
+      } catch (e: any) {
+        throw new ServiceUnavailableException(
+          `Can not start emulator}`,
+          e.message
+        );
+      }
+    }
   }
 
-  async start(cb: StartCallback = () => null) {
+  async onExitProjectContext() {
+    this.projectContext = undefined;
+    await this.stop();
+  }
+
+  async start() {
     const flags = this.getFlags();
     this.logger.debug(
       `starting with (${flags.length}) flags: ${flags.join(" ")}`
@@ -92,7 +111,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
           resolve(true);
         }
 
-        cb(FlowEmulatorService.formatLogLines(lines));
+        this.handleEmulatorLogs(FlowEmulatorService.formatLogLines(lines));
       });
 
       // No data is emitted to stderr for now
@@ -113,6 +132,14 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         reject(error);
       });
     });
+  }
+
+  private handleEmulatorLogs(data: string[]) {
+    return Promise.all(
+      data.map((line) => {
+        return this.logsService.create(LogEntity.create(line));
+      })
+    );
   }
 
   findLog(query) {
