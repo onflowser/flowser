@@ -1,4 +1,3 @@
-import { env } from "../../config";
 import { Emulator, Project } from "@flowser/types/generated/entities/projects";
 import {
   HashAlgorithm,
@@ -16,8 +15,8 @@ export const defaultEmulatorFlags = Project.fromPartial({
     withContracts: false,
     grpcServerPort: 3569,
     blockTime: 0,
-    servicePrivateKey: env.FLOW_ACCOUNT_PRIVATE_KEY,
-    servicePublicKey: env.FLOW_ACCOUNT_PUBLIC_KEY,
+    servicePrivateKey: undefined,
+    servicePublicKey: undefined,
     databasePath: "./flowdb",
     tokenSupply: 1000000000,
     transactionExpiry: 10,

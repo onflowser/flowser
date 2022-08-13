@@ -319,6 +319,8 @@ export class FlowEmulatorService {
         return "SHA3_384";
       case HashAlgorithm.KECCAK_256:
         return "KECCAK_256";
+      case HashAlgorithm.KMAC128_BLS_BLS12_381:
+        return "KMAC128_BLS_BLS12_381";
       default:
         throw new Error("Hash algorithm not supported");
     }

@@ -21,6 +21,8 @@ export class FlowUtils {
         return "SHA3-384";
       case HashAlgorithm.KECCAK_256:
         return "KECCAK-256";
+      case HashAlgorithm.KMAC128_BLS_BLS12_381:
+        return "KMAC128-BLS-BLS12-381";
       default:
         return "-";
     }
