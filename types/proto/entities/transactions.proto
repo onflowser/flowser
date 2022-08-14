@@ -31,6 +31,7 @@ enum TransactionStatusCode {
 message Transaction {
   string id = 1;
   string script = 2;
+  string block_id = 14;
   string reference_block_id = 3;
   uint32 gas_limit = 4;
   string payer = 5;

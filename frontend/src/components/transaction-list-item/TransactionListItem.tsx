@@ -22,7 +22,7 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
   className,
   ...restProps
 }) => {
-  const { id, referenceBlockId, status, payer, proposalKey } = transaction;
+  const { id, blockId, status, payer, proposalKey } = transaction;
   return (
     <Card
       className={`${classes.card} ${className}`}
@@ -40,8 +40,8 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
       <div>
         <Label>BLOCK ID</Label>
         <Value>
-          <NavLink to={`/blocks/details/${referenceBlockId}`}>
-            <Ellipsis className={classes.hash}>{referenceBlockId}</Ellipsis>
+          <NavLink to={`/blocks/details/${blockId}`}>
+            <Ellipsis className={classes.hash}>{blockId}</Ellipsis>
           </NavLink>
         </Value>
       </div>

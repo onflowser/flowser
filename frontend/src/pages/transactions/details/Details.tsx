@@ -86,8 +86,8 @@ const Details: FunctionComponent = () => {
         <div className={classes.firstLine}>
           <Label variant="large">BLOCK ID</Label>
           <Value variant="large">
-            <NavLink to={`/blocks/details/${transaction.referenceBlockId}`}>
-              {transaction.referenceBlockId}
+            <NavLink to={`/blocks/details/${transaction.blockId}`}>
+              {transaction.blockId}
             </NavLink>
           </Value>
         </div>

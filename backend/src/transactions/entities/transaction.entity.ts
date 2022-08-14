@@ -8,6 +8,7 @@ import {
 } from "@flowser/types/generated/entities/transactions";
 import { CadenceObject } from "@flowser/types/generated/entities/common";
 import {
+  FlowBlock,
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
@@ -26,6 +27,9 @@ export class TransactionEntity extends PollingEntity {
 
   @Column("text")
   script: string;
+
+  @Column()
+  blockId: string;
 
   @Column()
   referenceBlockId: string;
@@ -71,6 +75,7 @@ export class TransactionEntity extends PollingEntity {
     return Transaction.fromPartial({
       id: this.id,
       script: this.script,
+      blockId: this.blockId,
       referenceBlockId: this.referenceBlockId,
       gasLimit: this.gasLimit,
       payer: this.payerAddress,
@@ -85,6 +90,7 @@ export class TransactionEntity extends PollingEntity {
   }
 
   static create(
+    flowBlock: FlowBlock,
     flowTransaction: FlowTransaction,
     flowTransactionStatus: FlowTransactionStatus
   ): TransactionEntity {
@@ -92,6 +98,7 @@ export class TransactionEntity extends PollingEntity {
     transaction.id = flowTransaction.id;
     transaction.script = flowTransaction.script;
     transaction.payerAddress = ensurePrefixedAddress(flowTransaction.payer);
+    transaction.blockId = flowBlock.id;
     transaction.referenceBlockId = flowTransaction.referenceBlockId;
     transaction.gasLimit = flowTransaction.gasLimit;
     transaction.authorizers = flowTransaction.authorizers.map((address) =>

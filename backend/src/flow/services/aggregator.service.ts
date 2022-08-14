@@ -174,16 +174,19 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     // TODO(milestone-3): Transaction references previous block in referenceBlockId field. Why? Previously we used this field to indicate which block contained some transaction.
     // Docs say: referenceBlockId = A reference to the block used to calculate the expiry of this transaction.
     // https://developers.flow.com/tools/fcl-js/reference/api#transactionobject
-    const blockPromises = this.blockService
+    const blockPromise = this.blockService
       .create(BlockEntity.create(data.block))
       .catch((e) =>
         this.logger.error(`block save error: ${e.message}`, e.stack)
       );
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
-        this.handleTransactionCreated(transaction, transaction.status).catch(
-          (e) =>
-            this.logger.error(`transaction save error: ${e.message}`, e.stack)
+        this.handleTransactionCreated(
+          data.block,
+          transaction,
+          transaction.status
+        ).catch((e) =>
+          this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
@@ -197,7 +200,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       )
     );
 
-    return Promise.all([blockPromises, transactionPromises, eventPromises]);
+    return Promise.all([blockPromise, transactionPromises, eventPromises]);
   }
 
   public async getBlockData(height: number): Promise<BlockData> {
@@ -302,6 +305,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   async handleTransactionCreated(
+    block: FlowBlock,
     transaction: FlowTransaction,
     status: FlowTransactionStatus
   ) {
@@ -309,7 +313,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
       this.transactionService.create(
-        TransactionEntity.create(transaction, status)
+        TransactionEntity.create(block, transaction, status)
       ),
       this.accountService.markUpdated(payerAddress),
     ]);
