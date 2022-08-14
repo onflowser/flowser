@@ -4,28 +4,49 @@ import "entities/common.proto";
 
 // https://docs.onflow.org/fcl/reference/api/#transaction-statuses
 enum TransactionStatusCode {
-  UNKNOWN = 0;
+  TX_STATUS_UNKNOWN = 0;
   /**
    * Transaction Pending - Awaiting Finalization
    */
-  PENDING = 1;
+  TX_STATUS_PENDING = 1;
   /**
    * Transaction Finalized - Awaiting Execution
    */
-  FINALIZED = 2;
+  TX_STATUS_FINALIZED = 2;
   /**
    * Transaction Executed - Awaiting Sealing
    */
-  EXECUTED = 3;
+  TX_STATUS_EXECUTED = 3;
   /**
    * Transaction Sealed - Transaction Complete. At this point the transaction
    * result has been committed to the blockchain.
    */
-  SEALED = 4;
+  TX_STATUS_SEALED = 4;
   /**
    * Transaction Expired
    */
-  EXPIRED = 5;
+  TX_STATUS_EXPIRED = 5;
+}
+
+// https://grpc.github.io/grpc/core/md_doc_statuscodes.html
+enum GrcpStatusCode {
+  GRCP_STATUS_OK = 0;
+  GRCP_STATUS_CANCELLED = 1;
+  GRCP_STATUS_UNKNOWN = 2;
+  GRCP_STATUS_INVALID_ARGUMENT = 3;
+  GRCP_STATUS_DEADLINE_EXCEEDED = 4;
+  GRCP_STATUS_NOT_FOUND = 5;
+  GRCP_STATUS_ALREADY_EXISTS = 6;
+  GRCP_STATUS_PERMISSION_DENIED = 7;
+  GRCP_STATUS_RESOURCE_EXHAUSTED = 8;
+  GRCP_STATUS_FAILED_PRECONDITION = 9;
+  GRCP_STATUS_ABORTED = 10;
+  GRCP_STATUS_OUT_OF_RANGE = 11;
+  GRCP_STATUS_UNIMPLEMENTED = 12;
+  GRCP_STATUS_INTERNAL = 13;
+  GRCP_STATUS_UNAVAILABLE = 14;
+  GRCP_STATUS_DATA_LOSS = 15;
+  GRCP_STATUS_UNAUTHENTICATED = 16;
 }
 
 message Transaction {
@@ -59,8 +80,6 @@ message SignableObject {
 
 message TransactionStatus {
   TransactionStatusCode status = 1;
-  // I think status_code represents GRCP status code
-  // https://grpc.github.io/grpc/core/md_doc_statuscodes.html
-  int32 status_code = 2;
+  GrcpStatusCode status_code = 2;
   string error_message = 3;
 }

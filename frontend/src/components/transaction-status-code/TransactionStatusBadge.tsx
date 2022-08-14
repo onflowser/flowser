@@ -17,42 +17,42 @@ const TransactionStatusBadge: FunctionComponent<TransactionStatusCodeProps> = ({
 }) => {
   // TODO(milestone-3): add tooltip for each status code
   switch (statusCode) {
-    case TransactionStatusCode.UNKNOWN:
+    case TransactionStatusCode.TX_STATUS_UNKNOWN:
       return (
         <span className={`${classes.status} ${classes.unknown}`}>
           <UnknownIcon />
           <span>UNKNOWN</span>
         </span>
       );
-    case TransactionStatusCode.PENDING:
+    case TransactionStatusCode.TX_STATUS_PENDING:
       return (
         <span className={`${classes.status} ${classes.pending}`}>
           <TransactionPendingIcon />
           <span>PENDING</span>
         </span>
       );
-    case TransactionStatusCode.FINALIZED:
+    case TransactionStatusCode.TX_STATUS_FINALIZED:
       return (
         <span className={`${classes.status} ${classes.finalized}`}>
           <TransactionFinalizedIcon />
           <span>FINALIZED</span>
         </span>
       );
-    case TransactionStatusCode.EXECUTED:
+    case TransactionStatusCode.TX_STATUS_EXECUTED:
       return (
         <span className={`${classes.status} ${classes.executed}`}>
           <TransactionExecutedIcon />
           <span>EXECUTED</span>
         </span>
       );
-    case TransactionStatusCode.SEALED:
+    case TransactionStatusCode.TX_STATUS_SEALED:
       return (
         <span className={`${classes.status} ${classes.sealed}`}>
           <TransactionSealedIcon />
           <span>SEALED</span>
         </span>
       );
-    case TransactionStatusCode.EXPIRED:
+    case TransactionStatusCode.TX_STATUS_EXPIRED:
       return (
         <span className={`${classes.status} ${classes.expired}`}>
           <TransactionExpiredIcon />

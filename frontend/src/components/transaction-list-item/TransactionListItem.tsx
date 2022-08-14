@@ -11,6 +11,7 @@ import {
   TransactionStatusCode,
 } from "@flowser/types/generated/entities/transactions";
 import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
+import { FlowUtils } from "../../utils/flow-utils";
 
 export type TransactionListItemProps = {
   className?: string;
@@ -46,17 +47,37 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
         </Value>
       </div>
       <div>
-        <TransactionStatusBadge
-          statusCode={status?.status ?? TransactionStatusCode.UNKNOWN}
-        />
+        <Label>GRCP STATUS</Label>
+        <Value>
+          {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
+        </Value>
+      </div>
+      <div>
+        <Value>
+          <TransactionStatusBadge
+            statusCode={
+              status?.status ?? TransactionStatusCode.TX_STATUS_UNKNOWN
+            }
+          />
+        </Value>
       </div>
       <div>
         <Label>PAYER</Label>
-        <Value>{payer}</Value>
+        <Value>
+          <NavLink to={`/accounts/details/${payer}`}>{payer}</NavLink>
+        </Value>
       </div>
       <div>
         <Label>PROPOSER</Label>
-        <Value>{proposalKey?.address ?? "-"}</Value>
+        <Value>
+          {proposalKey ? (
+            <NavLink to={`/accounts/details/${proposalKey.address}`}>
+              {proposalKey.address}
+            </NavLink>
+          ) : (
+            "-"
+          )}
+        </Value>
       </div>
     </Card>
   );

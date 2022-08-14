@@ -43,7 +43,6 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     if (ref.current) {
       const options: ScrollToOptions = {
         top: ref.current.scrollHeight,
-        left: 0,
         behavior: smooth ? "smooth" : "auto",
       };
       ref.current.scrollTo(options);

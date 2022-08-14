@@ -23,6 +23,7 @@ import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
 } from "../../../hooks/use-api";
+import { FlowUtils } from "../../../utils/flow-utils";
 
 type RouteParams = {
   transactionId: string;
@@ -68,9 +69,7 @@ const Details: FunctionComponent = () => {
               <Value variant="large">{transaction.id}</Value>
             </div>
             <div>
-              <TransactionStatusBadge
-                statusCode={transaction.status?.statusCode}
-              />
+              <TransactionStatusBadge statusCode={transaction.status?.status} />
             </div>
           </>
         )}
@@ -104,11 +103,18 @@ const Details: FunctionComponent = () => {
               {transaction.proposalKey?.address ?? "-"}
             </NavLink>
           </Value>
+          {/* TODO(milestone-3): Better organise bellow fields */}
           <Label variant="large" className={classes.inlineLabel}>
             Sequence number:
           </Label>
           <Value variant="large" className={classes.inlineValue}>
             {transaction.proposalKey?.sequenceNumber ?? "-"}
+          </Value>
+          <Label variant="large" className={classes.inlineLabel}>
+            GRCP Status:
+          </Label>
+          <Value variant="large" className={classes.inlineValue}>
+            {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
           </Value>
         </div>
         <div>
