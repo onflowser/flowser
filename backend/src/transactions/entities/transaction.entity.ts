@@ -120,5 +120,10 @@ export class TransactionEntity extends PollingEntity {
 }
 
 function deserializeSignableObjects(signableObjects: FlowSignableObject[]) {
-  return signableObjects.map((signable) => SignableObject.fromJSON(signable));
+  return signableObjects.map((signable) =>
+    SignableObject.fromJSON({
+      ...signable,
+      address: ensurePrefixedAddress(signable.address),
+    })
+  );
 }

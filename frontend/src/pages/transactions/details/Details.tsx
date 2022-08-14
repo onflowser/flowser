@@ -154,8 +154,8 @@ const Details: FunctionComponent = () => {
           label="PAYLOAD SIGNATURES"
           value={transaction.payloadSignatures?.length || 0}
         >
-          {transaction.payloadSignatures.map((item, i: number) => (
-            <Card key={i} className={classes.listCard}>
+          {transaction.payloadSignatures.map((item) => (
+            <Card key={item.keyId} className={classes.listCard}>
               <div>
                 <Label className={classes.label}>ACCOUNT ADDRESS</Label>
                 <Value>

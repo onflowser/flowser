@@ -64,7 +64,7 @@ export type FlowProposalKey = {
 
 // https://docs.onflow.org/fcl/reference/api/#signableobject
 export type FlowSignableObject = {
-  addr: string;
+  address: string;
   keyId: number;
   signature: string;
 };
