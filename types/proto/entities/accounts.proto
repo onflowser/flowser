@@ -41,11 +41,12 @@ enum AccountStorageDomain {
 // Storage item maps a storage identifier to CadenceValue object (data field)
 // https://github.com/onflow/flow-emulator/blob/master/accountStorage.go
 message AccountStorageItem {
-  string identifier = 1;
-  AccountStorageDomain domain = 2;
-  google.protobuf.Struct data = 3;
-  string created_at = 4;
-  string updated_at = 5;
+  string id = 1;
+  string pathIdentifier = 2;
+  AccountStorageDomain pathDomain = 3;
+  google.protobuf.Struct data = 4;
+  string created_at = 5;
+  string updated_at = 6;
 }
 
 message AccountContract {

@@ -297,7 +297,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   async handleEvent(event: FlowEvent) {
     const { data, type } = event;
     this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
-    const { address, contract } = data as any;
+    const address = ensurePrefixedAddress(data.address);
     // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
       // TODO(milestone-3): define core event types in enum object
@@ -347,7 +347,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       AccountKeyEntity.create(flowAccount, flowKey)
     );
     await this.accountService.create(unSerializedAccount);
-    console.log(`Account ${address} created`);
     await Promise.all([
       this.accountKeysService.updateAccountKeys(address, newKeys),
       this.contractService.updateAccountContracts(
@@ -429,12 +428,13 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   async bootstrapServiceAccount() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
+    const serviceAccountAddress = ensurePrefixedAddress(
+      this.configService.getServiceAccountAddress()
+    );
 
     await queryRunner.startTransaction();
     try {
-      await this.storeNewAccountWithContractsAndKeys(
-        this.configService.getServiceAccountAddress()
-      );
+      await this.storeNewAccountWithContractsAndKeys(serviceAccountAddress);
       await queryRunner.commitTransaction();
       this.serviceAccountBootstrapped = true;
     } catch (error) {

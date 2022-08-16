@@ -15,10 +15,10 @@ import { ensurePrefixedAddress } from "../../utils";
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {
   @PrimaryColumn()
-  identifier: string;
+  pathIdentifier: string;
 
   @PrimaryColumn()
-  domain: AccountStorageDomain;
+  pathDomain: AccountStorageDomain;
 
   @PrimaryColumn()
   accountAddress: string;
@@ -29,10 +29,16 @@ export class AccountStorageItemEntity extends PollingEntity {
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
 
+  get id() {
+    const domain = this.getLowerCasedPathDomain();
+    return `/${domain}/${this.pathIdentifier}`;
+  }
+
   toProto() {
     return AccountStorageItem.fromPartial({
-      identifier: this.identifier,
-      domain: this.domain,
+      id: this.id,
+      pathIdentifier: this.pathIdentifier,
+      pathDomain: this.pathDomain,
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
@@ -48,8 +54,8 @@ export class AccountStorageItemEntity extends PollingEntity {
       flowAccountStorage[flowStorageDomain][flowStorageIdentifier];
 
     const storageItem = new AccountStorageItemEntity();
-    storageItem.identifier = flowStorageIdentifier;
-    storageItem.domain = this.convertFlowStorageDomain(flowStorageDomain);
+    storageItem.pathIdentifier = flowStorageIdentifier;
+    storageItem.pathDomain = this.convertFlowStorageDomain(flowStorageDomain);
     storageItem.data = storageData;
     storageItem.accountAddress = ensurePrefixedAddress(
       flowAccountStorage.Address
@@ -69,6 +75,19 @@ export class AccountStorageItemEntity extends PollingEntity {
         return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
       default:
         return AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
+    }
+  }
+
+  getLowerCasedPathDomain() {
+    switch (this.pathDomain) {
+      case AccountStorageDomain.STORAGE_DOMAIN_PUBLIC:
+        return "public";
+      case AccountStorageDomain.STORAGE_DOMAIN_PRIVATE:
+        return "private";
+      case AccountStorageDomain.STORAGE_DOMAIN_STORAGE:
+        return "storage";
+      default:
+        return "unknown";
     }
   }
 }

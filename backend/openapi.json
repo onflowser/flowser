@@ -333,7 +333,35 @@
             }
           },
           {
-            "name": "id",
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/accounts/{address}/storage/polling": {
+      "get": {
+        "operationId": "AccountsController_findAllNewStorageByAccount",
+        "parameters": [
+          {
+            "name": "timestamp",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "address",
             "required": true,
             "in": "path",
             "schema": {

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { AccountStorageItemEntity } from "../entities/storage-item.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()
@@ -10,6 +10,19 @@ export class AccountStorageService {
     @InjectRepository(AccountStorageItemEntity)
     private storageRepository: Repository<AccountStorageItemEntity>
   ) {}
+
+  async findAllNewerThanTimestampByAccount(
+    accountAddress: string,
+    timestamp: Date
+  ) {
+    return this.storageRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), accountAddress },
+        { createdAt: MoreThan(timestamp), accountAddress },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
 
   async findStorageByAccount(address: string) {
     return this.storageRepository.find({
@@ -23,10 +36,11 @@ export class AccountStorageService {
   ) {
     const oldStorageItems = await this.findStorageByAccount(address);
     const entitiesDiff = computeEntitiesDiff<AccountStorageItemEntity>({
-      primaryKey: "identifier",
+      primaryKey: "pathIdentifier",
       newEntities: newStorageItems,
       oldEntities: oldStorageItems,
     });
+    // TODO(milestone-3): this doesn't check if storage data actually changed
     return processEntitiesDiff<AccountStorageItemEntity>({
       create: (e) => this.create(e),
       update: (e) => this.update(e),
@@ -43,8 +57,8 @@ export class AccountStorageService {
     accountStorage.markUpdated();
     return this.storageRepository.update(
       {
-        identifier: accountStorage.identifier,
-        domain: accountStorage.domain,
+        pathIdentifier: accountStorage.pathIdentifier,
+        pathDomain: accountStorage.pathDomain,
         accountAddress: accountStorage.accountAddress,
       },
       accountStorage
@@ -53,8 +67,8 @@ export class AccountStorageService {
 
   async delete(accountStorage: AccountStorageItemEntity) {
     return this.storageRepository.delete({
-      identifier: accountStorage.identifier,
-      domain: accountStorage.domain,
+      pathIdentifier: accountStorage.pathIdentifier,
+      pathDomain: accountStorage.pathDomain,
       accountAddress: accountStorage.accountAddress,
     });
   }

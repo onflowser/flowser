@@ -3,11 +3,25 @@ import {
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
 import { GrcpStatusCode } from "@flowser/types/generated/entities/transactions";
+import { AccountStorageDomain } from "@flowser/types/generated/entities/accounts";
 
 export class FlowUtils {
   static isInitialBlockId(value: number | string): boolean {
     // initial parent id contains only zeros
     return `${value}`.replaceAll("0", "").length === 0;
+  }
+
+  static getLowerCasedPathDomain(pathDomain: AccountStorageDomain): string {
+    switch (pathDomain) {
+      case AccountStorageDomain.STORAGE_DOMAIN_PUBLIC:
+        return "public";
+      case AccountStorageDomain.STORAGE_DOMAIN_PRIVATE:
+        return "private";
+      case AccountStorageDomain.STORAGE_DOMAIN_STORAGE:
+        return "storage";
+      default:
+        return "unknown";
+    }
   }
 
   static getGrcpStatusName(statusCode: GrcpStatusCode | undefined): string {

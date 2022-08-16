@@ -1,0 +1,17 @@
+@import 'styles/typography';
+@import 'styles/colors';
+@import 'styles/spacings';
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-base $spacing-l;
+  margin-bottom: $spacing-base;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
