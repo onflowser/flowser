@@ -28,7 +28,8 @@ import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
 import { FlowSubscriptionService } from "./subscription.service";
 import { FlowConfigService } from "./config.service";
-import { ProjectContext } from "../utils/project-context";
+import { ProjectContextLifecycle } from "../utils/project-context";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 
 type BlockData = {
   block: FlowBlock;
@@ -47,7 +48,8 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService extends ProjectContext {
+export class FlowAggregatorService implements ProjectContextLifecycle {
+  private projectContext: ProjectEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
   private serviceAccountBootstrapped = false;
 
@@ -59,33 +61,21 @@ export class FlowAggregatorService extends ProjectContext {
     private contractService: ContractsService,
     private eventService: EventsService,
     private flowGatewayService: FlowGatewayService,
-    private flowEmulatorService: FlowEmulatorService,
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
     private configService: FlowConfigService
-  ) {
-    super();
+  ) {}
+
+  onEnterProjectContext(project: ProjectEntity): void {
+    this.projectContext = project;
   }
 
-  async startEmulator() {
-    await this.stopEmulator();
-    return this.flowEmulatorService.start((data) => {
-      this.handleEmulatorLogs(data);
-    });
+  onExitProjectContext(): void {
+    this.serviceAccountBootstrapped = false;
+    this.projectContext = undefined;
   }
 
-  stopEmulator() {
-    return this.flowEmulatorService.stop();
-  }
-
-  handleEmulatorLogs(data: string[]) {
-    return Promise.all(
-      data.map((line) => {
-        return this.logsService.create(LogEntity.create(line));
-      })
-    );
-  }
-
+  // TODO(milestone-3): Next interval shouldn't start before this function resolves
   @Interval(config.dataFetchInterval)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
@@ -184,16 +174,19 @@ export class FlowAggregatorService extends ProjectContext {
     // TODO(milestone-3): Transaction references previous block in referenceBlockId field. Why? Previously we used this field to indicate which block contained some transaction.
     // Docs say: referenceBlockId = A reference to the block used to calculate the expiry of this transaction.
     // https://developers.flow.com/tools/fcl-js/reference/api#transactionobject
-    const blockPromises = this.blockService
+    const blockPromise = this.blockService
       .create(BlockEntity.create(data.block))
       .catch((e) =>
         this.logger.error(`block save error: ${e.message}`, e.stack)
       );
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
-        this.handleTransactionCreated(transaction, transaction.status).catch(
-          (e) =>
-            this.logger.error(`transaction save error: ${e.message}`, e.stack)
+        this.handleTransactionCreated(
+          data.block,
+          transaction,
+          transaction.status
+        ).catch((e) =>
+          this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
@@ -207,7 +200,7 @@ export class FlowAggregatorService extends ProjectContext {
       )
     );
 
-    return Promise.all([blockPromises, transactionPromises, eventPromises]);
+    return Promise.all([blockPromise, transactionPromises, eventPromises]);
   }
 
   public async getBlockData(height: number): Promise<BlockData> {
@@ -313,6 +306,7 @@ export class FlowAggregatorService extends ProjectContext {
   }
 
   async handleTransactionCreated(
+    block: FlowBlock,
     transaction: FlowTransaction,
     status: FlowTransactionStatus
   ) {
@@ -320,7 +314,7 @@ export class FlowAggregatorService extends ProjectContext {
     const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
       this.transactionService.create(
-        TransactionEntity.create(transaction, status)
+        TransactionEntity.create(block, transaction, status)
       ),
       this.accountService.markUpdated(payerAddress),
     ]);

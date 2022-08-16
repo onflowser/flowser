@@ -1,7 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
-import { ProjectContext } from "../utils/project-context";
+import { ProjectContextLifecycle } from "../utils/project-context";
+import { ProjectEntity } from "../../projects/entities/project.entity";
 
 type FlowAddress = string;
 
@@ -55,9 +56,17 @@ export type FlowCliConfig = {
 };
 
 @Injectable()
-export class FlowConfigService extends ProjectContext {
+export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
   private config: FlowCliConfig = {};
+  private projectContext: ProjectEntity | undefined;
+
+  onEnterProjectContext(project: ProjectEntity): void {
+    this.projectContext = project;
+  }
+  onExitProjectContext(): void {
+    this.projectContext = undefined;
+  }
 
   async load() {
     const data = await readFile(this.getConfigPath());

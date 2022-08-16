@@ -203,17 +203,6 @@
         }
       }
     },
-    "/api/flow/debug/emulator": {
-      "get": {
-        "operationId": "FlowController_getEmulator",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/flow/debug/emulator/logs": {
       "get": {
         "operationId": "FlowController_getLogs",

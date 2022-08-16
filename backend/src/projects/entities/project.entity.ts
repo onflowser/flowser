@@ -58,7 +58,7 @@ export class ProjectEntity extends PollingEntity {
 
   hasEmulatorGateway() {
     // Testnet usage is in beta, main-net won't be support
-    // TODO: better handle emulator gateway detection (address could also be an IP)
+    // TODO(milestone-3): How to handle network type detection?
     return this.gateway.address.includes("localhost");
   }
 

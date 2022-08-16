@@ -11,6 +11,7 @@ import {
   TransactionStatusCode,
 } from "@flowser/types/generated/entities/transactions";
 import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
+import { FlowUtils } from "../../utils/flow-utils";
 
 export type TransactionListItemProps = {
   className?: string;
@@ -22,7 +23,7 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
   className,
   ...restProps
 }) => {
-  const { id, referenceBlockId, status, payer, proposalKey } = transaction;
+  const { id, blockId, status, payer, proposalKey } = transaction;
   return (
     <Card
       className={`${classes.card} ${className}`}
@@ -40,23 +41,43 @@ const TransactionListItem: FunctionComponent<TransactionListItemProps> = ({
       <div>
         <Label>BLOCK ID</Label>
         <Value>
-          <NavLink to={`/blocks/details/${referenceBlockId}`}>
-            <Ellipsis className={classes.hash}>{referenceBlockId}</Ellipsis>
+          <NavLink to={`/blocks/details/${blockId}`}>
+            <Ellipsis className={classes.hash}>{blockId}</Ellipsis>
           </NavLink>
         </Value>
       </div>
       <div>
-        <TransactionStatusBadge
-          statusCode={status?.status ?? TransactionStatusCode.UNKNOWN}
-        />
+        <Label>GRCP STATUS</Label>
+        <Value>
+          {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
+        </Value>
+      </div>
+      <div>
+        <Value>
+          <TransactionStatusBadge
+            statusCode={
+              status?.status ?? TransactionStatusCode.TX_STATUS_UNKNOWN
+            }
+          />
+        </Value>
       </div>
       <div>
         <Label>PAYER</Label>
-        <Value>{payer}</Value>
+        <Value>
+          <NavLink to={`/accounts/details/${payer}`}>{payer}</NavLink>
+        </Value>
       </div>
       <div>
         <Label>PROPOSER</Label>
-        <Value>{proposalKey?.address ?? "-"}</Value>
+        <Value>
+          {proposalKey ? (
+            <NavLink to={`/accounts/details/${proposalKey.address}`}>
+              {proposalKey.address}
+            </NavLink>
+          ) : (
+            "-"
+          )}
+        </Value>
       </div>
     </Card>
   );

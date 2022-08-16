@@ -1,10 +1,23 @@
 import { ProjectEntity } from "../../projects/entities/project.entity";
 
-export class ProjectContext {
-  projectContext: ProjectEntity | undefined;
+/**
+ * Services must implement this interface to get info on the current project.
+ */
+export interface ProjectContextLifecycle {
+  /**
+   * Perform setup logic.
+   */
+  onEnterProjectContext(project: ProjectEntity): Promise<void> | void;
 
-  // Standard interface to provide info about current project
-  setProjectContext(project: ProjectEntity) {
-    this.projectContext = project;
+  /**
+   * Perform teardown logic.
+   */
+  onExitProjectContext(): Promise<void> | void;
+}
+
+export function hasProjectContextInterface(object: unknown) {
+  if (typeof object !== "object") {
+    return false;
   }
+  return "onEnterProjectContext" in object && "onExitProjectContext" in object;
 }

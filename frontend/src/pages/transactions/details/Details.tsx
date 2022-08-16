@@ -23,6 +23,7 @@ import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
 } from "../../../hooks/use-api";
+import { FlowUtils } from "../../../utils/flow-utils";
 
 type RouteParams = {
   transactionId: string;
@@ -68,9 +69,7 @@ const Details: FunctionComponent = () => {
               <Value variant="large">{transaction.id}</Value>
             </div>
             <div>
-              <TransactionStatusBadge
-                statusCode={transaction.status?.statusCode}
-              />
+              <TransactionStatusBadge statusCode={transaction.status?.status} />
             </div>
           </>
         )}
@@ -86,8 +85,8 @@ const Details: FunctionComponent = () => {
         <div className={classes.firstLine}>
           <Label variant="large">BLOCK ID</Label>
           <Value variant="large">
-            <NavLink to={`/blocks/details/${transaction.referenceBlockId}`}>
-              {transaction.referenceBlockId}
+            <NavLink to={`/blocks/details/${transaction.blockId}`}>
+              {transaction.blockId}
             </NavLink>
           </Value>
         </div>
@@ -104,11 +103,18 @@ const Details: FunctionComponent = () => {
               {transaction.proposalKey?.address ?? "-"}
             </NavLink>
           </Value>
+          {/* TODO(milestone-3): Better organise bellow fields */}
           <Label variant="large" className={classes.inlineLabel}>
             Sequence number:
           </Label>
           <Value variant="large" className={classes.inlineValue}>
             {transaction.proposalKey?.sequenceNumber ?? "-"}
+          </Value>
+          <Label variant="large" className={classes.inlineLabel}>
+            GRCP Status:
+          </Label>
+          <Value variant="large" className={classes.inlineValue}>
+            {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
           </Value>
         </div>
         <div>
@@ -148,8 +154,8 @@ const Details: FunctionComponent = () => {
           label="PAYLOAD SIGNATURES"
           value={transaction.payloadSignatures?.length || 0}
         >
-          {transaction.payloadSignatures.map((item, i: number) => (
-            <Card key={i} className={classes.listCard}>
+          {transaction.payloadSignatures.map((item) => (
+            <Card key={item.keyId} className={classes.listCard}>
               <div>
                 <Label className={classes.label}>ACCOUNT ADDRESS</Label>
                 <Value>

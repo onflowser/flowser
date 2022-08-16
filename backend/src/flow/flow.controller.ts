@@ -16,7 +16,7 @@ export class FlowController {
 
   @Get("version")
   async getVersion() {
-    const info = await this.flowCliService.version();
+    const info = await this.flowCliService.getVersion();
     return GetFlowCliInfoResponse.toJSON(info);
   }
 
@@ -30,15 +30,6 @@ export class FlowController {
     const isConnected = await this.flowGatewayService.isConnectedToGateway();
     return {
       isConnected,
-    };
-  }
-
-  @Get("debug/emulator")
-  getEmulator() {
-    return {
-      status: this.flowEmulatorService.state,
-      config: this.flowEmulatorService.projectContext?.emulator,
-      process: this.flowEmulatorService.emulatorProcess,
     };
   }
 

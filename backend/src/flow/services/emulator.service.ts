@@ -1,15 +1,18 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from "@nestjs/common";
 import { EventEmitter } from "events";
-import { FlowCliService } from "./cli.service";
-import { Emulator } from "@flowser/types/generated/entities/projects";
 import {
   HashAlgorithm,
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
-import { ProjectContext } from "../utils/project-context";
-
-type StartCallback = (data: string[]) => void;
+import { ProjectContextLifecycle } from "../utils/project-context";
+import { ProjectEntity } from "../../projects/entities/project.entity";
+import { LogEntity } from "../../logs/entities/log.entity";
+import { LogsService } from "../../logs/logs.service";
 
 export enum FlowEmulatorState {
   STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)
@@ -24,15 +27,38 @@ type FlowEmulatorLog = {
 };
 
 @Injectable()
-export class FlowEmulatorService extends ProjectContext {
+export class FlowEmulatorService implements ProjectContextLifecycle {
   private readonly logger = new Logger(FlowEmulatorService.name);
+  private projectContext: ProjectEntity | undefined;
 
   public events: EventEmitter = new EventEmitter();
   public state: FlowEmulatorState = FlowEmulatorState.STOPPED;
   public emulatorProcess: ChildProcessWithoutNullStreams;
   public logs: string[] = [];
 
-  async start(cb: StartCallback = () => null) {
+  constructor(private logsService: LogsService) {}
+
+  async onEnterProjectContext(project: ProjectEntity) {
+    this.projectContext = project;
+    if (this.projectContext.hasEmulatorConfiguration()) {
+      await this.stop();
+      try {
+        await this.start();
+      } catch (e: any) {
+        throw new ServiceUnavailableException(
+          `Can not start emulator}`,
+          e.message
+        );
+      }
+    }
+  }
+
+  async onExitProjectContext() {
+    this.projectContext = undefined;
+    await this.stop();
+  }
+
+  async start() {
     const flags = this.getFlags();
     this.logger.debug(
       `starting with (${flags.length}) flags: ${flags.join(" ")}`
@@ -85,7 +111,7 @@ export class FlowEmulatorService extends ProjectContext {
           resolve(true);
         }
 
-        cb(FlowEmulatorService.formatLogLines(lines));
+        this.handleEmulatorLogs(FlowEmulatorService.formatLogLines(lines));
       });
 
       // No data is emitted to stderr for now
@@ -106,6 +132,14 @@ export class FlowEmulatorService extends ProjectContext {
         reject(error);
       });
     });
+  }
+
+  private handleEmulatorLogs(data: string[]) {
+    return Promise.all(
+      data.map((line) => {
+        return this.logsService.create(LogEntity.create(line));
+      })
+    );
   }
 
   findLog(query) {
