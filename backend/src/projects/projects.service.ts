@@ -25,6 +25,7 @@ import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
 import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
+import { AccountStorageService } from "../accounts/services/storage.service";
 
 @Injectable()
 export class ProjectsService {
@@ -51,6 +52,7 @@ export class ProjectsService {
     private flowConfigService: FlowConfigService,
     private accountsService: AccountsService,
     private accountKeysService: KeysService,
+    private accountStorageService: AccountStorageService,
     private contractsService: ContractsService,
     private blocksService: BlocksService,
     private eventsService: EventsService,
@@ -76,6 +78,7 @@ export class ProjectsService {
       await Promise.all([
         this.contractsService.removeAll(),
         this.accountKeysService.removeAll(),
+        this.accountStorageService.removeAll(),
       ]);
       await Promise.all([
         this.accountsService.removeAll(),

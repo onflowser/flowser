@@ -25,6 +25,14 @@ export class AccountsService {
     });
   }
 
+  async findAllAddresses() {
+    const result = await this.accountRepository
+      .createQueryBuilder()
+      .select("address")
+      .getRawMany();
+    return result.map((result) => result.address) as string[];
+  }
+
   findAllNewerThanTimestamp(timestamp: Date): Promise<AccountEntity[]> {
     return this.accountRepository.find({
       where: [

@@ -16,16 +16,20 @@ import { FlowAccount } from "./gateway.service";
 // ... or we could define all types and put them in a shared (npm) library?
 // Object that is stored under /private or /public domains.
 // https://github.com/onflow/cadence/blob/master/values.go
-export type CadenceValue = unknown;
+export type FlowCadenceValue = unknown;
 
 // Identifier that is used in account storage path (e.g. /private/<identifier>).
-export type StorageObjectIdentifier = string;
+export type FlowStorageIdentifier = string;
 
-export type AccountStorage = {
+export type FlowStorageItem = Record<FlowStorageIdentifier, FlowCadenceValue>;
+
+export type FlowAccountStorageDomain = "Private" | "Public" | "Storage";
+
+export type FlowAccountStorage = {
   Address: string;
-  Private: Record<StorageObjectIdentifier, CadenceValue>;
-  Public: Record<StorageObjectIdentifier, CadenceValue>;
-  Storage: Record<StorageObjectIdentifier, CadenceValue>;
+  Private: FlowStorageItem;
+  Public: FlowStorageItem;
+  Storage: FlowStorageItem;
   Account: FlowAccount;
 };
 
@@ -41,6 +45,6 @@ export class FlowAccountStorageService {
       throw new HttpException(response.statusText, response.status);
     }
 
-    return response.data as AccountStorage;
+    return response.data as FlowAccountStorage;
   }
 }

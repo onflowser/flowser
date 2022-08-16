@@ -72,7 +72,9 @@ const Details: FunctionComponent = () => {
       </Card>
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          {account.storage?.length && <Storage data={account.storage} />}
+          {/* TODO(milestone-3): display account storage*/}
+          {/* <Storage data={account.storage} />} */}
+          <pre>{JSON.stringify(account.storage, null, 2)}</pre>
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">

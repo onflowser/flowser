@@ -2,13 +2,14 @@ syntax = "proto3";
 
 import "entities/transactions.proto";
 import "entities/common.proto";
+import "google/protobuf/struct.proto";
 
 message Account {
   string address = 1;
   float balance = 2;
   string code = 3;
   repeated AccountKey keys = 4;
-  repeated AccountStorage storage = 5;
+  repeated AccountStorageItem storage = 5;
   repeated AccountContract contracts = 6;
   repeated Transaction transactions = 7;
   string created_at = 8;
@@ -28,11 +29,23 @@ message AccountKey {
     string updated_at = 10;
 }
 
-message AccountStorage {
-    string name = 1;
-    string account_address = 2;
-    int32 block_height = 3;
-    string value = 4;
+// Every account storage path consists of a domain and identifier: /<domain>/<identifier>
+// See official docs: https://developers.flow.com/cadence/language/accounts#paths
+enum AccountStorageDomain {
+  STORAGE_DOMAIN_UNKNOWN = 0;
+  STORAGE_DOMAIN_PRIVATE = 1;
+  STORAGE_DOMAIN_PUBLIC = 2;
+  STORAGE_DOMAIN_STORAGE = 3;
+}
+
+// Storage item maps a storage identifier to CadenceValue object (data field)
+// https://github.com/onflow/flow-emulator/blob/master/accountStorage.go
+message AccountStorageItem {
+  string identifier = 1;
+  AccountStorageDomain domain = 2;
+  google.protobuf.Struct data = 3;
+  string created_at = 4;
+  string updated_at = 5;
 }
 
 message AccountContract {

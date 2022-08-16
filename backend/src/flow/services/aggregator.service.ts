@@ -30,6 +30,16 @@ import { FlowSubscriptionService } from "./subscription.service";
 import { FlowConfigService } from "./config.service";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
+import {
+  FlowAccountStorage,
+  FlowAccountStorageService,
+} from "./storage.service";
+import { AccountStorageService } from "../../accounts/services/storage.service";
+import {
+  AccountStorageDomain,
+  AccountStorageItem,
+} from "@flowser/types/generated/entities/accounts";
+import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
 
 type BlockData = {
   block: FlowBlock;
@@ -57,9 +67,11 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
+    private accountStorageService: AccountStorageService,
     private accountKeysService: KeysService,
     private contractService: ContractsService,
     private eventService: EventsService,
+    private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
@@ -153,6 +165,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       await queryRunner.startTransaction();
 
       await this.storeBlockData(blockData);
+      await this.updateAccountsStorage();
 
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -377,14 +390,40 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  // TODO(milestone-3): when do we need to update the account storage?
-  async setUpdatedAccountStorage(account: AccountEntity) {
-    // storage data API works only for local emulator for now
-    if (this.projectContext.hasEmulatorGateway()) {
-      // TODO(milestone-3): enable this when we integrate the storage data API
-      // FIXME(milestone-3): storage server hangs up when using flow-cli@v0.31
-      // account.storage = await this.storageDataService.getStorageData(address);
+  async updateAccountsStorage() {
+    // Storage inspection API works only for local emulator
+    if (!this.projectContext.hasEmulatorGateway()) {
+      return;
     }
+    const allAddresses = await this.accountService.findAllAddresses();
+    const allStorages = await Promise.all(
+      allAddresses.map((address) =>
+        this.flowStorageService.getAccountStorage(address)
+      )
+    );
+    await Promise.all(
+      allStorages.map((storage) => this.processAccountStorage(storage))
+    );
+  }
+
+  async processAccountStorage(flowAccountStorage: FlowAccountStorage) {
+    const privateStorageIdentifiers = Object.keys(flowAccountStorage.Private);
+    const publicStorageIdentifiers = Object.keys(flowAccountStorage.Public);
+    const storageIdentifiers = Object.keys(flowAccountStorage.Storage);
+
+    const privateStorageItems = privateStorageIdentifiers.map((identifier) =>
+      AccountStorageItemEntity.create("Private", identifier, flowAccountStorage)
+    );
+    const publicStorageItems = publicStorageIdentifiers.map((identifier) =>
+      AccountStorageItemEntity.create("Public", identifier, flowAccountStorage)
+    );
+    const storageItems = storageIdentifiers.map((identifier) =>
+      AccountStorageItemEntity.create("Storage", identifier, flowAccountStorage)
+    );
+    return this.accountStorageService.updateAccountStorage(
+      flowAccountStorage.Address,
+      [...privateStorageItems, ...publicStorageItems, ...storageItems]
+    );
   }
 
   async bootstrapServiceAccount() {
