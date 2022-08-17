@@ -85,8 +85,8 @@ export function randomString() {
   return `${Math.round(Math.random() * Math.pow(10, 20))}`;
 }
 
-export function ensurePrefixedAddress(address: string) {
-  return address.startsWith("0x") ? address : `0x${address}`;
+export function ensurePrefixedAddress(address: string | null | undefined) {
+  return address?.startsWith("0x") ? address : `0x${address}`;
 }
 
 export type EntitiesDiff<T> = {
