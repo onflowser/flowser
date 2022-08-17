@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { readFile, writeFile } from "fs/promises";
-import path from "path";
+import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 
@@ -61,10 +61,13 @@ export class FlowConfigService implements ProjectContextLifecycle {
   private config: FlowCliConfig = {};
   private projectContext: ProjectEntity | undefined;
 
-  onEnterProjectContext(project: ProjectEntity): void {
+  async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
+    // TODO(milestone-x): listen on flow.json changes, reload config and restart emulator, etc...
+    await this.load();
   }
-  onExitProjectContext(): void {
+
+  onExitProjectContext() {
     this.projectContext = undefined;
   }
 
@@ -77,10 +80,13 @@ export class FlowConfigService implements ProjectContextLifecycle {
     await writeFile(this.getConfigPath(), JSON.stringify(this.config, null, 4));
   }
 
+  getAccountConfig(accountKey: string) {
+    return this.config.accounts[accountKey];
+  }
+
+  // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
   getServiceAccountAddress() {
-    // TODO(milestone-3): we should probably read this address from:
-    // this.config.accounts?.["emulator-account"]?.address;
-    return "f8d6e0586b0a20c7";
+    return this.getAccountConfig("emulator-account")?.address;
   }
 
   getDatabasePath() {

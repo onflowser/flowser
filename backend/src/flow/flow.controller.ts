@@ -17,22 +17,4 @@ export class FlowController {
     const info = await this.flowCliService.getVersion();
     return GetFlowCliInfoResponse.toJSON(info);
   }
-
-  /**
-   * Bellow are undocumented endpoints that are used only for debugging purposes.
-   * TODO: These endpoints should be removed in the future.
-   */
-
-  @Get("debug/gateway")
-  async getGateway() {
-    const isConnected = await this.flowGatewayService.isConnectedToGateway();
-    return {
-      isConnected,
-    };
-  }
-
-  @Get("debug/emulator/logs")
-  async getLogs() {
-    return this.flowEmulatorService.logs;
-  }
 }

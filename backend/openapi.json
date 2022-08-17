@@ -192,28 +192,6 @@
         }
       }
     },
-    "/api/flow/debug/gateway": {
-      "get": {
-        "operationId": "FlowController_getGateway",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/flow/debug/emulator/logs": {
-      "get": {
-        "operationId": "FlowController_getLogs",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/logs": {
       "get": {
         "operationId": "LogsController_findAll",
