@@ -18,13 +18,18 @@ import {
   GetAllProjectsResponse,
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
+  GetProjectObjectsResponse,
 } from "@flowser/types/generated/responses/projects";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
+import { FlowConfigService } from "../flow/services/config.service";
 
 @Controller("projects")
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly flowConfigService: FlowConfigService
+  ) {}
 
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
@@ -56,6 +61,18 @@ export class ProjectsController {
     const project = await this.projectsService.getCurrentProject();
     return GetSingleProjectResponse.fromPartial({
       project: project.toProto(),
+    });
+  }
+
+  @Get("current/objects")
+  async findCurrentProjectObjects() {
+    const [transactions, contracts] = await Promise.all([
+      this.flowConfigService.getTransactionTemplates(),
+      this.flowConfigService.getContractTemplates(),
+    ]);
+    return GetProjectObjectsResponse.fromPartial({
+      transactions,
+      contracts,
     });
   }
 

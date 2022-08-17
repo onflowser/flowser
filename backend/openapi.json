@@ -64,6 +64,17 @@
         }
       }
     },
+    "/api/projects/current/objects": {
+      "get": {
+        "operationId": "ProjectsController_findCurrentProjectObjects",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/projects/default": {
       "get": {
         "operationId": "ProjectsController_default",
