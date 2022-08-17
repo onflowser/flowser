@@ -18,9 +18,7 @@ import { AccountEntity } from "../../accounts/entities/account.entity";
 import { EventEntity } from "../../events/entities/event.entity";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { BlockEntity } from "../../blocks/entities/block.entity";
-import { FlowEmulatorService } from "./emulator.service";
 import { LogsService } from "../../logs/logs.service";
-import { LogEntity } from "../../logs/entities/log.entity";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
@@ -35,10 +33,6 @@ import {
   FlowAccountStorageService,
 } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
-import {
-  AccountStorageDomain,
-  AccountStorageItem,
-} from "@flowser/types/generated/entities/accounts";
 import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
 
 type BlockData = {
@@ -172,6 +166,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       await queryRunner.rollbackTransaction();
 
       await this.logger.error(`Failed to store latest data`, e);
+      console.error(e);
     } finally {
       await queryRunner.release();
     }
@@ -406,9 +401,13 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   async processAccountStorage(flowAccountStorage: FlowAccountStorage) {
-    const privateStorageIdentifiers = Object.keys(flowAccountStorage.Private);
-    const publicStorageIdentifiers = Object.keys(flowAccountStorage.Public);
-    const storageIdentifiers = Object.keys(flowAccountStorage.Storage);
+    const privateStorageIdentifiers = Object.keys(
+      flowAccountStorage.Private ?? {}
+    );
+    const publicStorageIdentifiers = Object.keys(
+      flowAccountStorage.Public ?? {}
+    );
+    const storageIdentifiers = Object.keys(flowAccountStorage.Storage ?? {});
 
     const privateStorageItems = privateStorageIdentifiers.map((identifier) =>
       AccountStorageItemEntity.create("Private", identifier, flowAccountStorage)

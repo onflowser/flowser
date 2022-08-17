@@ -115,14 +115,15 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         this.handleEmulatorLogs(FlowEmulatorService.formatLogLines(lines));
       });
 
-      // No data is emitted to stderr for now
-      // this.emulatorProcess.stderr.on("data", data => {})
+      this.emulatorProcess.stderr.on("data", (data) => {
+        this.logger.debug("Emulator stderr: ", data.toString());
+      });
 
       this.emulatorProcess.on("close", (code, signal) => {
         const error =
           this.getError() || new Error(`Emulator closed: ${code} (${signal})`);
         this.setState(FlowEmulatorState.STOPPED);
-        this.logger.error(error.message);
+        this.logger.error("Emulator closed: " + error);
         this.printLogs();
         reject(error);
       });
