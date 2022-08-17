@@ -64,6 +64,17 @@
         }
       }
     },
+    "/api/projects/current/objects": {
+      "get": {
+        "operationId": "ProjectsController_findCurrentProjectObjects",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/projects/default": {
       "get": {
         "operationId": "ProjectsController_default",
@@ -184,39 +195,6 @@
     "/api/flow/version": {
       "get": {
         "operationId": "FlowController_getVersion",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/flow/debug/gateway": {
-      "get": {
-        "operationId": "FlowController_getGateway",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/flow/debug/emulator/logs": {
-      "get": {
-        "operationId": "FlowController_getLogs",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/flow/storage/{address}": {
-      "get": {
-        "operationId": "FlowController_getAccountStorage",
         "parameters": [],
         "responses": {
           "200": {

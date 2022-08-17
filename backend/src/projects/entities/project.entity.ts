@@ -19,7 +19,7 @@ export class ProjectEntity extends PollingEntity {
   name: string;
 
   // TODO(milestone-3): this is a default test path that should be removed
-  filesystemPath: string = "/Users/bartkozorog/Projects/flowser";
+  filesystemPath: string = "/Users/bartkozorog/Projects/flowtea/cadence";
 
   @Column()
   pingable: boolean = false;

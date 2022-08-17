@@ -64,6 +64,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       `starting with (${flags.length}) flags: ${flags.join(" ")}`
     );
 
+    // TODO(milestone-3): check if emulator (or any other process) is already running on emulator ports
     return new Promise((resolve, reject) => {
       try {
         this.emulatorProcess = spawn("flow", ["emulator", ...flags], {

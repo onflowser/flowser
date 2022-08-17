@@ -1,8 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { readFile, writeFile } from "fs/promises";
-import path from "path";
+import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
+import {
+  ContractTemplate,
+  TransactionTemplate,
+} from "@flowser/types/generated/entities/config";
 
 type FlowAddress = string;
 
@@ -59,28 +63,79 @@ export type FlowCliConfig = {
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
   private config: FlowCliConfig = {};
+  // TODO(milestone-3): Config may not always be present in the project root
+  // Handle cases when it's not or just alert the user that config must be put in root
+  private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
 
-  onEnterProjectContext(project: ProjectEntity): void {
+  async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
+    // TODO(milestone-x): listen on flow.json changes, reload config and restart emulator, etc...
+    await this.load();
   }
-  onExitProjectContext(): void {
+
+  onExitProjectContext() {
     this.projectContext = undefined;
   }
 
+  async getContractTemplates(): Promise<ContractTemplate[]> {
+    const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
+      (nameKey) => ({
+        name: nameKey,
+        filePath: this.getContractFilePath(nameKey),
+      })
+    );
+
+    const contractsSourceCode = await Promise.all(
+      contractNamesAndPaths.map(({ filePath }) =>
+        this.readProjectFile(filePath)
+      )
+    );
+
+    return contractNamesAndPaths.map(({ name, filePath }, index) =>
+      ContractTemplate.fromPartial({
+        name,
+        filePath,
+        sourceCode: contractsSourceCode[index],
+      })
+    );
+  }
+
+  private getContractFilePath(contractNameKey: string) {
+    const contractConfig = this.config.contracts[contractNameKey];
+    const isSimpleFormat = typeof contractConfig === "string";
+    return isSimpleFormat ? contractConfig : contractConfig?.source;
+  }
+
+  async getTransactionTemplates(): Promise<TransactionTemplate[]> {
+    // TODO(milestone-3): Implement heuristic way for retrieving transactions
+    // For now we can't reliably tell where are transactions source files located,
+    // because they are not defined in flow.json config file - but this may be doable in the future.
+    // For now we have 2 options:
+    // - try to find a /transactions folder and read all files (hopefully transactions) within it
+    // - provide a Flowser setting to specify a path to the transactions folder
+    return [];
+  }
+
   async load() {
-    const data = await readFile(this.getConfigPath());
-    this.config = JSON.parse(data.toString());
+    const data = await this.readProjectFile(this.configFileName);
+    this.config = JSON.parse(data);
   }
 
   async save() {
-    await writeFile(this.getConfigPath(), JSON.stringify(this.config, null, 4));
+    await this.writeProjectFile(
+      this.configFileName,
+      JSON.stringify(this.config, null, 4)
+    );
   }
 
+  getAccountConfig(accountKey: string) {
+    return this.config.accounts[accountKey];
+  }
+
+  // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
   getServiceAccountAddress() {
-    // TODO(milestone-3): we should probably read this address from:
-    // this.config.accounts?.["emulator-account"]?.address;
-    return "f8d6e0586b0a20c7";
+    return this.getAccountConfig("emulator-account")?.address;
   }
 
   getDatabasePath() {
@@ -91,10 +146,20 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return this.buildProjectPath("flow.json");
   }
 
+  private async readProjectFile(pathPostfix: string) {
+    const data = await readFile(this.buildProjectPath(pathPostfix));
+    return data.toString();
+  }
+
+  private async writeProjectFile(pathPostfix: string, data: string) {
+    return writeFile(this.buildProjectPath(pathPostfix), data);
+  }
+
   private buildProjectPath(pathPostfix: string | undefined | null) {
     if (!pathPostfix) {
       return null;
     }
+    // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);
   }
 }
