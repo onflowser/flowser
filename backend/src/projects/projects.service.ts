@@ -34,13 +34,14 @@ export class ProjectsService {
 
   // TODO: Find a way to automatically retrieve all services
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
-  private readonly projectContextLifecycles: ProjectContextLifecycle[] = [
-    this.flowCliService,
-    this.flowGatewayService,
-    this.flowConfigService,
-    this.flowAggregatorService,
-    this.flowEmulatorService,
-  ];
+  private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
+    [
+      this.flowCliService,
+      this.flowGatewayService,
+      this.flowConfigService,
+      this.flowAggregatorService,
+      this.flowEmulatorService,
+    ];
 
   constructor(
     @InjectRepository(ProjectEntity)
@@ -93,7 +94,7 @@ export class ProjectsService {
 
     this.currentProject = undefined;
     await Promise.all(
-      this.projectContextLifecycles.map((service) =>
+      this.servicesWithProjectLifecycleContext.map((service) =>
         service.onExitProjectContext()
       )
     );
@@ -108,7 +109,7 @@ export class ProjectsService {
 
     // Provide project context to services that need it
     await Promise.all(
-      this.projectContextLifecycles.map((service) =>
+      this.servicesWithProjectLifecycleContext.map((service) =>
         service.onEnterProjectContext(this.currentProject)
       )
     );

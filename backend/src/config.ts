@@ -1,7 +1,7 @@
-import { join } from "path";
-import { cleanEnv, str, num } from "envalid";
+import { cleanEnv, str, num, bool } from "envalid";
 
 export const env = cleanEnv(process.env, {
+  GENERATE_API_DOCS_FILE: bool({ default: false }),
   DATABASE_TYPE: str({
     default: "sqlite",
     choices: ["mysql", "mariadb", "sqlite"],
@@ -17,10 +17,3 @@ export const env = cleanEnv(process.env, {
 
   HTTP_PORT: num({ default: 6061 }),
 });
-
-export default {
-  dataFetchInterval: env.DATA_FETCH_INTERVAL,
-  // __dirname is <project-root>/dist folder
-  flowserRootDir: join(__dirname, "..", ".flowser"),
-  storageServerPort: env.FLOW_STORAGE_SERVER_PORT,
-};

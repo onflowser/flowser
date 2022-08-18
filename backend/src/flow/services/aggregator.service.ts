@@ -1,4 +1,4 @@
-import config from "../../config";
+import { env } from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import {
@@ -82,7 +82,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   // TODO(milestone-3): Next interval shouldn't start before this function resolves
-  @Interval(config.dataFetchInterval)
+  @Interval(env.DATA_FETCH_INTERVAL)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
       return;
