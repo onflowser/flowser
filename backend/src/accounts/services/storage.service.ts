@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { AccountStorageItemEntity } from "../entities/storage-item.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
-import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
+import {
+  computeEntitiesDiff,
+  ensurePrefixedAddress,
+  processEntitiesDiff,
+} from "../../utils";
 
 @Injectable()
 export class AccountStorageService {
@@ -26,7 +30,7 @@ export class AccountStorageService {
 
   async findStorageByAccount(address: string) {
     return this.storageRepository.find({
-      where: { accountAddress: address },
+      where: { accountAddress: ensurePrefixedAddress(address) },
     });
   }
 

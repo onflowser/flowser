@@ -28,12 +28,8 @@ import { FlowSubscriptionService } from "./subscription.service";
 import { FlowConfigService } from "./config.service";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import {
-  FlowAccountStorage,
-  FlowAccountStorageService,
-} from "./storage.service";
+import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
-import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
 
 type BlockData = {
   block: FlowBlock;
@@ -390,38 +386,19 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       return;
     }
     const allAddresses = await this.accountService.findAllAddresses();
-    const allStorages = await Promise.all(
-      allAddresses.map((address) =>
-        this.flowStorageService.getAccountStorage(address)
-      )
-    );
     await Promise.all(
-      allStorages.map((storage) => this.processAccountStorage(storage))
+      allAddresses.map((address) => this.processAccountStorage(address))
     );
   }
 
-  async processAccountStorage(flowAccountStorage: FlowAccountStorage) {
-    const privateStorageIdentifiers = Object.keys(
-      flowAccountStorage.Private ?? {}
-    );
-    const publicStorageIdentifiers = Object.keys(
-      flowAccountStorage.Public ?? {}
-    );
-    const storageIdentifiers = Object.keys(flowAccountStorage.Storage ?? {});
-
-    const privateStorageItems = privateStorageIdentifiers.map((identifier) =>
-      AccountStorageItemEntity.create("Private", identifier, flowAccountStorage)
-    );
-    const publicStorageItems = publicStorageIdentifiers.map((identifier) =>
-      AccountStorageItemEntity.create("Public", identifier, flowAccountStorage)
-    );
-    const storageItems = storageIdentifiers.map((identifier) =>
-      AccountStorageItemEntity.create("Storage", identifier, flowAccountStorage)
-    );
-    return this.accountStorageService.updateAccountStorage(
-      flowAccountStorage.Address,
-      [...privateStorageItems, ...publicStorageItems, ...storageItems]
-    );
+  async processAccountStorage(address: string) {
+    const { privateItems, publicItems, storageItems } =
+      await this.flowStorageService.getAccountStorage(address);
+    return this.accountStorageService.updateAccountStorage(address, [
+      ...privateItems,
+      ...publicItems,
+      ...storageItems,
+    ]);
   }
 
   async bootstrapServiceAccount() {

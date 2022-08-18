@@ -1,6 +1,7 @@
 import { Injectable, HttpException } from "@nestjs/common";
 import axios from "axios";
 import { FlowAccount } from "./gateway.service";
+import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
 
 /**
  * For more info on the account storage model and API, see:
@@ -35,7 +36,31 @@ export type FlowAccountStorage = {
 
 @Injectable()
 export class FlowAccountStorageService {
-  async getAccountStorage(address: string) {
+  public async getAccountStorage(address: string) {
+    const flowAccountStorage = await this.fetchStorageByAddress(address);
+
+    const privateStorageIdentifiers = Object.keys(
+      flowAccountStorage.Private ?? {}
+    );
+    const publicStorageIdentifiers = Object.keys(
+      flowAccountStorage.Public ?? {}
+    );
+    const storageIdentifiers = Object.keys(flowAccountStorage.Storage ?? {});
+
+    const privateItems = privateStorageIdentifiers.map((identifier) =>
+      AccountStorageItemEntity.create("Private", identifier, flowAccountStorage)
+    );
+    const publicItems = publicStorageIdentifiers.map((identifier) =>
+      AccountStorageItemEntity.create("Public", identifier, flowAccountStorage)
+    );
+    const storageItems = storageIdentifiers.map((identifier) =>
+      AccountStorageItemEntity.create("Storage", identifier, flowAccountStorage)
+    );
+
+    return { privateItems, publicItems, storageItems };
+  }
+
+  private async fetchStorageByAddress(address: string) {
     // TODO(milestone-3): use value from emulator config object
     const response = await axios.get(
       `http://localhost:8080/emulator/storages/${address}`
