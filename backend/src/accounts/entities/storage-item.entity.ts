@@ -59,7 +59,7 @@ export class AccountStorageItemEntity extends PollingEntity {
 
     if (typeof storageData !== "object") {
       // In case the data is a simple value (string, number, boolean,...)
-      // we need to store it in object form (under "value" key).
+      // we need to store it in object form (e.g. under "value" key).
       // Otherwise it won't get properly encoded/decoded by protocol buffers.
       storageItem.data = { value: storageData };
     } else {

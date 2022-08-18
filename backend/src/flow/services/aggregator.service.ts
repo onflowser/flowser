@@ -30,6 +30,7 @@ import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
+import { FlowCoreEventType } from "@flowser/types/generated/flow";
 
 type BlockData = {
   block: FlowBlock;
@@ -162,7 +163,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       await queryRunner.rollbackTransaction();
 
       await this.logger.error(`Failed to store latest data`, e);
-      console.error(e);
     } finally {
       await queryRunner.release();
     }
@@ -260,10 +260,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   async processEvents(events: FlowEvent[]) {
     // Process new accounts first, so other events can reference them.
     const accountCreatedEvents = events.filter(
-      (event) => event.type === "flow.AccountCreated"
+      (event) => event.type === FlowCoreEventType.ACCOUNT_CREATED
     );
     const restEvents = events.filter(
-      (event) => event.type !== "flow.AccountCreated"
+      (event) => event.type !== FlowCoreEventType.ACCOUNT_CREATED
     );
     await Promise.all(
       accountCreatedEvents.map((event) =>
@@ -284,25 +284,20 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     );
   }
 
-  // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
   async handleEvent(event: FlowEvent) {
     const { data, type } = event;
     this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
     const address = ensurePrefixedAddress(data.address);
     // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
-      // TODO(milestone-3): define core event types in enum object
-      case "flow.AccountCreated":
+      case FlowCoreEventType.ACCOUNT_CREATED:
         return this.storeNewAccountWithContractsAndKeys(address);
-      case "flow.AccountKeyAdded":
+      case FlowCoreEventType.ACCOUNT_KEY_ADDED:
+      case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
         return this.updateStoredAccountKeys(address);
-      case "flow.AccountKeyRemoved":
-        return this.updateStoredAccountKeys(address);
-      case "flow.AccountContractAdded":
-        return this.updateStoredAccountContracts(address);
-      case "flow.AccountContractUpdated":
-        return this.updateStoredAccountContracts(address);
-      case "flow.AccountContractRemoved":
+      case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
+      case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
+      case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         return this.updateStoredAccountContracts(address);
       default:
         return null; // not a core event, ignore it
