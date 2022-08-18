@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
@@ -18,6 +19,8 @@ import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetPollingLogs } from "../../hooks/use-api";
+import { Log, LogSource } from "@flowser/types/generated/entities/logs";
+import { toast } from "react-hot-toast";
 
 type LogsProps = {
   className?: string;
@@ -28,18 +31,17 @@ const SEARCH_CONTEXT_NAME = "logs";
 const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
-  const { highlightLogKeywords } = useSyntaxHighlighter();
-  const miniLogRef = createRef<HTMLDivElement>();
-  const bigLogRef = createRef<HTMLDivElement>();
+  const tinyLogRef = createRef<HTMLDivElement>();
+  const nonTinyLogRef = createRef<HTMLDivElement>();
   const { data: logs } = useGetPollingLogs();
+  // TODO(milestone-x): why are logs not sorted correctly in useGetPollingLogs hooK?
+  const sortedLogs = useMemo(() => logs.sort((a, b) => a.id - b.id), [logs]);
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
-  const { filteredData } = useFilterData(logs, searchTerm);
+  const { filteredData } = useFilterData(sortedLogs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
 
-  const scrollToBottom = (
-    ref: React.RefObject<HTMLDivElement>,
-    smooth = true
-  ) => {
+  const scrollToBottom = (smooth = true) => {
+    const ref = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
     if (ref.current) {
       const options: ScrollToOptions = {
         top: ref.current.scrollHeight,
@@ -54,8 +56,22 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   }, []);
 
   useEffect(() => {
-    scrollToBottom(miniLogRef);
-    scrollToBottom(bigLogRef);
+    scrollToBottom();
+  }, [logDrawerSize]);
+
+  useEffect(() => {
+    // TODO(ui): scroll to bottom only when drawer is not "in use"
+    const hasStdErrLogs = logs.some(
+      (log) => log.source === LogSource.LOG_SOURCE_STDERR
+    );
+    if (hasStdErrLogs) {
+      setSize("small");
+      toast.error("Flow emulator encountered errors", {
+        duration: 4000,
+      });
+    }
+
+    scrollToBottom();
   }, [logs]);
 
   const onCaretChange = useCallback((state) => {
@@ -72,8 +88,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     setSize(size);
     splitbee.track(`Logs: size ${size}`);
     setTimeout(() => {
-      scrollToBottom(bigLogRef, false);
-      scrollToBottom(miniLogRef, false);
+      scrollToBottom(false);
     }, 100);
   }, []);
 
@@ -119,14 +134,9 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
         </span>
 
         {logDrawerSize === "tiny" && (
-          <div className={classes.midContainer} ref={miniLogRef}>
+          <div className={classes.midContainer} ref={tinyLogRef}>
             {filteredData.map((log) => (
-              <pre
-                key={log.id}
-                dangerouslySetInnerHTML={{
-                  __html: highlightLogKeywords(log.data),
-                }}
-              ></pre>
+              <LogLine key={log.id} log={log} />
             ))}
           </div>
         )}
@@ -164,21 +174,32 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       </div>
 
       {logDrawerSize !== "tiny" && (
-        <div className={classes.bigLogsContainer} ref={bigLogRef}>
+        <div className={classes.bigLogsContainer} ref={nonTinyLogRef}>
           {filteredData.map((log) => (
-            <pre
-              key={log.id}
-              className={classes.line}
-              dangerouslySetInnerHTML={{
-                __html: highlightLogKeywords(log.data),
-              }}
-            />
+            <LogLine key={log.id} log={log} />
           ))}
         </div>
       )}
     </div>
   );
 };
+
+function LogLine({ log }: { log: Log }) {
+  const { highlightLogKeywords } = useSyntaxHighlighter();
+
+  return (
+    <pre
+      className={classes.line}
+      style={
+        // TODO(ui): use color from color pallet
+        log.source === LogSource.LOG_SOURCE_STDERR ? { color: "#D02525" } : {}
+      }
+      dangerouslySetInnerHTML={{
+        __html: highlightLogKeywords(log.data),
+      }}
+    />
+  );
+}
 
 type VerticalDragLineProps = {
   startPositionDrag: (e: React.MouseEvent) => void;

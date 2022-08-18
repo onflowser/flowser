@@ -13,6 +13,7 @@ import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { LogEntity } from "../../logs/entities/log.entity";
 import { LogsService } from "../../logs/logs.service";
+import { LogSource } from "@flowser/types/generated/entities/logs";
 
 export enum FlowEmulatorState {
   STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)
@@ -77,13 +78,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       }
 
       this.emulatorProcess.stdout.on("data", (data) => {
-        const lines = data
-          .toString()
-          .split("\n")
-          .filter((e) => !!e);
-
-        // temporarily store the logs in memory for possible examination
-        this.logs.push(...lines);
+        this.handleOutput(LogSource.LOG_SOURCE_STDOUT, data);
 
         if (
           this.isState(FlowEmulatorState.STOPPED) &&
@@ -111,12 +106,11 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
           this.onServerRunning();
           resolve(true);
         }
-
-        this.handleEmulatorLogs(FlowEmulatorService.formatLogLines(lines));
       });
 
       this.emulatorProcess.stderr.on("data", (data) => {
         this.logger.debug("Emulator stderr: ", data.toString());
+        this.handleOutput(LogSource.LOG_SOURCE_STDERR, data);
       });
 
       this.emulatorProcess.on("close", (code, signal) => {
@@ -136,12 +130,23 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
     });
   }
 
-  private handleEmulatorLogs(data: string[]) {
-    return Promise.all(
-      data.map((line) => {
-        return this.logsService.create(LogEntity.create(line));
-      })
-    );
+  private handleOutput(source: LogSource, data: any) {
+    const lines = data
+      .toString()
+      .split("\n")
+      .filter((e) => !!e);
+
+    // temporarily store the logs in memory for possible examination
+    this.logs.push(...lines);
+
+    const formattedLines =
+      source === LogSource.LOG_SOURCE_STDOUT
+        ? FlowEmulatorService.formatLogLines(lines)
+        : lines;
+
+    formattedLines.forEach((line) => {
+      return this.logsService.create(LogEntity.create(source, line));
+    });
   }
 
   findLog(query) {

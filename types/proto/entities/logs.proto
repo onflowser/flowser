@@ -1,8 +1,15 @@
 syntax = "proto3";
 
+enum LogSource {
+  LOG_SOURCE_UNSPECIFIED = 0;
+  LOG_SOURCE_STDOUT = 1;
+  LOG_SOURCE_STDERR = 2;
+}
+
 message Log {
   int32 id = 1;
   string data = 2;
-  string created_at = 3;
-  string updated_at = 4;
+  LogSource source = 3;
+  string created_at = 4;
+  string updated_at = 5;
 }
