@@ -5,7 +5,7 @@
 .root {
   .navLink {
     display: flex;
-    color: $color-white;
+    color: $light-grey;
     font-size: $font-size-big;
     text-decoration: none;
     align-items: center;
@@ -15,7 +15,7 @@
       margin-bottom: 6px;
 
       & > svg {
-        fill: $color-white;
+        fill: $light-grey;
       }
     }
 
@@ -34,16 +34,16 @@
     }
 
     &.active {
-      color: $color-main-yellow;
+      color: $yellow;
 
       .iconWrapper {
         svg {
-          fill: $color-main-yellow;
+          fill: $yellow;
         }
       }
 
       & > div:first-child::after {
-        background-color: $color-main-yellow;
+        background-color: $yellow;
       }
     }
 
@@ -53,7 +53,7 @@
 
     & > div:last-child {
       margin-top: 30px;
-      background-color: $color-counter-badge-blue;
+      background-color: $blue;
       font-size: $font-size-xxsmall;
       line-height: calc(#{$font-size-xxsmall} + 4px);
       color: $color-main-text;

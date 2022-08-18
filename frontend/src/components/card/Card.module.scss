@@ -20,15 +20,15 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: $color-table-blue;
+    background-color: $table-line-background;
     align-items: center;
     justify-content: center;
-    color: $color-white;
+    color: $light-grey;
     opacity: 0.8;
   }
 
   &.blue {
-    background-color: $color-table-blue;
+    background-color: $table-line-background;
   }
 
   &.black {
@@ -36,6 +36,6 @@
   }
 
   &.active {
-    border: 1px solid $color-main-yellow;
+    border: 1px solid $yellow;
   }
 }

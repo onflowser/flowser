@@ -39,7 +39,7 @@
       margin-bottom: $spacing-l * 4;
 
       h2 {
-        color: $color-main-yellow;
+        color: $yellow;
         font-size: $font-size-h2;
       }
     }
@@ -58,7 +58,7 @@
         display: flex;
         justify-content: center;
         a {
-          color: $color-link-blue;
+          color: $blue;
         }
       }
 
@@ -97,7 +97,7 @@
         margin-top: $spacing-xl;
         margin-bottom: $spacing-l;
         font-size: $font-size-xlarge;
-        color: $color-main-yellow;
+        color: $yellow;
       }
 
       .section {
@@ -116,7 +116,7 @@
           }
 
           & > span:first-child {
-            color: $color-white;
+            color: $light-grey;
             font-size: $font-size-normal;
             max-width: 12vw;
 
@@ -182,7 +182,7 @@
 
             h6 {
               font-size: $font-size-normal;
-              color: $color-white;
+              color: $light-grey;
 
               span {
                 margin-left: $spacing-base;

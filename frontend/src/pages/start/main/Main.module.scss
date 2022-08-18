@@ -35,7 +35,7 @@
     margin-bottom: $spacing-l * 3;
 
     h1 {
-      color: $color-white;
+      color: $light-grey;
       opacity: 0.74;
       font-family: $font-family-days-one;
       font-size: 35px;
@@ -50,7 +50,7 @@
 
     .betaWarning {
       margin-top: $spacing-s;
-      color: $color-main-yellow;
+      color: $yellow;
       max-width: 400px;
     }
   }

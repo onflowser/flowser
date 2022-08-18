@@ -8,7 +8,7 @@
   padding: 0 $spacing-l * 2;
   padding-bottom: $spacing-l;
   border-top: 1px solid $color-logs-border;
-  background-color: $color-background;
+  background-color: $background;
 
   pre {
     white-space: nowrap;
@@ -18,7 +18,7 @@
   .header {
     display: flex;
     height: 63px;
-    color: $color-link-blue;
+    color: $blue;
     align-items: center;
     overflow: hidden;
 
@@ -42,7 +42,7 @@
       font-size: $font-size-small;
       font-weight: 100;
 
-      color: $color-white;
+      color: $light-grey;
       opacity: 0.4;
       cursor: default;
 
@@ -83,7 +83,7 @@
     flex-direction: column;
     height: 100%;
     overflow-y: scroll;
-    color: $color-white;
+    color: $light-grey;
 
     // TODO(milestone-3): Hide scrollbars?
     //padding-right: 17px; /* Increase/decrease this value for cross-browser compatibility */

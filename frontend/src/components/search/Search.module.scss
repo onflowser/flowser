@@ -19,7 +19,7 @@
   }
 
   &:focus-within {
-    border: 1px solid $color-main-yellow;
+    border: 1px solid $yellow;
   }
 
   & > input {
@@ -29,7 +29,7 @@
     margin-left: 0;
     background: none;
     outline: none;
-    color: $color-white;
+    color: $light-grey;
     font-size: $font-size-small;
     padding-left: 0;
     text-transform: uppercase;
