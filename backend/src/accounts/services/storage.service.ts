@@ -43,8 +43,8 @@ export class AccountStorageService {
       primaryKey: "pathIdentifier",
       newEntities: newStorageItems,
       oldEntities: oldStorageItems,
+      deepCompare: true,
     });
-    // TODO(milestone-3): this doesn't check if storage data actually changed
     return processEntitiesDiff<AccountStorageItemEntity>({
       create: (e) => this.create(e),
       update: (e) => this.update(e),
