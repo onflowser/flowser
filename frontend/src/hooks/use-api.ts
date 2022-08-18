@@ -3,6 +3,7 @@ import {
   Account,
   AccountContract,
   AccountKey,
+  AccountStorageItem,
 } from "@flowser/types/generated/entities/accounts";
 import { Transaction } from "@flowser/types/generated/entities/transactions";
 import { Block } from "@flowser/types/generated/entities/blocks";
@@ -42,9 +43,11 @@ import {
 import {
   GetPollingAccountsResponse,
   GetPollingKeysResponse,
+  GetPollingStorageResponse,
   GetSingleAccountResponse,
 } from "@flowser/types/generated/responses/accounts";
 import { GetFlowCliInfoResponse } from "@flowser/types/generated/responses/flow";
+import { StorageService } from "../services/storage.service";
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
@@ -83,6 +86,20 @@ export function useGetPollingContractsByAccount(
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
       ContractsService.getInstance().getAllByAccountWithPolling({
+        accountAddress,
+        timestamp,
+      }),
+  });
+}
+
+export function useGetPollingStorageByAccount(
+  accountAddress: string
+): TimeoutPollingHook<AccountStorageItem> {
+  return useTimeoutPolling<AccountStorageItem, GetPollingStorageResponse>({
+    resourceKey: `/accounts/${accountAddress}/storage/polling`,
+    resourceIdKey: "id",
+    fetcher: ({ timestamp }) =>
+      StorageService.getInstance().getAllByAccountWithPolling({
         accountAddress,
         timestamp,
       }),

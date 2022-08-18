@@ -57,6 +57,7 @@ export class KeysService {
   }
 
   async update(accountKey: AccountKeyEntity) {
+    accountKey.markUpdated();
     return this.keyRepository.update(
       {
         accountAddress: accountKey.accountAddress,

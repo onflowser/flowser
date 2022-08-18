@@ -17,6 +17,11 @@ message GetPollingKeysResponse {
   PollingMetaData meta = 2;
 }
 
+message GetPollingStorageResponse {
+  repeated AccountStorageItem data = 1;
+  PollingMetaData meta = 2;
+}
+
 message GetSingleAccountResponse {
   Account account = 1;
 }

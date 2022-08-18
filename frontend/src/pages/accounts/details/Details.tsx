@@ -4,7 +4,6 @@ import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
 import Card from "../../../components/card/Card";
-import Storage from "./Storage";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import KeyListItem from "./KeyListItem";
@@ -22,8 +21,10 @@ import {
   useGetAccount,
   useGetPollingContractsByAccount,
   useGetPollingKeysByAccount,
+  useGetPollingStorageByAccount,
   useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
+import StorageItem from "./StorageItem";
 
 type RouteParams = {
   accountId: string;
@@ -37,6 +38,7 @@ const Details: FunctionComponent = () => {
   const { data, isLoading } = useGetAccount(accountId);
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
+  const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
 
@@ -72,7 +74,11 @@ const Details: FunctionComponent = () => {
       </Card>
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          {account.storage?.length && <Storage data={account.storage} />}
+          {/* TODO(milestone-3): display account storage*/}
+          {/* <Storage data={account.storage} />} */}
+          {storageItems.map((item) => (
+            <StorageItem key={item.id} storageItem={item} />
+          ))}
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">

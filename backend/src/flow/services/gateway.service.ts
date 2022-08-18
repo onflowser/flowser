@@ -49,6 +49,10 @@ export type FlowCollection = {
   transactionIds: string[];
 };
 
+// TODO(milestone-3): We should probably rename that object to FlowTransactionArgument
+// This kind of structure seems to be specific to how transaction arguments are encoded in Flow
+// Transaction arguments are not represented by CadenceValue object in flow-go-sdk source:
+// https://github.com/onflow/flow-emulator/blob/3fbe8ad9dc841abdc13056e20e7b15fc0e32a749/accountStorage.go#L77-L83
 export type FlowCadenceObject = {
   type: string;
   // TODO: not sure about this, check the structure for more complex types

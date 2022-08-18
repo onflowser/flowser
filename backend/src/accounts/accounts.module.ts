@@ -8,8 +8,9 @@ import { ContractsService } from "./services/contracts.service";
 import { TransactionEntity } from "../transactions/entities/transaction.entity";
 import { AccountContractEntity } from "./entities/contract.entity";
 import { AccountKeyEntity } from "./entities/key.entity";
-import { AccountsStorageEntity } from "./entities/storage.entity";
+import { AccountStorageItemEntity } from "./entities/storage-item.entity";
 import { KeysService } from "./services/keys.service";
+import { AccountStorageService } from "./services/storage.service";
 
 @Module({
   imports: [
@@ -17,12 +18,22 @@ import { KeysService } from "./services/keys.service";
       AccountEntity,
       AccountContractEntity,
       AccountKeyEntity,
-      AccountsStorageEntity,
+      AccountStorageItemEntity,
       TransactionEntity,
     ]),
   ],
   controllers: [AccountsController, ContractsController],
-  providers: [AccountsService, ContractsService, KeysService],
-  exports: [AccountsService, ContractsService, KeysService],
+  providers: [
+    AccountsService,
+    AccountStorageService,
+    ContractsService,
+    KeysService,
+  ],
+  exports: [
+    AccountsService,
+    AccountStorageService,
+    ContractsService,
+    KeysService,
+  ],
 })
 export class AccountsModule {}

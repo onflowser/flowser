@@ -1,4 +1,4 @@
-import config from "../../config";
+import { env } from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import {
@@ -18,9 +18,7 @@ import { AccountEntity } from "../../accounts/entities/account.entity";
 import { EventEntity } from "../../events/entities/event.entity";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { BlockEntity } from "../../blocks/entities/block.entity";
-import { FlowEmulatorService } from "./emulator.service";
 import { LogsService } from "../../logs/logs.service";
-import { LogEntity } from "../../logs/entities/log.entity";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
@@ -30,6 +28,9 @@ import { FlowSubscriptionService } from "./subscription.service";
 import { FlowConfigService } from "./config.service";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
+import { FlowAccountStorageService } from "./storage.service";
+import { AccountStorageService } from "../../accounts/services/storage.service";
+import { FlowCoreEventType } from "@flowser/types/generated/flow";
 
 type BlockData = {
   block: FlowBlock;
@@ -57,9 +58,11 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
+    private accountStorageService: AccountStorageService,
     private accountKeysService: KeysService,
     private contractService: ContractsService,
     private eventService: EventsService,
+    private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
     private flowSubscriptionService: FlowSubscriptionService,
     private logsService: LogsService,
@@ -76,7 +79,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   // TODO(milestone-3): Next interval shouldn't start before this function resolves
-  @Interval(config.dataFetchInterval)
+  @Interval(env.DATA_FETCH_INTERVAL)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
       return;
@@ -153,6 +156,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       await queryRunner.startTransaction();
 
       await this.storeBlockData(blockData);
+      await this.updateAccountsStorage();
 
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -256,10 +260,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   async processEvents(events: FlowEvent[]) {
     // Process new accounts first, so other events can reference them.
     const accountCreatedEvents = events.filter(
-      (event) => event.type === "flow.AccountCreated"
+      (event) => event.type === FlowCoreEventType.ACCOUNT_CREATED
     );
     const restEvents = events.filter(
-      (event) => event.type !== "flow.AccountCreated"
+      (event) => event.type !== FlowCoreEventType.ACCOUNT_CREATED
     );
     await Promise.all(
       accountCreatedEvents.map((event) =>
@@ -280,24 +284,20 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     );
   }
 
-  // https://github.com/onflow/cadence/blob/master/docs/language/core-events.md
   async handleEvent(event: FlowEvent) {
     const { data, type } = event;
     this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
-    const { address, contract } = data as any;
+    const address = ensurePrefixedAddress(data.address);
     // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
-      case "flow.AccountCreated":
+      case FlowCoreEventType.ACCOUNT_CREATED:
         return this.storeNewAccountWithContractsAndKeys(address);
-      case "flow.AccountKeyAdded":
+      case FlowCoreEventType.ACCOUNT_KEY_ADDED:
+      case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
         return this.updateStoredAccountKeys(address);
-      case "flow.AccountKeyRemoved":
-        return this.updateStoredAccountKeys(address);
-      case "flow.AccountContractAdded":
-        return this.updateStoredAccountContracts(address);
-      case "flow.AccountContractUpdated":
-        return this.updateStoredAccountContracts(address);
-      case "flow.AccountContractRemoved":
+      case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
+      case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
+      case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         return this.updateStoredAccountContracts(address);
       default:
         return null; // not a core event, ignore it
@@ -333,7 +333,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       AccountKeyEntity.create(flowAccount, flowKey)
     );
     await this.accountService.create(unSerializedAccount);
-    console.log(`Account ${address} created`);
     await Promise.all([
       this.accountKeysService.updateAccountKeys(address, newKeys),
       this.contractService.updateAccountContracts(
@@ -376,25 +375,37 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  // TODO(milestone-3): when do we need to update the account storage?
-  async setUpdatedAccountStorage(account: AccountEntity) {
-    // storage data API works only for local emulator for now
-    if (this.projectContext.hasEmulatorGateway()) {
-      // TODO(milestone-3): enable this when we integrate the storage data API
-      // FIXME(milestone-3): storage server hangs up when using flow-cli@v0.31
-      // account.storage = await this.storageDataService.getStorageData(address);
+  async updateAccountsStorage() {
+    // Storage inspection API works only for local emulator
+    if (!this.projectContext.hasEmulatorGateway()) {
+      return;
     }
+    const allAddresses = await this.accountService.findAllAddresses();
+    await Promise.all(
+      allAddresses.map((address) => this.processAccountStorage(address))
+    );
+  }
+
+  async processAccountStorage(address: string) {
+    const { privateItems, publicItems, storageItems } =
+      await this.flowStorageService.getAccountStorage(address);
+    return this.accountStorageService.updateAccountStorage(address, [
+      ...privateItems,
+      ...publicItems,
+      ...storageItems,
+    ]);
   }
 
   async bootstrapServiceAccount() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
+    const serviceAccountAddress = ensurePrefixedAddress(
+      this.configService.getServiceAccountAddress()
+    );
 
     await queryRunner.startTransaction();
     try {
-      await this.storeNewAccountWithContractsAndKeys(
-        this.configService.getServiceAccountAddress()
-      );
+      await this.storeNewAccountWithContractsAndKeys(serviceAccountAddress);
       await queryRunner.commitTransaction();
       this.serviceAccountBootstrapped = true;
     } catch (error) {

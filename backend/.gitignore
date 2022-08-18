@@ -50,3 +50,5 @@ src/app/homepage/pages/**/*.html
 
 .env.development
 *.sqlite
+
+openapi.json
