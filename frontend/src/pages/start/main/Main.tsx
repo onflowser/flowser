@@ -7,7 +7,11 @@ import React, {
 import { useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
-import Logo from "../../../assets/images/logo.svg";
+import logo from "../../../assets/images/logo_with_text.svg";
+import trash from "../../../assets/icons/trash.svg";
+import newProject from "../../../assets/icons/new_project.svg";
+import openProject from "../../../assets/icons/open_project.svg";
+import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
 import { ReactComponent as CaretIcon } from "../../../assets/icons/caret.svg";
 import { ReactComponent as PlusIcon } from "../../../assets/icons/plus.svg";
@@ -24,7 +28,12 @@ const Main: FunctionComponent = () => {
   const history = useHistory();
   const projectService = ProjectsService.getInstance();
   const { data: projectData } = useGetAllProjects();
-  const { projects } = projectData ?? {};
+  const projects = [
+    { name: "Project name 1", id: 1 },
+    { name: "Project name 2", id: 2 },
+    { name: "Project name 3", id: 3 },
+    { name: "Project name 4", id: 4 },
+  ]; //projectData ?? {};
   const { data: flowserVersion } = useGetFlowserVersion();
 
   const onQuickstart = async (project: Project) => {
@@ -43,6 +52,66 @@ const Main: FunctionComponent = () => {
   }, []);
 
   return (
+    <div className={classes.container}>
+      <aside>
+        <div className={classes.sideBarHeader}>
+          <span>
+            <img src={logo} alt="FLOWSER" />
+          </span>
+        </div>
+        <ul className={classes.sideBarBody}>
+          <li className={classes.activeTab}>
+            <img
+              src={yellowLine}
+              alt="yellow line"
+              className={classes.yellowLine}
+            />
+            Projects
+          </li>
+          <li>
+            <img
+              src={yellowLine}
+              alt="yellow line"
+              className={classes.yellowLine}
+            />
+            About
+          </li>
+        </ul>
+        <ul className={classes.sideBarFooter}>
+          <li className={classes.openProjectButton}>
+            <img src={openProject} alt="open project icon" />
+            OPEN
+          </li>
+          <li className={classes.newProjectButton}>
+            <img src={newProject} alt="new project icon" />
+            NEW PROJECT
+          </li>
+        </ul>
+      </aside>
+      <div className={classes.projectList}>
+        <div className={classes.projectListHeader}>
+          {/* PLACEHOLDER! */}
+          <div className={classes.projectSearch}></div>
+          {/*<Search />*/}
+        </div>
+        <ul className={classes.projectListBody}>
+          {projects?.map((project) => (
+            <li key={project.id}>
+              <span className={classes.projectName}>{project.name}</span>
+              <span className={classes.projectLastOpened}>
+                last opened on 12-08-2022
+              </span>
+              <span className={classes.projectTrashcan}>
+                <img src={trash} alt="trash icon" />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
+  /*return (
     <div className={classes.container}>
       <img src={Logo} alt="FLOWSER" />
       <div className={classes.header}>
@@ -72,7 +141,7 @@ const Main: FunctionComponent = () => {
         ADD PROJECT
       </IconButton>
     </div>
-  );
+  );*/
 };
 
 export default Main;
