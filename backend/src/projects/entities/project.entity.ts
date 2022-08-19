@@ -1,13 +1,15 @@
-import { AfterLoad, Column, Entity, Index, PrimaryColumn } from "typeorm";
-import { toKebabCase } from "../../utils";
+import { Column, Entity, Index, PrimaryColumn } from "typeorm";
+import { toKebabCase, typeOrmProtobufTransformer } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import {
+  DevWallet,
   Emulator,
   Gateway,
   Project,
 } from "@flowser/types/generated/entities/projects";
 import { UpdateProjectDto } from "../dto/update-project.dto";
+import { DevWalletConfigurationDto } from "../dto/dev-wallet-configuration.dto";
 
 @Entity({ name: "projects" })
 export class ProjectEntity extends PollingEntity {
@@ -18,31 +20,33 @@ export class ProjectEntity extends PollingEntity {
   @Index({ unique: true })
   name: string;
 
-  // TODO(milestone-3): this is a default test path that should be removed
-  filesystemPath: string = "/Users/bartkozorog/Projects/flowtea/cadence";
-
   @Column()
-  pingable: boolean = false;
+  filesystemPath: string;
+
+  @Column("simple-json", {
+    nullable: true,
+    transformer: typeOrmProtobufTransformer(DevWallet),
+  })
+  devWallet: DevWallet;
 
   // TODO(milestone-3): gateway should be synced with network settings in flow.json
-  // Gateway could represent the currently selected network
-  @Column("simple-json", { nullable: true })
+  @Column("simple-json", {
+    nullable: true,
+    transformer: typeOrmProtobufTransformer(Gateway),
+  })
   gateway: Gateway;
 
   // TODO(milestone-3): emulator should be synced with settings in flow.json
-  @Column("simple-json", { nullable: true })
+  @Column("simple-json", {
+    nullable: true,
+    transformer: typeOrmProtobufTransformer(Emulator),
+  })
   emulator: Emulator | null;
 
   // Blockchain data will be fetched from this block height
   // Set this null to start fetching from the latest block
   @Column({ nullable: true })
   startBlockHeight: number | null = 0;
-
-  @AfterLoad()
-  unSerializeJsonFields() {
-    this.gateway = this.gateway ? Gateway.fromJSON(this.gateway) : null;
-    this.emulator = this.emulator ? Emulator.fromJSON(this.emulator) : null;
-  }
 
   hasGatewayConfiguration() {
     return this.gateway !== null;
@@ -56,17 +60,16 @@ export class ProjectEntity extends PollingEntity {
     return this.startBlockHeight !== null;
   }
 
-  hasEmulatorGateway() {
+  shouldRunEmulator() {
     // Testnet usage is in beta, main-net won't be support
     // TODO(milestone-3): How to handle network type detection?
-    return this.gateway.address.includes("localhost");
+    return this.emulator?.run;
   }
 
   toProto() {
     return Project.fromPartial({
       id: this.id,
       name: this.name,
-      pingable: this.pingable,
       filesystemPath: this.filesystemPath,
       startBlockHeight: this.startBlockHeight,
       gateway: this.gateway,
@@ -81,13 +84,14 @@ export class ProjectEntity extends PollingEntity {
     project.id = toKebabCase(projectDto.name);
     project.name = projectDto.name;
     project.startBlockHeight = projectDto.startBlockHeight;
-    // TODO(milestone-3): set filesystemPath
+    project.filesystemPath = projectDto.filesystemPath;
     project.gateway = projectDto.gateway
       ? Gateway.fromJSON(projectDto.gateway)
       : Gateway.fromPartial({
-          port: 8080,
-          address: "localhost",
+          restServerAddress: `http://localhost:${projectDto.emulator.restServerPort}`,
+          grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
         });
+    project.devWallet = DevWallet.fromPartial(projectDto.devWallet);
     project.emulator = Emulator.fromJSON(projectDto.emulator);
     return project;
   }

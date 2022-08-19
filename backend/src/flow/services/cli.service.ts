@@ -29,12 +29,16 @@ export class FlowCliService implements ProjectContextLifecycle {
   }
 
   async startDevWallet() {
+    this.logger.debug("Starting dev wallet");
     // TODO(milestone-3): only start if not yet running (e.g. by user)
-    // TODO(milestone-3): Dynamically set emulator-host arg
     // TODO(milestone-3): Define a shared process manager service, that would also act as a central storage for retrieving all flow-cli/emulator logs?
     this.devWalletProcess = spawn(
       "flow",
-      ["dev-wallet", "--emulator-host=http://localhost:8888"],
+      [
+        "dev-wallet",
+        `--emulator-host=http://localhost:${this.projectContext.emulator.restServerPort}`,
+        `--port=${this.projectContext.devWallet.port}`,
+      ],
       {
         cwd: this.projectContext.filesystemPath,
       }

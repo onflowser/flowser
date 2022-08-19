@@ -78,7 +78,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     this.projectContext = undefined;
   }
 
-  // TODO(milestone-3): Next interval shouldn't start before this function resolves
+  // TODO(milestone-x): Next interval shouldn't start before this function resolves
   @Interval(env.DATA_FETCH_INTERVAL)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
@@ -87,7 +87,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
     // service account exist only on emulator chains
     if (
-      this.projectContext.hasEmulatorGateway() &&
+      this.projectContext.shouldRunEmulator() &&
       !this.serviceAccountBootstrapped
     ) {
       await this.bootstrapServiceAccount();
@@ -377,7 +377,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   async updateAccountsStorage() {
     // Storage inspection API works only for local emulator
-    if (!this.projectContext.hasEmulatorGateway()) {
+    if (!this.projectContext.shouldRunEmulator()) {
       return;
     }
     const allAddresses = await this.accountService.findAllAddresses();

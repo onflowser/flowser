@@ -1,4 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  PreconditionFailedException,
+} from "@nestjs/common";
 import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
@@ -7,6 +11,7 @@ import {
   ContractTemplate,
   TransactionTemplate,
 } from "@flowser/types/generated/entities/config";
+import * as fs from "fs";
 
 type FlowAddress = string;
 
@@ -70,6 +75,9 @@ export class FlowConfigService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
+    if (!fs.existsSync(this.getConfigPath())) {
+      throw new PreconditionFailedException("flow.json config file is missing");
+    }
     // TODO(milestone-x): listen on flow.json changes, reload config and restart emulator, etc...
     await this.load();
   }

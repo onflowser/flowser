@@ -2,9 +2,9 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  PreconditionFailedException,
   Logger,
   NotFoundException,
-  ServiceUnavailableException,
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
@@ -20,19 +20,29 @@ import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/cli.service";
-import { plainToClass } from "class-transformer";
 import { ContractsService } from "../accounts/services/contracts.service";
 import { KeysService } from "../accounts/services/keys.service";
 import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { AccountStorageService } from "../accounts/services/storage.service";
+import {
+  DevWallet,
+  Emulator,
+  Gateway,
+  GatewayStatus,
+  Project,
+} from "@flowser/types/generated/entities/projects";
+import {
+  HashAlgorithm,
+  SignatureAlgorithm,
+} from "@flowser/types/generated/entities/common";
+import * as fs from "fs";
 
 @Injectable()
 export class ProjectsService {
   private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
-  // TODO: Find a way to automatically retrieve all services
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
     [
@@ -72,9 +82,8 @@ export class ProjectsService {
   async cleanupProject() {
     try {
       // remove all existing data of previously used project
-      // TODO(milestone-3): persist data for projects by default?
+      // TODO(milestone-x): persist data for projects by default?
 
-      // TODO(milestone-3): Instead of calling removeAll() directly, let those services implement ProjectContextLifecycle interface and call those methods themselves?
       // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([
         this.contractsService.removeAll(),
@@ -108,11 +117,18 @@ export class ProjectsService {
     // TODO(milestone-3): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
-    await Promise.all(
-      this.servicesWithProjectLifecycleContext.map((service) =>
-        service.onEnterProjectContext(this.currentProject)
-      )
-    );
+    try {
+      await Promise.all(
+        this.servicesWithProjectLifecycleContext.map((service) =>
+          service.onEnterProjectContext(this.currentProject)
+        )
+      );
+    } catch (e) {
+      this.logger.debug("Project context initialization failed", e);
+      throw new InternalServerErrorException(
+        "Project context initialization failed"
+      );
+    }
 
     this.logger.debug(`using project: ${id}`);
 
@@ -120,6 +136,10 @@ export class ProjectsService {
   }
 
   async create(createProjectDto: CreateProjectDto) {
+    const projectFolderExists = fs.existsSync(createProjectDto.filesystemPath);
+    if (!projectFolderExists) {
+      throw new PreconditionFailedException("Project folder not found");
+    }
     const project = ProjectEntity.create(createProjectDto);
     await this.projectRepository
       .insert(project)
@@ -167,17 +187,56 @@ export class ProjectsService {
     return this.projectRepository.delete({ id });
   }
 
+  async getDefaultProject() {
+    const restServerPort = 8888;
+    const grpcServerPort = 3569;
+
+    return Project.fromPartial({
+      name: "New Project",
+      gateway: Gateway.fromPartial({
+        restServerAddress: `http://localhost:${restServerPort}`,
+        grpcServerAddress: `http://localhost:${grpcServerPort}`,
+      }),
+      devWallet: DevWallet.fromJSON({
+        run: true,
+        port: 8701,
+      }),
+      emulator: Emulator.fromPartial({
+        run: true,
+        verboseLogging: true,
+        restServerPort,
+        grpcServerPort,
+        adminServerPort: 8080,
+        persist: false,
+        performInit: false,
+        withContracts: false,
+        blockTime: 0,
+        servicePrivateKey: undefined,
+        servicePublicKey: undefined,
+        databasePath: "./flowdb",
+        tokenSupply: 1000000000,
+        transactionExpiry: 10,
+        storagePerFlow: undefined,
+        minAccountBalance: undefined,
+        transactionMaxGasLimit: 9999,
+        scriptGasLimit: 100000,
+        serviceSignatureAlgorithm: SignatureAlgorithm.ECDSA_P256,
+        serviceHashAlgorithm: HashAlgorithm.SHA3_256,
+        storageLimit: true,
+        transactionFees: false,
+        simpleAddresses: false,
+      }),
+    });
+  }
+
   private async setComputedFields(project: ProjectEntity) {
     if (project.hasGatewayConfiguration()) {
-      const { address, port } = project.gateway;
-      // Assume non emulator networks are pingable
-      const pingable = project.hasEmulatorGateway()
-        ? await FlowGatewayService.isPingable(address, port)
-        : true;
-      return plainToClass(ProjectEntity, { ...project, pingable });
-    } else {
-      return project;
+      // Assume non-emulator networks are always online
+      project.gateway.status = project.shouldRunEmulator()
+        ? await FlowGatewayService.getGatewayStatus(project.gateway)
+        : GatewayStatus.GATEWAY_STATUS_ONLINE;
     }
+    return project;
   }
 
   private handleDatabaseError(error) {

@@ -1,8 +1,13 @@
 import { Injectable, Logger } from "@nestjs/common";
-const fcl = require("@onflow/fcl");
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
+import {
+  Gateway,
+  GatewayStatus,
+} from "@flowser/types/generated/entities/projects";
+
+const fcl = require("@onflow/fcl");
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -114,21 +119,15 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
     if (this.projectContext?.gateway) {
+      const accessNodeUrl = this.projectContext.gateway.restServerAddress;
       FlowGatewayService.logger.debug(
-        `@onflow/fcl listening on ${this.getGatewayUrl()}`
+        `@onflow/fcl listening on ${accessNodeUrl}`
       );
-      // TODO: temp
-      fcl.config().put("accessNode.api", "http://localhost:8888");
+      fcl.config().put("accessNode.api", accessNodeUrl);
     }
   }
   onExitProjectContext(): void {
     this.projectContext = undefined;
-  }
-
-  private getGatewayUrl() {
-    const { address, port } = this.projectContext?.gateway;
-    const host = `${address}${port ? `:${port}` : ""}`;
-    return host.startsWith("http") ? host : `http://${host}`;
   }
 
   public getTxStatusSubscription(transactionId: string) {
@@ -176,29 +175,35 @@ export class FlowGatewayService implements ProjectContextLifecycle {
       return false;
     }
 
-    const { address, port } = this.projectContext?.gateway;
-    return FlowGatewayService.isPingable(address, port);
+    const gatewayStatus = await FlowGatewayService.getGatewayStatus(
+      this.projectContext.gateway
+    );
+
+    return gatewayStatus === GatewayStatus.GATEWAY_STATUS_ONLINE;
   }
 
-  static async isPingable(host: string, port: number): Promise<boolean> {
+  static async getGatewayStatus(gateway: Gateway): Promise<GatewayStatus> {
+    const { hostname, port } = new URL(gateway.restServerAddress);
     return new Promise((resolve) => {
-      // must provide host without protocol prefix,
-      // otherwise hostname will not be resolved and ENOTFOUND error will be thrown
       const req = http
         .get(
           {
-            host: host.replace(/http(s?):\/\//, ""),
+            host: hostname,
             path: "/live",
             port,
           },
           (res) => {
             req.end();
-            return resolve(res.statusCode === 200);
+            return resolve(
+              res.statusCode === 200
+                ? GatewayStatus.GATEWAY_STATUS_ONLINE
+                : GatewayStatus.GATEWAY_STATUS_UNKNOWN
+            );
           }
         )
         .on("error", (err) => {
           req.end();
-          return resolve(false);
+          return resolve(GatewayStatus.GATEWAY_STATUS_OFFLINE);
         });
       return true;
     });

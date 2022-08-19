@@ -6,48 +6,61 @@ message Project {
   string id = 1;
   string name = 2;
   string filesystem_path = 10;
-  bool pingable = 3;
   // Blockchain data will be fetched from this block height
   // Set this null to start fetching from the latest block
   int32 start_block_height = 5;
 
   Gateway gateway = 6;
+  DevWallet dev_wallet = 11;
   Emulator emulator = 7;
 
   string created_at = 8;
   string updated_at = 9;
 }
 
+enum GatewayStatus {
+  GATEWAY_STATUS_UNKNOWN = 0;
+  GATEWAY_STATUS_ONLINE = 1;
+  GATEWAY_STATUS_OFFLINE = 2;
+}
+
 message Gateway {
-  uint32 port = 1;
-  string address = 2;
+  string rest_server_address = 1;
+  string grpc_server_address = 2;
+  GatewayStatus status = 3;
+}
+
+message DevWallet {
+  bool run = 1;
+  int32 port = 2;
 }
 
 message Emulator {
-    bool verbose_logging = 1;
-    string log_format = 22;
-    uint32 rest_server_port = 2;
-    uint32 grpc_server_port = 3;
-    uint32 admin_server_port = 21;
-    uint32 block_time = 4;
-    string service_private_key = 5;
-    string service_public_key = 6;
-    string database_path = 7;
-    uint32 token_supply = 8;
-    uint32 transaction_expiry = 9;
-    uint32 storage_per_flow = 10;
-    uint32 min_account_balance = 11;
-    uint32 transaction_max_gas_limit = 12;
-    uint32 script_gas_limit = 13;
-    SignatureAlgorithm service_signature_algorithm = 14;
-    HashAlgorithm service_hash_algorithm = 15;
-    bool storage_limit = 16;
-    bool transaction_fees = 17;
-    bool simple_addresses = 19;
-    bool persist = 20;
-    bool with_contracts = 23;
-    bool perform_init = 24;
-    bool enable_grpc_debug = 25;
-    bool enable_rest_debug = 26;
-    bool use_simple_addresses = 27;
+  bool run = 28;
+  bool verbose_logging = 1;
+  string log_format = 22;
+  uint32 rest_server_port = 2;
+  uint32 grpc_server_port = 3;
+  uint32 admin_server_port = 21;
+  uint32 block_time = 4;
+  string service_private_key = 5;
+  string service_public_key = 6;
+  string database_path = 7;
+  uint32 token_supply = 8;
+  uint32 transaction_expiry = 9;
+  uint32 storage_per_flow = 10;
+  uint32 min_account_balance = 11;
+  uint32 transaction_max_gas_limit = 12;
+  uint32 script_gas_limit = 13;
+  SignatureAlgorithm service_signature_algorithm = 14;
+  HashAlgorithm service_hash_algorithm = 15;
+  bool storage_limit = 16;
+  bool transaction_fees = 17;
+  bool simple_addresses = 19;
+  bool persist = 20;
+  bool with_contracts = 23;
+  bool perform_init = 24;
+  bool enable_grpc_debug = 25;
+  bool enable_rest_debug = 26;
+  bool use_simple_addresses = 27;
 }

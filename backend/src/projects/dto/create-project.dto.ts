@@ -3,11 +3,17 @@ import { IsNotEmpty, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { EmulatorConfigurationDto } from "./emulator-configuration.dto";
 import { ApiProperty } from "@nestjs/swagger";
+import { Project } from "@flowser/types/generated/entities/projects";
+import { DevWalletConfigurationDto } from "./dev-wallet-configuration.dto";
 
-export class CreateProjectDto {
+export class CreateProjectDto implements Partial<Project> {
   @ApiProperty()
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  filesystemPath: string;
 
   @ApiProperty({
     description: "Data will be fetched from this block height forward.",
@@ -19,12 +25,13 @@ export class CreateProjectDto {
   @Type(() => GatewayConfigurationDto)
   gateway: GatewayConfigurationDto | undefined;
 
-  @ApiProperty({
-    description:
-      "Custom emulator configuration, used to start a flowser managed emulator.",
-  })
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => EmulatorConfigurationDto)
   emulator: EmulatorConfigurationDto;
+
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => DevWalletConfigurationDto)
+  devWallet: DevWalletConfigurationDto;
 }
