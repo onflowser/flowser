@@ -30,8 +30,8 @@ export class EventEntity extends PollingEntity {
     this.id = `${this.transactionId}.${this.eventIndex}`;
   }
 
-  toProto() {
-    return Event.fromPartial({
+  toProto(): Event {
+    return {
       id: this.id,
       transactionId: this.transactionId,
       blockId: this.blockId,
@@ -41,7 +41,7 @@ export class EventEntity extends PollingEntity {
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(flowEvent: ExtendedFlowEvent): EventEntity {

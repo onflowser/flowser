@@ -39,6 +39,7 @@ export class BlockEntity extends PollingEntity {
     block.collectionGuarantees = flowBlock.collectionGuarantees;
     block.blockSeals = flowBlock.blockSeals;
     // TODO(milestone-3): why is "signatures" field not present in block response?
+    // https://github.com/onflow/fcl-js/issues/1355
     block.signatures = flowBlock.signatures ?? [];
     block.timestamp = new Date(flowBlock.timestamp);
     block.height = flowBlock.height;
@@ -46,16 +47,17 @@ export class BlockEntity extends PollingEntity {
     return block;
   }
 
-  toProto() {
-    return Block.fromPartial({
+  toProto(): Block {
+    return {
       id: this.id,
       parentId: this.parentId,
       height: this.height,
       timestamp: this.timestamp.toISOString(),
       blockSeals: this.blockSeals,
       signatures: this.signatures,
+      collectionGuarantees: this.collectionGuarantees,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 }

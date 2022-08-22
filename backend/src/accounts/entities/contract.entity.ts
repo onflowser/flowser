@@ -38,15 +38,15 @@ export class AccountContractEntity extends PollingEntity {
     this.id = `${this.accountAddress}.${this.name}`;
   }
 
-  toProto() {
-    return AccountContract.fromPartial({
+  toProto(): AccountContract {
+    return {
       id: this.id,
       accountAddress: this.accountAddress,
       name: this.name,
       code: this.code,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(account: FlowAccount, name: string, code: string) {

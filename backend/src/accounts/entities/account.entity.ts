@@ -49,8 +49,9 @@ export class AccountEntity extends PollingEntity {
     );
     return account;
   }
-  toProto() {
-    return Account.fromPartial({
+
+  toProto(): Account {
+    return {
       address: this.address,
       balance: this.balance,
       code: this.code,
@@ -62,6 +63,6 @@ export class AccountEntity extends PollingEntity {
       ),
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 }

@@ -41,7 +41,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (this.projectContext.hasEmulatorConfiguration()) {
+    if (this.projectContext.shouldRunEmulator()) {
       await this.stop();
       try {
         await this.start();

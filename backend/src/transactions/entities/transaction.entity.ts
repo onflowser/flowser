@@ -71,8 +71,8 @@ export class TransactionEntity extends PollingEntity {
   })
   status: TransactionStatus;
 
-  toProto() {
-    return Transaction.fromPartial({
+  toProto(): Transaction {
+    return {
       id: this.id,
       script: this.script,
       blockId: this.blockId,
@@ -83,10 +83,11 @@ export class TransactionEntity extends PollingEntity {
       args: this.args,
       proposalKey: this.proposalKey,
       envelopeSignatures: this.envelopeSignatures,
+      payloadSignatures: this.payloadSignatures,
       status: this.status,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(

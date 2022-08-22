@@ -38,8 +38,8 @@ export class AccountKeyEntity extends PollingEntity {
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
 
-  toProto() {
-    return AccountKey.fromPartial({
+  toProto(): AccountKey {
+    return {
       index: this.index,
       accountAddress: this.accountAddress,
       publicKey: this.publicKey,
@@ -50,7 +50,7 @@ export class AccountKeyEntity extends PollingEntity {
       revoked: this.revoked,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(flowAccount: FlowAccount, flowKey: FlowKey) {

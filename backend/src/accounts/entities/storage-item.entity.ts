@@ -34,15 +34,15 @@ export class AccountStorageItemEntity extends PollingEntity {
     return `/${domain}/${this.pathIdentifier}`;
   }
 
-  toProto() {
-    return AccountStorageItem.fromPartial({
+  toProto(): AccountStorageItem {
+    return {
       id: this.id,
       pathIdentifier: this.pathIdentifier,
       pathDomain: this.pathDomain,
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(

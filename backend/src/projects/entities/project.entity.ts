@@ -51,10 +51,6 @@ export class ProjectEntity extends PollingEntity {
     return this.gateway !== null;
   }
 
-  hasEmulatorConfiguration() {
-    return this.emulator !== null;
-  }
-
   isStartBlockHeightDefined() {
     return this.startBlockHeight !== null;
   }

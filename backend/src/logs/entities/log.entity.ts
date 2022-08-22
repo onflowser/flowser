@@ -13,14 +13,14 @@ export class LogEntity extends PollingEntity {
   @Column()
   data: string;
 
-  toProto() {
-    return Log.fromPartial({
+  toProto(): Log {
+    return {
       id: this.id,
       source: this.source,
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(source: LogSource, lineData: string) {
