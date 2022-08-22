@@ -1,5 +1,5 @@
-import { Column, Entity, Index, PrimaryColumn } from "typeorm";
-import { toKebabCase, typeOrmProtobufTransformer } from "../../utils";
+import { Column, Entity, PrimaryColumn } from "typeorm";
+import { typeOrmProtobufTransformer } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import {
@@ -9,7 +9,7 @@ import {
   Project,
 } from "@flowser/types/generated/entities/projects";
 import { UpdateProjectDto } from "../dto/update-project.dto";
-import { DevWalletConfigurationDto } from "../dto/dev-wallet-configuration.dto";
+import * as crypto from "crypto";
 
 @Entity({ name: "projects" })
 export class ProjectEntity extends PollingEntity {
@@ -17,7 +17,6 @@ export class ProjectEntity extends PollingEntity {
   id: string;
 
   @Column()
-  @Index({ unique: true })
   name: string;
 
   @Column()
@@ -61,27 +60,31 @@ export class ProjectEntity extends PollingEntity {
   }
 
   shouldRunEmulator() {
-    // Testnet usage is in beta, main-net won't be support
-    // TODO(milestone-3): How to handle network type detection?
     return this.emulator?.run;
   }
 
-  toProto() {
-    return Project.fromPartial({
+  toProto(): Project {
+    return {
       id: this.id,
       name: this.name,
       filesystemPath: this.filesystemPath,
       startBlockHeight: this.startBlockHeight,
       gateway: this.gateway,
+      devWallet: this.devWallet,
       emulator: this.emulator,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(projectDto: CreateProjectDto | UpdateProjectDto) {
     const project = new ProjectEntity();
-    project.id = toKebabCase(projectDto.name);
+    const isUpdateDto = "id" in projectDto && Boolean(projectDto.id);
+    if (isUpdateDto) {
+      project.id = projectDto.id;
+    } else {
+      project.id = crypto.randomUUID();
+    }
     project.name = projectDto.name;
     project.startBlockHeight = projectDto.startBlockHeight;
     project.filesystemPath = projectDto.filesystemPath;
@@ -91,7 +94,7 @@ export class ProjectEntity extends PollingEntity {
           restServerAddress: `http://localhost:${projectDto.emulator.restServerPort}`,
           grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
         });
-    project.devWallet = DevWallet.fromPartial(projectDto.devWallet);
+    project.devWallet = DevWallet.fromJSON(projectDto.devWallet);
     project.emulator = Emulator.fromJSON(projectDto.emulator);
     return project;
   }

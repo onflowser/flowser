@@ -8,7 +8,7 @@ import { useHistory, useParams } from "react-router-dom";
 
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
-import Input from "../../../components/input/Input";
+import Input, { InputProps } from "../../../components/input/Input";
 import ToggleButton from "../../../components/toggle-button/ToggleButton";
 import RadioButton from "../../../components/radio-button/RadioButton";
 import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
@@ -35,6 +35,12 @@ import {
   SignatureAlgorithm,
 } from "@flowser/types/generated/entities/common";
 import { FlowUtils } from "../../../utils/flow-utils";
+import * as yup from "yup";
+
+const projectSchema = yup.object().shape({
+  name: yup.string().required("Required"),
+  filesystemPath: yup.string().required("Required"),
+});
 
 const Configuration: FunctionComponent = () => {
   const projectService = ProjectsService.getInstance();
@@ -47,7 +53,7 @@ const Configuration: FunctionComponent = () => {
   const isExistingProject = Boolean(id);
 
   const formik = useFormik({
-    // TODO(milestone-3): add project schema validation
+    validationSchema: projectSchema,
     initialValues: Project.fromPartial({
       filesystemPath: "",
       devWallet: DevWallet.fromPartial({}),
@@ -71,6 +77,16 @@ const Configuration: FunctionComponent = () => {
   });
 
   useEffect(() => {
+    if (!formik.isValid) {
+      toast.error("Oops, please double check this form!");
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [formik.isValid]);
+
+  useEffect(() => {
     setIsLoading(true);
     (isExistingProject
       ? loadExistingProject(id)
@@ -85,7 +101,7 @@ const Configuration: FunctionComponent = () => {
       const existingProjectData = await projectService.getSingle(id);
       const existingProject = existingProjectData.data.project;
       if (existingProject) {
-        formik.setValues(existingProject);
+        formik.setValues(existingProject, false);
       }
     } catch (e) {
       console.error(e);
@@ -99,7 +115,7 @@ const Configuration: FunctionComponent = () => {
       const defaultProjectData = await projectService.getDefaultProjectInfo();
       const defaultProject = defaultProjectData.data.project;
       if (defaultProject) {
-        formik.setValues(defaultProject);
+        formik.setValues(defaultProject, false);
       }
     } catch (e) {
       toast.error(
@@ -138,6 +154,73 @@ const Configuration: FunctionComponent = () => {
 
   if (formik.isSubmitting) {
     return <FullScreenLoading className={classes.loader} />;
+  }
+
+  function DevWalletTextField({
+    path,
+    ...restProps
+  }: FieldProps & { path: keyof DevWallet }) {
+    return (
+      <TextField
+        disabled={!formik.values.devWallet?.run}
+        path={`devWallet.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function DevWalletToggleField({
+    path,
+    diseblable = true,
+    ...restProps
+  }: FieldProps & { path: keyof DevWallet; diseblable?: boolean }) {
+    return (
+      <ToggleField
+        disabled={!formik.values.devWallet?.run && diseblable}
+        path={`devWallet.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function EmulatorTextField({
+    path,
+    ...restProps
+  }: FieldProps & { path: keyof Emulator }) {
+    return (
+      <TextField
+        disabled={!formik.values.emulator?.run}
+        path={`emulator.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function EmulatorRadioField({
+    path,
+    ...restProps
+  }: RadioFieldProps & { path: keyof Emulator }) {
+    return (
+      <RadioField
+        disabled={!formik.values.emulator?.run}
+        path={`emulator.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function EmulatorToggleField({
+    path,
+    diseblable = true,
+    ...restProps
+  }: FieldProps & { path: keyof Emulator; diseblable?: boolean }) {
+    return (
+      <ToggleField
+        disabled={!formik.values.emulator?.run && diseblable}
+        path={`emulator.${path}`}
+        {...restProps}
+      />
+    );
   }
 
   return (
@@ -193,6 +276,7 @@ const Configuration: FunctionComponent = () => {
                   <DevWalletToggleField
                     label="Run dev-wallet"
                     path="run"
+                    diseblable={false}
                     description="Start the dev-wallet server"
                     formik={formik}
                   />
@@ -214,6 +298,7 @@ const Configuration: FunctionComponent = () => {
                   <EmulatorToggleField
                     label="Run emulator"
                     path="run"
+                    diseblable={false}
                     description="Start the emulator"
                     formik={formik}
                   />
@@ -468,41 +553,6 @@ const Configuration: FunctionComponent = () => {
   );
 };
 
-function DevWalletTextField({
-  path,
-  ...restProps
-}: FieldProps & { path: keyof DevWallet }) {
-  return <TextField path={`devWallet.${path}`} {...restProps} />;
-}
-
-function DevWalletToggleField({
-  path,
-  ...restProps
-}: FieldProps & { path: keyof DevWallet }) {
-  return <ToggleField path={`devWallet.${path}`} {...restProps} />;
-}
-
-function EmulatorTextField({
-  path,
-  ...restProps
-}: FieldProps & { path: keyof Emulator }) {
-  return <TextField path={`emulator.${path}`} {...restProps} />;
-}
-
-function EmulatorRadioField({
-  path,
-  ...restProps
-}: RadioFieldProps & { path: keyof Emulator }) {
-  return <RadioField path={`emulator.${path}`} {...restProps} />;
-}
-
-function EmulatorToggleField({
-  path,
-  ...restProps
-}: FieldProps & { path: keyof Emulator }) {
-  return <ToggleField path={`emulator.${path}`} {...restProps} />;
-}
-
 function getHashAlgorithmRadioOptions(hashAlgorithms: HashAlgorithm[]) {
   return hashAlgorithms.map((algo) => ({
     label: FlowUtils.getHashAlgoName(algo),
@@ -519,7 +569,7 @@ function getSignatureAlgorithmRadioOptions(
   }));
 }
 
-type FieldProps = {
+type FieldProps = Pick<InputProps, "type" | "disabled"> & {
   label?: string;
   description?: string;
   path: string;
@@ -535,13 +585,19 @@ type FieldProps = {
   };
 };
 
-function TextField({ label, description, formik, path }: FieldProps) {
+function TextField({
+  label,
+  description,
+  formik,
+  path,
+  ...inputProps
+}: FieldProps) {
   const error = CommonUtils.getNestedValue(formik.errors, path) as string;
   return (
     <>
       {label && <span>{label}</span>}
       <Input
-        type="text"
+        {...inputProps}
         name={path}
         value={CommonUtils.getNestedValue(formik.values, path) as string}
         onChange={formik.handleChange}
@@ -570,6 +626,7 @@ function RadioField({
   formik,
   path,
   options,
+  disabled,
 }: RadioFieldProps) {
   const value = CommonUtils.getNestedValue(formik.values, path);
 
@@ -585,6 +642,7 @@ function RadioField({
         <div key={option.value}>
           <span>{option.label}</span>
           <RadioButton
+            disabled={disabled}
             checked={value === option.value}
             onChange={() => formik.setFieldValue(path, option.value)}
           />
@@ -594,7 +652,13 @@ function RadioField({
   );
 }
 
-function ToggleField({ label, description, formik, path }: FieldProps) {
+function ToggleField({
+  label,
+  description,
+  formik,
+  path,
+  disabled,
+}: FieldProps) {
   const value = CommonUtils.getNestedValue(formik.values, path) as boolean;
 
   return (
@@ -603,6 +667,7 @@ function ToggleField({ label, description, formik, path }: FieldProps) {
       <div className={classes.toggleButton}>
         <span>False</span>
         <ToggleButton
+          disabled={disabled}
           value={value}
           onChange={(state) => formik.setFieldValue(path, state)}
         />

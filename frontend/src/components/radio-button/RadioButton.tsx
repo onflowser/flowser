@@ -1,31 +1,38 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import classes from "./RadioButton.module.scss";
+import classNames from "classnames";
 
 type RadioButtonProps = {
   checked: boolean;
+  disabled?: boolean;
   onChange: (checked: boolean) => void;
 };
 
 const RadioButton: FunctionComponent<RadioButtonProps> = ({
   checked = false,
+  disabled = false,
   onChange,
 }) => {
-  const [state, setState] = useState(checked);
+  const [isChecked, setIsChecked] = useState(checked);
 
   useEffect(() => {
-    setState(checked);
+    setIsChecked(checked);
   }, [checked]);
 
   const onClick = () => {
-    setState(true);
-    onChange(state);
+    if (!disabled) {
+      setIsChecked(true);
+      onChange(isChecked);
+    }
   };
 
   return (
     <div
-      className={`${classes.root} ${
-        state ? classes.checked : classes.unchecked
-      }`}
+      className={classNames(classes.root, {
+        [classes.checked]: isChecked,
+        [classes.unchecked]: !isChecked,
+        [classes.disabled]: disabled,
+      })}
       onClick={onClick}
     >
       <span></span>

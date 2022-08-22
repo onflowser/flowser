@@ -28,4 +28,10 @@
     }
   }
 
+  &.disabled {
+    & > span {
+      background-color: $color-grey;
+    }
+  }
+
 }
