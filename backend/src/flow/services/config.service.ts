@@ -116,7 +116,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   async getTransactionTemplates(): Promise<TransactionTemplate[]> {
-    // TODO(milestone-3): Implement heuristic way for retrieving transactions
+    // TODO(milestone-x): Is there a way to retrieve all project transaction files?
     // For now we can't reliably tell where are transactions source files located,
     // because they are not defined in flow.json config file - but this may be doable in the future.
     // For now we have 2 options:

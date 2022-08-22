@@ -141,9 +141,7 @@ export class ProjectsService {
       throw new PreconditionFailedException("Project folder not found");
     }
     const project = ProjectEntity.create(createProjectDto);
-    await this.projectRepository
-      .insert(project)
-      .catch(this.handleDatabaseError);
+    await this.projectRepository.insert(project);
     return project;
   }
 
@@ -174,9 +172,7 @@ export class ProjectsService {
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     const project = ProjectEntity.create(updateProjectDto);
     project.markUpdated();
-    await this.projectRepository
-      .update({ id }, project)
-      .catch(this.handleDatabaseError);
+    await this.projectRepository.update({ id }, project);
     return project;
   }
 
@@ -237,15 +233,5 @@ export class ProjectsService {
         : GatewayStatus.GATEWAY_STATUS_ONLINE;
     }
     return project;
-  }
-
-  private handleDatabaseError(error) {
-    // TODO(milestone-3): how to handle errors for SQL
-    switch (error.code) {
-      case 11000:
-        throw new ConflictException("Project name already exists");
-      default:
-        throw new InternalServerErrorException(error.message);
-    }
   }
 }

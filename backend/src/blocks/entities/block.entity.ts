@@ -38,7 +38,7 @@ export class BlockEntity extends PollingEntity {
     block.id = flowBlock.id;
     block.collectionGuarantees = flowBlock.collectionGuarantees;
     block.blockSeals = flowBlock.blockSeals;
-    // TODO(milestone-3): why is "signatures" field not present in block response?
+    // TODO(milestone-x): "signatures" field is not present in block response
     // https://github.com/onflow/fcl-js/issues/1355
     block.signatures = flowBlock.signatures ?? [];
     block.timestamp = new Date(flowBlock.timestamp);

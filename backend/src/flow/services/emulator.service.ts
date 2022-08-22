@@ -336,7 +336,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         })
         // only include lines that do not contain API call information
         // those lines are annoying, because they show up every second (due to our backend polling)
-        // TODO(milestone-3): improve API calls log filtering logic
+        // TODO(milestone-x): improve API calls log filtering logic
         .filter((line) => !line.includes("called"))
     );
   }

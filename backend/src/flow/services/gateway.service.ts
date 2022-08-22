@@ -23,8 +23,8 @@ export type FlowBlock = {
   timestamp: number;
   collectionGuarantees: FlowCollectionGuarantee[];
   blockSeals: any[];
-  // TODO(milestone-3): why is "signatures" field not present in block response (fcl-js@1.0)?
-  // See issue that I submitted: https://github.com/onflow/fcl-js/issues/1355
+  // TODO(milestone-x): "signatures" field is not present in block response
+  // https://github.com/onflow/fcl-js/issues/1355
   signatures: string[];
 };
 
