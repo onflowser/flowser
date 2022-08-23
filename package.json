@@ -37,6 +37,7 @@
   "workspaces": [
     "./backend",
     "./frontend",
-    "./types"
+    "./types",
+    "./desktop"
   ]
 }
