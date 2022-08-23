@@ -31,7 +31,7 @@ The following system dependencies are required:
 - Yarn (tested on v1.22)
 - TypeScript compiler - [tsc](https://www.typescriptlang.org/) (tested on v4.7.4)
 - Protocol Buffers compiler - [protoc](https://grpc.io/docs/protoc-installation/) (tested on v3.21)
-- [flow-cli](https://docs.onflow.org/flow-cli/install/) (works with < v0.28.3)
+- [flow-cli](https://docs.onflow.org/flow-cli/install/)
 
 > If you're using [nvm](https://github.com/nvm-sh/nvm) for Node.js version management, then just run `nvm use` in project root.
 
