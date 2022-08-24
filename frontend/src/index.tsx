@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.scss";
-import App from "./App";
+import { FlowserClientApp } from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { QueryClientProvider } from "react-query";
 import query from "./config/query";
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== "development") {
 ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={query}>
-      <App />
+      <FlowserClientApp />
     </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById("root")

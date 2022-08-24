@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import App from "./App";
+import { FlowserClientApp } from "./App";
 
 test("renders learn react link", () => {
-  render(<App />);
+  render(<FlowserClientApp />);
   const linkElement = screen.getByText(/Hello Flowser/i);
   expect(linkElement).toBeInTheDocument();
 });

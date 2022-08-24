@@ -39,8 +39,9 @@
   },
   "scripts": {
     "cleanup": "rm -rf node_modules",
-    "start": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "start:web": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build:web": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build:lib": "rollup -c",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
@@ -66,6 +67,10 @@
     ]
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-image": "^2.1.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
     "eslint-config-prettier": "^8.3.0",
@@ -73,6 +78,9 @@
     "eslint-plugin-react": "^7.26.0",
     "lint-staged": "^11.1.2",
     "prettier": "^2.4.1",
+    "rollup": "^2.78.1",
+    "rollup-plugin-dts": "^4.2.2",
+    "rollup-plugin-scss": "3",
     "sass": "^1.42.1"
   },
   "husky": {

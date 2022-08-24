@@ -54,7 +54,7 @@ const BrowserRouterEvents = withRouter(
   }
 );
 
-export const App = () => {
+export const FlowserClientApp = () => {
   return (
     <UiStateContextProvider>
       <BrowserRouter>
@@ -88,5 +88,3 @@ export const App = () => {
     </UiStateContextProvider>
   );
 };
-
-export default App;
