@@ -38,6 +38,7 @@
     "./backend",
     "./frontend",
     "./types",
-    "./desktop"
+    "./desktop",
+    "./web"
   ]
 }

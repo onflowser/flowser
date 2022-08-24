@@ -3,7 +3,8 @@
     "./backend",
     "./frontend",
     "./types",
-    "./desktop"
+    "./desktop",
+    "./web"
   ],
   "npmClient": "yarn",
   "useWorkspaces": true,
