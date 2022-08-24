@@ -3,7 +3,7 @@ import classes from "./KeyListItem.module.scss";
 import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import CopyButton from "../../../components/copy-button/CopyButton";
-import { ReactComponent as KeyIcon } from "../../../assets/icons/key.svg";
+import KeyIcon from "../../../assets/icons/key.svg";
 import Badge from "../../../components/badge/Badge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { AccountKey } from "@flowser/types/generated/entities/accounts";

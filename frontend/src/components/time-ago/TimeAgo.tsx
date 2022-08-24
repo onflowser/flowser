@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import ReactTimeAgo from "react-timeago";
-import { ReactComponent as ClockIcon } from "../../assets/icons/clock.svg";
+import ClockIcon from "../../assets/icons/clock.svg";
 import classes from "./TimeAgo.module.scss";
 
 type TimeAgoProps = {

@@ -10,7 +10,7 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
   loadingText?: string;
 };
 
-const Card: FunctionComponent<CardProps> = ({
+export const Card: FunctionComponent<CardProps> = ({
   children,
   className,
   variant = "blue",

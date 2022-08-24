@@ -1,4 +1,3 @@
-export { FlowserClientApp } from "./App";
-// import { hello } from "./demo";
+import "./parcel.d";
 
-// console.log(hello());
+export { FlowserClientApp } from "./App";

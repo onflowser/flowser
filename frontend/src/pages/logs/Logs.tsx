@@ -7,9 +7,9 @@ import React, {
 } from "react";
 import classes from "./Logs.module.scss";
 import Search from "../../components/search/Search";
-import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
-import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
-import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
+import ExpandIcon from "../../assets/icons/expand.svg";
+import ShrinkIcon from "../../assets/icons/shrink.svg";
+import LogsIcon from "../../assets/icons/logs.svg";
 import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";

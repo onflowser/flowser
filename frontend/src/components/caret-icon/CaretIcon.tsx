@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { ReactComponent as CaretIconSvg } from "../../assets/icons/caret.svg";
+import CaretIconSvg from "../../assets/icons/caret.svg";
 import classes from "./CaretIcon.module.scss";
 
 type CaretIconProps = {
