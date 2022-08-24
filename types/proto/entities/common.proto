@@ -34,7 +34,7 @@ enum CadenceType {
 
 message CadenceObject {
   CadenceType type = 1;
-  optional string value = 2;
+  string value = 2;
   repeated CadenceObject children = 3;
 }
 
