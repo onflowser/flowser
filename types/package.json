@@ -4,6 +4,7 @@
   "description": "",
   "main": "./generated/*.js",
   "types": "./generated/*.ts",
+  "type": "module",
   "scripts": {
     "cleanup": "rm -rf node_modules",
     "generate": "sh build.sh",
