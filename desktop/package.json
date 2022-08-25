@@ -89,6 +89,7 @@
     }
   },
   "dependencies": {
+    "@flowser/frontend": "^0.0.1",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^5.2.1",
