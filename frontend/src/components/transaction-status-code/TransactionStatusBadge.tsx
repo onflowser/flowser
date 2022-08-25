@@ -6,7 +6,7 @@ import TransactionFinalizedIcon from "../../assets/icons/status-finalized.svg";
 import TransactionExecutedIcon from "../../assets/icons/status-executed.svg";
 import TransactionSealedIcon from "../../assets/icons/status-sealed.svg";
 import TransactionExpiredIcon from "../../assets/icons/status-expired.svg";
-import { TransactionStatusCode } from "@flowser/types/generated/entities/transactions";
+import { TransactionStatusCode } from "@flowser/types";
 
 type TransactionStatusCodeProps = {
   statusCode: TransactionStatusCode | undefined;

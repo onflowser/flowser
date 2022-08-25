@@ -1,6 +1,13 @@
 @import 'styles/colors';
 @import 'styles/typography';
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+}
+
+
 html,
 body {
     background: $color-background;

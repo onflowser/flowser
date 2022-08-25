@@ -1,4 +1,4 @@
-import { GetPollingEventsResponse } from "@flowser/types/generated/responses/events";
+import { GetPollingEventsResponse } from "@flowser/types";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

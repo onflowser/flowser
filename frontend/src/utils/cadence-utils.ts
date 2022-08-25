@@ -1,7 +1,4 @@
-import {
-  CadenceObject,
-  CadenceType,
-} from "@flowser/types/generated/entities/common";
+import { CadenceObject, CadenceType } from "@flowser/types";
 
 export class CadenceUtils {
   static getDisplayType(cadenceObject: CadenceObject): string {

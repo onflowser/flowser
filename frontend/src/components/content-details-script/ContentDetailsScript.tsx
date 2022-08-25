@@ -6,7 +6,7 @@ import Label from "../label/Label";
 import Ellipsis from "../ellipsis/Ellipsis";
 import Value from "../value/Value";
 import CopyButton from "../copy-button/CopyButton";
-import { CadenceObject } from "@flowser/types/generated/entities/common";
+import { CadenceObject } from "@flowser/types";
 import { CadenceUtils } from "../../utils/cadence-utils";
 
 export type ContentDetailsScriptProps = {
