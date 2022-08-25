@@ -15,7 +15,6 @@ import { UiStateContextProvider } from "./contexts/ui-state.context";
 import { useSearch } from "./hooks/use-search";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
-import splitbee from "@splitbee/web";
 import { QueryClientProvider } from "react-query";
 
 // pages
@@ -28,13 +27,13 @@ import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
 import query from "./config/query";
 
-// init analytics
-if (process.env.NODE_ENV !== "development") {
-  splitbee.init({
-    token: "B3B9T4Z4SRQ3",
-    disableCookie: true,
-  });
-}
+// TODO(milestone-x): temporary disabled, move analytics to a separate hook
+// if (process.env.NODE_ENV !== "development") {
+//   splitbee.init({
+//     token: "B3B9T4Z4SRQ3",
+//     disableCookie: true,
+//   });
+// }
 
 const RouteWithLayout = (props: RouteProps) => (
   <Layout>
@@ -67,45 +66,40 @@ const BrowserRouterEvents = withRouter(
 
 export const FlowserClientApp = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={query}>
-        <UiStateContextProvider>
-          <BrowserRouter>
-            <BrowserRouterEvents>
-              <Switch>
-                <Route path={`/${routes.start}`} component={Start} />
-                <RouteWithLayout
-                  path={`/${routes.accounts}`}
-                  component={Accounts}
-                />
-                <RouteWithLayout
-                  path={`/${routes.blocks}`}
-                  component={Blocks}
-                />
-                <RouteWithLayout
-                  path={`/${routes.transactions}`}
-                  component={Transactions}
-                />
-                <RouteWithLayout
-                  path={`/${routes.contracts}`}
-                  component={Contracts}
-                />
-                <RouteWithLayout
-                  path={`/${routes.events}`}
-                  component={Events}
-                />
-                <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
-                <Redirect from="*" to={`/${routes.start}`} />
-              </Switch>
-              <Toaster
-                position="bottom-center"
-                gutter={8}
-                toastOptions={toastOptions}
-              />
-            </BrowserRouterEvents>
-          </BrowserRouter>
-        </UiStateContextProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={query}>
+      <UiStateContextProvider>
+        <FlowserRouter />
+      </UiStateContextProvider>
+    </QueryClientProvider>
+  );
+};
+
+export const FlowserRouter = () => {
+  return (
+    <BrowserRouter>
+      <BrowserRouterEvents>
+        <Switch>
+          <Route path={`/${routes.start}`} component={Start} />
+          <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
+          <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
+          <RouteWithLayout
+            path={`/${routes.transactions}`}
+            component={Transactions}
+          />
+          <RouteWithLayout
+            path={`/${routes.contracts}`}
+            component={Contracts}
+          />
+          <RouteWithLayout path={`/${routes.events}`} component={Events} />
+          <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
+          <Redirect from="*" to={`/${routes.start}`} />
+        </Switch>
+        <Toaster
+          position="bottom-center"
+          gutter={8}
+          toastOptions={toastOptions}
+        />
+      </BrowserRouterEvents>
+    </BrowserRouter>
   );
 };

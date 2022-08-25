@@ -69,7 +69,8 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
       <div className={`${classes.navigationContainer} ${props.className}`}>
         <div className={classes.mainContainer}>
           <div className={classes.logoContainer}>
-            <img src={Logo} alt="FLOWSER" />
+            {/* TODO(milestone-5): fix this image */}
+            <Logo />
           </div>
           <div className={classes.navLinksContainer}>
             <NavigationItem

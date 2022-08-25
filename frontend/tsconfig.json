@@ -1,28 +1,14 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
+    "declaration": true,
     "module": "esnext",
+    "target": "es5",
+    "lib": ["es6", "dom", "ES2021"],
+    "sourceMap": true,
+    "jsx": "react",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noImplicitAny": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src/**/*"]
 }

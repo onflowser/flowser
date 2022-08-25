@@ -1,5 +1,3 @@
-import "./parcel.d";
+import "./global.ts";
 
-export { CaretIcon } from "./components/caret-icon/CaretIcon";
-export { Card } from "./components/card/Card";
-export { FlowserClientApp } from "./App";
+export * from "./App";
