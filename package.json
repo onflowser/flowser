@@ -10,7 +10,8 @@
   "scripts": {
     "start": "lerna run start --parallel",
     "cleanup": "lerna run cleanup --parallel",
-    "bootstrap": "yarn install && lerna bootstrap && husky install && lerna run --scope @flowser/types build",
+    "build": "lerna run build --parallel",
+    "bootstrap": "yarn install && npx lerna bootstrap && husky install && npx lerna run build --scope @flowser/types --scope @flowser/frontend",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {

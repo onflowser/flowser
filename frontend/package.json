@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "source": "./src/index.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.mjs",
   "types": "./dist/types.d.ts",
   "dependencies": {
     "@flowser/types": "^0.0.1",
@@ -44,7 +43,7 @@
   },
   "scripts": {
     "cleanup": "rm -rf node_modules",
-    "build": "SASS_PATH=node_modules:src parcel build",
+    "build": "SASS_PATH=node_modules:src parcel build --no-source-maps",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",

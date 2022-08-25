@@ -9,7 +9,7 @@ type CaretIconProps = {
   inverted?: boolean; // Close state is upside orientated instead of downside orientated
 };
 
-const CaretIcon: FunctionComponent<CaretIconProps> = ({
+export const CaretIcon: FunctionComponent<CaretIconProps> = ({
   isOpen = false,
   onChange = () => false,
   inverted = false,
