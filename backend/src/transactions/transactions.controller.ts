@@ -8,7 +8,7 @@ import {
   GetAllTransactionsResponse,
   GetPollingTransactionsResponse,
   GetSingleTransactionResponse,
-} from "@flowser/types/generated/responses/transactions";
+} from "@flowser/types";
 
 @Controller()
 export class TransactionsController {

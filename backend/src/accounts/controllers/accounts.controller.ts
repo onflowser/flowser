@@ -8,7 +8,7 @@ import {
   GetAllAccountsResponse,
   GetSingleAccountResponse,
   GetPollingKeysResponse,
-} from "@flowser/types/generated/responses/accounts";
+} from "@flowser/types";
 import { KeysService } from "../services/keys.service";
 
 @Controller("accounts")

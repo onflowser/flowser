@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { AccountEntity } from "./account.entity";
-import { AccountStorage } from "@flowser/types/generated/entities/accounts";
+import { AccountStorage } from "@flowser/types";
 
 @Entity({ name: "storage" })
 export class AccountsStorageEntity {

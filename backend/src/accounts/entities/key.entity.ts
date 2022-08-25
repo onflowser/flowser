@@ -3,11 +3,8 @@ import { PollingEntity } from "../../common/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount, FlowKey } from "../../flow/services/flow-gateway.service";
-import { AccountKey } from "@flowser/types/generated/entities/accounts";
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+import { AccountKey } from "@flowser/types";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/types";
 
 @Entity({ name: "keys" })
 export class AccountKeyEntity extends PollingEntity {

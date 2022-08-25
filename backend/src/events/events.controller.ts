@@ -4,10 +4,7 @@ import { PollingResponseInterceptor } from "../common/interceptors/polling-respo
 import { ApiParam } from "@nestjs/swagger";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
-import {
-  GetAllEventsResponse,
-  GetPollingEventsResponse,
-} from "@flowser/types/generated/responses/events";
+import { GetAllEventsResponse, GetPollingEventsResponse } from "@flowser/types";
 
 @Controller()
 export class EventsController {
