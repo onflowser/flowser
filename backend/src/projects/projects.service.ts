@@ -123,10 +123,10 @@ export class ProjectsService {
           service.onEnterProjectContext(this.currentProject)
         )
       );
-    } catch (e) {
+    } catch (e: unknown) {
       this.logger.debug("Project context initialization failed", e);
       throw new InternalServerErrorException(
-        "Project context initialization failed"
+        e ?? "Project context initialization failed"
       );
     }
 
