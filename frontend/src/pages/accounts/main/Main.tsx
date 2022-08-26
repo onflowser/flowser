@@ -9,24 +9,10 @@ import { useFilterData } from "../../../hooks/use-filter-data";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingAccounts } from "../../../hooks/use-api";
-import Table, { TableData } from "../../../components/table/Table";
-import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
+import Table from "../../../components/table/Table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/types/generated/entities/accounts";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
-
-type FilteredData = {
-  address: string;
-  balance: number;
-  code: string;
-  contracts: [];
-  createdAt: string;
-  isNew: boolean;
-  isUpdated: boolean;
-  keys: [];
-  storage: [];
-  transactions: [];
-  updatedAt: string;
-};
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
