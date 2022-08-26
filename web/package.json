@@ -1,7 +1,8 @@
 {
-  "name": "web",
+  "name": "@flowser/web",
   "version": "0.1.0",
   "private": true,
+  "main": "public/main.js",
   "dependencies": {
     "@flowser/frontend": "^0.0.1",
     "@testing-library/jest-dom": "^5.16.5",
@@ -11,17 +12,25 @@
     "@types/node": "^16.11.56",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "concurrently": "^7.3.0",
+    "cross-env": "^7.0.3",
+    "electron": "^20.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "4.0.3",
     "typescript": "^4.7.4",
+    "wait-on": "^6.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "cleanup": "rm -rf node_modules",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron:serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
+    "electron:build": "yarn build && electron-builder -c.extraMetadata.main=build/main.js",
+    "electron:start": "wait-on tcp:3000 && electron ."
   },
   "eslintConfig": {
     "extends": [
