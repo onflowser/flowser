@@ -2,7 +2,12 @@
   "name": "@flowser/desktop",
   "private": true,
   "description": "Easily start you local Flow blockchain & inspect the state.",
-  "keywords": ["flow-blockchain", "flowser", "blockchain", "desktop-app"],
+  "keywords": [
+    "flow-blockchain",
+    "flowser",
+    "blockchain",
+    "desktop-app"
+  ],
   "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
   "bugs": {
     "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
@@ -94,8 +99,7 @@
     "electron-log": "^4.4.8",
     "electron-updater": "^5.2.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.3.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",

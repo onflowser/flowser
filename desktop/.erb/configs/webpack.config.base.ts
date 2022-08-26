@@ -41,11 +41,25 @@ const configuration: webpack.Configuration = {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    fallback: {
+      os: require.resolve('os-browserify/browser'),
+      tty: require.resolve('tty-browserify'),
+      stream: require.resolve('stream-browserify'),
+      https: require.resolve('https-browserify'),
+      http: require.resolve('stream-http'),
+      zlib: require.resolve('browserify-zlib'),
+    },
   },
 
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
     }),
   ],
 };
