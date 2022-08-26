@@ -12,6 +12,7 @@ import FullScreenLoading from "../../../components/fullscreen-loading/FullScreen
 import { useGetPollingAccounts } from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
+import { Account } from "@flowser/types/generated/entities/accounts";
 
 type FilteredData = {
   address: string;
@@ -79,7 +80,8 @@ const Main: FunctionComponent = () => {
         <NoResults className={classes.noResults} />
       )}
       {filteredData.length > 0 && (
-        <Table columns={columns} data={[...filteredData]}></Table>
+        // @ts-ignore TODO: fix types for columns
+        <Table<Account> columns={columns} data={[...filteredData]}></Table>
       )}
     </>
   );
