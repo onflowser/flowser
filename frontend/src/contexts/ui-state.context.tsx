@@ -1,4 +1,9 @@
-import React, { createContext, FunctionComponent, useState } from "react";
+import React, {
+  createContext,
+  FunctionComponent,
+  useContext,
+  useState,
+} from "react";
 import { LogDrawerUiState } from "../hooks/use-log-drawer";
 import { NavigationUiState } from "../hooks/use-navigation";
 
@@ -9,6 +14,10 @@ interface UiStateContextProps {
 type Props = UiStateContextProps;
 
 export const UiStateContext: any = createContext<any>([{}, () => undefined]);
+
+export function useUiStateContext() {
+  return useContext<any>(UiStateContext);
+}
 
 export interface UiState extends LogDrawerUiState, NavigationUiState {
   placeholder: { [key: string]: string };

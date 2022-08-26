@@ -9,9 +9,11 @@
   },
   "scripts": {
     "start": "lerna run start --parallel",
-    "cleanup": "lerna run cleanup --parallel",
+    "cleanup": "lerna run cleanup --parallel && rm -rf node_modules",
     "build": "lerna run build --parallel",
-    "bootstrap": "yarn install && npx lerna bootstrap && husky install && npx lerna run build --scope @flowser/types --scope @flowser/frontend",
+    "bootstrap": "yarn install && yarn run lerna:bootstrap && husky install",
+    "lerna:bootstrap": "lerna bootstrap",
+    "build:libs": " npx lerna run build --scope @flowser/types --scope @flowser/frontend",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {
@@ -39,7 +41,6 @@
     "./backend",
     "./frontend",
     "./types",
-    "./desktop",
     "./web"
   ]
 }

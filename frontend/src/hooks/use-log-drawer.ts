@@ -1,5 +1,4 @@
-import { useContext } from "react";
-import { UiState, UiStateContext } from "../contexts/ui-state.context";
+import { UiState, useUiStateContext } from "../contexts/ui-state.context";
 
 export type LogDrawerSize = "tiny" | "small" | "big" | "custom";
 
@@ -12,7 +11,7 @@ export interface UseLogDrawerHook extends LogDrawerUiState {
 }
 
 export const useLogDrawer = (): UseLogDrawerHook => {
-  const [state, setState] = useContext(UiStateContext);
+  const [state, setState] = useUiStateContext();
 
   const setSize = (size: LogDrawerSize): void => {
     setState((state: UiState) => ({ ...state, logDrawerSize: size }));

@@ -3,7 +3,9 @@
     "strict": false,
     "rootDir": ".",
     "declaration": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "files": [
     "src/index.ts"

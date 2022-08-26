@@ -3,7 +3,6 @@
     "./backend",
     "./frontend",
     "./types",
-    "./desktop",
     "./web"
   ],
   "npmClient": "yarn",
