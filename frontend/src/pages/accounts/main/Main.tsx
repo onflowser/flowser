@@ -10,6 +10,22 @@ import { useFilterData } from "../../../hooks/use-filter-data";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingAccounts } from "../../../hooks/use-api";
+import Table from "../../../components/table/Table";
+import { createColumnHelper } from "@tanstack/react-table";
+
+type FilteredData = {
+  address: string;
+  balance: number;
+  code: string;
+  contracts: [];
+  createdAt: string;
+  isNew: boolean;
+  isUpdated: boolean;
+  keys: [];
+  storage: [];
+  transactions: [];
+  updatedAt: string;
+};
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -28,39 +44,42 @@ const Main: FunctionComponent = () => {
 
   const { filteredData } = useFilterData(accounts, searchTerm);
 
+  const columnHelper = createColumnHelper<FilteredData>();
+
+  // Specify table shape
+  const columns = [
+    columnHelper.accessor("address", {
+      header: () => <Label>ADDRESS</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`accounts/details/${info.getValue()}`}>
+            {info.getValue()}
+          </NavLink>
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("balance", {
+      header: () => <Label>BALANCE</Label>,
+      cell: (info) => <Value>{info.getValue()} FLOW</Value>,
+    }),
+    columnHelper.accessor("keys", {
+      header: () => <Label>KEY COUNT</Label>,
+      cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
+    }),
+    columnHelper.accessor("transactions", {
+      header: () => <Label>TX COUNT</Label>,
+      cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
+    }),
+  ];
+
   return (
     <>
-      {filteredData.map((item) => (
-        <Card
-          key={item.address}
-          className={classes.card}
-          showIntroAnimation={item.isNew || item.isUpdated}
-        >
-          <div>
-            <Label>ADDRESS</Label>
-            <Value>
-              <NavLink to={`/accounts/details/${item.address}`}>
-                {item.address}
-              </NavLink>
-            </Value>
-          </div>
-          <div>
-            <Label>BALANCE</Label>
-            <Value>{item.balance}</Value>
-          </div>
-          <div>
-            <Label>KEY COUNT</Label>
-            <Value>{item.keys?.length ?? 0}</Value>
-          </div>
-          <div>
-            <Label>TX COUNT</Label>
-            <Value>{item.transactions.length ?? 0}</Value>
-          </div>
-        </Card>
-      ))}
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />
+      )}
+      {filteredData.length > 0 && (
+        <Table columns={columns} data={[...filteredData]}></Table>
       )}
     </>
   );

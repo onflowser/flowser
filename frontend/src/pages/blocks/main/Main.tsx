@@ -28,6 +28,22 @@ const Main: FunctionComponent = () => {
     disableSearchBar(false);
   }, []);
 
+  const tableData = {
+    columns: [
+      { heading: "BLOCK HEIGHT", value: "height" },
+      { heading: "BLOCK ID", value: "id" },
+      { heading: "PARENT ID", value: "parendId" },
+      { heading: "TIME", value: "timestamp" },
+      {
+        heading: "COLLECTION GUARANTEES",
+        value: "collectionGuarantees.length",
+      },
+      { heading: "BLOCK SEALS", value: "blockSeals" },
+      { heading: "SIGNATURES", value: "signatures.length" },
+    ],
+    links: [false, true, true, false, false, false, false],
+  };
+
   return (
     <>
       {filteredData.map((item) => (
