@@ -85,12 +85,8 @@
           height:10px;
           padding-right:8px;
         }
-        
-        display:flex;
-        flex-direction: row;
-        align-items: center;
-        
-        padding:14px;
+
+        padding:0 14px;
         margin-bottom: 12px;
         border-radius: 6px;
       }
@@ -98,11 +94,15 @@
       .openProjectButton {
         background-color: $background-highlight-1;
         color: $grey;
+        border:none;
+        width:100%;
       }
 
       .newProjectButton {
         background-color: $yellow;
         color:#2A3348;
+        border:none;
+        width:100%;
       }
     }
   }

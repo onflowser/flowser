@@ -28,12 +28,7 @@ const Main: FunctionComponent = () => {
   const history = useHistory();
   const projectService = ProjectsService.getInstance();
   const { data: projectData } = useGetAllProjects();
-  const projects = [
-    { name: "Project name 1", id: 1 },
-    { name: "Project name 2", id: 2 },
-    { name: "Project name 3", id: 3 },
-    { name: "Project name 4", id: 4 },
-  ]; //projectData ?? {};
+  const { projects } = projectData ?? {};
   const { data: flowserVersion } = useGetFlowserVersion();
 
   const onQuickstart = async (project: Project) => {
@@ -77,16 +72,26 @@ const Main: FunctionComponent = () => {
             About
           </li>
         </ul>
-        <ul className={classes.sideBarFooter}>
-          <li className={classes.openProjectButton}>
-            <img src={openProject} alt="open project icon" />
+        <div className={classes.sideBarFooter}>
+          <IconButton
+            variant="middle"
+            onClick={onConfigure}
+            icon={<img src={openProject} alt="open project icon" />}
+            iconPosition="before"
+            className={`${classes.openProjectButton}`}
+          >
             OPEN
-          </li>
-          <li className={classes.newProjectButton}>
-            <img src={newProject} alt="new project icon" />
+          </IconButton>
+          <IconButton
+            variant="middle"
+            onClick={onConfigure}
+            icon={<img src={newProject} alt="new project icon" />}
+            iconPosition="before"
+            className={`${classes.newProjectButton}`}
+          >
             NEW PROJECT
-          </li>
-        </ul>
+          </IconButton>
+        </div>
       </aside>
       <div className={classes.projectList}>
         <div className={classes.projectListHeader}>
@@ -96,7 +101,7 @@ const Main: FunctionComponent = () => {
         </div>
         <ul className={classes.projectListBody}>
           {projects?.map((project) => (
-            <li key={project.id}>
+            <li key={project.id} onClick={() => onQuickstart(project)}>
               <span className={classes.projectName}>{project.name}</span>
               <span className={classes.projectLastOpened}>
                 last opened on 12-08-2022
