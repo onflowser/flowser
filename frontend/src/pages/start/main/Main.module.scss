@@ -1,29 +1,29 @@
-@import 'styles/colors';
-@import 'styles/spacings';
-@import 'styles/typography';
-@import 'styles/animations';
-@import 'styles/rules';
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
+@import "styles/animations";
+@import "styles/rules";
 
 .container {
-  display:flex;
+  display: flex;
   flex-direction: row;
   color: $light-grey;
 
   aside {
-    width:512px;
-    height:100vh;
+    width: 512px;
+    height: 100vh;
     background-color: $background-highlight-2;
 
-    display:flex;
+    display: flex;
     flex-direction: column;
-    
+
     .sideBarHeader {
       box-sizing: border-box;
       height: 191px;
-      width:100%;
-      padding:38px 53px;
+      width: 100%;
+      padding: 38px 53px;
 
-      display:flex;
+      display: flex;
       flex-direction: row;
       justify-content: flex-start;
       align-items: flex-end;
@@ -41,102 +41,111 @@
     }
 
     .sideBarBody {
-      flex:1;
-      list-style-type:none;
+      flex: 1;
+      list-style-type: none;
 
       li {
-        width: 100%;
-        padding: 12px 53px;
-        box-sizing: border-box;
-        position: relative;
+        a {
+          display: block;
+          text-decoration: none;
+          color: $light-grey;
+          width: 100%;
+          padding: 12px 53px;
+          box-sizing: border-box;
+          position: relative;
 
-        .yellowLine {
-          display: none;
-          position: absolute;
-          left:20px;
-          top:50%;
-          height: calc(100% - 11px);
-          width:auto;
-          transform: translateY(-50%);
+          .yellowLine {
+            display: none;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            height: calc(100% - 11px);
+            width: auto;
+            transform: translateY(-50%);
+          }
         }
 
         &.activeTab {
-          .yellowLine {
-            display: block;
+          a {
+            .yellowLine {
+              display: block;
+            }
+            background-color: $background-highlight-1;
           }
-          background-color: $background-highlight-1;
         }
       }
     }
 
     .sideBarFooter {
       box-sizing: border-box;
-      height:152px;
-      width:100%;
-      padding:0 20px;
-      
-      display:flex;
+      height: 152px;
+      width: 100%;
+      padding: 0 20px;
+
+      display: flex;
       flex-direction: column;
       align-items: stretch;
-      
+
       > * {
         img {
-          width:10px;
-          height:10px;
-          padding-right:8px;
+          width: 10px;
+          height: 10px;
+          padding-right: 8px;
         }
 
-        padding:0 14px;
+        padding: 0 14px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
         margin-bottom: 12px;
         border-radius: 6px;
+        box-sizing: border-box;
       }
 
       .openProjectButton {
         background-color: $background-highlight-1;
         color: $grey;
-        border:none;
-        width:100%;
+        border: none;
+        width: 100%;
       }
 
       .newProjectButton {
         background-color: $yellow;
-        color:#2A3348;
-        border:none;
-        width:100%;
+        color: #2a3348;
+        border: none;
+        width: 100%;
       }
     }
   }
 
+  // ------ tabs ------
   .projectList {
     flex: 1;
     .projectListHeader {
       box-sizing: border-box;
-      height:162px;
-      width:100%;
+      height: 162px;
+      width: 100%;
       padding: 23px 20px;
 
-      display:flex;
+      display: flex;
       flex-direction: row;
       justify-content: flex-start;
       align-items: flex-end;
 
       .projectSearch {
         width: 400px;
-        height: 49px;
-        border: #4f5768 1px solid;
-        border-radius: 6px;
       }
     }
 
     .projectListBody {
-      list-style-type:none;
-      padding-left:23px;
+      list-style-type: none;
+      padding-left: 23px;
 
-      display:flex;
+      display: flex;
       flex-direction: column;
       align-items: stretch;
 
-      
       li {
         padding: 32px 125px 28px 35px;
         display: flex;
@@ -144,31 +153,42 @@
         justify-content: space-between;
         align-items: center;
 
-        position:relative;
-        
+        position: relative;
+
         .projectName {
           font-size: 17px;
           line-height: 26px;
-          color:#CDD9FA;
+          color: #cdd9fa;
+
+          &:hover {
+            cursor: pointer;
+          }
         }
         .projectLastOpened {
+          @media (max-width: 1029px) {
+            display: none;
+          }
           font-size: 13px;
           line-height: 26px;
-          color:$grey;
+          color: $grey;
         }
 
         .projectTrashcan {
-          display:none;
-          position:absolute;
+          display: none;
+          position: absolute;
           justify-content: center;
           align-items: center;
-          height:100%;
-          top:0;
-          right:21px;
+          height: 100%;
+          top: 0;
+          right: 21px;
 
           > * {
             height: 13px;
-            width:auto;
+            width: auto;
+          }
+
+          &:hover {
+            cursor: pointer;
           }
         }
 
@@ -182,4 +202,20 @@
       }
     }
   }
+
+  .bodyCenter {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    > div {
+      text-align: center;
+      line-height: 26px;
+      font-weight: 300;
+      font-size: 16px;
+      font-family: Inter;
+    }
+  }
+  // ------ tabs ------
 }

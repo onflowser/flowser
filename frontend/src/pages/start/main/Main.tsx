@@ -1,10 +1,16 @@
 import React, {
   FunctionComponent,
+  ReactElement,
   useCallback,
   useEffect,
   useState,
 } from "react";
-import { useHistory } from "react-router-dom";
+import {
+  Link,
+  RouteChildrenProps,
+  useHistory,
+  useParams,
+} from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
 import logo from "../../../assets/images/logo_with_text.svg";
@@ -13,8 +19,6 @@ import newProject from "../../../assets/icons/new_project.svg";
 import openProject from "../../../assets/icons/open_project.svg";
 import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
-import { ReactComponent as CaretIcon } from "../../../assets/icons/caret.svg";
-import { ReactComponent as PlusIcon } from "../../../assets/icons/plus.svg";
 import splitbee from "@splitbee/web";
 import { toast } from "react-hot-toast";
 import { ProjectsService } from "../../../services/projects.service";
@@ -23,8 +27,39 @@ import {
   useGetFlowserVersion,
 } from "../../../hooks/use-api";
 import { Project } from "@flowser/types/generated/entities/projects";
+import classNames from "classnames";
+import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
+import Search from "../../../components/search/Search";
+import { useSearch } from "../../../hooks/use-search";
+import moment from "moment";
 
-const Main: FunctionComponent = () => {
+const tabs = [
+  { id: "projects", label: "Projects", default: true },
+  { id: "about", label: "About" },
+];
+
+enum DialogTypes {
+  deleteProject,
+  openProject,
+}
+
+type IProps = RouteChildrenProps;
+
+const Main: FunctionComponent<IProps> = (props) => {
+  const [showDialog, setShowDialog] = useState<{
+    confirmBtnLabel: string;
+    cancelBtnLabel: string;
+    body: ReactElement;
+    onConfirm?: any;
+  } | null>(null);
+
+  const { searchTerm, setPlaceholder } = useSearch("projectSearch");
+
+  useEffect(() => {
+    setPlaceholder("Search projects");
+  }, []);
+
+  const tab = props.location.hash?.replace("#", "");
   const history = useHistory();
   const projectService = ProjectsService.getInstance();
   const { data: projectData } = useGetAllProjects();
@@ -46,6 +81,109 @@ const Main: FunctionComponent = () => {
     history.push(`/${routes.start}/configure`);
   }, []);
 
+  const onDelete = async (project: Project) => {
+    try {
+      splitbee.track("Configuration: delete");
+      await projectService.removeProject(project.id);
+      toast(`Project "${project.name}" deleted!`);
+    } catch (e) {
+      toast.error("Something went wrong: can not delete custom emulator");
+    } finally {
+      closeDialog();
+    }
+  };
+
+  const closeDialog = () => {
+    setShowDialog(null);
+  };
+
+  const openDialog = (type: DialogTypes, props?: any) => {
+    // return is just to break out of switch
+    switch (type) {
+      case DialogTypes.deleteProject:
+        return setShowDialog({
+          body: (
+            <>
+              <h3>Delete project</h3>
+              <span>Are you sure you want to delete this project?</span>
+            </>
+          ),
+          onConfirm: () => onDelete(props),
+          confirmBtnLabel: "DELETE",
+          cancelBtnLabel: "BACK",
+        });
+      case DialogTypes.openProject:
+        return setShowDialog({
+          body: (
+            <>
+              <h3>New emulator</h3>
+              <span>Not supported yet :(</span>
+            </>
+          ),
+          confirmBtnLabel: "CREATE",
+          cancelBtnLabel: "CANCEL",
+        });
+    }
+  };
+
+  const tabsDom = {
+    [tabs[0].id]:
+      projects && projects.length ? (
+        <div className={classes.projectList}>
+          <div className={classes.projectListHeader}>
+            {/* PLACEHOLDER! */}
+            <Search className={classes.projectSearch} context="projectSearch" />
+            {/*<Search />*/}
+          </div>
+          <ul className={classes.projectListBody}>
+            {projects
+              ?.filter((p) => !searchTerm || p.name.includes(searchTerm))
+              .map((project) => (
+                <li key={project.id}>
+                  <span
+                    className={classes.projectName}
+                    onClick={() => onQuickstart(project)}
+                  >
+                    {project.name}
+                  </span>
+                  <span className={classes.projectLastOpened}>
+                    last opened on{" "}
+                    {moment(project.updatedAt).format("DD-MM-YYYY")}
+                  </span>
+                  <span
+                    className={classes.projectTrashcan}
+                    onClick={() =>
+                      openDialog(DialogTypes.deleteProject, project)
+                    }
+                  >
+                    <img src={trash} alt="trash icon" />
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ) : (
+        <div className={classes.bodyCenter}>
+          <div>
+            To start, you need to create a project or <br />
+            <Link to="">open</Link> an existing folder
+          </div>
+        </div>
+      ),
+    [tabs[1].id]: (
+      <div className={classes.bodyCenter}>
+        <div>
+          Flowser 2022, v1.1
+          <br />
+          Connect with us on{" "}
+          <a href="https://discord.gg/SEu6USx4" title="Flowser discord">
+            Discord
+          </a>
+        </div>
+      </div>
+    ),
+  };
+
   return (
     <div className={classes.container}>
       <aside>
@@ -55,27 +193,29 @@ const Main: FunctionComponent = () => {
           </span>
         </div>
         <ul className={classes.sideBarBody}>
-          <li className={classes.activeTab}>
-            <img
-              src={yellowLine}
-              alt="yellow line"
-              className={classes.yellowLine}
-            />
-            Projects
-          </li>
-          <li>
-            <img
-              src={yellowLine}
-              alt="yellow line"
-              className={classes.yellowLine}
-            />
-            About
-          </li>
+          {tabs.map((tabData) => (
+            <li
+              key={tabData.id}
+              className={classNames({
+                [classes.activeTab]:
+                  tab == tabData.id || (tabData.default && !tab),
+              })}
+            >
+              <Link to={`/start#${tabData.id}`}>
+                <img
+                  src={yellowLine}
+                  alt="yellow line"
+                  className={classes.yellowLine}
+                />
+                {tabData.label}
+              </Link>
+            </li>
+          ))}
         </ul>
         <div className={classes.sideBarFooter}>
           <IconButton
             variant="middle"
-            onClick={onConfigure}
+            onClick={() => openDialog(DialogTypes.openProject)}
             icon={<img src={openProject} alt="open project icon" />}
             iconPosition="before"
             className={`${classes.openProjectButton}`}
@@ -93,26 +233,17 @@ const Main: FunctionComponent = () => {
           </IconButton>
         </div>
       </aside>
-      <div className={classes.projectList}>
-        <div className={classes.projectListHeader}>
-          {/* PLACEHOLDER! */}
-          <div className={classes.projectSearch}></div>
-          {/*<Search />*/}
-        </div>
-        <ul className={classes.projectListBody}>
-          {projects?.map((project) => (
-            <li key={project.id} onClick={() => onQuickstart(project)}>
-              <span className={classes.projectName}>{project.name}</span>
-              <span className={classes.projectLastOpened}>
-                last opened on 12-08-2022
-              </span>
-              <span className={classes.projectTrashcan}>
-                <img src={trash} alt="trash icon" />
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {tab ? tabsDom[tab] : tabsDom[tabs.find((t) => t.default)?.id || ""]}
+      {showDialog && (
+        <ConfirmDialog
+          onClose={closeDialog}
+          onConfirm={showDialog.onConfirm}
+          confirmBtnLabel={showDialog.confirmBtnLabel}
+          cancelBtnLabel={showDialog.cancelBtnLabel}
+        >
+          {showDialog.body}
+        </ConfirmDialog>
+      )}
     </div>
   );
 

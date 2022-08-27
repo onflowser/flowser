@@ -1,15 +1,14 @@
-@import 'styles/colors';
-@import 'styles/spacings';
-@import 'styles/typography';
-@import 'styles/animations';
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
+@import "styles/animations";
 
 .root {
   display: flex;
   flex-direction: column;
   color: $light-grey;
   padding: $spacing-l * 3 $spacing-l * 6;
-  @include fadeInAnimation(.5s);
-
+  @include fadeInAnimation(0.5s);
 
   h3 {
     margin-bottom: $spacing-base * 3;
@@ -36,7 +35,7 @@
     }
 
     & > * + * {
-      margin-left: $spacing-base * 3;
+      margin-left: $spacing-base;
     }
   }
 }
