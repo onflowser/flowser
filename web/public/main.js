@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require("electron");
+const { createApp } = require("@flowser/backend");
 
 const path = require("path");
 const isDev = require("electron-is-dev");
@@ -6,6 +7,7 @@ const isDev = require("electron-is-dev");
 // require("@electron/remote/main").initialize();
 
 function createWindow() {
+  createApp();
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
