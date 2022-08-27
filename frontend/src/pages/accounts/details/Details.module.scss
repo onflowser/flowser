@@ -1,4 +1,6 @@
 @import "styles/spacings";
+@import 'styles/colors';
+@import 'styles/typography';
 
 .root {
   display: flex;
@@ -47,4 +49,29 @@
   max-width: 20vw;
   min-width: 10vw;
   display: inline-block;
+}
+
+.hash {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+.badges {
+  color: $color-grey;
+  font-family: $font-family-oswald;
+  margin-bottom: $spacing-base;
+  margin-top: $spacing-base;
+}
+
+.keysRoot {
+  display: flex;
+  flex-direction: column;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
 }
