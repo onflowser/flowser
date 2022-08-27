@@ -25,6 +25,11 @@ import {
   useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
 import StorageItem from "./StorageItem";
+import { createColumnHelper } from "@tanstack/table-core";
+import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { AccountStorageItem } from "types/generated/entities/accounts";
+import { FlowUtils } from "../../../utils/flow-utils";
+import Table from "../../../components/table/Table";
 
 type RouteParams = {
   accountId: string;
@@ -53,6 +58,46 @@ const Details: FunctionComponent = () => {
     setBreadcrumbs(breadcrumbs);
   }, []);
 
+  const columnHelper =
+    createColumnHelper<DecoratedPollingEntity<AccountStorageItem>>();
+
+  const columns = [
+    columnHelper.accessor("pathDomain", {
+      header: () => <Label variant="medium">DOMAIN</Label>,
+      cell: (info) => (
+        <Value>{FlowUtils.getLowerCasedPathDomain(info.getValue())}</Value>
+      ),
+    }),
+    columnHelper.accessor("pathIdentifier", {
+      header: () => (
+        <div className={classes.storageTable}>
+          <Label variant="medium">IDENTIFIER</Label>
+        </div>
+      ),
+      cell: (info) => (
+        <div className={classes.storageTable}>
+          <Value>{info.getValue()}</Value>
+        </div>
+      ),
+    }),
+    columnHelper.accessor("data", {
+      header: () => (
+        <div className={classes.storageTable}>
+          <Label variant="medium">DATA</Label>
+        </div>
+      ),
+      cell: (info) => (
+        <div className={classes.storageTable}>
+          <Value>
+            <pre style={{ whiteSpace: "nowrap" }}>
+              {JSON.stringify(info.getValue()) ?? "-"}
+            </pre>
+          </Value>
+        </div>
+      ),
+    }),
+  ];
+
   if (isLoading || !account) {
     return <FullScreenLoading />;
   }
@@ -74,11 +119,10 @@ const Details: FunctionComponent = () => {
       </Card>
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          {/* TODO(milestone-3): display account storage*/}
-          {/* <Storage data={account.storage} />} */}
-          {storageItems.map((item) => (
-            <StorageItem key={item.id} storageItem={item} />
-          ))}
+          <Table<DecoratedPollingEntity<AccountStorageItem>>
+            data={storageItems}
+            columns={columns}
+          />
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">
