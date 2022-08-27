@@ -5,12 +5,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import {
-  Link,
-  RouteChildrenProps,
-  useHistory,
-  useParams,
-} from "react-router-dom";
+import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
 import logo from "../../../assets/images/logo_with_text.svg";
@@ -22,10 +17,7 @@ import classes from "./Main.module.scss";
 import splitbee from "@splitbee/web";
 import { toast } from "react-hot-toast";
 import { ProjectsService } from "../../../services/projects.service";
-import {
-  useGetAllProjects,
-  useGetFlowserVersion,
-} from "../../../hooks/use-api";
+import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/types/generated/entities/projects";
 import classNames from "classnames";
 import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
@@ -62,9 +54,7 @@ const Main: FunctionComponent<IProps> = (props) => {
   const tab = props.location.hash?.replace("#", "");
   const history = useHistory();
   const projectService = ProjectsService.getInstance();
-  const { data: projectData } = useGetAllProjects();
-  const { projects } = projectData ?? {};
-  const { data: flowserVersion } = useGetFlowserVersion();
+  const { projects } = useGetAllProjects()?.data ?? {};
 
   const onQuickstart = async (project: Project) => {
     try {
@@ -127,13 +117,12 @@ const Main: FunctionComponent<IProps> = (props) => {
   };
 
   const tabsDom = {
+    // Projects tab
     [tabs[0].id]:
       projects && projects.length ? (
         <div className={classes.projectList}>
           <div className={classes.projectListHeader}>
-            {/* PLACEHOLDER! */}
             <Search className={classes.projectSearch} context="projectSearch" />
-            {/*<Search />*/}
           </div>
           <ul className={classes.projectListBody}>
             {projects
@@ -170,14 +159,27 @@ const Main: FunctionComponent<IProps> = (props) => {
           </div>
         </div>
       ),
+    // About tab
     [tabs[1].id]: (
       <div className={classes.bodyCenter}>
         <div>
-          Flowser 2022, v1.1
-          <br />
+          Flowser 2022, v1.1 <br />
           Connect with us on{" "}
-          <a href="https://discord.gg/SEu6USx4" title="Flowser discord">
+          <a href="https://discord.gg/WJe6CKfp" title="Flowser discord">
             Discord
+          </a>
+          <br />
+          Follow us on{" "}
+          <a href="https://twitter.com/onflowser" title="Flowser twitter">
+            Twitter
+          </a>{" "}
+          <br />
+          Contribute on{" "}
+          <a
+            href="https://github.com/onflowser/flowser"
+            title="Flowser discord"
+          >
+            Github
           </a>
         </div>
       </div>
@@ -246,38 +248,6 @@ const Main: FunctionComponent<IProps> = (props) => {
       )}
     </div>
   );
-
-  /*return (
-    <div className={classes.container}>
-      <img src={Logo} alt="FLOWSER" />
-      <div className={classes.header}>
-        <h1>FLOWSER</h1>
-        <span className={classes.version}>{flowserVersion?.version}</span>
-      </div>
-      {projects?.map((project) => (
-        <IconButton
-          key={project.id}
-          onClick={() => onQuickstart(project)}
-          variant="big"
-          icon={<CaretIcon className={classes.caret} />}
-          iconPosition="after-end"
-        >
-          {project.name}
-        </IconButton>
-      ))}
-
-      <IconButton
-        variant="big"
-        outlined={true}
-        onClick={onConfigure}
-        icon={<PlusIcon />}
-        iconPosition="after-end"
-        className={`${classes.newProjectBtn}`}
-      >
-        ADD PROJECT
-      </IconButton>
-    </div>
-  );*/
 };
 
 export default Main;
