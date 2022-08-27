@@ -20,7 +20,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   variant = "normal",
   outlined = false,
   loading = false,
-  loaderColor = "#141C2D",
+  loaderColor = "#363F53",
   ...restProps
 }) => {
   return (
