@@ -1,8 +1,8 @@
-@import 'styles/spacings';
-@import 'styles/colors';
-@import 'styles/typography';
-@import 'styles/rules';
-@import 'styles/animations';
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+@import "styles/rules";
+@import "styles/animations";
 
 .loader {
   height: 100vh !important;
@@ -87,7 +87,7 @@
             border: none;
             outline: none;
             color: $color-grey;
-            font-family: $font-family-oswald;
+            font-family: $font-family-inter;
             font-size: $font-size-large;
           }
         }
@@ -132,7 +132,7 @@
 
           span:last-child {
             color: $color-grey;
-            font-family: $font-family-oswald-light;
+            font-family: $font-family-inter-light;
             margin-left: $spacing-base * 2;
             font-size: 13px;
             font-weight: 200;

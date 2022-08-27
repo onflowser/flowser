@@ -1,6 +1,6 @@
-@import 'styles/typography';
-@import 'styles/colors';
-@import 'styles/spacings';
+@import "styles/typography";
+@import "styles/colors";
+@import "styles/spacings";
 
 .root {
   font-family: $font-family-courier-new;
@@ -24,7 +24,7 @@
       padding: $spacing-l * 0.33;
       border-radius: 8px;
       color: $color-main-text;
-      font-family: $font-family-oswald;
+      font-family: $font-family-inter;
       position: relative;
       max-width: 80%;
       min-width: 80%;
@@ -43,7 +43,7 @@
   }
   .badges {
     color: $color-grey;
-    font-family: $font-family-oswald;
+    font-family: $font-family-inter;
     padding-left: ($spacing-base * 2) + 6;
   }
 }
