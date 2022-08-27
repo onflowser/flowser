@@ -15,20 +15,8 @@ import { useGetPollingBlocks } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
-
-type FilteredData = {
-  blockSeals: [];
-  collectionGuarantees: [];
-  createdAt: string;
-  height: number;
-  id: string;
-  isNew: boolean;
-  isUpdated: boolean;
-  parentId: string;
-  signatures: [];
-  timestamp: string;
-  updatedAt: string;
-};
+import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { Block } from "types/generated/entities/blocks";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -46,7 +34,7 @@ const Main: FunctionComponent = () => {
 
   // console.log(filteredData)
 
-  const columnHelper = createColumnHelper<FilteredData>();
+  const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
   // Specify table shape
   const columns = [
@@ -103,7 +91,10 @@ const Main: FunctionComponent = () => {
         <NoResults className={classes.noResults} />
       )}
       {filteredData.length > 0 && (
-        <Table columns={columns} data={[...filteredData]}></Table>
+        <Table<DecoratedPollingEntity<Block>>
+          columns={columns}
+          data={filteredData}
+        ></Table>
       )}
     </>
   );

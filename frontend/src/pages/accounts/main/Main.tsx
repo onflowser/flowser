@@ -68,7 +68,7 @@ const Main: FunctionComponent = () => {
       {filteredData.length > 0 && (
         <Table<DecoratedPollingEntity<Account>>
           columns={columns}
-          data={[...filteredData]}
+          data={filteredData}
         ></Table>
       )}
     </>
