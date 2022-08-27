@@ -25,8 +25,7 @@ const FullScreenLoading: FC<FullScreenLoadingProps> = ({
 
   return (
     <div className={`${classes.container} ${className}`}>
-      {/* TODO(milestone-5): fix this image */}
-      <Logo />
+      <Logo className={classes.logo} />
       <p className={classes.text}>Loading {dots}</p>
     </div>
   );

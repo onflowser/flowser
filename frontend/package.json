@@ -53,6 +53,7 @@
     "cleanup": "rm -rf node_modules",
     "postinstall": "yarn run build",
     "build": "SASS_PATH=node_modules:src rollup -c",
+    "build:watch": "SASS_PATH=node_modules:src rollup -c --watch",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "cd ../ && husky install ./frontend/.husky"
