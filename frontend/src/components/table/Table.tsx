@@ -1,19 +1,24 @@
-import React, { FunctionComponent } from "react";
+import React, { ReactElement } from "react";
 import Card from "../card/Card";
 import classes from "./Table.module.scss";
 import {
   flexRender,
   getCoreRowModel,
+  TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
+import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
+import { CommonUtils } from "../../utils/common-utils";
 
-type TableProps = {
-  columns: any[];
-  data: any[];
-};
+export type TableProps<TData> = Pick<
+  TableOptions<TableData<TData>>,
+  "data" | "columns"
+>;
 
-const Table: FunctionComponent<TableProps> = ({ columns, data }) => {
-  const table = useReactTable({
+export type TableData<TData> = DecoratedPollingEntity<TData> | TData;
+
+function Table<TData>({ columns, data }: TableProps<TData>): ReactElement {
+  const table = useReactTable<TableData<TData>>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -30,11 +35,11 @@ const Table: FunctionComponent<TableProps> = ({ columns, data }) => {
           ))}
         </Card>
       ))}
-      {table.getRowModel().rows.map((row, index) => (
+      {table.getRowModel().rows.map((row) => (
         <Card
           className={classes.tableRow}
           key={row.id}
-          showIntroAnimation={data[index].isNew || data[index].isUpdated}
+          showIntroAnimation={showIntroAnimation(row)}
         >
           {row.getVisibleCells().map((cell) => (
             <div key={cell.id} className={classes.element}>
@@ -54,6 +59,14 @@ const Table: FunctionComponent<TableProps> = ({ columns, data }) => {
       ))}
     </div>
   );
-};
+}
+
+function showIntroAnimation<TData>(dataItem: TableData<TData>) {
+  if (CommonUtils.isDecoratedPollingEntity(dataItem)) {
+    return dataItem.isNew || dataItem.isUpdated;
+  } else {
+    return false;
+  }
+}
 
 export default Table;
