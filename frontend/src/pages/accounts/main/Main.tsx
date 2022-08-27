@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect } from "react";
 import classes from "./Main.module.scss";
-import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { useNavigation } from "../../../hooks/use-navigation";
@@ -12,20 +11,8 @@ import FullScreenLoading from "../../../components/fullscreen-loading/FullScreen
 import { useGetPollingAccounts } from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
-
-type FilteredData = {
-  address: string;
-  balance: number;
-  code: string;
-  contracts: [];
-  createdAt: string;
-  isNew: boolean;
-  isUpdated: boolean;
-  keys: [];
-  storage: [];
-  transactions: [];
-  updatedAt: string;
-};
+import { Account } from "@flowser/types/generated/entities/accounts";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -44,7 +31,7 @@ const Main: FunctionComponent = () => {
 
   const { filteredData } = useFilterData(accounts, searchTerm);
 
-  const columnHelper = createColumnHelper<FilteredData>();
+  const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
   // Specify table shape
   const columns = [
@@ -79,7 +66,10 @@ const Main: FunctionComponent = () => {
         <NoResults className={classes.noResults} />
       )}
       {filteredData.length > 0 && (
-        <Table columns={columns} data={[...filteredData]}></Table>
+        <Table<DecoratedPollingEntity<Account>>
+          columns={columns}
+          data={[...filteredData]}
+        ></Table>
       )}
     </>
   );

@@ -1,4 +1,11 @@
+import { DecoratedPollingEntity } from "../hooks/use-timeout-polling";
+
 export class CommonUtils {
+  static isDecoratedPollingEntity<Entity>(
+    entity: Entity
+  ): entity is DecoratedPollingEntity<Entity> {
+    return "isNew" in entity && "isUpdated" in entity;
+  }
   static isNotEmpty<Value>(value: Value | null | undefined): value is Value {
     return value !== null && value !== undefined;
   }
