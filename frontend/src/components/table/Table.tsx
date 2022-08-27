@@ -20,9 +20,9 @@ const Table: FunctionComponent<TableProps> = ({ columns, data }) => {
   });
 
   return (
-    <div className={classes.root}>
+    <div>
       {table.getHeaderGroups().map((headerGroup) => (
-        <Card className={classes.card} key={headerGroup.id}>
+        <Card className={classes.tableRow} key={headerGroup.id}>
           {headerGroup.headers.map((header) => (
             <div key={header.id}>
               {flexRender(header.column.columnDef.header, header.getContext())}
@@ -32,7 +32,7 @@ const Table: FunctionComponent<TableProps> = ({ columns, data }) => {
       ))}
       {table.getRowModel().rows.map((row, index) => (
         <Card
-          className={classes.card}
+          className={classes.tableRow}
           key={row.id}
           showIntroAnimation={data[index].isNew || data[index].isUpdated}
         >
@@ -44,7 +44,7 @@ const Table: FunctionComponent<TableProps> = ({ columns, data }) => {
         </Card>
       ))}
       {table.getFooterGroups().map((footerGroup) => (
-        <div className={classes.card} key={footerGroup.id}>
+        <div className={classes.tableRow} key={footerGroup.id}>
           {footerGroup.headers.map((header) => (
             <div key={header.id}>
               {flexRender(header.column.columnDef.footer, header.getContext())}

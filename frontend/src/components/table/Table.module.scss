@@ -1,18 +1,16 @@
-@import 'styles/spacings';
-@import 'styles/animations';
+@import "styles/spacings";
+@import "styles/animations";
 
-.card {
+.tableRow {
   display: flex;
   justify-content: space-between;
-  padding: $spacing-base $spacing-l;
   margin-bottom: $spacing-base;
-  
+
   & > div {
     display: flex;
     width: 100%;
     align-content: flex-start;
   }
-
 }
 .noResults {
   margin-top: $spacing-l * 6;

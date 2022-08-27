@@ -13,6 +13,22 @@ import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingBlocks } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
+import { createColumnHelper } from "@tanstack/table-core";
+import Table from "../../../components/table/Table";
+
+type FilteredData = {
+  blockSeals: [];
+  collectionGuarantees: [];
+  createdAt: string;
+  height: number;
+  id: string;
+  isNew: boolean;
+  isUpdated: boolean;
+  parentId: string;
+  signatures: [];
+  timestamp: string;
+  updatedAt: string;
+};
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -28,75 +44,66 @@ const Main: FunctionComponent = () => {
     disableSearchBar(false);
   }, []);
 
-  const tableData = {
-    columns: [
-      { heading: "BLOCK HEIGHT", value: "height" },
-      { heading: "BLOCK ID", value: "id" },
-      { heading: "PARENT ID", value: "parendId" },
-      { heading: "TIME", value: "timestamp" },
-      {
-        heading: "COLLECTION GUARANTEES",
-        value: "collectionGuarantees.length",
-      },
-      { heading: "BLOCK SEALS", value: "blockSeals" },
-      { heading: "SIGNATURES", value: "signatures.length" },
-    ],
-    links: [false, true, true, false, false, false, false],
-  };
+  // console.log(filteredData)
+
+  const columnHelper = createColumnHelper<FilteredData>();
+
+  // Specify table shape
+  const columns = [
+    columnHelper.accessor("height", {
+      header: () => <Label variant="medium">BLOCK HEIGHT</Label>,
+      cell: (info) => <Value>{info.getValue()}</Value>,
+    }),
+    columnHelper.accessor("id", {
+      header: () => <Label variant="medium">BLOCK ID</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`/blocks/details/${info.getValue()}`}>
+            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          </NavLink>
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("parentId", {
+      header: () => <Label variant="medium">PARENT ID</Label>,
+      cell: (info) => (
+        <Value>
+          {FlowUtils.isInitialBlockId(info.getValue()) ? (
+            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          ) : (
+            <NavLink to={`/blocks/details/${info.getValue()}`}>
+              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+            </NavLink>
+          )}
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("timestamp", {
+      header: () => <Label variant="medium">TIME</Label>,
+      cell: (info) => <Value>{formatDate(info.getValue())}</Value>,
+    }),
+    columnHelper.accessor("collectionGuarantees", {
+      header: () => <Label variant="medium">COLLECTION GUARANTEES</Label>,
+      cell: (info) => <Value>{info.getValue()?.length}</Value>,
+    }),
+    columnHelper.accessor("blockSeals", {
+      header: () => <Label variant="medium">BLOCK SEALS</Label>,
+      cell: (info) => <Value>{info.getValue()?.length}</Value>,
+    }),
+    columnHelper.accessor("signatures", {
+      header: () => <Label variant="medium">SIGNATURES</Label>,
+      cell: (info) => <Value>{info.getValue()?.length}</Value>,
+    }),
+  ];
 
   return (
     <>
-      {filteredData.map((item) => (
-        <Card
-          key={item.id}
-          showIntroAnimation={item.isNew || item.isUpdated}
-          className={classes.card}
-        >
-          <div>
-            <Label>BLOCK HEIGHT</Label>
-            <Value>{item.height}</Value>
-          </div>
-          <div>
-            <Label>BLOCK ID</Label>
-            <Value>
-              <NavLink to={`/blocks/details/${item.id}`}>
-                <Ellipsis className={classes.hash}>{item.id}</Ellipsis>
-              </NavLink>
-            </Value>
-          </div>
-          <div>
-            <Label>PARENT ID</Label>
-            <Value>
-              {FlowUtils.isInitialBlockId(item.parentId) ? (
-                <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
-              ) : (
-                <NavLink to={`/blocks/details/${item.parentId}`}>
-                  <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
-                </NavLink>
-              )}
-            </Value>
-          </div>
-          <div>
-            <Label>TIME</Label>
-            <Value>{formatDate(item.timestamp)}</Value>
-          </div>
-          <div>
-            <Label>COLLECTION GUARANTEES</Label>
-            <Value>{item.collectionGuarantees?.length}</Value>
-          </div>
-          <div>
-            <Label>BLOCK SEALS</Label>
-            <Value>{item.blockSeals?.length}</Value>
-          </div>
-          <div>
-            <Label>SIGNATURES</Label>
-            <Value>{item.signatures?.length}</Value>
-          </div>
-        </Card>
-      ))}
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />
+      )}
+      {filteredData.length > 0 && (
+        <Table columns={columns} data={[...filteredData]}></Table>
       )}
     </>
   );

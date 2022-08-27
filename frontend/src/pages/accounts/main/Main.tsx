@@ -49,7 +49,7 @@ const Main: FunctionComponent = () => {
   // Specify table shape
   const columns = [
     columnHelper.accessor("address", {
-      header: () => <Label>ADDRESS</Label>,
+      header: () => <Label variant="medium">ADDRESS</Label>,
       cell: (info) => (
         <Value>
           <NavLink to={`accounts/details/${info.getValue()}`}>
@@ -59,15 +59,15 @@ const Main: FunctionComponent = () => {
       ),
     }),
     columnHelper.accessor("balance", {
-      header: () => <Label>BALANCE</Label>,
+      header: () => <Label variant="medium">BALANCE</Label>,
       cell: (info) => <Value>{info.getValue()} FLOW</Value>,
     }),
     columnHelper.accessor("keys", {
-      header: () => <Label>KEY COUNT</Label>,
+      header: () => <Label variant="medium">KEY COUNT</Label>,
       cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
     }),
     columnHelper.accessor("transactions", {
-      header: () => <Label>TX COUNT</Label>,
+      header: () => <Label variant="medium">TX COUNT</Label>,
       cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
     }),
   ];
@@ -79,7 +79,7 @@ const Main: FunctionComponent = () => {
         <NoResults className={classes.noResults} />
       )}
       {filteredData.length > 0 && (
-        <Table columns={columns} data={[...filteredData]}></Table>
+        <Table columns={columns} data={filteredData}></Table>
       )}
     </>
   );
