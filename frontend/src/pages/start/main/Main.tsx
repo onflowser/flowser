@@ -25,11 +25,6 @@ import Search from "../../../components/search/Search";
 import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
 
-const tabs = [
-  { id: "projects", label: "Projects", default: true },
-  { id: "about", label: "About" },
-];
-
 enum DialogTypes {
   deleteProject,
   openProject,
@@ -116,94 +111,104 @@ const Main: FunctionComponent<IProps> = (props) => {
     }
   };
 
-  const tabsDom = {
-    // Projects tab
-    [tabs[0].id]:
-      projects && projects.length ? (
-        <div className={classes.projectList}>
-          <div className={classes.projectListHeader}>
-            <Search className={classes.projectSearch} context="projectSearch" />
+  const tabs = [
+    {
+      id: "projects",
+      label: "Projects",
+      default: true,
+      content:
+        projects && projects.length ? (
+          <div className={classes.projectList}>
+            <div className={classes.projectListHeader}>
+              <Search
+                className={classes.projectSearch}
+                context="projectSearch"
+              />
+            </div>
+            <ul className={classes.projectListBody}>
+              {projects
+                ?.filter((p) => !searchTerm || p.name.includes(searchTerm))
+                .map((project) => (
+                  <li key={project.id} className={classes.projectWrapper}>
+                    <span
+                      className={classes.projectName}
+                      onClick={() => onQuickstart(project)}
+                    >
+                      {project.name}
+                    </span>
+                    <span className={classes.projectLastOpened}>
+                      last opened on{" "}
+                      {moment(project.updatedAt).format("DD-MM-YYYY")}
+                    </span>
+                    <span
+                      className={classes.projectTrashcan}
+                      onClick={() =>
+                        openDialog(DialogTypes.deleteProject, project)
+                      }
+                    >
+                      <img src={trash} alt="trash icon" />
+                    </span>
+                  </li>
+                ))}
+            </ul>
           </div>
-          <ul className={classes.projectListBody}>
-            {projects
-              ?.filter((p) => !searchTerm || p.name.includes(searchTerm))
-              .map((project) => (
-                <li key={project.id}>
-                  <span
-                    className={classes.projectName}
-                    onClick={() => onQuickstart(project)}
-                  >
-                    {project.name}
-                  </span>
-                  <span className={classes.projectLastOpened}>
-                    last opened on{" "}
-                    {moment(project.updatedAt).format("DD-MM-YYYY")}
-                  </span>
-                  <span
-                    className={classes.projectTrashcan}
-                    onClick={() =>
-                      openDialog(DialogTypes.deleteProject, project)
-                    }
-                  >
-                    <img src={trash} alt="trash icon" />
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </div>
-      ) : (
+        ) : (
+          <div className={classes.bodyCenter}>
+            <div>
+              To start, you need to create a project or <br />
+              <Link to="">open</Link> an existing folder
+            </div>
+          </div>
+        ),
+    },
+    {
+      id: "about",
+      label: "About",
+      content: (
         <div className={classes.bodyCenter}>
           <div>
-            To start, you need to create a project or <br />
-            <Link to="">open</Link> an existing folder
+            Flowser 2022, v1.1 <br />
+            Connect with us on{" "}
+            <a href="https://discord.gg/WJe6CKfp" title="Flowser discord">
+              Discord
+            </a>
+            <br />
+            Follow us on{" "}
+            <a href="https://twitter.com/onflowser" title="Flowser twitter">
+              Twitter
+            </a>{" "}
+            <br />
+            Contribute on{" "}
+            <a
+              href="https://github.com/onflowser/flowser"
+              title="Flowser discord"
+            >
+              Github
+            </a>
           </div>
         </div>
       ),
-    // About tab
-    [tabs[1].id]: (
-      <div className={classes.bodyCenter}>
-        <div>
-          Flowser 2022, v1.1 <br />
-          Connect with us on{" "}
-          <a href="https://discord.gg/WJe6CKfp" title="Flowser discord">
-            Discord
-          </a>
-          <br />
-          Follow us on{" "}
-          <a href="https://twitter.com/onflowser" title="Flowser twitter">
-            Twitter
-          </a>{" "}
-          <br />
-          Contribute on{" "}
-          <a
-            href="https://github.com/onflowser/flowser"
-            title="Flowser discord"
-          >
-            Github
-          </a>
-        </div>
-      </div>
-    ),
-  };
+    },
+  ];
 
   return (
     <div className={classes.container}>
-      <aside>
+      <aside className={classes.sidebar}>
         <div className={classes.sideBarHeader}>
-          <span>
-            <img src={logo} alt="FLOWSER" />
+          <span className={classes.logoWrapper}>
+            <img className={classes.logo} src={logo} alt="FLOWSER" />
           </span>
         </div>
         <ul className={classes.sideBarBody}>
           {tabs.map((tabData) => (
             <li
               key={tabData.id}
-              className={classNames({
+              className={classNames(classes.tabWrapper, {
                 [classes.activeTab]:
                   tab == tabData.id || (tabData.default && !tab),
               })}
             >
-              <Link to={`/start#${tabData.id}`}>
+              <Link to={`/start#${tabData.id}`} className={classes.tabLink}>
                 <img
                   src={yellowLine}
                   alt="yellow line"
@@ -235,7 +240,9 @@ const Main: FunctionComponent<IProps> = (props) => {
           </IconButton>
         </div>
       </aside>
-      {tab ? tabsDom[tab] : tabsDom[tabs.find((t) => t.default)?.id || ""]}
+      {tab
+        ? tabs.find((t) => t.id == tab)?.content
+        : tabs.find((t) => t.default)?.content}
       {showDialog && (
         <ConfirmDialog
           onClose={closeDialog}
