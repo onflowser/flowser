@@ -17,7 +17,7 @@
     color: $color-grey;
 
     &.expanded {
-      border-bottom: 1px solid $color-logs-text;
+      border-bottom: 1px solid $light-grey;
       padding-bottom: $spacing-l * 2;
     }
 
@@ -33,7 +33,7 @@
       }
 
       & > span:last-child {
-        color: $color-link-blue;
+        color: $blue;
         font-size: $font-size-normal;
         cursor: pointer;
       }

@@ -1,8 +1,8 @@
-@import 'styles/spacings';
-@import 'styles/colors';
-@import 'styles/typography';
-@import 'styles/rules';
-@import 'styles/animations';
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+@import "styles/rules";
+@import "styles/animations";
 
 .loader {
   height: 100vh !important;
@@ -39,7 +39,7 @@
       margin-bottom: $spacing-l * 4;
 
       h2 {
-        color: $color-main-yellow;
+        color: $yellow;
         font-size: $font-size-h2;
       }
     }
@@ -58,7 +58,7 @@
         display: flex;
         justify-content: center;
         a {
-          color: $color-link-blue;
+          color: $blue;
         }
       }
 
@@ -87,7 +87,7 @@
             border: none;
             outline: none;
             color: $color-grey;
-            font-family: $font-family-oswald;
+            font-family: $font-family-inter;
             font-size: $font-size-large;
           }
         }
@@ -97,7 +97,7 @@
         margin-top: $spacing-xl;
         margin-bottom: $spacing-l;
         font-size: $font-size-xlarge;
-        color: $color-main-yellow;
+        color: $yellow;
       }
 
       .section {
@@ -116,7 +116,7 @@
           }
 
           & > span:first-child {
-            color: $color-white;
+            color: $light-grey;
             font-size: $font-size-normal;
             max-width: 12vw;
 
@@ -132,7 +132,7 @@
 
           span:last-child {
             color: $color-grey;
-            font-family: $font-family-oswald-light;
+            font-family: $font-family-inter-light;
             margin-left: $spacing-base * 2;
             font-size: 13px;
             font-weight: 200;
@@ -182,7 +182,7 @@
 
             h6 {
               font-size: $font-size-normal;
-              color: $color-white;
+              color: $light-grey;
 
               span {
                 margin-left: $spacing-base;

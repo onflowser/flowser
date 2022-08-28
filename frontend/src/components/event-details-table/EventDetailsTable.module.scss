@@ -21,7 +21,7 @@
     }
 
     > div:first-child {
-      color: $color-white;
+      color: $light-grey;
       font-weight: bold;
       padding-left: $spacing-l * 3;
     }
@@ -30,7 +30,7 @@
   .row {
     background-color: $color-table-light;
     margin-top: $spacing-s;
-    color: $color-white;
+    color: $light-grey;
     display: flex;
     justify-content: space-around;
 

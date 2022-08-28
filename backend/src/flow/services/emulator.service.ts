@@ -46,8 +46,9 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       try {
         await this.start();
       } catch (e: any) {
+        const emulatorError = this.getEmulatorError();
         throw new ServiceUnavailableException(
-          `Can not start emulator}`,
+          emulatorError?.message ?? `Can not start emulator`,
           e.message
         );
       }
@@ -115,7 +116,8 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
       this.emulatorProcess.on("close", (code, signal) => {
         const error =
-          this.getError() || new Error(`Emulator closed: ${code} (${signal})`);
+          this.getEmulatorError() ||
+          new Error(`Emulator closed: ${code} (${signal})`);
         this.setState(FlowEmulatorState.STOPPED);
         this.logger.error("Emulator closed: " + error);
         this.printLogs();
@@ -202,7 +204,8 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
     );
   }
 
-  public getError() {
+  public getEmulatorError() {
+    // TODO(milestone-3): Better log parsing - move logic to Log.entity class
     for (let i = this.logs.length - 1; i > 0; i--) {
       if (this.logs[i].includes("level=error")) {
         const errorLine = FlowEmulatorService.parseLogLine(this.logs[i]);

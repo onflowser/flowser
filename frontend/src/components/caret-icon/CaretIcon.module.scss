@@ -3,14 +3,14 @@
 
 .root {
   @include flipVertical(.2s, 0deg);
-  fill: $color-link-blue;
-  stroke: $color-link-blue;
+  fill: $blue;
+  stroke: $blue;
   cursor: pointer;
 
   &.isOpen {
     @include flipVertical(.2s);
-    fill: $color-main-yellow;
-    stroke: $color-main-yellow;
+    fill: $yellow;
+    stroke: $yellow;
   }
 
   &.inverted {

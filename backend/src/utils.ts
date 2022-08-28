@@ -1,5 +1,4 @@
 import { FlowCadenceObject } from "./flow/services/gateway.service";
-import { CadenceObject } from "@flowser/types/generated/entities/common";
 import { mkdir, rm, stat } from "fs/promises";
 const kebabCase = require("kebab-case");
 
@@ -18,34 +17,12 @@ export async function mkdirIfEnoent(path: string) {
   }
 }
 
-export async function rmdir(path: string) {
-  return rm(path, { force: true, recursive: true });
+export function isArray(value: unknown): value is unknown[] {
+  return typeof value === "object" && "map" in value;
 }
 
-export function deserializeCadenceObject(
-  cadenceObject: FlowCadenceObject
-): CadenceObject {
-  if (typeof cadenceObject.value === "string") {
-    return CadenceObject.fromJSON({
-      type: cadenceObject.type,
-      value: cadenceObject.value,
-    });
-  }
-  if (cadenceObject.value instanceof Array) {
-    return CadenceObject.fromJSON({
-      type: cadenceObject.type,
-      children: cadenceObject.value.map((value) =>
-        deserializeCadenceObject(value)
-      ),
-    });
-  }
-  if (cadenceObject.value instanceof Object) {
-    return CadenceObject.fromJSON({
-      type: cadenceObject.type,
-      children: deserializeCadenceObject(cadenceObject.value),
-    });
-  }
-  throw new Error("Unimplemented cadence type");
+export async function rmdir(path: string) {
+  return rm(path, { force: true, recursive: true });
 }
 
 export type ProtobufLikeObject = {

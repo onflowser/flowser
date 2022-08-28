@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "entities/common.proto";
+import "entities/cadence.proto";
 
 // https://docs.onflow.org/fcl/reference/api/#transaction-statuses
 enum TransactionStatusCode {

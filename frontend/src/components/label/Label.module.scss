@@ -3,7 +3,7 @@
 
 .root {
   color: $color-grey;
-  font-family: $font-family-oswald;
+  font-family: $font-family-inter;
   font-size: $font-size-small;
 
   &.medium {
@@ -16,6 +16,6 @@
 
   &.xlarge {
     font-size: $font-size-xlarge;
-    color: $color-white;
+    color: $light-grey;
   }
 }

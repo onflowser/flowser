@@ -1,102 +1,221 @@
-@import 'styles/colors';
-@import 'styles/spacings';
-@import 'styles/typography';
-@import 'styles/animations';
-@import 'styles/rules';
-
-.emulatorDialog {
-  pre {
-    margin-top: $spacing-base;
-  }
-}
-
-.loaderWrapper {
-  height: 100vh;
-}
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
+@import "styles/animations";
+@import "styles/rules";
 
 .container {
-  background: $dark-blue;
-  padding: $spacing-base;
-  color: $black;
   display: flex;
-  height: 100vh;
-  flex-direction: column;
+  flex-direction: row;
+  color: $light-grey;
 
-  justify-content: center;
-  align-items: center;
+  .sidebar {
+    width: 512px;
+    height: 100vh;
+    background-color: $background-highlight-2;
 
-  img {
-    width: 108px;
-    margin-bottom: 50px;
-  }
+    display: flex;
+    flex-direction: column;
 
-  .header {
-    text-align: center;
-    margin-bottom: $spacing-l * 3;
+    .sideBarHeader {
+      box-sizing: border-box;
+      height: 191px;
+      width: 100%;
+      padding: 38px 53px;
 
-    h1 {
-      color: $color-white;
-      opacity: 0.74;
-      font-family: $font-family-days-one;
-      font-size: 35px;
-      font-weight: normal;
-      letter-spacing: 1.4px;
-      margin-bottom: $spacing-s;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-end;
+
+      .logoWrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .logo {
+          height: 70px;
+          width: auto;
+        }
+      }
     }
 
-    .version {
-      color: $color-mid-grey;
+    .sideBarBody {
+      flex: 1;
+      list-style-type: none;
+
+      .tabWrapper {
+        .tabLink {
+          display: block;
+          text-decoration: none;
+          color: $light-grey;
+          width: 100%;
+          padding: 12px 53px;
+          box-sizing: border-box;
+          position: relative;
+
+          .yellowLine {
+            display: none;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            height: calc(100% - 11px);
+            width: auto;
+            transform: translateY(-50%);
+          }
+        }
+
+        &.activeTab {
+          a {
+            .yellowLine {
+              display: block;
+            }
+            background-color: $background-highlight-1;
+          }
+        }
+      }
     }
 
-    .betaWarning {
-      margin-top: $spacing-s;
-      color: $color-main-yellow;
-      max-width: 400px;
+    .sideBarFooter {
+      box-sizing: border-box;
+      height: 152px;
+      width: 100%;
+      padding: 0 20px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+
+      > * {
+        img {
+          width: 10px;
+          height: 10px;
+          padding-right: 8px;
+        }
+
+        padding: 0 14px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        margin-bottom: 12px;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+
+      .openProjectButton {
+        background-color: $background-highlight-1;
+        color: $grey;
+        border: none;
+        width: 100%;
+      }
+
+      .newProjectButton {
+        background-color: $yellow;
+        color: #2a3348;
+        border: none;
+        width: 100%;
+      }
     }
   }
 
-  button {
-    margin-bottom: $spacing-base;
-    width: 368px;
-    height: 66px;
+  // ------ tabs ------
+  .projectList {
+    flex: 1;
+    .projectListHeader {
+      box-sizing: border-box;
+      height: 162px;
+      width: 100%;
+      padding: 23px 20px;
+
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-end;
+
+      .projectSearch {
+        width: 400px;
+      }
+    }
+
+    .projectListBody {
+      list-style-type: none;
+      padding-left: 23px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+
+      .projectWrapper {
+        padding: 32px 125px 28px 35px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        position: relative;
+
+        .projectName {
+          font-size: 17px;
+          line-height: 26px;
+          color: #cdd9fa;
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+        .projectLastOpened {
+          @media (max-width: 1029px) {
+            display: none;
+          }
+          font-size: 13px;
+          line-height: 26px;
+          color: $grey;
+        }
+
+        .projectTrashcan {
+          display: none;
+          position: absolute;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          top: 0;
+          right: 21px;
+
+          > * {
+            height: 13px;
+            width: auto;
+          }
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+
+        &:hover {
+          background: $background-highlight-1;
+
+          .projectTrashcan {
+            display: flex;
+          }
+        }
+      }
+    }
   }
 
-  .caret {
-    transform: rotate(-90deg);
-  }
+  .bodyCenter {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  .noEmulators,
-  .loading {
-    margin-top: $spacing-base;
-    color: $color-grey;
-    font-weight: 100;
+    > * {
+      text-align: center;
+      line-height: 26px;
+      font-weight: 300;
+      font-size: 16px;
+      font-family: Inter;
+    }
   }
-  .loading {
-    @include pulse(1.8s);
-  }
-}
-
-.newProjectBtn {
-  color: $color-grey;
-  border: 2px solid $color-grey;
-}
-
-h2 {
-  margin-top: $spacing-l * 2;
-  font-size: $font-size-small;
-  color: $color-grey;
-}
-
-@keyframes logoPulse {
-  0% {
-    transform: scale(1) rotate(0deg);
-  }
-
-  30% {
-    transform: scale(1.2) rotate(15deg);
-  }
-
-  100% {
-    transform: scale(1) rotate(0deg);
-  }
+  // ------ tabs ------
 }

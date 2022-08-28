@@ -57,6 +57,9 @@ export class AccountStorageItemEntity extends PollingEntity {
     storageItem.pathIdentifier = flowStorageIdentifier;
     storageItem.pathDomain = this.convertFlowStorageDomain(flowStorageDomain);
 
+    // TODO(milestone-x): For now we will just show plain (unparsed) storage data
+    // But in the future we will want to parse it so that we can extract info
+    // This will be possible after storage API implements proper deserialization of storage data
     if (typeof storageData !== "object") {
       // In case the data is a simple value (string, number, boolean,...)
       // we need to store it in object form (e.g. under "value" key).
