@@ -93,6 +93,8 @@ const Events: FunctionComponent = () => {
   //   }),
   // ];
 
+  console.log(filteredData);
+
   return (
     <>
       {filteredData.map((item) => (

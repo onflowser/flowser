@@ -24,6 +24,17 @@ import {
   useGetTransaction,
 } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
+import { createColumnHelper } from "@tanstack/table-core";
+import {
+  SignableObject,
+  Transaction,
+} from "types/generated/entities/transactions";
+import { info } from "console";
+import Table from "../../../components/table/Table";
+import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { Event } from "types/generated/entities/events";
+import { ComputedEventData, EventUtils } from "frontend/src/utils/event-utils";
+import CopyButton from "frontend/src/components/copy-button/CopyButton";
 
 type RouteParams = {
   transactionId: string;
@@ -58,6 +69,100 @@ const Details: FunctionComponent = () => {
   if (isLoading || !transaction) {
     return <FullScreenLoading />;
   }
+
+  // PROPOSAL KEY TABLE
+  const columnsHelperProposal = createColumnHelper<Transaction>();
+
+  const columnsProposal = [
+    columnsHelperProposal.accessor("proposalKey.address", {
+      header: () => <Label variant="medium">ADDRESS</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink
+            to={info.getValue() ? `/accounts/details/${info.getValue()}` : "#"}
+          >
+            {info.getValue()}
+          </NavLink>
+        </Value>
+      ),
+    }),
+    // columnsHelperProposal.accessor("index") ? can't find property index on "transaction" // TODO: ask which property is to be added to the table
+
+    columnsHelperProposal.accessor("proposalKey.sequenceNumber", {
+      header: () => <Label variant="medium">SEQUENCE</Label>,
+      cell: (info) => <Value>{info.getValue()}</Value>,
+    }),
+  ];
+
+  // PAYLOAD SIGNATURES TABLE
+  const columnsHelperPayload = createColumnHelper<SignableObject>();
+
+  const columnsPayload = [
+    columnsHelperPayload.accessor("address", {
+      header: () => <Label variant="medium">ADDRESS</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`/accounts/details/${info.getValue()}`}>
+            {info.getValue()}
+          </NavLink>
+        </Value>
+      ),
+    }),
+    columnsHelperPayload.accessor("signature", {
+      header: () => <Label variant="medium">SIGNATURE</Label>,
+      cell: (info) => (
+        <Value>
+          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        </Value>
+      ),
+    }),
+    columnsHelperPayload.accessor("keyId", {
+      header: () => <Label variant="medium">KEY ID</Label>, // TODO: ask what is meant by KEY INDEX in adobe design
+      cell: (info) => <Value>{info.getValue()}</Value>,
+    }),
+  ];
+
+  // EVENTS TABLE
+  // EventUtils.computeEventData(data);
+  const columnHelperEvents = createColumnHelper<ComputedEventData>();
+
+  const columnsEvents = [
+    columnHelperEvents.display({
+      id: "tableTitle",
+      header: () => <Label variant="medium">VALUES</Label>,
+    }),
+    columnHelperEvents.accessor("name", {
+      header: () => <Label variant="medium">NAME</Label>,
+      cell: (info) => (
+        <Value>
+          <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+        </Value>
+      ),
+    }),
+    columnHelperEvents.accessor("type", {
+      header: () => <Label variant="medium">TYPE</Label>,
+      cell: (info) => (
+        <Value>
+          <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+        </Value>
+      ),
+    }),
+    columnHelperEvents.accessor("value", {
+      header: () => <Label variant="medium">VALUE</Label>,
+      cell: (info) => (
+        <div>
+          <Ellipsis
+            style={{ whiteSpace: "nowrap" }}
+            className={classes.ellipsis}
+          >
+            {info.getValue()}
+          </Ellipsis>
+          <CopyButton value={info.getValue()} />
+        </div>
+      ),
+    }),
+  ];
+  // console.log(events)
 
   return (
     <div className={classes.root}>
@@ -141,6 +246,7 @@ const Details: FunctionComponent = () => {
             ))}
           </Value>
         </div>
+        {/* <Table<Transaction> data={transaction} columns={columnsProposal} />  TODO: ask about Transaction type*/}
       </DetailsCard>
       <DetailsTabs>
         <DetailsTabItem label="SCRIPT" value="<>">
@@ -177,6 +283,10 @@ const Details: FunctionComponent = () => {
               <div></div>
             </Card>
           ))}
+          <Table<SignableObject>
+            data={transaction.payloadSignatures}
+            columns={columnsPayload}
+          />
         </DetailsTabItem>
         <DetailsTabItem
           label="ENVELOPE SIGNATURES"
@@ -241,9 +351,13 @@ const Details: FunctionComponent = () => {
                 </div>
               </Card>
               {openedLog === item.id && item.data && (
-                <EventDetailsTable
-                  className={classes.detailsTable}
-                  data={item.data}
+                // <EventDetailsTable
+                //   className={classes.detailsTable}
+                //   data={item.data}
+                // />
+                <Table<ComputedEventData>
+                  data={EventUtils.computeEventData(item.data)}
+                  columns={columnsEvents}
                 />
               )}
             </React.Fragment>
