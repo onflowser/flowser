@@ -20,6 +20,10 @@ import {
   useGetPollingTransactionsByBlock,
 } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
+import { createColumnHelper } from "@tanstack/table-core";
+import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { Transaction } from "types/generated/entities/transactions";
+import Table from "../../../components/table/Table";
 
 type RouteParams = {
   blockId: string;
@@ -50,6 +54,23 @@ const Details: FunctionComponent = () => {
   if (isLoading || !block) {
     return <FullScreenLoading />;
   }
+
+  // TRANSACTIONS TABLE
+  const columnHelper =
+    createColumnHelper<DecoratedPollingEntity<Transaction>>();
+
+  const columns = [
+    columnHelper.accessor("id", {
+      header: () => <Label variant="medium">TRANSACTION ID</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`/transactions/details/${info.getValue()}`}>
+            {info.getValue()}
+          </NavLink>
+        </Value>
+      ),
+    }),
+  ];
 
   return (
     <div className={classes.root}>
@@ -87,7 +108,7 @@ const Details: FunctionComponent = () => {
               updateSearchBar("search for transactions", !transactions.length)
             }
           >
-            {transactions &&
+            {/* {transactions &&
               transactions.map((transaction, index) => (
                 <Card
                   variant="black"
@@ -101,7 +122,13 @@ const Details: FunctionComponent = () => {
                     </NavLink>
                   </Value>
                 </Card>
-              ))}
+              ))} */}
+            {transactions && (
+              <Table<DecoratedPollingEntity<Transaction>>
+                data={transactions}
+                columns={columns}
+              />
+            )}
           </Fragment>
         </DetailsTabItem>
 
