@@ -92,9 +92,7 @@ const Main: FunctionComponent = () => {
         </div>
       ),
     }),
-  ]; // TODO: dodaj ikono statusa
-
-  console.log(filteredData);
+  ];
 
   return (
     <>
