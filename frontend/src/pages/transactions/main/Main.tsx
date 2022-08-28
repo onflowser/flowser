@@ -10,12 +10,14 @@ import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
 import { Transaction } from "types/generated/entities/transactions";
-import Label from "../../../components/value/Value";
+import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Table from "../../../components/table/Table";
 import { info } from "console";
+import { FlowUtils } from "../../../utils/flow-utils";
+import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -60,7 +62,7 @@ const Main: FunctionComponent = () => {
       cell: (info) => (
         <Value>
           <NavLink to={`/accounts/details/${info.getValue}`}>
-            {info.getValue()}
+            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
           </NavLink>
         </Value>
       ),
@@ -81,17 +83,24 @@ const Main: FunctionComponent = () => {
         </Value>
       ),
     }),
-    columnHelper.accessor("status", {
+    columnHelper.accessor("status.statusCode", {
       header: () => <Label variant="medium">STATUS</Label>,
-      cell: (info) => <Value>{info.getValue()}</Value>,
+      cell: (info) => (
+        <div>
+          <ColoredCircle color="green" />
+          <Value>{FlowUtils.getGrcpStatusName(info.getValue())}</Value>{" "}
+        </div>
+      ),
     }),
   ]; // TODO: dodaj ikono statusa
 
+  console.log(filteredData);
+
   return (
     <>
-      {filteredData.map((item) => (
+      {/* {filteredData.map((item) => (
         <TransactionListItem key={item.id} transaction={item} />
-      ))}
+      ))} */}
       <Table<DecoratedPollingEntity<Transaction>>
         data={filteredData}
         columns={columns}

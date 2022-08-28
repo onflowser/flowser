@@ -162,7 +162,6 @@ const Details: FunctionComponent = () => {
       ),
     }),
   ];
-  // console.log(events)
 
   return (
     <div className={classes.root}>
@@ -255,7 +254,35 @@ const Details: FunctionComponent = () => {
             args={transaction.args}
           />
         </DetailsTabItem>
-        <DetailsTabItem label="GAS LIMIT" value={9000} />
+        <DetailsTabItem
+          label="ENVELOPE SIGNATURES"
+          value={transaction.envelopeSignatures.length}
+        >
+          {transaction.envelopeSignatures.map((item, i) => (
+            <Card key={i} className={classes.listCard}>
+              <div>
+                <Label className={classes.label}>ACCOUNT ADDRESS</Label>
+                <Value>
+                  <NavLink to={`/accounts/details/${item.address}`}>
+                    {item.address}
+                  </NavLink>
+                </Value>
+              </div>
+              <div>
+                <Label className={classes.label}>SIGNATURE</Label>
+                <Value>
+                  <Ellipsis className={classes.hash}>{item.signature}</Ellipsis>
+                </Value>
+              </div>
+              <div>
+                <Label className={classes.label}>KEY ID</Label>
+                <Value>{item.keyId}</Value>
+              </div>
+              <div></div>
+            </Card>
+          ))}
+          {/* <Table<Transaction> data={transaction.proposalKey} columns={columnsProposal}/>  TODO: ask about type Transaction  */}
+        </DetailsTabItem>
         <DetailsTabItem
           label="PAYLOAD SIGNATURES"
           value={transaction.payloadSignatures?.length || 0}
@@ -287,34 +314,6 @@ const Details: FunctionComponent = () => {
             data={transaction.payloadSignatures}
             columns={columnsPayload}
           />
-        </DetailsTabItem>
-        <DetailsTabItem
-          label="ENVELOPE SIGNATURES"
-          value={transaction.envelopeSignatures.length}
-        >
-          {transaction.envelopeSignatures.map((item, i) => (
-            <Card key={i} className={classes.listCard}>
-              <div>
-                <Label className={classes.label}>ACCOUNT ADDRESS</Label>
-                <Value>
-                  <NavLink to={`/accounts/details/${item.address}`}>
-                    {item.address}
-                  </NavLink>
-                </Value>
-              </div>
-              <div>
-                <Label className={classes.label}>SIGNATURE</Label>
-                <Value>
-                  <Ellipsis className={classes.hash}>{item.signature}</Ellipsis>
-                </Value>
-              </div>
-              <div>
-                <Label className={classes.label}>KEY ID</Label>
-                <Value>{item.keyId}</Value>
-              </div>
-              <div></div>
-            </Card>
-          ))}
         </DetailsTabItem>
         <DetailsTabItem label="EVENTS" value={events.length}>
           {events.map((item, i) => (
@@ -363,6 +362,7 @@ const Details: FunctionComponent = () => {
             </React.Fragment>
           ))}
         </DetailsTabItem>
+        <DetailsTabItem label="GAS LIMIT" value={transaction?.gasLimit} />
       </DetailsTabs>
     </div>
   );
