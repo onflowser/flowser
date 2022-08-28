@@ -33,8 +33,8 @@ import { info } from "console";
 import Table from "../../../components/table/Table";
 import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
 import { Event } from "types/generated/entities/events";
-import { ComputedEventData, EventUtils } from "frontend/src/utils/event-utils";
-import CopyButton from "frontend/src/components/copy-button/CopyButton";
+import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
+import CopyButton from "../../../components/copy-button/CopyButton";
 
 type RouteParams = {
   transactionId: string;
