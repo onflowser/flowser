@@ -6,6 +6,7 @@ import {
   Gateway,
   GatewayStatus,
 } from "@flowser/types/generated/entities/projects";
+import { CadenceType } from "@flowser/types/generated/entities/cadence";
 
 const fcl = require("@onflow/fcl");
 
@@ -54,14 +55,12 @@ export type FlowCollection = {
   transactionIds: string[];
 };
 
-// TODO(milestone-3): We should probably rename that object to FlowTransactionArgument
-// This kind of structure seems to be specific to how transaction arguments are encoded in Flow
-// Transaction arguments are not represented by CadenceValue object in flow-go-sdk source:
-// https://github.com/onflow/flow-emulator/blob/3fbe8ad9dc841abdc13056e20e7b15fc0e32a749/accountStorage.go#L77-L83
 export type FlowCadenceObject = {
-  type: string;
-  // TODO: not sure about this, check the structure for more complex types
+  type: string; // See CadenceType
   value: string | FlowCadenceObject | FlowCadenceObject[];
+  // Each object can contain other type-specific attributes
+  // Refer to: https://github.com/onflow/cadence/blob/master/values.go
+  [key: string]: unknown;
 };
 
 // https://docs.onflow.org/fcl/reference/api/#proposalkeyobject

@@ -6,19 +6,20 @@ import {
   SignableObject,
   TransactionStatus,
 } from "@flowser/types/generated/entities/transactions";
-import { CadenceObject } from "@flowser/types/generated/entities/common";
+import {
+  CadenceObject,
+  cadenceTypeFromJSON,
+} from "@flowser/types/generated/entities/cadence";
 import {
   FlowBlock,
+  FlowCadenceObject,
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
 } from "../../flow/services/gateway.service";
-import {
-  deserializeCadenceObject,
-  ensurePrefixedAddress,
-  typeOrmProtobufTransformer,
-} from "../../utils";
+import { ensurePrefixedAddress, typeOrmProtobufTransformer } from "../../utils";
 import { AccountEntity } from "../../accounts/entities/account.entity";
+import { CadenceUtils } from "../../flow/utils/cadence-utils";
 
 @Entity({ name: "transactions" })
 export class TransactionEntity extends PollingEntity {
@@ -46,10 +47,8 @@ export class TransactionEntity extends PollingEntity {
   @Column("simple-array")
   authorizers: string[]; // authorizers account addresses
 
-  @Column("simple-json", {
-    transformer: typeOrmProtobufTransformer(CadenceObject),
-  })
-  args: CadenceObject[];
+  @Column("simple-json")
+  args: FlowCadenceObject[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(TransactionProposalKey),
@@ -80,7 +79,7 @@ export class TransactionEntity extends PollingEntity {
       gasLimit: this.gasLimit,
       payer: this.payerAddress,
       authorizers: this.authorizers,
-      args: this.args,
+      args: this.args.map((arg) => CadenceUtils.serializeCadenceObject(arg)),
       proposalKey: this.proposalKey,
       envelopeSignatures: this.envelopeSignatures,
       payloadSignatures: this.payloadSignatures,
@@ -105,9 +104,7 @@ export class TransactionEntity extends PollingEntity {
     transaction.authorizers = flowTransaction.authorizers.map((address) =>
       ensurePrefixedAddress(address)
     );
-    transaction.args = flowTransaction.args.map((arg) =>
-      deserializeCadenceObject(arg)
-    );
+    transaction.args = flowTransaction.args;
     transaction.proposalKey = flowTransaction.proposalKey;
     transaction.envelopeSignatures = deserializeSignableObjects(
       flowTransaction.envelopeSignatures
