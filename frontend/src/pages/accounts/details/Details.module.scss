@@ -54,8 +54,8 @@
 .hash {
   display: inline-block;
   overflow: hidden;
-  max-width: 100%;
-  min-width: 100%;
+  max-width: 90vw;
+  margin: $spacing-base;
 }
 
 .badges {

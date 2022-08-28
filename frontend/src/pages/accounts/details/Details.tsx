@@ -133,7 +133,6 @@ const Details: FunctionComponent = () => {
   ];
 
   // KEYS TABLE
-
   const columnHelperKeys =
     createColumnHelper<DecoratedPollingEntity<AccountKey>>();
 

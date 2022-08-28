@@ -14,6 +14,10 @@ import NoResults from "../../components/no-results/NoResults";
 import FullScreenLoading from "../../components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
 import { useGetPollingEvents } from "../../hooks/use-api";
+import { ColumnDef, createColumnHelper } from "@tanstack/table-core";
+import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { Event } from "types/generated/entities/events";
+import { info } from "console";
 
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
@@ -31,6 +35,63 @@ const Events: FunctionComponent = () => {
     setOpenedLog(!status ? id : "");
     splitbee.track("Events: toggle details");
   };
+
+  // EVENTS TABLE (not working yet)
+  // const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
+
+  // const columnsEvents = [
+  //   columnHelper.accessor("blockId", {
+  //     header: () => <Label variant="medium">BLOCK ID</Label>,
+  //     cell: (info) => (
+  //       <Value>
+  //         <NavLink to={`/blocks/details/${info.getValue()}`}>
+  //           <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+  //         </NavLink>
+  //       </Value>
+  //     ),
+  //   }),
+  //   columnHelper.accessor("createdAt", {
+  //     header: () => <Label variant="medium">TIMESTAMP</Label>,
+  //     cell: (info) => (
+  //       <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
+  //     ),
+  //   }),
+  //   columnHelper.accessor("type", {
+  //     header: () => <Label variant="medium">TYPE</Label>,
+  //     cell: (info) => <Value>{info.getValue()}</Value>,
+  //   }),
+  //   columnHelper.accessor("transactionId", {
+  //     header: () => <Label variant="medium">TX ID</Label>,
+  //     cell: (info) => (
+  //       <Value>
+  //         <NavLink to={`/transactions/details/${info.getValue()}`}>
+  //           <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+  //         </NavLink>
+  //       </Value>
+  //     ),
+  //   }),
+  //   columnHelper.accessor("transactionIndex", {
+  //     header: () => <Label variant="medium">TX INDEX</Label>,
+  //     cell: (info) => <Value>{info.getValue()}</Value>,
+  //   }),
+  //   columnHelper.accessor("eventIndex", {
+  //     header: () => <Label variant="medium">EVENT INDEX</Label>,
+  //     cell: ({ row, getValue }) => (
+  //       <div>
+  //         <Value>{getValue()}</Value>
+  //         <CaretIcon
+  //               inverted={true}
+
+  //               className={classes.control}
+  //               {...{
+  //               onClick: row.getToggleExpandedHandler(),
+  //               style: { cursor: 'pointer' },
+  //               }}
+  //             />
+  //       </div>
+  //     ),
+  //   }),
+  // ];
 
   return (
     <>

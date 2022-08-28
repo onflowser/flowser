@@ -7,6 +7,15 @@ import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";
 import { useGetPollingTransactions } from "../../../hooks/use-api";
+import { createColumnHelper } from "@tanstack/table-core";
+import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { Transaction } from "types/generated/entities/transactions";
+import Label from "../../../components/value/Value";
+import Value from "../../../components/value/Value";
+import { NavLink } from "react-router-dom";
+import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import Table from "../../../components/table/Table";
+import { info } from "console";
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
@@ -21,11 +30,72 @@ const Main: FunctionComponent = () => {
     disableSearchBar(!data.length);
   }, [data]);
 
+  // TRANSACTIONS TABLE
+  const columnHelper =
+    createColumnHelper<DecoratedPollingEntity<Transaction>>();
+
+  const columns = [
+    columnHelper.accessor("id", {
+      header: () => <Label variant="medium">TRANSACTION ID</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`/transactions/details/${info.getValue()}`}>
+            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          </NavLink>
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("blockId", {
+      header: () => <Label variant="medium">BLOCK ID</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`/blocks/details/${info.getValue()}`}>
+            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          </NavLink>
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("payer", {
+      header: () => <Label variant="medium">PAYER</Label>,
+      cell: (info) => (
+        <Value>
+          <NavLink to={`/accounts/details/${info.getValue}`}>
+            {info.getValue()}
+          </NavLink>
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("proposalKey", {
+      header: () => <Label variant="medium">PROPOSER</Label>,
+      cell: (info) => (
+        <Value>
+          {info.getValue() ? (
+            <NavLink
+              to={`/accounts/details/${info.row.original.proposalKey?.address}`}
+            >
+              {info.row.original.proposalKey?.address}
+            </NavLink>
+          ) : (
+            "-"
+          )}
+        </Value>
+      ),
+    }),
+    columnHelper.accessor("status", {
+      header: () => <Label variant="medium">STATUS</Label>,
+      cell: (info) => <Value>{info.getValue()}</Value>,
+    }),
+  ]; // TODO: dodaj ikono statusa
+
   return (
     <>
       {filteredData.map((item) => (
         <TransactionListItem key={item.id} transaction={item} />
       ))}
+      <Table<DecoratedPollingEntity<Transaction>>
+        data={filteredData}
+        columns={columns}
+      />
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />
