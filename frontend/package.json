@@ -42,7 +42,8 @@
     "cross-env": "^7.0.3",
     "sqlite3": "^5.0.11",
     "wait-on": "^6.0.1",
-    "concurrently": "^7.3.0"
+    "concurrently": "^7.3.0",
+    "electron-is-dev": "^2.0.0"
   },
   "scripts": {
     "cleanup": "rm -rf node_modules",
@@ -53,7 +54,6 @@
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "cd ../ && husky install ./frontend/.husky",
-    "postinstall": "./node_modules/.bin/electron-rebuild",
     "install:m1": "cd ../node_modules/sqlite3 && ../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source",
     "electron:serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
     "electron:build": "yarn build && electron-builder -c.extraMetadata.main=build/main.js",
@@ -62,7 +62,7 @@
   "build": {
     "productName": "Flowser",
     "extends": null,
-    "appId": "dev.flowser.desktop",
+    "appId": "dev.flowser.app",
     "files": [
       "dist/**/*",
       "build/**/*",

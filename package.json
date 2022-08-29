@@ -40,7 +40,6 @@
   "workspaces": [
     "./backend",
     "./frontend",
-    "./types",
-    "./web"
+    "./types"
   ]
 }
