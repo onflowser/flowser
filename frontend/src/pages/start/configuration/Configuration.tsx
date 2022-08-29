@@ -11,7 +11,7 @@ import classes from "./Configuration.module.scss";
 import Input from "../../../components/input/Input";
 import ToggleButton from "../../../components/toggle-button/ToggleButton";
 import RadioButton from "../../../components/radio-button/RadioButton";
-import IconBackButton from "../../../assets/icons/back-button.svg";
+import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
 import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import Button from "../../../components/button/Button";

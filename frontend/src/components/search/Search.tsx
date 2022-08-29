@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useCallback } from "react";
 import { useSearch } from "../../hooks/use-search";
 import classes from "./Search.module.scss";
-import SearchIcon from "../../assets/icons/search.svg";
-import CancelIcon from "../../assets/icons/cancel.svg";
+import { ReactComponent as SearchIcon } from "../../assets/icons/search.svg";
+import { ReactComponent as CancelIcon } from "../../assets/icons/cancel.svg";
 
 export type SearchProps = {
   className?: string;

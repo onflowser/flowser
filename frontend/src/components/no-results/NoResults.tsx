@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import NoResultsIcon from "../../assets/icons/no-results.svg";
+import { ReactComponent as NoResultsIcon } from "../../assets/icons/no-results.svg";
 import classes from "./NoResults.module.scss";
 
 type NoResultsProps = {

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  // TODO(milestone-5): provide config at runtime
-  baseURL: "http://localhost:6061",
+  baseURL: process.env.REACT_APP_API_HOST || "http://localhost:6061",
 });
 
 instance.interceptors.response.use(

@@ -1,12 +1,12 @@
 import React, { FunctionComponent } from "react";
 import classes from "./TransactionStatusCode.module.scss";
-import UnknownIcon from "../../assets/icons/status-unknown.svg";
-import TransactionPendingIcon from "../../assets/icons/status-pending.svg";
-import TransactionFinalizedIcon from "../../assets/icons/status-finalized.svg";
-import TransactionExecutedIcon from "../../assets/icons/status-executed.svg";
-import TransactionSealedIcon from "../../assets/icons/status-sealed.svg";
-import TransactionExpiredIcon from "../../assets/icons/status-expired.svg";
-import { TransactionStatusCode } from "@flowser/types";
+import { ReactComponent as UnknownIcon } from "../../assets/icons/status-unknown.svg";
+import { ReactComponent as TransactionPendingIcon } from "../../assets/icons/status-pending.svg";
+import { ReactComponent as TransactionFinalizedIcon } from "../../assets/icons/status-finalized.svg";
+import { ReactComponent as TransactionExecutedIcon } from "../../assets/icons/status-executed.svg";
+import { ReactComponent as TransactionSealedIcon } from "../../assets/icons/status-sealed.svg";
+import { ReactComponent as TransactionExpiredIcon } from "../../assets/icons/status-expired.svg";
+import { TransactionStatusCode } from "@flowser/types/generated/entities/transactions";
 
 type TransactionStatusCodeProps = {
   statusCode: TransactionStatusCode | undefined;

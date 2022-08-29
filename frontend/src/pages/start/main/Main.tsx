@@ -9,8 +9,8 @@ import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
 import Logo from "../../../assets/images/logo.svg";
 import classes from "./Main.module.scss";
-import CaretIcon from "../../../assets/icons/caret.svg";
-import PlusIcon from "../../../assets/icons/plus.svg";
+import { ReactComponent as CaretIcon } from "../../../assets/icons/caret.svg";
+import { ReactComponent as PlusIcon } from "../../../assets/icons/plus.svg";
 import splitbee from "@splitbee/web";
 import { ProjectsService } from "../../../services/projects.service";
 import {

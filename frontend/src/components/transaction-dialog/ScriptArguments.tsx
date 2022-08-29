@@ -6,8 +6,8 @@ import * as t from "@onflow/types";
 import SelectInput from "../select-input/SelectInput";
 import { FlowScriptArgument } from "../../hooks/use-flow";
 import IconButton from "../icon-button/IconButton";
-import DeleteIcon from "../../assets/icons/cancel.svg";
-import PlusIcon from "../../assets/icons/plus.svg";
+import { ReactComponent as DeleteIcon } from "../../assets/icons/cancel.svg";
+import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
 import splitbee from "@splitbee/web";
 
 type ScriptArgumentsProps = {
