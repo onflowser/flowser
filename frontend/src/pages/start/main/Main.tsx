@@ -69,7 +69,8 @@ const Main: FunctionComponent = () => {
     <>
       {error && <div className={classes.errors}>{error}</div>}
       <div className={classes.container}>
-        <Logo className={classes.logo} />
+        {/* TODO(milestone-5): fix this image */}
+        <Logo />
         <div className={classes.header}>
           <h1>FLOWSER</h1>
           <span className={classes.version}>{flowserVersion?.version}</span>
