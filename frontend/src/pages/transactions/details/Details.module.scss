@@ -1,5 +1,5 @@
-@import 'styles/spacings';
-@import 'styles/animations';
+@import "styles/spacings";
+@import "styles/animations";
 
 .root {
   display: flex;
@@ -46,8 +46,8 @@
     }
   }
   .hash {
-    max-width: 30vw;
-    min-width: 30vw;
+    max-width: 20vw;
+    min-width: 10vw;
     display: inline-block;
     overflow: hidden;
   }

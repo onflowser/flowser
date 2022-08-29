@@ -27,7 +27,11 @@ function Table<TData>({ columns, data }: TableProps<TData>): ReactElement {
   return (
     <div>
       {table.getHeaderGroups().map((headerGroup) => (
-        <Card className={classes.tableRow} key={headerGroup.id}>
+        <Card
+          className={`${classes.tableRow} ${classes.headerRow}`}
+          key={headerGroup.id}
+          variant="header-row"
+        >
           {headerGroup.headers.map((header) => (
             <div key={header.id}>
               {flexRender(header.column.columnDef.header, header.getContext())}
@@ -40,6 +44,7 @@ function Table<TData>({ columns, data }: TableProps<TData>): ReactElement {
           className={classes.tableRow}
           key={row.id}
           showIntroAnimation={showIntroAnimation(row)}
+          variant="table-line"
         >
           {row.getVisibleCells().map((cell) => (
             <div key={cell.id} className={classes.element}>

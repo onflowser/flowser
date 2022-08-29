@@ -12,7 +12,6 @@ import {
   DetailsTabItem,
   DetailsTabs,
 } from "../../../components/details-tabs/DetailsTabs";
-import CollapsibleCard from "../../../components/collapsible-card/CollapsibleCard";
 import { NavLink, useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";

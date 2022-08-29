@@ -70,26 +70,30 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  // PROPOSAL KEY TABLE
-  const columnsHelperProposal = createColumnHelper<Transaction>();
+  // ENVELOPE SIGNATURES TABLE
+  const columnsHelperEnvelope = createColumnHelper<SignableObject>();
 
-  const columnsProposal = [
-    columnsHelperProposal.accessor("proposalKey.address", {
-      header: () => <Label variant="medium">ADDRESS</Label>,
+  const columnsEnvelope = [
+    columnsHelperEnvelope.accessor("address", {
+      header: () => <Label variant="medium">ACCOUNT ADDRESS</Label>,
       cell: (info) => (
         <Value>
-          <NavLink
-            to={info.getValue() ? `/accounts/details/${info.getValue()}` : "#"}
-          >
+          <NavLink to={`/accounts/details/${info.getValue()}`}>
             {info.getValue()}
           </NavLink>
         </Value>
       ),
     }),
-    // columnsHelperProposal.accessor("index") ? can't find property index on "transaction" // TODO: ask which property is to be added to the table
-
-    columnsHelperProposal.accessor("proposalKey.sequenceNumber", {
-      header: () => <Label variant="medium">SEQUENCE</Label>,
+    columnsHelperEnvelope.accessor("signature", {
+      header: () => <Label variant="medium">SIGNATURE</Label>,
+      cell: (info) => (
+        <Value>
+          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        </Value>
+      ),
+    }),
+    columnsHelperEnvelope.accessor("keyId", {
+      header: () => <Label variant="medium">KEY ID</Label>,
       cell: (info) => <Value>{info.getValue()}</Value>,
     }),
   ];
@@ -245,7 +249,6 @@ const Details: FunctionComponent = () => {
             ))}
           </Value>
         </div>
-        {/* <Table<Transaction> data={transaction} columns={columnsProposal} />  TODO: ask about Transaction type*/}
       </DetailsCard>
       <DetailsTabs>
         <DetailsTabItem label="SCRIPT" value="<>">
@@ -258,30 +261,10 @@ const Details: FunctionComponent = () => {
           label="ENVELOPE SIGNATURES"
           value={transaction.envelopeSignatures.length}
         >
-          {transaction.envelopeSignatures.map((item, i) => (
-            <Card key={i} className={classes.listCard}>
-              <div>
-                <Label className={classes.label}>ACCOUNT ADDRESS</Label>
-                <Value>
-                  <NavLink to={`/accounts/details/${item.address}`}>
-                    {item.address}
-                  </NavLink>
-                </Value>
-              </div>
-              <div>
-                <Label className={classes.label}>SIGNATURE</Label>
-                <Value>
-                  <Ellipsis className={classes.hash}>{item.signature}</Ellipsis>
-                </Value>
-              </div>
-              <div>
-                <Label className={classes.label}>KEY ID</Label>
-                <Value>{item.keyId}</Value>
-              </div>
-              <div></div>
-            </Card>
-          ))}
-          {/* <Table<Transaction> data={transaction.proposalKey} columns={columnsProposal}/>  TODO: ask about type Transaction  */}
+          <Table<SignableObject>
+            data={transaction.envelopeSignatures}
+            columns={columnsEnvelope}
+          />
         </DetailsTabItem>
         <DetailsTabItem
           label="PAYLOAD SIGNATURES"
