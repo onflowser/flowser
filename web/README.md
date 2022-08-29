@@ -37,12 +37,4 @@ Full "module not found" error log
 </details>
 
 
-This issue is also described in [this StackOverflow post](https://stackoverflow.com/questions/72553650/how-to-get-node-sqlite3-working-on-mac-m1#answer-72571188). The solution for now is to manually install the correct `sqlite3` bindings on M1, with the below command:
-
-```shell
-# Move to node_modules folder in project root!
-cd ../node_modules/sqlite3
-
-# Force target architecture to arm64
-../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source
-```
+This issue is also described in [this StackOverflow post](https://stackoverflow.com/questions/72553650/how-to-get-node-sqlite3-working-on-mac-m1#answer-72571188). The solution for now is to manually build the correct `sqlite3` bindings on M1, with `yarn run install:m1` command.

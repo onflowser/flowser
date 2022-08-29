@@ -6,8 +6,7 @@ const isDev = require("electron-is-dev");
 
 // require("@electron/remote/main").initialize();
 
-function createWindow() {
-  createApp();
+async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
@@ -23,6 +22,14 @@ function createWindow() {
       ? "http://localhost:3000"
       : `file://${path.join(__dirname, "../build/index.html")}`
   );
+
+  try {
+    const app = await createApp();
+    app.enableCors();
+    app.listen(6061);
+  } catch (e) {
+    console.error("Failed to start @flowser/backend", e);
+  }
 }
 
 app.on("ready", createWindow);
