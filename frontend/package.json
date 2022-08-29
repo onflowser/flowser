@@ -1,11 +1,7 @@
 {
   "name": "@flowser/frontend",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "private": true,
-  "source": "./src/index.ts",
-  "main": "./dist/main.js",
-  "module": "./dist/module.js",
-  "types": "./dist/types.d.ts",
   "dependencies": {
     "@onflow/fcl": "^0.0.77",
     "@onflow/types": "^0.0.5",
@@ -42,9 +38,8 @@
   },
   "scripts": {
     "cleanup": "rm -rf node_modules",
-    "start:web": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "build:web": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "build:lib": "parcel build",
+    "start": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
@@ -70,25 +65,13 @@
     ]
   },
   "devDependencies": {
-    "@parcel/packager-ts": "2.7.0",
-    "@parcel/transformer-sass": "^2.7.0",
-    "@parcel/transformer-svg-react": "^2.7.0",
-    "@parcel/transformer-typescript-types": "2.7.0",
-    "@rollup/plugin-commonjs": "^22.0.2",
-    "@rollup/plugin-image": "^2.1.1",
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "@rollup/plugin-typescript": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.26.0",
     "lint-staged": "^11.1.2",
-    "parcel": "^2.7.0",
     "prettier": "^2.4.1",
-    "rollup": "^2.78.1",
-    "rollup-plugin-dts": "^4.2.2",
-    "rollup-plugin-scss": "3",
     "sass": "^1.42.1"
   },
   "husky": {

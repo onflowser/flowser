@@ -11,7 +11,7 @@ export const useFilterData = <T>(
     return { filteredData: data };
   }
 
-  filterByProps = filterByProps || Object.keys(data[0]);
+  filterByProps = filterByProps || Object.keys(data[0] as never);
   const filteredData = data.filter(
     (item) =>
       JSON.stringify(item, filterByProps)
