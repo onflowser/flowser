@@ -2,7 +2,11 @@
   "name": "@flowser/frontend",
   "version": "0.0.1",
   "private": true,
+  "main": "electron/main.js",
+  "homepage": "./",
   "dependencies": {
+    "@flowser/types": "0.0.1",
+    "@flowser/backend": "0.0.1",
     "@onflow/fcl": "^0.0.77",
     "@onflow/types": "^0.0.5",
     "@splitbee/web": "^0.3.0",
@@ -34,7 +38,11 @@
     "react-scripts": "4.0.3",
     "react-timeago": "^6.2.1",
     "typescript": "^4.4.3",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "cross-env": "^7.0.3",
+    "sqlite3": "^5.0.11",
+    "wait-on": "^6.0.1",
+    "concurrently": "^7.3.0"
   },
   "scripts": {
     "cleanup": "rm -rf node_modules",
@@ -44,7 +52,26 @@
     "eject": "react-scripts eject",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "prepare": "cd ../ && husky install ./frontend/.husky"
+    "prepare": "cd ../ && husky install ./frontend/.husky",
+    "postinstall": "./node_modules/.bin/electron-rebuild",
+    "install:m1": "cd ../node_modules/sqlite3 && ../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source",
+    "electron:serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
+    "electron:build": "yarn build && electron-builder -c.extraMetadata.main=build/main.js",
+    "electron:start": "wait-on tcp:6060 && electron ."
+  },
+  "build": {
+    "productName": "Flowser",
+    "extends": null,
+    "appId": "dev.flowser.desktop",
+    "files": [
+      "dist/**/*",
+      "build/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -72,7 +99,10 @@
     "eslint-plugin-react": "^7.26.0",
     "lint-staged": "^11.1.2",
     "prettier": "^2.4.1",
-    "sass": "^1.42.1"
+    "sass": "^1.42.1",
+    "electron": "20.1.0",
+    "electron-builder": "^23.3.3",
+    "electron-rebuild": "^3.2.9"
   },
   "husky": {
     "hooks": {
@@ -84,6 +114,5 @@
       "eslint --quiet --fix",
       "prettier --write"
     ]
-  },
-  "proxy": "http://localhost:3001"
+  }
 }
