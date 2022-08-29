@@ -7,10 +7,10 @@ import React, {
 import { NavLink, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
-import Logo from "../../../assets/images/logo.svg";
+import logo from "../../../assets/images/logo.svg";
 import classes from "./Main.module.scss";
-import CaretIcon from "../../../assets/icons/caret.svg";
-import PlusIcon from "../../../assets/icons/plus.svg";
+import { ReactComponent as CaretIcon } from "../../../assets/icons/caret.svg";
+import { ReactComponent as PlusIcon } from "../../../assets/icons/plus.svg";
 import splitbee from "@splitbee/web";
 import { ProjectsService } from "../../../services/projects.service";
 import {
@@ -69,7 +69,7 @@ const Main: FunctionComponent = () => {
     <>
       {error && <div className={classes.errors}>{error}</div>}
       <div className={classes.container}>
-        <Logo className={classes.logo} />
+        <img className={classes.logo} src={logo} alt="FLOWSER" />
         <div className={classes.header}>
           <h1>FLOWSER</h1>
           <span className={classes.version}>{flowserVersion?.version}</span>

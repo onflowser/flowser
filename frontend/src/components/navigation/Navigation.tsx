@@ -5,15 +5,15 @@ import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
 import Button from "../button/Button";
 import IconButton from "../icon-button/IconButton";
-import Logo from "../../assets/images/logo.svg";
-import IconUser from "../../assets/icons/user.svg";
-import IconBlocks from "../../assets/icons/blocks.svg";
-import IconTransactions from "../../assets/icons/transactions.svg";
-import IconContracts from "../../assets/icons/contracts.svg";
-import IconEvents from "../../assets/icons/events.svg";
-import IconSettings from "../../assets/icons/settings.svg";
-import IconBackButton from "../../assets/icons/back-button.svg";
-import FlowLogo from "../../assets/icons/flow.svg";
+import logo from "../../assets/images/logo.svg";
+import { ReactComponent as IconUser } from "../../assets/icons/user.svg";
+import { ReactComponent as IconBlocks } from "../../assets/icons/blocks.svg";
+import { ReactComponent as IconTransactions } from "../../assets/icons/transactions.svg";
+import { ReactComponent as IconContracts } from "../../assets/icons/contracts.svg";
+import { ReactComponent as IconEvents } from "../../assets/icons/events.svg";
+import { ReactComponent as IconSettings } from "../../assets/icons/settings.svg";
+import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
+import { ReactComponent as FlowLogo } from "../../assets/icons/flow.svg";
 import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
@@ -69,7 +69,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
       <div className={`${classes.navigationContainer} ${props.className}`}>
         <div className={classes.mainContainer}>
           <div className={classes.logoContainer}>
-            <Logo className={classes.logo} />
+            <img src={logo} alt="FLOWSER" />
           </div>
           <div className={classes.navLinksContainer}>
             <NavigationItem

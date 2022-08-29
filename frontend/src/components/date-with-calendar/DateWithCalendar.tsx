@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import CalendarIcon from "../../assets/icons/calendar.svg";
+import { ReactComponent as CalendarIcon } from "../../assets/icons/calendar.svg";
 import classes from "./DateWithCalendar.module.scss";
 import { useFormattedDate } from "../../hooks/use-formatted-date";
 

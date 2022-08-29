@@ -4,8 +4,7 @@ import * as fcl from "@onflow/fcl";
 fcl
   .config()
   // flowser app details
-  // TODO(milestone-5): enable showing icon
-  // .put("app.detail.icon", `${process.env.REACT_APP_URL}/favicon.ico`)
+  .put("app.detail.icon", `${process.env.REACT_APP_URL}/favicon.ico`)
   .put("app.detail.title", "Flowser")
   // Point App at Emulator
   // TODO(milestone-3): Use the value stored in Project entity (under project.gateway)

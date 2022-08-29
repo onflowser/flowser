@@ -4,7 +4,7 @@ import Button from "../button/Button";
 import classes from "./TransactionDialog.module.scss";
 import { FlowScriptArgument, useFlow } from "../../hooks/use-flow";
 import { toast } from "react-hot-toast";
-import TxIcon from "../../assets/icons/bottle.svg";
+import { ReactComponent as TxIcon } from "../../assets/icons/bottle.svg";
 import ScriptArguments from "./ScriptArguments";
 import CadenceEditor from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";

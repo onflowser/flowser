@@ -1,7 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { app, BrowserWindow } = require("electron");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createApp } = require("@flowser/backend");
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const isDev = require("electron-is-dev");
 
 // require("@electron/remote/main").initialize();
@@ -19,7 +23,7 @@ async function createWindow() {
 
   win.loadURL(
     isDev
-      ? "http://localhost:3000"
+      ? "http://localhost:6060"
       : `file://${path.join(__dirname, "../build/index.html")}`
   );
 
