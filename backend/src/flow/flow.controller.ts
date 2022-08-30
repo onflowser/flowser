@@ -1,9 +1,27 @@
-import { Controller, Get, Param, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Query,
+  UseInterceptors,
+} from "@nestjs/common";
 import { FlowGatewayService } from "./services/gateway.service";
 import { FlowEmulatorService } from "./services/emulator.service";
 import { FlowCliService } from "./services/cli.service";
-import { GetFlowCliInfoResponse } from "@flowser/shared";
 import { FlowSnapshotService } from "./services/snapshot.service";
+import {
+  GetFlowCliInfoResponse,
+  GetAllEmulatorSnapshotsResponse,
+  GetPollingEmulatorSnapshotsResponse,
+  CreateEmulatorSnapshotRequest,
+  RevertToEmulatorSnapshotRequest,
+  RevertToEmulatorSnapshotResponse,
+  CreateEmulatorSnapshotResponse,
+} from "@flowser/shared";
+import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller("flow")
 export class FlowController {
@@ -20,18 +38,42 @@ export class FlowController {
     return GetFlowCliInfoResponse.toJSON(info);
   }
 
-  @Get("snapshot")
+  @Get("snapshots")
   async getSnapshots() {
-    return this.flowSnapshotService.findAll();
+    const snapshots = await this.flowSnapshotService.findAll();
+    return GetAllEmulatorSnapshotsResponse.toJSON({
+      snapshots: snapshots.map((snapshot) => snapshot.toProto()),
+    });
   }
 
-  @Post("snapshot")
-  async createSnapshot() {
-    return this.flowSnapshotService.create("Test");
+  @Get("snapshots/polling")
+  @UseInterceptors(
+    new PollingResponseInterceptor(GetPollingEmulatorSnapshotsResponse)
+  )
+  async getSnapshotsWithPolling(
+    @Query("timestamp", ParseUnixTimestampPipe) timestamp
+  ) {
+    const snapshots = await this.flowSnapshotService.findAllNewerThanTimestamp(
+      timestamp
+    );
+    return snapshots.map((snapshot) => snapshot.toProto());
   }
 
-  @Put("snapshot/:blockId")
-  async revertToSnapshot(@Param("blockId") blockId) {
-    return this.flowSnapshotService.revertTo(blockId);
+  @Post("snapshots")
+  async createSnapshot(@Body() body) {
+    const request = CreateEmulatorSnapshotRequest.fromJSON(body);
+    const snapshot = await this.flowSnapshotService.create(request.description);
+    return CreateEmulatorSnapshotResponse.toJSON({
+      snapshot: snapshot.toProto(),
+    });
+  }
+
+  @Put("snapshots")
+  async revertToSnapshot(@Body() body) {
+    const request = RevertToEmulatorSnapshotRequest.fromJSON(body);
+    const snapshot = await this.flowSnapshotService.revertTo(request.blockId);
+    return RevertToEmulatorSnapshotResponse.toJSON({
+      snapshot: snapshot.toProto(),
+    });
   }
 }

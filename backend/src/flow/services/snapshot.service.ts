@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios from "axios";
 import { randomUUID } from "crypto";
@@ -50,7 +50,7 @@ export class FlowSnapshotService {
     snapshot.blockId = snapshotData.blockId;
     snapshot.description = description;
 
-    return this.snapshotRepository.insert(snapshot);
+    return this.snapshotRepository.save(snapshot);
   }
 
   async revertTo(blockId: string) {
@@ -71,6 +71,13 @@ export class FlowSnapshotService {
     }
 
     return existingSnapshot;
+  }
+
+  findAllNewerThanTimestamp(timestamp: Date): Promise<SnapshotEntity[]> {
+    return this.snapshotRepository.find({
+      where: { createdAt: MoreThan(timestamp) },
+      order: { createdAt: "DESC" },
+    });
   }
 
   async findAll() {
