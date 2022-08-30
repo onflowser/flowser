@@ -37,9 +37,14 @@
     "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"
   },
-  "workspaces": [
-    "./backend",
-    "./frontend",
-    "./types"
-  ]
+  "workspaces": {
+    "packages": [
+      "./backend",
+      "./frontend",
+      "./types"
+    ],
+    "nohoist": [
+      "**/backend"
+    ]
+  }
 }

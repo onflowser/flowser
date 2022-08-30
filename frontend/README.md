@@ -1,5 +1,9 @@
 # @flowser/frontend
 
+## Architecture
+
+This app is structured
+
 ## Setup
 
 ### Running on Macbook M1
