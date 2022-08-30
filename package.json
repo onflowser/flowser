@@ -8,9 +8,13 @@
     "doc": "docs"
   },
   "scripts": {
+    "start:desktop": "cd frontend && yarn run electron:serve",
     "start": "lerna run start --parallel",
-    "cleanup": "lerna run cleanup --parallel",
-    "bootstrap": "yarn install && lerna bootstrap && husky install && lerna run generate && flow init",
+    "cleanup": "lerna run cleanup --parallel && rm -rf node_modules",
+    "build": "lerna run build --parallel",
+    "bootstrap": "yarn install && yarn run lerna:bootstrap && husky install",
+    "lerna:bootstrap": "lerna bootstrap",
+    "build:libs": " npx lerna run build --scope @flowser/types --scope @flowser/frontend",
     "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {
@@ -34,9 +38,14 @@
     "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"
   },
-  "workspaces": [
-    "./backend",
-    "./frontend",
-    "./types"
-  ]
+  "workspaces": {
+    "packages": [
+      "./backend",
+      "./frontend",
+      "./types"
+    ],
+    "nohoist": [
+      "**/backend"
+    ]
+  }
 }

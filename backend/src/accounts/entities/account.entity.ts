@@ -5,7 +5,7 @@ import { AccountContractEntity } from "./contract.entity";
 import { AccountsStorageEntity } from "./storage.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { Account } from "@flowser/types/generated/entities/accounts";
+import { Account } from "@flowser/types";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 
 @Entity({ name: "accounts" })

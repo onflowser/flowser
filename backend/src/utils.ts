@@ -1,5 +1,5 @@
 import { FlowCadenceObject } from "./flow/services/flow-gateway.service";
-import { CadenceObject } from "@flowser/types/generated/entities/common";
+import { CadenceObject } from "@flowser/types";
 
 const kebabCase = require("kebab-case");
 

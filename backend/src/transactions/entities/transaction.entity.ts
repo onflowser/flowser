@@ -5,8 +5,8 @@ import {
   TransactionProposalKey,
   SignableObject,
   TransactionStatus,
-} from "@flowser/types/generated/entities/transactions";
-import { CadenceObject } from "@flowser/types/generated/entities/common";
+} from "@flowser/types";
+import { CadenceObject } from "@flowser/types";
 import {
   FlowSignableObject,
   FlowTransaction,

@@ -2,12 +2,13 @@
   "name": "@flowser/types",
   "version": "0.0.1",
   "description": "",
-  "main": "./generated/*.js",
-  "types": "./generated/*.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "cleanup": "rm -rf node_modules",
-    "generate": "sh build.sh",
-    "start": "chokidar \"**/*.proto\" -c \"yarn run generate\""
+    "build": "sh build.sh && tsc -p tsconfig.json",
+    "start": "chokidar \"**/*.proto\" -c \"yarn run generate\"",
+    "postinstall": "yarn run build"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,11 @@
   "homepage": "https://github.com/onflowser/flowser#readme",
   "dependencies": {
     "chokidar-cli": "^3.0.0",
+    "protobufjs": "^7.0.0",
     "ts-proto": "^1.121.1",
     "ts-protoc-gen": "^0.15.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.7.0"
   }
 }

@@ -4,7 +4,7 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { EventEmitter } from "events";
 import { FlowCliService } from "./flow-cli.service";
 import { randomString } from "../../utils";
-import { Emulator } from "@flowser/types/generated/entities/projects";
+import { Emulator } from "@flowser/types";
 
 type StartCallback = (data: string[]) => void;
 

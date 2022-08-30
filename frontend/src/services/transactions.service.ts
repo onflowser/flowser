@@ -1,7 +1,7 @@
 import {
   GetSingleTransactionResponse,
   GetPollingTransactionsResponse,
-} from "@flowser/types/generated/responses/transactions";
+} from "@flowser/types";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

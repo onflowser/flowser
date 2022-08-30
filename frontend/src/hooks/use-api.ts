@@ -1,13 +1,9 @@
 import { TimeoutPollingHook, useTimeoutPolling } from "./use-timeout-polling";
-import {
-  Account,
-  AccountContract,
-  AccountKey,
-} from "@flowser/types/generated/entities/accounts";
-import { Transaction } from "@flowser/types/generated/entities/transactions";
-import { Block } from "@flowser/types/generated/entities/blocks";
-import { Event } from "@flowser/types/generated/entities/events";
-import { Log } from "@flowser/types/generated/entities/logs";
+import { Account, AccountContract, AccountKey } from "@flowser/types";
+import { Transaction } from "@flowser/types";
+import { Block } from "@flowser/types";
+import { Event } from "@flowser/types";
+import { Log } from "@flowser/types";
 import { AccountsService } from "../services/accounts.service";
 import { ContractsService } from "../services/contracts.service";
 import { TransactionsService } from "../services/transactions.service";
@@ -20,31 +16,31 @@ import { CommonService } from "../services/common.service";
 import {
   GetAllObjectsCountsResponse,
   GetFlowserVersionResponse,
-} from "@flowser/types/generated/responses/common";
+} from "@flowser/types";
 import {
   GetAllProjectsResponse,
   GetSingleProjectResponse,
-} from "@flowser/types/generated/responses/projects";
+} from "@flowser/types";
 import {
   GetPollingTransactionsResponse,
   GetSingleTransactionResponse,
-} from "@flowser/types/generated/responses/transactions";
-import { GetPollingLogsResponse } from "@flowser/types/generated/responses/logs";
-import { GetPollingEventsResponse } from "@flowser/types/generated/responses/events";
+} from "@flowser/types";
+import { GetPollingLogsResponse } from "@flowser/types";
+import { GetPollingEventsResponse } from "@flowser/types";
 import {
   GetPollingBlocksResponse,
   GetSingleBlockResponse,
-} from "@flowser/types/generated/responses/blocks";
+} from "@flowser/types";
 import {
   GetPollingContractsResponse,
   GetSingleContractResponse,
-} from "@flowser/types/generated/responses/contracts";
+} from "@flowser/types";
 import {
   GetPollingAccountsResponse,
   GetPollingKeysResponse,
   GetSingleAccountResponse,
-} from "@flowser/types/generated/responses/accounts";
-import { GetFlowCliInfoResponse } from "@flowser/types/generated/responses/flow";
+} from "@flowser/types";
+import { GetFlowCliInfoResponse } from "@flowser/types";
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({

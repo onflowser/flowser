@@ -22,17 +22,10 @@ import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import { ProjectsService } from "../../../services/projects.service";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
-import {
-  Emulator,
-  Gateway,
-  Project,
-} from "@flowser/types/generated/entities/projects";
+import { Emulator, Gateway, Project } from "@flowser/types";
 import { CommonUtils } from "../../../utils/common-utils";
 import { FormikErrors } from "formik/dist/types";
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/types";
 import { FlowUtils } from "../../../utils/flow-utils";
 
 const Configuration: FunctionComponent = () => {

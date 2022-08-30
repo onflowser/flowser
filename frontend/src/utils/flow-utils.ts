@@ -1,7 +1,4 @@
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/types";
 
 export class FlowUtils {
   static isInitialBlockId(value: number | string): boolean {

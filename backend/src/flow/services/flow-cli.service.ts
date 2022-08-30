@@ -3,7 +3,7 @@ import { join } from "path";
 import config from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
 import { spawn } from "child_process";
-import { Emulator } from "@flowser/types/generated/entities/projects";
+import { Emulator } from "@flowser/types";
 
 export type FlowCliConfig = {
   emulators: {

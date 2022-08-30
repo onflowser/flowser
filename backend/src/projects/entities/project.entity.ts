@@ -2,11 +2,7 @@ import { AfterLoad, Column, Entity, Index, PrimaryColumn } from "typeorm";
 import { toKebabCase } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import {
-  Emulator,
-  Gateway,
-  Project,
-} from "@flowser/types/generated/entities/projects";
+import { Emulator, Gateway, Project } from "@flowser/types";
 import { UpdateProjectDto } from "../dto/update-project.dto";
 
 @Entity({ name: "projects" })

@@ -4,7 +4,7 @@ import {
   FlowTransactionStatus,
 } from "./flow-gateway.service";
 import { TransactionsService } from "../../transactions/transactions.service";
-import { TransactionStatus } from "@flowser/types/generated/entities/transactions";
+import { TransactionStatus } from "@flowser/types";
 
 @Injectable()
 export class FlowSubscriptionService {

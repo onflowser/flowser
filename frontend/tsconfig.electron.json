@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "outDir": "./dist"
+  },
+  "include": [
+    "src/targets/electron/main.ts"
+  ]
+}

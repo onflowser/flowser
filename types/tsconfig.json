@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "strict": false,
-    "module": "commonjs",
     "rootDir": ".",
-    "target": "es2017",
+    "declaration": true,
     "outDir": "dist",
-    "checkJs": false
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "generated"
+  "files": [
+    "src/index.ts"
   ]
 }

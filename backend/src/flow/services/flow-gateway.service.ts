@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 const fcl = require("@onflow/fcl");
 import * as http from "http";
-import { Gateway } from "@flowser/types/generated/entities/projects";
+import { Gateway } from "@flowser/types";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
