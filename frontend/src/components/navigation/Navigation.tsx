@@ -15,6 +15,7 @@ import { ReactComponent as IconSettings } from "../../assets/icons/settings.svg"
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import { ReactComponent as FlowLogo } from "../../assets/icons/flow.svg";
 import { useNavigation } from "../../hooks/use-navigation";
+import { toast } from "react-hot-toast";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
 import { useFlow } from "../../hooks/use-flow";
@@ -24,6 +25,7 @@ import {
   useGetCurrentProject,
 } from "../../hooks/use-api";
 import { ProjectsService } from "../../services/projects.service";
+import { SnapshotService } from "../../services/snapshots.service";
 
 const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const [isSwitching, setIsSwitching] = useState(false);
@@ -34,6 +36,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
     isSearchBarVisible,
   } = useNavigation();
   const projectService = ProjectsService.getInstance();
+  const snapshotService = SnapshotService.getInstance();
   const { data: counters } = useGetAllObjectsCounts();
   const [showTxDialog, setShowTxDialog] = useState(false);
   const { data } = useGetCurrentProject();
@@ -53,6 +56,18 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
       await logout(); // logout from dev-wallet, because config may change
     } finally {
       setIsSwitching(false);
+    }
+  }, []);
+
+  const createSnapshot = useCallback(async () => {
+    try {
+      await snapshotService.create({
+        description: "Test",
+      });
+      toast.success("Snapshot created");
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to create snapshot");
     }
   }, []);
 
@@ -120,6 +135,9 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
               <span>EMULATOR</span>
             </div>
             <div>
+              <Button className={classes.loginButton} onClick={createSnapshot}>
+                SNAPSHOT
+              </Button>
               {isLoggedIn ? (
                 <IconButton
                   className={classes.logoutButton}

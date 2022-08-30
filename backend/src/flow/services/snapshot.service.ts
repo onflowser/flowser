@@ -35,7 +35,7 @@ export class FlowSnapshotService {
 
     const snapshotData = response.data as SnapshotResponse;
 
-    const existingSnapshot = this.snapshotRepository.findOneBy({
+    const existingSnapshot = await this.snapshotRepository.findOneBy({
       blockId: snapshotData.blockId,
     });
 
