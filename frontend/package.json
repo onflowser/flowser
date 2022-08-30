@@ -2,7 +2,7 @@
   "name": "@flowser/frontend",
   "version": "0.0.1",
   "private": true,
-  "main": "electron/main.js",
+  "main": "dist/main.js",
   "homepage": "./",
   "dependencies": {
     "@flowser/types": "0.0.1",
@@ -48,15 +48,19 @@
   "scripts": {
     "cleanup": "rm -rf node_modules",
     "start": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build:react": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build:electron-main": "tsc --project tsconfig.electron.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "cd ../ && husky install ./frontend/.husky",
     "install:m1": "cd ../node_modules/sqlite3 && ../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source",
-    "electron:serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
-    "electron:build": "yarn build && electron-builder -c.extraMetadata.main=build/main.js",
+    "prebuild:web": "cp src/targets/web/index.tsx src/index.tsx",
+    "prebuild:electron": "cp src/targets/electron/index.tsx src/index.tsx",
+    "web:serve": "yarn run prebuild:web && yarn run start",
+    "electron:serve": "yarn run prebuild:electron && concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
+    "electron:build": "yarn run prebuild:electron && yarn build:react && yarn run build:electron-main && electron-builder -c.extraMetadata.main=dist/main.js",
     "electron:start": "wait-on tcp:6060 && electron ."
   },
   "build": {
@@ -70,7 +74,55 @@
       "package.json"
     ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "assets",
+      "output": "release/build"
+    },
+    "mac": {
+      "target": {
+        "target": "default",
+        "arch": [
+          "arm64",
+          "x64"
+        ]
+      },
+      "type": "distribution",
+      "hardenedRuntime": true,
+      "entitlements": "src/assets/entitlements.mac.plist",
+      "entitlementsInherit": "src/assets/entitlements.mac.plist",
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development"
+    },
+    "extraResources": [
+      "./assets/**"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "onflowser",
+      "repo": "flowser"
     }
   },
   "eslintConfig": {

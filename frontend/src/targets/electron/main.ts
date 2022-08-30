@@ -1,14 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { app, BrowserWindow } = require("electron");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { createApp } = require("@flowser/backend");
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require("path");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const isDev = require("electron-is-dev");
-
-// require("@electron/remote/main").initialize();
+import * as path from "path";
+import { app, BrowserWindow } from "electron";
+import * as isDev from "electron-is-dev";
+import { createApp } from "@flowser/backend";
 
 async function createWindow() {
   // Create the browser window.
