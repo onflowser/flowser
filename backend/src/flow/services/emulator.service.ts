@@ -5,15 +5,12 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { EventEmitter } from "events";
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { LogEntity } from "../../logs/entities/log.entity";
 import { LogsService } from "../../logs/logs.service";
-import { LogSource } from "@flowser/types/generated/entities/logs";
+import { LogSource } from "@flowser/shared";
 
 export enum FlowEmulatorState {
   STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)

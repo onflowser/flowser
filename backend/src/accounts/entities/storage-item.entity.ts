@@ -1,9 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { AccountEntity } from "./account.entity";
-import {
-  AccountStorageDomain,
-  AccountStorageItem,
-} from "@flowser/types/generated/entities/accounts";
+import { AccountStorageDomain, AccountStorageItem } from "@flowser/shared";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import {
   FlowAccountStorage,

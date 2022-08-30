@@ -1,4 +1,4 @@
-import { PollingMetaData } from "./generated/responses/common";
+import { PollingMetaData } from "../generated/responses/common";
 
 export interface PollingEntity {
   createdAt: string;

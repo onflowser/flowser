@@ -42,7 +42,7 @@
     "packages": [
       "./backend",
       "./frontend",
-      "./types"
+      "./shared"
     ],
     "nohoist": [
       "**/backend"

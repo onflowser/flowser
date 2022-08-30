@@ -2,7 +2,7 @@ import { Controller, Get } from "@nestjs/common";
 import { FlowGatewayService } from "./services/gateway.service";
 import { FlowEmulatorService } from "./services/emulator.service";
 import { FlowCliService } from "./services/cli.service";
-import { GetFlowCliInfoResponse } from "@flowser/types/generated/responses/flow";
+import { GetFlowCliInfoResponse } from "@flowser/shared";
 
 @Controller("flow")
 export class FlowController {

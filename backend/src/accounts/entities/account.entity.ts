@@ -3,8 +3,8 @@ import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKeyEntity } from "./key.entity";
 import { AccountContractEntity } from "./contract.entity";
 import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { Account } from "@flowser/types";
+import { FlowAccount } from "../../flow/services/gateway.service";
+import { Account } from "@flowser/shared";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { AccountStorageItemEntity } from "./storage-item.entity";
 

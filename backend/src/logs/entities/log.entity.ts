@@ -1,6 +1,6 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { Log, LogSource } from "@flowser/types/generated/entities/logs";
+import { Log, LogSource } from "@flowser/shared";
 
 @Entity()
 export class LogEntity extends PollingEntity {

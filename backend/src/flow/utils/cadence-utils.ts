@@ -3,8 +3,8 @@ import {
   CadenceObject,
   CadenceType,
   cadenceTypeFromJSON,
-} from "@flowser/types/generated/entities/cadence";
-import { CadenceUtils as SharedCadenceUtils } from "@flowser/types/generated/cadence-utils";
+} from "@flowser/shared";
+import { CadenceUtils as SharedCadenceUtils } from "@flowser/shared";
 import { isArray } from "../../utils";
 
 export class CadenceUtils {

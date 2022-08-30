@@ -18,7 +18,7 @@ import {
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
   GetProjectObjectsResponse,
-} from "@flowser/types/generated/responses/projects";
+} from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 import { FlowConfigService } from "../flow/services/config.service";

@@ -4,8 +4,8 @@ import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
 import { env } from "../../config";
 import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { AccountContract } from "@flowser/types";
+import { FlowAccount } from "../../flow/services/gateway.service";
+import { AccountContract } from "@flowser/shared";
 
 @Entity({ name: "contracts" })
 export class AccountContractEntity extends PollingEntity {

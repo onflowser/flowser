@@ -6,7 +6,7 @@ import CopyButton from "../../../components/copy-button/CopyButton";
 import { ReactComponent as KeyIcon } from "../../../assets/icons/key.svg";
 import Badge from "../../../components/badge/Badge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
-import { AccountKey } from "@flowser/types";
+import { AccountKey } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 

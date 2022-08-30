@@ -1,4 +1,4 @@
-import { GetPollingStorageResponse } from "@flowser/types/generated/responses/accounts";
+import { GetPollingStorageResponse } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

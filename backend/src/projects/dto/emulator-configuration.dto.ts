@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Emulator } from "@flowser/types/generated/entities/projects";
+import { Emulator } from "@flowser/shared";
 
 export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()

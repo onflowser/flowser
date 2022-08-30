@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "homepage": "./",
   "dependencies": {
-    "@flowser/types": "0.0.1",
+    "@flowser/shared": "0.0.1",
     "@flowser/backend": "0.0.1",
     "@onflow/fcl": "^1.2.0",
     "@onflow/types": "^1.0.3",
@@ -40,7 +40,7 @@
     "react-timeago": "^6.2.1",
     "typescript": "^4.4.3",
     "web-vitals": "^1.1.2",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
     "cross-env": "^7.0.3",
     "sqlite3": "^5.0.11",
     "wait-on": "^6.0.1",

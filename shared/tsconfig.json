@@ -7,7 +7,6 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  // TODO: this needs to work for shared stuff to
   "files": [
     "src/index.ts"
   ]

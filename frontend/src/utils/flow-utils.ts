@@ -1,9 +1,9 @@
 import {
   HashAlgorithm,
   SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
-import { GrcpStatusCode } from "@flowser/types/generated/entities/transactions";
-import { AccountStorageDomain } from "@flowser/types/generated/entities/accounts";
+  GrcpStatusCode,
+  AccountStorageDomain,
+} from "@flowser/shared";
 
 export class FlowUtils {
   static isInitialBlockId(value: number | string): boolean {

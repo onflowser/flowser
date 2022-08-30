@@ -1,9 +1,5 @@
-import {
-  CadenceObject,
-  CadenceType,
-  cadenceTypeToJSON,
-} from "@flowser/types";
-import { CadenceUtils as SharedCadenceUtils } from "@flowser/types";
+import { CadenceObject, CadenceType, cadenceTypeToJSON } from "@flowser/shared";
+import { CadenceUtils as SharedCadenceUtils } from "@flowser/shared";
 
 export class CadenceUtils {
   static getDisplayType(cadenceObject: CadenceObject): string {
@@ -40,7 +36,7 @@ export class CadenceUtils {
       return `[${nestedTypes.join(",")}]`;
     }
     if (cadenceObject.type === CadenceType.Dictionary) {
-      // TODO(milestone-3): add support for complex types (e.g. dictionaries)
+      // TODO(milestone-3): add support for complex shared (e.g. dictionaries)
       return "-";
     }
     return "-";

@@ -3,8 +3,8 @@ import { AxiosResponse } from "axios";
 import {
   GetAllObjectsCountsResponse,
   GetFlowserVersionResponse,
-} from "@flowser/types";
-import { GetFlowCliInfoResponse } from "@flowser/types";
+} from "@flowser/shared";
+import { GetFlowCliInfoResponse } from "@flowser/shared";
 
 export class CommonService {
   private static instance: CommonService | undefined;

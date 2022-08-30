@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { PollingResponse, PollingEntity } from "@flowser/types";
+import { PollingResponse, PollingEntity } from "@flowser/shared";
 
 interface ProtoSerializer<T extends PollingEntity[]> {
   toJSON: (message: any) => unknown;

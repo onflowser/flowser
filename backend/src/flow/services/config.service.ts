@@ -7,10 +7,7 @@ import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import {
-  ContractTemplate,
-  TransactionTemplate,
-} from "@flowser/types/generated/entities/config";
+import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import * as fs from "fs";
 
 type FlowAddress = string;

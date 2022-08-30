@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
 import { AxiosResponse } from "axios";
-import { PollingResponse, PollingEntity } from "@flowser/types";
+import { PollingResponse, PollingEntity } from "@flowser/shared";
 
 export interface TimeoutPollingHook<T extends PollingEntity> {
   stopPolling: () => void;

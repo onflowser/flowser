@@ -31,11 +31,8 @@ import {
   Gateway,
   GatewayStatus,
   Project,
-} from "@flowser/types/generated/entities/projects";
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+} from "@flowser/shared";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import * as fs from "fs";
 
 @Injectable()

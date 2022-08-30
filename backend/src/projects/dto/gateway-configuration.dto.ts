@@ -1,9 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  Gateway,
-  GatewayStatus,
-} from "@flowser/types/generated/entities/projects";
+import { Gateway, GatewayStatus } from "@flowser/shared";
 
 export class GatewayConfigurationDto implements Gateway {
   @ApiProperty()

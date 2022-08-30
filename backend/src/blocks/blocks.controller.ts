@@ -7,7 +7,7 @@ import {
   GetAllBlocksResponse,
   GetPollingBlocksResponse,
   GetSingleBlockResponse,
-} from "@flowser/types";
+} from "@flowser/shared";
 
 @Controller("blocks")
 export class BlocksController {

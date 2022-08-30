@@ -9,7 +9,7 @@ import {
   GetSingleAccountResponse,
   GetPollingKeysResponse,
   GetPollingStorageResponse,
-} from "@flowser/types";
+} from "@flowser/shared";
 import { KeysService } from "../services/keys.service";
 import { AccountStorageService } from "../services/storage.service";
 

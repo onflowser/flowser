@@ -18,7 +18,7 @@ import splitbee from "@splitbee/web";
 import { toast } from "react-hot-toast";
 import { ProjectsService } from "../../../services/projects.service";
 import { useGetAllProjects } from "../../../hooks/use-api";
-import { Project } from "@flowser/types/generated/entities/projects";
+import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
 import Search from "../../../components/search/Search";

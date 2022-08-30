@@ -2,7 +2,7 @@ import {
   GetSingleAccountResponse,
   GetPollingAccountsResponse,
   GetPollingKeysResponse,
-} from "@flowser/types";
+} from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

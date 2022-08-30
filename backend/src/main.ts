@@ -1,3 +1,4 @@
+import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { writeFile } from "fs";
 import { env } from "./config";
