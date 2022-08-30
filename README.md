@@ -44,9 +44,16 @@ yarn run bootstrap
 
 ### 3. Start Flowser
 
-The following command will start Flowser along with Flow emulator and development wallet.
+### Website
+
 ```bash
 yarn run start
+```
+
+### Desktop app
+
+```bash
+yarn run start:desktop
 ```
 
 ### 4. Open in browser

@@ -2,7 +2,7 @@
 
 ## Architecture
 
-This app is structured
+This app can be built as a website or a desktop app. The entry points for different targets are located in `src/targets` dir.
 
 ## Setup
 

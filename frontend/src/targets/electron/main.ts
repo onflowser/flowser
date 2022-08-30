@@ -4,14 +4,9 @@ import * as isDev from "electron-is-dev";
 import { createApp } from "@flowser/backend";
 
 async function createWindow() {
-  // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    webPreferences: {
-      // nodeIntegration: true,
-      // enableRemoteModule: true,
-    },
   });
 
   win.loadURL(

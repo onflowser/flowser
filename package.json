@@ -8,6 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "start:desktop": "cd frontend && yarn run electron:serve",
     "start": "lerna run start --parallel",
     "cleanup": "lerna run cleanup --parallel && rm -rf node_modules",
     "build": "lerna run build --parallel",

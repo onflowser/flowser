@@ -47,7 +47,8 @@
   },
   "scripts": {
     "cleanup": "rm -rf node_modules",
-    "start": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "start": "yarn run prebuild:web && yarn run start:react",
+    "start:react": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "build:react": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "build:electron-main": "tsc --project tsconfig.electron.json",
     "test": "react-scripts test",
@@ -58,7 +59,6 @@
     "install:m1": "cd ../node_modules/sqlite3 && ../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source",
     "prebuild:web": "cp src/targets/web/index.tsx src/index.tsx",
     "prebuild:electron": "cp src/targets/electron/index.tsx src/index.tsx",
-    "web:serve": "yarn run prebuild:web && yarn run start",
     "electron:serve": "yarn run prebuild:electron && concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
     "electron:build": "yarn run prebuild:electron && yarn build:react && yarn run build:electron-main && electron-builder -c.extraMetadata.main=dist/main.js",
     "electron:start": "wait-on tcp:6060 && electron ."
