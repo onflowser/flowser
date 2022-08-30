@@ -135,7 +135,7 @@ const columnsPayload = [
     ),
   }),
   columnsHelperPayload.accessor("keyId", {
-    header: () => <Label variant="medium">KEY ID</Label>, // TODO: ask what is meant by KEY INDEX in adobe design
+    header: () => <Label variant="medium">KEY ID</Label>,
     cell: (info) => <Value>{info.getValue()}</Value>,
   }),
 ];
