@@ -2,7 +2,7 @@ import {
   GetSingleAccountResponse,
   GetPollingAccountsResponse,
   GetPollingKeysResponse,
-} from "@flowser/types/generated/responses/accounts";
+} from "@flowser/types";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

@@ -5,7 +5,7 @@ import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
 import Button from "../button/Button";
 import IconButton from "../icon-button/IconButton";
-import Logo from "../../assets/images/logo.svg";
+import logo from "../../assets/images/logo.svg";
 import { ReactComponent as IconUser } from "../../assets/icons/user.svg";
 import { ReactComponent as IconBlocks } from "../../assets/icons/blocks.svg";
 import { ReactComponent as IconTransactions } from "../../assets/icons/transactions.svg";
@@ -69,7 +69,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
       <div className={`${classes.navigationContainer} ${props.className}`}>
         <div className={classes.mainContainer}>
           <div className={classes.logoContainer}>
-            <img src={Logo} alt="FLOWSER" />
+            <img src={logo} alt="FLOWSER" />
           </div>
           <div className={classes.navLinksContainer}>
             <NavigationItem

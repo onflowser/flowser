@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { GetFlowserVersionResponse } from "@flowser/types/generated/responses/common";
+import { GetFlowserVersionResponse } from "@flowser/types";
 
 @Controller()
 export class AppController {

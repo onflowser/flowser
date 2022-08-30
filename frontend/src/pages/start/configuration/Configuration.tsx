@@ -27,13 +27,10 @@ import {
   Emulator,
   Gateway,
   Project,
-} from "@flowser/types/generated/entities/projects";
+} from "@flowser/types";
 import { CommonUtils } from "../../../utils/common-utils";
 import { FormikErrors } from "formik/dist/types";
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/types";
 import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
 

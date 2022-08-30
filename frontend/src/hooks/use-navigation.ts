@@ -1,5 +1,4 @@
-import { useContext } from "react";
-import { UiState, UiStateContext } from "../contexts/ui-state.context";
+import { UiState, useUiStateContext } from "../contexts/ui-state.context";
 
 export interface Breadcrumb {
   to?: string;
@@ -23,7 +22,7 @@ export interface UseNavigationHook extends NavigationUiState {
 }
 
 export const useNavigation = (): UseNavigationHook => {
-  const [state, setState] = useContext(UiStateContext);
+  const [state, setState] = useUiStateContext();
 
   const showNavigationDrawer = (show: boolean) => {
     setState((state: UiState) => ({

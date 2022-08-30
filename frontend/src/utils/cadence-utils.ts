@@ -2,8 +2,8 @@ import {
   CadenceObject,
   CadenceType,
   cadenceTypeToJSON,
-} from "@flowser/types/generated/entities/cadence";
-import { CadenceUtils as SharedCadenceUtils } from "@flowser/types/generated/cadence-utils";
+} from "@flowser/types";
+import { CadenceUtils as SharedCadenceUtils } from "@flowser/types";
 
 export class CadenceUtils {
   static getDisplayType(cadenceObject: CadenceObject): string {

@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
-import Logo from "../../assets/images/logo.svg";
 import classes from "./FullScreenLoading.module.scss";
+import logo from "../../assets/images/logo.svg";
 
 type FullScreenLoadingProps = {
   dotInterval?: number;
@@ -25,7 +25,7 @@ const FullScreenLoading: FC<FullScreenLoadingProps> = ({
 
   return (
     <div className={`${classes.container} ${className}`}>
-      <img className={classes.logo} src={Logo} alt="FLOWSER" />
+      <img className={classes.logo} src={logo} alt="FLOWSER" />
       <p className={classes.text}>Loading {dots}</p>
     </div>
   );

@@ -6,10 +6,7 @@ import Value from "../value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
 import TransactionStatusBadge from "../transaction-status-code/TransactionStatusBadge";
-import {
-  Transaction,
-  TransactionStatusCode,
-} from "@flowser/types/generated/entities/transactions";
+import { Transaction, TransactionStatusCode } from "@flowser/types";
 import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 import { FlowUtils } from "../../utils/flow-utils";
 

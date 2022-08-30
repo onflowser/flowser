@@ -1,10 +1,7 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
-import { FlowBlock } from "../../flow/services/gateway.service";
-import {
-  Block,
-  CollectionGuarantee,
-} from "@flowser/types/generated/entities/blocks";
+import { FlowBlock } from "../../flow/services/flow-gateway.service";
+import { Block, CollectionGuarantee } from "@flowser/types";
 import { typeOrmProtobufTransformer } from "../../utils";
 
 @Entity({ name: "blocks" })

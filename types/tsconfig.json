@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "strict": false,
-    "module": "commonjs",
     "rootDir": ".",
-    "target": "es2017",
+    "declaration": true,
     "outDir": "dist",
-    "checkJs": false
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "generated",
-    "shared"
+  // TODO: this needs to work for shared stuff to
+  "files": [
+    "src/index.ts"
   ]
 }

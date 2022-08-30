@@ -1,7 +1,7 @@
 import {
   GetSingleContractResponse,
   GetPollingContractsResponse,
-} from "@flowser/types/generated/responses/contracts";
+} from "@flowser/types";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 
