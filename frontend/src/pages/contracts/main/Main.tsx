@@ -14,6 +14,33 @@ import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
 import Table from "../../../components/table/Table";
 import { AccountContract } from "types/generated/entities/accounts";
 
+// CONTRACTS TABLE
+const columnHelper =
+  createColumnHelper<DecoratedPollingEntity<AccountContract>>();
+
+const columns = [
+  columnHelper.accessor("name", {
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/contracts/details/${info.row.original.id}`}>
+          {info.row.original.name}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("accountAddress", {
+    header: () => <Label variant="medium">ACCOUNT</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+];
+
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
@@ -26,39 +53,12 @@ const Main: FunctionComponent = () => {
     showSubNavigation(true);
   }, []);
 
-  const columnHelper =
-    createColumnHelper<DecoratedPollingEntity<AccountContract>>();
-
-  const columns = [
-    columnHelper.accessor("name", {
-      header: () => <Label variant="medium">NAME</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/contracts/details/${info.row.original.id}`}>
-            {info.row.original.name}
-          </NavLink>
-        </Value>
-      ),
-    }),
-    columnHelper.accessor("accountAddress", {
-      header: () => <Label variant="medium">ACCOUNT</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/accounts/details/${info.getValue()}`}>
-            {info.getValue()}
-          </NavLink>
-        </Value>
-      ),
-    }),
-  ];
-
   return (
     <>
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />
       )}
-
       <Table<DecoratedPollingEntity<AccountContract>>
         columns={columns}
         data={data}

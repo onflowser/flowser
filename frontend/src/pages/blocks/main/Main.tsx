@@ -18,10 +18,62 @@ import Table from "../../../components/table/Table";
 import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
 import { Block } from "types/generated/entities/blocks";
 
+const { formatDate } = useFormattedDate();
+
+const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
+
+// Specify table shape
+const columns = [
+  columnHelper.accessor("height", {
+    header: () => <Label variant="medium">BLOCK HEIGHT</Label>,
+    cell: (info) => <Value>{info.getValue()}</Value>,
+  }),
+  columnHelper.accessor("id", {
+    header: () => <Label variant="medium">BLOCK ID</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/blocks/details/${info.getValue()}`}>
+          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("parentId", {
+    header: () => <Label variant="medium">PARENT ID</Label>,
+    cell: (info) => (
+      <Value>
+        {FlowUtils.isInitialBlockId(info.getValue()) ? (
+          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        ) : (
+          <NavLink to={`/blocks/details/${info.getValue()}`}>
+            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          </NavLink>
+        )}
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("timestamp", {
+    header: () => <Label variant="medium">TIME</Label>,
+    cell: (info) => <Value>{formatDate(info.getValue())}</Value>,
+  }),
+  columnHelper.accessor("collectionGuarantees", {
+    header: () => <Label variant="medium">COLLECTION GUARANTEES</Label>,
+    cell: (info) => <Value>{info.getValue()?.length}</Value>,
+  }),
+  columnHelper.accessor("blockSeals", {
+    header: () => <Label variant="medium">BLOCK SEALS</Label>,
+    cell: (info) => <Value>{info.getValue()?.length}</Value>,
+  }),
+  columnHelper.accessor("signatures", {
+    header: () => <Label variant="medium">SIGNATURES</Label>,
+    cell: (info) => <Value>{info.getValue()?.length}</Value>,
+  }),
+];
+
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { formatDate } = useFormattedDate();
+
   const { data: blocks, firstFetch } = useGetPollingBlocks();
   const { filteredData } = useFilterData(blocks, searchTerm);
 
@@ -31,58 +83,6 @@ const Main: FunctionComponent = () => {
     showSubNavigation(true);
     disableSearchBar(false);
   }, []);
-
-  // console.log(filteredData)
-
-  const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
-
-  // Specify table shape
-  const columns = [
-    columnHelper.accessor("height", {
-      header: () => <Label variant="medium">BLOCK HEIGHT</Label>,
-      cell: (info) => <Value>{info.getValue()}</Value>,
-    }),
-    columnHelper.accessor("id", {
-      header: () => <Label variant="medium">BLOCK ID</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/blocks/details/${info.getValue()}`}>
-            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-          </NavLink>
-        </Value>
-      ),
-    }),
-    columnHelper.accessor("parentId", {
-      header: () => <Label variant="medium">PARENT ID</Label>,
-      cell: (info) => (
-        <Value>
-          {FlowUtils.isInitialBlockId(info.getValue()) ? (
-            <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-          ) : (
-            <NavLink to={`/blocks/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-            </NavLink>
-          )}
-        </Value>
-      ),
-    }),
-    columnHelper.accessor("timestamp", {
-      header: () => <Label variant="medium">TIME</Label>,
-      cell: (info) => <Value>{formatDate(info.getValue())}</Value>,
-    }),
-    columnHelper.accessor("collectionGuarantees", {
-      header: () => <Label variant="medium">COLLECTION GUARANTEES</Label>,
-      cell: (info) => <Value>{info.getValue()?.length}</Value>,
-    }),
-    columnHelper.accessor("blockSeals", {
-      header: () => <Label variant="medium">BLOCK SEALS</Label>,
-      cell: (info) => <Value>{info.getValue()?.length}</Value>,
-    }),
-    columnHelper.accessor("signatures", {
-      header: () => <Label variant="medium">SIGNATURES</Label>,
-      cell: (info) => <Value>{info.getValue()?.length}</Value>,
-    }),
-  ];
 
   return (
     <>

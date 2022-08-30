@@ -40,6 +40,107 @@ type RouteParams = {
   accountId: string;
 };
 
+// STORAGE TABLE
+const columnHelperStorage =
+  createColumnHelper<DecoratedPollingEntity<AccountStorageItem>>();
+
+const columnsStorage = [
+  columnHelperStorage.accessor("pathDomain", {
+    header: () => <Label variant="medium">DOMAIN</Label>,
+    cell: (info) => (
+      <Value>{FlowUtils.getLowerCasedPathDomain(info.getValue())}</Value>
+    ),
+  }),
+  columnHelperStorage.accessor("pathIdentifier", {
+    header: () => (
+      <div className={classes.storageTable}>
+        <Label variant="medium">IDENTIFIER</Label>
+      </div>
+    ),
+    cell: (info) => (
+      <div className={classes.storageTable}>
+        <Value>{info.getValue()}</Value>
+      </div>
+    ),
+  }),
+  columnHelperStorage.accessor("data", {
+    header: () => (
+      <div className={classes.storageTable}>
+        <Label variant="medium">DATA</Label>
+      </div>
+    ),
+    cell: (info) => (
+      <div className={classes.storageTable}>
+        <Value>
+          <pre style={{ whiteSpace: "nowrap" }}>
+            {JSON.stringify(info.getValue()) ?? "-"}
+          </pre>
+        </Value>
+      </div>
+    ),
+  }),
+];
+
+// CONTRACTS TABLE
+const columnHelperContracts =
+  createColumnHelper<DecoratedPollingEntity<AccountContract>>();
+
+const columnsContract = [
+  columnHelperContracts.accessor("name", {
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/contracts/details/${info.row.original.id}`}>
+          {info.row.original.name}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelperContracts.accessor("accountAddress", {
+    header: () => <Label variant="medium">ACCOUNT</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+];
+
+// KEYS TABLE
+const columnHelperKeys =
+  createColumnHelper<DecoratedPollingEntity<AccountKey>>();
+
+const columnsKeys = [
+  columnHelperKeys.accessor("accountAddress", {
+    header: () => <Label variant="medium">KEY</Label>,
+    cell: (info) => (
+      <div className={classes.keysRoot}>
+        <div className={classes.row}>
+          <Ellipsis className={classes.hash}>
+            {info.row.original.publicKey}
+          </Ellipsis>
+          <CopyButton value={info.row.original.publicKey} />
+        </div>
+        <div className={`${classes.badges} ${classes.row}`}>
+          <Badge>WEIGHT: {info.row.original.weight}</Badge>
+          <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
+          <Badge>INDEX: {info.row.original.index}</Badge>
+          <Badge>
+            SIGN CURVE:{" "}
+            {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo)}
+          </Badge>
+          <Badge>
+            HASH ALGO.: {FlowUtils.getHashAlgoName(info.row.original.hashAlgo)}
+          </Badge>
+          <Badge>REVOKED: {info.row.original.revoked ? "YES" : "NO"}</Badge>
+        </div>
+      </div>
+    ),
+  }),
+];
+
 const Details: FunctionComponent = () => {
   const { accountId } = useParams<RouteParams>();
   const { updateSearchBar } = useSearch();
@@ -62,108 +163,6 @@ const Details: FunctionComponent = () => {
     showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
   }, []);
-
-  // STORAGE TABLE
-  const columnHelperStorage =
-    createColumnHelper<DecoratedPollingEntity<AccountStorageItem>>();
-
-  const columnsStorage = [
-    columnHelperStorage.accessor("pathDomain", {
-      header: () => <Label variant="medium">DOMAIN</Label>,
-      cell: (info) => (
-        <Value>{FlowUtils.getLowerCasedPathDomain(info.getValue())}</Value>
-      ),
-    }),
-    columnHelperStorage.accessor("pathIdentifier", {
-      header: () => (
-        <div className={classes.storageTable}>
-          <Label variant="medium">IDENTIFIER</Label>
-        </div>
-      ),
-      cell: (info) => (
-        <div className={classes.storageTable}>
-          <Value>{info.getValue()}</Value>
-        </div>
-      ),
-    }),
-    columnHelperStorage.accessor("data", {
-      header: () => (
-        <div className={classes.storageTable}>
-          <Label variant="medium">DATA</Label>
-        </div>
-      ),
-      cell: (info) => (
-        <div className={classes.storageTable}>
-          <Value>
-            <pre style={{ whiteSpace: "nowrap" }}>
-              {JSON.stringify(info.getValue()) ?? "-"}
-            </pre>
-          </Value>
-        </div>
-      ),
-    }),
-  ];
-
-  // CONTRACTS TABLE
-  const columnHelperContracts =
-    createColumnHelper<DecoratedPollingEntity<AccountContract>>();
-
-  const columnsContract = [
-    columnHelperContracts.accessor("name", {
-      header: () => <Label variant="medium">NAME</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/contracts/details/${info.row.original.id}`}>
-            {info.row.original.name}
-          </NavLink>
-        </Value>
-      ),
-    }),
-    columnHelperContracts.accessor("accountAddress", {
-      header: () => <Label variant="medium">ACCOUNT</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/accounts/details/${info.getValue()}`}>
-            {info.getValue()}
-          </NavLink>
-        </Value>
-      ),
-    }),
-  ];
-
-  // KEYS TABLE
-  const columnHelperKeys =
-    createColumnHelper<DecoratedPollingEntity<AccountKey>>();
-
-  const columnsKeys = [
-    columnHelperKeys.accessor("accountAddress", {
-      header: () => <Label variant="medium">KEY</Label>,
-      cell: (info) => (
-        <div className={classes.keysRoot}>
-          <div className={classes.row}>
-            <Ellipsis className={classes.hash}>
-              {info.row.original.publicKey}
-            </Ellipsis>
-            <CopyButton value={info.row.original.publicKey} />
-          </div>
-          <div className={`${classes.badges} ${classes.row}`}>
-            <Badge>WEIGHT: {info.row.original.weight}</Badge>
-            <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
-            <Badge>INDEX: {info.row.original.index}</Badge>
-            <Badge>
-              SIGN CURVE:{" "}
-              {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo)}
-            </Badge>
-            <Badge>
-              HASH ALGO.:{" "}
-              {FlowUtils.getHashAlgoName(info.row.original.hashAlgo)}
-            </Badge>
-            <Badge>REVOKED: {info.row.original.revoked ? "YES" : "NO"}</Badge>
-          </div>
-        </div>
-      ),
-    }),
-  ];
 
   if (isLoading || !account) {
     return <FullScreenLoading />;

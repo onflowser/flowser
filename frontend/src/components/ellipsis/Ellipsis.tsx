@@ -18,6 +18,7 @@ const Ellipsis: FunctionComponent<EllipsisProps> = ({
 
   useEffect(() => {
     const resize = () => {
+      console.log("RESIZE");
       setState(children);
       const offsetWidth = elRef.current ? elRef.current.offsetWidth : 0;
       const scrollWidth = elRef.current ? elRef.current.scrollWidth : 0;

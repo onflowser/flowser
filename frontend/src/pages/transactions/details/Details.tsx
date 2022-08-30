@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import { NavLink, useParams } from "react-router-dom";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
@@ -35,13 +41,106 @@ import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
 import { Event } from "types/generated/entities/events";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
+import CollapsibleCard from "../../../components/collapsible-card/CollapsibleCard";
+import { flexRender } from "@tanstack/react-table";
 
 type RouteParams = {
   transactionId: string;
 };
 
+// EVENTS SUBTABLE
+const columnHelperEvents = createColumnHelper<ComputedEventData>();
+const columnsEvents = [
+  columnHelperEvents.display({
+    id: "tableTitle",
+    header: () => <Label variant="medium">VALUES</Label>,
+  }),
+  columnHelperEvents.accessor("name", {
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+      </Value>
+    ),
+  }),
+  columnHelperEvents.accessor("type", {
+    header: () => <Label variant="medium">TYPE</Label>,
+    cell: (info) => (
+      <Value>
+        <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+      </Value>
+    ),
+  }),
+  columnHelperEvents.accessor("value", {
+    header: () => <Label variant="medium">VALUE</Label>,
+    cell: (info) => (
+      <div>
+        <Ellipsis style={{ whiteSpace: "nowrap" }} className={classes.subtable}>
+          {info.getValue()}
+        </Ellipsis>
+        <CopyButton value={info.getValue()} />
+      </div>
+    ),
+  }),
+];
+
+// ENVELOPE SIGNATURES TABLE
+const columnsHelperEnvelope = createColumnHelper<SignableObject>();
+
+const columnsEnvelope = [
+  columnsHelperEnvelope.accessor("address", {
+    header: () => <Label variant="medium">ACCOUNT ADDRESS</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnsHelperEnvelope.accessor("signature", {
+    header: () => <Label variant="medium">SIGNATURE</Label>,
+    cell: (info) => (
+      <Value>
+        <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+      </Value>
+    ),
+  }),
+  columnsHelperEnvelope.accessor("keyId", {
+    header: () => <Label variant="medium">KEY ID</Label>,
+    cell: (info) => <Value>{info.getValue()}</Value>,
+  }),
+];
+
+// PAYLOAD SIGNATURES TABLE
+const columnsHelperPayload = createColumnHelper<SignableObject>();
+
+const columnsPayload = [
+  columnsHelperPayload.accessor("address", {
+    header: () => <Label variant="medium">ADDRESS</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnsHelperPayload.accessor("signature", {
+    header: () => <Label variant="medium">SIGNATURE</Label>,
+    cell: (info) => (
+      <Value>
+        <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+      </Value>
+    ),
+  }),
+  columnsHelperPayload.accessor("keyId", {
+    header: () => <Label variant="medium">KEY ID</Label>, // TODO: ask what is meant by KEY INDEX in adobe design
+    cell: (info) => <Value>{info.getValue()}</Value>,
+  }),
+];
+
 const Details: FunctionComponent = () => {
-  const { formatDate } = useFormattedDate();
   const [openedLog, setOpenedLog] = useState("");
   const { transactionId } = useParams<RouteParams>();
   const { setBreadcrumbs, showSearchBar } = useNavigation();
@@ -49,6 +148,74 @@ const Details: FunctionComponent = () => {
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};
+  const { formatDate } = useFormattedDate();
+  const openLog = (status: boolean, id: string) => {
+    setOpenedLog(!status ? id : "");
+  };
+  const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
+
+  // EVENTS TABLE
+  const columnsEventsParent = useMemo(
+    () => [
+      columnHelper.accessor("blockId", {
+        header: () => <Label variant="medium">BLOCK ID</Label>,
+        cell: (info) => (
+          <Value>
+            <NavLink to={`/blocks/details/${info.getValue()}`}>
+              <Ellipsis className={classes.hashEvents}>
+                {info.getValue()}
+              </Ellipsis>
+            </NavLink>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("createdAt", {
+        header: () => <Label variant="medium">TIMESTAMP</Label>,
+        cell: (info) => (
+          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
+        ),
+      }),
+      columnHelper.accessor("type", {
+        header: () => <Label variant="medium">TYPE</Label>,
+        cell: (info) => (
+          <Value>
+            <pre style={{ whiteSpace: "nowrap" }}>{info.getValue()}</pre>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("transactionId", {
+        header: () => <Label variant="medium">TX ID</Label>,
+        cell: (info) => (
+          <Value>
+            <NavLink to={`/transactions/details/${info.getValue()}`}>
+              <Ellipsis className={classes.hashEvents}>
+                {info.getValue()}
+              </Ellipsis>
+            </NavLink>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("transactionIndex", {
+        header: () => <Label variant="medium">TX INDEX</Label>,
+        cell: (info) => <Value>{info.getValue()}</Value>,
+      }),
+      columnHelper.accessor("eventIndex", {
+        header: () => <Label variant="medium">EVENT INDEX</Label>,
+        cell: ({ row, getValue }) => (
+          <div className={classes.caretIcon}>
+            <Value>{getValue()}</Value>
+            <CaretIcon
+              inverted={true}
+              className={classes.icon}
+              isOpen={openedLog === row.id}
+              onChange={(status) => openLog(status, row.id)}
+            />
+          </div>
+        ),
+      }),
+    ],
+    [openedLog]
+  );
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/transactions", label: "Transactions" },
@@ -62,110 +229,9 @@ const Details: FunctionComponent = () => {
     showSearchBar(false);
   }, []);
 
-  const openLog = (status: boolean, id: string) => {
-    setOpenedLog(!status ? id : "");
-  };
-
   if (isLoading || !transaction) {
     return <FullScreenLoading />;
   }
-
-  // ENVELOPE SIGNATURES TABLE
-  const columnsHelperEnvelope = createColumnHelper<SignableObject>();
-
-  const columnsEnvelope = [
-    columnsHelperEnvelope.accessor("address", {
-      header: () => <Label variant="medium">ACCOUNT ADDRESS</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/accounts/details/${info.getValue()}`}>
-            {info.getValue()}
-          </NavLink>
-        </Value>
-      ),
-    }),
-    columnsHelperEnvelope.accessor("signature", {
-      header: () => <Label variant="medium">SIGNATURE</Label>,
-      cell: (info) => (
-        <Value>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-        </Value>
-      ),
-    }),
-    columnsHelperEnvelope.accessor("keyId", {
-      header: () => <Label variant="medium">KEY ID</Label>,
-      cell: (info) => <Value>{info.getValue()}</Value>,
-    }),
-  ];
-
-  // PAYLOAD SIGNATURES TABLE
-  const columnsHelperPayload = createColumnHelper<SignableObject>();
-
-  const columnsPayload = [
-    columnsHelperPayload.accessor("address", {
-      header: () => <Label variant="medium">ADDRESS</Label>,
-      cell: (info) => (
-        <Value>
-          <NavLink to={`/accounts/details/${info.getValue()}`}>
-            {info.getValue()}
-          </NavLink>
-        </Value>
-      ),
-    }),
-    columnsHelperPayload.accessor("signature", {
-      header: () => <Label variant="medium">SIGNATURE</Label>,
-      cell: (info) => (
-        <Value>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-        </Value>
-      ),
-    }),
-    columnsHelperPayload.accessor("keyId", {
-      header: () => <Label variant="medium">KEY ID</Label>, // TODO: ask what is meant by KEY INDEX in adobe design
-      cell: (info) => <Value>{info.getValue()}</Value>,
-    }),
-  ];
-
-  // EVENTS TABLE
-  // EventUtils.computeEventData(data);
-  const columnHelperEvents = createColumnHelper<ComputedEventData>();
-
-  const columnsEvents = [
-    columnHelperEvents.display({
-      id: "tableTitle",
-      header: () => <Label variant="medium">VALUES</Label>,
-    }),
-    columnHelperEvents.accessor("name", {
-      header: () => <Label variant="medium">NAME</Label>,
-      cell: (info) => (
-        <Value>
-          <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
-        </Value>
-      ),
-    }),
-    columnHelperEvents.accessor("type", {
-      header: () => <Label variant="medium">TYPE</Label>,
-      cell: (info) => (
-        <Value>
-          <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
-        </Value>
-      ),
-    }),
-    columnHelperEvents.accessor("value", {
-      header: () => <Label variant="medium">VALUE</Label>,
-      cell: (info) => (
-        <div>
-          <Ellipsis
-            style={{ whiteSpace: "nowrap" }}
-            className={classes.ellipsis}
-          >
-            {info.getValue()}
-          </Ellipsis>
-          <CopyButton value={info.getValue()} />
-        </div>
-      ),
-    }),
-  ];
 
   return (
     <div className={classes.root}>
@@ -299,51 +365,53 @@ const Details: FunctionComponent = () => {
           />
         </DetailsTabItem>
         <DetailsTabItem label="EVENTS" value={events.length}>
-          {events.map((item, i) => (
-            <React.Fragment key={i}>
+          <Table<DecoratedPollingEntity<Event>>
+            data={events}
+            columns={columnsEventsParent}
+            renderCustomHeader={(headerGroup) => (
               <Card
-                showIntroAnimation={item.isNew || item.isUpdated}
-                className={classes.card}
+                className={`${classes.tableRow}`}
+                key={headerGroup.id}
+                variant="header-row"
               >
-                <div>
-                  <Label>TIMESTAMP</Label>
-                  <Value>
-                    {formatDate(new Date(item.createdAt).toISOString())}
-                  </Value>
-                </div>
-                <div>
-                  <Label>TYPE</Label>
-                  <Value>{item.type}</Value>
-                </div>
-                <div>
-                  <Label title="TRANSACTION INDEX">TX INDEX</Label>
-                  <Value>{item.transactionIndex}</Value>
-                </div>
-                <div>
-                  <Label>EVENT INDEX</Label>
-                  <Value>{item.eventIndex}</Value>
-                </div>
-                <div>
-                  <CaretIcon
-                    inverted={true}
-                    isOpen={openedLog === item.id}
-                    className={classes.control}
-                    onChange={(status) => openLog(status, item.id)}
-                  />
-                </div>
+                {headerGroup.headers.map((header) => (
+                  <div key={header.id}>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </div>
+                ))}
               </Card>
-              {openedLog === item.id && item.data && (
-                // <EventDetailsTable
-                //   className={classes.detailsTable}
-                //   data={item.data}
-                // />
-                <Table<ComputedEventData>
-                  data={EventUtils.computeEventData(item.data)}
-                  columns={columnsEvents}
-                />
-              )}
-            </React.Fragment>
-          ))}
+            )}
+            renderCustomRow={(row) => (
+              <>
+                <Card
+                  className={classes.tableRow}
+                  key={row.id}
+                  showIntroAnimation={true}
+                  variant="table-line"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <div key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </div>
+                  ))}
+                </Card>
+                {openedLog === row.id && row.original && (
+                  <div>
+                    <Table<ComputedEventData>
+                      data={EventUtils.computeEventData(row.original.data)}
+                      columns={columnsEvents}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          />
         </DetailsTabItem>
         <DetailsTabItem label="GAS LIMIT" value={transaction?.gasLimit} />
       </DetailsTabs>
