@@ -4,11 +4,11 @@ import classes from "./Table.module.scss";
 import {
   flexRender,
   getCoreRowModel,
-  Header,
   HeaderGroup,
   Row,
   TableOptions,
   useReactTable,
+  RowData,
 } from "@tanstack/react-table";
 import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 import { CommonUtils } from "../../utils/common-utils";
@@ -22,15 +22,26 @@ export type TableProps<TData> = Pick<
   TableOptions<TableData<TData>>,
   "data" | "columns"
 > &
-  CustomTableType;
+  CustomTableType & {
+    className?: string;
+  };
 
 export type TableData<TData> = DecoratedPollingEntity<TData> | TData;
+
+declare module "@tanstack/table-core" {
+  // https://tanstack.com/table/v8/docs/api/core/column-def#meta
+  interface ColumnMeta<TData extends RowData, TValue> {
+    // Can be used to assign a custom class name to a column.
+    className?: string;
+  }
+}
 
 function Table<TData>({
   columns,
   data,
   renderCustomRow,
   renderCustomHeader,
+  className,
 }: TableProps<TData>): ReactElement {
   const table = useReactTable<TableData<TData>>({
     data,
@@ -39,7 +50,7 @@ function Table<TData>({
   });
 
   return (
-    <div>
+    <div className={className}>
       {table.getHeaderGroups().map((headerGroup) =>
         renderCustomHeader ? (
           renderCustomHeader(headerGroup)
@@ -50,7 +61,10 @@ function Table<TData>({
             variant="header-row"
           >
             {headerGroup.headers.map((header) => (
-              <div key={header.id}>
+              <div
+                key={header.id}
+                className={header.column.columnDef.meta?.className}
+              >
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext()
@@ -71,7 +85,10 @@ function Table<TData>({
             variant="table-line"
           >
             {row.getVisibleCells().map((cell) => (
-              <div key={cell.id}>
+              <div
+                key={cell.id}
+                className={cell.column.columnDef.meta?.className}
+              >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </div>
             ))}
@@ -81,7 +98,10 @@ function Table<TData>({
       {table.getFooterGroups().map((footerGroup) => (
         <div className={classes.tableRow} key={footerGroup.id}>
           {footerGroup.headers.map((header) => (
-            <div key={header.id}>
+            <div
+              key={header.id}
+              className={header.column.columnDef.meta?.className}
+            >
               {flexRender(header.column.columnDef.footer, header.getContext())}
             </div>
           ))}

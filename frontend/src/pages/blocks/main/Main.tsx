@@ -79,27 +79,9 @@ const Main: FunctionComponent = () => {
           </Value>
         ),
       }),
-      columnHelper.accessor("parentId", {
-        header: () => <Label variant="medium">PARENT ID</Label>,
-        cell: (info) => (
-          <Value>
-            {FlowUtils.isInitialBlockId(info.getValue()) ? (
-              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-            ) : (
-              <NavLink to={`/blocks/details/${info.getValue()}`}>
-                <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
-              </NavLink>
-            )}
-          </Value>
-        ),
-      }),
       columnHelper.accessor("timestamp", {
         header: () => <Label variant="medium">TIME</Label>,
         cell: (info) => <Value>{formatDate(info.getValue())}</Value>,
-      }),
-      columnHelper.accessor("collectionGuarantees", {
-        header: () => <Label variant="medium">COLLECTION GUARANTEES</Label>,
-        cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
       columnHelper.accessor("blockSeals", {
         header: () => <Label variant="medium">BLOCK SEALS</Label>,
