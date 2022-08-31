@@ -4,6 +4,10 @@
 
 This app can be built as a website or a desktop app. The entry points for different targets are located in `src/targets` dir.
 
+## UI Design
+
+You can view our UI design definitions on [Adobe XD](https://xd.adobe.com/view/00f8a11a-5a64-4fca-97ee-f3a6c3547a4b-55ab/) or [Google Drive](https://drive.google.com/drive/folders/1ixHczX7g64C2B06wfYhHvPfm4RLdVxdL).
+
 ## Setup
 
 ### Running on Macbook M1
