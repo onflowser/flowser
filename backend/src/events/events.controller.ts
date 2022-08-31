@@ -3,11 +3,10 @@ import { EventsService } from "./events.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
-
 import {
   GetAllEventsResponse,
   GetPollingEventsResponse,
-} from "@flowser/types/generated/responses/events";
+} from "@flowser/shared";
 
 @Controller()
 export class EventsController {

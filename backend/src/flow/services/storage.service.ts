@@ -12,9 +12,9 @@ import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.e
  * https://github.com/onflow/flow-emulator/blob/3fbe8ad9dc841abdc13056e20e7b15fc0e32a749/server/backend/backend.go#L584-L590
  */
 
-// TODO(milestone-3): Defining types for all possible cadence types would be quite difficult.
-// We could define just some of the most common types like Resource, Path, Dictionary,.. to save time
-// ... or we could define all types and put them in a shared (npm) library?
+// TODO(milestone-3): Defining shared for all possible cadence shared would be quite difficult.
+// We could define just some of the most common shared like Resource, Path, Dictionary,.. to save time
+// ... or we could define all shared and put them in a shared (npm) library?
 // Object that is stored under /private or /public domains.
 // https://github.com/onflow/cadence/blob/master/values.go
 export type FlowCadenceValue = unknown;

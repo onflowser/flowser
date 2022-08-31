@@ -2,11 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import {
-  Gateway,
-  GatewayStatus,
-} from "@flowser/types/generated/entities/projects";
-import { CadenceType } from "@flowser/types/generated/entities/cadence";
+import { Gateway, GatewayStatus } from "@flowser/shared";
 
 const fcl = require("@onflow/fcl");
 

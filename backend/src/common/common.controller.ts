@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { CommonService } from "./common.service";
-import { GetAllObjectsCountsResponse } from "@flowser/types/generated/responses/common";
+import { GetAllObjectsCountsResponse } from "@flowser/shared";
 
 @Controller("common")
 export class CommonController {

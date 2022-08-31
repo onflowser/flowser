@@ -5,7 +5,7 @@ import classes from "./ContentDetailsScript.module.scss";
 import Label from "../label/Label";
 import Ellipsis from "../ellipsis/Ellipsis";
 import Value from "../value/Value";
-import { CadenceObject } from "@flowser/types/generated/entities/cadence";
+import { CadenceObject } from "@flowser/shared";
 import { CadenceUtils } from "../../utils/cadence-utils";
 
 export type ContentDetailsScriptProps = {

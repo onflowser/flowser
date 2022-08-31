@@ -1,9 +1,9 @@
-import { Project } from "@flowser/types/generated/entities/projects";
+import { Project } from "@flowser/shared";
 import {
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
   GetAllProjectsResponse,
-} from "@flowser/types/generated/responses/projects";
+} from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

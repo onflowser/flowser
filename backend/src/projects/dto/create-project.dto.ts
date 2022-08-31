@@ -3,7 +3,7 @@ import { IsNotEmpty, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { EmulatorConfigurationDto } from "./emulator-configuration.dto";
 import { ApiProperty } from "@nestjs/swagger";
-import { Project } from "@flowser/types/generated/entities/projects";
+import { Project } from "@flowser/shared";
 import { DevWalletConfigurationDto } from "./dev-wallet-configuration.dto";
 
 export class CreateProjectDto implements Partial<Project> {

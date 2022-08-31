@@ -9,6 +9,7 @@ import { BlocksModule } from "../blocks/blocks.module";
 import { EventsModule } from "../events/events.module";
 import { LogsModule } from "../logs/logs.module";
 import { TransactionsModule } from "../transactions/transactions.module";
+import { CommonModule } from "../common/common.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TransactionsModule } from "../transactions/transactions.module";
     EventsModule,
     LogsModule,
     TransactionsModule,
+    CommonModule,
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService],

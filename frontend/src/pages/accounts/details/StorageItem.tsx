@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import classes from "./StorageItem.module.scss";
 import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
-import { AccountStorageItem } from "@flowser/types/generated/entities/accounts";
+import { AccountStorageItem } from "@flowser/shared";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import Value from "../../../components/value/Value";
 import { FlowUtils } from "../../../utils/flow-utils";

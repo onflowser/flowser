@@ -31,12 +31,10 @@ import {
   Gateway,
   GatewayStatus,
   Project,
-} from "@flowser/types/generated/entities/projects";
-import {
-  HashAlgorithm,
-  SignatureAlgorithm,
-} from "@flowser/types/generated/entities/common";
+} from "@flowser/shared";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import * as fs from "fs";
+import { CommonService } from "../common/common.service";
 
 @Injectable()
 export class ProjectsService {
@@ -68,7 +66,8 @@ export class ProjectsService {
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private logsService: LogsService,
-    private transactionsService: TransactionsService
+    private transactionsService: TransactionsService,
+    private commonService: CommonService
   ) {}
 
   getCurrentProject() {
@@ -83,20 +82,7 @@ export class ProjectsService {
     try {
       // remove all existing data of previously used project
       // TODO(milestone-x): persist data for projects by default?
-
-      // Remove contracts before removing accounts, because of the foreign key constraint.
-      await Promise.all([
-        this.contractsService.removeAll(),
-        this.accountKeysService.removeAll(),
-        this.accountStorageService.removeAll(),
-      ]);
-      await Promise.all([
-        this.accountsService.removeAll(),
-        this.blocksService.removeAll(),
-        this.eventsService.removeAll(),
-        this.logsService.removeAll(),
-        this.transactionsService.removeAll(),
-      ]);
+      await this.commonService.removeBlockchainData();
     } catch (e) {
       throw new InternalServerErrorException("Database cleanup failed");
     }
@@ -203,7 +189,7 @@ export class ProjectsService {
         restServerPort,
         grpcServerPort,
         adminServerPort: 8080,
-        persist: false,
+        persist: true,
         performInit: false,
         withContracts: false,
         blockTime: 0,

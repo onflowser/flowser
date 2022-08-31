@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import { useFilterData } from "../../../hooks/use-filter-data";
@@ -16,7 +16,11 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
-import { Block } from "types/generated/entities/blocks";
+import { Block } from "@flowser/shared";
+import {
+  useGetPollingBlocks,
+  useGetPollingEmulatorSnapshots,
+} from "../../../hooks/use-api";
 
 const { formatDate } = useFormattedDate();
 
@@ -71,11 +75,34 @@ const columns = [
 ];
 
 const Main: FunctionComponent = () => {
+  const emulatorSnapshotService = SnapshotService.getInstance();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
-  const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { formatDate } = useFormattedDate();
+  const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
+  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
+  const snapshotLookupByBlockId = useMemo(
+    () =>
+      new Map(
+        emulatorSnapshots.map((snapshot) => [snapshot.blockId, snapshot])
+      ),
+    [emulatorSnapshots]
+  );
+
+  async function onRevertToBlock(blockId: string) {
+    try {
+      const snapshot = await emulatorSnapshotService.revertTo({
+        blockId,
+      });
+      fetchAll();
+      toast.success(`Reverted to "${snapshot.data.snapshot?.description}"`);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to revert to block");
+    }
+  }
 
   useEffect(() => {
     setPlaceholder("Search for block ids, parent ids, time, ...");

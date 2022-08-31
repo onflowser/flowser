@@ -1,7 +1,7 @@
 import {
   GetSingleBlockResponse,
   GetPollingBlocksResponse,
-} from "@flowser/types/generated/responses/blocks";
+} from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
 

@@ -1,5 +1,5 @@
-import { useCallback, useContext } from "react";
-import { UiState, UiStateContext } from "../contexts/ui-state.context";
+import { useCallback } from "react";
+import { UiState, useUiStateContext } from "../contexts/ui-state.context";
 
 export interface UseSearchHook {
   setSearchTerm: (term: string) => void;
@@ -12,7 +12,7 @@ export interface UseSearchHook {
 }
 
 export const useSearch = (context = "default"): UseSearchHook => {
-  const [state, setState] = useContext(UiStateContext);
+  const [state, setState] = useUiStateContext();
 
   const setSearchTerm = (term: string) =>
     setState((state: UiState) => ({

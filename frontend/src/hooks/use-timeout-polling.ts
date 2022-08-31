@@ -1,11 +1,12 @@
 import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
 import { AxiosResponse } from "axios";
-import { PollingResponse, PollingEntity } from "@flowser/types/shared/polling";
+import { PollingResponse, PollingEntity } from "@flowser/shared";
 
 export interface TimeoutPollingHook<T extends PollingEntity> {
   stopPolling: () => void;
   startPolling: () => void;
+  fetchAll: () => void;
   isFetching: boolean;
   firstFetch: boolean;
   error: Error | null;
@@ -43,7 +44,7 @@ export const useTimeoutPolling = <
     return props.fetcher({ timestamp: lastPollingTime });
   }, [lastPollingTime]);
 
-  const { isFetching, error } = useQuery<
+  const { isFetching, error, refetch } = useQuery<
     AxiosResponse<PollingResponse<T[]>>,
     Error
   >(props.resourceKey, fetchCallback, {
@@ -92,9 +93,16 @@ export const useTimeoutPolling = <
     setStop(false);
   };
 
+  const fetchAll = useCallback(() => {
+    setData([]);
+    setLastPollingTime(0);
+    refetch();
+  }, []);
+
   return {
     stopPolling,
     startPolling,
+    fetchAll,
     isFetching,
     error,
     data,

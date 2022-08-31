@@ -19,7 +19,7 @@ import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetPollingLogs } from "../../hooks/use-api";
-import { Log, LogSource } from "@flowser/types/generated/entities/logs";
+import { Log, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 
 type LogsProps = {
