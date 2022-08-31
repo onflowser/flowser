@@ -63,7 +63,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       `starting with (${flags.length}) flags: ${flags.join(" ")}`
     );
 
-    // TODO(milestone-3): check if emulator (or any other process) is already running on emulator ports
+    // TODO(milestone-5): check if emulator (or any other process) is already running on emulator ports
     return new Promise((resolve, reject) => {
       try {
         this.emulatorProcess = spawn("flow", ["emulator", ...flags], {
@@ -202,7 +202,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   }
 
   public getEmulatorError() {
-    // TODO(milestone-3): Better log parsing - move logic to Log.entity class
+    // TODO(milestone-x): Better log parsing - move logic to Log.entity class
     for (let i = this.logs.length - 1; i > 0; i--) {
       if (this.logs[i].includes("level=error")) {
         const errorLine = FlowEmulatorService.parseLogLine(this.logs[i]);

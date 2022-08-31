@@ -13,7 +13,7 @@ import { FlowCliService } from "./cli.service";
 export class FlowActionsService {
   constructor(private readonly flowCliService: FlowCliService) {}
 
-  // TODO(milestone-3): add newly created account in flow.json (+ test logic)
+  // TODO(milestone-x): create new accounts from Flowser UI?
   async createAccount() {
     const keysOutput = await this.flowCliService.execute("flow", [
       "keys",

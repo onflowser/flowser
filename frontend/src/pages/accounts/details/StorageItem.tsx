@@ -11,7 +11,7 @@ type ContentDetailsKeysProps = {
   storageItem: DecoratedPollingEntity<AccountStorageItem>;
 };
 
-// TODO(milestone-3): this is a temporary storage item view, should be replaced with the on in design
+// TODO(milestone-5): this is a temporary storage item view, should be replaced with the on in design
 const StorageItem: FunctionComponent<ContentDetailsKeysProps> = ({
   storageItem,
 }) => {

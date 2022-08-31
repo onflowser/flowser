@@ -30,8 +30,8 @@ export class FlowCliService implements ProjectContextLifecycle {
 
   async startDevWallet() {
     this.logger.debug("Starting dev wallet");
-    // TODO(milestone-3): only start if not yet running (e.g. by user)
-    // TODO(milestone-3): Define a shared process manager service, that would also act as a central storage for retrieving all flow-cli/emulator logs?
+    // TODO(milestone-5): only start if not yet running (e.g. by user)
+    // TODO(milestone-5): Define a shared process manager service, that would also act as a central storage for retrieving all flow-cli/emulator logs?
     this.devWalletProcess = spawn(
       "flow",
       [

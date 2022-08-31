@@ -23,14 +23,12 @@ export class ProjectEntity extends PollingEntity {
   })
   devWallet: DevWallet;
 
-  // TODO(milestone-3): gateway should be synced with network settings in flow.json
   @Column("simple-json", {
     nullable: true,
     transformer: typeOrmProtobufTransformer(Gateway),
   })
   gateway: Gateway;
 
-  // TODO(milestone-3): emulator should be synced with settings in flow.json
   @Column("simple-json", {
     nullable: true,
     transformer: typeOrmProtobufTransformer(Emulator),

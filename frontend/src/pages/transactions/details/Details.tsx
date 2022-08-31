@@ -265,7 +265,7 @@ const Details: FunctionComponent = () => {
               {transaction.proposalKey?.address ?? "-"}
             </NavLink>
           </Value>
-          {/* TODO(milestone-3): Better organise bellow fields */}
+          {/* TODO(milestone-5): Better organise bellow fields */}
           <Label variant="large" className={classes.inlineLabel}>
             Sequence number:
           </Label>

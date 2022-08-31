@@ -61,7 +61,7 @@ const Configuration: FunctionComponent = () => {
         await projectService.useProject(response.data.project!.id);
         history.replace(`/${routes.firstRouteAfterStart}`);
       } catch (e) {
-        // TODO(milestone-3): better handle errors
+        // TODO(milestone-5): better handle errors
         toast.error(`Something went wrong, cannot run emulator`);
         window.scrollTo(0, 0);
       }

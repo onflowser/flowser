@@ -15,7 +15,7 @@ type TransactionStatusCodeProps = {
 const TransactionStatusBadge: FunctionComponent<TransactionStatusCodeProps> = ({
   statusCode,
 }) => {
-  // TODO(milestone-3): add tooltip for each status code
+  // TODO(milestone-5): add tooltip for each status code
   switch (statusCode) {
     case TransactionStatusCode.TX_STATUS_UNKNOWN:
       return (

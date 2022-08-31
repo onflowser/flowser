@@ -173,9 +173,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   async storeBlockData(data: BlockData) {
-    // TODO(milestone-3): Transaction references previous block in referenceBlockId field. Why? Previously we used this field to indicate which block contained some transaction.
-    // Docs say: referenceBlockId = A reference to the block used to calculate the expiry of this transaction.
-    // https://developers.flow.com/tools/fcl-js/reference/api#transactionobject
     const blockPromise = this.blockService
       .create(BlockEntity.create(data.block))
       .catch((e) =>

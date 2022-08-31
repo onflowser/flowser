@@ -36,7 +36,7 @@ export type FlowAccountsConfig = Record<FlowAccountName, FlowAccountConfig>;
 
 type FlowAccountName = "emulator-account" | string;
 
-// TODO(milestone-3): add support for advanced account format
+// TODO(milestone-x): add support for advanced account format
 // https://developers.flow.com/tools/flow-cli/configuration#advanced-format
 type FlowAccountConfig = {
   address: string;
@@ -65,7 +65,7 @@ export type FlowCliConfig = {
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
   private config: FlowCliConfig = {};
-  // TODO(milestone-3): Config may not always be present in the project root
+  // TODO(milestone-5): Config may not always be present in the project root
   // Handle cases when it's not or just alert the user that config must be put in root
   private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
@@ -164,7 +164,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
     if (!pathPostfix) {
       return null;
     }
-    // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
+    // TODO(milestone-5): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);
   }
 }

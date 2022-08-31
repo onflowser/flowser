@@ -100,7 +100,7 @@ export class ProjectsService {
 
     this.currentProject = await this.findOne(id);
 
-    // TODO(milestone-3): validate that project has a valid flow.json config
+    // TODO(milestone-5): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
     try {
