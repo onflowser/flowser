@@ -25,6 +25,8 @@ import {
   GetFlowCliInfoResponse,
   GetPollingEventsResponse,
   GetPollingLogsResponse,
+  EmulatorSnapshot,
+  GetPollingEmulatorSnapshotsResponse,
 } from "@flowser/shared";
 import { AccountsService } from "../services/accounts.service";
 import { ContractsService } from "../services/contracts.service";
@@ -36,6 +38,7 @@ import { useGetAxiosQuery } from "./use-get-axios-query";
 import { ProjectsService } from "../services/projects.service";
 import { CommonService } from "../services/common.service";
 import { StorageService } from "../services/storage.service";
+import { SnapshotService } from "../services/snapshots.service";
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
@@ -239,5 +242,19 @@ export function useGetAllObjectsCounts() {
     resourceKey: "/counts",
     fetcher: CommonService.getInstance().getAllObjectsCounts,
     refetchInterval: 1000,
+  });
+}
+
+export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSnapshot> {
+  return useTimeoutPolling<
+    EmulatorSnapshot,
+    GetPollingEmulatorSnapshotsResponse
+  >({
+    resourceKey: "/snapshots/polling",
+    resourceIdKey: "id",
+    fetcher: ({ timestamp }) =>
+      SnapshotService.getInstance().getAllWithPolling({
+        timestamp,
+      }),
   });
 }

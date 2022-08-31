@@ -9,6 +9,7 @@ import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios from "axios";
 import { randomUUID } from "crypto";
+import { CommonService } from "../../common/common.service";
 
 type SnapshotResponse = {
   blockId: string;
@@ -20,7 +21,8 @@ type SnapshotResponse = {
 export class FlowSnapshotService {
   constructor(
     @InjectRepository(SnapshotEntity)
-    private readonly snapshotRepository: Repository<SnapshotEntity>
+    private readonly snapshotRepository: Repository<SnapshotEntity>,
+    private readonly commonService: CommonService
   ) {}
 
   async create(description: string) {
@@ -69,6 +71,8 @@ export class FlowSnapshotService {
     if (response.status !== 200) {
       throw new InternalServerErrorException("Failed to revert to snapshot");
     }
+
+    await this.commonService.removeBlockchainData();
 
     return existingSnapshot;
   }
