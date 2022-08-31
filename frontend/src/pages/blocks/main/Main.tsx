@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import { useFilterData } from "../../../hooks/use-filter-data";
 import { useSearch } from "../../../hooks/use-search";
-import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
@@ -11,16 +10,17 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import { useGetPollingBlocks } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
-import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Block } from "@flowser/shared";
 import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../../../hooks/use-api";
+import { SnapshotService } from "../../../services/snapshots.service";
+import toast from "react-hot-toast";
 
 const { formatDate } = useFormattedDate();
 
@@ -79,7 +79,6 @@ const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
-  const { formatDate } = useFormattedDate();
   const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);

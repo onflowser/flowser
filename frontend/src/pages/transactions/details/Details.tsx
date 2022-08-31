@@ -1,10 +1,4 @@
-import React, {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import React, { FunctionComponent, useEffect, useState, useMemo } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
@@ -21,7 +15,6 @@ import DateWithCalendar from "../../../components/date-with-calendar/DateWithCal
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import TransactionStatusBadge from "../../../components/transaction-status-code/TransactionStatusBadge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
-import EventDetailsTable from "../../../components/event-details-table/EventDetailsTable";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
 import { useFormattedDate } from "../../../hooks/use-formatted-date";
@@ -31,17 +24,12 @@ import {
 } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
-import {
-  SignableObject,
-  Transaction,
-} from "types/generated/entities/transactions";
-import { info } from "console";
+import { SignableObject } from "@flowser/shared";
 import Table from "../../../components/table/Table";
-import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
-import { Event } from "types/generated/entities/events";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
+import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
-import CollapsibleCard from "../../../components/collapsible-card/CollapsibleCard";
 import { flexRender } from "@tanstack/react-table";
 
 type RouteParams = {

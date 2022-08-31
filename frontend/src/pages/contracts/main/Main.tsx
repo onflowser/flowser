@@ -10,9 +10,9 @@ import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingContracts } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import Table from "../../../components/table/Table";
-import { AccountContract } from "types/generated/entities/accounts";
+import { AccountContract } from "@flowser/shared";
 
 // CONTRACTS TABLE
 const columnHelper =

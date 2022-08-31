@@ -11,7 +11,7 @@ import FullScreenLoading from "../../../components/fullscreen-loading/FullScreen
 import { useGetPollingAccounts } from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Account } from "@flowser/types/generated/entities/accounts";
+import { Account } from "@flowser/shared";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();

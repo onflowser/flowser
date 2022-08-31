@@ -6,7 +6,6 @@ import Value from "../../../components/value/Value";
 import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
-import KeyListItem from "./KeyListItem";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import {
   DetailsTabItem,
@@ -14,7 +13,6 @@ import {
 } from "../../../components/details-tabs/DetailsTabs";
 import { NavLink, useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";
 import Fragment from "../../../components/fragment/Fragment";
 import {
   useGetAccount,
@@ -24,15 +22,14 @@ import {
   useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "frontend/src/hooks/use-timeout-polling";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import {
   AccountContract,
   AccountKey,
   AccountStorageItem,
-} from "types/generated/entities/accounts";
+} from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
-import { Decipher } from "crypto";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
 
