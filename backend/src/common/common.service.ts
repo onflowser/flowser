@@ -5,6 +5,8 @@ import { TransactionsService } from "../transactions/transactions.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
 import { LogsService } from "../logs/logs.service";
+import { KeysService } from "../accounts/services/keys.service";
+import { AccountStorageService } from "../accounts/services/storage.service";
 
 @Injectable()
 export class CommonService {
@@ -14,7 +16,9 @@ export class CommonService {
     private blocksService: BlocksService,
     private transactionsService: TransactionsService,
     private eventsService: EventsService,
-    private logsService: LogsService
+    private logsService: LogsService,
+    private accountKeysService: KeysService,
+    private accountStorageService: AccountStorageService
   ) {}
 
   async getCounters() {
@@ -35,5 +39,21 @@ export class CommonService {
       events,
       contracts,
     };
+  }
+
+  async removeBlockchainData() {
+    // Remove contracts before removing accounts, because of the foreign key constraint.
+    await Promise.all([
+      this.contractsService.removeAll(),
+      this.accountKeysService.removeAll(),
+      this.accountStorageService.removeAll(),
+    ]);
+    await Promise.all([
+      this.accountsService.removeAll(),
+      this.blocksService.removeAll(),
+      this.eventsService.removeAll(),
+      this.logsService.removeAll(),
+      this.transactionsService.removeAll(),
+    ]);
   }
 }

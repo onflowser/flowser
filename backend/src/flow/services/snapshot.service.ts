@@ -89,7 +89,10 @@ export class FlowSnapshotService {
   private async createOrRevertSnapshotRequest(snapshotId: string) {
     // Docs: https://github.com/onflow/flow-emulator#managing-emulator-state
     return axios.get<SnapshotResponse>(
-      `http://localhost:8080/emulator/snapshot/${snapshotId}`
+      `http://localhost:8080/emulator/snapshot/${snapshotId}`,
+      // Prevent axios from throwing on certain http response codes
+      // https://github.com/axios/axios/issues/41
+      { validateStatus: () => true }
     );
   }
 }
