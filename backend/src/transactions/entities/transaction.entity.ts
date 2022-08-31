@@ -102,7 +102,10 @@ export class TransactionEntity extends PollingEntity {
       ensurePrefixedAddress(address)
     );
     transaction.args = flowTransaction.args;
-    transaction.proposalKey = flowTransaction.proposalKey;
+    transaction.proposalKey = {
+      ...flowTransaction.proposalKey,
+      address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
+    };
     transaction.envelopeSignatures = deserializeSignableObjects(
       flowTransaction.envelopeSignatures
     );

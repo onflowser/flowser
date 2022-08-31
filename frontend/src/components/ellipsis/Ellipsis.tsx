@@ -42,7 +42,7 @@ const Ellipsis: FunctionComponent<EllipsisProps> = ({
   }, []);
 
   return (
-    <span ref={elRef} className={`${className}`} style={style}>
+    <span ref={elRef} className={className} style={style}>
       {state}
     </span>
   );

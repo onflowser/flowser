@@ -43,12 +43,16 @@
 }
 
 .storageTable {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  max-width: 20vw;
-  min-width: 10vw;
-  display: inline-block;
+  .identifierColumn {
+    flex: 2;
+  }
+  .dataColumn {
+    flex: 5;
+    overflow: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 .hash {
