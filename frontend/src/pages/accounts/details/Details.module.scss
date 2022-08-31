@@ -1,4 +1,6 @@
-@import 'styles/spacings';
+@import "styles/spacings";
+@import 'styles/colors';
+@import 'styles/typography';
 
 .root {
   display: flex;
@@ -31,12 +33,45 @@
       .label {
         min-width: 188px;
         display: inline-flex;
-
       }
     }
   }
 
   .script {
     margin-bottom: $spacing-l;
+  }
+}
+
+.storageTable {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 20vw;
+  min-width: 10vw;
+  display: inline-block;
+}
+
+.hash {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 90vw;
+  margin: $spacing-base;
+}
+
+.badges {
+  color: $color-grey;
+  font-family: $font-family-inter;
+  margin-bottom: $spacing-base;
+  margin-top: $spacing-base;
+}
+
+.keysRoot {
+  display: flex;
+  flex-direction: column;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
   }
 }

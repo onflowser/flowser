@@ -20,10 +20,30 @@ import {
   useGetPollingTransactionsByBlock,
 } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
+import { createColumnHelper } from "@tanstack/table-core";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
+import { Transaction } from "@flowser/shared";
+import Table from "../../../components/table/Table";
 
 type RouteParams = {
   blockId: string;
 };
+
+// TRANSACTIONS TABLE
+const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
+
+const columns = [
+  columnHelper.accessor("id", {
+    header: () => <Label variant="medium">TRANSACTION ID</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/transactions/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+];
 
 const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
@@ -78,7 +98,6 @@ const Details: FunctionComponent = () => {
           <DateWithCalendar date={createdDate} />
         </div>
       </Card>
-
       <DetailsTabs>
         <DetailsTabItem label="HEIGHT" value={block.height} />
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
@@ -87,21 +106,12 @@ const Details: FunctionComponent = () => {
               updateSearchBar("search for transactions", !transactions.length)
             }
           >
-            {transactions &&
-              transactions.map((transaction, index) => (
-                <Card
-                  variant="black"
-                  key={index}
-                  className={classes.transactionListItem}
-                >
-                  <Label>TRANSACTION ID</Label>
-                  <Value>
-                    <NavLink to={`/transactions/details/${transaction.id}`}>
-                      {transaction.id}
-                    </NavLink>
-                  </Value>
-                </Card>
-              ))}
+            {transactions && (
+              <Table<DecoratedPollingEntity<Transaction>>
+                data={transactions}
+                columns={columns}
+              />
+            )}
           </Fragment>
         </DetailsTabItem>
 

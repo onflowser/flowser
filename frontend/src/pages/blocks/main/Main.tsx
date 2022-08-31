@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import { useFilterData } from "../../../hooks/use-filter-data";
 import { useSearch } from "../../../hooks/use-search";
-import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
@@ -11,19 +10,28 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import { FlowUtils } from "../../../utils/flow-utils";
+import { createColumnHelper } from "@tanstack/table-core";
+import Table from "../../../components/table/Table";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
+import { Block } from "@flowser/shared";
 import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../../../hooks/use-api";
-import { toast } from "react-hot-toast";
 import { SnapshotService } from "../../../services/snapshots.service";
+import toast from "react-hot-toast";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+
+const { formatDate } = useFormattedDate();
+
+const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
 const Main: FunctionComponent = () => {
   const emulatorSnapshotService = SnapshotService.getInstance();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { formatDate } = useFormattedDate();
+
   const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
@@ -55,55 +63,86 @@ const Main: FunctionComponent = () => {
     disableSearchBar(false);
   }, []);
 
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("height", {
+        header: () => <Label variant="medium">BLOCK HEIGHT</Label>,
+        cell: (info) => <Value>{info.getValue()}</Value>,
+      }),
+      columnHelper.accessor("id", {
+        header: () => <Label variant="medium">BLOCK ID</Label>,
+        cell: (info) => (
+          <Value>
+            <NavLink to={`/blocks/details/${info.getValue()}`}>
+              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+            </NavLink>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("parentId", {
+        header: () => <Label variant="medium">PARENT ID</Label>,
+        cell: (info) => (
+          <Value>
+            {FlowUtils.isInitialBlockId(info.getValue()) ? (
+              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+            ) : (
+              <NavLink to={`/blocks/details/${info.getValue()}`}>
+                <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+              </NavLink>
+            )}
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("timestamp", {
+        header: () => <Label variant="medium">TIME</Label>,
+        cell: (info) => <Value>{formatDate(info.getValue())}</Value>,
+      }),
+      columnHelper.accessor("collectionGuarantees", {
+        header: () => <Label variant="medium">COLLECTION GUARANTEES</Label>,
+        cell: (info) => <Value>{info.getValue()?.length}</Value>,
+      }),
+      columnHelper.accessor("blockSeals", {
+        header: () => <Label variant="medium">BLOCK SEALS</Label>,
+        cell: (info) => <Value>{info.getValue()?.length}</Value>,
+      }),
+      columnHelper.accessor("signatures", {
+        header: () => <Label variant="medium">SIGNATURES</Label>,
+        cell: (info) => <Value>{info.getValue()?.length}</Value>,
+      }),
+      columnHelper.display({
+        id: "snapshot",
+        header: () => <Label variant="medium">SNAPSHOT</Label>,
+        cell: (info) => {
+          const block = info.row.original;
+          const snapshot = snapshotLookupByBlockId.get(block.id);
+          return (
+            <Value>
+              {snapshot ? (
+                <SimpleButton onClick={() => onRevertToBlock(block.id)}>
+                  {snapshot.description}
+                </SimpleButton>
+              ) : (
+                "-"
+              )}
+            </Value>
+          );
+        },
+      }),
+    ],
+    [filteredData, snapshotLookupByBlockId]
+  );
+
   return (
     <>
-      {filteredData.map((item) => (
-        <Card
-          key={item.id}
-          showIntroAnimation={item.isNew || item.isUpdated}
-          className={classes.card}
-        >
-          <div>
-            <Label>BLOCK HEIGHT</Label>
-            <Value>{item.height}</Value>
-          </div>
-          <div>
-            <Label>BLOCK ID</Label>
-            <Value>
-              <NavLink to={`/blocks/details/${item.id}`}>
-                <Ellipsis className={classes.hash}>{item.id}</Ellipsis>
-              </NavLink>
-            </Value>
-          </div>
-          <div>
-            <Label>TIME</Label>
-            <Value>{formatDate(item.timestamp)}</Value>
-          </div>
-          <div>
-            <Label>COLLECTION GUARANTEES</Label>
-            <Value>{item.collectionGuarantees?.length}</Value>
-          </div>
-          <div>
-            <Label>BLOCK SEALS</Label>
-            <Value>{item.blockSeals?.length}</Value>
-          </div>
-          <div>
-            <Label>SIGNATURES</Label>
-            <Value>{item.signatures?.length}</Value>
-          </div>
-          <div>
-            <Label>SNAPSHOT</Label>
-            <Value>
-              <SimpleButton onClick={() => onRevertToBlock(item.id)}>
-                {snapshotLookupByBlockId.get(item.id)?.description ?? "-"}
-              </SimpleButton>
-            </Value>
-          </div>
-        </Card>
-      ))}
       {!firstFetch && <FullScreenLoading />}
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />
+      )}
+      {filteredData.length > 0 && (
+        <Table<DecoratedPollingEntity<Block>>
+          columns={columns}
+          data={filteredData}
+        ></Table>
       )}
     </>
   );

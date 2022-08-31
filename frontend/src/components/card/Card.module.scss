@@ -27,12 +27,17 @@
     opacity: 0.8;
   }
 
-  &.blue {
+  &.header-row {
+    background-color: $dark-violet;
+    color: $grey;
+  }
+
+  &.table-line {
     background-color: $table-line-background;
   }
 
-  &.black {
-    background-color: $color-table-black;
+  &.dark-blue {
+    background-color: $dark-blue;
   }
 
   &.active {

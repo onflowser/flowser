@@ -145,8 +145,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
     const blockData = await this.getBlockData(height);
 
-    console.log(`Found ${blockData.transactions.length} in block #${height}`);
-
     // Process events first, so that transactions can reference created users.
     await this.processEvents(blockData.events);
 
