@@ -61,6 +61,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
 
   const createSnapshot = useCallback(async () => {
     try {
+      // TODO(milestone-5): provide a way to input a custom description
       await snapshotService.create({
         description: "Test",
       });
