@@ -2,11 +2,11 @@ import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKeyEntity } from "./key.entity";
 import { AccountContractEntity } from "./contract.entity";
-import { AccountsStorageEntity } from "./storage.entity";
 import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { Account } from "@flowser/types";
+import { FlowAccount } from "../../flow/services/gateway.service";
+import { Account } from "@flowser/shared";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { AccountStorageItemEntity } from "./storage-item.entity";
 
 @Entity({ name: "accounts" })
 export class AccountEntity extends PollingEntity {
@@ -24,10 +24,10 @@ export class AccountEntity extends PollingEntity {
   })
   keys: AccountKeyEntity[];
 
-  @OneToMany(() => AccountsStorageEntity, (storage) => storage.account, {
+  @OneToMany(() => AccountStorageItemEntity, (storage) => storage.account, {
     eager: true,
   })
-  storage: AccountsStorageEntity[];
+  storage: AccountStorageItemEntity[];
 
   @OneToMany(() => AccountContractEntity, (contract) => contract.account, {
     eager: true,
@@ -50,19 +50,19 @@ export class AccountEntity extends PollingEntity {
     return account;
   }
 
-  toProto() {
-    return Account.fromPartial({
+  toProto(): Account {
+    return {
       address: this.address,
       balance: this.balance,
       code: this.code,
-      keys: this.keys.map((key) => key.toProto()),
       storage: this.storage.map((storage) => storage.toProto()),
+      keys: this.keys.map((key) => key.toProto()),
       contracts: this.contracts.map((contract) => contract.toProto()),
       transactions: this.transactions.map((transaction) =>
         transaction.toProto()
       ),
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 }

@@ -2,7 +2,7 @@
   "packages": [
     "./backend",
     "./frontend",
-    "./types"
+    "./shared"
   ],
   "npmClient": "yarn",
   "useWorkspaces": true,

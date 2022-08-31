@@ -7,7 +7,7 @@ import {
   GetSingleContractResponse,
   GetPollingContractsResponse,
   GetAllContractsResponse,
-} from "@flowser/types";
+} from "@flowser/shared";
 
 @Controller()
 export class ContractsController {

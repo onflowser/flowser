@@ -8,7 +8,7 @@ import { useHistory, useParams } from "react-router-dom";
 
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
-import Input from "../../../components/input/Input";
+import Input, { InputProps } from "../../../components/input/Input";
 import ToggleButton from "../../../components/toggle-button/ToggleButton";
 import RadioButton from "../../../components/radio-button/RadioButton";
 import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
@@ -22,11 +22,17 @@ import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import { ProjectsService } from "../../../services/projects.service";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
-import { Emulator, Gateway, Project } from "@flowser/types";
+import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
 import { CommonUtils } from "../../../utils/common-utils";
 import { FormikErrors } from "formik/dist/types";
-import { HashAlgorithm, SignatureAlgorithm } from "@flowser/types";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
+import * as yup from "yup";
+
+const projectSchema = yup.object().shape({
+  name: yup.string().required("Required"),
+  filesystemPath: yup.string().required("Required"),
+});
 
 const Configuration: FunctionComponent = () => {
   const projectService = ProjectsService.getInstance();
@@ -39,8 +45,10 @@ const Configuration: FunctionComponent = () => {
   const isExistingProject = Boolean(id);
 
   const formik = useFormik({
-    // TODO(milestone-3): add project schema validation
+    validationSchema: projectSchema,
     initialValues: Project.fromPartial({
+      filesystemPath: "",
+      devWallet: DevWallet.fromPartial({}),
       emulator: Emulator.fromPartial({}),
       gateway: Gateway.fromPartial({}),
     }),
@@ -53,11 +61,22 @@ const Configuration: FunctionComponent = () => {
         await projectService.useProject(response.data.project!.id);
         history.replace(`/${routes.firstRouteAfterStart}`);
       } catch (e) {
+        // TODO(milestone-3): better handle errors
         toast.error(`Something went wrong, cannot run emulator`);
         window.scrollTo(0, 0);
       }
     },
   });
+
+  useEffect(() => {
+    if (!formik.isValid) {
+      toast.error("Oops, please double check this form!");
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [formik.isValid]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -74,7 +93,7 @@ const Configuration: FunctionComponent = () => {
       const existingProjectData = await projectService.getSingle(id);
       const existingProject = existingProjectData.data.project;
       if (existingProject) {
-        formik.setValues(existingProject);
+        formik.setValues(existingProject, false);
       }
     } catch (e) {
       console.error(e);
@@ -88,7 +107,7 @@ const Configuration: FunctionComponent = () => {
       const defaultProjectData = await projectService.getDefaultProjectInfo();
       const defaultProject = defaultProjectData.data.project;
       if (defaultProject) {
-        formik.setValues(defaultProject);
+        formik.setValues(defaultProject, false);
       }
     } catch (e) {
       toast.error(
@@ -116,16 +135,6 @@ const Configuration: FunctionComponent = () => {
     }
   };
 
-  const copyAccountConfig = (event: any) => {
-    event.preventDefault();
-    // TODO(milestone-3): build & copy config
-    // copy(`"emulator-account": {
-    //   "address": "${formState?.serviceAddress}",
-    //   "key": "${formState?.servicePrivateKey}"
-    // }`);
-    // toast("Service account config copied to clipboard!");
-  };
-
   const closeDialog = () => {
     setShowDialog(false);
   };
@@ -139,6 +148,73 @@ const Configuration: FunctionComponent = () => {
     return <FullScreenLoading className={classes.loader} />;
   }
 
+  function DevWalletTextField({
+    path,
+    ...restProps
+  }: FieldProps & { path: keyof DevWallet }) {
+    return (
+      <TextField
+        disabled={!formik.values.devWallet?.run}
+        path={`devWallet.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function DevWalletToggleField({
+    path,
+    diseblable = true,
+    ...restProps
+  }: FieldProps & { path: keyof DevWallet; diseblable?: boolean }) {
+    return (
+      <ToggleField
+        disabled={!formik.values.devWallet?.run && diseblable}
+        path={`devWallet.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function EmulatorTextField({
+    path,
+    ...restProps
+  }: FieldProps & { path: keyof Emulator }) {
+    return (
+      <TextField
+        disabled={!formik.values.emulator?.run}
+        path={`emulator.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function EmulatorRadioField({
+    path,
+    ...restProps
+  }: RadioFieldProps & { path: keyof Emulator }) {
+    return (
+      <RadioField
+        disabled={!formik.values.emulator?.run}
+        path={`emulator.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
+  function EmulatorToggleField({
+    path,
+    diseblable = true,
+    ...restProps
+  }: FieldProps & { path: keyof Emulator; diseblable?: boolean }) {
+    return (
+      <ToggleField
+        disabled={!formik.values.emulator?.run && diseblable}
+        path={`emulator.${path}`}
+        {...restProps}
+      />
+    );
+  }
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -146,256 +222,301 @@ const Configuration: FunctionComponent = () => {
           <div className={classes.inner}>
             <IconBackButton className={classes.backButton} onClick={onBack} />
             <div className={classes.top}>
-              <h2>EMULATOR CONFIGURATION</h2>
+              <h2>PROJECT SETTINGS</h2>
             </div>
+
             <Card
-              className={classes.bottom}
+              className={classes.card}
               loading={isLoading}
               loadingText={loadingText}
             >
-              <div className={classes.bottom1}>
-                <Label variant="xlarge">Configuration Name:</Label>
+              <div className={classes.section}>
+                <div className={classes.projectNameSection}>
+                  <Label variant="xlarge">Project Name:</Label>
 
-                <div className={classes.nameInput}>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
+                  <div className={classes.nameInputWrapper}>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  {formik.errors.name && (
+                    <span className={classes.errorMessage}>
+                      {formik.errors.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <h2 className={classes.sectionTitle}>Flowser settings</h2>
+              <div className={classes.section}>
+                <div className={classes.row}>
+                  <TextField
+                    label="Project root path"
+                    description="Specify the filesystem path to your project"
+                    path="filesystemPath"
+                    formik={formik}
                   />
                 </div>
-                {formik.errors.name && (
-                  <span className={classes.errorMessage}>
-                    {formik.errors.name}
-                  </span>
-                )}
               </div>
-              <div className={classes.bottom2}>
-                <div className={classes.left}>
-                  <div className={classes.row}>
-                    <Field
-                      label="RPC Port"
-                      path="emulator.rpcServerPort"
-                      description="RPC port to listen on"
-                      formik={formik}
-                    />
-                  </div>
 
-                  <div className={classes.row}>
-                    <Field
-                      label="HTTP Port"
-                      path="emulator.httpServerPort"
-                      description="HTTP port to listen on"
-                      formik={formik}
-                    />
-                  </div>
-
-                  {/* TODO(milestone-3): Provide service address config */}
-                  {/*<div className={classes.row}>*/}
-                  {/*  <span>Service address</span>*/}
-                  {/*  <Input*/}
-                  {/*    type="text"*/}
-                  {/*    value={formState.serviceAddress}*/}
-                  {/*    disabled*/}
-                  {/*  />*/}
-                  {/*  <span>Service account address</span>*/}
-                  {/*</div>*/}
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Service Private Key"
-                      path="emulator.servicePrivateKey"
-                      description="Private key of the service account"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Service Public Key"
-                      path="emulator.servicePublicKey"
-                      description="Public key of the service account"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Block time"
-                      path="emulator.blockTime"
-                      description="Time between sealed blocks. Valid units are: ns, us (or µs), ms, s, m or h"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Database path"
-                      path="emulator.databasePath"
-                      description="Specify path for the database file persisting the state"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Token supply"
-                      path="emulator.tokenSupply"
-                      description="Initial FLOW token supply"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Transaction Expiry"
-                      path="emulator.transactionExpiry"
-                      description="Transaction expiry, measured in blocks"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Transaction Expiry"
-                      path="emulator.storagePerFlow"
-                      description="Specify size of the storage in MB for each FLOW in account balance. Default value from the flow-go"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Minimum Account Balance"
-                      path="emulator.minAccountBalance"
-                      description="Specify minimum balance the account must have. Default value from the flow-go"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Transaction Max Gas Limit"
-                      path="emulator.transactionMaxGasLimit"
-                      description="Maximum gas limit for transactions"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Script Gas Limit"
-                      path="emulator.scriptGasLimit"
-                      description="Specify gas limit for script execution"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.row}>
-                    <Field
-                      label="Initial accounts"
-                      path="emulator.numberOfInitialAccounts"
-                      description="Specify number of initial accounts"
-                      formik={formik}
-                    />
-                  </div>
-
-                  <div className={classes.right}>
-                    <div className={classes.firstPart}>
-                      <RadioField
-                        label="Service Signature Algorithm"
-                        path="emulator.serviceSignatureAlgorithm"
-                        formik={formik}
-                        options={getSignatureAlgorithmRadioOptions([
-                          SignatureAlgorithm.ECDSA_P256,
-                          SignatureAlgorithm.ECDSA_secp256k1,
-                          SignatureAlgorithm.BLS_BLS12_381,
-                        ])}
-                      />
-                      <RadioField
-                        label="Service Hash Algorithm"
-                        path="emulator.serviceHashAlgorithm"
-                        formik={formik}
-                        options={getHashAlgorithmRadioOptions([
-                          HashAlgorithm.SHA2_256,
-                          HashAlgorithm.SHA2_384,
-                          HashAlgorithm.SHA3_256,
-                          HashAlgorithm.SHA3_384,
-                          HashAlgorithm.KMAC128_BLS_BLS12_381,
-                          HashAlgorithm.KECCAK_256,
-                        ])}
-                      />
-                    </div>
-                    <div className={classes.secondPart}>
-                      <div className={classes.row}>
-                        <ToggleField
-                          label="Verbose"
-                          path="emulator.verboseLogging"
-                          description="Enable verbose logging"
-                          formik={formik}
-                        />
-                      </div>
-                      <div className={classes.row}>
-                        <ToggleField
-                          label="Persist"
-                          path="emulator.persist"
-                          description="Enable persistence of the state between restarts"
-                          formik={formik}
-                        />
-                      </div>
-                      <div className={classes.row}>
-                        <ToggleField
-                          label="Simple Addresses"
-                          path="emulator.simpleAddresses"
-                          description="Use sequential addresses starting with 0x1"
-                          formik={formik}
-                        />
-                      </div>
-                      <div className={classes.row}>
-                        <ToggleField
-                          label="Storage Limit"
-                          path="emulator.storageLimit"
-                          description="Enable account storage limit"
-                          formik={formik}
-                        />
-                      </div>
-                      <div className={classes.row}>
-                        <ToggleField
-                          label="Transaction Fees"
-                          path="emulator.transactionFees"
-                          description="Enable transaction fees"
-                          formik={formik}
-                        />
-                      </div>
-                    </div>
-                    <div className={classes.buttons}>
-                      <div>
-                        <Button
-                          onClick={copyAccountConfig}
-                          variant="middle"
-                          outlined={true}
-                          style={{ width: 150 }}
-                        >
-                          COPY SERVICE CONFIG
-                        </Button>
-                      </div>
-                      <div>
-                        <Button
-                          onClick={openDialog}
-                          variant="middle"
-                          outlined={true}
-                          disabled={!id}
-                        >
-                          DELETE
-                        </Button>
-                        <Button variant="middle" type="submit">
-                          SAVE & RUN
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+              <h2 className={classes.sectionTitle}>Dev Wallet settings</h2>
+              <div className={classes.section}>
+                <div className={classes.row}>
+                  <DevWalletToggleField
+                    label="Run dev-wallet"
+                    path="run"
+                    diseblable={false}
+                    description="Start the dev-wallet server"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <DevWalletTextField
+                    label="Port"
+                    path="port"
+                    description="Port to start the dev-wallet on"
+                    formik={formik}
+                  />
                 </div>
               </div>
+
+              <h2 className={classes.sectionTitle}>Emulator settings</h2>
+
+              <div className={classes.section}>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Run emulator"
+                    path="run"
+                    diseblable={false}
+                    description="Start the emulator"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="RPC Port"
+                    path="grpcServerPort"
+                    description="gRPC port to listen on"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="HTTP Port"
+                    path="restServerPort"
+                    description="REST API port to listen on"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Admin Port"
+                    path="adminServerPort"
+                    description="Admin API port to listen on"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Service Private Key"
+                    path="servicePrivateKey"
+                    description="Private key used for the service account"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Service Public Key"
+                    path="servicePublicKey"
+                    description="Public key used for the service account"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Block time"
+                    path="blockTime"
+                    description="Time between sealed blocks. Valid units are ns, us (or µs), ms, s, m, h"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Database path"
+                    path="databasePath"
+                    description="Specify path for the database file persisting the state"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Token supply"
+                    path="tokenSupply"
+                    description="Initial FLOW token supply"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Transaction Expiry"
+                    path="transactionExpiry"
+                    description="Transaction expiry, measured in blocks"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Transaction Expiry"
+                    path="storagePerFlow"
+                    description="Specify size of the storage in MB for each FLOW in account balance. Default value from the flow-go"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Minimum Account Balance"
+                    path="minAccountBalance"
+                    description="Specify minimum balance the account must have. Default value from the flow-go"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Transaction Max Gas Limit"
+                    path="transactionMaxGasLimit"
+                    description="Maximum gas limit for transactions"
+                    formik={formik}
+                  />
+                </div>
+
+                <div className={classes.row}>
+                  <EmulatorTextField
+                    label="Script Gas Limit"
+                    path="scriptGasLimit"
+                    description="Specify gas limit for script execution"
+                    formik={formik}
+                  />
+                </div>
+              </div>
+
+              <div className={classes.section}>
+                <div className={classes.radioInputs}>
+                  <EmulatorRadioField
+                    label="Service Signature Algorithm"
+                    path="serviceSignatureAlgorithm"
+                    formik={formik}
+                    options={getSignatureAlgorithmRadioOptions([
+                      SignatureAlgorithm.ECDSA_P256,
+                      SignatureAlgorithm.ECDSA_secp256k1,
+                      SignatureAlgorithm.BLS_BLS12_381,
+                    ])}
+                  />
+                  <EmulatorRadioField
+                    label="Service Hash Algorithm"
+                    path="serviceHashAlgorithm"
+                    formik={formik}
+                    options={getHashAlgorithmRadioOptions([
+                      HashAlgorithm.SHA2_256,
+                      HashAlgorithm.SHA2_384,
+                      HashAlgorithm.SHA3_256,
+                      HashAlgorithm.SHA3_384,
+                      HashAlgorithm.KMAC128_BLS_BLS12_381,
+                      HashAlgorithm.KECCAK_256,
+                    ])}
+                  />
+                </div>
+              </div>
+
+              <div className={classes.section}>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Verbose"
+                    path="verboseLogging"
+                    description="Enable verbose logging"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Persist"
+                    path="persist"
+                    description="Enable persistence of the state between restarts"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Simple Addresses"
+                    path="simpleAddresses"
+                    description="Use sequential addresses starting with 0x1"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Storage Limit"
+                    path="storageLimit"
+                    description="Enable account storage limit"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Transaction Fees"
+                    path="transactionFees"
+                    description="Enable transaction fees"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Init"
+                    path="performInit"
+                    description="Generate and set a new service account"
+                    formik={formik}
+                  />
+                </div>
+                <div className={classes.row}>
+                  <EmulatorToggleField
+                    label="Contracts"
+                    path="withContracts"
+                    description="Start with contracts like FUSD, NFT and an NFT Marketplace, when the emulator starts"
+                    formik={formik}
+                  />
+                </div>
+              </div>
+
+              <div className={classes.section}>
+                <div className={classes.footerButtons}>
+                  <Button
+                    onClick={openDialog}
+                    variant="middle"
+                    outlined={true}
+                    disabled={!id}
+                  >
+                    DELETE
+                  </Button>
+                  <Button variant="middle" type="submit">
+                    SAVE & RUN
+                  </Button>
+                </div>
+              </div>
+
               <div className={classes.versionWrapper}>
                 <a
                   target="_blank"
@@ -440,7 +561,7 @@ function getSignatureAlgorithmRadioOptions(
   }));
 }
 
-type FieldProps = {
+type FieldProps = Pick<InputProps, "type" | "disabled"> & {
   label?: string;
   description?: string;
   path: string;
@@ -456,13 +577,19 @@ type FieldProps = {
   };
 };
 
-function Field({ label, description, formik, path }: FieldProps) {
+function TextField({
+  label,
+  description,
+  formik,
+  path,
+  ...inputProps
+}: FieldProps) {
   const error = CommonUtils.getNestedValue(formik.errors, path) as string;
   return (
     <>
       {label && <span>{label}</span>}
       <Input
-        type="text"
+        {...inputProps}
         name={path}
         value={CommonUtils.getNestedValue(formik.values, path) as string}
         onChange={formik.handleChange}
@@ -491,6 +618,7 @@ function RadioField({
   formik,
   path,
   options,
+  disabled,
 }: RadioFieldProps) {
   const value = CommonUtils.getNestedValue(formik.values, path);
 
@@ -506,6 +634,7 @@ function RadioField({
         <div key={option.value}>
           <span>{option.label}</span>
           <RadioButton
+            disabled={disabled}
             checked={value === option.value}
             onChange={() => formik.setFieldValue(path, option.value)}
           />
@@ -515,15 +644,22 @@ function RadioField({
   );
 }
 
-function ToggleField({ label, description, formik, path }: FieldProps) {
+function ToggleField({
+  label,
+  description,
+  formik,
+  path,
+  disabled,
+}: FieldProps) {
   const value = CommonUtils.getNestedValue(formik.values, path) as boolean;
 
   return (
     <>
       <span>{label}</span>
-      <div>
+      <div className={classes.toggleButton}>
         <span>False</span>
         <ToggleButton
+          disabled={disabled}
           value={value}
           onChange={(state) => formik.setFieldValue(path, state)}
         />

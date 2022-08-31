@@ -1,4 +1,5 @@
 @import 'styles/typography';
+@import 'styles/colors';
 
 code,
 pre {
@@ -66,7 +67,7 @@ pre {
   [class="token number"],
   .token.boolean,
   .token.number {
-    color: #FFC016;
+    color: $yellow;
   }
 
   [class="token selector"],
@@ -81,7 +82,7 @@ pre {
   .token.char,
   .token.builtin,
   .token.inserted {
-    color: #BAB8B8;
+    color: $light-grey;
   }
 
   [class="token operator"],
@@ -111,7 +112,7 @@ pre {
 
   [class="token keyword"],
   .token.keyword {
-    color: #88C4F2;
+    color: $blue;
   }
 
   [class="token regex"],

@@ -8,7 +8,7 @@
   .storageContent {
     flex: 3;
     padding-left: $spacing-l;
-    border-left: 1px solid $color-main-yellow;
+    border-left: 1px solid $yellow;
 
     pre {
       color: #f8f8f2;
@@ -63,7 +63,7 @@
       .token.constant,
       .token.symbol,
       .token.deleted {
-        color: #FFC016;
+        color: $yellow;
 
       }
 
@@ -77,7 +77,7 @@
       [class="token number"],
       .token.boolean,
       .token.number {
-        color: #FFC016;
+        color: $yellow;
       }
 
       [class="token selector"],
@@ -92,7 +92,7 @@
       .token.char,
       .token.builtin,
       .token.inserted {
-        color: #BAB8B8;
+        color: $light-grey;
       }
 
       [class="token operator"],
@@ -122,7 +122,7 @@
 
       [class="token keyword"],
       .token.keyword {
-        color: #88C4F2;
+        color: $blue;
       }
 
       [class="token regex"],
@@ -167,7 +167,7 @@
       &.active {
         //background-color: red;
         box-shadow: none;
-        border: 1px solid $color-main-yellow;
+        border: 1px solid $yellow;
         border-right: none;
         z-index: 100;
         margin-right: -1px;

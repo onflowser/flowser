@@ -8,14 +8,17 @@ import {
   GetAllAccountsResponse,
   GetSingleAccountResponse,
   GetPollingKeysResponse,
-} from "@flowser/types";
+  GetPollingStorageResponse,
+} from "@flowser/shared";
 import { KeysService } from "../services/keys.service";
+import { AccountStorageService } from "../services/storage.service";
 
 @Controller("accounts")
 export class AccountsController {
   constructor(
     private readonly accountsService: AccountsService,
-    private readonly keysService: KeysService
+    private readonly keysService: KeysService,
+    private readonly storageService: AccountStorageService
   ) {}
 
   @Get()
@@ -36,7 +39,7 @@ export class AccountsController {
     return accounts.map((account) => account.toProto());
   }
 
-  @ApiParam({ name: "id", type: String })
+  @ApiParam({ name: "address", type: String })
   @ApiQuery({ name: "timestamp", type: Number })
   @Get(":address/keys/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingKeysResponse))
@@ -49,6 +52,22 @@ export class AccountsController {
       timestamp
     );
     return keys.map((key) => key.toProto());
+  }
+
+  @ApiParam({ name: "address", type: String })
+  @ApiQuery({ name: "timestamp", type: Number })
+  @Get(":address/storage/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingStorageResponse))
+  async findAllNewStorageByAccount(
+    @Param("address") accountAddress,
+    @Query("timestamp", ParseUnixTimestampPipe) timestamp
+  ) {
+    const storageItems =
+      await this.storageService.findAllNewerThanTimestampByAccount(
+        accountAddress,
+        timestamp
+      );
+    return storageItems.map((storageItem) => storageItem.toProto());
   }
 
   @ApiParam({ name: "address", type: String })

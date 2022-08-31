@@ -1,38 +1,83 @@
-import { Injectable, NotImplementedException } from "@nestjs/common";
-import { AccountsStorageEntity } from "../entities/storage.entity";
+import { Injectable } from "@nestjs/common";
+import { AccountStorageItemEntity } from "../entities/storage-item.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
+import {
+  computeEntitiesDiff,
+  ensurePrefixedAddress,
+  processEntitiesDiff,
+} from "../../utils";
 
-// TODO(milestone-3): implement this class
 @Injectable()
-export class StorageService {
+export class AccountStorageService {
   constructor(
-    @InjectRepository(AccountsStorageEntity)
-    private storageRepository: Repository<AccountsStorageEntity>
+    @InjectRepository(AccountStorageItemEntity)
+    private storageRepository: Repository<AccountStorageItemEntity>
   ) {}
+
+  async findAllNewerThanTimestampByAccount(
+    accountAddress: string,
+    timestamp: Date
+  ) {
+    return this.storageRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), accountAddress },
+        { createdAt: MoreThan(timestamp), accountAddress },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
 
   async findStorageByAccount(address: string) {
     return this.storageRepository.find({
-      where: { accountAddress: address },
+      where: { accountAddress: ensurePrefixedAddress(address) },
     });
   }
 
   async updateAccountStorage(
     address: string,
-    newStorage: AccountsStorageEntity[]
+    newStorageItems: AccountStorageItemEntity[]
   ) {
-    throw new NotImplementedException();
+    const oldStorageItems = await this.findStorageByAccount(address);
+    const entitiesDiff = computeEntitiesDiff<AccountStorageItemEntity>({
+      primaryKey: "pathIdentifier",
+      newEntities: newStorageItems,
+      oldEntities: oldStorageItems,
+      deepCompare: true,
+    });
+    return processEntitiesDiff<AccountStorageItemEntity>({
+      create: (e) => this.create(e),
+      update: (e) => this.update(e),
+      delete: (e) => this.delete(e),
+      diff: entitiesDiff,
+    });
   }
 
-  async create(accountStorage: AccountsStorageEntity) {
-    throw new NotImplementedException();
+  async create(accountStorage: AccountStorageItemEntity) {
+    return this.storageRepository.insert(accountStorage);
   }
 
-  async update(accountStorage: AccountsStorageEntity) {
-    throw new NotImplementedException();
+  async update(accountStorage: AccountStorageItemEntity) {
+    accountStorage.markUpdated();
+    return this.storageRepository.update(
+      {
+        pathIdentifier: accountStorage.pathIdentifier,
+        pathDomain: accountStorage.pathDomain,
+        accountAddress: accountStorage.accountAddress,
+      },
+      accountStorage
+    );
   }
 
-  async delete(accountAddress: string, keyName: string) {
-    throw new NotImplementedException();
+  async delete(accountStorage: AccountStorageItemEntity) {
+    return this.storageRepository.delete({
+      pathIdentifier: accountStorage.pathIdentifier,
+      pathDomain: accountStorage.pathDomain,
+      accountAddress: accountStorage.accountAddress,
+    });
+  }
+
+  async removeAll() {
+    return this.storageRepository.delete({});
   }
 }

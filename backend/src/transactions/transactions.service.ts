@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TransactionEntity } from "./entities/transaction.entity";
 import { MoreThan, Repository } from "typeorm";
-import { TransactionStatus } from "@flowser/types";
+import { TransactionStatus } from "@flowser/shared";
 
 @Injectable()
 export class TransactionsService {
@@ -34,7 +34,7 @@ export class TransactionsService {
 
   findAllByBlock(blockId: string) {
     return this.transactionRepository.find({
-      where: { referenceBlockId: blockId },
+      where: { blockId },
       order: { createdAt: "DESC" },
     });
   }
@@ -49,11 +49,11 @@ export class TransactionsService {
     });
   }
 
-  findAllNewerThanTimestampByBlock(referenceBlockId: string, timestamp: Date) {
+  findAllNewerThanTimestampByBlock(blockId: string, timestamp: Date) {
     return this.transactionRepository.find({
       where: [
-        { updatedAt: MoreThan(timestamp), referenceBlockId },
-        { createdAt: MoreThan(timestamp), referenceBlockId },
+        { updatedAt: MoreThan(timestamp), blockId },
+        { createdAt: MoreThan(timestamp), blockId },
       ],
       order: { createdAt: "DESC" },
     });

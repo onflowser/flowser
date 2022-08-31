@@ -1,0 +1,18 @@
+@import "styles/spacings";
+@import "styles/animations";
+@import "styles/colors";
+
+.tableRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $spacing-base;
+
+  & > div {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+.noResults {
+  margin-top: $spacing-l * 6;
+}

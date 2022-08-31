@@ -1,6 +1,6 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { Log } from "@flowser/types";
+import { Log, LogSource } from "@flowser/shared";
 
 @Entity()
 export class LogEntity extends PollingEntity {
@@ -8,17 +8,24 @@ export class LogEntity extends PollingEntity {
   id: number;
 
   @Column()
+  source: LogSource;
+
+  @Column()
   data: string;
 
-  toProto() {
-    return Log.fromPartial({
+  toProto(): Log {
+    return {
       id: this.id,
+      source: this.source,
       data: this.data,
-    });
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 
-  static create(lineData: string) {
+  static create(source: LogSource, lineData: string) {
     const log = new LogEntity();
+    log.source = source;
     log.data = lineData;
     return log;
   }

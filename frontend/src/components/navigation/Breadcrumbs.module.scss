@@ -1,6 +1,6 @@
-@import 'styles/typography';
-@import 'styles/colors';
-@import 'styles/spacings';
+@import "styles/typography";
+@import "styles/colors";
+@import "styles/spacings";
 
 .root {
   display: flex;
@@ -11,7 +11,7 @@
   }
 
   * {
-    font-family: $font-family-oswald;
+    font-family: $font-family-inter;
     font-size: $font-size-small;
     color: $color-grey;
     text-decoration: none;

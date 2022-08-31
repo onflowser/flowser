@@ -3,7 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AccountEntity } from "../entities/account.entity";
 import { MoreThan, Repository } from "typeorm";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
-import { ContractsService } from "./contracts.service";
 
 @Injectable()
 export class AccountsService {
@@ -11,8 +10,7 @@ export class AccountsService {
     @InjectRepository(AccountEntity)
     private accountRepository: Repository<AccountEntity>,
     @InjectRepository(TransactionEntity)
-    private transactionRepository: Repository<TransactionEntity>,
-    private contractsService: ContractsService
+    private transactionRepository: Repository<TransactionEntity>
   ) {}
 
   async countAll() {
@@ -25,6 +23,14 @@ export class AccountsService {
     });
   }
 
+  async findAllAddresses() {
+    const result = await this.accountRepository
+      .createQueryBuilder()
+      .select("address")
+      .getRawMany();
+    return result.map((result) => result.address) as string[];
+  }
+
   findAllNewerThanTimestamp(timestamp: Date): Promise<AccountEntity[]> {
     return this.accountRepository.find({
       where: [
@@ -35,6 +41,11 @@ export class AccountsService {
         createdAt: "DESC",
       },
     });
+  }
+
+  async accountExists(address: string) {
+    const existingAccount = await this.accountRepository.findOneBy({ address });
+    return existingAccount !== null;
   }
 
   async findOneByAddress(address: string) {

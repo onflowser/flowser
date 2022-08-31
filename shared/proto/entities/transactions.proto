@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+import "entities/cadence.proto";
+
+// https://docs.onflow.org/fcl/reference/api/#transaction-statuses
+enum TransactionStatusCode {
+  TX_STATUS_UNKNOWN = 0;
+  /**
+   * Transaction Pending - Awaiting Finalization
+   */
+  TX_STATUS_PENDING = 1;
+  /**
+   * Transaction Finalized - Awaiting Execution
+   */
+  TX_STATUS_FINALIZED = 2;
+  /**
+   * Transaction Executed - Awaiting Sealing
+   */
+  TX_STATUS_EXECUTED = 3;
+  /**
+   * Transaction Sealed - Transaction Complete. At this point the transaction
+   * result has been committed to the blockchain.
+   */
+  TX_STATUS_SEALED = 4;
+  /**
+   * Transaction Expired
+   */
+  TX_STATUS_EXPIRED = 5;
+}
+
+// https://grpc.github.io/grpc/core/md_doc_statuscodes.html
+enum GrcpStatusCode {
+  GRCP_STATUS_OK = 0;
+  GRCP_STATUS_CANCELLED = 1;
+  GRCP_STATUS_UNKNOWN = 2;
+  GRCP_STATUS_INVALID_ARGUMENT = 3;
+  GRCP_STATUS_DEADLINE_EXCEEDED = 4;
+  GRCP_STATUS_NOT_FOUND = 5;
+  GRCP_STATUS_ALREADY_EXISTS = 6;
+  GRCP_STATUS_PERMISSION_DENIED = 7;
+  GRCP_STATUS_RESOURCE_EXHAUSTED = 8;
+  GRCP_STATUS_FAILED_PRECONDITION = 9;
+  GRCP_STATUS_ABORTED = 10;
+  GRCP_STATUS_OUT_OF_RANGE = 11;
+  GRCP_STATUS_UNIMPLEMENTED = 12;
+  GRCP_STATUS_INTERNAL = 13;
+  GRCP_STATUS_UNAVAILABLE = 14;
+  GRCP_STATUS_DATA_LOSS = 15;
+  GRCP_STATUS_UNAUTHENTICATED = 16;
+}
+
+message Transaction {
+  string id = 1;
+  string script = 2;
+  string block_id = 14;
+  string reference_block_id = 3;
+  uint32 gas_limit = 4;
+  string payer = 5;
+  TransactionProposalKey proposal_key = 6;
+  TransactionStatus status = 7;
+  repeated CadenceObject args = 8;
+  repeated string authorizers = 9;
+  repeated SignableObject envelope_signatures = 10;
+  repeated SignableObject payload_signatures = 11;
+  string created_at = 12;
+  string updated_at = 13;
+}
+
+message TransactionProposalKey {
+  string address = 1;
+  int32 key_id = 2;
+  int32 sequence_number = 3;
+}
+
+message SignableObject {
+  string address = 1;
+  int32 key_id = 2;
+  string signature = 3;
+}
+
+message TransactionStatus {
+  TransactionStatusCode status = 1;
+  GrcpStatusCode status_code = 2;
+  string error_message = 3;
+}

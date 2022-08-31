@@ -1,32 +1,28 @@
-import { FlowCadenceObject } from "./flow/services/flow-gateway.service";
-import { CadenceObject } from "@flowser/types";
-
+import { FlowCadenceObject } from "./flow/services/gateway.service";
+import { mkdir, rm, stat } from "fs/promises";
 const kebabCase = require("kebab-case");
 
-export function deserializeCadenceObject(
-  cadenceObject: FlowCadenceObject
-): CadenceObject {
-  if (typeof cadenceObject.value === "string") {
-    return CadenceObject.fromJSON({
-      type: cadenceObject.type,
-      value: cadenceObject.value,
-    });
+// create directory if it does not already exist
+export async function mkdirIfEnoent(path: string) {
+  try {
+    await stat(path);
+    console.debug(`directory "${path}" exists, skipping creation`);
+  } catch (e: any) {
+    if (e.code === "ENOENT") {
+      console.debug(`directory "${path}" not found, creating`);
+      await mkdir(path);
+    } else {
+      throw e;
+    }
   }
-  if (cadenceObject.value instanceof Array) {
-    return CadenceObject.fromJSON({
-      type: cadenceObject.type,
-      children: cadenceObject.value.map((value) =>
-        deserializeCadenceObject(value)
-      ),
-    });
-  }
-  if (cadenceObject.value instanceof Object) {
-    return CadenceObject.fromJSON({
-      type: cadenceObject.type,
-      children: deserializeCadenceObject(cadenceObject.value),
-    });
-  }
-  throw new Error("Unimplemented cadence type");
+}
+
+export function isArray(value: unknown): value is unknown[] {
+  return typeof value === "object" && "map" in value;
+}
+
+export async function rmdir(path: string) {
+  return rm(path, { force: true, recursive: true });
 }
 
 export type ProtobufLikeObject = {
@@ -66,8 +62,8 @@ export function randomString() {
   return `${Math.round(Math.random() * Math.pow(10, 20))}`;
 }
 
-export function ensurePrefixedAddress(address: string) {
-  return address.startsWith("0x") ? address : `0x${address}`;
+export function ensurePrefixedAddress(address: string | null | undefined) {
+  return address?.startsWith("0x") ? address : `0x${address}`;
 }
 
 export type EntitiesDiff<T> = {
@@ -80,6 +76,7 @@ export function computeEntitiesDiff<T>(props: {
   primaryKey: keyof T;
   oldEntities: T[];
   newEntities: T[];
+  deepCompare?: boolean;
 }): EntitiesDiff<T> {
   const newEntitiesLookup = new Map(
     props.newEntities.map((entity) => [entity[props.primaryKey], entity])
@@ -93,10 +90,16 @@ export function computeEntitiesDiff<T>(props: {
   const deleted = [];
   for (const [primaryKey, entity] of newEntitiesLookup) {
     const isExistingEntity = oldEntitiesLookup.has(primaryKey);
-    if (isExistingEntity) {
-      updated.push(entity);
-    } else {
+    if (!isExistingEntity) {
       created.push(entity);
+    }
+
+    if (!props.deepCompare) {
+      updated.push(entity);
+    }
+
+    if (areDeepEqualEntities(oldEntitiesLookup.get(primaryKey), entity)) {
+      updated.push(entity);
     }
   }
   for (const [primaryKey, entity] of oldEntitiesLookup) {
@@ -129,4 +132,23 @@ export async function processEntitiesDiff<T>(
     promises.push(opts.delete(entity));
   }
   return Promise.all(promises);
+}
+
+function areDeepEqualEntities<Entity>(
+  firstEntity: Entity,
+  secondEntity: Entity
+) {
+  // Entities may have createdAt and updatedAt fields (if they are a subclass of PollingEntity)
+  // We shouldn't compare those fields, because we are interested only in other attributes
+  const firstData = JSON.stringify({
+    ...firstEntity,
+    createdAt: null,
+    updatedAt: null,
+  });
+  const secondData = JSON.stringify({
+    ...secondEntity,
+    createdAt: null,
+    updatedAt: null,
+  });
+  return firstData === secondData;
 }

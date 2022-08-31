@@ -1,7 +1,7 @@
 import React, { FunctionComponent, InputHTMLAttributes } from "react";
 import classes from "./Input.module.scss";
 
-type InputProps = InputHTMLAttributes<HTMLInputElement>;
+export type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
 const Input: FunctionComponent<InputProps> = ({
   type = "text",

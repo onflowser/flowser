@@ -15,7 +15,7 @@
     overflow: hidden;
   }
   a {
-    color: $color-background;
+    color: $background;
     font-weight: bolder;
     vertical-align: middle;
   }
@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: $color-white;
+  color: $light-grey;
   padding: $spacing-l * 3 $spacing-l * 6;
   @include fadeInAnimation(.5s);
 

@@ -6,7 +6,7 @@ import CaretIcon from "../caret-icon/CaretIcon";
 type CollapsibleCardProps = {
   header: string;
   subheader?: string;
-  variant?: "blue" | "black";
+  variant?: "table-line" | "black" | "header-row" | "dark-blue";
   showIntroAnimation?: boolean;
   className?: string;
 };

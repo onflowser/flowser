@@ -1,42 +1,59 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Emulator } from "@flowser/shared";
 
-export class EmulatorConfigurationDto {
+export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
-  verboseLogging: boolean;
+  adminServerPort: number;
+  @ApiProperty()
+  blockTime: number;
+  @ApiProperty()
+  databasePath: string;
+  @ApiProperty()
+  enableGrpcDebug: boolean;
+  @ApiProperty()
+  enableRestDebug: boolean;
+  @ApiProperty()
+  grpcServerPort: number;
+  @ApiProperty()
+  logFormat: string;
+  @ApiProperty()
+  minAccountBalance: number;
+  @ApiProperty()
+  performInit: boolean;
   @ApiProperty()
   persist: boolean;
   @ApiProperty()
-  httpServerPort: number;
+  restServerPort: number;
   @ApiProperty()
-  rpcServerPort: number;
+  run: boolean;
   @ApiProperty()
-  blockTime: number;
+  scriptGasLimit: number;
+  @ApiProperty()
+  serviceHashAlgorithm: number;
   @ApiProperty()
   servicePrivateKey: string;
   @ApiProperty()
   servicePublicKey: string;
   @ApiProperty()
-  databasePath: string;
+  serviceSignatureAlgorithm: number;
+  @ApiProperty()
+  simpleAddresses: boolean;
+  @ApiProperty()
+  storageLimit: boolean;
+  @ApiProperty()
+  storagePerFlow: number;
   @ApiProperty()
   tokenSupply: number;
   @ApiProperty()
   transactionExpiry: number;
   @ApiProperty()
-  storagePerFlow: number;
-  @ApiProperty()
-  minAccountBalance: number;
+  transactionFees: boolean;
   @ApiProperty()
   transactionMaxGasLimit: number;
   @ApiProperty()
-  scriptGasLimit: number;
+  useSimpleAddresses: boolean;
   @ApiProperty()
-  serviceSignatureAlgorithm: string;
+  verboseLogging: boolean;
   @ApiProperty()
-  serviceHashAlgorithm: string;
-  @ApiProperty()
-  storageLimit: boolean;
-  @ApiProperty()
-  transactionFees: boolean;
-  @ApiProperty()
-  numberOfInitialAccounts: number;
+  withContracts: boolean;
 }

@@ -52,3 +52,58 @@
   margin-top: $spacing-l * 6;
 }
 
+.tableRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $spacing-base;
+  align-items: center;
+
+  & > div {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 $spacing-base 0 $spacing-base;
+  }
+  & > div:nth-child(1) {
+    flex: 7
+  }
+
+  & > div:nth-child(2) {
+    flex: 7;
+    overflow-wrap: anywhere;
+  }
+
+  & > div:nth-child(3) {
+    overflow:hidden;
+    flex: 10;
+  }
+  & > div:nth-child(4) {
+    flex: 7;
+  }
+  & > div:nth-child(5),
+  & > div:nth-child(6) {
+    flex: 3;
+  }
+}
+
+.hashEvents {
+  max-width: 13vw;
+  display: flex;
+  overflow: hidden;
+}
+
+.caretIcon {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subtable {
+  max-width: 13vw;
+  display: inline-block;
+  overflow: hidden;
+  margin-right: $spacing-base;
+}
+
+

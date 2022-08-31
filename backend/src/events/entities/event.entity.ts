@@ -1,7 +1,7 @@
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
-import { ExtendedFlowEvent } from "../../flow/services/flow-aggregator.service";
-import { Event } from "@flowser/types";
+import { ExtendedFlowEvent } from "../../flow/services/aggregator.service";
+import { Event } from "@flowser/shared";
 
 @Entity({ name: "events" })
 export class EventEntity extends PollingEntity {
@@ -30,8 +30,8 @@ export class EventEntity extends PollingEntity {
     this.id = `${this.transactionId}.${this.eventIndex}`;
   }
 
-  toProto() {
-    return Event.fromPartial({
+  toProto(): Event {
+    return {
       id: this.id,
       transactionId: this.transactionId,
       blockId: this.blockId,
@@ -41,7 +41,7 @@ export class EventEntity extends PollingEntity {
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(flowEvent: ExtendedFlowEvent): EventEntity {

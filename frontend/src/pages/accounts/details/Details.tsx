@@ -4,30 +4,139 @@ import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
 import Card from "../../../components/card/Card";
-import Storage from "./Storage";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
-import KeyListItem from "./KeyListItem";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import {
   DetailsTabItem,
   DetailsTabs,
 } from "../../../components/details-tabs/DetailsTabs";
-import CollapsibleCard from "../../../components/collapsible-card/CollapsibleCard";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import TransactionListItem from "../../../components/transaction-list-item/TransactionListItem";
 import Fragment from "../../../components/fragment/Fragment";
 import {
   useGetAccount,
   useGetPollingContractsByAccount,
   useGetPollingKeysByAccount,
+  useGetPollingStorageByAccount,
   useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
+import { createColumnHelper } from "@tanstack/table-core";
+import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
+import {
+  AccountContract,
+  AccountKey,
+  AccountStorageItem,
+} from "@flowser/shared";
+import { FlowUtils } from "../../../utils/flow-utils";
+import Table from "../../../components/table/Table";
+import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import Badge from "../../../components/badge/Badge";
 
 type RouteParams = {
   accountId: string;
 };
+
+// STORAGE TABLE
+const columnHelperStorage =
+  createColumnHelper<DecoratedPollingEntity<AccountStorageItem>>();
+
+const columnsStorage = [
+  columnHelperStorage.accessor("pathDomain", {
+    header: () => <Label variant="medium">DOMAIN</Label>,
+    cell: (info) => (
+      <Value>{FlowUtils.getLowerCasedPathDomain(info.getValue())}</Value>
+    ),
+  }),
+  columnHelperStorage.accessor("pathIdentifier", {
+    header: () => (
+      <div className={classes.storageTable}>
+        <Label variant="medium">IDENTIFIER</Label>
+      </div>
+    ),
+    cell: (info) => (
+      <div className={classes.storageTable}>
+        <Value>{info.getValue()}</Value>
+      </div>
+    ),
+  }),
+  columnHelperStorage.accessor("data", {
+    header: () => (
+      <div className={classes.storageTable}>
+        <Label variant="medium">DATA</Label>
+      </div>
+    ),
+    cell: (info) => (
+      <div className={classes.storageTable}>
+        <Value>
+          <pre style={{ whiteSpace: "nowrap" }}>
+            {JSON.stringify(info.getValue()) ?? "-"}
+          </pre>
+        </Value>
+      </div>
+    ),
+  }),
+];
+
+// CONTRACTS TABLE
+const columnHelperContracts =
+  createColumnHelper<DecoratedPollingEntity<AccountContract>>();
+
+const columnsContract = [
+  columnHelperContracts.accessor("name", {
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/contracts/details/${info.row.original.id}`}>
+          {info.row.original.name}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelperContracts.accessor("accountAddress", {
+    header: () => <Label variant="medium">ACCOUNT</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+];
+
+// KEYS TABLE
+const columnHelperKeys =
+  createColumnHelper<DecoratedPollingEntity<AccountKey>>();
+
+const columnsKeys = [
+  columnHelperKeys.accessor("accountAddress", {
+    header: () => <Label variant="medium">KEY</Label>,
+    cell: (info) => (
+      <div className={classes.keysRoot}>
+        <div className={classes.row}>
+          <Ellipsis className={classes.hash}>
+            {info.row.original.publicKey}
+          </Ellipsis>
+          <CopyButton value={info.row.original.publicKey} />
+        </div>
+        <div className={`${classes.badges} ${classes.row}`}>
+          <Badge>WEIGHT: {info.row.original.weight}</Badge>
+          <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
+          <Badge>INDEX: {info.row.original.index}</Badge>
+          <Badge>
+            SIGN CURVE:{" "}
+            {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo)}
+          </Badge>
+          <Badge>
+            HASH ALGO.: {FlowUtils.getHashAlgoName(info.row.original.hashAlgo)}
+          </Badge>
+          <Badge>REVOKED: {info.row.original.revoked ? "YES" : "NO"}</Badge>
+        </div>
+      </div>
+    ),
+  }),
+];
 
 const Details: FunctionComponent = () => {
   const { accountId } = useParams<RouteParams>();
@@ -37,6 +146,7 @@ const Details: FunctionComponent = () => {
   const { data, isLoading } = useGetAccount(accountId);
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
+  const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
 
@@ -71,8 +181,33 @@ const Details: FunctionComponent = () => {
         </div>
       </Card>
       <DetailsTabs>
+        <DetailsTabItem
+          label="CONTRACTS"
+          value={contracts.length}
+          onClick={() =>
+            updateSearchBar("search for contracts", !contracts.length)
+          }
+        >
+          <Table<DecoratedPollingEntity<AccountContract>>
+            columns={columnsContract}
+            data={contracts}
+          />
+        </DetailsTabItem>
+        <DetailsTabItem label="KEYS" value={keys.length}>
+          <Fragment
+            onMount={() => updateSearchBar("search for keys", !keys.length)}
+          >
+            <Table<DecoratedPollingEntity<AccountKey>>
+              columns={columnsKeys}
+              data={keys}
+            />
+          </Fragment>
+        </DetailsTabItem>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          {account.storage?.length && <Storage data={account.storage} />}
+          <Table<DecoratedPollingEntity<AccountStorageItem>>
+            data={storageItems}
+            columns={columnsStorage}
+          />
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">
@@ -83,55 +218,6 @@ const Details: FunctionComponent = () => {
             </Fragment>
           </DetailsTabItem>
         )}
-        <DetailsTabItem
-          label="TRANSACTIONS"
-          value={account.transactions.length}
-        >
-          <Fragment
-            onMount={() =>
-              updateSearchBar("search for transactions", !transactions.length)
-            }
-          >
-            {transactions.map((item) => (
-              <TransactionListItem key={item.id} transaction={item} />
-            ))}
-          </Fragment>
-        </DetailsTabItem>
-        <DetailsTabItem
-          label="CONTRACTS"
-          value={contracts.length}
-          onClick={() =>
-            updateSearchBar("search for contracts", !contracts.length)
-          }
-        >
-          {contracts.map((contract) => (
-            <CollapsibleCard
-              key={contract.id}
-              showIntroAnimation={contract.isNew || contract.isUpdated}
-              header="CONTRACT NAME"
-              subheader={contract.name}
-              variant="black"
-              className={classes.script}
-            >
-              <Fragment
-                onMount={() =>
-                  updateSearchBar("search for contracts", !contracts.length)
-                }
-              >
-                <ContentDetailsScript script={contract.code} />
-              </Fragment>
-            </CollapsibleCard>
-          ))}
-        </DetailsTabItem>
-        <DetailsTabItem label="KEYS" value={keys.length}>
-          <Fragment
-            onMount={() => updateSearchBar("search for keys", !keys.length)}
-          >
-            {keys.map((key) => (
-              <KeyListItem key={key.index} accountKey={key} />
-            ))}
-          </Fragment>
-        </DetailsTabItem>
       </DetailsTabs>
     </div>
   );

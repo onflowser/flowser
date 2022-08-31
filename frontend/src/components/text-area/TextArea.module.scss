@@ -11,7 +11,7 @@
   overflow: hidden;
 
   &:focus-within {
-    border-color: $color-main-yellow;
+    border-color: $yellow;
   }
 
   & > textarea {

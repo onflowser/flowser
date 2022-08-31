@@ -1,18 +1,18 @@
-@import 'styles/colors';
-@import 'styles/rules';
-@import 'styles/typography';
+@import "styles/colors";
+@import "styles/rules";
+@import "styles/typography";
 
 .button {
   position: relative;
-  background-color: $color-main-yellow;
+  background-color: $yellow;
   border-radius: $border-radius-button;
-  color: $color-background;
+  color: $background;
   font-size: $font-size-big;
-  font-family: $font-family-oswald;
+  font-family: $font-family-inter;
   letter-spacing: $character-spacing-medium;
   font-style: normal;
   font-weight: bold;
-  border: 2px solid $color-main-yellow;
+  border: 2px solid $yellow;
   cursor: pointer;
 
   &:hover {
@@ -47,7 +47,7 @@
 }
 
 .normal {
-  background: $color-main-yellow;
+  background: $yellow;
   height: 32px;
   padding: 0 18px;
   font-size: $font-size-xsmall !important;
@@ -55,7 +55,7 @@
 
 .middle {
   width: 127px;
-  height: 46px;
+  height: 43px;
   font-size: $font-size-xsmall !important;
 }
 
@@ -83,7 +83,7 @@
 
 .outlined {
   background: none;
-  color: $color-main-yellow;
+  color: $yellow;
 
   &.disabled {
     color: $color-not-active-button-text-grey;

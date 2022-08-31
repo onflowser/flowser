@@ -43,7 +43,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
       toast.error("Some values are undefined!");
     }
     if (unsetTypes.length > 0) {
-      toast.error("Some types are undefined!");
+      toast.error("Some shared are undefined!");
     }
     const isValid = unsetValues.length === 0 && unsetTypes.length === 0;
     return isValid;

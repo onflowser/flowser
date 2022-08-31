@@ -3,7 +3,7 @@ import classes from "./Card.module.scss";
 
 type CardProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
-  variant?: "blue" | "black";
+  variant?: "table-line" | "black" | "header-row" | "dark-blue";
   active?: boolean;
   loading?: boolean;
   showIntroAnimation?: boolean;
@@ -13,7 +13,7 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
 const Card: FunctionComponent<CardProps> = ({
   children,
   className,
-  variant = "blue",
+  variant = "dark-blue",
   active = false,
   loading = false,
   loadingText = "Loading ...",
@@ -23,6 +23,7 @@ const Card: FunctionComponent<CardProps> = ({
   return (
     <div
       className={`${classes.root} ${classes[variant]} ${
+        // TODO: fix the possibly undefined index "variant"
         active ? classes.active : ""
       } ${className} ${showIntroAnimation ? classes.introAnimation : ""}`}
       {...restProps}

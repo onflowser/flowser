@@ -2,9 +2,9 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../common/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount, FlowKey } from "../../flow/services/flow-gateway.service";
-import { AccountKey } from "@flowser/types";
-import { HashAlgorithm, SignatureAlgorithm } from "@flowser/types";
+import { FlowAccount, FlowKey } from "../../flow/services/gateway.service";
+import { AccountKey } from "@flowser/shared";
+import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 
 @Entity({ name: "keys" })
 export class AccountKeyEntity extends PollingEntity {
@@ -35,8 +35,8 @@ export class AccountKeyEntity extends PollingEntity {
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
 
-  toProto() {
-    return AccountKey.fromPartial({
+  toProto(): AccountKey {
+    return {
       index: this.index,
       accountAddress: this.accountAddress,
       publicKey: this.publicKey,
@@ -47,7 +47,7 @@ export class AccountKeyEntity extends PollingEntity {
       revoked: this.revoked,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(flowAccount: FlowAccount, flowKey: FlowKey) {

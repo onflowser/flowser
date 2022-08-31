@@ -4,8 +4,8 @@ import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
 import { env } from "../../config";
 import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/flow-gateway.service";
-import { AccountContract } from "@flowser/types";
+import { FlowAccount } from "../../flow/services/gateway.service";
+import { AccountContract } from "@flowser/shared";
 
 @Entity({ name: "contracts" })
 export class AccountContractEntity extends PollingEntity {
@@ -38,15 +38,15 @@ export class AccountContractEntity extends PollingEntity {
     this.id = `${this.accountAddress}.${this.name}`;
   }
 
-  toProto() {
-    return AccountContract.fromPartial({
+  toProto(): AccountContract {
+    return {
       id: this.id,
       accountAddress: this.accountAddress,
       name: this.name,
       code: this.code,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(account: FlowAccount, name: string, code: string) {

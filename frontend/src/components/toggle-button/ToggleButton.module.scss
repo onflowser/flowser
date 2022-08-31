@@ -31,6 +31,10 @@
         transition: all 100ms;
         background-color: #5B5E62;
       }
+
+      &.disabled {
+        background-color: $dark-grey;
+      }
     }
   }
 }

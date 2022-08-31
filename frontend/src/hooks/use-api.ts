@@ -1,9 +1,33 @@
 import { TimeoutPollingHook, useTimeoutPolling } from "./use-timeout-polling";
-import { Account, AccountContract, AccountKey } from "@flowser/types";
-import { Transaction } from "@flowser/types";
-import { Block } from "@flowser/types";
-import { Event } from "@flowser/types";
-import { Log } from "@flowser/types";
+import {
+  Account,
+  AccountContract,
+  AccountKey,
+  AccountStorageItem,
+  Transaction,
+  Block,
+  Event,
+  Log,
+  GetAllObjectsCountsResponse,
+  GetFlowserVersionResponse,
+  GetAllProjectsResponse,
+  GetSingleProjectResponse,
+  GetPollingTransactionsResponse,
+  GetSingleTransactionResponse,
+  GetPollingBlocksResponse,
+  GetSingleBlockResponse,
+  GetPollingContractsResponse,
+  GetSingleContractResponse,
+  GetPollingAccountsResponse,
+  GetPollingKeysResponse,
+  GetPollingStorageResponse,
+  GetSingleAccountResponse,
+  GetFlowCliInfoResponse,
+  GetPollingEventsResponse,
+  GetPollingLogsResponse,
+  EmulatorSnapshot,
+  GetPollingEmulatorSnapshotsResponse,
+} from "@flowser/shared";
 import { AccountsService } from "../services/accounts.service";
 import { ContractsService } from "../services/contracts.service";
 import { TransactionsService } from "../services/transactions.service";
@@ -13,34 +37,8 @@ import { LogsService } from "../services/logs.service";
 import { useGetAxiosQuery } from "./use-get-axios-query";
 import { ProjectsService } from "../services/projects.service";
 import { CommonService } from "../services/common.service";
-import {
-  GetAllObjectsCountsResponse,
-  GetFlowserVersionResponse,
-} from "@flowser/types";
-import {
-  GetAllProjectsResponse,
-  GetSingleProjectResponse,
-} from "@flowser/types";
-import {
-  GetPollingTransactionsResponse,
-  GetSingleTransactionResponse,
-} from "@flowser/types";
-import { GetPollingLogsResponse } from "@flowser/types";
-import { GetPollingEventsResponse } from "@flowser/types";
-import {
-  GetPollingBlocksResponse,
-  GetSingleBlockResponse,
-} from "@flowser/types";
-import {
-  GetPollingContractsResponse,
-  GetSingleContractResponse,
-} from "@flowser/types";
-import {
-  GetPollingAccountsResponse,
-  GetPollingKeysResponse,
-  GetSingleAccountResponse,
-} from "@flowser/types";
-import { GetFlowCliInfoResponse } from "@flowser/types";
+import { StorageService } from "../services/storage.service";
+import { SnapshotService } from "../services/snapshots.service";
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
@@ -79,6 +77,20 @@ export function useGetPollingContractsByAccount(
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
       ContractsService.getInstance().getAllByAccountWithPolling({
+        accountAddress,
+        timestamp,
+      }),
+  });
+}
+
+export function useGetPollingStorageByAccount(
+  accountAddress: string
+): TimeoutPollingHook<AccountStorageItem> {
+  return useTimeoutPolling<AccountStorageItem, GetPollingStorageResponse>({
+    resourceKey: `/accounts/${accountAddress}/storage/polling`,
+    resourceIdKey: "id",
+    fetcher: ({ timestamp }) =>
+      StorageService.getInstance().getAllByAccountWithPolling({
         accountAddress,
         timestamp,
       }),
@@ -190,10 +202,17 @@ export function useGetTransaction(transactionId: string) {
 }
 
 export function useGetCurrentProject() {
-  return useGetAxiosQuery<GetSingleProjectResponse>({
+  const { data, error, ...rest } = useGetAxiosQuery<GetSingleProjectResponse>({
     resourceKey: `/projects/current`,
     fetcher: ProjectsService.getInstance().getCurrentProject,
   });
+
+  // In case there is no current project, 404 error is thrown
+  return {
+    data: error ? undefined : data,
+    error,
+    ...rest,
+  };
 }
 
 export function useGetAllProjects() {
@@ -223,5 +242,19 @@ export function useGetAllObjectsCounts() {
     resourceKey: "/counts",
     fetcher: CommonService.getInstance().getAllObjectsCounts,
     refetchInterval: 1000,
+  });
+}
+
+export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSnapshot> {
+  return useTimeoutPolling<
+    EmulatorSnapshot,
+    GetPollingEmulatorSnapshotsResponse
+  >({
+    resourceKey: "/snapshots/polling",
+    resourceIdKey: "id",
+    fetcher: ({ timestamp }) =>
+      SnapshotService.getInstance().getAllWithPolling({
+        timestamp,
+      }),
   });
 }

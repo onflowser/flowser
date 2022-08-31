@@ -10,12 +10,10 @@ instance.interceptors.response.use(
     return response;
   },
   function (error) {
-    const data = error.response?.data;
-    // status codes outside of the 2xx range trigger this function
+    // TODO(milestone-x): improve error handling (return and parse error info from backend)
+    // status codes outside the 2xx range trigger this function
     return Promise.reject({
-      // use error message returned from the server, otherwise use default error message
-      message: data ? data?.message : error.message,
-      error: data ? data?.error : error.message,
+      message: error.response.statusText,
     });
   }
 );

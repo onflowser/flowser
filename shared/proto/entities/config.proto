@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+// Represents the transaction Cadence file, stored in your project source.
+message TransactionTemplate {
+  string file_path = 1;
+  string sourceCode = 2;
+}
+
+// Represents the contract Cadence file, stored in your project source.
+message ContractTemplate {
+  string file_path = 1;
+  string name = 2;
+  string sourceCode = 3;
+}

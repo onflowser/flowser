@@ -5,19 +5,18 @@ import {
   TransactionProposalKey,
   SignableObject,
   TransactionStatus,
-} from "@flowser/types";
-import { CadenceObject } from "@flowser/types";
+} from "@flowser/shared";
+import { CadenceObject, cadenceTypeFromJSON } from "@flowser/shared";
 import {
+  FlowBlock,
+  FlowCadenceObject,
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
-} from "../../flow/services/flow-gateway.service";
-import {
-  deserializeCadenceObject,
-  ensurePrefixedAddress,
-  typeOrmProtobufTransformer,
-} from "../../utils";
+} from "../../flow/services/gateway.service";
+import { ensurePrefixedAddress, typeOrmProtobufTransformer } from "../../utils";
 import { AccountEntity } from "../../accounts/entities/account.entity";
+import { CadenceUtils } from "../../flow/utils/cadence-utils";
 
 @Entity({ name: "transactions" })
 export class TransactionEntity extends PollingEntity {
@@ -26,6 +25,9 @@ export class TransactionEntity extends PollingEntity {
 
   @Column("text")
   script: string;
+
+  @Column()
+  blockId: string;
 
   @Column()
   referenceBlockId: string;
@@ -42,10 +44,8 @@ export class TransactionEntity extends PollingEntity {
   @Column("simple-array")
   authorizers: string[]; // authorizers account addresses
 
-  @Column("simple-json", {
-    transformer: typeOrmProtobufTransformer(CadenceObject),
-  })
-  args: CadenceObject[];
+  @Column("simple-json")
+  args: FlowCadenceObject[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(TransactionProposalKey),
@@ -67,24 +67,27 @@ export class TransactionEntity extends PollingEntity {
   })
   status: TransactionStatus;
 
-  toProto() {
-    return Transaction.fromPartial({
+  toProto(): Transaction {
+    return {
       id: this.id,
       script: this.script,
+      blockId: this.blockId,
       referenceBlockId: this.referenceBlockId,
       gasLimit: this.gasLimit,
       payer: this.payerAddress,
       authorizers: this.authorizers,
-      args: this.args,
+      args: this.args.map((arg) => CadenceUtils.serializeCadenceObject(arg)),
       proposalKey: this.proposalKey,
       envelopeSignatures: this.envelopeSignatures,
+      payloadSignatures: this.payloadSignatures,
       status: this.status,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
-    });
+    };
   }
 
   static create(
+    flowBlock: FlowBlock,
     flowTransaction: FlowTransaction,
     flowTransactionStatus: FlowTransactionStatus
   ): TransactionEntity {
@@ -92,14 +95,13 @@ export class TransactionEntity extends PollingEntity {
     transaction.id = flowTransaction.id;
     transaction.script = flowTransaction.script;
     transaction.payerAddress = ensurePrefixedAddress(flowTransaction.payer);
+    transaction.blockId = flowBlock.id;
     transaction.referenceBlockId = flowTransaction.referenceBlockId;
     transaction.gasLimit = flowTransaction.gasLimit;
     transaction.authorizers = flowTransaction.authorizers.map((address) =>
       ensurePrefixedAddress(address)
     );
-    transaction.args = flowTransaction.args.map((arg) =>
-      deserializeCadenceObject(arg)
-    );
+    transaction.args = flowTransaction.args;
     transaction.proposalKey = flowTransaction.proposalKey;
     transaction.envelopeSignatures = deserializeSignableObjects(
       flowTransaction.envelopeSignatures
@@ -113,5 +115,10 @@ export class TransactionEntity extends PollingEntity {
 }
 
 function deserializeSignableObjects(signableObjects: FlowSignableObject[]) {
-  return signableObjects.map((signable) => SignableObject.fromJSON(signable));
+  return signableObjects.map((signable) =>
+    SignableObject.fromJSON({
+      ...signable,
+      address: ensurePrefixedAddress(signable.address),
+    })
+  );
 }

@@ -1,6 +1,6 @@
-@import 'styles/typography';
-@import 'styles/spacings';
-@import 'styles/colors';
+@import "styles/typography";
+@import "styles/spacings";
+@import "styles/colors";
 
 .root {
   font-family: $font-family-courier-new;
@@ -15,7 +15,7 @@
   .argListItem {
     display: flex;
     align-items: baseline;
-    font-family: $font-family-oswald;
+    font-family: $font-family-inter;
     font-weight: 100;
     font-size: $font-size-small;
 
@@ -36,7 +36,7 @@
 
     & > span:first-child {
       border-radius: 50%;
-      background-color: $color-main-yellow;
+      background-color: $yellow;
       color: $color-table-black;
       opacity: .8;
       width: 18px;
