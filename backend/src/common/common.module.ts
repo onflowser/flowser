@@ -14,8 +14,15 @@ import { EventsModule } from "../events/events.module";
     TransactionsModule,
     LogsModule,
     EventsModule,
+    AccountsModule,
+    BlocksModule,
+    EventsModule,
+    LogsModule,
+    TransactionsModule,
+    CommonModule,
   ],
   controllers: [CommonController],
   providers: [CommonService],
+  exports: [CommonService],
 })
 export class CommonModule {}

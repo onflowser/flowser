@@ -52,7 +52,6 @@ export type ExtendedFlowEvent = FlowEvent & {
 export class FlowAggregatorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
-  private serviceAccountBootstrapped = false;
 
   constructor(
     private blockService: BlocksService,
@@ -74,7 +73,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   onExitProjectContext(): void {
-    this.serviceAccountBootstrapped = false;
     this.projectContext = undefined;
   }
 
@@ -85,12 +83,12 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       return;
     }
 
-    // service account exist only on emulator chains
+    // Service account is present only on emulator chain
     if (
       this.projectContext.shouldRunEmulator() &&
-      !this.serviceAccountBootstrapped
+      !(await this.isServiceAccountProcessed())
     ) {
-      await this.bootstrapServiceAccount();
+      await this.processServiceAccount();
     }
 
     const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
@@ -146,6 +144,8 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     const queryRunner = dataSource.createQueryRunner();
 
     const blockData = await this.getBlockData(height);
+
+    console.log(`Found ${blockData.transactions.length} in block #${height}`);
 
     // Process events first, so that transactions can reference created users.
     await this.processEvents(blockData.events);
@@ -396,7 +396,14 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  async bootstrapServiceAccount() {
+  async isServiceAccountProcessed() {
+    const serviceAccountAddress = ensurePrefixedAddress(
+      this.configService.getServiceAccountAddress()
+    );
+    return this.accountService.accountExists(serviceAccountAddress);
+  }
+
+  async processServiceAccount() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
     const serviceAccountAddress = ensurePrefixedAddress(
@@ -407,7 +414,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     try {
       await this.storeNewAccountWithContractsAndKeys(serviceAccountAddress);
       await queryRunner.commitTransaction();
-      this.serviceAccountBootstrapped = true;
     } catch (error) {
       await queryRunner.rollbackTransaction();
     } finally {

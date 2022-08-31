@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "entities/snapshots.proto";
+import "responses/common.proto";
+
+message GetAllEmulatorSnapshotsResponse {
+  repeated EmulatorSnapshot snapshots = 1;
+}
+
+message GetPollingEmulatorSnapshotsResponse {
+  repeated EmulatorSnapshot data = 1;
+  PollingMetaData meta = 2;
+}
+
+message CreateEmulatorSnapshotRequest {
+  string description = 1;
+}
+
+message CreateEmulatorSnapshotResponse {
+  EmulatorSnapshot snapshot = 1;
+}
+
+message RevertToEmulatorSnapshotRequest {
+  string block_id = 1;
+}
+
+message RevertToEmulatorSnapshotResponse {
+  EmulatorSnapshot snapshot = 1;
+}

@@ -16,6 +16,7 @@ export * from "../generated/responses/logs";
 export * from "../generated/responses/projects";
 export * from "../generated/responses/transactions";
 export * from "../generated/responses/flow";
+export * from "../generated/responses/snapshots";
 
 // Entities
 export * from "../generated/entities/config";
@@ -27,3 +28,4 @@ export * from "../generated/entities/events";
 export * from "../generated/entities/logs";
 export * from "../generated/entities/projects";
 export * from "../generated/entities/transactions";
+export * from "../generated/entities/snapshots";

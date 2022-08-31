@@ -14,16 +14,20 @@ import { FlowSubscriptionService } from "./services/subscription.service";
 import { FlowConfigService } from "./services/config.service";
 import { FlowActionsService } from "./services/actions.service";
 import { FlowAccountStorageService } from "./services/storage.service";
+import { SnapshotEntity } from "./entities/snapshot.entity";
+import { FlowSnapshotService } from "./services/snapshot.service";
+import { CommonModule } from "../common/common.module";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature(),
+    TypeOrmModule.forFeature([SnapshotEntity]),
     LogsModule,
     BlocksModule,
     AccountsModule,
     BlocksModule,
     EventsModule,
     TransactionsModule,
+    CommonModule,
   ],
   controllers: [FlowController],
   providers: [
@@ -35,6 +39,7 @@ import { FlowAccountStorageService } from "./services/storage.service";
     FlowConfigService,
     FlowActionsService,
     FlowAccountStorageService,
+    FlowSnapshotService,
   ],
   exports: [
     FlowAggregatorService,

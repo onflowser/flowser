@@ -7,7 +7,7 @@
   "scripts": {
     "cleanup": "rm -rf node_modules",
     "build": "sh build.sh && tsc -p tsconfig.json",
-    "start": "chokidar \"**/*.proto\" -c \"yarn run generate\"",
+    "start": "chokidar \"**/*.proto\" -c \"yarn run build\"",
     "postinstall": "yarn run build"
   },
   "repository": {

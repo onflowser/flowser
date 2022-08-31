@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import { useFilterData } from "../../../hooks/use-filter-data";
@@ -11,15 +11,42 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import { useGetPollingBlocks } from "../../../hooks/use-api";
-import { FlowUtils } from "../../../utils/flow-utils";
+import {
+  useGetPollingBlocks,
+  useGetPollingEmulatorSnapshots,
+} from "../../../hooks/use-api";
+import { toast } from "react-hot-toast";
+import { SnapshotService } from "../../../services/snapshots.service";
+import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 
 const Main: FunctionComponent = () => {
+  const emulatorSnapshotService = SnapshotService.getInstance();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
   const { formatDate } = useFormattedDate();
-  const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
+  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
+  const snapshotLookupByBlockId = useMemo(
+    () =>
+      new Map(
+        emulatorSnapshots.map((snapshot) => [snapshot.blockId, snapshot])
+      ),
+    [emulatorSnapshots]
+  );
+
+  async function onRevertToBlock(blockId: string) {
+    try {
+      const snapshot = await emulatorSnapshotService.revertTo({
+        blockId,
+      });
+      fetchAll();
+      toast.success(`Reverted to "${snapshot.data.snapshot?.description}"`);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to revert to block");
+    }
+  }
 
   useEffect(() => {
     setPlaceholder("Search for block ids, parent ids, time, ...");
@@ -49,18 +76,6 @@ const Main: FunctionComponent = () => {
             </Value>
           </div>
           <div>
-            <Label>PARENT ID</Label>
-            <Value>
-              {FlowUtils.isInitialBlockId(item.parentId) ? (
-                <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
-              ) : (
-                <NavLink to={`/blocks/details/${item.parentId}`}>
-                  <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
-                </NavLink>
-              )}
-            </Value>
-          </div>
-          <div>
             <Label>TIME</Label>
             <Value>{formatDate(item.timestamp)}</Value>
           </div>
@@ -75,6 +90,14 @@ const Main: FunctionComponent = () => {
           <div>
             <Label>SIGNATURES</Label>
             <Value>{item.signatures?.length}</Value>
+          </div>
+          <div>
+            <Label>SNAPSHOT</Label>
+            <Value>
+              <SimpleButton onClick={() => onRevertToBlock(item.id)}>
+                {snapshotLookupByBlockId.get(item.id)?.description ?? "-"}
+              </SimpleButton>
+            </Value>
           </div>
         </Card>
       ))}
