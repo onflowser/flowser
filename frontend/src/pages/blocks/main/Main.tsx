@@ -24,7 +24,7 @@ const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
   const { formatDate } = useFormattedDate();
-  const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
   const snapshotLookupByBlockId = useMemo(
@@ -40,7 +40,7 @@ const Main: FunctionComponent = () => {
       const snapshot = await emulatorSnapshotService.revertTo({
         blockId,
       });
-      // TODO(milestone-3): invalidate all blockchain cache
+      fetchAll();
       toast.success(`Reverted to "${snapshot.data.snapshot?.description}"`);
     } catch (e) {
       console.error(e);
