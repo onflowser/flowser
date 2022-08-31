@@ -100,8 +100,6 @@ const Details: FunctionComponent = () => {
   const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
   const createdDate = block ? new Date(block.timestamp).toISOString() : "-";
 
-  console.log(transactions);
-
   useEffect(() => {
     showNavigationDrawer(true);
     showSubNavigation(false);
