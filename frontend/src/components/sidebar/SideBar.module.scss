@@ -15,6 +15,7 @@
     padding: $spacing-base;
     margin-top: $line-spacing-l;
     margin-left: $line-spacing-m;
+    justify-content: space-between;
 
     .menuItem {
       display: flex;
@@ -37,6 +38,20 @@
     .menuItem:hover {
       .text {
         color: $grey
+      }
+    }
+
+    .footer {
+      display: flex;
+      flex-direction: column;
+      padding: $spacing-base;
+      align-items: center;
+      margin-bottom: 70px;
+
+      .button {
+        width: 100%;
+        margin-left: $line-spacing-l;
+        margin-bottom: $line-spacing-l
       }
     }
   }

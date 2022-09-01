@@ -6,7 +6,8 @@ import classes from "./SideBar.module.scss";
 import { ReactComponent as SettingsIcon } from "../../assets/icons/settings-circle.svg";
 import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle .svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
-import ColoredCircle from "components/colored-circle/ColoredCircle";
+import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
+import IconButton from "components/icon-button/IconButton";
 
 export type Sidebar = {
   toggled: boolean;
@@ -30,18 +31,26 @@ function SideBar({ toggled, toggleSidebar }: Sidebar) {
             <SwitchIcon className={classes.icon} />
             <div className={classes.text}>Switch project</div>
           </NavLink>
-        </div>
-        <div>
+
           <NavLink to={"#"} className={classes.menuItem}>
             <ConnectIcon className={classes.icon} />
             <div className={classes.text}>Connect</div>
           </NavLink>
-        </div>
-        <div>
+
           <NavLink to={"#"} className={classes.menuItem}>
             <SettingsIcon className={classes.icon} />
             <div className={classes.text}>Settings</div>
           </NavLink>
+        </div>
+        <div className={`${classes.menuItem} ${classes.footer}`}>
+          <IconButton
+            icon={<PlusIcon></PlusIcon>}
+            iconPosition="before"
+            className={classes.button}
+          >
+            NEW PROJECT
+          </IconButton>
+          <p>TODO: Show emulator connection status</p>
         </div>
       </div>
     </Drawer>
