@@ -1,5 +1,10 @@
 {
   "name": "@flowser/frontend",
+  "author": {
+    "name": "Flowser",
+    "url": "https://flowser.dev"
+  },
+  "description": "Easily start you local Flow blockchain & inspect the state.",
   "version": "0.0.1",
   "private": true,
   "main": "dist/main.js",
@@ -156,8 +161,7 @@
     "prettier": "^2.4.1",
     "sass": "^1.42.1",
     "electron": "20.1.0",
-    "electron-builder": "^23.3.3",
-    "electron-rebuild": "^3.2.9"
+    "electron-builder": "^23.3.3"
   },
   "husky": {
     "hooks": {
