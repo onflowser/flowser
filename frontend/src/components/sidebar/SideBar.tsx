@@ -14,6 +14,8 @@ export type Sidebar = {
 };
 
 function SideBar({ toggled, toggleSidebar }: Sidebar) {
+  // TODO(sideBar-component): Check if it is possible (with currently used library "react-modern-drawer")
+  // to position sidebar bellow navbar instead of overlaping it
   return (
     <Drawer
       open={toggled}
