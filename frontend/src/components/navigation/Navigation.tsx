@@ -27,7 +27,10 @@ import {
 import { ProjectsService } from "../../services/projects.service";
 import { SnapshotService } from "../../services/snapshots.service";
 
-const Navigation: FunctionComponent<{ className: string }> = (props) => {
+const Navigation: FunctionComponent<{
+  className: string;
+  toggleSidebar: () => void;
+}> = (props) => {
   const [isSwitching, setIsSwitching] = useState(false);
   const history = useHistory();
   const {
@@ -138,6 +141,12 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
             <div>
               <Button className={classes.loginButton} onClick={createSnapshot}>
                 SNAPSHOT
+              </Button>
+              <Button
+                className={classes.loginButton}
+                onClick={props.toggleSidebar}
+              >
+                SIDEBAR
               </Button>
               {isLoggedIn ? (
                 <IconButton

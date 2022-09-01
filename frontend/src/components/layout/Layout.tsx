@@ -29,7 +29,10 @@ const Layout: FunctionComponent = ({ children }) => {
 
   return (
     <div className={`${classes.layoutContainer}`}>
-      <Navigation className={classes.navigation} />
+      <Navigation
+        className={classes.navigation}
+        toggleSidebar={toggleSidebar}
+      />
       {isSubNavigationVisible && (
         <SubNavigation className={classes.subNavigation} />
       )}
