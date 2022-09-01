@@ -9,9 +9,10 @@
   },
   "scripts": {
     "start:desktop": "cd frontend && yarn run electron:serve",
+    "build:desktop": "yarn run build && cd app/scripts && sh build.sh",
     "start": "lerna run start --parallel",
     "cleanup": "lerna run cleanup --parallel && rm -rf node_modules",
-    "build": "lerna run build --parallel",
+    "build": "lerna run build --scope @flowser/backend --scope @flowser/shared && lerna run build --scope @flowser/frontend",
     "bootstrap": "yarn install && yarn run lerna:bootstrap && husky install",
     "lerna:bootstrap": "lerna bootstrap",
     "build:libs": " npx lerna run build --scope @flowser/types --scope @flowser/frontend",
@@ -43,9 +44,6 @@
       "./backend",
       "./frontend",
       "./shared"
-    ],
-    "nohoist": [
-      "**/backend"
     ]
   }
 }

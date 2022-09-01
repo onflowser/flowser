@@ -10,9 +10,12 @@ async function createWindow() {
   });
 
   win.loadURL(
+    // TODO(desktop-app-release-build): Provide index.html path via env vars
+    // This path is currently set to "react", because that's the folder used in @flowser/app package
+    // Refer to the app/README for more info on the current build process.
     isDev
       ? "http://localhost:6060"
-      : `file://${path.join(__dirname, "../build/index.html")}`
+      : `file://${path.join(__dirname, "../react/index.html")}`
   );
 
   try {
