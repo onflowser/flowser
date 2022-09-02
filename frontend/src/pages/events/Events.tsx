@@ -23,12 +23,8 @@ import { flexRender } from "@tanstack/react-table";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
-  subTableColumnHelper.display({
-    id: "tableTitle",
-    header: () => <Label variant="medium">VALUES</Label>,
-  }),
   subTableColumnHelper.accessor("name", {
-    header: () => <Label variant="medium">NAME</Label>,
+    header: () => <Label variant="medium">ARGUMENT NAME</Label>,
     cell: (info) => (
       <Value>
         <Ellipsis className={classes.subTableValue}>{info.getValue()}</Ellipsis>
@@ -36,7 +32,7 @@ const subTableColumns = [
     ),
   }),
   subTableColumnHelper.accessor("type", {
-    header: () => <Label variant="medium">TYPE</Label>,
+    header: () => <Label variant="medium">ARGUMENT TYPE</Label>,
     cell: (info) => (
       <Value>
         <Ellipsis className={classes.subTableValue}>{info.getValue()}</Ellipsis>
@@ -44,7 +40,7 @@ const subTableColumns = [
     ),
   }),
   subTableColumnHelper.accessor("value", {
-    header: () => <Label variant="medium">VALUE</Label>,
+    header: () => <Label variant="medium">ARGUMENT VALUE</Label>,
     cell: (info) => (
       <Value>
         <Ellipsis
