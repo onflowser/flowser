@@ -32,6 +32,8 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
+import StorageCard from "./StorageCard";
+import StorageCardExtendable from "./StorageCardExtendable";
 
 type RouteParams = {
   accountId: string;
@@ -171,6 +173,8 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
+  console.log(storageItems);
+
   return (
     <div className={classes.root}>
       <div className={classes.firstRow}>
@@ -210,11 +214,33 @@ const Details: FunctionComponent = () => {
           </Fragment>
         </DetailsTabItem>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          <Table<DecoratedPollingEntity<AccountStorageItem>>
-            className={classes.storageTable}
-            data={storageItems}
-            columns={columnsStorage}
-          />
+          <div className={classes.gridStorage}>
+            {storageItems &&
+              storageItems.map((item) =>
+                FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
+                  "private" ||
+                FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
+                  "public" ? (
+                  <StorageCard key={item.pathIdentifier} content={item} />
+                ) : (
+                  ""
+                )
+              )}
+          </div>
+          <div className={classes.gridStorageExtendable}>
+            {storageItems &&
+              storageItems.map((item) =>
+                FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
+                "storage" ? (
+                  <StorageCardExtendable
+                    key={item.pathIdentifier}
+                    content={item}
+                  />
+                ) : (
+                  ""
+                )
+              )}
+          </div>
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">

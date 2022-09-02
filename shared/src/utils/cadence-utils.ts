@@ -1,4 +1,4 @@
-import { CadenceType } from "../../generated/entities/cadence";
+import { CadenceType } from "../generated/entities/cadence";
 
 export class CadenceUtils {
   static isPrimitiveType(cadenceType: CadenceType): boolean {
