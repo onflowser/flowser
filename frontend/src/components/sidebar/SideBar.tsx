@@ -70,6 +70,7 @@ function SideBar({ toggled, toggleSidebar }: Sidebar) {
           >
             NEW PROJECT
           </IconButton>
+          {/* TODO(milestone-5): Show emulator status */}
           <p>TODO: Show emulator connection status</p>
         </div>
       </div>
