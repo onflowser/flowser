@@ -21,38 +21,40 @@ import CopyButton from "../../components/copy-button/CopyButton";
 import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
 
-// EVENTS SUBTABLE
-const columnHelperEvents = createColumnHelper<ComputedEventData>();
-const columnsEvents = [
-  columnHelperEvents.display({
+const subTableColumnHelper = createColumnHelper<ComputedEventData>();
+const subTableColumns = [
+  subTableColumnHelper.display({
     id: "tableTitle",
     header: () => <Label variant="medium">VALUES</Label>,
   }),
-  columnHelperEvents.accessor("name", {
+  subTableColumnHelper.accessor("name", {
     header: () => <Label variant="medium">NAME</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.subtable}>{info.getValue()}</Ellipsis>
+        <Ellipsis className={classes.subTableValue}>{info.getValue()}</Ellipsis>
       </Value>
     ),
   }),
-  columnHelperEvents.accessor("type", {
+  subTableColumnHelper.accessor("type", {
     header: () => <Label variant="medium">TYPE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.subtable}>{info.getValue()}</Ellipsis>
+        <Ellipsis className={classes.subTableValue}>{info.getValue()}</Ellipsis>
       </Value>
     ),
   }),
-  columnHelperEvents.accessor("value", {
+  subTableColumnHelper.accessor("value", {
     header: () => <Label variant="medium">VALUE</Label>,
     cell: (info) => (
-      <div>
-        <Ellipsis style={{ whiteSpace: "nowrap" }} className={classes.subtable}>
+      <Value>
+        <Ellipsis
+          style={{ whiteSpace: "nowrap", marginRight: 5 }}
+          className={classes.subTableValue}
+        >
           {info.getValue()}
         </Ellipsis>
         <CopyButton value={info.getValue()} />
-      </div>
+      </Value>
     ),
   }),
 ];
@@ -65,8 +67,7 @@ const Events: FunctionComponent = () => {
   const { filteredData } = useFilterData(data, searchTerm);
   const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
-  // EVENTS TABLE
-  const columnsEventsParent = useMemo(
+  const columns = useMemo(
     () => [
       columnHelper.accessor("blockId", {
         header: () => <Label variant="medium">BLOCK ID</Label>,
@@ -142,10 +143,10 @@ const Events: FunctionComponent = () => {
     <>
       <Table<DecoratedPollingEntity<Event>>
         data={filteredData}
-        columns={columnsEventsParent}
+        columns={columns}
         renderCustomHeader={(headerGroup) => (
           <Card
-            className={`${classes.tableRow}`}
+            className={classes.tableRow}
             key={headerGroup.id}
             variant="header-row"
           >
@@ -177,7 +178,9 @@ const Events: FunctionComponent = () => {
               <div>
                 <Table<ComputedEventData>
                   data={EventUtils.computeEventData(row.original.data)}
-                  columns={columnsEvents}
+                  columns={subTableColumns}
+                  bodyRowClass={classes.subTableRow}
+                  headerRowClass={classes.subTableRow}
                 />
               </div>
             )}

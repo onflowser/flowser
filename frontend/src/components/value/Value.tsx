@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { FunctionComponent } from "react";
 import classes from "./Value.module.scss";
 
@@ -12,7 +13,7 @@ const Value: FunctionComponent<ValueProps> = ({
   variant = "normal",
 }) => {
   return (
-    <span className={`${classes.root} ${classes[variant]} ${className}`}>
+    <span className={classNames(classes.root, classes[variant], className)}>
       {children}
     </span>
   );
