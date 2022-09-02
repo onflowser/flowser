@@ -1,10 +1,4 @@
-import React, {
-  FunctionComponent,
-  ReactElement,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { FunctionComponent, useCallback, useEffect } from "react";
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
@@ -20,26 +14,18 @@ import { ProjectsService } from "../../../services/projects.service";
 import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
-import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
 import Search from "../../../components/search/Search";
 import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
-
-enum DialogTypes {
-  deleteProject,
-  openProject,
-}
+import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
+import { useProjectActions } from "../../../contexts/project-actions.context";
+import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 
 type IProps = RouteChildrenProps;
 
 const Main: FunctionComponent<IProps> = (props) => {
-  const [showDialog, setShowDialog] = useState<{
-    confirmBtnLabel: string;
-    cancelBtnLabel: string;
-    body: ReactElement;
-    onConfirm?: any;
-  } | null>(null);
-
+  const { showDialog } = useConfirmDialog();
+  const { removeProject } = useProjectActions();
   const { searchTerm, setPlaceholder } = useSearch("projectSearch");
 
   useEffect(() => {
@@ -66,50 +52,18 @@ const Main: FunctionComponent<IProps> = (props) => {
     history.push(`/${routes.start}/configure`);
   }, []);
 
-  const onDelete = async (project: Project) => {
-    try {
-      splitbee.track("Configuration: delete");
-      await projectService.removeProject(project.id);
-      toast(`Project "${project.name}" deleted!`);
-    } catch (e) {
-      toast.error("Something went wrong: can not delete custom emulator");
-    } finally {
-      closeDialog();
-    }
-  };
-
-  const closeDialog = () => {
-    setShowDialog(null);
-  };
-
-  const openDialog = (type: DialogTypes, props?: any) => {
-    // return is just to break out of switch
-    switch (type) {
-      case DialogTypes.deleteProject:
-        return setShowDialog({
-          body: (
-            <>
-              <h3>Delete project</h3>
-              <span>Are you sure you want to delete this project?</span>
-            </>
-          ),
-          onConfirm: () => onDelete(props),
-          confirmBtnLabel: "DELETE",
-          cancelBtnLabel: "BACK",
-        });
-      case DialogTypes.openProject:
-        return setShowDialog({
-          body: (
-            <>
-              <h3>New emulator</h3>
-              <span>Not supported yet :(</span>
-            </>
-          ),
-          confirmBtnLabel: "CREATE",
-          cancelBtnLabel: "CANCEL",
-        });
-    }
-  };
+  function showOpenProjectDialog() {
+    showDialog({
+      body: (
+        <>
+          <h3>New emulator</h3>
+          <span>Not supported yet :(</span>
+        </>
+      ),
+      confirmBtnLabel: "CREATE",
+      cancelBtnLabel: "CANCEL",
+    });
+  }
 
   const tabs = [
     {
@@ -140,14 +94,12 @@ const Main: FunctionComponent<IProps> = (props) => {
                       last opened on{" "}
                       {moment(project.updatedAt).format("DD-MM-YYYY")}
                     </span>
-                    <span
+                    <SimpleButton
                       className={classes.projectTrashcan}
-                      onClick={() =>
-                        openDialog(DialogTypes.deleteProject, project)
-                      }
+                      onClick={() => removeProject(project)}
                     >
                       <img src={trash} alt="trash icon" />
-                    </span>
+                    </SimpleButton>
                   </li>
                 ))}
             </ul>
@@ -222,7 +174,7 @@ const Main: FunctionComponent<IProps> = (props) => {
         <div className={classes.sideBarFooter}>
           <IconButton
             variant="middle"
-            onClick={() => openDialog(DialogTypes.openProject)}
+            onClick={() => showOpenProjectDialog()}
             icon={<img src={openProject} alt="open project icon" />}
             iconPosition="before"
             className={`${classes.openProjectButton}`}
@@ -243,16 +195,6 @@ const Main: FunctionComponent<IProps> = (props) => {
       {tab
         ? tabs.find((t) => t.id == tab)?.content
         : tabs.find((t) => t.default)?.content}
-      {showDialog && (
-        <ConfirmDialog
-          onClose={closeDialog}
-          onConfirm={showDialog.onConfirm}
-          confirmBtnLabel={showDialog.confirmBtnLabel}
-          cancelBtnLabel={showDialog.cancelBtnLabel}
-        >
-          {showDialog.body}
-        </ConfirmDialog>
-      )}
     </div>
   );
 };

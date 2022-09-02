@@ -26,6 +26,8 @@ import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
 import query from "./config/query";
+import { ProjectActionsProvider } from "./contexts/project-actions.context";
+import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -67,9 +69,13 @@ const BrowserRouterEvents = withRouter(
 export const FlowserClientApp = () => {
   return (
     <QueryClientProvider client={query}>
-      <UiStateContextProvider>
-        <FlowserRouter />
-      </UiStateContextProvider>
+      <ConfirmDialogProvider>
+        <ProjectActionsProvider>
+          <UiStateContextProvider>
+            <FlowserRouter />
+          </UiStateContextProvider>
+        </ProjectActionsProvider>
+      </ConfirmDialogProvider>
     </QueryClientProvider>
   );
 };
