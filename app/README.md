@@ -2,19 +2,15 @@
 
 This is a kinda hacky solution to the issues that we are experiencing when building electron app in a monorepo project.
 
-# Setup
+Because of that, this is just a workaround solution for now.
 
-This is a workaround for now.
+## Building
 
-To setup and build the app, follow the below steps:
-1. `node scripts/generate-package-file.js`
-2. Remove `@flowser/backend`, `@flowser/frontend`, `@flowser/shared` packages from `package.json`
-3. `yarn install`
-4. Add `@flowser/backend`, `@flowser/frontend`, `@flowser/shared` back to `package.json`
-5. Run `sh scrits/build.sh` to build the app 
+1. Run `node scripts/setup.js` to prepare the workspace for building
+2. Run `sh scrits/build.sh` to build the app 
 
 
-## Context 
+## Context
 
 The main seems to be that `electron-builder` isn't correctly resolving node packages in a monorepo environment with yarn workspaces.
 
