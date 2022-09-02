@@ -3,82 +3,34 @@ import { useHistory } from "react-router-dom";
 import { routes } from "../../constants/routes";
 import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
-import Button from "../button/Button";
-import IconButton from "../icon-button/IconButton";
 import logo from "../../assets/images/logo.svg";
 import { ReactComponent as IconUser } from "../../assets/icons/user.svg";
 import { ReactComponent as IconBlocks } from "../../assets/icons/blocks.svg";
 import { ReactComponent as IconTransactions } from "../../assets/icons/transactions.svg";
 import { ReactComponent as IconContracts } from "../../assets/icons/contracts.svg";
 import { ReactComponent as IconEvents } from "../../assets/icons/events.svg";
-import { ReactComponent as IconSettings } from "../../assets/icons/settings.svg";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
-import { ReactComponent as FlowLogo } from "../../assets/icons/flow.svg";
 import { useNavigation } from "../../hooks/use-navigation";
-import { toast } from "react-hot-toast";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
-import { useFlow } from "../../hooks/use-flow";
 import TransactionDialog from "../transaction-dialog/TransactionDialog";
-import {
-  useGetAllObjectsCounts,
-  useGetCurrentProject,
-} from "../../hooks/use-api";
-import { ProjectsService } from "../../services/projects.service";
-import { SnapshotService } from "../../services/snapshots.service";
+import { useGetAllObjectsCounts } from "../../hooks/use-api";
+import Button from "../button/Button";
+import { useProjectActions } from "../../contexts/project-actions.context";
 
 const Navigation: FunctionComponent<{
   className: string;
   toggleSidebar: () => void;
 }> = (props) => {
-  const [isSwitching, setIsSwitching] = useState(false);
   const history = useHistory();
+  const { createSnapshot } = useProjectActions();
   const {
     isShowBackButtonVisible,
     isNavigationDrawerVisible,
     isSearchBarVisible,
   } = useNavigation();
-  const projectService = ProjectsService.getInstance();
-  const snapshotService = SnapshotService.getInstance();
   const { data: counters } = useGetAllObjectsCounts();
   const [showTxDialog, setShowTxDialog] = useState(false);
-  const { data } = useGetCurrentProject();
-  const { project: currentProject } = data ?? {};
-  const { isLoggedIn, login, isLoggingIn, logout, isLoggingOut } = useFlow();
-
-  const onSwitchProject = useCallback(async () => {
-    setIsSwitching(true);
-    try {
-      await projectService.unUseCurrentProject();
-    } catch (e) {
-      // nothing critical happened, ignore the error
-      console.warn("Couldn't stop the emulator: ", e);
-    }
-    history.replace(`/${routes.start}`);
-    try {
-      await logout(); // logout from dev-wallet, because config may change
-    } finally {
-      setIsSwitching(false);
-    }
-  }, []);
-
-  const createSnapshot = useCallback(async () => {
-    try {
-      // TODO(milestone-5): provide a way to input a custom description
-      await snapshotService.create({
-        description: "Test",
-      });
-      toast.success("Snapshot created");
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to create snapshot");
-    }
-  }, []);
-
-  const onSettings = () => {
-    history.push(`/start/configure/${currentProject?.id}`);
-  };
-
   const onBack = useCallback(() => {
     history.goBack();
   }, []);
@@ -135,61 +87,18 @@ const Navigation: FunctionComponent<{
 
           <div className={classes.rightContainer}>
             <div>
-              <span>NETWORK</span>
-              <span>EMULATOR</span>
-            </div>
-            <div>
               <Button className={classes.loginButton} onClick={createSnapshot}>
                 SNAPSHOT
               </Button>
-              <Button
-                className={classes.loginButton}
-                onClick={props.toggleSidebar}
-              >
-                SIDEBAR
-              </Button>
-              {isLoggedIn ? (
-                <IconButton
-                  className={classes.logoutButton}
-                  icon={<FlowLogo className={classes.flowIcon} />}
-                  iconPosition="before"
-                  onClick={logout}
-                  loading={isLoggingOut}
-                >
-                  LOG OUT
-                </IconButton>
-              ) : (
-                <IconButton
-                  className={classes.loginButton}
-                  icon={<FlowLogo className={classes.flowIcon} />}
-                  iconPosition="before"
-                  onClick={login}
-                  loading={isLoggingIn}
-                >
-                  LOG IN
-                </IconButton>
-              )}
-              {isLoggedIn && (
-                <Button
-                  className={classes.txButton}
-                  onClick={() => setShowTxDialog(true)}
-                >
-                  SEND TRANSACTION
-                </Button>
-              )}
             </div>
-            <div>
-              <Button loading={isSwitching} onClick={onSwitchProject}>
-                SWITCH
-              </Button>
-              <IconButton
-                onClick={onSettings}
-                icon={<IconSettings className={classes.settingsIcon} />}
-              />
-            </div>
+            <Button
+              className={classes.loginButton}
+              onClick={props.toggleSidebar}
+            >
+              SIDEBAR
+            </Button>
           </div>
         </div>
-        {/* NAVIGATION DRAWER */}
         {isNavigationDrawerVisible && (
           <div className={classes.navigationDrawerContainer}>
             {isShowBackButtonVisible && (
