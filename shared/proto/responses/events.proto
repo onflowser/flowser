@@ -7,7 +7,21 @@ message GetAllEventsResponse {
   repeated Event events = 1;
 }
 
+message GetPollingEventsRequest {
+  uint32 timestamp = 1;
+}
+
 message GetPollingEventsResponse {
+  repeated Event data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetPollingEventsByTransactionRequest {
+  uint32 timestamp = 1;
+  string transaction_id = 2;
+}
+
+message GetPollingEventsByTransactionResponse {
   repeated Event data = 1;
   PollingMetaData meta = 2;
 }

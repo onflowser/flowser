@@ -1,5 +1,6 @@
 import {
   CreateProjectResponse,
+  GetPollingProjectsRequest,
   Project,
   UseProjectResponse,
 } from "@flowser/shared";
@@ -8,31 +9,28 @@ import {
   GetPollingProjectsResponse,
   GetAllProjectsResponse,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
 import { TransportService } from "./transports/transport.service";
 
 export class ProjectsService {
   constructor(private readonly transport: TransportService) {}
 
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingProjectsResponse>> {
-    return axios.get("/api/projects/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingProjectsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingProjectsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingProjectsRequest,
+      responseProtobuf: GetPollingProjectsResponse,
     });
   }
 
-  getSingle(id: string): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.get(`/api/projects/${id}`, {
-      transformResponse: (data) =>
-        GetSingleProjectResponse.fromJSON(JSON.parse(data)),
+  getSingle(id: string): Promise<GetSingleProjectResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/${id}`,
+      responseProtobuf: GetSingleProjectResponse,
     });
   }
 

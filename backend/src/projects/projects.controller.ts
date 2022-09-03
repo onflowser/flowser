@@ -20,9 +20,9 @@ import {
   GetProjectObjectsResponse,
   UseProjectResponse,
   CreateProjectResponse,
+  GetPollingProjectsRequest,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 import { FlowConfigService } from "../flow/services/config.service";
 
 @Controller("projects")
@@ -50,9 +50,10 @@ export class ProjectsController {
 
   @Get("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingProjectsResponse))
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingProjectsRequest.fromJSON(data);
     const projects = await this.projectsService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return projects.map((project) => project.toProto());
   }

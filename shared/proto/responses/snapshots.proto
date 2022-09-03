@@ -7,6 +7,10 @@ message GetAllEmulatorSnapshotsResponse {
   repeated EmulatorSnapshot snapshots = 1;
 }
 
+message GetPollingEmulatorSnapshotsRequest {
+  uint32 timestamp = 1;
+}
+
 message GetPollingEmulatorSnapshotsResponse {
   repeated EmulatorSnapshot data = 1;
   PollingMetaData meta = 2;

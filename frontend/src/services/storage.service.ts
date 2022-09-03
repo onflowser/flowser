@@ -1,6 +1,7 @@
-import { GetPollingStorageResponse } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
+import {
+  GetPollingStorageRequest,
+  GetPollingStorageResponse,
+} from "@flowser/shared";
 import { TransportService } from "./transports/transport.service";
 
 export class StorageService {
@@ -8,17 +9,17 @@ export class StorageService {
 
   getAllByAccountWithPolling({
     accountAddress,
-    timestamp,
+    ...data
   }: {
     accountAddress: string;
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingStorageResponse>> {
-    return axios.get(`/api/accounts/${accountAddress}/storage/polling`, {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingStorageResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingStorageResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/accounts/${accountAddress}/storage/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingStorageRequest,
+      responseProtobuf: GetPollingStorageResponse,
     });
   }
 }

@@ -28,7 +28,6 @@ import {
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
 } from "@flowser/shared";
-import { useGetAxiosQuery } from "./use-get-axios-query";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
 
@@ -49,7 +48,7 @@ export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
     resourceKey: "/accounts/polling",
     resourceIdKey: "address",
-    fetcher: accountsService.getAllWithPolling,
+    fetcher: (data) => accountsService.getAllWithPolling(data),
   });
 }
 
@@ -119,7 +118,7 @@ export function useGetPollingContracts(): TimeoutPollingHook<AccountContract> {
   return useTimeoutPolling<AccountContract, GetPollingContractsResponse>({
     resourceKey: "/contracts/polling",
     resourceIdKey: "id",
-    fetcher: contractsService.getAllWithPolling,
+    fetcher: (data) => contractsService.getAllWithPolling(data),
   });
 }
 
@@ -133,7 +132,7 @@ export function useGetPollingTransactions(): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/transactions/polling",
     resourceIdKey: "id",
-    fetcher: transactionsService.getAllWithPolling,
+    fetcher: (data) => transactionsService.getAllWithPolling(data),
   });
 }
 
@@ -141,7 +140,7 @@ export function useGetPollingBlocks(): TimeoutPollingHook<Block> {
   return useTimeoutPolling<Block, GetPollingBlocksResponse>({
     resourceKey: "/blocks/polling",
     resourceIdKey: "id",
-    fetcher: blocksService.getAllWithPolling,
+    fetcher: (data) => blocksService.getAllWithPolling(data),
   });
 }
 
@@ -155,7 +154,7 @@ export function useGetPollingEvents(): TimeoutPollingHook<Event> {
   return useTimeoutPolling<Event, GetPollingEventsResponse>({
     resourceKey: "/events/polling",
     resourceIdKey: "id",
-    fetcher: eventsService.getAllWithPolling,
+    fetcher: (data) => eventsService.getAllWithPolling(data),
   });
 }
 
@@ -177,7 +176,7 @@ export function useGetPollingLogs(): TimeoutPollingHook<Log> {
   return useTimeoutPolling<Log, GetPollingLogsResponse>({
     resourceKey: "/logs/polling",
     resourceIdKey: "id",
-    fetcher: logsService.getAllWithPolling,
+    fetcher: (data) => logsService.getAllWithPolling(data),
   });
 }
 
@@ -218,9 +217,13 @@ export function useGetCurrentProject() {
 }
 
 export function useGetAllProjects() {
-  return useQuery<GetAllProjectsResponse>(`/projects`, projectsService.getAll, {
-    refetchInterval: 1000,
-  });
+  return useQuery<GetAllProjectsResponse>(
+    `/projects`,
+    () => projectsService.getAll(),
+    {
+      refetchInterval: 1000,
+    }
+  );
 }
 
 export function useGetFlowserVersion() {

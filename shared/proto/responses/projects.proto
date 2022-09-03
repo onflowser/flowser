@@ -8,6 +8,10 @@ message GetAllProjectsResponse {
   repeated Project projects = 1;
 }
 
+message GetPollingProjectsRequest {
+  uint32 timestamp = 1;
+}
+
 message GetPollingProjectsResponse {
   repeated Project data = 1;
   PollingMetaData meta = 2;

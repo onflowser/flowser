@@ -5,9 +5,8 @@ import {
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
   CreateEmulatorSnapshotResponse,
+  GetPollingEmulatorSnapshotsRequest,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
 import { TransportService } from "./transports/transport.service";
 
 export class SnapshotService {
@@ -45,17 +44,15 @@ export class SnapshotService {
     });
   }
 
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingEmulatorSnapshotsResponse>> {
-    return axios.get("/api/flow/snapshots/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingEmulatorSnapshotsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingEmulatorSnapshotsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/flow/snapshots/polling",
+      requestData: data,
+      requestProtobuf: GetPollingEmulatorSnapshotsRequest,
+      responseProtobuf: GetPollingEmulatorSnapshotsResponse,
     });
   }
 }

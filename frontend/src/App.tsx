@@ -15,7 +15,6 @@ import { UiStateContextProvider } from "./contexts/ui-state.context";
 import { useSearch } from "./hooks/use-search";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
-import { QueryClientProvider } from "react-query";
 
 // pages
 import Start from "./pages/start/Start";
@@ -25,7 +24,6 @@ import Transactions from "./pages/transactions/Transactions";
 import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
-import query from "./config/query";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -66,11 +64,9 @@ const BrowserRouterEvents = withRouter(
 
 export const FlowserClientApp = () => {
   return (
-    <QueryClientProvider client={query}>
-      <UiStateContextProvider>
-        <FlowserRouter />
-      </UiStateContextProvider>
-    </QueryClientProvider>
+    <UiStateContextProvider>
+      <FlowserRouter />
+    </UiStateContextProvider>
   );
 };
 

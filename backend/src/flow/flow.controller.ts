@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Put,
-  Query,
   UseInterceptors,
 } from "@nestjs/common";
 import { FlowGatewayService } from "./services/gateway.service";
@@ -19,9 +18,9 @@ import {
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
   CreateEmulatorSnapshotResponse,
+  GetPollingEmulatorSnapshotsRequest,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller("flow")
 export class FlowController {
@@ -50,11 +49,10 @@ export class FlowController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingEmulatorSnapshotsResponse)
   )
-  async getSnapshotsWithPolling(
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
-  ) {
+  async getSnapshotsWithPolling(@Body() data) {
+    const request = GetPollingEmulatorSnapshotsRequest.fromJSON(data);
     const snapshots = await this.flowSnapshotService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return snapshots.map((snapshot) => snapshot.toProto());
   }

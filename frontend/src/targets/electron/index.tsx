@@ -3,8 +3,7 @@ import ReactDOM from "react-dom";
 import "App.scss";
 import { FlowserClientApp } from "App";
 import reportWebVitals from "reportWebVitals";
-import { QueryClientProvider } from "react-query";
-import query from "config/query";
+import { QueryClientProvider, QueryClient } from "react-query";
 import splitbee from "@splitbee/web";
 
 // init analytics
@@ -15,9 +14,11 @@ if (process.env.NODE_ENV !== "development") {
   });
 }
 
+const queryClient = new QueryClient();
+
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={query}>
+    <QueryClientProvider client={queryClient}>
       <FlowserClientApp />
     </QueryClientProvider>
   </React.StrictMode>,

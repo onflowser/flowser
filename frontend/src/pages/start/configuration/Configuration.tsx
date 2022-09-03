@@ -97,7 +97,7 @@ const Configuration: FunctionComponent = () => {
   async function loadExistingProject(id: string) {
     try {
       const existingProjectData = await projectService.getSingle(id);
-      const existingProject = existingProjectData.data.project;
+      const existingProject = existingProjectData.project;
       if (existingProject) {
         formik.setValues(existingProject, false);
       }

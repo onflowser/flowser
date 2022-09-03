@@ -1,10 +1,11 @@
-import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
+import { Controller, Get, Param, UseInterceptors, Body } from "@nestjs/common";
 import { EventsService } from "./events.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 import {
   GetAllEventsResponse,
+  GetPollingEventsRequest,
+  GetPollingEventsByTransactionRequest,
   GetPollingEventsResponse,
 } from "@flowser/shared";
 
@@ -32,23 +33,22 @@ export class EventsController {
   @ApiParam({ name: "id", type: String })
   @Get("/transactions/:id/events/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
-  async findAllNewByTransaction(
-    @Param("id") transactionId,
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
-  ) {
+  async findAllNewByTransaction(@Body() data) {
+    const request = GetPollingEventsByTransactionRequest.fromJSON(data);
     const events =
       await this.eventsService.findAllByTransactionNewerThanTimestamp(
-        transactionId,
-        timestamp
+        request.transactionId,
+        new Date(request.timestamp)
       );
     return events.map((event) => event.toProto());
   }
 
   @Get("/events/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingEventsRequest.fromJSON(data);
     const events = await this.eventsService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return events.map((event) => event.toProto());
   }

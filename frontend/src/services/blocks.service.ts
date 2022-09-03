@@ -1,25 +1,22 @@
 import {
   GetSingleBlockResponse,
   GetPollingBlocksResponse,
+  GetPollingBlocksRequest,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
 import { TransportService } from "./transports/transport.service";
 
 export class BlocksService {
   constructor(private readonly transport: TransportService) {}
 
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingBlocksResponse>> {
-    return axios.get("/api/blocks/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingBlocksResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingBlocksResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/blocks/polling",
+      requestData: data,
+      requestProtobuf: GetPollingBlocksRequest,
+      responseProtobuf: GetPollingBlocksResponse,
     });
   }
 

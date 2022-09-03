@@ -1,41 +1,40 @@
 import {
   GetSingleContractResponse,
   GetPollingContractsResponse,
+  GetPollingContractsByAccountResponse,
+  GetPollingContractsByAccountRequest,
+  GetPollingContractsRequest,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
 import { TransportService } from "./transports/transport.service";
 
 export class ContractsService {
   constructor(private readonly transport: TransportService) {}
 
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingContractsResponse>> {
-    return axios.get("/api/contracts/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingContractsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingContractsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/contracts/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingContractsRequest,
+      responseProtobuf: GetPollingContractsResponse,
     });
   }
 
   getAllByAccountWithPolling({
     accountAddress,
-    timestamp,
+    ...data
   }: {
     accountAddress: string;
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingContractsResponse>> {
-    return axios.get(`/api/accounts/${accountAddress}/contracts/polling`, {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingContractsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingContractsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/accounts/${accountAddress}/contracts/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingContractsByAccountRequest,
+      responseProtobuf: GetPollingContractsByAccountResponse,
     });
   }
 

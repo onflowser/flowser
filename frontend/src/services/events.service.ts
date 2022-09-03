@@ -1,38 +1,39 @@
-import { GetPollingEventsResponse } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
+import {
+  GetPollingEventsByTransactionRequest,
+  GetPollingEventsByTransactionResponse,
+  GetPollingEventsRequest,
+  GetPollingEventsResponse,
+} from "@flowser/shared";
 import { TransportService } from "./transports/transport.service";
 
 export class EventsService {
   constructor(private readonly transport: TransportService) {}
 
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingEventsResponse>> {
-    return axios.get("/api/events/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingEventsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingEventsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/events/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingEventsRequest,
+      responseProtobuf: GetPollingEventsResponse,
     });
   }
 
   getAllWithPollingByTransaction({
-    timestamp,
     transactionId,
+    ...data
   }: {
     timestamp: number;
     transactionId: string;
-  }): Promise<AxiosResponse<GetPollingEventsResponse>> {
-    return axios.get(`/api/transactions/${transactionId}/events/polling`, {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingEventsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingEventsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/transactions/${transactionId}/events/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingEventsByTransactionRequest,
+      responseProtobuf: GetPollingEventsByTransactionResponse,
     });
   }
 }

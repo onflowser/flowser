@@ -1,10 +1,10 @@
-import { Controller, Get, Param, Query, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, UseInterceptors } from "@nestjs/common";
 import { BlocksService } from "./blocks.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 import {
   GetAllBlocksResponse,
+  GetPollingBlocksRequest,
   GetPollingBlocksResponse,
   GetSingleBlockResponse,
 } from "@flowser/shared";
@@ -23,9 +23,10 @@ export class BlocksController {
 
   @Get("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingBlocksResponse))
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingBlocksRequest.fromJSON(data);
     const blocks = await this.blocksService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return blocks.map((block) => block.toProto());
   }
