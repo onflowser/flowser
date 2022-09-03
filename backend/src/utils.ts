@@ -25,10 +25,11 @@ export async function rmdir(path: string) {
   return rm(path, { force: true, recursive: true });
 }
 
-export type ProtobufLikeObject = {
+export interface ProtobufLikeObject {
   toJSON: (value: any) => any;
   fromJSON: (value: any) => any;
-};
+  fromPartial: (value: any) => any;
+}
 
 export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
   return {

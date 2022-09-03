@@ -22,7 +22,13 @@ import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import { ProjectsService } from "../../../services/projects.service";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
-import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
+import {
+  DevWallet,
+  Emulator,
+  ErrorData,
+  Gateway,
+  Project,
+} from "@flowser/shared";
 import { CommonUtils } from "../../../utils/common-utils";
 import { FormikErrors } from "formik/dist/types";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
@@ -58,11 +64,17 @@ const Configuration: FunctionComponent = () => {
         const response = isExistingProject
           ? await projectService.updateProject(formik.values)
           : await projectService.createProject(formik.values);
-        await projectService.useProject(response.data.project!.id);
+        if (response.project) {
+          await projectService.useProject(response.project.id);
+        }
         history.replace(`/${routes.firstRouteAfterStart}`);
       } catch (e) {
-        // TODO(milestone-3): better handle errors
-        toast.error(`Something went wrong, cannot run emulator`);
+        console.error(e);
+        if (CommonUtils.isStandardApiError(e)) {
+          toast.error(e.message);
+        } else {
+          toast.error(`Something went wrong, cannot run emulator`);
+        }
         window.scrollTo(0, 0);
       }
     },

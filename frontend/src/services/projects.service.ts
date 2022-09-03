@@ -1,4 +1,8 @@
-import { Project } from "@flowser/shared";
+import {
+  CreateProjectResponse,
+  Project,
+  UseProjectResponse,
+} from "@flowser/shared";
 import {
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
@@ -45,29 +49,24 @@ export class ProjectsService {
     });
   }
 
-  useProject(id: string): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.post(`/api/projects/use/${id}`, {
-      transformResponse: (data: string) =>
-        GetSingleProjectResponse.fromJSON(JSON.parse(data)),
-    });
+  async useProject(id: string): Promise<UseProjectResponse> {
+    const response = await axios.post(`/api/projects/use/${id}`);
+    return UseProjectResponse.fromJSON(response.data);
   }
 
-  createProject(
+  async createProject(
     data: Exclude<Project, "id">
-  ): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.post("/api/projects", Project.toJSON(data), {
-      transformResponse: (data: string) =>
-        GetSingleProjectResponse.fromJSON(JSON.parse(data)),
-    });
+  ): Promise<CreateProjectResponse> {
+    const response = await axios.post("/api/projects", Project.toJSON(data));
+    return CreateProjectResponse.fromJSON(response.data);
   }
 
-  updateProject(
-    data: Project
-  ): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.patch(`/api/projects/${data.id}`, Project.toJSON(data), {
-      transformResponse: (data: string) =>
-        GetSingleProjectResponse.fromJSON(JSON.parse(data)),
-    });
+  async updateProject(data: Project): Promise<GetSingleProjectResponse> {
+    const response = await axios.patch(
+      `/api/projects/${data.id}`,
+      Project.toJSON(data)
+    );
+    return GetSingleProjectResponse.fromJSON(response.data);
   }
 
   async unUseCurrentProject(): Promise<void> {

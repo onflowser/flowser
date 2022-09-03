@@ -1,4 +1,5 @@
 import { DecoratedPollingEntity } from "../hooks/use-timeout-polling";
+import { ErrorData } from "@flowser/shared";
 
 export class CommonUtils {
   static isDecoratedPollingEntity<Entity>(
@@ -6,6 +7,17 @@ export class CommonUtils {
   ): entity is DecoratedPollingEntity<Entity> {
     return "isNew" in entity && "isUpdated" in entity;
   }
+
+  static isStandardApiError(error: unknown): error is ErrorData {
+    return (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      "name" in error &&
+      "code" in error
+    );
+  }
+
   static isNotEmpty<Value>(value: Value | null | undefined): value is Value {
     return value !== null && value !== undefined;
   }

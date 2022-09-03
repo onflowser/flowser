@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ErrorData } from "@flowser/shared";
 
 const instance = axios.create({
   baseURL: process.env.REACT_APP_API_HOST || "http://localhost:6061",
@@ -9,12 +10,15 @@ instance.interceptors.response.use(
     // status codes within the 2xx range trigger this function
     return response;
   },
-  function (error) {
-    // TODO(milestone-x): improve error handling (return and parse error info from backend)
+  function (error): ErrorData {
     // status codes outside the 2xx range trigger this function
-    return Promise.reject({
-      message: error.response.statusText,
-    });
+    console.log("ERR", { error });
+    throw (
+      error.response.data.error ??
+      ErrorData.fromPartial({
+        message: "Unknown error",
+      })
+    );
   }
 );
 

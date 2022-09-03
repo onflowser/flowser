@@ -18,6 +18,8 @@ import {
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
   GetProjectObjectsResponse,
+  UseProjectResponse,
+  CreateProjectResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
@@ -33,7 +35,7 @@ export class ProjectsController {
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
     const project = await this.projectsService.create(createProjectDto);
-    return GetSingleProjectResponse.toJSON({
+    return CreateProjectResponse.fromPartial({
       project: project.toProto(),
     });
   }
@@ -119,7 +121,7 @@ export class ProjectsController {
   @Post("/use/:id")
   async useProject(@Param("id") id: string) {
     const project = await this.projectsService.useProject(id);
-    return GetSingleProjectResponse.toJSON({
+    return UseProjectResponse.fromPartial({
       project: project.toProto(),
     });
   }

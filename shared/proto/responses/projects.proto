@@ -13,6 +13,16 @@ message GetPollingProjectsResponse {
   PollingMetaData meta = 2;
 }
 
+message CreateProjectResponse {
+  ErrorData error = 1;
+  Project project = 2;
+}
+
+message UseProjectResponse {
+  ErrorData error = 1;
+  Project project = 2;
+}
+
 message GetSingleProjectResponse {
   Project project = 1;
 }
