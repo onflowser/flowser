@@ -12,7 +12,7 @@
     "start:desktop": "cd frontend && yarn run electron:serve",
     "build:desktop": "yarn run build && cd app/scripts && node setup.js && sh build.sh",
     "start": "lerna run start --parallel",
-    "cleanup": "lerna run cleanup --parallel && rm -rf node_modules",
+    "cleanup": "lerna run cleanup --parallel && rm -rf node_modules app/node_modules app/build app/release flowdb",
     "build": "lerna run build --scope @flowser/backend --scope @flowser/shared && lerna run build --scope @flowser/frontend",
     "bootstrap": "yarn install && yarn run lerna:bootstrap && husky install",
     "lerna:bootstrap": "lerna bootstrap",
