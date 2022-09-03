@@ -1,5 +1,5 @@
 import * as path from "path";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, shell } from "electron";
 import { createApp } from "@flowser/backend";
 import fixPath from "fix-path";
 
@@ -9,6 +9,12 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+  });
+
+  // Open urls in the user's browser
+  win.webContents.setWindowOpenHandler((data) => {
+    shell.openExternal(data.url);
+    return { action: "deny" };
   });
 
   const isDev = !app.isPackaged;
