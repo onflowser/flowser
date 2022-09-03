@@ -8,6 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "start:desktop:prod:macos-arm": "yarn run build:desktop && ./app/release/build/mac-arm64/Flowser.app/Contents/MacOS/Flowser",
     "start:desktop": "cd frontend && yarn run electron:serve",
     "build:desktop": "yarn run build && cd app/scripts && node setup.js && sh build.sh",
     "start": "lerna run start --parallel",
