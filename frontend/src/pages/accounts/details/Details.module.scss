@@ -1,6 +1,6 @@
 @import "styles/spacings";
-@import 'styles/colors';
-@import 'styles/typography';
+@import "styles/colors";
+@import "styles/typography";
 
 .root {
   display: flex;
@@ -97,21 +97,35 @@
   column-gap: 15px;
   row-gap: 20px;
   grid-template-columns: repeat(4, 1fr);
-}
 
-@media all and (max-width:1350px){
-  .gridStorageExtendable {
-    grid-template-columns: repeat(3, 1fr);
+  .gridItemExtended {
+    grid-column: 1 / span 4;
+    height: 600px;
   }
 }
 
+@media all and (max-width: 1350px) {
+  .gridStorageExtendable {
+    grid-template-columns: repeat(3, 1fr);
 
-@media all and (max-width:900px){
+    .gridItemExtended {
+      grid-column: 1 / span 3;
+      height: 600px;
+    }
+  }
+}
+
+@media all and (max-width: 900px) {
   .gridStorage {
     grid-template-columns: repeat(2, 1fr);
   }
 
   .gridStorageExtendable {
     grid-template-columns: repeat(2, 1fr);
+
+    .gridItemExtended {
+      grid-column: 1 / span 2;
+      height: 600px;
+    }
   }
 }

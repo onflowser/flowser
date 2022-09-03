@@ -1,0 +1,47 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 10px;
+  height: 196px;
+  background-color: #4c536c;
+
+  .content {
+    margin-left: 19px;
+    margin-top: 40px;
+
+    .identifier {
+      font-size: $font-size-large;
+      color: $light-grey;
+      margin-bottom: 6px;
+    }
+
+    .link {
+      display: flex;
+      flex-direction: row;
+      color: $purple;
+      align-items: center;
+
+      .linkText {
+        margin-left: 6px;
+        display: inline-block;
+        overflow: hidden;
+        max-width: 30vw;
+      }
+    }
+    .link:hover {
+      color: #d0bdf8;
+    }
+
+    .bottomText {
+      margin-top: 6px;
+      display: inline-block;
+      overflow: hidden;
+      max-width: 15vw;
+    }
+  }
+}

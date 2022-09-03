@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
@@ -32,8 +32,9 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
-import StorageCard from "./StorageCard";
-import StorageCardExtendable from "./StorageCardExtendable";
+import { StorageCard } from "./StorageCard";
+import { StorageCardExtendable } from "./StorageCardExtendable";
+import classNames from "classnames";
 
 type RouteParams = {
   accountId: string;
@@ -157,6 +158,19 @@ const Details: FunctionComponent = () => {
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
+  
+
+  let extendedCardId = "";
+  const toggleExtended = (id: string) => {
+    extendedCardId = id;
+   
+    let card = document.getElementById(id);
+    if (!card?.classList.contains(classes.gridItemExtended)) {
+      card?.classList.add(classes.gridItemExtended);
+    } else {
+      card?.classList.remove(classes.gridItemExtended);
+    }
+  };
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -173,7 +187,7 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  console.log(storageItems);
+  
 
   return (
     <div className={classes.root}>
@@ -232,10 +246,12 @@ const Details: FunctionComponent = () => {
               storageItems.map((item) =>
                 FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
                 "storage" ? (
-                  <StorageCardExtendable
-                    key={item.pathIdentifier}
-                    content={item}
-                  />
+                  <div key={item.pathIdentifier} id={item.pathIdentifier}>
+                    <StorageCardExtendable
+                      content={item}
+                      toggleExtended={toggleExtended}
+                    />
+                  </div>
                 ) : (
                   ""
                 )
