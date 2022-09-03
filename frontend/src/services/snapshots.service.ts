@@ -8,47 +8,40 @@ import {
 } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class SnapshotService {
-  private static instance: SnapshotService | undefined;
-
-  static getInstance(): SnapshotService {
-    if (!SnapshotService.instance) {
-      SnapshotService.instance = new SnapshotService();
-    }
-    return SnapshotService.instance;
-  }
+  constructor(private readonly transport: TransportService) {}
 
   create(
     data: CreateEmulatorSnapshotRequest
-  ): Promise<AxiosResponse<CreateEmulatorSnapshotResponse>> {
-    return axios.post(
-      "/api/flow/snapshots",
-      CreateEmulatorSnapshotRequest.toJSON(data),
-      {
-        transformResponse: (data) =>
-          CreateEmulatorSnapshotResponse.fromJSON(JSON.parse(data)),
-      }
-    );
+  ): Promise<CreateEmulatorSnapshotResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: "/api/flow/snapshots",
+      requestData: data,
+      requestProtobuf: CreateEmulatorSnapshotRequest,
+      responseProtobuf: CreateEmulatorSnapshotResponse,
+    });
   }
 
   revertTo(
     data: RevertToEmulatorSnapshotRequest
-  ): Promise<AxiosResponse<RevertToEmulatorSnapshotResponse>> {
-    return axios.put(
-      "/api/flow/snapshots",
-      RevertToEmulatorSnapshotRequest.toJSON(data),
-      {
-        transformResponse: (data) =>
-          RevertToEmulatorSnapshotResponse.fromJSON(JSON.parse(data)),
-      }
-    );
+  ): Promise<RevertToEmulatorSnapshotResponse> {
+    return this.transport.send({
+      requestMethod: "PUT",
+      resourceIdentifier: "/api/flow/snapshots",
+      requestData: data,
+      requestProtobuf: RevertToEmulatorSnapshotRequest,
+      responseProtobuf: RevertToEmulatorSnapshotResponse,
+    });
   }
 
-  getAll(): Promise<AxiosResponse<GetAllEmulatorSnapshotsResponse>> {
-    return axios.get("/api/flow/snapshots", {
-      transformResponse: (data) =>
-        GetAllEmulatorSnapshotsResponse.fromJSON(JSON.parse(data)),
+  getAll(): Promise<GetAllEmulatorSnapshotsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/flow/snapshots",
+      responseProtobuf: GetAllEmulatorSnapshotsResponse,
     });
   }
 

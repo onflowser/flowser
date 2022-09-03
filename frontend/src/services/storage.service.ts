@@ -1,16 +1,10 @@
 import { GetPollingStorageResponse } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class StorageService {
-  private static instance: StorageService | undefined;
-
-  static getInstance(): StorageService {
-    if (!StorageService.instance) {
-      StorageService.instance = new StorageService();
-    }
-    return StorageService.instance;
-  }
+  constructor(private readonly transport: TransportService) {}
 
   getAllByAccountWithPolling({
     accountAddress,

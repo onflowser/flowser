@@ -4,16 +4,10 @@ import {
 } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class BlocksService {
-  private static instance: BlocksService | undefined;
-
-  static getInstance(): BlocksService {
-    if (!BlocksService.instance) {
-      BlocksService.instance = new BlocksService();
-    }
-    return BlocksService.instance;
-  }
+  constructor(private readonly transport: TransportService) {}
 
   getAllWithPolling({
     timestamp,
@@ -29,10 +23,11 @@ export class BlocksService {
     });
   }
 
-  getSingle(id: string): Promise<AxiosResponse<GetSingleBlockResponse>> {
-    return axios.get(`/api/blocks/${id}`, {
-      transformResponse: (data) =>
-        GetSingleBlockResponse.fromJSON(JSON.parse(data)),
+  getSingle(id: string): Promise<GetSingleBlockResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/blocks/${id}`,
+      responseProtobuf: GetSingleBlockResponse,
     });
   }
 }

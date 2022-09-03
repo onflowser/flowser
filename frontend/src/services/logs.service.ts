@@ -1,16 +1,10 @@
 import { GetPollingLogsResponse } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class LogsService {
-  private static instance: LogsService | undefined;
-
-  static getInstance(): LogsService {
-    if (!LogsService.instance) {
-      LogsService.instance = new LogsService();
-    }
-    return LogsService.instance;
-  }
+  constructor(private readonly transport: TransportService) {}
 
   getAllWithPolling({
     timestamp,

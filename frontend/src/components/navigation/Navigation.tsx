@@ -24,8 +24,7 @@ import {
   useGetAllObjectsCounts,
   useGetCurrentProject,
 } from "../../hooks/use-api";
-import { ProjectsService } from "../../services/projects.service";
-import { SnapshotService } from "../../services/snapshots.service";
+import { ServiceRegistry } from "../../services/service-registry";
 
 const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const [isSwitching, setIsSwitching] = useState(false);
@@ -35,8 +34,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
     isNavigationDrawerVisible,
     isSearchBarVisible,
   } = useNavigation();
-  const projectService = ProjectsService.getInstance();
-  const snapshotService = SnapshotService.getInstance();
+  const { projectsService, snapshotService } = ServiceRegistry.getInstance();
   const { data: counters } = useGetAllObjectsCounts();
   const [showTxDialog, setShowTxDialog] = useState(false);
   const { data } = useGetCurrentProject();
@@ -46,7 +44,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const onSwitchProject = useCallback(async () => {
     setIsSwitching(true);
     try {
-      await projectService.unUseCurrentProject();
+      await projectsService.unUseCurrentProject();
     } catch (e) {
       // nothing critical happened, ignore the error
       console.warn("Couldn't stop the emulator: ", e);

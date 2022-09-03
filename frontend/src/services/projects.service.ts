@@ -10,16 +10,10 @@ import {
 } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class ProjectsService {
-  private static instance: ProjectsService | undefined;
-
-  static getInstance(): ProjectsService {
-    if (!ProjectsService.instance) {
-      ProjectsService.instance = new ProjectsService();
-    }
-    return ProjectsService.instance;
-  }
+  constructor(private readonly transport: TransportService) {}
 
   getAllWithPolling({
     timestamp,
@@ -42,52 +36,68 @@ export class ProjectsService {
     });
   }
 
-  getAll(): Promise<AxiosResponse<GetAllProjectsResponse>> {
-    return axios.get("/api/projects", {
-      transformResponse: (data) =>
-        GetAllProjectsResponse.fromJSON(JSON.parse(data)),
+  getAll(): Promise<GetAllProjectsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/projects",
+      responseProtobuf: GetAllProjectsResponse,
     });
   }
 
-  async useProject(id: string): Promise<UseProjectResponse> {
-    const response = await axios.post(`/api/projects/use/${id}`);
-    return UseProjectResponse.fromJSON(response.data);
-  }
-
-  async createProject(
-    data: Exclude<Project, "id">
-  ): Promise<CreateProjectResponse> {
-    const response = await axios.post("/api/projects", Project.toJSON(data));
-    return CreateProjectResponse.fromJSON(response.data);
-  }
-
-  async updateProject(data: Project): Promise<GetSingleProjectResponse> {
-    const response = await axios.patch(
-      `/api/projects/${data.id}`,
-      Project.toJSON(data)
-    );
-    return GetSingleProjectResponse.fromJSON(response.data);
-  }
-
-  async unUseCurrentProject(): Promise<void> {
-    await axios.delete(`/api/projects/use`);
-  }
-
-  async removeProject(id: string): Promise<void> {
-    await axios.delete(`/api/projects/${id}`);
-  }
-
-  getCurrentProject(): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.get("/api/projects/current", {
-      transformResponse: (data: string) =>
-        GetSingleProjectResponse.fromJSON(JSON.parse(data)),
+  useProject(id: string): Promise<UseProjectResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: `/api/projects/use/${id}`,
     });
   }
 
-  getDefaultProjectInfo(): Promise<AxiosResponse<GetSingleProjectResponse>> {
-    return axios.get("/api/projects/default", {
-      transformResponse: (data: string) =>
-        GetSingleProjectResponse.fromJSON(JSON.parse(data)),
+  createProject(data: Exclude<Project, "id">): Promise<CreateProjectResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: "/api/projects",
+      requestData: data,
+      requestProtobuf: Project,
+      responseProtobuf: CreateProjectResponse,
+    });
+  }
+
+  updateProject(data: Project): Promise<GetSingleProjectResponse> {
+    return this.transport.send({
+      requestMethod: "PATCH",
+      resourceIdentifier: `/api/projects/${data.id}`,
+      requestData: data,
+      requestProtobuf: Project,
+      responseProtobuf: GetSingleProjectResponse,
+    });
+  }
+
+  unUseCurrentProject(): Promise<void> {
+    return this.transport.send({
+      requestMethod: "DELETE",
+      resourceIdentifier: "/api/projects/use",
+    });
+  }
+
+  removeProject(id: string): Promise<void> {
+    return this.transport.send({
+      requestMethod: "DELETE",
+      resourceIdentifier: `/api/projects/${id}`,
+    });
+  }
+
+  getCurrentProject(): Promise<GetSingleProjectResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/current`,
+      responseProtobuf: GetSingleProjectResponse,
+    });
+  }
+
+  getDefaultProjectInfo(): Promise<GetSingleProjectResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/default`,
+      responseProtobuf: GetSingleProjectResponse,
     });
   }
 }

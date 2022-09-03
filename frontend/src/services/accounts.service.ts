@@ -5,16 +5,10 @@ import {
 } from "@flowser/shared";
 import axios from "../config/axios";
 import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class AccountsService {
-  private static instance: AccountsService | undefined;
-
-  static getInstance(): AccountsService {
-    if (!AccountsService.instance) {
-      AccountsService.instance = new AccountsService();
-    }
-    return AccountsService.instance;
-  }
+  constructor(private readonly transport: TransportService) {}
 
   getAllWithPolling({
     timestamp,
@@ -46,10 +40,11 @@ export class AccountsService {
     });
   }
 
-  getSingle(id: string): Promise<AxiosResponse<GetSingleAccountResponse>> {
-    return axios.get(`/api/accounts/${id}`, {
-      transformResponse: (data) =>
-        GetSingleAccountResponse.fromJSON(JSON.parse(data)),
+  getSingle(id: string): Promise<GetSingleAccountResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/accounts/${id}`,
+      responseProtobuf: GetSingleAccountResponse,
     });
   }
 }

@@ -20,20 +20,14 @@ import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
-import { ProjectsService } from "../../../services/projects.service";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
-import {
-  DevWallet,
-  Emulator,
-  ErrorData,
-  Gateway,
-  Project,
-} from "@flowser/shared";
+import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
 import { CommonUtils } from "../../../utils/common-utils";
 import { FormikErrors } from "formik/dist/types";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
+import { ServiceRegistry } from "../../../services/service-registry";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -41,7 +35,7 @@ const projectSchema = yup.object().shape({
 });
 
 const Configuration: FunctionComponent = () => {
-  const projectService = ProjectsService.getInstance();
+  const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
   const [loadingText, setLoadingText] = useState("loading");
   const [showDialog, setShowDialog] = useState(false);
@@ -117,7 +111,7 @@ const Configuration: FunctionComponent = () => {
   async function loadDefaultProject() {
     try {
       const defaultProjectData = await projectService.getDefaultProjectInfo();
-      const defaultProject = defaultProjectData.data.project;
+      const defaultProject = defaultProjectData.project;
       if (defaultProject) {
         formik.setValues(defaultProject, false);
       }
