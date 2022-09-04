@@ -50,6 +50,12 @@ export const useTimeoutPolling = <
       onSuccess: (response) => {
         if (response.data.length) {
           const latestTimestamp = response.meta?.latestTimestamp ?? 0;
+
+          const hasCompleteData = latestTimestamp === lastPollingTime;
+          if (hasCompleteData) {
+            return;
+          }
+
           if (latestTimestamp > 0) {
             setLastPollingTime(latestTimestamp);
           }
