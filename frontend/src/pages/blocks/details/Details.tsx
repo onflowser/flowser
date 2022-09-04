@@ -26,6 +26,7 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
+import { StatusIcon } from "components/status-icon/StatusIcon";
 
 type RouteParams = {
   blockId: string;
@@ -71,15 +72,13 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("status", {
+  columnHelper.accessor("status.statusCode", {
     header: () => <Label variant="medium">STATUS</Label>,
     cell: (info) => (
       <div>
-        {/* TODO(milestone-5): Display transaction status icon */}
-        <ColoredCircle color="green" />
         <Value>
-          {FlowUtils.getGrcpStatusName(info.getValue()?.statusCode)}
-        </Value>{" "}
+          <StatusIcon status={info.getValue()} />
+        </Value>
       </div>
     ),
   }),

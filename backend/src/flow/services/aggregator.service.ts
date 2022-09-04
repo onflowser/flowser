@@ -31,7 +31,6 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import { FlowCoreEventType } from "@flowser/shared";
-import { throwError } from "rxjs";
 
 type BlockData = {
   block: FlowBlock;
@@ -79,65 +78,32 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   // TODO(milestone-x): Next interval shouldn't start before this function resolves
   @Interval(env.DATA_FETCH_INTERVAL)
-  async test() {
-    try {
-      this.fetchDataFromDataSource().catch((err) => {
-        console.log("neki");
-        console.log(err);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
       return;
     }
 
     // Service account is present only on emulator chain
-    try {
-      if (
-        this.projectContext.shouldRunEmulator() &&
-        !(await this.isServiceAccountProcessed().catch((err) => {
-          console.log("zadnji err");
-          console.log(err);
-        }))
-      ) {
-        await this.processServiceAccount().catch((err) => {
-          console.log("processing service account catch");
-          console.log(err);
-        });
-      }
-    } catch (error) {
-      console.log("processing service account");
-      console.log(error);
+    if (
+      this.projectContext.shouldRunEmulator() &&
+      !(await this.isServiceAccountProcessed())
+    ) {
+      await this.processServiceAccount();
     }
-    try {
-      const { startBlockHeight, endBlockHeight } =
-        await this.getBlockRange().catch((err) => {
-          console.log("processing service account 2");
-          console.log(err);
-          throw err;
-        });
-      const hasBlocksToProcess = startBlockHeight <= endBlockHeight;
-      if (!hasBlocksToProcess) {
-        return;
-      }
 
-      try {
-        await this.processBlocksWithinHeightRange(
-          startBlockHeight,
-          endBlockHeight
-        ).catch((err) => {
-          console.log("processing service account 3");
-          console.log(err);
-        });
-      } catch (e) {
-        return this.logger.debug(`failed to fetch block data: ${e}`);
-      }
-    } catch (error) {
-      console.log("get block range");
-      console.log(error);
+    const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
+    const hasBlocksToProcess = startBlockHeight <= endBlockHeight;
+    if (!hasBlocksToProcess) {
+      return;
+    }
+
+    try {
+      await this.processBlocksWithinHeightRange(
+        startBlockHeight,
+        endBlockHeight
+      );
+    } catch (e) {
+      return this.logger.debug(`failed to fetch block data: ${e}`);
     }
   }
 
