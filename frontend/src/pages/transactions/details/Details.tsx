@@ -132,7 +132,7 @@ const Details: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
   const { transactionId } = useParams<RouteParams>();
   const { setBreadcrumbs, showSearchBar } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};
@@ -212,7 +212,6 @@ const Details: FunctionComponent = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
     showSearchBar(false);
   }, []);

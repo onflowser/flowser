@@ -44,13 +44,12 @@ const columns = [
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const { data: accounts, firstFetch } = useGetPollingAccounts();
 
   useEffect(() => {
     setPlaceholder("search for block numbers or tx hashes");
     showNavigationDrawer(false);
-    showSubNavigation(true);
   }, []);
 
   useEffect(() => {

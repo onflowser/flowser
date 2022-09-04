@@ -89,7 +89,7 @@ const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
   const { disableSearchBar, updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const breadcrumbs: Breadcrumb[] = [
     { to: "/blocks", label: "Blocks" },
     { label: "Details" },
@@ -102,7 +102,6 @@ const Details: FunctionComponent = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
     disableSearchBar(true);
   }, []);

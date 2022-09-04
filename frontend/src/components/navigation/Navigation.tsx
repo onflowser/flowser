@@ -4,16 +4,6 @@ import { routes } from "../../constants/routes";
 import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
 import Button from "../button/Button";
-import IconButton from "../icon-button/IconButton";
-import logo from "../../assets/images/logo.svg";
-import { ReactComponent as IconUser } from "../../assets/icons/user.svg";
-import { ReactComponent as IconBlocks } from "../../assets/icons/blocks.svg";
-import { ReactComponent as IconTransactions } from "../../assets/icons/transactions.svg";
-import { ReactComponent as IconContracts } from "../../assets/icons/contracts.svg";
-import { ReactComponent as IconEvents } from "../../assets/icons/events.svg";
-import { ReactComponent as IconSettings } from "../../assets/icons/settings.svg";
-import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
-import { ReactComponent as FlowLogo } from "../../assets/icons/flow.svg";
 import { useNavigation } from "../../hooks/use-navigation";
 import { toast } from "react-hot-toast";
 import Breadcrumbs from "./Breadcrumbs";
@@ -27,6 +17,13 @@ import {
 import { ServiceRegistry } from "../../services/service-registry";
 import { CommonUtils } from "../../utils/common-utils";
 import { useErrorHandler } from "../../hooks/use-error-handler";
+
+import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
+import sideMenuOpen from "../../assets/icons/side-menu-open.svg";
+import sideMenuClosed from "../../assets/icons/side-menu-closed.svg";
+import sideMenuClosedEmuNoWork from "../../assets/icons/side-menu-closed-emulator-not-working.svg";
+import sideMenuOpenEmuNoWork from "../../assets/icons/side-menu-open-emulator-not-working.svg";
+import classNames from "classnames";
 
 const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const { handleError } = useErrorHandler(Navigation.name);
@@ -43,6 +40,9 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const { data } = useGetCurrentProject();
   const { project: currentProject } = data ?? {};
   const { isLoggedIn, login, isLoggingIn, logout, isLoggingOut } = useFlow();
+
+  const isEmulatorWorking = true;
+  const isSidebarOpen = false;
 
   const onSwitchProject = useCallback(async () => {
     setIsSwitching(true);
@@ -84,100 +84,67 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
     <>
       <div className={`${classes.navigationContainer} ${props.className}`}>
         <div className={classes.mainContainer}>
-          <div className={classes.logoContainer}>
-            <img src={logo} alt="FLOWSER" />
-          </div>
           <div className={classes.navLinksContainer}>
             <NavigationItem
               to={`/${routes.accounts}`}
               activeClassName={classes.active}
-              icon={<IconUser />}
-              counter={counters?.accounts}
+              totalCounter={counters?.accounts}
             >
               ACCOUNTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.blocks}`}
               activeClassName={classes.active}
-              icon={<IconBlocks />}
-              counter={counters?.blocks}
+              totalCounter={counters?.blocks}
             >
               BLOCKS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.transactions}`}
               activeClassName={classes.active}
-              counter={counters?.transactions}
-              icon={<IconTransactions />}
+              totalCounter={counters?.transactions}
             >
               TRANSACTIONS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.contracts}`}
               activeClassName={classes.active}
-              counter={counters?.contracts}
-              icon={<IconContracts />}
+              totalCounter={counters?.contracts}
             >
               CONTRACTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.events}`}
               activeClassName={classes.active}
-              icon={<IconEvents />}
-              counter={counters?.events}
+              totalCounter={counters?.events}
             >
               EVENTS
             </NavigationItem>
           </div>
 
           <div className={classes.rightContainer}>
-            <div>
-              <span>NETWORK</span>
-              <span>EMULATOR</span>
-            </div>
-            <div>
-              <Button className={classes.loginButton} onClick={createSnapshot}>
-                SNAPSHOT
-              </Button>
-              {isLoggedIn ? (
-                <IconButton
-                  className={classes.logoutButton}
-                  icon={<FlowLogo className={classes.flowIcon} />}
-                  iconPosition="before"
-                  onClick={logout}
-                  loading={isLoggingOut}
-                >
-                  LOG OUT
-                </IconButton>
-              ) : (
-                <IconButton
-                  className={classes.loginButton}
-                  icon={<FlowLogo className={classes.flowIcon} />}
-                  iconPosition="before"
-                  onClick={login}
-                  loading={isLoggingIn}
-                >
-                  LOG IN
-                </IconButton>
-              )}
-              {isLoggedIn && (
-                <Button
-                  className={classes.txButton}
-                  onClick={() => setShowTxDialog(true)}
-                >
-                  SEND TRANSACTION
-                </Button>
-              )}
-            </div>
-            <div>
-              <Button loading={isSwitching} onClick={onSwitchProject}>
-                SWITCH
-              </Button>
-              <IconButton
-                onClick={onSettings}
-                icon={<IconSettings className={classes.settingsIcon} />}
+            <Search className={classes.searchBox} />
+            <Button className={classes.snapshotButton} onClick={createSnapshot}>
+              SNAPSHOT
+            </Button>
+            <Button className={classes.sidebarButton}>
+              <img
+                src={
+                  isEmulatorWorking
+                    ? isSidebarOpen
+                      ? sideMenuOpen
+                      : sideMenuClosed
+                    : isSidebarOpen
+                    ? sideMenuOpenEmuNoWork
+                    : sideMenuClosedEmuNoWork
+                }
+                className={classNames({
+                  [classes.sidebarOpen]: isSidebarOpen,
+                  [classes.emulatorWorking]: isEmulatorWorking,
+                })}
+                alt="sidebar toggle button"
               />
-            </div>
+            </Button>
           </div>
         </div>
         {/* NAVIGATION DRAWER */}

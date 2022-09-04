@@ -43,14 +43,13 @@ const columns = [
 
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder } = useSearch();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const { data, firstFetch } = useGetPollingContracts();
   const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
     setPlaceholder("search for contracts");
     showNavigationDrawer(false);
-    showSubNavigation(true);
   }, []);
 
   return (

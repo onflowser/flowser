@@ -1,18 +1,23 @@
-@import 'styles/colors';
-@import 'styles/spacings';
-@import 'styles/typography';
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
+@import "styles/rules";
 
 .navigationContainer {
   display: flex;
   flex-direction: column;
+  margin: 0 $spacing-l;
+  border-bottom-right-radius: $border-radius-card;
+  border-bottom-left-radius: $border-radius-card;
+  overflow: hidden;
 
   .mainContainer {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 0 $spacing-l;
     background-color: $table-line-background;
-    height: 118px;
+    height: 65px;
+    box-sizing: border-box;
 
     .logoContainer {
       img {
@@ -24,7 +29,6 @@
     }
 
     .navLinksContainer {
-      margin-top: -18px;
       display: flex;
       margin-right: $spacing-base * 3;
 
@@ -36,46 +40,38 @@
     .rightContainer {
       display: flex;
       margin-left: auto;
+      align-items: center;
+      gap: 10px;
+      height: 100%;
 
-      & > div:nth-child(1) {
-        flex-direction: column;
+      padding: 11px $spacing-l 14px 0;
+
+      > * {
+        box-sizing: border-box;
+        height: calc(100% - 25px);
       }
 
-      & > div:nth-child(2) {
-        flex-direction: row;
+      .searchBox {
+        width: 362px;
       }
 
-      & > div:nth-child(1), & > div:nth-child(2) {
-        display: flex;
-        padding-right: $spacing-base * 2;
-        margin-right: $spacing-base * 2;
-        border-right: 1px solid $light-grey;
+      .snapshotButton {
+        background: #ffffff1d;
+        border: $blue 1px solid;
+        color: $blue;
       }
 
-      & > div:first-child {
-        span {
-          font-size: $font-size-small;
-          height: 18px;
-          line-height: 18px;
+      .sidebarButton {
+        background: none;
+        border: none;
+        padding: 0 0 0 15px;
+
+        .emulatorWorking {
+          padding-right: 4px;
         }
 
-        span:first-child {
-          color: $light-grey;
-        }
-
-        span:last-child {
-          color: $yellow;
-          font-weight: bold;
-        }
-
-      }
-
-      & > div {
-        display: flex;
-        align-items: center;
-
-        button + button {
-          margin-left: $spacing-base;
+        .sidebarOpen {
+          padding-left: 6px;
         }
       }
     }
@@ -95,27 +91,6 @@
   height: 18px;
 }
 
-.loginButton {
-  .flowIcon {
-    [class=flowWhite],
-    .flowWhite {
-      fill: $background;
-    }
-  }
-}
-
-.logoutButton {
-  background: transparent !important;
-  border-color: $blue !important;
-  color: $blue !important;
-  .flowIcon {
-    [class=flowWhite],
-    .flowWhite {
-      fill: $blue;
-    }
-  }
-}
-
 .txButton {
   background: $blue !important;
   border-color: $blue !important;
@@ -125,7 +100,7 @@
   height: 26px;
   width: 26px;
   margin-right: $spacing-s * 0.5 !important;
-  [class=flowPrimary],
+  [class="flowPrimary"],
   .flowPrimary {
     fill: transparent;
   }

@@ -148,7 +148,7 @@ const Details: FunctionComponent = () => {
   const { accountId } = useParams<RouteParams>();
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
@@ -163,7 +163,6 @@ const Details: FunctionComponent = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
   }, []);
 

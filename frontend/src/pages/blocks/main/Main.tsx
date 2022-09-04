@@ -31,7 +31,7 @@ const Main: FunctionComponent = () => {
   const { snapshotService } = ServiceRegistry.getInstance();
   const { handleError } = useErrorHandler(Main.name);
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
 
   const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
@@ -59,7 +59,6 @@ const Main: FunctionComponent = () => {
   useEffect(() => {
     setPlaceholder("Search for block ids, parent ids, time, ...");
     showNavigationDrawer(false);
-    showSubNavigation(true);
     disableSearchBar(false);
   }, []);
 
