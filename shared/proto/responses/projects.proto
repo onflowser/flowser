@@ -22,6 +22,11 @@ message CreateProjectResponse {
   Project project = 2;
 }
 
+message UpdateProjectResponse {
+  ErrorData error = 1;
+  Project project = 2;
+}
+
 message UseProjectResponse {
   ErrorData error = 1;
   Project project = 2;

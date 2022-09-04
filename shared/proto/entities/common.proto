@@ -1,9 +1,5 @@
 syntax = "proto3";
 
-enum FlowserErrorCode {
-  ERROR_CODE_UNSPECIFIED = 0;
-}
-
 // https://docs.onflow.org/cadence/language/crypto/#hashing
 enum SignatureAlgorithm {
   SIGNATURE_ALGORITHM_UNSPECIFIED = 0;

@@ -16,7 +16,7 @@ export class EventsController {
   @Get("/events")
   async findAll() {
     const events = await this.eventsService.findAll();
-    return GetAllEventsResponse.fromPartial({
+    return GetAllEventsResponse.toJSON({
       events: events.map((event) => event.toProto()),
     });
   }
@@ -25,7 +25,7 @@ export class EventsController {
   @Get("/transactions/:id/events")
   async findAllByTransaction(@Param("id") transactionId) {
     const events = await this.eventsService.findAllByTransaction(transactionId);
-    return GetAllEventsResponse.fromPartial({
+    return GetAllEventsResponse.toJSON({
       events: events.map((event) => event.toProto()),
     });
   }

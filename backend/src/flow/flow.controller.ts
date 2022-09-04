@@ -17,7 +17,6 @@ import {
   CreateEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
-  CreateEmulatorSnapshotResponse,
   GetPollingEmulatorSnapshotsRequest,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
@@ -61,17 +60,21 @@ export class FlowController {
   async createSnapshot(@Body() body) {
     const request = CreateEmulatorSnapshotRequest.fromJSON(body);
     const snapshot = await this.flowSnapshotService.create(request.description);
-    return CreateEmulatorSnapshotResponse.toJSON({
-      snapshot: snapshot.toProto(),
-    });
+    return RevertToEmulatorSnapshotResponse.toJSON(
+      RevertToEmulatorSnapshotResponse.fromPartial({
+        snapshot: snapshot.toProto(),
+      })
+    );
   }
 
   @Put("snapshots")
   async revertToSnapshot(@Body() body) {
     const request = RevertToEmulatorSnapshotRequest.fromJSON(body);
     const snapshot = await this.flowSnapshotService.revertTo(request.blockId);
-    return RevertToEmulatorSnapshotResponse.toJSON({
-      snapshot: snapshot.toProto(),
-    });
+    return RevertToEmulatorSnapshotResponse.toJSON(
+      RevertToEmulatorSnapshotResponse.fromPartial({
+        snapshot: snapshot.toProto(),
+      })
+    );
   }
 }

@@ -5,7 +5,7 @@ import {
   HttpException,
 } from "@nestjs/common";
 import { Response } from "express";
-import { ErrorResponse, FlowserErrorCode } from "@flowser/shared";
+import { ErrorResponse } from "@flowser/shared";
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -17,7 +17,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(status).json(
       ErrorResponse.toJSON({
         error: {
-          code: FlowserErrorCode.ERROR_CODE_UNSPECIFIED,
           name: exception.name,
           message: exception.message,
         },

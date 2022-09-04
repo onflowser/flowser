@@ -2,6 +2,7 @@ import {
   CreateProjectResponse,
   GetPollingProjectsRequest,
   Project,
+  UpdateProjectResponse,
   UseProjectResponse,
 } from "@flowser/shared";
 import {
@@ -59,7 +60,7 @@ export class ProjectsService {
     });
   }
 
-  updateProject(data: Project): Promise<GetSingleProjectResponse> {
+  updateProject(data: Project): Promise<UpdateProjectResponse> {
     return this.transport.send({
       requestMethod: "PATCH",
       resourceIdentifier: `/api/projects/${data.id}`,

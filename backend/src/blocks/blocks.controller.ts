@@ -16,7 +16,7 @@ export class BlocksController {
   @Get()
   async findAll() {
     const blocks = await this.blocksService.findAll();
-    return GetAllBlocksResponse.fromPartial({
+    return GetAllBlocksResponse.toJSON({
       blocks: blocks.map((block) => block.toProto()),
     });
   }
@@ -35,7 +35,7 @@ export class BlocksController {
   @Get(":id")
   async findOne(@Param("id") id: string) {
     const block = await this.blocksService.findOne(id);
-    return GetSingleBlockResponse.fromPartial({
+    return GetSingleBlockResponse.toJSON({
       block: block.toProto(),
     });
   }

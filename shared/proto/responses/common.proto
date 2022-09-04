@@ -1,11 +1,8 @@
 syntax = "proto3";
 
-import "entities/common.proto";
-
 message ErrorData {
-  FlowserErrorCode code = 1;
-  string name = 2;
-  string message = 3;
+  string name = 1;
+  string message = 2;
 }
 
 message ErrorResponse {
