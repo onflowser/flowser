@@ -1,35 +1,35 @@
 import React, { useState } from "react";
-import classes from "./StorageCardExtendable.module.scss";
+import classes from "./ExtendableStorageCard.module.scss";
 import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
 
-type StorageCardExtendableProps = {
+type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
   toggleExtended: (id: string) => void;
 };
 
-export function StorageCardExtendable({
+export function ExtendableStorageCard({
   content,
   toggleExtended,
-}: StorageCardExtendableProps) {
+}: ExtendableStorageCardProps) {
   const [extended, setExtended] = useState(false);
   const extend = () => {
     setExtended((prevState) => !prevState);
   };
 
-  var extendClass = classNames({
+  const extendClass = classNames({
     [classes.root]: true,
     [classes.gridItemExtended]: extended,
   });
 
-  var extendClassToggle = classNames({
+  const extendClassToggle = classNames({
     [classes.circleOpen]: !extended,
     [classes.circleClosed]: extended,
   });
 
-  var dumyData = {
+  const dumyData = {
     flowEpochsDKGAdmin: {
       ResourceType: {
         Location: {

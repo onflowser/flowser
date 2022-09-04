@@ -26,6 +26,7 @@ import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import {
   AccountContract,
   AccountKey,
+  AccountStorageDomain,
   AccountStorageItem,
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
@@ -33,8 +34,7 @@ import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
 import { StorageCard } from "./StorageCard";
-import { StorageCardExtendable } from "./StorageCardExtendable";
-import classNames from "classnames";
+import { ExtendableStorageCard } from "./ExtendableStorageCard";
 
 type RouteParams = {
   accountId: string;
@@ -158,19 +158,33 @@ const Details: FunctionComponent = () => {
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
-  
 
   let extendedCardId = "";
   const toggleExtended = (id: string) => {
     extendedCardId = id;
-   
-    let card = document.getElementById(id);
+
+    const card = document.getElementById(id);
     if (!card?.classList.contains(classes.gridItemExtended)) {
       card?.classList.add(classes.gridItemExtended);
     } else {
       card?.classList.remove(classes.gridItemExtended);
     }
   };
+
+  const privateStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PRIVATE
+  );
+  const publicStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
+  );
+  const basicStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
+  );
+
+  const privateAndPublicStorageItems = [
+    ...publicStorageItems,
+    ...privateStorageItems,
+  ];
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -186,8 +200,6 @@ const Details: FunctionComponent = () => {
   if (isLoading || !account) {
     return <FullScreenLoading />;
   }
-
-  
 
   return (
     <div className={classes.root}>
@@ -228,34 +240,22 @@ const Details: FunctionComponent = () => {
           </Fragment>
         </DetailsTabItem>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          <div className={classes.gridStorage}>
-            {storageItems &&
-              storageItems.map((item) =>
-                FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
-                  "private" ||
-                FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
-                  "public" ? (
-                  <StorageCard key={item.pathIdentifier} content={item} />
-                ) : (
-                  ""
-                )
-              )}
+          <div className={classes.grid}>
+            {privateAndPublicStorageItems &&
+              privateAndPublicStorageItems.map((item) => (
+                <StorageCard key={item.pathIdentifier} content={item} />
+              ))}
           </div>
-          <div className={classes.gridStorageExtendable}>
-            {storageItems &&
-              storageItems.map((item) =>
-                FlowUtils.getLowerCasedPathDomain(item.pathDomain) ==
-                "storage" ? (
-                  <div key={item.pathIdentifier} id={item.pathIdentifier}>
-                    <StorageCardExtendable
-                      content={item}
-                      toggleExtended={toggleExtended}
-                    />
-                  </div>
-                ) : (
-                  ""
-                )
-              )}
+          <div className={classes.gridExtendable}>
+            {basicStorageItems &&
+              basicStorageItems.map((item) => (
+                <div key={item.pathIdentifier} id={item.pathIdentifier}>
+                  <ExtendableStorageCard
+                    content={item}
+                    toggleExtended={toggleExtended}
+                  />
+                </div>
+              ))}
           </div>
         </DetailsTabItem>
         {!!account.code && (

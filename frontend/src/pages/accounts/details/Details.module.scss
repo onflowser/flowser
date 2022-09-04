@@ -80,7 +80,7 @@
   }
 }
 
-.gridStorage {
+.grid {
   width: 100%;
   max-width: 100%;
   display: grid;
@@ -90,7 +90,7 @@
   margin-bottom: 40px;
 }
 
-.gridStorageExtendable {
+.gridExtendable {
   width: 100%;
   max-width: 100%;
   display: grid;
@@ -105,7 +105,7 @@
 }
 
 @media all and (max-width: 1350px) {
-  .gridStorageExtendable {
+  .gridExtendable {
     grid-template-columns: repeat(3, 1fr);
 
     .gridItemExtended {
@@ -116,11 +116,11 @@
 }
 
 @media all and (max-width: 900px) {
-  .gridStorage {
+  .grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .gridStorageExtendable {
+  .gridExtendable {
     grid-template-columns: repeat(2, 1fr);
 
     .gridItemExtended {
