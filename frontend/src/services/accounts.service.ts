@@ -2,54 +2,47 @@ import {
   GetSingleAccountResponse,
   GetPollingAccountsResponse,
   GetPollingKeysResponse,
+  GetPollingAccountsRequest,
+  GetPollingKeysRequest,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class AccountsService {
-  private static instance: AccountsService | undefined;
+  constructor(private readonly transport: TransportService) {}
 
-  static getInstance(): AccountsService {
-    if (!AccountsService.instance) {
-      AccountsService.instance = new AccountsService();
-    }
-    return AccountsService.instance;
-  }
-
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingAccountsResponse>> {
-    return axios.get("/api/accounts/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingAccountsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingAccountsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/accounts/polling",
+      requestData: data,
+      requestProtobuf: GetPollingAccountsRequest,
+      responseProtobuf: GetPollingAccountsResponse,
     });
   }
 
   getAllKeysByAccountWithPolling({
     accountAddress,
-    timestamp,
+    ...data
   }: {
     accountAddress: string;
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingKeysResponse>> {
-    return axios.get(`/api/accounts/${accountAddress}/keys/polling`, {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingKeysResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingKeysResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/accounts/${accountAddress}/keys/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingKeysRequest,
+      responseProtobuf: GetPollingKeysResponse,
     });
   }
 
-  getSingle(id: string): Promise<AxiosResponse<GetSingleAccountResponse>> {
-    return axios.get(`/api/accounts/${id}`, {
-      transformResponse: (data) =>
-        GetSingleAccountResponse.fromJSON(JSON.parse(data)),
+  getSingle(id: string): Promise<GetSingleAccountResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/accounts/${id}`,
+      responseProtobuf: GetSingleAccountResponse,
     });
   }
 }

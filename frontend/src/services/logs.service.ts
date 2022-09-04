@@ -1,28 +1,18 @@
-import { GetPollingLogsResponse } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
+import { GetPollingLogsRequest, GetPollingLogsResponse } from "@flowser/shared";
+import { TransportService } from "./transports/transport.service";
 
 export class LogsService {
-  private static instance: LogsService | undefined;
+  constructor(private readonly transport: TransportService) {}
 
-  static getInstance(): LogsService {
-    if (!LogsService.instance) {
-      LogsService.instance = new LogsService();
-    }
-    return LogsService.instance;
-  }
-
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingLogsResponse>> {
-    return axios.get("/api/logs/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingLogsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingLogsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/logs/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingLogsRequest,
+      responseProtobuf: GetPollingLogsResponse,
     });
   }
 }
