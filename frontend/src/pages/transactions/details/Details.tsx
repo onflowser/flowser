@@ -31,6 +31,7 @@ import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
+import { StatusIcon } from "components/status-icon/StatusIcon";
 
 type RouteParams = {
   transactionId: string;
@@ -276,7 +277,12 @@ const Details: FunctionComponent = () => {
             GRCP Status:
           </Label>
           <Value variant="large" className={classes.inlineValue}>
-            {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
+            <div className={classes.flex}>
+              <StatusIcon status={transaction.status?.statusCode} />
+              <div className={classes.text}>
+                {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
+              </div>
+            </div>
           </Value>
         </div>
         <div>

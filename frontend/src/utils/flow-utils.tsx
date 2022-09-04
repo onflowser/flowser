@@ -4,6 +4,14 @@ import {
   GrcpStatusCode,
   AccountStorageDomain,
 } from "@flowser/shared";
+import React from "react";
+import { ReactComponentElement } from "react";
+import { ReactComponent as ExecutedIcon } from "../assets/icons/executed-tx-icon.svg";
+import { ReactComponent as ExpiredIcon } from "../assets/icons/expired-tx-icon.svg";
+import { ReactComponent as FinalisedIcon } from "../assets/icons/finalised-tx-icon.svg";
+import { ReactComponent as PendingIcon } from "../assets/icons/pending-tx-icon.svg";
+import { ReactComponent as SealedIcon } from "../assets/icons/sealed-tx-icon.svg";
+import { ReactComponent as UnknownIcon } from "../assets/icons/unknown-tx-icon.svg";
 
 export class FlowUtils {
   static isInitialBlockId(value: number | string): boolean {
@@ -62,6 +70,49 @@ export class FlowUtils {
         return "Unauthenticated";
       default:
         return "-";
+    }
+  }
+
+  static getGrcpStatusIcon(
+    statusCode: GrcpStatusCode | undefined
+  ): JSX.Element {
+    switch (statusCode) {
+      case GrcpStatusCode.GRCP_STATUS_OK:
+        return <SealedIcon />;
+      case GrcpStatusCode.GRCP_STATUS_CANCELLED:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
+        return <UnknownIcon />;
+      case GrcpStatusCode.GRCP_STATUS_INVALID_ARGUMENT:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_DEADLINE_EXCEEDED:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_NOT_FOUND:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_ALREADY_EXISTS:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_FAILED_PRECONDITION:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_ABORTED:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_OUT_OF_RANGE:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_UNIMPLEMENTED:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_INTERNAL:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_UNAVAILABLE:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
+        return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_UNAUTHENTICATED:
+        return <ExpiredIcon />;
+      default:
+        return <UnknownIcon />;
     }
   }
 

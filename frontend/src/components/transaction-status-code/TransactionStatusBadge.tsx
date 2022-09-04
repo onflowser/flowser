@@ -1,11 +1,11 @@
 import React, { FunctionComponent } from "react";
 import classes from "./TransactionStatusCode.module.scss";
-import { ReactComponent as UnknownIcon } from "../../assets/icons/status-unknown.svg";
-import { ReactComponent as TransactionPendingIcon } from "../../assets/icons/status-pending.svg";
-import { ReactComponent as TransactionFinalizedIcon } from "../../assets/icons/status-finalized.svg";
-import { ReactComponent as TransactionExecutedIcon } from "../../assets/icons/status-executed.svg";
-import { ReactComponent as TransactionSealedIcon } from "../../assets/icons/status-sealed.svg";
-import { ReactComponent as TransactionExpiredIcon } from "../../assets/icons/status-expired.svg";
+import { ReactComponent as ExecutedIcon } from "../../assets/icons/executed-tx-icon.svg";
+import { ReactComponent as ExpiredIcon } from "../../assets/icons/expired-tx-icon.svg";
+import { ReactComponent as FinalisedIcon } from "../../assets/icons/finalised-tx-icon.svg";
+import { ReactComponent as PendingIcon } from "../../assets/icons/pending-tx-icon.svg";
+import { ReactComponent as SealedIcon } from "../../assets/icons/sealed-tx-icon.svg";
+import { ReactComponent as UnknownIcon } from "../../assets/icons/unknown-tx-icon.svg";
 import { TransactionStatusCode } from "@flowser/shared";
 
 type TransactionStatusCodeProps = {
@@ -27,40 +27,44 @@ const TransactionStatusBadge: FunctionComponent<TransactionStatusCodeProps> = ({
     case TransactionStatusCode.TX_STATUS_PENDING:
       return (
         <span className={`${classes.status} ${classes.pending}`}>
-          <TransactionPendingIcon />
+          <PendingIcon />
           <span>PENDING</span>
         </span>
       );
     case TransactionStatusCode.TX_STATUS_FINALIZED:
       return (
         <span className={`${classes.status} ${classes.finalized}`}>
-          <TransactionFinalizedIcon />
+          <FinalisedIcon />
           <span>FINALIZED</span>
         </span>
       );
     case TransactionStatusCode.TX_STATUS_EXECUTED:
       return (
         <span className={`${classes.status} ${classes.executed}`}>
-          <TransactionExecutedIcon />
+          <ExecutedIcon />
           <span>EXECUTED</span>
         </span>
       );
     case TransactionStatusCode.TX_STATUS_SEALED:
       return (
         <span className={`${classes.status} ${classes.sealed}`}>
-          <TransactionSealedIcon />
+          <SealedIcon />
           <span>SEALED</span>
         </span>
       );
     case TransactionStatusCode.TX_STATUS_EXPIRED:
       return (
         <span className={`${classes.status} ${classes.expired}`}>
-          <TransactionExpiredIcon />
+          <ExpiredIcon />
           <span>EXPIRED</span>
         </span>
       );
     default:
-      return <></>;
+      return (
+        <>
+          <UnknownIcon />
+        </>
+      );
   }
 };
 

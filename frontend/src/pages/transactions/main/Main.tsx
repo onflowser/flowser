@@ -16,6 +16,7 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Table from "../../../components/table/Table";
 import { FlowUtils } from "../../../utils/flow-utils";
 import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
+import { StatusIcon } from "components/status-icon/StatusIcon";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
@@ -72,8 +73,7 @@ const columns = [
     cell: (info) => (
       <div>
         {/* TODO(milestone-5): Display transaction status icon */}
-        <ColoredCircle color="green" />
-        <Value>{FlowUtils.getGrcpStatusName(info.getValue())}</Value>{" "}
+        <StatusIcon status={info.getValue()} />
       </div>
     ),
   }),
