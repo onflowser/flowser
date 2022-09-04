@@ -52,7 +52,7 @@ export class HttpTransportService implements TransportService {
           requestProtobuf?.toJSON(requestData) ?? {}
         );
       case "PUT":
-        return this.axios.post(
+        return this.axios.put(
           resourceIdentifier,
           requestProtobuf?.toJSON(requestData) ?? {}
         );

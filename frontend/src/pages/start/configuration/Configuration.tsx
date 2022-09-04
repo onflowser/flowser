@@ -28,6 +28,7 @@ import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
 import { ServiceRegistry } from "../../../services/service-registry";
+import { useErrorHandler } from "../../../hooks/use-error-handler";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -40,6 +41,7 @@ const Configuration: FunctionComponent = () => {
   const [loadingText, setLoadingText] = useState("loading");
   const [showDialog, setShowDialog] = useState(false);
   const { data: flowCliInfo } = useGetFlowCliInfo();
+  const { handleError } = useErrorHandler(Configuration.name);
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const isExistingProject = Boolean(id);
@@ -63,12 +65,7 @@ const Configuration: FunctionComponent = () => {
         }
         history.replace(`/${routes.firstRouteAfterStart}`);
       } catch (e) {
-        console.error(e);
-        if (CommonUtils.isStandardApiError(e)) {
-          toast.error(e.message);
-        } else {
-          toast.error(`Something went wrong, cannot run emulator`);
-        }
+        handleError(e);
         window.scrollTo(0, 0);
       }
     },

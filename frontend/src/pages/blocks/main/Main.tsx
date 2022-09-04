@@ -21,6 +21,7 @@ import {
 import toast from "react-hot-toast";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
+import { useErrorHandler } from "../../../hooks/use-error-handler";
 
 const { formatDate } = useFormattedDate();
 
@@ -28,6 +29,7 @@ const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
 const Main: FunctionComponent = () => {
   const { snapshotService } = ServiceRegistry.getInstance();
+  const { handleError } = useErrorHandler(Main.name);
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
@@ -50,8 +52,7 @@ const Main: FunctionComponent = () => {
       fetchAll();
       toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
     } catch (e) {
-      console.error(e);
-      toast.error("Failed to revert to block");
+      handleError(e);
     }
   }
 

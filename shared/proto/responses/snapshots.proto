@@ -21,7 +21,8 @@ message CreateEmulatorSnapshotRequest {
 }
 
 message CreateEmulatorSnapshotResponse {
-  EmulatorSnapshot snapshot = 1;
+  ErrorData error = 1;
+  EmulatorSnapshot snapshot = 2;
 }
 
 message RevertToEmulatorSnapshotRequest {
@@ -29,5 +30,6 @@ message RevertToEmulatorSnapshotRequest {
 }
 
 message RevertToEmulatorSnapshotResponse {
-  EmulatorSnapshot snapshot = 1;
+  ErrorData error = 1;
+  EmulatorSnapshot snapshot = 2;
 }

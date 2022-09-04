@@ -25,8 +25,11 @@ import {
   useGetCurrentProject,
 } from "../../hooks/use-api";
 import { ServiceRegistry } from "../../services/service-registry";
+import { CommonUtils } from "../../utils/common-utils";
+import { useErrorHandler } from "../../hooks/use-error-handler";
 
 const Navigation: FunctionComponent<{ className: string }> = (props) => {
+  const { handleError } = useErrorHandler(Navigation.name);
   const [isSwitching, setIsSwitching] = useState(false);
   const history = useHistory();
   const {
@@ -65,8 +68,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
       });
       toast.success("Snapshot created");
     } catch (e) {
-      console.error(e);
-      toast.error("Failed to create snapshot");
+      handleError(e);
     }
   }, []);
 
