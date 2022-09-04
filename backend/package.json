@@ -9,7 +9,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "cleanup": "rm -rf node_modules",
+    "cleanup": "rm -rf node_modules && rm -rf dist",
     "build": "nest build --path ./tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start --debug --watch --preserveWatchOutput",

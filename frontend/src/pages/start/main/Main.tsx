@@ -16,7 +16,6 @@ import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
 import splitbee from "@splitbee/web";
 import { toast } from "react-hot-toast";
-import { ProjectsService } from "../../../services/projects.service";
 import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
@@ -24,6 +23,7 @@ import ConfirmDialog from "../../../components/confirm-dialog/ConfirmDialog";
 import Search from "../../../components/search/Search";
 import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
+import { ServiceRegistry } from "../../../services/service-registry";
 
 enum DialogTypes {
   deleteProject,
@@ -48,7 +48,7 @@ const Main: FunctionComponent<IProps> = (props) => {
 
   const tab = props.location.hash?.replace("#", "");
   const history = useHistory();
-  const projectService = ProjectsService.getInstance();
+  const projectService = ServiceRegistry.getInstance().projectsService;
   const { projects } = useGetAllProjects()?.data ?? {};
 
   const onQuickstart = async (project: Project) => {

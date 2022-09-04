@@ -59,10 +59,12 @@ const Main: FunctionComponent = () => {
       {firstFetch && filteredData.length === 0 && (
         <NoResults className={classes.noResults} />
       )}
-      <Table<DecoratedPollingEntity<AccountContract>>
-        columns={columns}
-        data={data}
-      />
+      {filteredData.length > 0 && (
+        <Table<DecoratedPollingEntity<AccountContract>>
+          columns={columns}
+          data={data}
+        />
+      )}
     </>
   );
 };

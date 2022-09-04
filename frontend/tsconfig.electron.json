@@ -2,6 +2,7 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "outDir": "./dist"
   },
   "include": [

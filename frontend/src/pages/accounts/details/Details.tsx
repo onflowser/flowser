@@ -49,25 +49,31 @@ const columnsStorage = [
     ),
   }),
   columnHelperStorage.accessor("pathIdentifier", {
+    meta: {
+      className: classes.identifierColumn,
+    },
     header: () => (
-      <div className={classes.storageTable}>
+      <div>
         <Label variant="medium">IDENTIFIER</Label>
       </div>
     ),
     cell: (info) => (
-      <div className={classes.storageTable}>
+      <div>
         <Value>{info.getValue()}</Value>
       </div>
     ),
   }),
   columnHelperStorage.accessor("data", {
+    meta: {
+      className: classes.dataColumn,
+    },
     header: () => (
-      <div className={classes.storageTable}>
+      <div>
         <Label variant="medium">DATA</Label>
       </div>
     ),
     cell: (info) => (
-      <div className={classes.storageTable}>
+      <div>
         <Value>
           <pre style={{ whiteSpace: "nowrap" }}>
             {JSON.stringify(info.getValue()) ?? "-"}
@@ -205,6 +211,7 @@ const Details: FunctionComponent = () => {
         </DetailsTabItem>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <Table<DecoratedPollingEntity<AccountStorageItem>>
+            className={classes.storageTable}
             data={storageItems}
             columns={columnsStorage}
           />

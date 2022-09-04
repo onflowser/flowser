@@ -1,11 +1,13 @@
-import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
+import { Controller, Get, Param, UseInterceptors, Body } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 import {
   GetAllTransactionsResponse,
+  GetPollingTransactionsByAccountRequest,
+  GetPollingTransactionsByBlockRequest,
+  GetPollingTransactionsRequest,
   GetPollingTransactionsResponse,
   GetSingleTransactionResponse,
 } from "@flowser/shared";
@@ -26,9 +28,12 @@ export class TransactionsController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingTransactionsRequest.fromJSON(data);
     const transactions =
-      await this.transactionsService.findAllNewerThanTimestamp(timestamp);
+      await this.transactionsService.findAllNewerThanTimestamp(
+        new Date(request.timestamp)
+      );
     return transactions.map((transaction) => transaction.toProto());
   }
 
@@ -42,19 +47,16 @@ export class TransactionsController {
   }
 
   @ApiParam({ name: "id", type: String })
-  @ApiQuery({ name: "timestamp", type: Number })
   @Get("/blocks/:id/transactions/polling")
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
-  async findAllNewByBlock(
-    @Param("id") blockId,
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
-  ) {
+  async findAllNewByBlock(@Param("id") blockId, @Body() data) {
+    const request = GetPollingTransactionsByBlockRequest.fromJSON(data);
     const transactions =
       await this.transactionsService.findAllNewerThanTimestampByBlock(
         blockId,
-        timestamp
+        new Date(request.timestamp)
       );
     return transactions.map((transaction) => transaction.toProto());
   }
@@ -65,14 +67,12 @@ export class TransactionsController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
-  async findAllNewByAccount(
-    @Param("address") accountAddress,
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
-  ) {
+  async findAllNewByAccount(@Param("address") accountAddress, @Body() data) {
+    const request = GetPollingTransactionsByAccountRequest.fromJSON(data);
     const transactions =
       await this.transactionsService.findAllNewerThanTimestampByAccount(
         accountAddress,
-        timestamp
+        new Date(request.timestamp)
       );
     return transactions.map((transaction) => transaction.toProto());
   }

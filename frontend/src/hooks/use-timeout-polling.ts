@@ -1,6 +1,5 @@
 import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
-import { AxiosResponse } from "axios";
 import { PollingResponse, PollingEntity } from "@flowser/shared";
 
 export interface TimeoutPollingHook<T extends PollingEntity> {
@@ -24,7 +23,7 @@ type UseTimeoutPollingProps<
 > = {
   resourceKey: string;
   resourceIdKey: keyof T;
-  fetcher: ({ timestamp }: { timestamp: number }) => Promise<AxiosResponse<R>>;
+  fetcher: ({ timestamp }: { timestamp: number }) => Promise<R>;
   interval?: number;
   newestFirst?: boolean;
 };
@@ -44,40 +43,48 @@ export const useTimeoutPolling = <
     return props.fetcher({ timestamp: lastPollingTime });
   }, [lastPollingTime]);
 
-  const { isFetching, error, refetch } = useQuery<
-    AxiosResponse<PollingResponse<T[]>>,
-    Error
-  >(props.resourceKey, fetchCallback, {
-    onSuccess: (response) => {
-      if (response.status === 200 && response.data.data.length) {
-        const latestTimestamp = response.data?.meta?.latestTimestamp ?? 0;
-        if (latestTimestamp > 0) {
-          setLastPollingTime(latestTimestamp);
-        }
+  const { isFetching, error, refetch } = useQuery<PollingResponse<T[]>, Error>(
+    props.resourceKey,
+    fetchCallback,
+    {
+      onSuccess: (response) => {
+        if (response.data.length) {
+          const latestTimestamp = response.meta?.latestTimestamp ?? 0;
 
-        const newItems = mergeAndDecorateItems(
-          data,
-          response.data.data,
-          props.resourceIdKey
-        );
+          const hasCompleteData = latestTimestamp === lastPollingTime;
+          if (hasCompleteData) {
+            return;
+          }
 
-        if (props.newestFirst ?? true) {
-          const sortedNewItems = newItems.sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          if (latestTimestamp > 0) {
+            setLastPollingTime(latestTimestamp);
+          }
+
+          const newItems = mergeAndDecorateItems(
+            data,
+            response.data,
+            props.resourceIdKey
           );
 
-          setData(sortedNewItems);
-        } else {
-          setData(newItems);
+          if (props.newestFirst ?? true) {
+            const sortedNewItems = newItems.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            );
+
+            setData(sortedNewItems);
+          } else {
+            setData(newItems);
+          }
         }
-      }
-    },
-    enabled: !stop,
-    refetchInterval: props.interval || 1000,
-    refetchIntervalInBackground: true,
-    refetchOnWindowFocus: false,
-  });
+      },
+      enabled: !stop,
+      refetchInterval: props.interval || 1000,
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: false,
+    }
+  );
 
   useEffect(() => {
     if (!isFetching && !firstFetch) {

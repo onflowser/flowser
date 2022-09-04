@@ -48,3 +48,10 @@
     margin-bottom: $spacing-base;
   }
 }
+
+.hash {
+  max-width: 15vw;
+  min-width: 10vw;
+  display: inline-block;
+  overflow: hidden;
+}

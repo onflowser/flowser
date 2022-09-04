@@ -1,5 +1,14 @@
 syntax = "proto3";
 
+message ErrorData {
+  string name = 1;
+  string message = 2;
+}
+
+message ErrorResponse {
+  ErrorData error = 1;
+}
+
 message PollingMetaData {
   int32 latest_timestamp = 1;
 }

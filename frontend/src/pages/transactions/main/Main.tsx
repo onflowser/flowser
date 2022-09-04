@@ -71,6 +71,7 @@ const columns = [
     header: () => <Label variant="medium">STATUS</Label>,
     cell: (info) => (
       <div>
+        {/* TODO(milestone-5): Display transaction status icon */}
         <ColoredCircle color="green" />
         <Value>{FlowUtils.getGrcpStatusName(info.getValue())}</Value>{" "}
       </div>

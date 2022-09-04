@@ -4,6 +4,10 @@
 
 This app can be built as a website or a desktop app. The entry points for different targets are located in `src/targets` dir.
 
+## UI Design
+
+You can view our UI design definitions on [Adobe XD](https://xd.adobe.com/view/00f8a11a-5a64-4fca-97ee-f3a6c3547a4b-55ab/) or [Google Drive](https://drive.google.com/drive/folders/1ixHczX7g64C2B06wfYhHvPfm4RLdVxdL).
+
 ## Setup
 
 ### Running on Macbook M1
@@ -43,6 +47,14 @@ Full "module not found" error log
 
 This issue is also described in [this StackOverflow post](https://stackoverflow.com/questions/72553650/how-to-get-node-sqlite3-working-on-mac-m1#answer-72571188). The solution for now is to manually build the correct `sqlite3` bindings on M1, with `yarn run install:m1` command.
 
+## Running
+
+To start the electron app in development, use `yarn run start:desktop` command.
+
+For production, you'll need to package the app with `yarn run build:desktop` command. Note that this was only tested on MacOS (M1).
+
+> If you want to run the production app and see the STDOUT log output, you need to run the executable directly. 
+> E.g. `./app/release/build/mac-arm64/Flowser.app/Contents/MacOS/Flowser`
 
 ### Automatic tasks
 
