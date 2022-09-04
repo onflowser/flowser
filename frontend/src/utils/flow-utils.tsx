@@ -5,11 +5,7 @@ import {
   AccountStorageDomain,
 } from "@flowser/shared";
 import React from "react";
-import { ReactComponentElement } from "react";
-import { ReactComponent as ExecutedIcon } from "../assets/icons/executed-tx-icon.svg";
 import { ReactComponent as ExpiredIcon } from "../assets/icons/expired-tx-icon.svg";
-import { ReactComponent as FinalisedIcon } from "../assets/icons/finalised-tx-icon.svg";
-import { ReactComponent as PendingIcon } from "../assets/icons/pending-tx-icon.svg";
 import { ReactComponent as SealedIcon } from "../assets/icons/sealed-tx-icon.svg";
 import { ReactComponent as UnknownIcon } from "../assets/icons/unknown-tx-icon.svg";
 
