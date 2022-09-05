@@ -119,7 +119,7 @@ const Details: FunctionComponent = () => {
   };
   const removeID = (id: string) => {
     expandedCardIds.delete(id);
-    setExpandedCardIds(new Set(expandedCardIds)); // TODO: is it okay to delete an element this way?
+    setExpandedCardIds(new Set(expandedCardIds));
   };
 
   const toggleExtended = (id: string) => {
