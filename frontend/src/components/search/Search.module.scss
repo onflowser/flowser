@@ -56,4 +56,17 @@
     border: 1px solid $color-not-active-button-text-grey;
     opacity: 0.5;
   }
+
+  &.responsive:not(:focus-within) {
+    @media (max-width: 1290px) {
+      border: none !important;
+      border: #4f5768 1px solid;
+      padding: 0;
+
+      & > input {
+        max-width: 0 !important;
+        margin: 0 !important;
+      }
+    }
+  }
 }

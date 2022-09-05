@@ -13,6 +13,11 @@
     gap: 6px;
     line-height: 19px;
     padding: 11px 45px 14px 45px;
+    border-right: 1px solid $background;
+
+    @media (max-width: 1500px) {
+      padding: 11px 23px 14px 23px;
+    }
 
     &:hover {
       opacity: 0.9;

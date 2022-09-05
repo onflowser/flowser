@@ -31,10 +31,6 @@
     .navLinksContainer {
       display: flex;
       margin-right: $spacing-base * 3;
-
-      & > div:not(:last-child) {
-        margin-right: $spacing-base * 2.5;
-      }
     }
 
     .rightContainer {
@@ -53,9 +49,16 @@
 
       .searchBox {
         width: 362px;
+
+        @media (max-width: 1290px) {
+          width: min-content;
+        }
       }
 
       .snapshotButton {
+        @media (max-width: 970px) {
+          display: none;
+        }
         background: #ffffff1d;
         border: $blue 1px solid;
         color: $blue;
@@ -72,6 +75,25 @@
 
         .sidebarOpen {
           padding-left: 6px;
+        }
+      }
+
+      @media (max-width: 1290px) {
+        &:focus-within {
+          .snapshotButton,
+          .sidebarButton {
+            display: none;
+          }
+
+          @media (min-width: 1000px) {
+            .searchBox {
+              width: 362px !important;
+
+              @media (max-width: 1125px) {
+                width: 250px !important;
+              }
+            }
+          }
         }
       }
     }

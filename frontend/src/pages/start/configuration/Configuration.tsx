@@ -223,7 +223,6 @@ const Configuration: FunctionComponent = () => {
       <form onSubmit={formik.handleSubmit}>
         <div className={classes.root}>
           <div className={classes.inner}>
-            <IconBackButton className={classes.backButton} onClick={onBack} />
             <div className={classes.top}>
               <h2>PROJECT SETTINGS</h2>
             </div>

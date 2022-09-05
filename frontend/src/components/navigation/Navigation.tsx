@@ -123,7 +123,7 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
           </div>
 
           <div className={classes.rightContainer}>
-            <Search className={classes.searchBox} />
+            <Search className={classes.searchBox} responsive={true} />
             <Button className={classes.snapshotButton} onClick={createSnapshot}>
               SNAPSHOT
             </Button>
