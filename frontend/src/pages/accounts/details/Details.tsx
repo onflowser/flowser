@@ -35,57 +35,11 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
 import { StorageCard } from "./StorageCard";
 import { ExtendableStorageCard } from "./ExtendableStorageCard";
+import classNames from "classnames";
 
 type RouteParams = {
   accountId: string;
 };
-
-// STORAGE TABLE
-const columnHelperStorage =
-  createColumnHelper<DecoratedPollingEntity<AccountStorageItem>>();
-
-const columnsStorage = [
-  columnHelperStorage.accessor("pathDomain", {
-    header: () => <Label variant="medium">DOMAIN</Label>,
-    cell: (info) => (
-      <Value>{FlowUtils.getLowerCasedPathDomain(info.getValue())}</Value>
-    ),
-  }),
-  columnHelperStorage.accessor("pathIdentifier", {
-    meta: {
-      className: classes.identifierColumn,
-    },
-    header: () => (
-      <div>
-        <Label variant="medium">IDENTIFIER</Label>
-      </div>
-    ),
-    cell: (info) => (
-      <div>
-        <Value>{info.getValue()}</Value>
-      </div>
-    ),
-  }),
-  columnHelperStorage.accessor("data", {
-    meta: {
-      className: classes.dataColumn,
-    },
-    header: () => (
-      <div>
-        <Label variant="medium">DATA</Label>
-      </div>
-    ),
-    cell: (info) => (
-      <div>
-        <Value>
-          <pre style={{ whiteSpace: "nowrap" }}>
-            {JSON.stringify(info.getValue()) ?? "-"}
-          </pre>
-        </Value>
-      </div>
-    ),
-  }),
-];
 
 // CONTRACTS TABLE
 const columnHelperContracts =
@@ -158,16 +112,21 @@ const Details: FunctionComponent = () => {
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
+  const [expandedCardIds, setExpandedCardIds] = useState(new Set<string>());
 
-  let extendedCardId = "";
+  const addID = (id: string) => {
+    setExpandedCardIds((prev) => new Set(prev.add(id)));
+  };
+  const removeID = (id: string) => {
+    expandedCardIds.delete(id);
+    setExpandedCardIds(new Set(expandedCardIds)); // TODO: is it okay to delete an element this way?
+  };
+
   const toggleExtended = (id: string) => {
-    extendedCardId = id;
-
-    const card = document.getElementById(id);
-    if (!card?.classList.contains(classes.gridItemExtended)) {
-      card?.classList.add(classes.gridItemExtended);
+    if (expandedCardIds.has(id)) {
+      removeID(id);
     } else {
-      card?.classList.remove(classes.gridItemExtended);
+      addID(id);
     }
   };
 
@@ -249,10 +208,19 @@ const Details: FunctionComponent = () => {
           <div className={classes.gridExtendable}>
             {basicStorageItems &&
               basicStorageItems.map((item) => (
-                <div key={item.pathIdentifier} id={item.pathIdentifier}>
+                <div
+                  key={item.pathIdentifier}
+                  id={item.pathIdentifier}
+                  className={classNames({
+                    [classes.gridItemExtended]: expandedCardIds.has(
+                      item.pathIdentifier
+                    ),
+                  })}
+                >
                   <ExtendableStorageCard
                     content={item}
                     toggleExtended={toggleExtended}
+                    expendedCardIds={expandedCardIds}
                   />
                 </div>
               ))}

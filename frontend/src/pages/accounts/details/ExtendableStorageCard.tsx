@@ -8,25 +8,22 @@ import classNames from "classnames";
 type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
   toggleExtended: (id: string) => void;
+  expendedCardIds: Set<string>;
 };
 
 export function ExtendableStorageCard({
   content,
   toggleExtended,
+  expendedCardIds,
 }: ExtendableStorageCardProps) {
-  const [extended, setExtended] = useState(false);
-  const extend = () => {
-    setExtended((prevState) => !prevState);
-  };
-
   const extendClass = classNames({
     [classes.root]: true,
-    [classes.gridItemExtended]: extended,
+    [classes.gridItemExtended]: expendedCardIds.has(content.pathIdentifier),
   });
 
   const extendClassToggle = classNames({
-    [classes.circleOpen]: !extended,
-    [classes.circleClosed]: extended,
+    [classes.circleOpen]: !expendedCardIds.has(content.pathIdentifier),
+    [classes.circleClosed]: expendedCardIds.has(content.pathIdentifier),
   });
 
   const dumyData = {
@@ -53,9 +50,9 @@ export function ExtendableStorageCard({
         </div>
         <div
           className={extendClassToggle}
-          onClick={() => (extend(), toggleExtended(content.pathIdentifier))}
+          onClick={() => toggleExtended(content.pathIdentifier)}
         >
-          {extended ? (
+          {expendedCardIds.has(content.pathIdentifier) ? (
             <div className={classes.iconClosed}>-</div>
           ) : (
             <div className={classes.iconOpen}>+</div>
@@ -65,7 +62,7 @@ export function ExtendableStorageCard({
       <div className={classes.body}>
         <div className={classes.content}>
           <div className={classes.title}>{content.pathIdentifier}</div>
-          {extended ? (
+          {expendedCardIds.has(content.pathIdentifier) ? (
             <div className={classes.json}>
               <pre className={classes.jsonText}>
                 {JSON.stringify(dumyData, undefined, 2)}
