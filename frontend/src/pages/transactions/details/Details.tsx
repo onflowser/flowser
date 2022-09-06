@@ -13,7 +13,7 @@ import Card from "../../../components/card/Card";
 import TimeAgo from "../../../components/time-ago/TimeAgo";
 import DateWithCalendar from "../../../components/date-with-calendar/DateWithCalendar";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import TransactionStatusBadge from "../../../components/transaction-status-code/TransactionStatusBadge";
+import TransactionStatusBadge from "../../../components/status/TransactionStatusBadge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
@@ -269,7 +269,7 @@ const Details: FunctionComponent = () => {
               {transaction.proposalKey?.address ?? "-"}
             </NavLink>
           </Value>
-          {/* TODO(milestone-3): Better organise bellow fields */}
+          {/* TODO(milestone-5): Better organise bellow fields */}
           <Label variant="large" className={classes.inlineLabel}>
             Sequence number:
           </Label>

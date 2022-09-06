@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import classes from "./TransactionStatusCode.module.scss";
+import classes from "./TransactionStatusBadge.module.scss";
 import { ReactComponent as ExecutedIcon } from "../../assets/icons/executed-tx-icon.svg";
 import { ReactComponent as ExpiredIcon } from "../../assets/icons/expired-tx-icon.svg";
 import { ReactComponent as FinalisedIcon } from "../../assets/icons/finalised-tx-icon.svg";
