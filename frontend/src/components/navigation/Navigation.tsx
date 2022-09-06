@@ -128,6 +128,14 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
             >
               EVENTS
             </NavigationItem>
+            <NavigationItem
+              to={`/${routes.project}`}
+              activeClassName={classes.active}
+              icon={<IconContracts />}
+              // counter={counters?.project} TODO
+            >
+              PROJECT
+            </NavigationItem>
           </div>
 
           <div className={classes.rightContainer}>

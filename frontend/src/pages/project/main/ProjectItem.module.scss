@@ -1,0 +1,27 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.item {
+  display: flex;
+  flex-direction: column;
+
+  .main {
+    display: flex;
+    color: white;
+    font-size: $font-size-normal;
+    font-weight: bold;
+    margin-bottom: $spacing-base;
+
+    .title {
+      display: inline-block;
+      overflow: hidden;
+      max-height: fit-content;
+    }
+  }
+
+  .timestamp {
+    opacity: 0.39;
+    color: white;
+  }
+}

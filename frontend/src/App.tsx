@@ -24,6 +24,7 @@ import Transactions from "./pages/transactions/Transactions";
 import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
+import { Project } from "./pages/project/Project";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -87,6 +88,7 @@ export const FlowserRouter = () => {
             component={Contracts}
           />
           <RouteWithLayout path={`/${routes.events}`} component={Events} />
+          <RouteWithLayout path={`/${routes.project}`} component={Project} />
           <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
           <Redirect from="*" to={`/${routes.start}`} />
         </Switch>
