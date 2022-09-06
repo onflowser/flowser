@@ -16,8 +16,9 @@ export function StorageCard({ content }: StorageCardProps): ReactElement {
   const borrowType = content.data?.BorrowType ?? "-";
   const borrowTypePathParts = borrowType?.split(".");
   const targetAccountAddress = `0x${borrowTypePathParts?.[1]}`;
+  const targetStorageId = `${targetAccountAddress}/storage/${targetPathIdentifier}`;
   const targetUrl = borrowTypePathParts
-    ? `/accounts/details/${targetAccountAddress}`
+    ? `/accounts/details/${targetAccountAddress}?focusedStorageId=${targetStorageId}`
     : "#";
   return (
     <div className={classes.root}>
@@ -30,7 +31,9 @@ export function StorageCard({ content }: StorageCardProps): ReactElement {
           <LinkIcon />
           <div className={classes.linkText}>{targetPathIdentifier}</div>
         </NavLink>
-        <span className={classes.bottomText}>{borrowType}</span>
+        <span title={borrowType} className={classes.bottomText}>
+          {borrowType}
+        </span>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import classes from "./ExtendableStorageCard.module.scss";
 import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
@@ -7,25 +7,25 @@ import classNames from "classnames";
 
 type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
-  toggleExtended: (id: string) => void;
-  expendedCardIds: Set<string>;
+  onToggleExpand: () => void;
+  isExpanded: boolean;
   className?: string;
 };
 
 export function ExtendableStorageCard({
   content,
-  toggleExtended,
-  expendedCardIds,
+  onToggleExpand,
+  isExpanded,
   className,
-}: ExtendableStorageCardProps) {
+}: ExtendableStorageCardProps): ReactElement {
   const extendClass = classNames(className, {
     [classes.root]: true,
-    [classes.gridItemExtended]: expendedCardIds.has(content.pathIdentifier),
+    [classes.gridItemExtended]: isExpanded,
   });
 
   const extendClassToggle = classNames({
-    [classes.circleOpen]: !expendedCardIds.has(content.pathIdentifier),
-    [classes.circleClosed]: expendedCardIds.has(content.pathIdentifier),
+    [classes.circleOpen]: !isExpanded,
+    [classes.circleClosed]: isExpanded,
   });
 
   return (
@@ -34,11 +34,8 @@ export function ExtendableStorageCard({
         <div className={classes.type}>
           {FlowUtils.getLowerCasedPathDomain(content.pathDomain)}
         </div>
-        <div
-          className={extendClassToggle}
-          onClick={() => toggleExtended(content.pathIdentifier)}
-        >
-          {expendedCardIds.has(content.pathIdentifier) ? (
+        <div className={extendClassToggle} onClick={() => onToggleExpand()}>
+          {isExpanded ? (
             <div className={classes.iconClosed}>-</div>
           ) : (
             <div className={classes.iconOpen}>+</div>
@@ -47,7 +44,7 @@ export function ExtendableStorageCard({
       </div>
       <div className={classes.body}>
         <div className={classes.title}>{content.pathIdentifier}</div>
-        {expendedCardIds.has(content.pathIdentifier) ? (
+        {isExpanded ? (
           <pre className={classes.json}>
             {JSON.stringify(content.data, undefined, 2)}
           </pre>

@@ -35,8 +35,9 @@ import Badge from "../../../components/badge/Badge";
 import { StorageCard } from "./StorageCard";
 import { ExtendableStorageCard } from "./ExtendableStorageCard";
 import classNames from "classnames";
+import { useUrlQuery } from "../../../hooks/use-url-query";
 
-type RouteParams = {
+export type AccountDetailsRouteParams = {
   accountId: string;
 };
 
@@ -101,7 +102,9 @@ const columnsKeys = [
 ];
 
 const Details: FunctionComponent = () => {
-  const { accountId } = useParams<RouteParams>();
+  const { accountId } = useParams<AccountDetailsRouteParams>();
+  const urlQueryParams = useUrlQuery();
+  const focusedStorageId = urlQueryParams.get("focusedStorageId");
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
@@ -112,21 +115,29 @@ const Details: FunctionComponent = () => {
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
-  const [expandedCardIds, setExpandedCardIds] = useState(new Set<string>());
+  const [expandedCardIds, setExpandedCardIds] = useState(
+    new Set<string>(focusedStorageId ? [focusedStorageId] : [])
+  );
 
-  const addID = (id: string) => {
+  useEffect(() => {
+    if (focusedStorageId) {
+      expandCardById(focusedStorageId);
+    }
+  }, [focusedStorageId]);
+
+  const expandCardById = (id: string) => {
     setExpandedCardIds((prev) => new Set(prev.add(id)));
   };
-  const removeID = (id: string) => {
+  const minimizeCardById = (id: string) => {
     expandedCardIds.delete(id);
     setExpandedCardIds(new Set(expandedCardIds));
   };
 
-  const toggleExtended = (id: string) => {
+  const toggleCardExpand = (id: string) => {
     if (expandedCardIds.has(id)) {
-      removeID(id);
+      minimizeCardById(id);
     } else {
-      addID(id);
+      expandCardById(id);
     }
   };
 
@@ -187,12 +198,10 @@ const Details: FunctionComponent = () => {
               <ExtendableStorageCard
                 key={item.id}
                 content={item}
-                toggleExtended={toggleExtended}
-                expendedCardIds={expandedCardIds}
+                onToggleExpand={() => toggleCardExpand(item.id)}
+                isExpanded={expandedCardIds.has(item.id)}
                 className={classNames({
-                  [classes.gridItemExtended]: expandedCardIds.has(
-                    item.pathIdentifier
-                  ),
+                  [classes.gridItemExtended]: expandedCardIds.has(item.id),
                 })}
               />
             ))}

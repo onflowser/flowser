@@ -51,9 +51,6 @@ export class AccountStorageItemEntity extends PollingEntity {
     const storageItem = new AccountStorageItemEntity();
     storageItem.pathIdentifier = flowStorageIdentifier;
     storageItem.pathDomain = this.convertFlowStorageDomain(flowStorageDomain);
-    storageItem.id = `${
-      flowAccountStorage.Address
-    }/${storageItem.getLowerCasedPathDomain()}/${storageItem.pathIdentifier}`;
 
     // TODO(milestone-x): For now we will just show plain (unparsed) storage data
     // But in the future we will want to parse it so that we can extract info
@@ -69,6 +66,9 @@ export class AccountStorageItemEntity extends PollingEntity {
     storageItem.accountAddress = ensurePrefixedAddress(
       flowAccountStorage.Address
     );
+    storageItem.id = `${
+      storageItem.accountAddress
+    }/${storageItem.getLowerCasedPathDomain()}/${storageItem.pathIdentifier}`;
     return storageItem;
   }
 
