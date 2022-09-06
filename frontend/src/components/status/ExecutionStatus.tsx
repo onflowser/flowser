@@ -10,9 +10,9 @@ export type ExecutionStatusProps = {
 export function ExecutionStatus({
   status,
 }: ExecutionStatusProps): ReactElement {
-  const executionStatusCode = status?.status;
-  const icon = FlowUtils.getExecutionStatusIcon(executionStatusCode);
-  const statusName = FlowUtils.getExecutionStatusName(executionStatusCode);
+  const { executionStatus } = status ?? {};
+  const icon = FlowUtils.getExecutionStatusIcon(executionStatus);
+  const statusName = FlowUtils.getExecutionStatusName(executionStatus);
   return (
     <div className={classes.root}>
       {icon}

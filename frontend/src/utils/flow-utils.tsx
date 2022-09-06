@@ -3,7 +3,7 @@ import {
   GrcpStatusCode,
   HashAlgorithm,
   SignatureAlgorithm,
-  TransactionStatusCode,
+  ExecutionStatusCode,
 } from "@flowser/shared";
 import React from "react";
 import { ReactComponent as ExpiredIcon } from "../assets/icons/expired-tx-icon.svg";
@@ -102,20 +102,20 @@ export class FlowUtils {
   }
 
   static getExecutionStatusIcon(
-    statusCode: TransactionStatusCode | undefined
+    statusCode: ExecutionStatusCode | undefined
   ): JSX.Element {
     switch (statusCode) {
-      case TransactionStatusCode.TX_STATUS_EXECUTED:
+      case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:
         return <ExecutedIcon />;
-      case TransactionStatusCode.TX_STATUS_EXPIRED:
+      case ExecutionStatusCode.EXECUTION_STATUS_EXPIRED:
         return <ExpiredIcon />;
-      case TransactionStatusCode.TX_STATUS_FINALIZED:
+      case ExecutionStatusCode.EXECUTION_STATUS_FINALIZED:
         return <FinalizedIcon />;
-      case TransactionStatusCode.TX_STATUS_SEALED:
+      case ExecutionStatusCode.EXECUTION_STATUS_SEALED:
         return <SealedIcon />;
-      case TransactionStatusCode.TX_STATUS_PENDING:
+      case ExecutionStatusCode.EXECUTION_STATUS_PENDING:
         return <PendingIcon />;
-      case TransactionStatusCode.TX_STATUS_UNKNOWN:
+      case ExecutionStatusCode.EXECUTION_STATUS_UNKNOWN:
         return <UnknownIcon />;
       default:
         return <></>;
@@ -123,20 +123,20 @@ export class FlowUtils {
   }
 
   static getExecutionStatusName(
-    statusCode: TransactionStatusCode | undefined
+    statusCode: ExecutionStatusCode | undefined
   ): string {
     switch (statusCode) {
-      case TransactionStatusCode.TX_STATUS_EXECUTED:
+      case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:
         return "Executed";
-      case TransactionStatusCode.TX_STATUS_EXPIRED:
+      case ExecutionStatusCode.EXECUTION_STATUS_EXPIRED:
         return "Expired";
-      case TransactionStatusCode.TX_STATUS_FINALIZED:
+      case ExecutionStatusCode.EXECUTION_STATUS_FINALIZED:
         return "Finalized";
-      case TransactionStatusCode.TX_STATUS_SEALED:
+      case ExecutionStatusCode.EXECUTION_STATUS_SEALED:
         return "Sealed";
-      case TransactionStatusCode.TX_STATUS_PENDING:
+      case ExecutionStatusCode.EXECUTION_STATUS_PENDING:
         return "Pending";
-      case TransactionStatusCode.TX_STATUS_UNKNOWN:
+      case ExecutionStatusCode.EXECUTION_STATUS_UNKNOWN:
         return "Unknown";
       default:
         return "-";

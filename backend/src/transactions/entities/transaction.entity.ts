@@ -5,8 +5,9 @@ import {
   TransactionProposalKey,
   SignableObject,
   TransactionStatus,
+  grcpStatusCodeFromJSON,
+  executionStatusCodeFromJSON,
 } from "@flowser/shared";
-import { CadenceObject, cadenceTypeFromJSON } from "@flowser/shared";
 import {
   FlowBlock,
   FlowCadenceObject,
@@ -112,7 +113,13 @@ export class TransactionEntity extends PollingEntity {
     transaction.payloadSignatures = deserializeSignableObjects(
       flowTransaction.payloadSignatures
     );
-    transaction.status = TransactionStatus.fromJSON(flowTransactionStatus);
+    transaction.status = {
+      errorMessage: flowTransactionStatus.errorMessage,
+      grcpStatus: grcpStatusCodeFromJSON(flowTransactionStatus.statusCode),
+      executionStatus: executionStatusCodeFromJSON(
+        flowTransactionStatus.status
+      ),
+    };
     return transaction;
   }
 }

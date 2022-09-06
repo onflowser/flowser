@@ -233,7 +233,9 @@ const Details: FunctionComponent = () => {
               <Value variant="large">{transaction.id}</Value>
             </div>
             <div>
-              <TransactionStatusBadge statusCode={transaction.status?.status} />
+              <TransactionStatusBadge
+                statusCode={transaction.status?.executionStatus}
+              />
             </div>
           </>
         )}

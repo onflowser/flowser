@@ -8,9 +8,9 @@ export type GrcpStatusProps = {
 };
 
 export function GrcpStatus({ status }: GrcpStatusProps): ReactElement {
-  const executionStatusCode = status?.status;
-  const icon = FlowUtils.getExecutionStatusIcon(executionStatusCode);
-  const statusName = FlowUtils.getExecutionStatusName(executionStatusCode);
+  const { grcpStatus } = status ?? {};
+  const icon = FlowUtils.getGrcpStatusIcon(grcpStatus);
+  const statusName = FlowUtils.getGrcpStatusName(grcpStatus);
   return (
     <div className={classes.root}>
       {icon}
