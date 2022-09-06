@@ -29,11 +29,8 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
   const { handleError } = useErrorHandler(Navigation.name);
   const [isSwitching, setIsSwitching] = useState(false);
   const history = useHistory();
-  const {
-    isShowBackButtonVisible,
-    isNavigationDrawerVisible,
-    isSearchBarVisible,
-  } = useNavigation();
+  const { isShowBackButtonVisible, isNavigationDrawerVisible } =
+    useNavigation();
   const { projectsService, snapshotService } = ServiceRegistry.getInstance();
   const { data: counters } = useGetAllObjectsCounts();
   const [showTxDialog, setShowTxDialog] = useState(false);
@@ -151,10 +148,11 @@ const Navigation: FunctionComponent<{ className: string }> = (props) => {
         {isNavigationDrawerVisible && (
           <div className={classes.navigationDrawerContainer}>
             {isShowBackButtonVisible && (
-              <IconBackButton onClick={onBack} className={classes.backButton} />
+              <div className={classes.backButtonWrapper} onClick={onBack}>
+                <IconBackButton className={classes.backButton} />
+              </div>
             )}
             <Breadcrumbs className={classes.breadcrumbs} />
-            {isSearchBarVisible && <Search className={classes.searchBar} />}
           </div>
         )}
         <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
