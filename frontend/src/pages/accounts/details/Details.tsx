@@ -200,30 +200,24 @@ const Details: FunctionComponent = () => {
         </DetailsTabItem>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>
-            {privateAndPublicStorageItems &&
-              privateAndPublicStorageItems.map((item) => (
-                <StorageCard key={item.pathIdentifier} content={item} />
-              ))}
+            {privateAndPublicStorageItems.map((item) => (
+              <StorageCard key={item.pathIdentifier} content={item} />
+            ))}
           </div>
           <div className={classes.gridExtendable}>
-            {basicStorageItems &&
-              basicStorageItems.map((item) => (
-                <div
-                  key={item.pathIdentifier}
-                  id={item.pathIdentifier}
-                  className={classNames({
-                    [classes.gridItemExtended]: expandedCardIds.has(
-                      item.pathIdentifier
-                    ),
-                  })}
-                >
-                  <ExtendableStorageCard
-                    content={item}
-                    toggleExtended={toggleExtended}
-                    expendedCardIds={expandedCardIds}
-                  />
-                </div>
-              ))}
+            {basicStorageItems.map((item) => (
+              <ExtendableStorageCard
+                key={item.id}
+                content={item}
+                toggleExtended={toggleExtended}
+                expendedCardIds={expandedCardIds}
+                className={classNames({
+                  [classes.gridItemExtended]: expandedCardIds.has(
+                    item.pathIdentifier
+                  ),
+                })}
+              />
+            ))}
           </div>
         </DetailsTabItem>
         {!!account.code && (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import classes from "./ExtendableStorageCard.module.scss";
 import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
@@ -9,14 +9,16 @@ type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
   toggleExtended: (id: string) => void;
   expendedCardIds: Set<string>;
+  className?: string;
 };
 
 export function ExtendableStorageCard({
   content,
   toggleExtended,
   expendedCardIds,
+  className,
 }: ExtendableStorageCardProps) {
-  const extendClass = classNames({
+  const extendClass = classNames(className, {
     [classes.root]: true,
     [classes.gridItemExtended]: expendedCardIds.has(content.pathIdentifier),
   });
