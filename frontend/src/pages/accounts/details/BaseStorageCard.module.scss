@@ -98,11 +98,13 @@
     }
 
     .tags {
-      display: inline-block;
+      display: flex;
+      flex-wrap: wrap;
       overflow: hidden;
       margin-top: 20px;
 
       .badge {
+        margin-right: $spacing-s;
         width: fit-content;
         margin-bottom: 8px;
         border: 0.5px solid $purple;
