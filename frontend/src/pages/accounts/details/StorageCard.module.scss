@@ -8,6 +8,7 @@
   width: 100%;
   border-radius: 10px;
   height: 196px;
+  overflow: hidden;
   background-color: #4c536c;
 
   .content {
@@ -41,7 +42,8 @@
       margin-top: 6px;
       display: inline-block;
       overflow: hidden;
-      max-width: 15vw;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
   }
 }

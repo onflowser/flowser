@@ -176,28 +176,6 @@ const Details: FunctionComponent = () => {
         </div>
       </Card>
       <DetailsTabs>
-        <DetailsTabItem
-          label="CONTRACTS"
-          value={contracts.length}
-          onClick={() =>
-            updateSearchBar("search for contracts", !contracts.length)
-          }
-        >
-          <Table<DecoratedPollingEntity<AccountContract>>
-            columns={columnsContract}
-            data={contracts}
-          />
-        </DetailsTabItem>
-        <DetailsTabItem label="KEYS" value={keys.length}>
-          <Fragment
-            onMount={() => updateSearchBar("search for keys", !keys.length)}
-          >
-            <Table<DecoratedPollingEntity<AccountKey>>
-              columns={columnsKeys}
-              data={keys}
-            />
-          </Fragment>
-        </DetailsTabItem>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
@@ -219,6 +197,28 @@ const Details: FunctionComponent = () => {
               />
             ))}
           </div>
+        </DetailsTabItem>
+        <DetailsTabItem
+          label="CONTRACTS"
+          value={contracts.length}
+          onClick={() =>
+            updateSearchBar("search for contracts", !contracts.length)
+          }
+        >
+          <Table<DecoratedPollingEntity<AccountContract>>
+            columns={columnsContract}
+            data={contracts}
+          />
+        </DetailsTabItem>
+        <DetailsTabItem label="KEYS" value={keys.length}>
+          <Fragment
+            onMount={() => updateSearchBar("search for keys", !keys.length)}
+          >
+            <Table<DecoratedPollingEntity<AccountKey>>
+              columns={columnsKeys}
+              data={keys}
+            />
+          </Fragment>
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">

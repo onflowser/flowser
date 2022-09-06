@@ -11,24 +11,21 @@ type StorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
 };
 
-export function StorageCard({ content }: StorageCardProps) {
+export function StorageCard({ content }: StorageCardProps): ReactElement {
+  const borrowType = content.data?.BorrowType ?? "-";
+  const targetPathIdentifier = content.data?.TargetPath?.Identifier ?? "-";
   return (
     <div className={classes.root}>
       <div className={classes.content}>
         <StorageBadge
           text={FlowUtils.getLowerCasedPathDomain(content.pathDomain)}
         />
-
         <div className={classes.identifier}>{content.pathIdentifier}</div>
         <NavLink className={classes.link} to={"#"}>
           <LinkIcon />
-          <div className={classes.linkText}>
-            {content.data && content.data.TargetPath.Identifier}
-          </div>
+          <div className={classes.linkText}>{targetPathIdentifier}</div>
         </NavLink>
-        <div className={classes.bottomText}>
-          \u0026A.f8d6e0586b0a20c7.LockedTokens.TokenAdminCollection
-        </div>
+        <span className={classes.bottomText}>{borrowType}</span>
       </div>
     </div>
   );
