@@ -26,7 +26,7 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
-import { StatusIcon } from "components/status-icon/StatusIcon";
+import { ExecutionStatus } from "components/status/ExecutionStatus";
 
 type RouteParams = {
   blockId: string;
@@ -72,12 +72,12 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("status.statusCode", {
+  columnHelper.accessor("status", {
     header: () => <Label variant="medium">STATUS</Label>,
     cell: (info) => (
       <div>
         <Value>
-          <StatusIcon status={info.getValue()} />
+          <ExecutionStatus status={info.getValue()} />
         </Value>
       </div>
     ),

@@ -1,13 +1,17 @@
 import {
+  AccountStorageDomain,
+  GrcpStatusCode,
   HashAlgorithm,
   SignatureAlgorithm,
-  GrcpStatusCode,
-  AccountStorageDomain,
+  TransactionStatusCode,
 } from "@flowser/shared";
 import React from "react";
 import { ReactComponent as ExpiredIcon } from "../assets/icons/expired-tx-icon.svg";
 import { ReactComponent as SealedIcon } from "../assets/icons/sealed-tx-icon.svg";
 import { ReactComponent as UnknownIcon } from "../assets/icons/unknown-tx-icon.svg";
+import { ReactComponent as PendingIcon } from "../assets/icons/pending-tx-icon.svg";
+import { ReactComponent as FinalizedIcon } from "../assets/icons/finalised-tx-icon.svg";
+import { ReactComponent as ExecutedIcon } from "../assets/icons/executed-tx-icon.svg";
 
 export class FlowUtils {
   static isInitialBlockId(value: number | string): boolean {
@@ -76,39 +80,66 @@ export class FlowUtils {
       case GrcpStatusCode.GRCP_STATUS_OK:
         return <SealedIcon />;
       case GrcpStatusCode.GRCP_STATUS_CANCELLED:
-        return <ExpiredIcon />;
-      case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
-        return <UnknownIcon />;
       case GrcpStatusCode.GRCP_STATUS_INVALID_ARGUMENT:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_DEADLINE_EXCEEDED:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_NOT_FOUND:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_ALREADY_EXISTS:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_FAILED_PRECONDITION:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_ABORTED:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_OUT_OF_RANGE:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_UNIMPLEMENTED:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_INTERNAL:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_UNAVAILABLE:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
-        return <ExpiredIcon />;
       case GrcpStatusCode.GRCP_STATUS_UNAUTHENTICATED:
         return <ExpiredIcon />;
+      case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
       default:
         return <UnknownIcon />;
+    }
+  }
+
+  static getExecutionStatusIcon(
+    statusCode: TransactionStatusCode | undefined
+  ): JSX.Element {
+    switch (statusCode) {
+      case TransactionStatusCode.TX_STATUS_EXECUTED:
+        return <ExecutedIcon />;
+      case TransactionStatusCode.TX_STATUS_EXPIRED:
+        return <ExpiredIcon />;
+      case TransactionStatusCode.TX_STATUS_FINALIZED:
+        return <FinalizedIcon />;
+      case TransactionStatusCode.TX_STATUS_SEALED:
+        return <SealedIcon />;
+      case TransactionStatusCode.TX_STATUS_PENDING:
+        return <PendingIcon />;
+      case TransactionStatusCode.TX_STATUS_UNKNOWN:
+        return <UnknownIcon />;
+      default:
+        return <></>;
+    }
+  }
+
+  static getExecutionStatusName(
+    statusCode: TransactionStatusCode | undefined
+  ): string {
+    switch (statusCode) {
+      case TransactionStatusCode.TX_STATUS_EXECUTED:
+        return "Executed";
+      case TransactionStatusCode.TX_STATUS_EXPIRED:
+        return "Expired";
+      case TransactionStatusCode.TX_STATUS_FINALIZED:
+        return "Finalized";
+      case TransactionStatusCode.TX_STATUS_SEALED:
+        return "Sealed";
+      case TransactionStatusCode.TX_STATUS_PENDING:
+        return "Pending";
+      case TransactionStatusCode.TX_STATUS_UNKNOWN:
+        return "Unknown";
+      default:
+        return "-";
     }
   }
 
