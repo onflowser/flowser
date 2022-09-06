@@ -12,6 +12,9 @@ import { ensurePrefixedAddress } from "../../utils";
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {
   @PrimaryColumn()
+  id: string;
+
+  @Column()
   pathIdentifier: string;
 
   @PrimaryColumn()
@@ -25,11 +28,6 @@ export class AccountStorageItemEntity extends PollingEntity {
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
-
-  get id() {
-    const domain = this.getLowerCasedPathDomain();
-    return `/${domain}/${this.pathIdentifier}`;
-  }
 
   toProto(): AccountStorageItem {
     return {
@@ -53,6 +51,9 @@ export class AccountStorageItemEntity extends PollingEntity {
     const storageItem = new AccountStorageItemEntity();
     storageItem.pathIdentifier = flowStorageIdentifier;
     storageItem.pathDomain = this.convertFlowStorageDomain(flowStorageDomain);
+    storageItem.id = `${
+      flowAccountStorage.Address
+    }/${storageItem.getLowerCasedPathDomain()}/${storageItem.pathIdentifier}`;
 
     // TODO(milestone-x): For now we will just show plain (unparsed) storage data
     // But in the future we will want to parse it so that we can extract info

@@ -27,7 +27,6 @@ import {
   AccountContract,
   AccountKey,
   AccountStorageDomain,
-  AccountStorageItem,
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
@@ -107,6 +106,7 @@ const Details: FunctionComponent = () => {
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
+  // TODO(milestone-5): Should we show all transactions of account?
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
@@ -179,7 +179,7 @@ const Details: FunctionComponent = () => {
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
-              <StorageCard key={item.pathIdentifier} content={item} />
+              <StorageCard key={item.id} content={item} />
             ))}
           </div>
           <div className={classes.gridExtendable}>

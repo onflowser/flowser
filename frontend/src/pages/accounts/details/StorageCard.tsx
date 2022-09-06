@@ -12,8 +12,13 @@ type StorageCardProps = {
 };
 
 export function StorageCard({ content }: StorageCardProps): ReactElement {
-  const borrowType = content.data?.BorrowType ?? "-";
   const targetPathIdentifier = content.data?.TargetPath?.Identifier ?? "-";
+  const borrowType = content.data?.BorrowType ?? "-";
+  const borrowTypePathParts = borrowType?.split(".");
+  const targetAccountAddress = `0x${borrowTypePathParts?.[1]}`;
+  const targetUrl = borrowTypePathParts
+    ? `/accounts/details/${targetAccountAddress}`
+    : "#";
   return (
     <div className={classes.root}>
       <div className={classes.content}>
@@ -21,7 +26,7 @@ export function StorageCard({ content }: StorageCardProps): ReactElement {
           text={FlowUtils.getLowerCasedPathDomain(content.pathDomain)}
         />
         <div className={classes.identifier}>{content.pathIdentifier}</div>
-        <NavLink className={classes.link} to={"#"}>
+        <NavLink className={classes.link} to={targetUrl}>
           <LinkIcon />
           <div className={classes.linkText}>{targetPathIdentifier}</div>
         </NavLink>
