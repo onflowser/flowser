@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import classes from "./ExtendableStorageCard.module.scss";
+import classes from "./BaseStorageCard.module.scss";
 import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
@@ -12,7 +12,7 @@ type ExtendableStorageCardProps = {
   className?: string;
 };
 
-export function ExtendableStorageCard({
+export function BaseStorageCard({
   content,
   onToggleExpand,
   isExpanded,

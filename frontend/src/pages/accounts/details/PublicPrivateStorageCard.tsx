@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import classes from "./StorageCard.module.scss";
+import classes from "./PublicPrivateStorageCard.module.scss";
 import { StorageDomainBadge } from "./StorageDomainBadge";
 import { NavLink } from "react-router-dom";
 import { ReactComponent as LinkIcon } from "../../../assets/icons/link.svg";
@@ -10,7 +10,9 @@ type StorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
 };
 
-export function StorageCard({ content }: StorageCardProps): ReactElement {
+export function PublicPrivateStorageCard({
+  content,
+}: StorageCardProps): ReactElement {
   const targetPathIdentifier = content.data?.TargetPath?.Identifier ?? "-";
   const borrowType = content.data?.BorrowType ?? "-";
   const borrowTypePathParts = borrowType?.split(".");

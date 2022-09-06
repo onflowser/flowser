@@ -32,8 +32,8 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
-import { StorageCard } from "./StorageCard";
-import { ExtendableStorageCard } from "./ExtendableStorageCard";
+import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
+import { BaseStorageCard } from "./BaseStorageCard";
 import classNames from "classnames";
 import { useUrlQuery } from "../../../hooks/use-url-query";
 
@@ -147,7 +147,7 @@ const Details: FunctionComponent = () => {
   const publicStorageItems = storageItems.filter(
     (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
   );
-  const basicStorageItems = storageItems.filter(
+  const baseStorageItems = storageItems.filter(
     (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
   );
 
@@ -190,12 +190,12 @@ const Details: FunctionComponent = () => {
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
-              <StorageCard key={item.id} content={item} />
+              <PublicPrivateStorageCard key={item.id} content={item} />
             ))}
           </div>
           <div className={classes.gridExtendable}>
-            {basicStorageItems.map((item) => (
-              <ExtendableStorageCard
+            {baseStorageItems.map((item) => (
+              <BaseStorageCard
                 key={item.id}
                 content={item}
                 onToggleExpand={() => toggleCardExpand(item.id)}
