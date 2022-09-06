@@ -4,6 +4,7 @@ import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
+import ReactJson from "react-json-view";
 
 type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
@@ -45,9 +46,13 @@ export function BaseStorageCard({
       <div className={classes.body}>
         <div className={classes.title}>{content.pathIdentifier}</div>
         {isExpanded ? (
-          <pre className={classes.json}>
-            {JSON.stringify(content.data, undefined, 2)}
-          </pre>
+          <div className={classes.json}>
+            <ReactJson
+              style={{ backgroundColor: "none" }}
+              theme="ashes"
+              src={content.data as Record<string, unknown>}
+            />
+          </div>
         ) : (
           <div className={classes.tags}>
             <div className={classes.badge}>ResourceType</div>

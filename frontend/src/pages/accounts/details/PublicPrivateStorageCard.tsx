@@ -18,6 +18,7 @@ export function PublicPrivateStorageCard({
   const borrowTypePathParts = borrowType?.split(".");
   const targetAccountAddress = `0x${borrowTypePathParts?.[1]}`;
   const targetStorageId = `${targetAccountAddress}/storage/${targetPathIdentifier}`;
+  // TODO(milestone-x): Navigate to a specific sub-structure of the react-json-view (research)?
   const targetUrl = borrowTypePathParts
     ? `/accounts/details/${targetAccountAddress}?focusedStorageId=${targetStorageId}`
     : "#";
