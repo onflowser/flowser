@@ -12,7 +12,20 @@
   .header {
     display: flex;
     justify-content: space-between;
-    background-color: #8693b0;
+    background: rgb(127, 137, 174);
+    background: linear-gradient(
+      90deg,
+      rgba(127, 137, 174, 1) 0%,
+      rgba(138, 146, 175, 1) 4%,
+      rgba(140, 147, 174, 1) 12%,
+      rgba(147, 146, 176, 1) 17%,
+      rgba(141, 143, 176, 1) 22%,
+      rgba(131, 147, 175, 1) 36%,
+      rgba(129, 133, 176, 1) 57%,
+      rgba(132, 149, 175, 1) 73%,
+      rgba(124, 150, 175, 1) 89%,
+      rgba(136, 160, 169, 1) 100%
+    );
     border-radius: 10px 10px 0px 0px;
 
     .type {
