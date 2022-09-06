@@ -1,0 +1,12 @@
+@import 'styles/spacings';
+@import 'styles/typography';
+@import 'styles/colors';
+
+.root {
+  font-size: $font-size-xsmall;
+  display: flex;
+  align-items: center;
+  border-radius: 100px;
+  padding: 0 $spacing-base;
+  font-weight: bold;
+}
