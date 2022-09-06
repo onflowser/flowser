@@ -29,6 +29,8 @@ export function BaseStorageCard({
     [classes.circleClosed]: isExpanded,
   });
 
+  const storageDataPaths = getDataTypeKeysInStorageData(content.data);
+
   return (
     <div className={extendClass}>
       <div className={classes.header}>
@@ -55,11 +57,57 @@ export function BaseStorageCard({
           </div>
         ) : (
           <div className={classes.tags}>
-            <div className={classes.badge}>ResourceType</div>
-            <div className={classes.badge}>flowContractAuditVouchersAdmin</div>
+            {storageDataPaths.map((path) => (
+              <div key={path} className={classes.badge}>
+                {path}
+              </div>
+            ))}
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function getDataTypeKeysInStorageData(
+  storageData: Record<string, unknown> | undefined
+): string[] {
+  const nestedObjectsKeys = Object.keys(storageData ?? {});
+  const uniqueDataTypes = new Set<string>();
+  const addAll = (values: string[]) =>
+    values.forEach((value) => uniqueDataTypes.add(value));
+
+  addAll(getDataTypeKeysAtCurrentDepth(storageData));
+
+  // Find all data type keys that are stored in nested objects
+  for (const key of nestedObjectsKeys) {
+    const nestedObjectCandidate = storageData?.[key] as
+      | Record<string, unknown>
+      | undefined;
+    const isValidCandidate =
+      typeof nestedObjectCandidate === "object" &&
+      nestedObjectCandidate !== null;
+    if (isValidCandidate) {
+      const nestedDataTypeKeys = getDataTypeKeysInStorageData(
+        nestedObjectCandidate
+      );
+      addAll(nestedDataTypeKeys);
+    }
+  }
+  return [...uniqueDataTypes];
+}
+
+function getDataTypeKeysAtCurrentDepth(
+  storageData: Record<string, unknown> | undefined
+): string[] {
+  const compositeDataTypeKeyPattern = /[a-zA-Z]+Type/;
+  const keys = Object.keys(storageData ?? {});
+  const compositeDataTypes = keys.filter((key) =>
+    compositeDataTypeKeyPattern.test(key)
+  );
+  const simpleDataTypes =
+    storageData !== undefined && "value" in storageData
+      ? [typeof storageData.value]
+      : [];
+  return [...compositeDataTypes, ...simpleDataTypes];
 }
