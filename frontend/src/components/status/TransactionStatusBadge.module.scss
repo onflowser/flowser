@@ -2,36 +2,11 @@
 @import 'styles/typography';
 @import 'styles/colors';
 
-.status {
+.root {
   font-size: $font-size-xsmall;
   display: flex;
   align-items: center;
-
-  > span {
-    margin-left: $spacing-s;
-  }
-
-  &.unknown {
-    color: $color-status-unknown;
-  }
-
-  &.pending {
-    color: $color-status-pending;
-  }
-
-  &.finalized {
-    color: $color-status-finalized;
-  }
-
-  &.executed {
-    color: $color-status-executed;
-  }
-
-  &.sealed {
-    color: $light-green;
-  }
-
-  &.expired {
-    color: $color-status-expired;
-  }
+  border-radius: 100px;
+  padding: 0 $spacing-base;
+  font-weight: bold;
 }

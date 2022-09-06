@@ -226,27 +226,25 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <DetailsCard
-        Header={() => (
+        header={
           <>
             <div>
               <Label variant="large">TRANSACTION</Label>
               <Value variant="large">{transaction.id}</Value>
             </div>
             <div>
-              <TransactionStatusBadge
-                statusCode={transaction.status?.executionStatus}
-              />
+              <TransactionStatusBadge status={transaction.status} />
             </div>
           </>
-        )}
-        Footer={() => (
+        }
+        footer={
           <>
             <TimeAgo date={new Date(transaction.createdAt).toISOString()} />
             <DateWithCalendar
               date={new Date(transaction.createdAt).toISOString()}
             />
           </>
-        )}
+        }
       >
         <div className={classes.firstLine}>
           <Label variant="large">BLOCK ID</Label>

@@ -1,71 +1,62 @@
 import React, { FunctionComponent } from "react";
+import { ExecutionStatusCode, TransactionStatus } from "@flowser/shared";
 import classes from "./TransactionStatusBadge.module.scss";
-import { ReactComponent as ExecutedIcon } from "../../assets/icons/executed-tx-icon.svg";
-import { ReactComponent as ExpiredIcon } from "../../assets/icons/expired-tx-icon.svg";
-import { ReactComponent as FinalisedIcon } from "../../assets/icons/finalised-tx-icon.svg";
-import { ReactComponent as PendingIcon } from "../../assets/icons/pending-tx-icon.svg";
-import { ReactComponent as SealedIcon } from "../../assets/icons/sealed-tx-icon.svg";
-import { ReactComponent as UnknownIcon } from "../../assets/icons/unknown-tx-icon.svg";
-import { ExecutionStatusCode } from "@flowser/shared";
+import { FlowUtils } from "../../utils/flow-utils";
 
 type ExecutionStatusCodeProps = {
-  statusCode: ExecutionStatusCode | undefined;
+  status: TransactionStatus | undefined;
 };
 
 const TransactionStatusBadge: FunctionComponent<ExecutionStatusCodeProps> = ({
-  statusCode,
+  status,
 }) => {
-  // TODO(milestone-3): add tooltip for each status code
-  switch (statusCode) {
-    case ExecutionStatusCode.EXECUTION_STATUS_UNKNOWN:
-      return (
-        <span className={`${classes.status} ${classes.unknown}`}>
-          <UnknownIcon />
-          <span>UNKNOWN</span>
-        </span>
-      );
-    case ExecutionStatusCode.EXECUTION_STATUS_PENDING:
-      return (
-        <span className={`${classes.status} ${classes.pending}`}>
-          <PendingIcon />
-          <span>PENDING</span>
-        </span>
-      );
-    case ExecutionStatusCode.EXECUTION_STATUS_FINALIZED:
-      return (
-        <span className={`${classes.status} ${classes.finalized}`}>
-          <FinalisedIcon />
-          <span>FINALIZED</span>
-        </span>
-      );
-    case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:
-      return (
-        <span className={`${classes.status} ${classes.executed}`}>
-          <ExecutedIcon />
-          <span>EXECUTED</span>
-        </span>
-      );
-    case ExecutionStatusCode.EXECUTION_STATUS_SEALED:
-      return (
-        <span className={`${classes.status} ${classes.sealed}`}>
-          <SealedIcon />
-          <span>SEALED</span>
-        </span>
-      );
-    case ExecutionStatusCode.EXECUTION_STATUS_EXPIRED:
-      return (
-        <span className={`${classes.status} ${classes.expired}`}>
-          <ExpiredIcon />
-          <span>EXPIRED</span>
-        </span>
-      );
-    default:
-      return (
-        <>
-          <UnknownIcon />
-        </>
-      );
-  }
+  const statusName = FlowUtils.getExecutionStatusName(status?.executionStatus);
+  const backgroundColor = getBackgroundColor(status?.executionStatus);
+  const color = getTextColor(status?.executionStatus);
+
+  return (
+    <div className={classes.root} style={{ backgroundColor, color }}>
+      {statusName}
+    </div>
+  );
 };
+
+function getBackgroundColor(statusCode: ExecutionStatusCode | undefined) {
+  switch (statusCode) {
+    case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:
+      return "#9D3CC7";
+    case ExecutionStatusCode.EXECUTION_STATUS_EXPIRED:
+      return "#dd868b";
+    case ExecutionStatusCode.EXECUTION_STATUS_FINALIZED:
+      return "#F89473";
+    case ExecutionStatusCode.EXECUTION_STATUS_PENDING:
+      return "#EAEA84";
+    case ExecutionStatusCode.EXECUTION_STATUS_SEALED:
+      return "#A2CE8D";
+    case ExecutionStatusCode.EXECUTION_STATUS_UNKNOWN:
+    case ExecutionStatusCode.UNRECOGNIZED:
+    default:
+      return "#D0D2D6";
+  }
+}
+
+function getTextColor(statusCode: ExecutionStatusCode | undefined) {
+  switch (statusCode) {
+    case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:
+      return "#218300";
+    case ExecutionStatusCode.EXECUTION_STATUS_EXPIRED:
+      return "#FFFFFF";
+    case ExecutionStatusCode.EXECUTION_STATUS_FINALIZED:
+      return "#FFFFFF";
+    case ExecutionStatusCode.EXECUTION_STATUS_PENDING:
+      return "#A88903";
+    case ExecutionStatusCode.EXECUTION_STATUS_SEALED:
+      return "#218300";
+    case ExecutionStatusCode.EXECUTION_STATUS_UNKNOWN:
+    case ExecutionStatusCode.UNRECOGNIZED:
+    default:
+      return "#837E7E";
+  }
+}
 
 export default TransactionStatusBadge;
