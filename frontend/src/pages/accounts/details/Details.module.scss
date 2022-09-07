@@ -15,10 +15,11 @@
 
     & > div {
       display: flex;
-      margin-bottom: $spacing-l;
+      margin-bottom: $spacing-base;
+      margin-top: $spacing-base;
 
       .label {
-        margin-left: $spacing-l;
+        margin-left: $spacing-xl * 2;
         margin-right: 18px;
         display: inline-flex;
       }
