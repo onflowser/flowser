@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseInterceptors, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { EventsService } from "./events.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
@@ -31,7 +38,7 @@ export class EventsController {
   }
 
   @ApiParam({ name: "id", type: String })
-  @Get("/transactions/:id/events/polling")
+  @Post("/transactions/:id/events/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
   async findAllNewByTransaction(@Body() data) {
     const request = GetPollingEventsByTransactionRequest.fromJSON(data);
@@ -43,7 +50,7 @@ export class EventsController {
     return events.map((event) => event.toProto());
   }
 
-  @Get("/events/polling")
+  @Post("/events/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
   async findAllNew(@Body() data) {
     const request = GetPollingEventsRequest.fromJSON(data);

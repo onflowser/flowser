@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Param, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseInterceptors,
+} from "@nestjs/common";
 import { BlocksService } from "./blocks.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
@@ -21,7 +28,7 @@ export class BlocksController {
     });
   }
 
-  @Get("/polling")
+  @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingBlocksResponse))
   async findAllNew(@Body() data) {
     const request = GetPollingBlocksRequest.fromJSON(data);

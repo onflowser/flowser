@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseInterceptors, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { ContractsService } from "../services/contracts.service";
 import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
@@ -22,7 +29,7 @@ export class ContractsController {
     });
   }
 
-  @Get("contracts/polling")
+  @Post("contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
   async findAllNew(@Body() data) {
     const request = GetPollingContractsRequest.fromJSON(data);
@@ -33,7 +40,7 @@ export class ContractsController {
   }
 
   @ApiParam({ name: "id", type: String })
-  @Get("/accounts/:address/contracts/polling")
+  @Post("/accounts/:address/contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
   async findAllNewByAccount(@Param("address") accountAddress, @Body() data) {
     const request = GetPollingContractsByAccountRequest.fromJSON(data);

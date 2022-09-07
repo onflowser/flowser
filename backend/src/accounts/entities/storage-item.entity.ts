@@ -12,6 +12,9 @@ import { ensurePrefixedAddress } from "../../utils";
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {
   @PrimaryColumn()
+  id: string;
+
+  @Column()
   pathIdentifier: string;
 
   @PrimaryColumn()
@@ -25,11 +28,6 @@ export class AccountStorageItemEntity extends PollingEntity {
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
-
-  get id() {
-    const domain = this.getLowerCasedPathDomain();
-    return `/${domain}/${this.pathIdentifier}`;
-  }
 
   toProto(): AccountStorageItem {
     return {
@@ -68,6 +66,9 @@ export class AccountStorageItemEntity extends PollingEntity {
     storageItem.accountAddress = ensurePrefixedAddress(
       flowAccountStorage.Address
     );
+    storageItem.id = `${
+      storageItem.accountAddress
+    }/${storageItem.getLowerCasedPathDomain()}/${storageItem.pathIdentifier}`;
     return storageItem;
   }
 

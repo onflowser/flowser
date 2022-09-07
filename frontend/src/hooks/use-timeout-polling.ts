@@ -43,11 +43,14 @@ export const useTimeoutPolling = <
     return props.fetcher({ timestamp: lastPollingTime });
   }, [lastPollingTime]);
 
+  useEffect(() => fetchAll(), [props.resourceKey]);
+
   const { isFetching, error, refetch } = useQuery<PollingResponse<T[]>, Error>(
     props.resourceKey,
     fetchCallback,
     {
       onSuccess: (response) => {
+        console.log(props.resourceKey, response);
         if (response.data.length) {
           const latestTimestamp = response.meta?.latestTimestamp ?? 0;
 
@@ -103,6 +106,7 @@ export const useTimeoutPolling = <
   const fetchAll = useCallback(() => {
     setData([]);
     setLastPollingTime(0);
+    setFirstFetch(true);
     refetch();
   }, []);
 
