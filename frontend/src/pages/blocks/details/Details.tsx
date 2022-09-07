@@ -25,18 +25,17 @@ import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
-import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
 
 type RouteParams = {
   blockId: string;
 };
 
-// TRANSACTIONS TABLE
-const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
+const txTableColHelper =
+  createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
-const columns = [
-  columnHelper.accessor("id", {
+const txTableColumns = [
+  txTableColHelper.accessor("id", {
     header: () => <Label variant="medium">TRANSACTION ID</Label>,
     cell: (info) => (
       <Value>
@@ -46,7 +45,7 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("payer", {
+  txTableColHelper.accessor("payer", {
     header: () => <Label variant="medium">PAYER</Label>,
     cell: (info) => (
       <Value>
@@ -56,7 +55,7 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("proposalKey", {
+  txTableColHelper.accessor("proposalKey", {
     header: () => <Label variant="medium">PROPOSER</Label>,
     cell: (info) => (
       <Value>
@@ -72,7 +71,7 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("status", {
+  txTableColHelper.accessor("status", {
     header: () => <Label variant="medium">STATUS</Label>,
     cell: (info) => (
       <div>
@@ -111,12 +110,17 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.firstRow}>
-        <Label variant="large">BLOCK ID</Label>
-        <Value variant="large">{block.id}</Value>
-        <CopyButton value={block.id} />
-      </div>
       <Card className={classes.bigCard}>
+        <div>
+          <Label variant="large" className={classes.label}>
+            BLOCK ID
+          </Label>
+          <Value variant="large">
+            <NavLink to={`/blocks/details/${block.parentId}`}>
+              {block.id}
+            </NavLink>
+          </Value>
+        </div>
         <div>
           <Label variant="large" className={classes.label}>
             PARENT ID
@@ -147,7 +151,7 @@ const Details: FunctionComponent = () => {
             {transactions && (
               <Table<DecoratedPollingEntity<Transaction>>
                 data={transactions}
-                columns={columns}
+                columns={txTableColumns}
               />
             )}
           </Fragment>

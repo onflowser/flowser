@@ -22,7 +22,6 @@ import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
 } from "../../../hooks/use-api";
-import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
 import Table from "../../../components/table/Table";
@@ -31,7 +30,6 @@ import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
-import { ExecutionStatus } from "components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 
 type RouteParams = {

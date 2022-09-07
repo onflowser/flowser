@@ -179,12 +179,13 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.firstRow}>
-        <Label variant="large">ADDRESS</Label>
-        <Value variant="large">{account.address}</Value>
-        <CopyButton value={account.address} />
-      </div>
       <Card className={classes.bigCard}>
+        <div>
+          <Label variant="large" className={classes.label}>
+            ADDRESS
+          </Label>
+          <Value variant="large">{account.address}</Value>
+        </div>
         <div>
           <Label variant="large" className={classes.label}>
             BALANCE
