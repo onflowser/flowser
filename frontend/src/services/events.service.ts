@@ -13,7 +13,7 @@ export class EventsService {
     timestamp: number;
   }): Promise<GetPollingEventsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/events/polling`,
       requestData: data,
       requestProtobuf: GetPollingEventsRequest,
@@ -29,7 +29,7 @@ export class EventsService {
     transactionId: string;
   }): Promise<GetPollingEventsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/transactions/${transactionId}/events/polling`,
       requestData: data,
       requestProtobuf: GetPollingEventsByTransactionRequest,

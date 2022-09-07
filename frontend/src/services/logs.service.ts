@@ -8,7 +8,7 @@ export class LogsService {
     timestamp: number;
   }): Promise<GetPollingLogsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/logs/polling`,
       requestData: data,
       requestProtobuf: GetPollingLogsRequest,

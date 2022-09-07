@@ -24,6 +24,9 @@ import Transactions from "./pages/transactions/Transactions";
 import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
+import { ProjectActionsProvider } from "./contexts/project-actions.context";
+import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
@@ -63,41 +66,46 @@ const BrowserRouterEvents = withRouter(
   }
 );
 
+const queryClient = new QueryClient();
+
 export const FlowserClientApp = () => {
   return (
-    <UiStateContextProvider>
-      <FlowserRouter />
-    </UiStateContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ConfirmDialogProvider>
+          <ProjectActionsProvider>
+            <UiStateContextProvider>
+              <FlowserRoutes />
+            </UiStateContextProvider>
+          </ProjectActionsProvider>
+        </ConfirmDialogProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
-export const FlowserRouter = () => {
+export const FlowserRoutes = () => {
   return (
-    <BrowserRouter>
-      <BrowserRouterEvents>
-        <Switch>
-          <Route path={`/${routes.start}`} component={Start} />
-          <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
-          <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
-          <RouteWithLayout
-            path={`/${routes.transactions}`}
-            component={Transactions}
-          />
-          <RouteWithLayout
-            path={`/${routes.contracts}`}
-            component={Contracts}
-          />
-          <RouteWithLayout path={`/${routes.events}`} component={Events} />
-          <RouteWithLayout path={`/${routes.project}`} component={Project} />
-          <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
-          <Redirect from="*" to={`/${routes.start}`} />
-        </Switch>
-        <Toaster
-          position="bottom-center"
-          gutter={8}
-          toastOptions={toastOptions}
+    <BrowserRouterEvents>
+      <Switch>
+        <Route path={`/${routes.start}`} component={Start} />
+        <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
+        <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
+        <RouteWithLayout
+          path={`/${routes.transactions}`}
+          component={Transactions}
         />
-      </BrowserRouterEvents>
-    </BrowserRouter>
+        <RouteWithLayout path={`/${routes.contracts}`} component={Contracts} />
+        <RouteWithLayout path={`/${routes.events}`} component={Events} />
+        <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
+        <RouteWithLayout path={`/${routes.project}`} component={Project} />
+        <Redirect from="*" to={`/${routes.start}`} />
+      </Switch>
+      <Toaster
+        position="bottom-center"
+        gutter={8}
+        toastOptions={toastOptions}
+      />
+    </BrowserRouterEvents>
   );
 };

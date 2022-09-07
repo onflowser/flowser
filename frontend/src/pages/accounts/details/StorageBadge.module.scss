@@ -1,0 +1,21 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+
+  .badge {
+    margin-right: 30px;
+    border-radius: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: 600;
+    background: linear-gradient(90deg, rgba(127, 137, 174, 1) 0%, rgba(138, 146, 175, 1) 4%, rgba(140, 147, 174, 1) 11%, rgba(147, 146, 176, 1) 15%, rgba(141, 143, 176, 1) 21%, rgba(131, 147, 175, 1) 57%, rgba(132, 149, 175, 1) 72%, rgba(124, 150, 175, 1) 89%, rgba(136, 160, 169, 1) 100%);
+    color: $dark-violet;
+    font-size: $font-size-normal;
+    text-transform: uppercase;
+  }
+}

@@ -5,7 +5,12 @@ export type ComputedEventData = {
 };
 
 export class EventUtils {
-  static computeEventData(data: Record<string, unknown>): ComputedEventData[] {
+  static computeEventData(
+    data: Record<string, unknown> | undefined
+  ): ComputedEventData[] {
+    if (!data) {
+      return [];
+    }
     const keys = Object.keys(data);
     return keys.map((key) => {
       const item = data[key];

@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseInterceptors, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { AccountsService } from "../services/accounts.service";
 import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
@@ -32,7 +39,7 @@ export class AccountsController {
   }
 
   @ApiQuery({ name: "timestamp", type: Number })
-  @Get("/polling")
+  @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingAccountsResponse))
   async findAllNew(@Body() data) {
     const request = GetPollingAccountsRequest.fromJSON(data);
@@ -43,7 +50,7 @@ export class AccountsController {
   }
 
   @ApiParam({ name: "address", type: String })
-  @Get(":address/keys/polling")
+  @Post(":address/keys/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingKeysResponse))
   async findAllNewKeysByAccount(
     @Param("address") accountAddress,
@@ -58,7 +65,7 @@ export class AccountsController {
   }
 
   @ApiParam({ name: "address", type: String })
-  @Get(":address/storage/polling")
+  @Post(":address/storage/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingStorageResponse))
   async findAllNewStorageByAccount(
     @Param("address") accountAddress,

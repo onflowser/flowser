@@ -16,7 +16,7 @@ export class TransactionsService {
     timestamp: number;
   }): Promise<GetPollingTransactionsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: "/api/transactions/polling",
       requestData: data,
       requestProtobuf: GetPollingTransactionsRequest,
@@ -32,7 +32,7 @@ export class TransactionsService {
     blockId: string;
   }): Promise<GetPollingTransactionsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/blocks/${blockId}/transactions/polling`,
       requestData: data,
       requestProtobuf: GetPollingTransactionsByBlockRequest,
@@ -48,7 +48,7 @@ export class TransactionsService {
     accountAddress: string;
   }): Promise<GetPollingTransactionsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/accounts/${accountAddress}/transactions/polling`,
       requestData: data,
       requestProtobuf: GetPollingTransactionsByAccountRequest,

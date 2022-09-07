@@ -14,7 +14,7 @@ export class AccountsService {
     timestamp: number;
   }): Promise<GetPollingAccountsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: "/api/accounts/polling",
       requestData: data,
       requestProtobuf: GetPollingAccountsRequest,
@@ -30,7 +30,7 @@ export class AccountsService {
     timestamp: number;
   }): Promise<GetPollingKeysResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/accounts/${accountAddress}/keys/polling`,
       requestData: data,
       requestProtobuf: GetPollingKeysRequest,

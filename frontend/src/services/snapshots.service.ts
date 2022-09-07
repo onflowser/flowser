@@ -48,7 +48,7 @@ export class SnapshotService {
     timestamp: number;
   }): Promise<GetPollingEmulatorSnapshotsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: "/api/flow/snapshots/polling",
       requestData: data,
       requestProtobuf: GetPollingEmulatorSnapshotsRequest,

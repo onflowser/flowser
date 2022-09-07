@@ -2,7 +2,8 @@
 @import "styles/typography";
 
 .root {
-  display: inline-block;
+  display: flex;
+  align-items: center;
 
   a {
     text-decoration: none;
