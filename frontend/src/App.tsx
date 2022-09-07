@@ -70,43 +70,40 @@ const queryClient = new QueryClient();
 export const FlowserClientApp = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ConfirmDialogProvider>
-        <ProjectActionsProvider>
-          <UiStateContextProvider>
-            <FlowserRouter />
-          </UiStateContextProvider>
-        </ProjectActionsProvider>
-      </ConfirmDialogProvider>
+      <BrowserRouter>
+        <ConfirmDialogProvider>
+          <ProjectActionsProvider>
+            <UiStateContextProvider>
+              <FlowserRoutes />
+            </UiStateContextProvider>
+          </ProjectActionsProvider>
+        </ConfirmDialogProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
 
-export const FlowserRouter = () => {
+export const FlowserRoutes = () => {
   return (
-    <BrowserRouter>
-      <BrowserRouterEvents>
-        <Switch>
-          <Route path={`/${routes.start}`} component={Start} />
-          <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
-          <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
-          <RouteWithLayout
-            path={`/${routes.transactions}`}
-            component={Transactions}
-          />
-          <RouteWithLayout
-            path={`/${routes.contracts}`}
-            component={Contracts}
-          />
-          <RouteWithLayout path={`/${routes.events}`} component={Events} />
-          <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
-          <Redirect from="*" to={`/${routes.start}`} />
-        </Switch>
-        <Toaster
-          position="bottom-center"
-          gutter={8}
-          toastOptions={toastOptions}
+    <BrowserRouterEvents>
+      <Switch>
+        <Route path={`/${routes.start}`} component={Start} />
+        <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
+        <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
+        <RouteWithLayout
+          path={`/${routes.transactions}`}
+          component={Transactions}
         />
-      </BrowserRouterEvents>
-    </BrowserRouter>
+        <RouteWithLayout path={`/${routes.contracts}`} component={Contracts} />
+        <RouteWithLayout path={`/${routes.events}`} component={Events} />
+        <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
+        <Redirect from="*" to={`/${routes.start}`} />
+      </Switch>
+      <Toaster
+        position="bottom-center"
+        gutter={8}
+        toastOptions={toastOptions}
+      />
+    </BrowserRouterEvents>
   );
 };

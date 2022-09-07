@@ -2,12 +2,11 @@ import React, { ReactElement, useCallback, useState } from "react";
 import { createContext, useContext } from "react";
 import { routes } from "../constants/routes";
 import { useHistory } from "react-router-dom";
-import { ProjectsService } from "../services/projects.service";
-import { SnapshotService } from "../services/snapshots.service";
 import { useFlow } from "../hooks/use-flow";
 import toast from "react-hot-toast";
 import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
+import { ServiceRegistry } from "../services/service-registry";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
@@ -33,8 +32,7 @@ export function ProjectActionsProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const projectService = ProjectsService.getInstance();
-  const snapshotService = SnapshotService.getInstance();
+  const { projectsService, snapshotService } = ServiceRegistry.getInstance();
 
   const history = useHistory();
   const { showDialog, hideDialog } = useConfirmDialog();
@@ -47,7 +45,7 @@ export function ProjectActionsProvider({
   const confirmProjectRemove = async (project: Project) => {
     setIsRemovingProject(true);
     try {
-      await projectService.removeProject(project.id);
+      await projectsService.removeProject(project.id);
       toast(`Project "${project.name}" deleted!`);
       history.replace(`/${routes.start}`);
     } catch (e) {
@@ -75,7 +73,7 @@ export function ProjectActionsProvider({
   const switchProject = useCallback(async () => {
     setIsSwitching(true);
     try {
-      await projectService.unUseCurrentProject();
+      await projectsService.unUseCurrentProject();
     } catch (e) {
       // nothing critical happened, ignore the error
       console.warn("Couldn't stop the emulator: ", e);

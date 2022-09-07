@@ -113,7 +113,6 @@ const Details: FunctionComponent = () => {
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
-  console.log({ storageItems });
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
   const [expandedCardIds, setExpandedCardIds] = useState(
