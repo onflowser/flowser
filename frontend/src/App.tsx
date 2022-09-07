@@ -75,7 +75,7 @@ export const FlowserRouter = () => {
     <BrowserRouter>
       <BrowserRouterEvents>
         <Switch>
-          <RouteWithLayout path={`/${routes.start}`} component={Start} />
+          <Route path={`/${routes.start}`} component={Start} />
           <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
           <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
           <RouteWithLayout
