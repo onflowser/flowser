@@ -31,6 +31,7 @@ import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
+import ReactTimeAgo from "react-timeago";
 
 type RouteParams = {
   transactionId: string;
@@ -222,87 +223,103 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <DetailsCard
-        header={
-          <>
+      <Card className={classes.bigCard}>
+        <div className={classes.bigCardContent}>
+          <div className={classes.bigCardColumn}>
             <div>
-              <Label variant="large">TRANSACTION</Label>
-              <Value variant="large">{transaction.id}</Value>
-            </div>
-            <div>
+              <Label variant="medium" className={classes.label}>
+                Transaction
+              </Label>
+              <Value variant="small" className={classes.value}>
+                <Ellipsis className={classes.elipsis}>
+                  {transaction.id}
+                </Ellipsis>
+              </Value>
               <TransactionStatusBadge status={transaction.status} />
             </div>
-          </>
-        }
-        footer={
-          <>
-            <TimeAgo date={new Date(transaction.createdAt).toISOString()} />
-            <DateWithCalendar
-              date={new Date(transaction.createdAt).toISOString()}
-            />
-          </>
-        }
-      >
-        <div className={classes.firstLine}>
-          <Label variant="large">BLOCK ID</Label>
-          <Value variant="large">
-            <NavLink to={`/blocks/details/${transaction.blockId}`}>
-              {transaction.blockId}
-            </NavLink>
-          </Value>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Block ID
+              </Label>
+              <Value variant="small" className={classes.value}>
+                <NavLink to={`/blocks/details/${transaction.blockId}`}>
+                  <Ellipsis className={classes.elipsis}>
+                    {transaction.blockId}
+                  </Ellipsis>
+                </NavLink>
+              </Value>
+            </div>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Time Stamp
+              </Label>
+              <Value variant="small" className={classes.value}>
+                {formatDate(transaction.createdAt)}
+              </Value>
+            </div>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Time
+              </Label>
+              <Value variant="small" className={classes.value}>
+                <ReactTimeAgo date={transaction.createdAt} />
+              </Value>
+            </div>
+          </div>
+          <div className={classes.bigCardColumn}>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Proposer
+              </Label>
+              <Value variant="small" className={classes.value}>
+                <NavLink
+                  to={
+                    transaction.proposalKey
+                      ? `/accounts/details/${transaction.proposalKey.address}`
+                      : "#"
+                  }
+                >
+                  {transaction.proposalKey?.address ?? "-"}
+                </NavLink>
+              </Value>
+            </div>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Payer
+              </Label>
+              <Value variant="small" className={classes.value}>
+                <NavLink to={`/accounts/details/${transaction.payer}`}>
+                  {transaction.payer}
+                </NavLink>
+              </Value>
+            </div>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Authorizers
+              </Label>
+              <Value variant="small" className={classes.value}>
+                {transaction.authorizers.map((address: string) => (
+                  <NavLink
+                    key={address}
+                    className={classes.authorizersAddress}
+                    to={`/accounts/${address}`}
+                  >
+                    {address}
+                  </NavLink>
+                ))}
+              </Value>
+            </div>
+            <div>
+              <Label variant="medium" className={classes.label}>
+                Sequence nb.
+              </Label>
+              <Value variant="small" className={classes.value}>
+                {transaction.proposalKey?.sequenceNumber ?? "-"}
+              </Value>
+            </div>
+          </div>
         </div>
-        <div className={classes.twoColumns}>
-          <Label variant="large">PROPOSER</Label>
-          <Value variant="large">
-            <NavLink
-              to={
-                transaction.proposalKey
-                  ? `/accounts/details/${transaction.proposalKey.address}`
-                  : "#"
-              }
-            >
-              {transaction.proposalKey?.address ?? "-"}
-            </NavLink>
-          </Value>
-          {/* TODO(milestone-5): Better organise bellow fields */}
-          <Label variant="large" className={classes.inlineLabel}>
-            Sequence number:
-          </Label>
-          <Value variant="large" className={classes.inlineValue}>
-            {transaction.proposalKey?.sequenceNumber ?? "-"}
-          </Value>
-          <Label variant="large" className={classes.inlineLabel}>
-            GRCP Status:
-          </Label>
-          <Value variant="large" className={classes.inlineValue}>
-            <GrcpStatus status={transaction.status} />
-          </Value>
-        </div>
-        <div>
-          <Label variant="large">PAYER</Label>
-          <Value variant="large">
-            <NavLink to={`/accounts/details/${transaction.payer}`}>
-              {transaction.payer}
-            </NavLink>
-          </Value>
-        </div>
-        <div>
-          <Label variant="large" className={classes.authorizersLabel}>
-            AUTHORIZERS
-          </Label>
-          <Value variant="large">
-            {transaction.authorizers.map((address: string) => (
-              <NavLink
-                key={address}
-                className={classes.authorizersAddress}
-                to={`/accounts/${address}`}
-              >
-                {address}
-              </NavLink>
-            ))}
-          </Value>
-        </div>
-      </DetailsCard>
+      </Card>
       <DetailsTabs>
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript

@@ -26,6 +26,8 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
+import { useFormattedDate } from "hooks/use-formatted-date";
+import ReactTimeAgo from "react-timeago";
 
 type RouteParams = {
   blockId: string;
@@ -97,6 +99,7 @@ const Details: FunctionComponent = () => {
   const { block } = data ?? {};
   const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
   const createdDate = block ? new Date(block.timestamp).toISOString() : "-";
+  const { formatDate } = useFormattedDate();
 
   useEffect(() => {
     showNavigationDrawer(true);
@@ -111,33 +114,47 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <Card className={classes.bigCard}>
-        <div>
-          <Label variant="large" className={classes.label}>
-            BLOCK ID
-          </Label>
-          <Value variant="large">
-            <NavLink to={`/blocks/details/${block.parentId}`}>
-              {block.id}
-            </NavLink>
-          </Value>
-        </div>
-        <div>
-          <Label variant="large" className={classes.label}>
-            PARENT ID
-          </Label>
-          <Value variant="large">
-            {FlowUtils.isInitialBlockId(block.parentId) ? (
-              block.parentId
-            ) : (
+        <div className={classes.bigCardContent}>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Block ID
+            </Label>
+            <Value variant="small" className={classes.value}>
               <NavLink to={`/blocks/details/${block.parentId}`}>
-                {block.parentId}
+                {block.id}
               </NavLink>
-            )}
-          </Value>
-        </div>
-        <div className={classes.dateAndTimeAgo}>
-          <TimeAgo date={createdDate} />
-          <DateWithCalendar date={createdDate} />
+            </Value>
+          </div>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Parent ID
+            </Label>
+            <Value variant="small" className={classes.value}>
+              {FlowUtils.isInitialBlockId(block.parentId) ? (
+                block.parentId
+              ) : (
+                <NavLink to={`/blocks/details/${block.parentId}`}>
+                  {block.parentId}
+                </NavLink>
+              )}
+            </Value>
+          </div>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Time Stamp
+            </Label>
+            <Value variant="small" className={classes.value}>
+              {formatDate(createdDate)}
+            </Value>
+          </div>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Time
+            </Label>
+            <Value variant="small" className={classes.value}>
+              <ReactTimeAgo date={createdDate} />
+            </Value>
+          </div>
         </div>
       </Card>
       <DetailsTabs>

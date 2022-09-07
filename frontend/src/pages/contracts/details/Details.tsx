@@ -7,6 +7,8 @@ import ContentDetailsScript from "../../../components/content-details-script/Con
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
+import Card from "components/card/Card";
+import classes from "./Details.module.scss";
 
 type RouteParams = {
   contractId: string;
@@ -35,21 +37,29 @@ const Details: FunctionComponent = () => {
   }
 
   return (
-    <div>
-      <DetailsCard>
-        <div>
-          <Label variant="large">NAME</Label>
-          <Value variant="large">{contract.name}</Value>
+    <div className={classes.root}>
+      <Card className={classes.bigCard}>
+        <div className={classes.bigCardContent}>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Name
+            </Label>
+            <Value variant="small" className={classes.value}>
+              {contract.name}
+            </Value>
+          </div>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Account
+            </Label>
+            <Value variant="small" className={classes.value}>
+              <NavLink to={`/accounts/details/${contract.accountAddress}`}>
+                {contract.accountAddress}
+              </NavLink>
+            </Value>
+          </div>
         </div>
-        <div>
-          <Label variant="large">ACCOUNT</Label>
-          <Value variant="large">
-            <NavLink to={`/accounts/details/${contract.accountAddress}`}>
-              {contract.accountAddress}
-            </NavLink>
-          </Value>
-        </div>
-      </DetailsCard>
+      </Card>
       <ContentDetailsScript script={contract.code} />
     </div>
   );

@@ -180,22 +180,24 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <Card className={classes.bigCard}>
-        <div>
-          <Label variant="medium" className={classes.label}>
-            Address
-          </Label>
-          <Value variant="small" className={classes.value}>
-            {account.address}
-          </Value>
-        </div>
-        <div>
-          <Label variant="medium" className={classes.label}>
-            Balance
-          </Label>
-          <Value variant="small" className={classes.value}>
-            {account.balance}
-            <span className={classes.currency}>FLOW</span>
-          </Value>
+        <div className={classes.bigCardContent}>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Address
+            </Label>
+            <Value variant="small" className={classes.value}>
+              {account.address}
+            </Value>
+          </div>
+          <div>
+            <Label variant="medium" className={classes.label}>
+              Balance
+            </Label>
+            <Value variant="small" className={classes.value}>
+              {account.balance}
+              <span className={classes.currency}>FLOW</span>
+            </Value>
+          </div>
         </div>
       </Card>
       <DetailsTabs>
