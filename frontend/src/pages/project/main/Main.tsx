@@ -7,11 +7,22 @@ import {
   useGetPollingEmulatorSnapshots,
   useGetProjectObjects,
 } from "../../../hooks/use-api";
+import {
+  useLimitedArray,
+  LimitedArrayState,
+} from "../../../hooks/use-limited-array";
+import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 
 export const Main: FunctionComponent = () => {
   const { data: projectObjects } = useGetProjectObjects();
   const { data: snapshots } = useGetPollingEmulatorSnapshots();
   const { contracts } = projectObjects ?? { contracts: [] };
+  const limitedContracts = useLimitedArray([
+    ...contracts,
+    ...contracts,
+    ...contracts,
+  ]);
+  const limitedSnapshots = useLimitedArray(snapshots);
 
   return (
     <div className={classes.root}>
@@ -23,7 +34,7 @@ export const Main: FunctionComponent = () => {
           </div>
           <div className={classes.items}>
             <ul className={classes.bar}>
-              {snapshots.map((snapshot) => (
+              {limitedSnapshots.data.map((snapshot) => (
                 <li key={snapshot.id}>
                   <ProjectItem
                     title={snapshot.description}
@@ -33,9 +44,10 @@ export const Main: FunctionComponent = () => {
               ))}
             </ul>
           </div>
-          {/*<NavLink className={classes.footer} to={"#"}>*/}
-          {/*  + 5 Snapshots*/}
-          {/*</NavLink>*/}
+          <ToggleLimitedButton
+            title="Snapshots"
+            limitedState={limitedSnapshots}
+          />
         </div>
       </Card>
       <Card className={classes.card}>
@@ -45,18 +57,43 @@ export const Main: FunctionComponent = () => {
             <div className={classes.counter}>{contracts.length}</div>
           </div>
           <div className={classes.items}>
-            {contracts.map((contract) => (
+            {limitedContracts.data.map((contract) => (
               <div key={contract.filePath} className={classes.item}>
                 <IconContracts />
                 <ProjectItem title={contract.name} footer={contract.filePath} />
               </div>
             ))}
           </div>
-          {/*<NavLink className={classes.footer} to={"#"}>*/}
-          {/*  + 6 Contracts*/}
-          {/*</NavLink>*/}
+          <ToggleLimitedButton
+            title="Contracts"
+            limitedState={limitedContracts}
+          />
         </div>
       </Card>
     </div>
   );
 };
+
+function ToggleLimitedButton<DataItem>({
+  title,
+  limitedState,
+}: {
+  limitedState: LimitedArrayState<DataItem>;
+  title: string;
+}) {
+  if (limitedState.isExpanded) {
+    return (
+      <SimpleButton className={classes.footer} onClick={limitedState.showLess}>
+        <span>Show less</span>
+      </SimpleButton>
+    );
+  } else {
+    return (
+      <SimpleButton className={classes.footer} onClick={limitedState.showMore}>
+        <span>
+          + {limitedState.hiddenCount} {title}
+        </span>
+      </SimpleButton>
+    );
+  }
+}

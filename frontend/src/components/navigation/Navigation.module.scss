@@ -48,11 +48,7 @@
       }
 
       .searchBox {
-        width: 362px;
-
-        @media (max-width: 1290px) {
-          width: min-content;
-        }
+        width: min-content;
       }
 
       .snapshotButton {

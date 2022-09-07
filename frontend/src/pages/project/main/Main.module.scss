@@ -106,6 +106,10 @@
         margin-top: $spacing-xl * 1.5;
         font-weight: bold;
         color: $blue;
+        width: min-content;
+        span {
+          white-space: nowrap;
+        }
       }
     }
   }
