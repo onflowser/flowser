@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { ReactElement, useCallback } from "react";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
@@ -13,20 +13,19 @@ import { useHistory } from "react-router-dom";
 import { useProjectActions } from "../../contexts/project-actions.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
+import classNames from "classnames";
 
 export type Sidebar = {
   toggled: boolean;
   toggleSidebar: () => void;
 };
 
-function SideBar({ toggled, toggleSidebar }: Sidebar) {
+export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
   const { data } = useGetCurrentProject();
   const { login } = useFlow();
   const { switchProject } = useProjectActions();
   const { project: currentProject } = data ?? {};
-  // TODO(sideBar-component): Check if it is possible (with currently used library "react-modern-drawer")
-  // to position sidebar bellow navbar instead of overlaping it
 
   const createProject = useCallback(() => {
     history.push(`/${routes.start}/configure`);
@@ -61,7 +60,7 @@ function SideBar({ toggled, toggleSidebar }: Sidebar) {
             <div className={classes.text}>Settings</div>
           </SimpleButton>
         </div>
-        <div className={`${classes.menuItem} ${classes.footer}`}>
+        <div className={classNames(classes.menuItem, classes.footer)}>
           <IconButton
             onClick={createProject}
             icon={<PlusIcon></PlusIcon>}
@@ -70,12 +69,9 @@ function SideBar({ toggled, toggleSidebar }: Sidebar) {
           >
             NEW PROJECT
           </IconButton>
-          {/* TODO(milestone-5): Show emulator status */}
-          <p>TODO: Show emulator connection status</p>
+          {/* TODO(milestone-5): Show emulator status? */}
         </div>
       </div>
     </Drawer>
   );
 }
-
-export default SideBar;

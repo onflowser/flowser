@@ -11,30 +11,30 @@
 
   .menu {
     display: flex;
+    width: 100%;
     flex-direction: column;
-    padding: $spacing-base;
-    margin-top: $line-spacing-l;
-    margin-left: $line-spacing-m;
+    margin: $line-spacing-l;
     justify-content: space-between;
 
     .menuItem {
       display: flex;
       padding: $spacing-base;
       align-items: center;
-     
+
       .text {
         transition: 0.3s;
         margin-left: $spacing-base;
         color: $light-grey;
       }
-      
+
 
       .icon {
-        height: 45px;
-        width: 45px;
+        height: 40px;
+        width: 40px;
       }
-     
+
     }
+
     .menuItem:hover {
       .text {
         color: $grey
@@ -46,12 +46,16 @@
       flex-direction: column;
       padding: $spacing-base;
       align-items: center;
-      margin-bottom: 70px;
 
       .button {
-        width: 100%;
-        margin-left: $line-spacing-l;
-        margin-bottom: $line-spacing-l
+        width: 120%;
+        transform: translateX(10%);
+        font-size: 16px;
+        color: $background;
+
+        path {
+          fill: $background;
+        }
       }
     }
   }
