@@ -37,3 +37,8 @@ function setupOpenApiDocs(app: INestApplication) {
 }
 
 bootstrap();
+
+process.on("unhandledRejection", (reason, p) => {
+  console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
+  // TODO(milestone-5): better handle errors
+});

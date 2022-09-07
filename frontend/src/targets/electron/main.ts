@@ -1,7 +1,9 @@
 import * as path from "path";
-import { app, BrowserWindow } from "electron";
-import * as isDev from "electron-is-dev";
+import { app, BrowserWindow, shell } from "electron";
 import { createApp } from "@flowser/backend";
+import fixPath from "fix-path";
+
+fixPath();
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -9,10 +11,19 @@ async function createWindow() {
     height: 600,
   });
 
+  // Open urls in the user's browser
+  win.webContents.setWindowOpenHandler((data) => {
+    shell.openExternal(data.url);
+    return { action: "deny" };
+  });
+
+  const isDev = !app.isPackaged;
   win.loadURL(
+    // This path is currently set to "react", because that's the folder used in @flowser/app package
+    // Refer to the app/README for more info on the current build process.
     isDev
       ? "http://localhost:6060"
-      : `file://${path.join(__dirname, "../build/index.html")}`
+      : `file://${path.join(__dirname, "../react/index.html")}`
   );
 
   try {

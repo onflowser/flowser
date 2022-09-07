@@ -24,6 +24,9 @@ import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
+import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
+import { ExecutionStatus } from "components/status/ExecutionStatus";
 
 type RouteParams = {
   blockId: string;
@@ -38,9 +41,45 @@ const columns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>
-          {info.getValue()}
+          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
         </NavLink>
       </Value>
+    ),
+  }),
+  columnHelper.accessor("payer", {
+    header: () => <Label variant="medium">PAYER</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("proposalKey", {
+    header: () => <Label variant="medium">PROPOSER</Label>,
+    cell: (info) => (
+      <Value>
+        {info.getValue() ? (
+          <NavLink
+            to={`/accounts/details/${info.row.original.proposalKey?.address}`}
+          >
+            {info.row.original.proposalKey?.address}
+          </NavLink>
+        ) : (
+          "-"
+        )}
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("status", {
+    header: () => <Label variant="medium">STATUS</Label>,
+    cell: (info) => (
+      <div>
+        <Value>
+          <ExecutionStatus status={info.getValue()} />
+        </Value>
+      </div>
     ),
   }),
 ];

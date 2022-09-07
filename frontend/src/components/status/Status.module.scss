@@ -1,0 +1,17 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  display: flex;
+  align-items: center;
+
+  .statusLabel {
+    margin-left: $spacing-s;
+    color: $grey;
+    font-size: $font-size-large;
+    @media (max-width: 1000px) {
+      display: none;
+    }
+  }
+}

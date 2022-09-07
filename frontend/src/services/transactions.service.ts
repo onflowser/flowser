@@ -1,70 +1,66 @@
 import {
   GetSingleTransactionResponse,
   GetPollingTransactionsResponse,
+  GetPollingTransactionsRequest,
+  GetPollingTransactionsByBlockRequest,
+  GetPollingTransactionsByBlockResponse,
+  GetPollingTransactionsByAccountRequest,
+  GetPollingTransactionsByAccountResponse,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class TransactionsService {
-  private static instance: TransactionsService | undefined;
+  constructor(private readonly transport: TransportService) {}
 
-  static getInstance(): TransactionsService {
-    if (!TransactionsService.instance) {
-      TransactionsService.instance = new TransactionsService();
-    }
-    return TransactionsService.instance;
-  }
-
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingTransactionsResponse>> {
-    return axios.get("/api/transactions/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingTransactionsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingTransactionsResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: "/api/transactions/polling",
+      requestData: data,
+      requestProtobuf: GetPollingTransactionsRequest,
+      responseProtobuf: GetPollingTransactionsResponse,
     });
   }
 
   getAllByBlockWithPolling({
-    timestamp,
     blockId,
+    ...data
   }: {
     timestamp: number;
     blockId: string;
-  }): Promise<AxiosResponse<GetPollingTransactionsResponse>> {
-    return axios.get(`/api/blocks/${blockId}/transactions/polling`, {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingTransactionsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingTransactionsResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: `/api/blocks/${blockId}/transactions/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingTransactionsByBlockRequest,
+      responseProtobuf: GetPollingTransactionsByBlockResponse,
     });
   }
 
   getAllByAccountWithPolling({
-    timestamp,
     accountAddress,
+    ...data
   }: {
     timestamp: number;
     accountAddress: string;
-  }): Promise<AxiosResponse<GetPollingTransactionsResponse>> {
-    return axios.get(`/api/accounts/${accountAddress}/transactions/polling`, {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingTransactionsResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingTransactionsResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: `/api/accounts/${accountAddress}/transactions/polling`,
+      requestData: data,
+      requestProtobuf: GetPollingTransactionsByAccountRequest,
+      responseProtobuf: GetPollingTransactionsByAccountResponse,
     });
   }
 
-  getSingle(id: string): Promise<AxiosResponse<GetSingleTransactionResponse>> {
-    return axios.get(`/api/transactions/${id}`, {
-      transformResponse: (data) =>
-        GetSingleTransactionResponse.fromJSON(JSON.parse(data)),
+  getSingle(id: string): Promise<GetSingleTransactionResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/transactions/${id}`,
+      responseProtobuf: GetSingleTransactionResponse,
     });
   }
 }

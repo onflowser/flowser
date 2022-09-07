@@ -13,7 +13,7 @@ import Card from "../../../components/card/Card";
 import TimeAgo from "../../../components/time-ago/TimeAgo";
 import DateWithCalendar from "../../../components/date-with-calendar/DateWithCalendar";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import TransactionStatusBadge from "../../../components/transaction-status-code/TransactionStatusBadge";
+import TransactionStatusBadge from "../../../components/status/TransactionStatusBadge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
@@ -31,6 +31,8 @@ import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
+import { ExecutionStatus } from "components/status/ExecutionStatus";
+import { GrcpStatus } from "../../../components/status/GrcpStatus";
 
 type RouteParams = {
   transactionId: string;
@@ -224,25 +226,25 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <DetailsCard
-        Header={() => (
+        header={
           <>
             <div>
               <Label variant="large">TRANSACTION</Label>
               <Value variant="large">{transaction.id}</Value>
             </div>
             <div>
-              <TransactionStatusBadge statusCode={transaction.status?.status} />
+              <TransactionStatusBadge status={transaction.status} />
             </div>
           </>
-        )}
-        Footer={() => (
+        }
+        footer={
           <>
             <TimeAgo date={new Date(transaction.createdAt).toISOString()} />
             <DateWithCalendar
               date={new Date(transaction.createdAt).toISOString()}
             />
           </>
-        )}
+        }
       >
         <div className={classes.firstLine}>
           <Label variant="large">BLOCK ID</Label>
@@ -265,7 +267,7 @@ const Details: FunctionComponent = () => {
               {transaction.proposalKey?.address ?? "-"}
             </NavLink>
           </Value>
-          {/* TODO(milestone-3): Better organise bellow fields */}
+          {/* TODO(milestone-5): Better organise bellow fields */}
           <Label variant="large" className={classes.inlineLabel}>
             Sequence number:
           </Label>
@@ -276,7 +278,7 @@ const Details: FunctionComponent = () => {
             GRCP Status:
           </Label>
           <Value variant="large" className={classes.inlineValue}>
-            {FlowUtils.getGrcpStatusName(transaction.status?.statusCode)}
+            <GrcpStatus status={transaction.status} />
           </Value>
         </div>
         <div>

@@ -14,8 +14,7 @@ import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Table from "../../../components/table/Table";
-import { FlowUtils } from "../../../utils/flow-utils";
-import ColoredCircle from "../../../components/colored-circle/ColoredCircle";
+import { ExecutionStatus } from "components/status/ExecutionStatus";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
@@ -67,12 +66,11 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("status.statusCode", {
+  columnHelper.accessor("status", {
     header: () => <Label variant="medium">STATUS</Label>,
     cell: (info) => (
       <div>
-        <ColoredCircle color="green" />
-        <Value>{FlowUtils.getGrcpStatusName(info.getValue())}</Value>{" "}
+        <ExecutionStatus status={info.getValue()} />
       </div>
     ),
   }),

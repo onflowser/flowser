@@ -1,5 +1,5 @@
-import { FlowCadenceObject } from "./flow/services/gateway.service";
 import { mkdir, rm, stat } from "fs/promises";
+import { ProtobufLikeObject } from "@flowser/shared";
 const kebabCase = require("kebab-case");
 
 // create directory if it does not already exist
@@ -24,11 +24,6 @@ export function isArray(value: unknown): value is unknown[] {
 export async function rmdir(path: string) {
   return rm(path, { force: true, recursive: true });
 }
-
-export type ProtobufLikeObject = {
-  toJSON: (value: any) => any;
-  fromJSON: (value: any) => any;
-};
 
 export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
   return {

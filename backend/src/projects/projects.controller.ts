@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   UseInterceptors,
 } from "@nestjs/common";
 import { ProjectsService } from "./projects.service";
@@ -18,9 +17,12 @@ import {
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
   GetProjectObjectsResponse,
+  UseProjectResponse,
+  UpdateProjectResponse,
+  CreateProjectResponse,
+  GetPollingProjectsRequest,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 import { FlowConfigService } from "../flow/services/config.service";
 
 @Controller("projects")
@@ -33,24 +35,29 @@ export class ProjectsController {
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
     const project = await this.projectsService.create(createProjectDto);
-    return GetSingleProjectResponse.toJSON({
-      project: project.toProto(),
-    });
+    return CreateProjectResponse.toJSON(
+      CreateProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 
   @Get()
   async findAll() {
     const projects = await this.projectsService.findAll();
-    return GetAllProjectsResponse.fromPartial({
-      projects: projects.map((project) => project.toProto()),
-    });
+    return GetAllProjectsResponse.toJSON(
+      GetAllProjectsResponse.fromPartial({
+        projects: projects.map((project) => project.toProto()),
+      })
+    );
   }
 
-  @Get("/polling")
+  @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingProjectsResponse))
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingProjectsRequest.fromJSON(data);
     const projects = await this.projectsService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return projects.map((project) => project.toProto());
   }
@@ -58,9 +65,11 @@ export class ProjectsController {
   @Get("current")
   async findCurrent() {
     const project = await this.projectsService.getCurrentProject();
-    return GetSingleProjectResponse.fromPartial({
-      project: project.toProto(),
-    });
+    return GetSingleProjectResponse.toJSON(
+      GetSingleProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 
   @Get("current/objects")
@@ -69,17 +78,21 @@ export class ProjectsController {
       this.flowConfigService.getTransactionTemplates(),
       this.flowConfigService.getContractTemplates(),
     ]);
-    return GetProjectObjectsResponse.fromPartial({
-      transactions,
-      contracts,
-    });
+    return GetProjectObjectsResponse.toJSON(
+      GetProjectObjectsResponse.fromPartial({
+        transactions,
+        contracts,
+      })
+    );
   }
 
   @Get("/default")
   async default() {
-    return GetSingleProjectResponse.fromPartial({
-      project: await this.projectsService.getDefaultProject(),
-    });
+    return GetSingleProjectResponse.toJSON(
+      GetSingleProjectResponse.fromPartial({
+        project: await this.projectsService.getDefaultProject(),
+      })
+    );
   }
 
   @ApiParam({ name: "id", type: String })
@@ -98,9 +111,11 @@ export class ProjectsController {
     @Body() updateProjectDto: UpdateProjectDto
   ) {
     const project = await this.projectsService.update(id, updateProjectDto);
-    return GetSingleProjectResponse.toJSON({
-      project: project.toProto(),
-    });
+    return UpdateProjectResponse.toJSON(
+      UpdateProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 
   @Delete("/use")
@@ -119,8 +134,10 @@ export class ProjectsController {
   @Post("/use/:id")
   async useProject(@Param("id") id: string) {
     const project = await this.projectsService.useProject(id);
-    return GetSingleProjectResponse.toJSON({
-      project: project.toProto(),
-    });
+    return UseProjectResponse.toJSON(
+      UseProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 }

@@ -1,12 +1,20 @@
-import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { ContractsService } from "../services/contracts.service";
 import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
-import { ApiParam, ApiQuery } from "@nestjs/swagger";
-import { ParseUnixTimestampPipe } from "../../common/pipes/parse-unix-timestamp.pipe";
+import { ApiParam } from "@nestjs/swagger";
 import {
   GetSingleContractResponse,
   GetPollingContractsResponse,
   GetAllContractsResponse,
+  GetPollingContractsRequest,
+  GetPollingContractsByAccountRequest,
 } from "@flowser/shared";
 
 @Controller()
@@ -21,27 +29,25 @@ export class ContractsController {
     });
   }
 
-  @Get("contracts/polling")
+  @Post("contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingContractsRequest.fromJSON(data);
     const contracts = await this.contractsService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return contracts.map((contract) => contract.toProto());
   }
 
   @ApiParam({ name: "id", type: String })
-  @ApiQuery({ name: "timestamp", type: Number })
-  @Get("/accounts/:address/contracts/polling")
+  @Post("/accounts/:address/contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
-  async findAllNewByAccount(
-    @Param("address") accountAddress,
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
-  ) {
+  async findAllNewByAccount(@Param("address") accountAddress, @Body() data) {
+    const request = GetPollingContractsByAccountRequest.fromJSON(data);
     const contracts =
       await this.contractsService.findAllNewerThanTimestampByAccount(
         accountAddress,
-        timestamp
+        new Date(request.timestamp)
       );
     return contracts.map((transaction) => transaction.toProto());
   }

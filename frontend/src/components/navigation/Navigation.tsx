@@ -14,9 +14,9 @@ import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
 import TransactionDialog from "../transaction-dialog/TransactionDialog";
-import { useGetAllObjectsCounts } from "../../hooks/use-api";
 import Button from "../button/Button";
 import { useProjectActions } from "../../contexts/project-actions.context";
+import { useGetAllObjectsCounts } from "../../hooks/use-api";
 
 const Navigation: FunctionComponent<{
   className: string;

@@ -5,8 +5,9 @@ import {
   TransactionProposalKey,
   SignableObject,
   TransactionStatus,
+  grcpStatusCodeFromJSON,
+  executionStatusCodeFromJSON,
 } from "@flowser/shared";
-import { CadenceObject, cadenceTypeFromJSON } from "@flowser/shared";
 import {
   FlowBlock,
   FlowCadenceObject,
@@ -102,14 +103,23 @@ export class TransactionEntity extends PollingEntity {
       ensurePrefixedAddress(address)
     );
     transaction.args = flowTransaction.args;
-    transaction.proposalKey = flowTransaction.proposalKey;
+    transaction.proposalKey = {
+      ...flowTransaction.proposalKey,
+      address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
+    };
     transaction.envelopeSignatures = deserializeSignableObjects(
       flowTransaction.envelopeSignatures
     );
     transaction.payloadSignatures = deserializeSignableObjects(
       flowTransaction.payloadSignatures
     );
-    transaction.status = TransactionStatus.fromJSON(flowTransactionStatus);
+    transaction.status = {
+      errorMessage: flowTransactionStatus.errorMessage,
+      grcpStatus: grcpStatusCodeFromJSON(flowTransactionStatus.statusCode),
+      executionStatus: executionStatusCodeFromJSON(
+        flowTransactionStatus.status
+      ),
+    };
     return transaction;
   }
 }

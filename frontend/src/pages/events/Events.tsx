@@ -77,20 +77,6 @@ const Events: FunctionComponent = () => {
           </Value>
         ),
       }),
-      columnHelper.accessor("createdAt", {
-        header: () => <Label variant="medium">TIMESTAMP</Label>,
-        cell: (info) => (
-          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
-        ),
-      }),
-      columnHelper.accessor("type", {
-        header: () => <Label variant="medium">TYPE</Label>,
-        cell: (info) => (
-          <Value>
-            <pre style={{ whiteSpace: "nowrap" }}>{info.getValue()}</pre>
-          </Value>
-        ),
-      }),
       columnHelper.accessor("transactionId", {
         header: () => <Label variant="medium">TX ID</Label>,
         cell: (info) => (
@@ -103,22 +89,35 @@ const Events: FunctionComponent = () => {
           </Value>
         ),
       }),
-      columnHelper.accessor("transactionIndex", {
-        header: () => <Label variant="medium">TX INDEX</Label>,
-        cell: (info) => <Value>{info.getValue()}</Value>,
+      columnHelper.accessor("type", {
+        header: () => <Label variant="medium">TYPE</Label>,
+        meta: {
+          className: classes.typeColumn,
+        },
+        cell: (info) => (
+          <Value>
+            <pre style={{ whiteSpace: "nowrap" }}>{info.getValue()}</pre>
+          </Value>
+        ),
       }),
-      columnHelper.accessor("eventIndex", {
-        header: () => <Label variant="medium">EVENT INDEX</Label>,
-        cell: ({ row, getValue }) => (
-          <div className={classes.caretIcon}>
-            <Value>{getValue()}</Value>
-            <CaretIcon
-              inverted={true}
-              className={classes.icon}
-              isOpen={openedLog === row.id}
-              onChange={(status) => openLog(status, row.id)}
-            />
-          </div>
+      columnHelper.accessor("createdAt", {
+        header: () => <Label variant="medium">TIMESTAMP</Label>,
+        cell: (info) => (
+          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
+        ),
+      }),
+      columnHelper.display({
+        id: "caret",
+        meta: {
+          className: classes.caretColumn,
+        },
+        cell: ({ row }) => (
+          <CaretIcon
+            inverted={true}
+            className={classes.icon}
+            isOpen={openedLog === row.id}
+            onChange={(status) => openLog(status, row.id)}
+          />
         ),
       }),
     ],
@@ -147,7 +146,10 @@ const Events: FunctionComponent = () => {
             variant="header-row"
           >
             {headerGroup.headers.map((header) => (
-              <div key={header.id}>
+              <div
+                key={header.id}
+                className={header.column.columnDef.meta?.className}
+              >
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext()
@@ -165,7 +167,10 @@ const Events: FunctionComponent = () => {
               variant="table-line"
             >
               {row.getVisibleCells().map((cell) => (
-                <div key={cell.id}>
+                <div
+                  key={cell.id}
+                  className={cell.column.columnDef.meta?.className}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </div>
               ))}

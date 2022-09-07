@@ -15,23 +15,24 @@ interface ProtoSerializer<T extends PollingEntity[]> {
 
 @Injectable()
 export class PollingResponseInterceptor<T extends PollingEntity[], P>
-  implements NestInterceptor<T, PollingResponse<T>>
+  implements NestInterceptor<T, unknown>
 {
   constructor(private readonly serializer: ProtoSerializer<T>) {}
 
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>
-  ): Observable<PollingResponse<T>> {
+  ): Observable<unknown> {
     return next.handle().pipe(
-      map(
-        (data): PollingResponse<T> =>
+      map((data): unknown =>
+        this.serializer.toJSON(
           this.serializer.fromPartial({
             data,
             meta: {
               latestTimestamp: findLatestTimestamp(data),
             },
           })
+        )
       )
     );
   }

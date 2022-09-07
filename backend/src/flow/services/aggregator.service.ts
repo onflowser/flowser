@@ -88,7 +88,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       this.projectContext.shouldRunEmulator() &&
       !(await this.isServiceAccountProcessed())
     ) {
-      await this.processServiceAccount();
+      await this.processStaticAccounts();
     }
 
     const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
@@ -401,16 +401,29 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     return this.accountService.accountExists(serviceAccountAddress);
   }
 
-  async processServiceAccount() {
+  async processStaticAccounts() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
     const serviceAccountAddress = ensurePrefixedAddress(
       this.configService.getServiceAccountAddress()
     );
+    const staticAccountAddresses = [
+      serviceAccountAddress,
+      // TODO(milestone-5): Are these account addresses always the same?
+      // https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
+      // https://github.com/onflow/flow-go/blob/138e1c32d8bb51e891b2babcd2c7a38c0db41f73/fvm/bootstrap.go#L894-L903
+      "0xee82856bf20e2aa6",
+      "0xe5a8b7f23e8b548f",
+      "0x0ae53cb6e3f42a79",
+    ];
 
     await queryRunner.startTransaction();
     try {
-      await this.storeNewAccountWithContractsAndKeys(serviceAccountAddress);
+      await Promise.all(
+        staticAccountAddresses.map((address) =>
+          this.storeNewAccountWithContractsAndKeys(address)
+        )
+      );
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();

@@ -15,7 +15,6 @@ import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
 import splitbee from "@splitbee/web";
 import { toast } from "react-hot-toast";
-import { ProjectsService } from "../../../services/projects.service";
 import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
@@ -25,6 +24,7 @@ import moment from "moment";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import { useProjectActions } from "../../../contexts/project-actions.context";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { ServiceRegistry } from "../../../services/service-registry";
 
 type ProjectTab = {
   id: string;
@@ -132,8 +132,7 @@ function ProjectsListContent() {
   const { searchTerm, setPlaceholder } = useSearch("projectSearch");
   const { removeProject } = useProjectActions();
   const history = useHistory();
-  const projectService = ProjectsService.getInstance();
-
+  const projectService = ServiceRegistry.getInstance().projectsService;
   const showProjectList = projects && projects.length > 0;
 
   useEffect(() => {

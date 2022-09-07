@@ -1,14 +1,23 @@
-import { Controller, Get, Param, UseInterceptors, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { AccountsService } from "../services/accounts.service";
 import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
-import { ParseUnixTimestampPipe } from "../../common/pipes/parse-unix-timestamp.pipe";
 import {
   GetPollingAccountsResponse,
   GetAllAccountsResponse,
   GetSingleAccountResponse,
   GetPollingKeysResponse,
   GetPollingStorageResponse,
+  GetPollingStorageRequest,
+  GetPollingAccountsRequest,
+  GetPollingKeysRequest,
 } from "@flowser/shared";
 import { KeysService } from "../services/keys.service";
 import { AccountStorageService } from "../services/storage.service";
@@ -30,42 +39,43 @@ export class AccountsController {
   }
 
   @ApiQuery({ name: "timestamp", type: Number })
-  @Get("/polling")
+  @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingAccountsResponse))
-  async findAllNew(@Query("timestamp", ParseUnixTimestampPipe) timestamp) {
+  async findAllNew(@Body() data) {
+    const request = GetPollingAccountsRequest.fromJSON(data);
     const accounts = await this.accountsService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return accounts.map((account) => account.toProto());
   }
 
   @ApiParam({ name: "address", type: String })
-  @ApiQuery({ name: "timestamp", type: Number })
-  @Get(":address/keys/polling")
+  @Post(":address/keys/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingKeysResponse))
   async findAllNewKeysByAccount(
     @Param("address") accountAddress,
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
+    @Body() data
   ) {
+    const request = GetPollingKeysRequest.fromJSON(data);
     const keys = await this.keysService.findAllNewerThanTimestampByAccount(
       accountAddress,
-      timestamp
+      new Date(request.timestamp)
     );
     return keys.map((key) => key.toProto());
   }
 
   @ApiParam({ name: "address", type: String })
-  @ApiQuery({ name: "timestamp", type: Number })
-  @Get(":address/storage/polling")
+  @Post(":address/storage/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingStorageResponse))
   async findAllNewStorageByAccount(
     @Param("address") accountAddress,
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
+    @Body() data
   ) {
+    const request = GetPollingStorageRequest.fromJSON(data);
     const storageItems =
       await this.storageService.findAllNewerThanTimestampByAccount(
         accountAddress,
-        timestamp
+        new Date(request.timestamp)
       );
     return storageItems.map((storageItem) => storageItem.toProto());
   }
