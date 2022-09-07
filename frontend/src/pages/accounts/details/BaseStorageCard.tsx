@@ -32,7 +32,7 @@ export function BaseStorageCard({
   const storageDataPaths = getDataTypeKeysInStorageData(content.data);
 
   return (
-    <div className={extendClass}>
+    <div id={content.id} className={extendClass}>
       <div className={classes.header}>
         <div className={classes.type}>
           {FlowUtils.getLowerCasedPathDomain(content.pathDomain)}
@@ -52,6 +52,7 @@ export function BaseStorageCard({
             <ReactJson
               style={{ backgroundColor: "none" }}
               theme="ashes"
+              collapsed={4}
               src={content.data as Record<string, unknown>}
             />
           </div>

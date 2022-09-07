@@ -122,8 +122,15 @@ const Details: FunctionComponent = () => {
   useEffect(() => {
     if (focusedStorageId) {
       expandCardById(focusedStorageId);
+      // We need to wait for the virtual nodes to be added to the browser DOM.
+      // This is achieved with setTimeout call - wait for the next window pain.
+      // There might be a better React way to do this.
+      setTimeout(() => {
+        const targetDomNode = document.getElementById(focusedStorageId);
+        window.scrollTo(0, targetDomNode?.offsetTop ?? 0);
+      });
     }
-  }, [focusedStorageId]);
+  }, [focusedStorageId, storageItems]);
 
   const expandCardById = (id: string) => {
     setExpandedCardIds((prev) => new Set(prev.add(id)));
