@@ -8,7 +8,6 @@ import {
   Block,
   Event,
   Log,
-  GetAllObjectsCountsResponse,
   GetFlowserVersionResponse,
   GetAllProjectsResponse,
   GetSingleProjectResponse,
@@ -219,7 +218,7 @@ export function useGetCurrentProject() {
 
 export function useGetProjectObjects() {
   return useQuery<GetProjectObjectsResponse>(
-    `/projects/objects`,
+    `/flow/objects`,
     () => projectsService.getAllProjectObjects(),
     {
       refetchInterval: 1000,
@@ -246,14 +245,6 @@ export function useGetFlowserVersion() {
 export function useGetFlowCliInfo() {
   return useQuery<GetFlowCliInfoResponse>("/version", () =>
     commonService.getFlowCliInfo()
-  );
-}
-
-export function useGetAllObjectsCounts() {
-  return useQuery<GetAllObjectsCountsResponse>(
-    "/counts",
-    () => commonService.getAllObjectsCounts(),
-    { refetchInterval: 1000 }
   );
 }
 

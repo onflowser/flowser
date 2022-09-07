@@ -7,7 +7,6 @@ import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
 import TransactionDialog from "../transaction-dialog/TransactionDialog";
-import { useGetAllObjectsCounts } from "../../hooks/use-api";
 
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import sideMenuOpen from "../../assets/icons/side-menu-open.svg";
@@ -17,6 +16,7 @@ import sideMenuOpenEmuNoWork from "../../assets/icons/side-menu-open-emulator-no
 import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project-actions.context";
 import { useHistory } from "react-router-dom";
+import { useTabCount } from "../../hooks/use-tab-count";
 
 const Navigation: FunctionComponent<{
   className: string;
@@ -27,7 +27,7 @@ const Navigation: FunctionComponent<{
     useNavigation();
   const history = useHistory();
   const { createSnapshot } = useProjectActions();
-  const { data: counters } = useGetAllObjectsCounts();
+  const tabCount = useTabCount();
   const [showTxDialog, setShowTxDialog] = useState(false);
 
   const isEmulatorWorking = true;
@@ -44,38 +44,37 @@ const Navigation: FunctionComponent<{
           <div className={classes.navLinksContainer}>
             <NavigationItem
               to={`/${routes.accounts}`}
-              totalCounter={counters?.accounts}
+              totalCounter={tabCount.accounts}
             >
               ACCOUNTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.blocks}`}
-              totalCounter={counters?.blocks}
+              totalCounter={tabCount.blocks}
             >
               BLOCKS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.transactions}`}
-              totalCounter={counters?.transactions}
+              totalCounter={tabCount.transactions}
             >
               TRANSACTIONS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.contracts}`}
-              totalCounter={counters?.contracts}
+              totalCounter={tabCount.contracts}
             >
               CONTRACTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.events}`}
-              totalCounter={counters?.events}
+              totalCounter={tabCount.events}
             >
               EVENTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.project}`}
-              activeClassName={classes.active}
-              // counter={counters?.project} TODO(milestone-5): add project objects count
+              totalCounter={tabCount.project}
             >
               PROJECT
             </NavigationItem>

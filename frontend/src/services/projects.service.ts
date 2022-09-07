@@ -47,7 +47,7 @@ export class ProjectsService {
   getAllProjectObjects(): Promise<GetProjectObjectsResponse> {
     return this.transport.send({
       requestMethod: "GET",
-      resourceIdentifier: "/api/projects/current/objects",
+      resourceIdentifier: "/api/flow/objects",
       responseProtobuf: GetProjectObjectsResponse,
     });
   }

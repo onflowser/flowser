@@ -44,14 +44,14 @@ export const Main: FunctionComponent = () => {
             <div>Contracts</div>
             <div className={classes.counter}>{contracts.length}</div>
           </div>
-          {contracts.map((contract) => (
-            <div key={contract.filePath} className={classes.items}>
-              <div className={classes.item}>
+          <div className={classes.items}>
+            {contracts.map((contract) => (
+              <div key={contract.filePath} className={classes.item}>
                 <IconContracts />
                 <ProjectItem title={contract.name} footer={contract.filePath} />
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
           {/*<NavLink className={classes.footer} to={"#"}>*/}
           {/*  + 6 Contracts*/}
           {/*</NavLink>*/}

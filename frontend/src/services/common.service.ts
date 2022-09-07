@@ -1,7 +1,4 @@
-import {
-  GetAllObjectsCountsResponse,
-  GetFlowserVersionResponse,
-} from "@flowser/shared";
+import { GetFlowserVersionResponse } from "@flowser/shared";
 import { GetFlowCliInfoResponse } from "@flowser/shared";
 import { TransportService } from "./transports/transport.service";
 
@@ -21,14 +18,6 @@ export class CommonService {
       requestMethod: "GET",
       resourceIdentifier: "/api/flow/version",
       responseProtobuf: GetFlowCliInfoResponse,
-    });
-  }
-
-  getAllObjectsCounts(): Promise<GetAllObjectsCountsResponse> {
-    return this.transport.send({
-      requestMethod: "GET",
-      resourceIdentifier: "/api/common/counters",
-      responseProtobuf: GetAllObjectsCountsResponse,
     });
   }
 }
