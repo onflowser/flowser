@@ -13,6 +13,32 @@
   display: flex;
   flex-direction: column;
 
+  .backButtonWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0);
+    margin-top: -20px;
+    &:not(.isConfig) {
+      margin: 50px 0 0 50px;
+    }
+    cursor: pointer;
+
+    .backButton {
+      width: 20px;
+      height: 16px;
+    }
+
+    transition: background 0.1s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
   .inner {
     align-self: center;
     max-width: 1200px;
@@ -72,7 +98,7 @@
 
         .nameInputWrapper {
           border-radius: $border-radius-input;
-          background-color: #4C515E;
+          background-color: #4c515e;
           height: 48px;
           padding: 0 $spacing-l * 2;
           margin-left: $spacing-l * 3;
@@ -123,7 +149,6 @@
             @media screen and (max-width: 1600px) {
               max-width: 25vw;
             }
-
           }
 
           *:nth-child(2) {
@@ -158,7 +183,6 @@
             margin-right: $spacing-l * 3;
 
             & > div > span {
-
               @media screen and (max-width: 1600px) {
                 min-width: 140px;
               }
@@ -206,7 +230,6 @@
               align-items: center;
               margin-bottom: $spacing-l;
 
-
               & > * {
                 margin-right: $spacing-base;
               }
@@ -231,5 +254,4 @@
   font-size: $font-size-small !important;
   font-weight: 400 !important;
   @include pulse(1.5s);
-
 }
