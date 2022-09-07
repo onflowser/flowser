@@ -4,15 +4,18 @@ import classes from "./Search.module.scss";
 import { ReactComponent as SearchIcon } from "../../assets/icons/search.svg";
 import { ReactComponent as CancelIcon } from "../../assets/icons/cancel.svg";
 import { useRef } from "react";
+import classNames from "classnames";
 
 export type SearchProps = {
   className?: string;
   context?: string;
+  responsive?: boolean;
 };
 
 const Search: FunctionComponent<SearchProps> = ({
   className,
   context = "default",
+  responsive,
 }) => {
   const { searchTerm, setSearchTerm, placeholder, searchDisabled } =
     useSearch(context);
@@ -30,9 +33,10 @@ const Search: FunctionComponent<SearchProps> = ({
 
   return (
     <div
-      className={`${classes.root} ${className} ${
-        searchDisabled && classes.disabled
-      }`}
+      className={classNames(classes.root, className, {
+        [classes.disabled]: searchDisabled,
+        [classes.responsive]: responsive,
+      })}
       onClick={() => {
         inputRef.current?.focus();
       }}

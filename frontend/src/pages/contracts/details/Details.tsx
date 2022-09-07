@@ -15,7 +15,7 @@ type RouteParams = {
 const Details: FunctionComponent = () => {
   const { contractId } = useParams<RouteParams>();
   const { setBreadcrumbs, showSearchBar } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const { isLoading, data } = useGetContract(contractId);
   const { contract } = data ?? {};
 
@@ -26,7 +26,6 @@ const Details: FunctionComponent = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
     showSearchBar(false);
   }, []);

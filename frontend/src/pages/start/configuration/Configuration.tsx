@@ -11,7 +11,6 @@ import classes from "./Configuration.module.scss";
 import Input, { InputProps } from "../../../components/input/Input";
 import ToggleButton from "../../../components/toggle-button/ToggleButton";
 import RadioButton from "../../../components/radio-button/RadioButton";
-import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
 import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import Button from "../../../components/button/Button";
@@ -120,10 +119,6 @@ const Configuration: FunctionComponent = () => {
     }
   }
 
-  const onBack = useCallback(() => {
-    history.goBack();
-  }, []);
-
   if (formik.isSubmitting) {
     return <FullScreenLoading className={classes.loader} />;
   }
@@ -195,10 +190,11 @@ const Configuration: FunctionComponent = () => {
     );
   }
 
+  // TODO(milestone-5): Display navigation when editing existing project info
+  // TODO(milestone-5): Show back button when editing new project info
   return (
     <div className={classes.root}>
       <div className={classes.inner}>
-        <IconBackButton className={classes.backButton} onClick={onBack} />
         <div className={classes.top}>
           <h2>PROJECT SETTINGS</h2>
         </div>

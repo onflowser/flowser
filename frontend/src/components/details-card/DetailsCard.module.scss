@@ -18,6 +18,7 @@
 
 .body {
   & > * {
+    display: flex;
     margin-bottom: $spacing-base;
     & > *:first-child {
       display: inline-block;

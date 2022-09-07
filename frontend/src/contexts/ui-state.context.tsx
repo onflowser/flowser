@@ -34,7 +34,6 @@ export const defaultUiState: UiState = {
   logDrawerSize: "tiny",
   breadcrumbs: [],
   isNavigationDrawerVisible: false,
-  isSubNavigationVisible: true,
   isShowBackButtonVisible: true,
   isSearchBarVisible: true,
 };

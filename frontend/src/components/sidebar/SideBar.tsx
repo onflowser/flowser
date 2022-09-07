@@ -42,6 +42,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
       onClose={toggleSidebar}
       className={classes.sidebar}
       size={300}
+      duration={300}
     >
       <div className={classes.menu}>
         <div>
