@@ -18,8 +18,18 @@
       margin-bottom: $spacing-l;
 
       .label {
-        min-width: 188px;
+        margin-left: $spacing-l;
+        margin-right: 18px;
         display: inline-flex;
+      }
+
+      .value {
+        font-weight: bold;
+
+        .currency {
+          color: $strong-green;
+          margin-left: $spacing-s;
+        }
       }
     }
   }

@@ -9,6 +9,9 @@
     text-decoration: none;
     color: $blue !important;
   }
+  &.small {
+    font-size:$font-size-normal;
+  }
 
   &.medium {
     font-size: $font-size-large;

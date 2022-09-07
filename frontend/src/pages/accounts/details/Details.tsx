@@ -181,16 +181,21 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <Card className={classes.bigCard}>
         <div>
-          <Label variant="large" className={classes.label}>
-            ADDRESS
+          <Label variant="medium" className={classes.label}>
+            Address
           </Label>
-          <Value variant="large">{account.address}</Value>
+          <Value variant="small" className={classes.value}>
+            {account.address}
+          </Value>
         </div>
         <div>
-          <Label variant="large" className={classes.label}>
-            BALANCE
+          <Label variant="medium" className={classes.label}>
+            Balance
           </Label>
-          <Value variant="large">{account.balance} FLOW</Value>
+          <Value variant="small" className={classes.value}>
+            {account.balance}
+            <span className={classes.currency}>FLOW</span>
+          </Value>
         </div>
       </Card>
       <DetailsTabs>
