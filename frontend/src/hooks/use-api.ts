@@ -27,6 +27,7 @@ import {
   GetPollingLogsResponse,
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
+  GetProjectObjectsResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -214,6 +215,16 @@ export function useGetCurrentProject() {
     error,
     ...rest,
   };
+}
+
+export function useGetProjectObjects() {
+  return useQuery<GetProjectObjectsResponse>(
+    `/projects/objects`,
+    () => projectsService.getAllProjectObjects(),
+    {
+      refetchInterval: 1000,
+    }
+  );
 }
 
 export function useGetAllProjects() {
