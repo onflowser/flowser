@@ -75,8 +75,7 @@ const Navigation: FunctionComponent<{
             <NavigationItem
               to={`/${routes.project}`}
               activeClassName={classes.active}
-              icon={<IconContracts />}
-              // counter={counters?.project} TODO
+              // counter={counters?.project} TODO(milestone-5): add project objects count
             >
               PROJECT
             </NavigationItem>
