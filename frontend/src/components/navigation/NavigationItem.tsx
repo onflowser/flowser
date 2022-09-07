@@ -1,19 +1,19 @@
-import React, { FunctionComponent, ReactNode } from "react";
+import React, { FunctionComponent } from "react";
 import { NavLink } from "react-router-dom";
 import classes from "./NavigationItem.module.scss";
 
 type NavigationItemProps = {
   to: string;
-  icon?: ReactNode;
-  counter?: number;
+  totalCounter?: number;
+  unreadCounter?: number;
   activeClassName?: string;
 };
 
 const NavigationItem: FunctionComponent<NavigationItemProps> = ({
   to,
   children,
-  icon,
-  counter = 0,
+  totalCounter = 0,
+  unreadCounter = null,
 }) => {
   return (
     <div className={classes.root}>
@@ -22,11 +22,13 @@ const NavigationItem: FunctionComponent<NavigationItemProps> = ({
         className={classes.navLink}
         activeClassName={classes.active}
       >
-        <div>
-          {icon && <div className={classes.iconWrapper}> {icon}</div>}
-          <span>{children}</span>
+        <span>{children}</span>
+        <div className={classes.counters}>
+          <div className={classes.totalCounter}>{totalCounter}</div>
+          {unreadCounter && (
+            <div className={classes.unreadCounter}>{unreadCounter}</div>
+          )}
         </div>
-        <div>{counter}</div>
       </NavLink>
     </div>
   );

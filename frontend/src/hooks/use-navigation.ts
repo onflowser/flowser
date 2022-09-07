@@ -8,14 +8,12 @@ export interface Breadcrumb {
 export interface NavigationUiState {
   breadcrumbs: Breadcrumb[];
   isNavigationDrawerVisible: boolean;
-  isSubNavigationVisible: boolean;
   isShowBackButtonVisible: boolean;
   isSearchBarVisible: boolean;
 }
 
 export interface UseNavigationHook extends NavigationUiState {
   showNavigationDrawer: (show: boolean) => void;
-  showSubNavigation: (show: boolean) => void;
   showBackButton: (show: boolean) => void;
   showSearchBar: (show: boolean) => void;
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
@@ -30,11 +28,6 @@ export const useNavigation = (): UseNavigationHook => {
       isNavigationDrawerVisible: show,
     }));
   };
-
-  const showSubNavigation = (show: boolean) => {
-    setState((state: UiState) => ({ ...state, isSubNavigationVisible: show }));
-  };
-
   const showBackButton = (show: boolean) => {
     setState((state: UiState) => ({ ...state, isShowBackButtonVisible: show }));
   };
@@ -49,13 +42,11 @@ export const useNavigation = (): UseNavigationHook => {
 
   return {
     showNavigationDrawer,
-    showSubNavigation,
     showBackButton,
     showSearchBar,
     setBreadcrumbs,
     breadcrumbs: state.breadcrumbs,
     isNavigationDrawerVisible: state.isNavigationDrawerVisible,
-    isSubNavigationVisible: state.isSubNavigationVisible,
     isShowBackButtonVisible: state.isShowBackButtonVisible,
     isSearchBarVisible: state.isSearchBarVisible,
   };

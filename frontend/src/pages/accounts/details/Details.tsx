@@ -107,7 +107,7 @@ const Details: FunctionComponent = () => {
   const focusedStorageId = urlQueryParams.get("focusedStorageId");
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
+  const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
   // TODO(milestone-5): Should we show all transactions of account?
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
@@ -170,7 +170,6 @@ const Details: FunctionComponent = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
   }, []);
 
@@ -180,12 +179,13 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.firstRow}>
-        <Label variant="large">ADDRESS</Label>
-        <Value variant="large">{account.address}</Value>
-        <CopyButton value={account.address} />
-      </div>
       <Card className={classes.bigCard}>
+        <div>
+          <Label variant="large" className={classes.label}>
+            ADDRESS
+          </Label>
+          <Value variant="large">{account.address}</Value>
+        </div>
         <div>
           <Label variant="large" className={classes.label}>
             BALANCE

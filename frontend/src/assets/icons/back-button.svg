@@ -1,4 +1,12 @@
-<svg id="Group_166" data-name="Group 166" xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
-  <path id="Rectangle_13" data-name="Rectangle 13" d="M0,0H72a0,0,0,0,1,0,0V22A50,50,0,0,1,22,72H0a0,0,0,0,1,0,0V0A0,0,0,0,1,0,0Z" fill="#ffc016"/>
-  <path id="back" d="M32.921,14.64H6.189l8.046-8.046a1.52,1.52,0,1,0-2.15-2.15L1.445,15.086a1.52,1.52,0,0,0,0,2.149l10.64,10.64a1.52,1.52,0,1,0,2.15-2.15L6.189,17.68H32.921a1.52,1.52,0,0,0,0-3.04Z" transform="translate(15 18.626)" fill="#191919"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg stroke-miterlimit="10" height="24.32" width="33.44" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 33.44 24.32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs/>
+<clipPath id="ArtboardFrame">
+<rect height="24.32" width="33.44" x="0" y="0"/>
+</clipPath>
+<g clip-path="url(#ArtboardFrame)" id="Untitled">
+<path d="M31.9209 10.6413L5.1889 10.6413L13.2349 2.59528C13.8286 2.00157 13.8286 1.03899 13.2349 0.445279C12.6412-0.148426 11.6786-0.148427 11.0849 0.445279L0.444895 11.0873C-0.148299 11.6808-0.148298 12.6428 0.444896 13.2363L11.0849 23.8763C11.6786 24.47 12.6412 24.47 13.2349 23.8763C13.8286 23.2826 13.8286 22.32 13.2349 21.7263L5.1889 13.6813L31.9209 13.6813C32.7602 13.681 33.4404 13.0005 33.4404 12.1613C33.4404 11.322 32.7602 10.6416 31.9209 10.6413Z" fill="#C7CAD0" fill-rule="evenodd" opacity="1" stroke="none"/>
+</g>
 </svg>
