@@ -18,6 +18,15 @@
     .inlineValue,
     .inlineLabel {
       margin-left: $spacing-l * 2;
+
+      .flex {
+        display: flex;
+        flex-direction: row;
+
+        .text {
+          margin-left: $spacing-base;
+        }
+      }
     }
   }
 
@@ -151,3 +160,4 @@
   justify-content: space-between;
   align-items: center;
 }
+

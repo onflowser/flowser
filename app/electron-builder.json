@@ -1,0 +1,63 @@
+{
+  "productName": "Flowser",
+  "extends": null,
+  "appId": "dev.flowser.app",
+  "electronVersion": "20.1.0",
+  "files": [
+    "build/electron/**/*",
+    "build/react/**/*",
+    "node_modules/**/*",
+    "package.json"
+  ],
+  "directories": {
+    "buildResources": "build/react/static",
+    "output": "release/build"
+  },
+  "mac": {
+    "target": {
+      "target": "default",
+      "arch": [
+        "arm64",
+        "x64"
+      ]
+    },
+    "type": "distribution",
+    "hardenedRuntime": true,
+    "entitlements": "src/assets/entitlements.mac.plist",
+    "entitlementsInherit": "src/assets/entitlements.mac.plist",
+    "gatekeeperAssess": false
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ]
+  },
+  "win": {
+    "target": [
+      "nsis"
+    ]
+  },
+  "linux": {
+    "target": [
+      "AppImage"
+    ],
+    "category": "Development"
+  },
+  "extraResources": [
+    "./assets/**"
+  ],
+  "publish": {
+    "provider": "github",
+    "owner": "onflowser",
+    "repo": "flowser"
+  }
+}

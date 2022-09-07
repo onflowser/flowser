@@ -7,6 +7,10 @@ message GetAllBlocksResponse {
   repeated Block blocks = 1;
 }
 
+message GetPollingBlocksRequest {
+  uint32 timestamp = 1;
+}
+
 message GetPollingBlocksResponse {
   repeated Block data = 1;
   PollingMetaData meta = 2;

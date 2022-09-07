@@ -1,39 +1,34 @@
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
 import {
   GetAllObjectsCountsResponse,
   GetFlowserVersionResponse,
 } from "@flowser/shared";
 import { GetFlowCliInfoResponse } from "@flowser/shared";
+import { TransportService } from "./transports/transport.service";
 
 export class CommonService {
-  private static instance: CommonService | undefined;
+  constructor(private readonly transport: TransportService) {}
 
-  static getInstance(): CommonService {
-    if (!CommonService.instance) {
-      CommonService.instance = new CommonService();
-    }
-    return CommonService.instance;
-  }
-
-  getFlowserVersion(): Promise<AxiosResponse<GetFlowserVersionResponse>> {
-    return axios.get("/api/version", {
-      transformResponse: (data) =>
-        GetFlowserVersionResponse.fromJSON(JSON.parse(data)),
+  getFlowserVersion(): Promise<GetFlowserVersionResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/version",
+      responseProtobuf: GetFlowserVersionResponse,
     });
   }
 
-  getFlowCliInfo(): Promise<AxiosResponse<GetFlowCliInfoResponse>> {
-    return axios.get("/api/flow/version", {
-      transformResponse: (data) =>
-        GetFlowCliInfoResponse.fromJSON(JSON.parse(data)),
+  getFlowCliInfo(): Promise<GetFlowCliInfoResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/flow/version",
+      responseProtobuf: GetFlowCliInfoResponse,
     });
   }
 
-  getAllObjectsCounts(): Promise<AxiosResponse<GetAllObjectsCountsResponse>> {
-    return axios.get("/api/common/counters", {
-      transformResponse: (data) =>
-        GetAllObjectsCountsResponse.fromJSON(JSON.parse(data)),
+  getAllObjectsCounts(): Promise<GetAllObjectsCountsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/common/counters",
+      responseProtobuf: GetAllObjectsCountsResponse,
     });
   }
 }

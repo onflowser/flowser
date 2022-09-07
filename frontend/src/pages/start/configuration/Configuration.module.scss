@@ -227,7 +227,7 @@
 }
 
 .errorMessage {
-  color: lighten($color-status-expired, 10%) !important;
+  color: lighten($color-red, 10%) !important;
   font-size: $font-size-small !important;
   font-weight: 400 !important;
   @include pulse(1.5s);

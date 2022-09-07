@@ -1,38 +1,30 @@
 import {
   GetSingleBlockResponse,
   GetPollingBlocksResponse,
+  GetPollingBlocksRequest,
 } from "@flowser/shared";
-import axios from "../config/axios";
-import { AxiosResponse } from "axios";
+import { TransportService } from "./transports/transport.service";
 
 export class BlocksService {
-  private static instance: BlocksService | undefined;
+  constructor(private readonly transport: TransportService) {}
 
-  static getInstance(): BlocksService {
-    if (!BlocksService.instance) {
-      BlocksService.instance = new BlocksService();
-    }
-    return BlocksService.instance;
-  }
-
-  getAllWithPolling({
-    timestamp,
-  }: {
+  getAllWithPolling(data: {
     timestamp: number;
-  }): Promise<AxiosResponse<GetPollingBlocksResponse>> {
-    return axios.get("/api/blocks/polling", {
-      params: {
-        timestamp,
-      },
-      transformResponse: (data) =>
-        GetPollingBlocksResponse.fromJSON(JSON.parse(data)),
+  }): Promise<GetPollingBlocksResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/blocks/polling",
+      requestData: data,
+      requestProtobuf: GetPollingBlocksRequest,
+      responseProtobuf: GetPollingBlocksResponse,
     });
   }
 
-  getSingle(id: string): Promise<AxiosResponse<GetSingleBlockResponse>> {
-    return axios.get(`/api/blocks/${id}`, {
-      transformResponse: (data) =>
-        GetSingleBlockResponse.fromJSON(JSON.parse(data)),
+  getSingle(id: string): Promise<GetSingleBlockResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/blocks/${id}`,
+      responseProtobuf: GetSingleBlockResponse,
     });
   }
 }

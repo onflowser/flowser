@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Put,
-  Query,
   UseInterceptors,
 } from "@nestjs/common";
 import { FlowGatewayService } from "./services/gateway.service";
@@ -18,10 +17,9 @@ import {
   CreateEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
-  CreateEmulatorSnapshotResponse,
+  GetPollingEmulatorSnapshotsRequest,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
-import { ParseUnixTimestampPipe } from "../common/pipes/parse-unix-timestamp.pipe";
 
 @Controller("flow")
 export class FlowController {
@@ -50,11 +48,10 @@ export class FlowController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingEmulatorSnapshotsResponse)
   )
-  async getSnapshotsWithPolling(
-    @Query("timestamp", ParseUnixTimestampPipe) timestamp
-  ) {
+  async getSnapshotsWithPolling(@Body() data) {
+    const request = GetPollingEmulatorSnapshotsRequest.fromJSON(data);
     const snapshots = await this.flowSnapshotService.findAllNewerThanTimestamp(
-      timestamp
+      new Date(request.timestamp)
     );
     return snapshots.map((snapshot) => snapshot.toProto());
   }
@@ -63,17 +60,21 @@ export class FlowController {
   async createSnapshot(@Body() body) {
     const request = CreateEmulatorSnapshotRequest.fromJSON(body);
     const snapshot = await this.flowSnapshotService.create(request.description);
-    return CreateEmulatorSnapshotResponse.toJSON({
-      snapshot: snapshot.toProto(),
-    });
+    return RevertToEmulatorSnapshotResponse.toJSON(
+      RevertToEmulatorSnapshotResponse.fromPartial({
+        snapshot: snapshot.toProto(),
+      })
+    );
   }
 
   @Put("snapshots")
   async revertToSnapshot(@Body() body) {
     const request = RevertToEmulatorSnapshotRequest.fromJSON(body);
     const snapshot = await this.flowSnapshotService.revertTo(request.blockId);
-    return RevertToEmulatorSnapshotResponse.toJSON({
-      snapshot: snapshot.toProto(),
-    });
+    return RevertToEmulatorSnapshotResponse.toJSON(
+      RevertToEmulatorSnapshotResponse.fromPartial({
+        snapshot: snapshot.toProto(),
+      })
+    );
   }
 }

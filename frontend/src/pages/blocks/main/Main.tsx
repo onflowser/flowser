@@ -10,7 +10,6 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import NoResults from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
@@ -19,16 +18,18 @@ import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../../../hooks/use-api";
-import { SnapshotService } from "../../../services/snapshots.service";
 import toast from "react-hot-toast";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { ServiceRegistry } from "../../../services/service-registry";
+import { useErrorHandler } from "../../../hooks/use-error-handler";
 
 const { formatDate } = useFormattedDate();
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
 const Main: FunctionComponent = () => {
-  const emulatorSnapshotService = SnapshotService.getInstance();
+  const { snapshotService } = ServiceRegistry.getInstance();
+  const { handleError } = useErrorHandler(Main.name);
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer, showSubNavigation } = useNavigation();
 
@@ -45,14 +46,13 @@ const Main: FunctionComponent = () => {
 
   async function onRevertToBlock(blockId: string) {
     try {
-      const snapshot = await emulatorSnapshotService.revertTo({
+      const snapshot = await snapshotService.revertTo({
         blockId,
       });
       fetchAll();
-      toast.success(`Reverted to "${snapshot.data.snapshot?.description}"`);
+      toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
     } catch (e) {
-      console.error(e);
-      toast.error("Failed to revert to block");
+      handleError(e);
     }
   }
 

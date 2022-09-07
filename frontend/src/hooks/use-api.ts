@@ -28,31 +28,34 @@ import {
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
 } from "@flowser/shared";
-import { AccountsService } from "../services/accounts.service";
-import { ContractsService } from "../services/contracts.service";
-import { TransactionsService } from "../services/transactions.service";
-import { BlocksService } from "../services/blocks.service";
-import { EventsService } from "../services/events.service";
-import { LogsService } from "../services/logs.service";
-import { useGetAxiosQuery } from "./use-get-axios-query";
-import { ProjectsService } from "../services/projects.service";
-import { CommonService } from "../services/common.service";
-import { StorageService } from "../services/storage.service";
-import { SnapshotService } from "../services/snapshots.service";
+import { ServiceRegistry } from "../services/service-registry";
+import { useQuery } from "react-query";
+
+const {
+  projectsService,
+  commonService,
+  contractsService,
+  transactionsService,
+  storageService,
+  blocksService,
+  eventsService,
+  logsService,
+  accountsService,
+  snapshotService,
+} = ServiceRegistry.getInstance();
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
     resourceKey: "/accounts/polling",
     resourceIdKey: "address",
-    fetcher: AccountsService.getInstance().getAllWithPolling,
+    fetcher: (data) => accountsService.getAllWithPolling(data),
   });
 }
 
 export function useGetAccount(address: string) {
-  return useGetAxiosQuery<GetSingleAccountResponse>({
-    resourceKey: `/accounts/${address}`,
-    fetcher: () => AccountsService.getInstance().getSingle(address),
-  });
+  return useQuery<GetSingleAccountResponse>(`/accounts/${address}`, () =>
+    accountsService.getSingle(address)
+  );
 }
 
 export function useGetPollingTransactionsByAccount(
@@ -62,7 +65,7 @@ export function useGetPollingTransactionsByAccount(
     resourceKey: `/accounts/${accountAddress}/transactions/polling`,
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      TransactionsService.getInstance().getAllByAccountWithPolling({
+      transactionsService.getAllByAccountWithPolling({
         accountAddress,
         timestamp,
       }),
@@ -76,7 +79,7 @@ export function useGetPollingContractsByAccount(
     resourceKey: `/accounts/${accountAddress}/contracts/polling`,
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      ContractsService.getInstance().getAllByAccountWithPolling({
+      contractsService.getAllByAccountWithPolling({
         accountAddress,
         timestamp,
       }),
@@ -90,7 +93,7 @@ export function useGetPollingStorageByAccount(
     resourceKey: `/accounts/${accountAddress}/storage/polling`,
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      StorageService.getInstance().getAllByAccountWithPolling({
+      storageService.getAllByAccountWithPolling({
         accountAddress,
         timestamp,
       }),
@@ -104,7 +107,7 @@ export function useGetPollingKeysByAccount(
     resourceKey: `/accounts/${accountAddress}/keys/polling`,
     resourceIdKey: "index",
     fetcher: ({ timestamp }) =>
-      AccountsService.getInstance().getAllKeysByAccountWithPolling({
+      accountsService.getAllKeysByAccountWithPolling({
         accountAddress,
         timestamp,
       }),
@@ -115,22 +118,21 @@ export function useGetPollingContracts(): TimeoutPollingHook<AccountContract> {
   return useTimeoutPolling<AccountContract, GetPollingContractsResponse>({
     resourceKey: "/contracts/polling",
     resourceIdKey: "id",
-    fetcher: ContractsService.getInstance().getAllWithPolling,
+    fetcher: (data) => contractsService.getAllWithPolling(data),
   });
 }
 
 export function useGetContract(contractId: string) {
-  return useGetAxiosQuery<GetSingleContractResponse>({
-    resourceKey: `/contract/${contractId}`,
-    fetcher: () => ContractsService.getInstance().getSingle(contractId),
-  });
+  return useQuery<GetSingleContractResponse>(`/contract/${contractId}`, () =>
+    contractsService.getSingle(contractId)
+  );
 }
 
 export function useGetPollingTransactions(): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/transactions/polling",
     resourceIdKey: "id",
-    fetcher: TransactionsService.getInstance().getAllWithPolling,
+    fetcher: (data) => transactionsService.getAllWithPolling(data),
   });
 }
 
@@ -138,22 +140,21 @@ export function useGetPollingBlocks(): TimeoutPollingHook<Block> {
   return useTimeoutPolling<Block, GetPollingBlocksResponse>({
     resourceKey: "/blocks/polling",
     resourceIdKey: "id",
-    fetcher: BlocksService.getInstance().getAllWithPolling,
+    fetcher: (data) => blocksService.getAllWithPolling(data),
   });
 }
 
 export function useGetBlock(blockId: string) {
-  return useGetAxiosQuery<GetSingleBlockResponse>({
-    resourceKey: `/blocks/${blockId}`,
-    fetcher: () => BlocksService.getInstance().getSingle(blockId),
-  });
+  return useQuery<GetSingleBlockResponse>(`/blocks/${blockId}`, () =>
+    blocksService.getSingle(blockId)
+  );
 }
 
 export function useGetPollingEvents(): TimeoutPollingHook<Event> {
   return useTimeoutPolling<Event, GetPollingEventsResponse>({
     resourceKey: "/events/polling",
     resourceIdKey: "id",
-    fetcher: EventsService.getInstance().getAllWithPolling,
+    fetcher: (data) => eventsService.getAllWithPolling(data),
   });
 }
 
@@ -164,7 +165,7 @@ export function useGetPollingEventsByTransaction(
     resourceKey: `/transaction/${transactionId}/events/polling`,
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      EventsService.getInstance().getAllWithPollingByTransaction({
+      eventsService.getAllWithPollingByTransaction({
         transactionId,
         timestamp,
       }),
@@ -175,7 +176,7 @@ export function useGetPollingLogs(): TimeoutPollingHook<Log> {
   return useTimeoutPolling<Log, GetPollingLogsResponse>({
     resourceKey: "/logs/polling",
     resourceIdKey: "id",
-    fetcher: LogsService.getInstance().getAllWithPolling,
+    fetcher: (data) => logsService.getAllWithPolling(data),
   });
 }
 
@@ -186,7 +187,7 @@ export function useGetPollingTransactionsByBlock(
     resourceKey: "/block/transactions/polling",
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      TransactionsService.getInstance().getAllByBlockWithPolling({
+      transactionsService.getAllByBlockWithPolling({
         blockId,
         timestamp,
       }),
@@ -194,18 +195,18 @@ export function useGetPollingTransactionsByBlock(
 }
 
 export function useGetTransaction(transactionId: string) {
-  return useGetAxiosQuery<GetSingleTransactionResponse>({
-    resourceKey: `/transactions/${transactionId}`,
-    fetcher: () => TransactionsService.getInstance().getSingle(transactionId),
-    refetchInterval: 1000,
-  });
+  return useQuery<GetSingleTransactionResponse>(
+    `/transactions/${transactionId}`,
+    () => transactionsService.getSingle(transactionId),
+    { refetchInterval: 1000 }
+  );
 }
 
 export function useGetCurrentProject() {
-  const { data, error, ...rest } = useGetAxiosQuery<GetSingleProjectResponse>({
-    resourceKey: `/projects/current`,
-    fetcher: ProjectsService.getInstance().getCurrentProject,
-  });
+  const { data, error, ...rest } = useQuery<GetSingleProjectResponse>(
+    `/projects/current`,
+    () => projectsService.getCurrentProject()
+  );
 
   // In case there is no current project, 404 error is thrown
   return {
@@ -216,33 +217,33 @@ export function useGetCurrentProject() {
 }
 
 export function useGetAllProjects() {
-  return useGetAxiosQuery<GetAllProjectsResponse>({
-    resourceKey: `/projects`,
-    fetcher: ProjectsService.getInstance().getAll,
-    refetchInterval: 1000,
-  });
+  return useQuery<GetAllProjectsResponse>(
+    `/projects`,
+    () => projectsService.getAll(),
+    {
+      refetchInterval: 1000,
+    }
+  );
 }
 
 export function useGetFlowserVersion() {
-  return useGetAxiosQuery<GetFlowserVersionResponse>({
-    resourceKey: "/version",
-    fetcher: CommonService.getInstance().getFlowserVersion,
-  });
+  return useQuery<GetFlowserVersionResponse>("/version", () =>
+    commonService.getFlowserVersion()
+  );
 }
 
 export function useGetFlowCliInfo() {
-  return useGetAxiosQuery<GetFlowCliInfoResponse>({
-    resourceKey: "/version",
-    fetcher: CommonService.getInstance().getFlowCliInfo,
-  });
+  return useQuery<GetFlowCliInfoResponse>("/version", () =>
+    commonService.getFlowCliInfo()
+  );
 }
 
 export function useGetAllObjectsCounts() {
-  return useGetAxiosQuery<GetAllObjectsCountsResponse>({
-    resourceKey: "/counts",
-    fetcher: CommonService.getInstance().getAllObjectsCounts,
-    refetchInterval: 1000,
-  });
+  return useQuery<GetAllObjectsCountsResponse>(
+    "/counts",
+    () => commonService.getAllObjectsCounts(),
+    { refetchInterval: 1000 }
+  );
 }
 
 export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSnapshot> {
@@ -253,7 +254,7 @@ export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSna
     resourceKey: "/snapshots/polling",
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      SnapshotService.getInstance().getAllWithPolling({
+      snapshotService.getAllWithPolling({
         timestamp,
       }),
   });

@@ -3,29 +3,29 @@ syntax = "proto3";
 import "entities/cadence.proto";
 
 // https://docs.onflow.org/fcl/reference/api/#transaction-statuses
-enum TransactionStatusCode {
-  TX_STATUS_UNKNOWN = 0;
+enum ExecutionStatusCode {
+  EXECUTION_STATUS_UNKNOWN = 0;
   /**
    * Transaction Pending - Awaiting Finalization
    */
-  TX_STATUS_PENDING = 1;
+  EXECUTION_STATUS_PENDING = 1;
   /**
    * Transaction Finalized - Awaiting Execution
    */
-  TX_STATUS_FINALIZED = 2;
+  EXECUTION_STATUS_FINALIZED = 2;
   /**
    * Transaction Executed - Awaiting Sealing
    */
-  TX_STATUS_EXECUTED = 3;
+  EXECUTION_STATUS_EXECUTED = 3;
   /**
    * Transaction Sealed - Transaction Complete. At this point the transaction
    * result has been committed to the blockchain.
    */
-  TX_STATUS_SEALED = 4;
+  EXECUTION_STATUS_SEALED = 4;
   /**
    * Transaction Expired
    */
-  TX_STATUS_EXPIRED = 5;
+  EXECUTION_STATUS_EXPIRED = 5;
 }
 
 // https://grpc.github.io/grpc/core/md_doc_statuscodes.html
@@ -79,7 +79,7 @@ message SignableObject {
 }
 
 message TransactionStatus {
-  TransactionStatusCode status = 1;
-  GrcpStatusCode status_code = 2;
+  ExecutionStatusCode execution_status = 1;
+  GrcpStatusCode grcp_status = 2;
   string error_message = 3;
 }
