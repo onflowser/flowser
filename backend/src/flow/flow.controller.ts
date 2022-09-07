@@ -44,7 +44,7 @@ export class FlowController {
     });
   }
 
-  @Get("snapshots/polling")
+  @Post("snapshots/polling")
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingEmulatorSnapshotsResponse)
   )

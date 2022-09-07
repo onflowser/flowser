@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseInterceptors, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
@@ -24,7 +31,7 @@ export class TransactionsController {
     });
   }
 
-  @Get("/transactions/polling")
+  @Post("/transactions/polling")
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
@@ -47,7 +54,7 @@ export class TransactionsController {
   }
 
   @ApiParam({ name: "id", type: String })
-  @Get("/blocks/:id/transactions/polling")
+  @Post("/blocks/:id/transactions/polling")
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
@@ -63,7 +70,7 @@ export class TransactionsController {
 
   @ApiParam({ name: "id", type: String })
   @ApiQuery({ name: "timestamp", type: Number })
-  @Get("/accounts/:address/transactions/polling")
+  @Post("/accounts/:address/transactions/polling")
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )

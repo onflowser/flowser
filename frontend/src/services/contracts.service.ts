@@ -14,7 +14,7 @@ export class ContractsService {
     timestamp: number;
   }): Promise<GetPollingContractsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/contracts/polling`,
       requestData: data,
       requestProtobuf: GetPollingContractsRequest,
@@ -30,7 +30,7 @@ export class ContractsService {
     timestamp: number;
   }): Promise<GetPollingContractsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/accounts/${accountAddress}/contracts/polling`,
       requestData: data,
       requestProtobuf: GetPollingContractsByAccountRequest,

@@ -50,6 +50,7 @@ export const useTimeoutPolling = <
     fetchCallback,
     {
       onSuccess: (response) => {
+        console.log(props.resourceKey, response);
         if (response.data.length) {
           const latestTimestamp = response.meta?.latestTimestamp ?? 0;
 
@@ -105,6 +106,7 @@ export const useTimeoutPolling = <
   const fetchAll = useCallback(() => {
     setData([]);
     setLastPollingTime(0);
+    setFirstFetch(true);
     refetch();
   }, []);
 
