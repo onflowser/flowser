@@ -39,13 +39,13 @@
       gap: 5px;
 
       > * {
-        font-size: $font-size-xxsmall;
+        font-size: $font-size-xsmall;
         line-height: calc(#{$font-size-xxsmall} + 2px);
         color: $color-main-text;
         border-radius: 8px;
         text-align: center;
         font-weight: 400;
-        padding: 1px 5px;
+        padding: 2px 5px;
       }
       .totalCounter {
         background-color: $grey;

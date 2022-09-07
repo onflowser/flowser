@@ -33,12 +33,10 @@ const Search: FunctionComponent<SearchProps> = ({
 
   return (
     <div
-      className={classNames(
-        `${classes.root} ${className} ${searchDisabled && classes.disabled}`,
-        {
-          [classes.responsive]: responsive,
-        }
-      )}
+      className={classNames(classes.root, className, {
+        [classes.disabled]: searchDisabled,
+        [classes.responsive]: responsive,
+      })}
       onClick={() => {
         inputRef.current?.focus();
       }}
