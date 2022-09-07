@@ -4,8 +4,8 @@ import Button from "../button/Button";
 import classes from "./ConfirmDialog.module.scss";
 
 type ConfirmDialogProps = Pick<DialogProps, "onClose"> & {
-  onClose: React.MouseEventHandler<HTMLButtonElement>;
-  onConfirm: MouseEventHandler<HTMLButtonElement>;
+  onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onConfirm: MouseEventHandler<HTMLButtonElement> | undefined;
   confirmBtnLabel?: string;
   cancelBtnLabel?: string;
   className?: string;

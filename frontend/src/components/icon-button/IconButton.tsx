@@ -1,6 +1,7 @@
 import React, { FunctionComponent, ReactElement } from "react";
 import Button, { ButtonProps } from "../button/Button";
 import classes from "./IconButton.module.scss";
+import classNames from "classnames";
 
 interface IconButtonProps extends ButtonProps {
   icon: ReactElement;
@@ -35,7 +36,10 @@ const IconButton: FunctionComponent<IconButtonProps> = ({
     }
   }
   return (
-    <Button {...restProps} className={`${classes.root} ${restProps.className}`}>
+    <Button
+      {...restProps}
+      className={classNames(classes.root, restProps.className)}
+    >
       {children}
     </Button>
   );

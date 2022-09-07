@@ -1,6 +1,7 @@
 import React, { ReactElement } from "react";
 import Card from "../card/Card";
 import classes from "./Table.module.scss";
+import classNames from "classnames";
 import {
   flexRender,
   getCoreRowModel,
@@ -13,16 +14,19 @@ import {
 import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 import { CommonUtils } from "../../utils/common-utils";
 
-export type CustomTableType = {
-  renderCustomHeader?: (header: HeaderGroup<TableData<any>>) => ReactElement;
-  renderCustomRow?: (row: Row<TableData<any>>) => ReactElement;
+type CustomTableProps<TData> = {
+  renderCustomHeader?: (header: HeaderGroup<TableData<TData>>) => ReactElement;
+  renderCustomRow?: (row: Row<TableData<TData>>) => ReactElement;
+  headerRowClass?: string;
+  bodyRowClass?: string;
+  footerRowClass?: string;
 };
 
 export type TableProps<TData> = Pick<
   TableOptions<TableData<TData>>,
   "data" | "columns"
 > &
-  CustomTableType & {
+  CustomTableProps<TData> & {
     className?: string;
   };
 
@@ -41,6 +45,9 @@ function Table<TData>({
   data,
   renderCustomRow,
   renderCustomHeader,
+  headerRowClass,
+  bodyRowClass,
+  footerRowClass,
   className,
 }: TableProps<TData>): ReactElement {
   const table = useReactTable<TableData<TData>>({
@@ -56,7 +63,7 @@ function Table<TData>({
           renderCustomHeader(headerGroup)
         ) : (
           <Card
-            className={`${classes.tableRow} ${classes.headerRow}`}
+            className={classNames(classes.tableRow, headerRowClass)}
             key={headerGroup.id}
             variant="header-row"
           >
@@ -79,7 +86,7 @@ function Table<TData>({
           renderCustomRow(row)
         ) : (
           <Card
-            className={classes.tableRow}
+            className={classNames(classes.tableRow, bodyRowClass)}
             key={row.id}
             showIntroAnimation={showIntroAnimation(row)}
             variant="table-line"
@@ -96,7 +103,10 @@ function Table<TData>({
         )
       )}
       {table.getFooterGroups().map((footerGroup) => (
-        <div className={classes.tableRow} key={footerGroup.id}>
+        <div
+          className={classNames(classes.tableRow, footerRowClass)}
+          key={footerGroup.id}
+        >
           {footerGroup.headers.map((header) => (
             <div
               key={header.id}

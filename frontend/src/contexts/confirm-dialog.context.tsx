@@ -1,0 +1,63 @@
+import React, {
+  createContext,
+  ReactElement,
+  useContext,
+  useState,
+} from "react";
+import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
+
+export type ConfirmDialogContextState = {
+  showDialog: (props: OpenConfirmDialogProps) => void;
+  hideDialog: () => void;
+};
+
+export type OpenConfirmDialogProps = {
+  confirmBtnLabel: string;
+  cancelBtnLabel: string;
+  body: ReactElement;
+  onConfirm?: () => void;
+};
+
+const ConfirmDialogContext = createContext<ConfirmDialogContextState>({
+  showDialog: () => undefined,
+  hideDialog: () => undefined,
+});
+
+export function useConfirmDialog(): ConfirmDialogContextState {
+  return useContext(ConfirmDialogContext);
+}
+
+export function ConfirmDialogProvider({
+  children,
+}: {
+  children: ReactElement;
+}): ReactElement {
+  const [dialogProps, setDialogProps] = useState<
+    OpenConfirmDialogProps | undefined
+  >();
+  const isShowingDialog = dialogProps !== undefined;
+
+  function showDialog(props: OpenConfirmDialogProps) {
+    setDialogProps(props);
+  }
+
+  function hideDialog() {
+    setDialogProps(undefined);
+  }
+
+  return (
+    <ConfirmDialogContext.Provider value={{ showDialog, hideDialog }}>
+      {children}
+      {isShowingDialog && (
+        <ConfirmDialog
+          onClose={hideDialog}
+          onConfirm={dialogProps.onConfirm}
+          confirmBtnLabel={dialogProps.confirmBtnLabel}
+          cancelBtnLabel={dialogProps.cancelBtnLabel}
+        >
+          {dialogProps.body}
+        </ConfirmDialog>
+      )}
+    </ConfirmDialogContext.Provider>
+  );
+}
