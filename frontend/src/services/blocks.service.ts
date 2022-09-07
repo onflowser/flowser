@@ -12,7 +12,7 @@ export class BlocksService {
     timestamp: number;
   }): Promise<GetPollingBlocksResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: "/api/blocks/polling",
       requestData: data,
       requestProtobuf: GetPollingBlocksRequest,

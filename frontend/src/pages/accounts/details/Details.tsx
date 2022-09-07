@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
@@ -26,63 +26,20 @@ import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import {
   AccountContract,
   AccountKey,
-  AccountStorageItem,
+  AccountStorageDomain,
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Badge from "../../../components/badge/Badge";
+import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
+import { BaseStorageCard } from "./BaseStorageCard";
+import classNames from "classnames";
+import { useUrlQuery } from "../../../hooks/use-url-query";
 
-type RouteParams = {
+export type AccountDetailsRouteParams = {
   accountId: string;
 };
-
-// STORAGE TABLE
-const columnHelperStorage =
-  createColumnHelper<DecoratedPollingEntity<AccountStorageItem>>();
-
-const columnsStorage = [
-  columnHelperStorage.accessor("pathDomain", {
-    header: () => <Label variant="medium">DOMAIN</Label>,
-    cell: (info) => (
-      <Value>{FlowUtils.getLowerCasedPathDomain(info.getValue())}</Value>
-    ),
-  }),
-  columnHelperStorage.accessor("pathIdentifier", {
-    meta: {
-      className: classes.identifierColumn,
-    },
-    header: () => (
-      <div>
-        <Label variant="medium">IDENTIFIER</Label>
-      </div>
-    ),
-    cell: (info) => (
-      <div>
-        <Value>{info.getValue()}</Value>
-      </div>
-    ),
-  }),
-  columnHelperStorage.accessor("data", {
-    meta: {
-      className: classes.dataColumn,
-    },
-    header: () => (
-      <div>
-        <Label variant="medium">DATA</Label>
-      </div>
-    ),
-    cell: (info) => (
-      <div>
-        <Value>
-          <pre style={{ whiteSpace: "nowrap" }}>
-            {JSON.stringify(info.getValue()) ?? "-"}
-          </pre>
-        </Value>
-      </div>
-    ),
-  }),
-];
 
 // CONTRACTS TABLE
 const columnHelperContracts =
@@ -145,16 +102,66 @@ const columnsKeys = [
 ];
 
 const Details: FunctionComponent = () => {
-  const { accountId } = useParams<RouteParams>();
+  const { accountId } = useParams<AccountDetailsRouteParams>();
+  const urlQueryParams = useUrlQuery();
+  const focusedStorageId = urlQueryParams.get("focusedStorageId");
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
+  // TODO(milestone-5): Should we show all transactions of account?
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
+  const [expandedCardIds, setExpandedCardIds] = useState(
+    new Set<string>(focusedStorageId ? [focusedStorageId] : [])
+  );
+
+  useEffect(() => {
+    if (focusedStorageId) {
+      expandCardById(focusedStorageId);
+      // We need to wait for the virtual nodes to be added to the browser DOM.
+      // This is achieved with setTimeout call - wait for the next window pain.
+      // There might be a better React way to do this.
+      setTimeout(() => {
+        const targetDomNode = document.getElementById(focusedStorageId);
+        window.scrollTo(0, targetDomNode?.offsetTop ?? 0);
+      });
+    }
+  }, [focusedStorageId, storageItems]);
+
+  const expandCardById = (id: string) => {
+    setExpandedCardIds((prev) => new Set(prev.add(id)));
+  };
+  const minimizeCardById = (id: string) => {
+    expandedCardIds.delete(id);
+    setExpandedCardIds(new Set(expandedCardIds));
+  };
+
+  const toggleCardExpand = (id: string) => {
+    if (expandedCardIds.has(id)) {
+      minimizeCardById(id);
+    } else {
+      expandCardById(id);
+    }
+  };
+
+  const privateStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PRIVATE
+  );
+  const publicStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
+  );
+  const baseStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
+  );
+
+  const privateAndPublicStorageItems = [
+    ...publicStorageItems,
+    ...privateStorageItems,
+  ];
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -186,6 +193,26 @@ const Details: FunctionComponent = () => {
         </div>
       </Card>
       <DetailsTabs>
+        <DetailsTabItem label="STORAGE" value={account.storage?.length}>
+          <div className={classes.grid}>
+            {privateAndPublicStorageItems.map((item) => (
+              <PublicPrivateStorageCard key={item.id} content={item} />
+            ))}
+          </div>
+          <div className={classes.gridExtendable}>
+            {baseStorageItems.map((item) => (
+              <BaseStorageCard
+                key={item.id}
+                content={item}
+                onToggleExpand={() => toggleCardExpand(item.id)}
+                isExpanded={expandedCardIds.has(item.id)}
+                className={classNames({
+                  [classes.gridItemExtended]: expandedCardIds.has(item.id),
+                })}
+              />
+            ))}
+          </div>
+        </DetailsTabItem>
         <DetailsTabItem
           label="CONTRACTS"
           value={contracts.length}
@@ -207,13 +234,6 @@ const Details: FunctionComponent = () => {
               data={keys}
             />
           </Fragment>
-        </DetailsTabItem>
-        <DetailsTabItem label="STORAGE" value={account.storage?.length}>
-          <Table<DecoratedPollingEntity<AccountStorageItem>>
-            className={classes.storageTable}
-            data={storageItems}
-            columns={columnsStorage}
-          />
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">

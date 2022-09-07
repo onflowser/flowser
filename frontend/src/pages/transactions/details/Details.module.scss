@@ -18,6 +18,15 @@
     .inlineValue,
     .inlineLabel {
       margin-left: $spacing-l * 2;
+
+      .flex {
+        display: flex;
+        flex-direction: row;
+
+        .text {
+          margin-left: $spacing-base;
+        }
+      }
     }
   }
 
@@ -138,7 +147,7 @@
   overflow: hidden;
 }
 
-.subtable {
+.subTableValue {
   max-width: 13vw;
   display: inline-block;
   overflow: hidden;
@@ -151,3 +160,4 @@
   justify-content: space-between;
   align-items: center;
 }
+

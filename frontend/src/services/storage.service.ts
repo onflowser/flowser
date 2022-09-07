@@ -15,7 +15,7 @@ export class StorageService {
     timestamp: number;
   }): Promise<GetPollingStorageResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/accounts/${accountAddress}/storage/polling`,
       requestData: data,
       requestProtobuf: GetPollingStorageRequest,

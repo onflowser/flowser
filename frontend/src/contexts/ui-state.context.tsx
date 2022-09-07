@@ -13,7 +13,7 @@ interface UiStateContextProps {
 
 type Props = UiStateContextProps;
 
-export const UiStateContext: any = createContext<any>([{}, () => undefined]);
+const UiStateContext: any = createContext<any>([{}, () => undefined]);
 
 export function useUiStateContext() {
   return useContext<any>(UiStateContext);

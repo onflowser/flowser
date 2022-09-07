@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30" viewBox="0 0 30 30">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_9" data-name="Rectangle 9" width="13.35" height="13.35" rx="5" fill="#e5e5e5"/>
+    </clipPath>
+  </defs>
+  <g id="Group_574" data-name="Group 574" transform="translate(-1700 -202)">
+    <circle id="Ellipse_12" data-name="Ellipse 12" cx="15" cy="15" r="15" transform="translate(1700 202)" fill="#41465b"/>
+    <g id="not-active-button" transform="translate(1708.325 210.325)" clip-path="url(#clip-path)">
+      <g id="flow-logo" transform="translate(0 0)">
+        <g id="Group_235" data-name="Group 235" transform="translate(0)">
+          <g id="Group_232" data-name="Group 232" transform="translate(8.641 4.71)">
+            <rect id="Rectangle_43" data-name="Rectangle 43" width="3.141" height="3.141" fill="#e5e5e5"/>
+          </g>
+          <g id="Group_233" data-name="Group 233" transform="translate(0 4.71)">
+            <path id="Path_168" data-name="Path 168" d="M11.016,15.439v0a1.179,1.179,0,1,1-1.179-1.179h1.179V11.121H9.837a4.32,4.32,0,1,0,4.32,4.32V14.262H11.016Z" transform="translate(-5.517 -11.121)" fill="#e5e5e5"/>
+          </g>
+          <g id="Group_234" data-name="Group 234" transform="translate(5.499)">
+            <path id="Path_169" data-name="Path 169" d="M16.014,8.968h3.533V5.829H16.014A4.343,4.343,0,0,0,11.7,10.147v.392h3.141v-.392A1.187,1.187,0,0,1,16.014,8.968Z" transform="translate(-11.696 -5.829)" fill="#e5e5e5"/>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

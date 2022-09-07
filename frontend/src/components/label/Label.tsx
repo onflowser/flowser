@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from "react";
 import classes from "./Label.module.scss";
+import classNames from "classnames";
 
 type LabelProps = {
   className?: string;
@@ -15,7 +16,7 @@ const Label: FunctionComponent<LabelProps> = ({
 }) => {
   return (
     <span
-      className={`${classes.root} ${classes[variant]} ${className}`}
+      className={classNames(classes.root, classes[variant], className)}
       title={title}
     >
       {children}

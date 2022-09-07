@@ -1,4 +1,11 @@
-import { Controller, Get, UseInterceptors, Query, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  UseInterceptors,
+  Query,
+  Body,
+  Post,
+} from "@nestjs/common";
 import { LogsService } from "./logs.service";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
 import {
@@ -19,7 +26,7 @@ export class LogsController {
     });
   }
 
-  @Get("/polling")
+  @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingLogsResponse))
   async findAllNew(@Body() data) {
     const request = GetPollingLogsRequest.fromJSON(data);

@@ -1,0 +1,62 @@
+@import 'styles/spacings';
+@import 'styles/colors';
+@import 'styles/typography';
+
+.sidebar {
+  background-color: $background !important;
+  color: $grey;
+  display: flex;
+  justify-content: flex-start;
+  font-size: $font-size-large;
+
+  .menu {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    margin: $line-spacing-l;
+    justify-content: space-between;
+
+    .menuItem {
+      display: flex;
+      padding: $spacing-base;
+      align-items: center;
+
+      .text {
+        transition: 0.3s;
+        margin-left: $spacing-base;
+        color: $light-grey;
+      }
+
+
+      .icon {
+        height: 40px;
+        width: 40px;
+      }
+
+    }
+
+    .menuItem:hover {
+      .text {
+        color: $grey
+      }
+    }
+
+    .footer {
+      display: flex;
+      flex-direction: column;
+      padding: $spacing-base;
+      align-items: center;
+
+      .button {
+        width: 120%;
+        transform: translateX(10%);
+        font-size: 16px;
+        color: $background;
+
+        path {
+          fill: $background;
+        }
+      }
+    }
+  }
+}
