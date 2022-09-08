@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback } from "react";
+import React, { FunctionComponent, ReactElement, useCallback } from "react";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
@@ -24,7 +24,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
   const { data } = useGetCurrentProject();
   const { login } = useFlow();
-  const { switchProject } = useProjectActions();
+  const { switchProject, sendTransaction } = useProjectActions();
   const { project: currentProject } = data ?? {};
 
   const createProject = useCallback(() => {
@@ -46,20 +46,26 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
     >
       <div className={classes.menu}>
         <div>
-          <SimpleButton className={classes.menuItem} onClick={switchProject}>
-            <SwitchIcon className={classes.icon} />
-            <div className={classes.text}>Switch project</div>
-          </SimpleButton>
-
-          <SimpleButton className={classes.menuItem} onClick={login}>
-            <ConnectIcon className={classes.icon} />
-            <div className={classes.text}>Connect</div>
-          </SimpleButton>
-
-          <SimpleButton className={classes.menuItem} onClick={openSettings}>
-            <SettingsIcon className={classes.icon} />
-            <div className={classes.text}>Settings</div>
-          </SimpleButton>
+          <SidebarButton
+            onClick={switchProject}
+            title="Switch project"
+            iconComponent={SwitchIcon}
+          />
+          <SidebarButton
+            onClick={openSettings}
+            title="Settings"
+            iconComponent={SettingsIcon}
+          />
+          <SidebarButton
+            onClick={login}
+            title="Connect wallet"
+            iconComponent={ConnectIcon}
+          />
+          <SidebarButton
+            onClick={sendTransaction}
+            title="Send transaction"
+            iconComponent={ConnectIcon}
+          />
         </div>
         <div className={classNames(classes.menuItem, classes.footer)}>
           <IconButton
@@ -74,5 +80,22 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
         </div>
       </div>
     </Drawer>
+  );
+}
+
+function SidebarButton({
+  onClick,
+  title,
+  iconComponent: IconComponent,
+}: {
+  onClick: () => void;
+  title: string;
+  iconComponent: FunctionComponent<{ className?: string }>;
+}) {
+  return (
+    <SimpleButton className={classes.menuItem} onClick={onClick}>
+      <IconComponent className={classes.icon} />
+      <div className={classes.text}>{title}</div>
+    </SimpleButton>
   );
 }

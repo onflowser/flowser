@@ -63,12 +63,8 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
 
   function showOpenProjectDialog() {
     showDialog({
-      body: (
-        <>
-          <h3>New emulator</h3>
-          <span>Not supported yet :(</span>
-        </>
-      ),
+      title: "New emulator",
+      body: <span>Not supported yet :(</span>,
       confirmBtnLabel: "CREATE",
       cancelBtnLabel: "CANCEL",
     });

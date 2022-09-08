@@ -5,6 +5,7 @@ import classes from "./SnapshotDialog.module.scss";
 import toast from "react-hot-toast";
 import { ServiceRegistry } from "../../services/service-registry";
 import Input from "../input/Input";
+import { ActionDialog } from "../action-dialog/ActionDialog";
 
 export type SnapshotDialogProps = {
   show?: boolean;
@@ -40,29 +41,30 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
   }
 
   return (
-    <Dialog className={classes.dialog} onClose={onClose}>
-      <div className={classes.root}>
-        <h3>CREATE EMULATOR SNAPSHOT</h3>
-        <div className={classes.body}>
-          <p>
-            This action will create a snapshot of the whole blockchain state at
-            the latest block.
-          </p>
-          <Input
-            placeholder="Snapshot description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-        <div className={classes.actions}>
+    <ActionDialog
+      className={classes.root}
+      title="Create emulator snapshot"
+      onClose={onClose}
+      footer={
+        <>
           <Button outlined={true} variant="middle" onClick={onClose}>
             Cancel
           </Button>
           <Button loading={loading} variant="middle" onClick={onConfirm}>
             Send
           </Button>
-        </div>
-      </div>
-    </Dialog>
+        </>
+      }
+    >
+      <p className={classes.description}>
+        This action will create a snapshot of the whole blockchain state at the
+        latest block.
+      </p>
+      <Input
+        placeholder="Snapshot description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+    </ActionDialog>
   );
 };

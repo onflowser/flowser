@@ -9,12 +9,14 @@ import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
 import { useGetCurrentProject } from "../hooks/use-api";
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
+import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
   switchProject: () => Promise<void>;
 
-  createSnapshot: () => Promise<void>;
+  sendTransaction: () => void;
+  createSnapshot: () => void;
 
   isRemovingProject: boolean;
   removeProject: (project: Project) => void;
@@ -38,8 +40,9 @@ export function ProjectActionsProvider({
   const history = useHistory();
   const { showDialog, hideDialog } = useConfirmDialog();
   const { data: currentProject } = useGetCurrentProject();
-  const { logout } = useFlow();
+  const { isLoggedIn, logout } = useFlow();
 
+  const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const [isRemovingProject, setIsRemovingProject] = useState(false);
@@ -60,12 +63,8 @@ export function ProjectActionsProvider({
 
   function removeProject(project: Project) {
     showDialog({
-      body: (
-        <>
-          <h3>Delete project</h3>
-          <span>Are you sure you want to delete this project?</span>
-        </>
-      ),
+      title: "Delete project",
+      body: <span>Are you sure you want to delete this project?</span>,
       onConfirm: () => confirmProjectRemove(project),
       confirmBtnLabel: "DELETE",
       cancelBtnLabel: "BACK",
@@ -88,7 +87,7 @@ export function ProjectActionsProvider({
     }
   }, []);
 
-  const createSnapshot = useCallback(async () => {
+  const createSnapshot = useCallback(() => {
     const { persist } = currentProject?.project?.emulator ?? {};
     if (!persist) {
       toast("Snapshots can only be created in 'persist' emulator mode", {
@@ -99,16 +98,28 @@ export function ProjectActionsProvider({
     }
   }, [currentProject]);
 
+  const sendTransaction = useCallback(() => {
+    if (!isLoggedIn) {
+      toast("You need to login with wallet to send transactions", {
+        duration: 5000,
+      });
+    } else {
+      setShowTxDialog(true);
+    }
+  }, [isLoggedIn]);
+
   return (
     <ProjectActionsContext.Provider
       value={{
         isSwitching,
         switchProject,
         createSnapshot,
+        sendTransaction,
         isRemovingProject,
         removeProject,
       }}
     >
+      <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
       <SnapshotDialog show={showSnapshotModal} setShow={setShowSnapshotModal} />
       {children}
     </ProjectActionsContext.Provider>
