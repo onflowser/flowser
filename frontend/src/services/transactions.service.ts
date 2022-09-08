@@ -6,11 +6,20 @@ import {
   GetPollingTransactionsByBlockResponse,
   GetPollingTransactionsByAccountRequest,
   GetPollingTransactionsByAccountResponse,
+  GetAllTransactionsResponse,
 } from "@flowser/shared";
 import { TransportService } from "./transports/transport.service";
 
 export class TransactionsService {
   constructor(private readonly transport: TransportService) {}
+
+  getAll(): Promise<GetAllTransactionsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: "/api/transactions",
+      responseProtobuf: GetAllTransactionsResponse,
+    });
+  }
 
   getAllWithPolling(data: {
     timestamp: number;

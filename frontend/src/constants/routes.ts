@@ -7,4 +7,5 @@ export const routes = {
   events: "events",
   logs: "logs",
   firstRouteAfterStart: "accounts",
+  project: "project",
 };

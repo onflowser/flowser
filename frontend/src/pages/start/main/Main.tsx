@@ -47,6 +47,9 @@ const tabs: ProjectTab[] = [
   },
 ];
 
+// TODO(milestone-x): Enable "open project" action?
+const enableOpenProjectAction = false;
+
 const Main: FunctionComponent<RouteChildrenProps> = (props) => {
   const { showDialog } = useConfirmDialog();
   const history = useHistory();
@@ -63,12 +66,8 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
 
   function showOpenProjectDialog() {
     showDialog({
-      body: (
-        <>
-          <h3>New emulator</h3>
-          <span>Not supported yet :(</span>
-        </>
-      ),
+      title: "New emulator",
+      body: <span>Not supported yet :(</span>,
       confirmBtnLabel: "CREATE",
       cancelBtnLabel: "CANCEL",
     });
@@ -102,21 +101,23 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
           ))}
         </ul>
         <div className={classes.sideBarFooter}>
-          <IconButton
-            variant="middle"
-            onClick={() => showOpenProjectDialog()}
-            icon={<img src={openProject} alt="open project icon" />}
-            iconPosition="before"
-            className={`${classes.openProjectButton}`}
-          >
-            OPEN
-          </IconButton>
+          {enableOpenProjectAction && (
+            <IconButton
+              variant="middle"
+              onClick={() => showOpenProjectDialog()}
+              icon={<img src={openProject} alt="open project icon" />}
+              iconPosition="before"
+              className={classes.openProjectButton}
+            >
+              OPEN
+            </IconButton>
+          )}
           <IconButton
             variant="middle"
             onClick={onConfigure}
             icon={<img src={newProject} alt="new project icon" />}
             iconPosition="before"
-            className={`${classes.newProjectButton}`}
+            className={classes.newProjectButton}
           >
             NEW PROJECT
           </IconButton>

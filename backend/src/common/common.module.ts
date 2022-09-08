@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { CommonService } from "./common.service";
-import { CommonController } from "./common.controller";
 import { AccountsModule } from "../accounts/accounts.module";
 import { BlocksModule } from "../blocks/blocks.module";
 import { TransactionsModule } from "../transactions/transactions.module";
@@ -21,7 +20,6 @@ import { EventsModule } from "../events/events.module";
     TransactionsModule,
     CommonModule,
   ],
-  controllers: [CommonController],
   providers: [CommonService],
   exports: [CommonService],
 })

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState } from "react";
+import React, { FunctionComponent, useCallback } from "react";
 import { routes } from "../../constants/routes";
 import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
@@ -6,8 +6,7 @@ import Button from "../button/Button";
 import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
-import TransactionDialog from "../transaction-dialog/TransactionDialog";
-import { useGetAllObjectsCounts } from "../../hooks/use-api";
+import { useTabCount } from "../../hooks/use-tab-count";
 
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import sideMenuOpen from "../../assets/icons/side-menu-open.svg";
@@ -27,8 +26,7 @@ const Navigation: FunctionComponent<{
     useNavigation();
   const history = useHistory();
   const { createSnapshot } = useProjectActions();
-  const { data: counters } = useGetAllObjectsCounts();
-  const [showTxDialog, setShowTxDialog] = useState(false);
+  const tabCount = useTabCount();
 
   const isEmulatorWorking = true;
   const isSidebarOpen = props.isSidebarOpen;
@@ -44,33 +42,39 @@ const Navigation: FunctionComponent<{
           <div className={classes.navLinksContainer}>
             <NavigationItem
               to={`/${routes.accounts}`}
-              totalCounter={counters?.accounts}
+              totalCounter={tabCount.accounts}
             >
               ACCOUNTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.blocks}`}
-              totalCounter={counters?.blocks}
+              totalCounter={tabCount.blocks}
             >
               BLOCKS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.transactions}`}
-              totalCounter={counters?.transactions}
+              totalCounter={tabCount.transactions}
             >
               TRANSACTIONS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.contracts}`}
-              totalCounter={counters?.contracts}
+              totalCounter={tabCount.contracts}
             >
               CONTRACTS
             </NavigationItem>
             <NavigationItem
               to={`/${routes.events}`}
-              totalCounter={counters?.events}
+              totalCounter={tabCount.events}
             >
               EVENTS
+            </NavigationItem>
+            <NavigationItem
+              to={`/${routes.project}`}
+              totalCounter={tabCount.project}
+            >
+              PROJECT
             </NavigationItem>
           </div>
 
@@ -113,7 +117,6 @@ const Navigation: FunctionComponent<{
             <Breadcrumbs className={classes.breadcrumbs} />
           </div>
         )}
-        <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
       </div>
     </>
   );
