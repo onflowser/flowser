@@ -138,6 +138,14 @@
       height: 100%;
       width: 100%;
     }
+
+    .json::-webkit-scrollbar-track {
+      background-color: $code-background;
+    }
+
+    .json::-webkit-scrollbar-corner {
+      background-color: $code-background;
+    }
   }
 }
 
