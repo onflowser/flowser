@@ -6,6 +6,13 @@ import Logs from "../../pages/logs/Logs";
 import { useLogDrawer } from "../../hooks/use-log-drawer";
 import { useGetCurrentProject } from "../../hooks/use-api";
 import { SideBar } from "components/sidebar/SideBar";
+import { Route, RouteProps } from "react-router-dom";
+
+export const RouteWithLayout = (props: RouteProps) => (
+  <Layout>
+    <Route {...props} />
+  </Layout>
+);
 
 const Layout: FunctionComponent = ({ children }) => {
   const { logDrawerSize } = useLogDrawer();

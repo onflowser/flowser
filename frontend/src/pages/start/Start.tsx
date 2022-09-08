@@ -3,12 +3,7 @@ import { Redirect, Route, RouteProps, Switch } from "react-router-dom";
 import Main from "./main/Main";
 import Configuration from "./configuration/Configuration";
 import Layout from "components/layout/Layout";
-
-const RouteWithLayout = (props: RouteProps) => (
-  <Layout>
-    <Route {...props} />
-  </Layout>
-);
+import { RouteWithLayout } from "components/layout/Layout";
 
 const Start: FunctionComponent = () => {
   return (

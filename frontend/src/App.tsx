@@ -9,7 +9,7 @@ import {
   withRouter,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Layout from "./components/layout/Layout";
+import { RouteWithLayout } from "./components/layout/Layout";
 import { routes } from "./constants/routes";
 import { UiStateContextProvider } from "./contexts/ui-state.context";
 import { useSearch } from "./hooks/use-search";
@@ -36,12 +36,6 @@ import { Project } from "./pages/project/Project";
 //     disableCookie: true,
 //   });
 // }
-
-const RouteWithLayout = (props: RouteProps) => (
-  <Layout>
-    <Route {...props} />
-  </Layout>
-);
 
 const BrowserRouterEvents = withRouter(
   ({
