@@ -13,10 +13,6 @@ export class AccountsService {
     private transactionRepository: Repository<TransactionEntity>
   ) {}
 
-  async countAll() {
-    return this.accountRepository.count();
-  }
-
   findAll() {
     return this.accountRepository.find({
       order: { createdAt: "DESC", updatedAt: "DESC" },

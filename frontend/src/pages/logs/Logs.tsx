@@ -65,7 +65,8 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       (log) => log.source === LogSource.LOG_SOURCE_STDERR
     );
     if (hasStdErrLogs) {
-      setSize("small");
+      // TODO(milestone-5): Uncomment below line
+      // setSize("small"); -- this is temporary
       toast.error("Flow emulator encountered errors", {
         duration: 4000,
       });

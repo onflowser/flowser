@@ -22,26 +22,6 @@ export class CommonService {
     private accountStorageService: AccountStorageService
   ) {}
 
-  async getCounters() {
-    const [logs, accounts, blocks, transactions, events, contracts] =
-      await Promise.all([
-        this.logsService.countAll(),
-        this.accountsService.countAll(),
-        this.blocksService.countAll(),
-        this.transactionsService.countAll(),
-        this.eventsService.countAll(),
-        this.contractsService.countAll(),
-      ]);
-    return {
-      logs,
-      accounts,
-      blocks,
-      transactions,
-      events,
-      contracts,
-    };
-  }
-
   async removeBlockchainData() {
     // Remove contracts before removing accounts, because of the foreign key constraint.
     try {

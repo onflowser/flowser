@@ -12,6 +12,7 @@ import Ellipsis from "../ellipsis/Ellipsis";
 import { CommonUtils } from "../../utils/common-utils";
 import splitbee from "@splitbee/web";
 import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
+import { ActionDialog } from "../action-dialog/ActionDialog";
 
 export type TransactionDialogProps = {
   show?: boolean;
@@ -118,10 +119,24 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   }
 
   return (
-    <Dialog className={classes.dialog} onClose={onClose}>
-      <div className={classes.root}>
-        <TxIcon className={classes.icon} />
-        <h3>SEND A TRANSACTION</h3>
+    <ActionDialog
+      className={classes.dialog}
+      bodyClass={classes.root}
+      title="Send a transaction"
+      onClose={onClose}
+      footer={
+        <>
+          {" "}
+          <Button outlined={true} variant="middle" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button loading={loading} variant="middle" onClick={onConfirm}>
+            Send
+          </Button>
+        </>
+      }
+    >
+      <>
         {longError && (
           <button
             className={classes.errorButton}
@@ -132,16 +147,8 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
         )}
         <CadenceEditor value={code} onChange={setCode} />
         <ScriptArguments className={classes.arguments} onChange={setArgs} />
-        <div className={classes.actions}>
-          <Button outlined={true} variant="middle" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button loading={loading} variant="middle" onClick={onConfirm}>
-            Send
-          </Button>
-        </div>
-      </div>
-    </Dialog>
+      </>
+    </ActionDialog>
   );
 };
 

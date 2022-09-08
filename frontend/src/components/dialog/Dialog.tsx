@@ -4,6 +4,7 @@ import React, {
   ReactElement,
 } from "react";
 import classes from "./Dialog.module.scss";
+import classNames from "classnames";
 import Card from "../card/Card";
 
 export type DialogProps = {
@@ -15,7 +16,7 @@ export type DialogProps = {
 const Dialog: FunctionComponent<DialogProps> = ({
   children,
   onClose,
-  className = "",
+  className,
 }) => {
   const onOutsideClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
@@ -27,8 +28,8 @@ const Dialog: FunctionComponent<DialogProps> = ({
   };
 
   return (
-    <div className={`${classes.root}`} onClick={onOutsideClick}>
-      <div className={`${classes.dialog} ${className}`}>
+    <div className={classes.root} onClick={onOutsideClick}>
+      <div className={classNames(classes.dialog, className)}>
         <Card className={classes.card} onClick={onClickInside}>
           {children}
         </Card>

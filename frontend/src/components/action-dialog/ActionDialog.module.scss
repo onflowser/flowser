@@ -6,36 +6,35 @@
 .root {
   display: flex;
   flex-direction: column;
+  align-items: center;
   color: $light-grey;
   padding: $spacing-l * 3 $spacing-l * 6;
-  @include fadeInAnimation(0.5s);
+  @include fadeInAnimation(.5s);
 
   h3 {
-    margin-bottom: $spacing-base * 3;
+    margin-top: $spacing-base * 2;
+    margin-bottom: $spacing-base * 4;
     font-size: $font-size-xlarge;
     text-align: center;
   }
 
-  span {
-    font-size: $font-size-normal;
-    text-align: center;
-  }
-
-  a {
-    color: $blue;
+  .body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
 
   .actions {
+    margin-top: $spacing-base * 3;
     display: flex;
     align-items: center;
-    margin-top: $spacing-base * 3;
 
     & > * {
       flex: 1;
     }
 
     & > * + * {
-      margin-left: $spacing-base;
+      margin-left: $spacing-base * 3;
     }
   }
 }

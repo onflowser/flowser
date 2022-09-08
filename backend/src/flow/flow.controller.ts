@@ -18,8 +18,10 @@ import {
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
   GetPollingEmulatorSnapshotsRequest,
+  GetProjectObjectsResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { FlowConfigService } from "./services/config.service";
 
 @Controller("flow")
 export class FlowController {
@@ -27,6 +29,7 @@ export class FlowController {
     private flowGatewayService: FlowGatewayService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
+    private flowConfigService: FlowConfigService,
     private flowSnapshotService: FlowSnapshotService
   ) {}
 
@@ -42,6 +45,20 @@ export class FlowController {
     return GetAllEmulatorSnapshotsResponse.toJSON({
       snapshots: snapshots.map((snapshot) => snapshot.toProto()),
     });
+  }
+
+  @Get("objects")
+  async findCurrentProjectObjects() {
+    const [transactions, contracts] = await Promise.all([
+      this.flowConfigService.getTransactionTemplates(),
+      this.flowConfigService.getContractTemplates(),
+    ]);
+    return GetProjectObjectsResponse.toJSON(
+      GetProjectObjectsResponse.fromPartial({
+        transactions,
+        contracts,
+      })
+    );
   }
 
   @Post("snapshots/polling")
