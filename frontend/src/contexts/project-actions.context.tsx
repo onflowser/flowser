@@ -8,12 +8,12 @@ import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
 import { useGetCurrentProject } from "../hooks/use-api";
+import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
   switchProject: () => Promise<void>;
 
-  isCreatingSnapshot: boolean;
   createSnapshot: () => Promise<void>;
 
   isRemovingProject: boolean;
@@ -33,16 +33,16 @@ export function ProjectActionsProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { projectsService, snapshotService } = ServiceRegistry.getInstance();
+  const { projectsService } = ServiceRegistry.getInstance();
 
   const history = useHistory();
   const { showDialog, hideDialog } = useConfirmDialog();
   const { data: currentProject } = useGetCurrentProject();
   const { logout } = useFlow();
 
+  const [showSnapshotModal, setShowSnapshotModal] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const [isRemovingProject, setIsRemovingProject] = useState(false);
-  const [isCreatingSnapshot, setIsCreatingSnapshot] = useState(false);
 
   const confirmProjectRemove = async (project: Project) => {
     setIsRemovingProject(true);
@@ -89,25 +89,13 @@ export function ProjectActionsProvider({
   }, []);
 
   const createSnapshot = useCallback(async () => {
-    try {
-      // TODO(milestone-5): provide a way to input a custom description
-      const { run, persist } = currentProject?.project?.emulator ?? {};
-      if (run && !persist) {
-        toast("Snapshots can only be created in 'persist' emulator mode", {
-          duration: 5000,
-        });
-        return;
-      }
-      setIsCreatingSnapshot(true);
-      await snapshotService.create({
-        description: "Test",
+    const { persist } = currentProject?.project?.emulator ?? {};
+    if (!persist) {
+      toast("Snapshots can only be created in 'persist' emulator mode", {
+        duration: 5000,
       });
-      toast.success("Snapshot created");
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to create snapshot");
-    } finally {
-      setIsCreatingSnapshot(false);
+    } else {
+      setShowSnapshotModal(true);
     }
   }, [currentProject]);
 
@@ -116,12 +104,12 @@ export function ProjectActionsProvider({
       value={{
         isSwitching,
         switchProject,
-        isCreatingSnapshot,
         createSnapshot,
         isRemovingProject,
         removeProject,
       }}
     >
+      <SnapshotDialog show={showSnapshotModal} setShow={setShowSnapshotModal} />
       {children}
     </ProjectActionsContext.Provider>
   );
