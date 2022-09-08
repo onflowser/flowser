@@ -46,8 +46,8 @@ export const Main: FunctionComponent = () => {
             <div>Snapshots</div>
             <div className={classes.counter}>{snapshots.length}</div>
           </div>
-          <div className={classes.items}>
-            <ul className={classes.bar}>
+          <div className={classes.itemsWrapper}>
+            <ul className={classes.snapshotsList}>
               {snapshots.length === 0 && <span>No snapshots created yet</span>}
               {limitedSnapshots.data.map((snapshot) => (
                 <li key={snapshot.id}>
@@ -78,7 +78,7 @@ export const Main: FunctionComponent = () => {
             <div>Contracts</div>
             <div className={classes.counter}>{contracts.length}</div>
           </div>
-          <div className={classes.items}>
+          <div className={classes.itemsWrapper}>
             {contracts.length === 0 && (
               <span>No contracts defined in flow.json</span>
             )}

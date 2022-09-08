@@ -15,10 +15,10 @@ export const ProjectItem: FunctionComponent<ProjectItemProps> = ({
   return (
     <div className={classes.item}>
       <div className={classes.main}>
-        <div className={classes.title}>{title}</div>
+        <div className={classes.header}>{title}</div>
         <div>{rightSection}</div>
       </div>
-      <div className={classes.timestamp}>{footer}</div>
+      <div className={classes.footer}>{footer}</div>
     </div>
   );
 };

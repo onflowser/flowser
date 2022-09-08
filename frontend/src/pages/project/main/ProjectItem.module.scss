@@ -13,14 +13,14 @@
     font-weight: bold;
     margin-bottom: $spacing-base;
 
-    .title {
+    .header {
       display: inline-block;
       overflow: hidden;
       max-height: fit-content;
     }
   }
 
-  .timestamp {
+  .footer {
     opacity: 0.39;
     color: white;
   }
