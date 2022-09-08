@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
+import { useGetCurrentProject } from "../hooks/use-api";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
@@ -36,6 +37,7 @@ export function ProjectActionsProvider({
 
   const history = useHistory();
   const { showDialog, hideDialog } = useConfirmDialog();
+  const { data: currentProject } = useGetCurrentProject();
   const { logout } = useFlow();
 
   const [isSwitching, setIsSwitching] = useState(false);
@@ -89,6 +91,13 @@ export function ProjectActionsProvider({
   const createSnapshot = useCallback(async () => {
     try {
       // TODO(milestone-5): provide a way to input a custom description
+      const { run, persist } = currentProject?.project?.emulator ?? {};
+      if (run && !persist) {
+        toast("Snapshots can only be created in 'persist' emulator mode", {
+          duration: 5000,
+        });
+        return;
+      }
       setIsCreatingSnapshot(true);
       await snapshotService.create({
         description: "Test",
@@ -100,7 +109,7 @@ export function ProjectActionsProvider({
     } finally {
       setIsCreatingSnapshot(false);
     }
-  }, []);
+  }, [currentProject]);
 
   return (
     <ProjectActionsContext.Provider
