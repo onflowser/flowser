@@ -6,6 +6,8 @@ import Button from "../button/Button";
 import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
+import { useTabCount } from "../../hooks/use-tab-count";
+
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import sideMenuOpen from "../../assets/icons/side-menu-open.svg";
 import sideMenuClosed from "../../assets/icons/side-menu-closed.svg";
@@ -14,7 +16,6 @@ import sideMenuOpenEmuNoWork from "../../assets/icons/side-menu-open-emulator-no
 import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project-actions.context";
 import { useHistory } from "react-router-dom";
-import { useTabCount } from "../../hooks/use-tab-count";
 
 const Navigation: FunctionComponent<{
   className: string;
@@ -105,6 +106,7 @@ const Navigation: FunctionComponent<{
             </Button>
           </div>
         </div>
+        {/* NAVIGATION DRAWER */}
         {isNavigationDrawerVisible && (
           <div className={classes.navigationDrawerContainer}>
             {isShowBackButtonVisible && (

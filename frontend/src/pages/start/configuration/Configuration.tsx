@@ -28,6 +28,9 @@ import * as yup from "yup";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { useProjectActions } from "../../../contexts/project-actions.context";
+import { useNavigation } from "hooks/use-navigation";
+import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
+import classNames from "classnames";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -194,6 +197,18 @@ const Configuration: FunctionComponent = () => {
   // TODO(milestone-5): Show back button when editing new project info
   return (
     <div className={classes.root}>
+      <div
+        className={classNames(classes.backButtonWrapper, {
+          [classes.isConfig]: !!id,
+        })}
+      >
+        <IconBackButton
+          onClick={() => {
+            history.goBack();
+          }}
+          className={classes.backButton}
+        />
+      </div>
       <div className={classes.inner}>
         <div className={classes.top}>
           <h2>PROJECT SETTINGS</h2>
