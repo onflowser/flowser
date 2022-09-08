@@ -204,7 +204,7 @@ const Configuration: FunctionComponent = () => {
       >
         <IconBackButton
           onClick={() => {
-            window.history.back();
+            history.goBack();
           }}
           className={classes.backButton}
         />
