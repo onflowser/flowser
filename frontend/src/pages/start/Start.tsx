@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import Main from "./main/Main";
-import Configuration from "./configuration/Configuration";
+import { Configuration } from "./configuration/Configuration";
 
 const Start: FunctionComponent = () => {
   return (

@@ -1,0 +1,70 @@
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
+@import "styles/animations";
+
+.textFieldRoot, .toggleFieldRoot {
+  display: flex;
+  margin: $spacing-l 0;
+  .label, .input, .description {
+    display: flex;
+    align-items: center;
+  }
+  .label {
+    flex: 1.2;
+    color: $light-grey;
+  }
+  .input {
+    flex: 1;
+    margin: 0 $spacing-xl;
+  }
+  .description {
+    flex: 2;
+    color: $light-grey;
+    font-size: $font-size-small;
+  }
+  .errorMessage {
+    color: lighten($color-red, 10%) !important;
+    font-size: $font-size-small !important;
+    font-weight: 400 !important;
+    @include pulse(1.5s);
+  }
+}
+
+.toggleFieldRoot {
+  .input {
+    .toggleButton {
+      margin: 0 $spacing-base;
+    }
+    span {
+      color: $light-grey;
+    }
+  }
+}
+
+.radioFieldRoot {
+  .header {
+    display: flex;
+    margin-bottom: $spacing-base;
+    .title, .description {
+      color: $light-grey;
+    }
+    .title {
+
+    }
+    .description {
+
+    }
+  }
+  .body {
+    .radioItem {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: $spacing-s;
+      span {
+        color: $light-grey;
+        font-size: $font-size-small;
+      }
+    }
+  }
+}
