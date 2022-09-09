@@ -23,26 +23,22 @@ export class CommonService {
   ) {}
 
   async removeBlockchainData() {
-    // Remove contracts before removing accounts, because of the foreign key constraint.
     try {
+      // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([
         this.contractsService.removeAll(),
         this.accountKeysService.removeAll(),
         this.accountStorageService.removeAll(),
       ]);
-    } catch (e) {
-      this.logger.error("Failed to remove account relations data", e);
-    }
-    try {
       await Promise.all([
         this.accountsService.removeAll(),
         this.blocksService.removeAll(),
-        this.eventsService.removeAll(),
         this.logsService.removeAll(),
         this.transactionsService.removeAll(),
       ]);
+      // Must be deleted last, because of the relation to blocks & transactions
+      await this.eventsService.removeAll();
     } catch (e) {
-      // TODO(milestone-x): Data removal fails when reverting to snapshot (QueryFailedError: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed)
       this.logger.error("Failed to remove other data", e);
       throw e;
     }
