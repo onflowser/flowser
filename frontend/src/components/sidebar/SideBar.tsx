@@ -14,6 +14,8 @@ import { useProjectActions } from "../../contexts/project-actions.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
+import { FlowUtils } from "../../utils/flow-utils";
+import { UserIcon } from "../user-icon/UserIcon";
 
 export type Sidebar = {
   toggled: boolean;
@@ -64,13 +66,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
               onClick={switchProject}
               title={user?.addr}
               footer={"100 FLOW"}
-              icon={
-                <img
-                  className={classes.avatarImage}
-                  alt=""
-                  src={getUserAvatarUrl(user?.addr)}
-                />
-              }
+              icon={<UserIcon />}
             />
           )}
           {isLoggedIn && (
@@ -130,9 +126,4 @@ function SidebarButton({
       </div>
     </SimpleButton>
   );
-}
-
-function getUserAvatarUrl(address: string) {
-  const appName = "Flowser"; // TODO: Read this from fcl-js config
-  return `https://avatars.onflow.org/avatar/avatar/${address}-${appName}.svg`;
 }

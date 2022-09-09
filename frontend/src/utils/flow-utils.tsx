@@ -14,6 +14,11 @@ import { ReactComponent as FinalizedIcon } from "../assets/icons/finalised-tx-ic
 import { ReactComponent as ExecutedIcon } from "../assets/icons/executed-tx-icon.svg";
 
 export class FlowUtils {
+  static getUserAvatarUrl(address: string): string {
+    const appName = "Flowser"; // TODO: Read this from fcl-js config
+    return `https://avatars.onflow.org/avatar/avatar/${address}-${appName}.svg`;
+  }
+
   static isInitialBlockId(value: number | string): boolean {
     // initial parent id contains only zeros
     return `${value}`.replaceAll("0", "").length === 0;

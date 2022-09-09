@@ -16,6 +16,9 @@ import sideMenuOpenEmuNoWork from "../../assets/icons/side-menu-open-emulator-no
 import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project-actions.context";
 import { useHistory } from "react-router-dom";
+import { UserIcon } from "../user-icon/UserIcon";
+import { useFlow } from "../../hooks/use-flow";
+import { SimpleButton } from "../simple-button/SimpleButton";
 
 const Navigation: FunctionComponent<{
   className: string;
@@ -24,6 +27,7 @@ const Navigation: FunctionComponent<{
 }> = (props) => {
   const { isShowBackButtonVisible, isNavigationDrawerVisible } =
     useNavigation();
+  const { isLoggedIn } = useFlow();
   const history = useHistory();
   const { createSnapshot } = useProjectActions();
   const tabCount = useTabCount();
@@ -83,6 +87,11 @@ const Navigation: FunctionComponent<{
             <Button className={classes.snapshotButton} onClick={createSnapshot}>
               SNAPSHOT
             </Button>
+            {isLoggedIn && (
+              <SimpleButton className={classes.userButton}>
+                <UserIcon />
+              </SimpleButton>
+            )}
             <Button
               className={classes.sidebarButton}
               onClick={props.toggleSidebar}
