@@ -1,11 +1,12 @@
 import React, { FC, useState } from "react";
-import Dialog from "../dialog/Dialog";
 import Button from "../button/Button";
 import classes from "./SnapshotDialog.module.scss";
 import toast from "react-hot-toast";
 import { ServiceRegistry } from "../../services/service-registry";
 import Input from "../input/Input";
 import { ActionDialog } from "../action-dialog/ActionDialog";
+import { useGetCurrentProject } from "../../hooks/use-api";
+import { useErrorHandler } from "../../hooks/use-error-handler";
 
 export type SnapshotDialogProps = {
   show?: boolean;
@@ -13,6 +14,8 @@ export type SnapshotDialogProps = {
 };
 
 export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
+  const { data } = useGetCurrentProject();
+  const { handleError } = useErrorHandler(SnapshotDialog.name);
   const { snapshotService } = ServiceRegistry.getInstance();
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
@@ -28,9 +31,15 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
         description,
       });
       toast.success("Snapshot created");
+      onClose();
     } catch (e) {
-      console.error(e);
-      toast.error("Failed to create snapshot");
+      handleError(e);
+      if (!data?.project?.emulator?.run) {
+        toast(
+          "Make sure you are using the '--persist' flag when running emulator",
+          { duration: 4000 }
+        );
+      }
     } finally {
       setLoading(false);
     }

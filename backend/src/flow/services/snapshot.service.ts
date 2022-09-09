@@ -3,6 +3,7 @@ import {
   PreconditionFailedException,
   InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
@@ -19,6 +20,8 @@ type SnapshotResponse = {
 
 @Injectable()
 export class FlowSnapshotService {
+  private logger = new Logger(FlowSnapshotService.name);
+
   constructor(
     @InjectRepository(SnapshotEntity)
     private readonly snapshotRepository: Repository<SnapshotEntity>,
@@ -31,6 +34,10 @@ export class FlowSnapshotService {
     const response = await this.createOrRevertSnapshotRequest(snapshotId);
 
     if (response.status !== 200) {
+      this.logger.error(
+        `Got ${response.status} response from emulator`,
+        response.data
+      );
       // Most likely reason for failure is that emulator wasn't started with "persist" flag
       throw new InternalServerErrorException("Failed to create snapshot");
     }
@@ -69,6 +76,10 @@ export class FlowSnapshotService {
     );
 
     if (response.status !== 200) {
+      this.logger.error(
+        `Got ${response.status} response from emulator`,
+        response.data
+      );
       throw new InternalServerErrorException("Failed to revert to snapshot");
     }
 
