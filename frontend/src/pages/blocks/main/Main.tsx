@@ -22,6 +22,8 @@ import toast from "react-hot-toast";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
+import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
+import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 
 const { formatDate } = useFormattedDate();
 
@@ -32,6 +34,7 @@ const Main: FunctionComponent = () => {
   const { handleError } = useErrorHandler(Main.name);
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { showNavigationDrawer } = useNavigation();
+  const { showDialog } = useConfirmDialog();
 
   const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
@@ -45,15 +48,29 @@ const Main: FunctionComponent = () => {
   );
 
   async function onRevertToBlock(blockId: string) {
-    try {
-      const snapshot = await snapshotService.revertTo({
-        blockId,
-      });
-      fetchAll();
-      toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
-    } catch (e) {
-      handleError(e);
-    }
+    const block = blocks.find((block) => block.id === blockId);
+    showDialog({
+      title: "Revert to snapshot",
+      body: (
+        <span style={{ textAlign: "center" }}>
+          Do you want to revert the emulator blockchain state to the block with
+          height <code>{block?.height}</code>?
+        </span>
+      ),
+      confirmBtnLabel: "REVERT",
+      cancelBtnLabel: "CANCEL",
+      onConfirm: async () => {
+        try {
+          const snapshot = await snapshotService.revertTo({
+            blockId,
+          });
+          fetchAll();
+          toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
+        } catch (e) {
+          handleError(e);
+        }
+      },
+    });
   }
 
   useEffect(() => {
@@ -98,12 +115,14 @@ const Main: FunctionComponent = () => {
           const snapshot = snapshotLookupByBlockId.get(block.id);
           return (
             <Value>
-              {snapshot ? (
-                <SimpleButton onClick={() => onRevertToBlock(block.id)}>
-                  {snapshot.description}
+              {snapshot?.description ?? "null"}
+              {snapshot && (
+                <SimpleButton
+                  style={{ marginLeft: 5 }}
+                  onClick={() => onRevertToBlock(block.id)}
+                >
+                  <SnapshotIcon />
                 </SimpleButton>
-              ) : (
-                "-"
               )}
             </Value>
           );
