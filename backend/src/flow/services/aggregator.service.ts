@@ -84,10 +84,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     }
 
     // Service account is present only on emulator chain
-    if (
-      this.projectContext.shouldRunEmulator() &&
-      !(await this.isServiceAccountProcessed())
-    ) {
+    if (!(await this.isServiceAccountProcessed())) {
       await this.processStaticAccounts();
     }
 
@@ -374,10 +371,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   async updateAccountsStorage() {
-    // Storage inspection API works only for local emulator
-    if (!this.projectContext.shouldRunEmulator()) {
-      return;
-    }
     const allAddresses = await this.accountService.findAllAddresses();
     await Promise.all(
       allAddresses.map((address) => this.processAccountStorage(address))

@@ -13,8 +13,7 @@ export class CommonUtils {
       typeof error === "object" &&
       error !== null &&
       "message" in error &&
-      "name" in error &&
-      "code" in error
+      "name" in error
     );
   }
 
