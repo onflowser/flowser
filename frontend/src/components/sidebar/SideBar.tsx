@@ -14,8 +14,8 @@ import { useProjectActions } from "../../contexts/project-actions.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
-import { FlowUtils } from "../../utils/flow-utils";
 import { UserIcon } from "../user-icon/UserIcon";
+import { useGetAccountBalance } from "../../hooks/use-account-balance";
 
 export type Sidebar = {
   toggled: boolean;
@@ -28,6 +28,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const { login, logout, user, isLoggedIn } = useFlow();
   const { switchProject, sendTransaction } = useProjectActions();
   const { project: currentProject } = data ?? {};
+  const { flow: flowBalance } = useGetAccountBalance(user?.addr);
 
   const createProject = useCallback(() => {
     history.push(`/${routes.start}/configure`);
@@ -65,7 +66,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             <SidebarButton
               onClick={switchProject}
               title={user?.addr}
-              footer={"100 FLOW"}
+              footer={flowBalance}
               icon={<UserIcon />}
             />
           )}

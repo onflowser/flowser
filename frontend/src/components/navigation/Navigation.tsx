@@ -88,7 +88,10 @@ const Navigation: FunctionComponent<{
               SNAPSHOT
             </Button>
             {isLoggedIn && (
-              <SimpleButton className={classes.userButton}>
+              <SimpleButton
+                className={classes.userButton}
+                onClick={props.toggleSidebar}
+              >
                 <UserIcon />
               </SimpleButton>
             )}
