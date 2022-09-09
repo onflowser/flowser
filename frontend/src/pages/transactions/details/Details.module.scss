@@ -9,42 +9,6 @@
   width: 100%;
   margin-top: 48px;
 
-  .firstLine {
-    margin-bottom: $spacing-l * 2;
-  }
-
-  .twoColumns {
-    display: flex;
-    .inlineValue,
-    .inlineLabel {
-      margin-left: $spacing-l * 2;
-
-      .flex {
-        display: flex;
-        flex-direction: row;
-
-        .text {
-          margin-left: $spacing-base;
-        }
-      }
-    }
-  }
-
-  .authorizersAddress {
-    display: block;
-    margin-bottom: $spacing-s;
-  }
-
-  .authorizersLabel {
-    vertical-align: top;
-  }
-
-  .detailsItemsWrapper {
-    display: flex;
-    justify-content: space-between;
-    margin-top: $spacing-l;
-  }
-
   .listCard {
     display: flex;
     justify-content: space-between;
@@ -107,6 +71,14 @@
   }
 }
 
+.elipsis {
+  max-width: 13vw;
+  display: inline-block;
+  overflow: hidden;
+  margin-right: $spacing-base;
+}
+
+
 .tableRow {
   display: flex;
   justify-content: space-between;
@@ -117,10 +89,10 @@
     width: 100%;
     display: flex;
     justify-content: flex-start;
-    margin: 0 $spacing-base 0 $spacing-base
+    margin: 0 $spacing-base 0 $spacing-base;
   }
   & > div:nth-child(1) {
-    flex: 7
+    flex: 7;
   }
 
   & > div:nth-child(2) {
@@ -129,7 +101,7 @@
   }
 
   & > div:nth-child(3) {
-    overflow:hidden;
+    overflow: hidden;
     flex: 10;
   }
   & > div:nth-child(4) {
@@ -160,4 +132,3 @@
   justify-content: space-between;
   align-items: center;
 }
-

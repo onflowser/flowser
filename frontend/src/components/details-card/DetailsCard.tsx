@@ -1,26 +1,41 @@
-import React, { FunctionComponent, ReactElement } from "react";
+import Label from "components/label/Label";
+import Value from "components/value/Value";
+import React, { FC, ReactElement } from "react";
 import Card from "../card/Card";
 import classes from "./DetailsCard.module.scss";
 
-type DetailsCardProps = {
-  header?: ReactElement;
-  footer?: ReactElement;
+export type DetailsCardRow = {
+  label: ReactElement | string;
+  value: ReactElement | string;
 };
 
-const DetailsCard: FunctionComponent<DetailsCardProps> = ({
-  children,
-  header,
-  footer,
-}) => {
+export type DetailsCardColumn = DetailsCardRow[];
+
+export type DetailsCardProps = {
+  columns: DetailsCardColumn[];
+};
+
+export const DetailsCard: FC<DetailsCardProps> = ({ columns }) => {
   return (
-    <div>
-      {header && <div className={classes.header}>{header}</div>}
-      <Card className={classes.container}>
-        <div className={classes.body}>{children}</div>
-        {footer && <div className={classes.footer}>{footer}</div>}
+    <div className={classes.root}>
+      <Card className={classes.bigCard}>
+        <div className={classes.bigCardContent}>
+          {columns?.map((rows, index) => (
+            <div className={classes.bigCardColumn} key={index}>
+              {rows?.map((row, i) => (
+                <div key={i}>
+                  <Label variant="medium" className={classes.label}>
+                    {row.label}
+                  </Label>
+                  <Value variant="small" className={classes.value}>
+                    {row.value}
+                  </Value>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </Card>
     </div>
   );
 };
-
-export default DetailsCard;

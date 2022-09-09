@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useState, useMemo } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import DetailsCard from "../../../components/details-card/DetailsCard";
 import classes from "./Details.module.scss";
 import {
   DetailsTabItem,
@@ -10,8 +9,6 @@ import {
 } from "../../../components/details-tabs/DetailsTabs";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import Card from "../../../components/card/Card";
-import TimeAgo from "../../../components/time-ago/TimeAgo";
-import DateWithCalendar from "../../../components/date-with-calendar/DateWithCalendar";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import TransactionStatusBadge from "../../../components/status/TransactionStatusBadge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
@@ -30,7 +27,12 @@ import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
-import { GrcpStatus } from "../../../components/status/GrcpStatus";
+import ReactTimeAgo from "react-timeago";
+import {
+  DetailsCard,
+  DetailsCardColumn,
+  DetailsCardProps,
+} from "components/details-card/DetailsCard";
 
 type RouteParams = {
   transactionId: string;
@@ -220,77 +222,63 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  return (
-    <div className={classes.root}>
-      <DetailsCard
-        header={
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Transaction",
+        value: (
           <>
-            <div>
-              <Label variant="large">TRANSACTION</Label>
-              <Value variant="large">{transaction.id}</Value>
-            </div>
-            <div>
-              <TransactionStatusBadge status={transaction.status} />
-            </div>
+            <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
+            <TransactionStatusBadge status={transaction.status} />
           </>
-        }
-        footer={
-          <>
-            <TimeAgo date={new Date(transaction.createdAt).toISOString()} />
-            <DateWithCalendar
-              date={new Date(transaction.createdAt).toISOString()}
-            />
-          </>
-        }
-      >
-        <div className={classes.firstLine}>
-          <Label variant="large">BLOCK ID</Label>
-          <Value variant="large">
-            <NavLink to={`/blocks/details/${transaction.blockId}`}>
+        ),
+      },
+      {
+        label: "Block ID",
+        value: (
+          <NavLink to={`/blocks/details/${transaction.blockId}`}>
+            <Ellipsis className={classes.elipsis}>
               {transaction.blockId}
-            </NavLink>
-          </Value>
-        </div>
-        <div className={classes.twoColumns}>
-          <Label variant="large">PROPOSER</Label>
-          <Value variant="large">
-            <NavLink
-              to={
-                transaction.proposalKey
-                  ? `/accounts/details/${transaction.proposalKey.address}`
-                  : "#"
-              }
-            >
-              {transaction.proposalKey?.address ?? "-"}
-            </NavLink>
-          </Value>
-          {/* TODO(milestone-5): Better organise bellow fields */}
-          <Label variant="large" className={classes.inlineLabel}>
-            Sequence number:
-          </Label>
-          <Value variant="large" className={classes.inlineValue}>
-            {transaction.proposalKey?.sequenceNumber ?? "-"}
-          </Value>
-          <Label variant="large" className={classes.inlineLabel}>
-            GRCP Status:
-          </Label>
-          <Value variant="large" className={classes.inlineValue}>
-            <GrcpStatus status={transaction.status} />
-          </Value>
-        </div>
-        <div>
-          <Label variant="large">PAYER</Label>
-          <Value variant="large">
-            <NavLink to={`/accounts/details/${transaction.payer}`}>
-              {transaction.payer}
-            </NavLink>
-          </Value>
-        </div>
-        <div>
-          <Label variant="large" className={classes.authorizersLabel}>
-            AUTHORIZERS
-          </Label>
-          <Value variant="large">
+            </Ellipsis>
+          </NavLink>
+        ),
+      },
+      {
+        label: "Time Stamp",
+        value: formatDate(transaction.createdAt),
+      },
+      {
+        label: "Time",
+        value: <ReactTimeAgo date={transaction.createdAt} />,
+      },
+    ],
+    [
+      {
+        label: "Proposer",
+        value: (
+          <NavLink
+            to={
+              transaction.proposalKey
+                ? `/accounts/details/${transaction.proposalKey.address}`
+                : "#"
+            }
+          >
+            {transaction.proposalKey?.address ?? "-"}
+          </NavLink>
+        ),
+      },
+      {
+        label: "Payer",
+        value: (
+          <NavLink to={`/accounts/details/${transaction.payer}`}>
+            {transaction.payer}
+          </NavLink>
+        ),
+      },
+      {
+        label: "Authorizers",
+        value: (
+          <>
             {transaction.authorizers.map((address: string) => (
               <NavLink
                 key={address}
@@ -300,9 +288,19 @@ const Details: FunctionComponent = () => {
                 {address}
               </NavLink>
             ))}
-          </Value>
-        </div>
-      </DetailsCard>
+          </>
+        ),
+      },
+      {
+        label: "Sequence nb.",
+        value: <>{transaction.proposalKey?.sequenceNumber ?? "-"}</>,
+      },
+    ],
+  ];
+
+  return (
+    <div className={classes.root}>
+      <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript

@@ -1,4 +1,4 @@
-@import 'styles/spacings';
+@import "styles/spacings";
 
 .root {
   display: flex;
@@ -6,28 +6,6 @@
   align-self: center;
   max-width: 1690px;
   width: 100%;
-
-  .bigCard {
-    margin-bottom: $spacing-l * 2;
-    padding: $spacing-base * 3;
-
-    & > div {
-      display: flex;
-      margin-bottom: $spacing-l;
-
-      .label {
-        min-width: 188px;
-        display: inline-flex;
-      }
-    }
-
-    .dateAndTimeAgo {
-      margin-bottom: 0;
-      > * + * {
-        margin-left: $spacing-l;
-      }
-    }
-  }
 
   .transactionListItem {
     display: flex;

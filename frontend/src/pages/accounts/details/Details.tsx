@@ -3,7 +3,6 @@ import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
-import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import CopyButton from "../../../components/copy-button/CopyButton";
@@ -36,6 +35,10 @@ import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
 import { BaseStorageCard } from "./BaseStorageCard";
 import classNames from "classnames";
 import { useUrlQuery } from "../../../hooks/use-url-query";
+import {
+  DetailsCard,
+  DetailsCardColumn,
+} from "components/details-card/DetailsCard";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -177,22 +180,27 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Address",
+        value: account.address,
+      },
+      {
+        label: "Balance",
+        value: (
+          <>
+            {account.balance}
+            <span className={classes.currency}>FLOW</span>
+          </>
+        ),
+      },
+    ],
+  ];
+
   return (
     <div className={classes.root}>
-      <Card className={classes.bigCard}>
-        <div>
-          <Label variant="large" className={classes.label}>
-            ADDRESS
-          </Label>
-          <Value variant="large">{account.address}</Value>
-        </div>
-        <div>
-          <Label variant="large" className={classes.label}>
-            BALANCE
-          </Label>
-          <Value variant="large">{account.balance} FLOW</Value>
-        </div>
-      </Card>
+      <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>
