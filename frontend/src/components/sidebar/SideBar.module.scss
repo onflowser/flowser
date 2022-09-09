@@ -13,30 +13,62 @@
     display: flex;
     width: 100%;
     flex-direction: column;
-    margin: $line-spacing-l;
+    margin: $spacing-l * 2;
     justify-content: space-between;
+
+    .menuDivider {
+      width: 100%;
+      height: 1px;
+      opacity: 0.4;
+      background: $light-grey;
+      margin-top: $spacing-l;
+      margin-bottom: $spacing-l * 1.5;
+    }
+
+    .menuSectionTitle {
+      display: block;
+      color: $light-grey;
+      font-size: $font-size-normal;
+      margin-bottom: $spacing-base;
+      opacity: 0.5;
+    }
 
     .menuItem {
       display: flex;
-      padding: $spacing-base;
+      padding: $spacing-base 0;
       align-items: center;
 
-      .text {
-        transition: 0.3s;
+      .menuItemMainWrapper {
+        display: flex;
+        flex-direction: column;
         margin-left: $spacing-base;
+        align-items: flex-start;
+      }
+
+      .menuItemHeader {
+        transition: 0.3s;
         color: $light-grey;
       }
 
+      .menuItemFooter {
+        color: $light-grey;
+        opacity: 0.5;
+        font-size: $font-size-small;
+      }
 
-      .icon {
+      .menuItemIcon {
         height: 40px;
         width: 40px;
+        & > * {
+          width: 100%;
+          height: 100%;
+        }
       }
 
     }
 
     .menuItem:hover {
-      .text {
+      .menuItemHeader {
         color: $grey
       }
     }

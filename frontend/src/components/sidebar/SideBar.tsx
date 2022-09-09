@@ -14,6 +14,8 @@ import { useProjectActions } from "../../contexts/project-actions.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
+import { UserIcon } from "../user-icon/UserIcon";
+import { useGetAccountBalance } from "../../hooks/use-account-balance";
 
 export type Sidebar = {
   toggled: boolean;
@@ -23,9 +25,10 @@ export type Sidebar = {
 export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
   const { data } = useGetCurrentProject();
-  const { login } = useFlow();
+  const { login, logout, user, isLoggedIn } = useFlow();
   const { switchProject, sendTransaction } = useProjectActions();
   const { project: currentProject } = data ?? {};
+  const { flow: flowBalance } = useGetAccountBalance(user?.addr);
 
   const createProject = useCallback(() => {
     history.push(`/${routes.start}/configure`);
@@ -34,6 +37,11 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const openSettings = () => {
     history.push(`/start/configure/${currentProject?.id}`);
   };
+
+  function onClickUserProfile() {
+    history.push(`/accounts/details/${user?.addr}`);
+    toggleSidebar();
+  }
 
   return (
     <Drawer
@@ -46,26 +54,47 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
     >
       <div className={classes.menu}>
         <div>
+          <span className={classes.menuSectionTitle}>FLOWSER</span>
           <SidebarButton
             onClick={switchProject}
             title="Switch project"
-            iconComponent={SwitchIcon}
+            icon={<SwitchIcon />}
           />
           <SidebarButton
             onClick={openSettings}
             title="Settings"
-            iconComponent={SettingsIcon}
+            icon={<SettingsIcon />}
           />
-          <SidebarButton
-            onClick={login}
-            title="Connect wallet"
-            iconComponent={ConnectIcon}
-          />
-          <SidebarButton
-            onClick={sendTransaction}
-            title="Send transaction"
-            iconComponent={ConnectIcon}
-          />
+          <div className={classes.menuDivider} />
+          <span className={classes.menuSectionTitle}>EMULATOR</span>
+          {isLoggedIn && (
+            <SidebarButton
+              onClick={onClickUserProfile}
+              title={user?.addr}
+              footer={flowBalance}
+              icon={<UserIcon />}
+            />
+          )}
+          {isLoggedIn && (
+            <SidebarButton
+              onClick={sendTransaction}
+              title="Send transaction"
+              icon={<ConnectIcon />}
+            />
+          )}
+          {isLoggedIn ? (
+            <SidebarButton
+              onClick={logout}
+              title="Disconnect wallet"
+              icon={<ConnectIcon />}
+            />
+          ) : (
+            <SidebarButton
+              onClick={login}
+              title="Connect wallet"
+              icon={<ConnectIcon />}
+            />
+          )}
         </div>
         <div className={classNames(classes.menuItem, classes.footer)}>
           <IconButton
@@ -86,16 +115,21 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
 function SidebarButton({
   onClick,
   title,
-  iconComponent: IconComponent,
+  footer,
+  icon,
 }: {
   onClick: () => void;
   title: string;
-  iconComponent: FunctionComponent<{ className?: string }>;
+  footer?: string;
+  icon: ReactElement;
 }) {
   return (
     <SimpleButton className={classes.menuItem} onClick={onClick}>
-      <IconComponent className={classes.icon} />
-      <div className={classes.text}>{title}</div>
+      <div className={classes.menuItemIcon}>{icon}</div>
+      <div className={classes.menuItemMainWrapper}>
+        <div className={classes.menuItemHeader}>{title}</div>
+        {footer && <span className={classes.menuItemFooter}>{footer}</span>}
+      </div>
     </SimpleButton>
   );
 }

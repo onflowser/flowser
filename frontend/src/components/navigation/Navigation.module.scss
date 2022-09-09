@@ -55,6 +55,15 @@
         }
       }
 
+      .userButton {
+        width: 35px;
+        height: 35px;
+        & > * {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
       .snapshotButton {
         @media (max-width: 970px) {
           display: none;

@@ -16,7 +16,7 @@ export type FlowScriptArgument = {
 };
 
 export function useFlow() {
-  const [user, setUser] = useState({ loggedIn: null });
+  const [user, setUser] = useState<any>({ loggedIn: null });
   const [isLoggingIn, setLoggingIn] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
 
