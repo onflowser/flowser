@@ -10,8 +10,10 @@
   color: $light-grey;
 
   .sidebar {
-    width: 512px;
+    width: 30%;
     height: 100vh;
+    max-width: 450px;
+    min-width: 300px;
     background-color: $background-highlight-2;
 
     display: flex;
@@ -35,7 +37,7 @@
 
         .logo {
           height: 70px;
-          width: auto;
+          width: 100%;
         }
       }
     }
