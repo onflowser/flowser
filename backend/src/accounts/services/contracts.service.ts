@@ -11,10 +11,6 @@ export class ContractsService {
     private contractRepository: Repository<AccountContractEntity>
   ) {}
 
-  async countAll() {
-    return this.contractRepository.count();
-  }
-
   async findAll() {
     return this.contractRepository.find({
       order: { createdAt: "DESC" },

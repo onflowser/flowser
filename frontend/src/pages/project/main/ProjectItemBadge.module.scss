@@ -1,0 +1,21 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  border: .5px solid $grey;
+  color: $grey;
+  opacity: 0.39;
+  border-radius: 14px;
+  padding: ($spacing-l * 0.25) $spacing-l;
+  margin: auto;
+  font-weight: 100;
+  margin-left: $spacing-base;
+  transition: 0.3s;
+}
+
+.root:hover {
+  background-color: $light-grey;
+  color: $background;
+  cursor: pointer;
+}
