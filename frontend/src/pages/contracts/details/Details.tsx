@@ -10,7 +10,7 @@ import Card from "components/card/Card";
 import classes from "./Details.module.scss";
 import {
   DetailsCard,
-  DetailsCardProps,
+  DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 
 type RouteParams = {
@@ -39,28 +39,26 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  const detailsColumns: DetailsCardProps = {
-    columns: [
-      [
-        {
-          label: "Name",
-          value: contract.name,
-        },
-        {
-          label: "Account",
-          value: (
-            <NavLink to={`/accounts/details/${contract.accountAddress}`}>
-              {contract.accountAddress}
-            </NavLink>
-          ),
-        },
-      ],
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Name",
+        value: contract.name,
+      },
+      {
+        label: "Account",
+        value: (
+          <NavLink to={`/accounts/details/${contract.accountAddress}`}>
+            {contract.accountAddress}
+          </NavLink>
+        ),
+      },
     ],
-  };
+  ];
 
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns.columns} />
+      <DetailsCard columns={detailsColumns} />
       <ContentDetailsScript script={contract.code} />
     </div>
   );

@@ -4,10 +4,6 @@ import { useSearch } from "../../../hooks/use-search";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import CopyButton from "../../../components/copy-button/CopyButton";
-import Card from "../../../components/card/Card";
-import TimeAgo from "../../../components/time-ago/TimeAgo";
-import DateWithCalendar from "../../../components/date-with-calendar/DateWithCalendar";
 import classes from "./Details.module.scss";
 import {
   DetailsTabItem,
@@ -30,7 +26,7 @@ import { useFormattedDate } from "hooks/use-formatted-date";
 import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
-  DetailsCardProps,
+  DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 
 type RouteParams = {
@@ -115,42 +111,38 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  const detailsColumns: DetailsCardProps = {
-    columns: [
-      [
-        {
-          label: "Block ID",
-          value: (
-            <NavLink to={`/blocks/details/${block.parentId}`}>
-              {block.id}
-            </NavLink>
-          ),
-        },
-        {
-          label: "Parent ID",
-          value: FlowUtils.isInitialBlockId(block.parentId) ? (
-            block.parentId
-          ) : (
-            <NavLink to={`/blocks/details/${block.parentId}`}>
-              {block.parentId}
-            </NavLink>
-          ),
-        },
-        {
-          label: "Time Stamp",
-          value: formatDate(createdDate),
-        },
-        {
-          label: "Time",
-          value: <ReactTimeAgo date={createdDate} />,
-        },
-      ],
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Block ID",
+        value: (
+          <NavLink to={`/blocks/details/${block.parentId}`}>{block.id}</NavLink>
+        ),
+      },
+      {
+        label: "Parent ID",
+        value: FlowUtils.isInitialBlockId(block.parentId) ? (
+          block.parentId
+        ) : (
+          <NavLink to={`/blocks/details/${block.parentId}`}>
+            {block.parentId}
+          </NavLink>
+        ),
+      },
+      {
+        label: "Time Stamp",
+        value: formatDate(createdDate),
+      },
+      {
+        label: "Time",
+        value: <ReactTimeAgo date={createdDate} />,
+      },
     ],
-  };
+  ];
 
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns.columns} />
+      <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
         <DetailsTabItem label="HEIGHT" value={block.height} />
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>

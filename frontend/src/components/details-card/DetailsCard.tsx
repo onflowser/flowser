@@ -1,26 +1,28 @@
 import Label from "components/label/Label";
 import Value from "components/value/Value";
-import React, { FunctionComponent, ReactElement } from "react";
+import React, { FC, ReactElement } from "react";
 import Card from "../card/Card";
 import classes from "./DetailsCard.module.scss";
 
-export type column = Array<{
+export type DetailsCardRow = {
   label: ReactElement | string;
   value: ReactElement | string;
-}>;
-
-export type DetailsCardProps = {
-  columns: column[];
 };
 
-export const DetailsCard = ({ columns }: DetailsCardProps) => {
+export type DetailsCardColumn = DetailsCardRow[];
+
+export type DetailsCardProps = {
+  columns: DetailsCardColumn[];
+};
+
+export const DetailsCard: FC<DetailsCardProps> = ({ columns }) => {
   return (
     <div className={classes.root}>
       <Card className={classes.bigCard}>
         <div className={classes.bigCardContent}>
-          {columns?.map((column, index) => (
+          {columns?.map((rows, index) => (
             <div className={classes.bigCardColumn} key={index}>
-              {column?.map((row, i) => (
+              {rows?.map((row, i) => (
                 <div key={i}>
                   <Label variant="medium" className={classes.label}>
                     {row.label}

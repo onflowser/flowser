@@ -3,7 +3,6 @@ import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
-import Card from "../../../components/card/Card";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import CopyButton from "../../../components/copy-button/CopyButton";
@@ -38,7 +37,7 @@ import classNames from "classnames";
 import { useUrlQuery } from "../../../hooks/use-url-query";
 import {
   DetailsCard,
-  DetailsCardProps,
+  DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 
 export type AccountDetailsRouteParams = {
@@ -181,29 +180,27 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  const detailsColumns: DetailsCardProps = {
-    columns: [
-      [
-        {
-          label: "Address",
-          value: account.address,
-        },
-        {
-          label: "Balance",
-          value: (
-            <>
-              {account.balance}
-              <span className={classes.currency}>FLOW</span>
-            </>
-          ),
-        },
-      ],
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Address",
+        value: account.address,
+      },
+      {
+        label: "Balance",
+        value: (
+          <>
+            {account.balance}
+            <span className={classes.currency}>FLOW</span>
+          </>
+        ),
+      },
     ],
-  };
+  ];
 
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns.columns} />
+      <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>
