@@ -30,6 +30,10 @@ export class CommonService {
         this.accountKeysService.removeAll(),
         this.accountStorageService.removeAll(),
       ]);
+    } catch (e) {
+      this.logger.error("Failed to remove account relations data", e);
+    }
+    try {
       await Promise.all([
         this.accountsService.removeAll(),
         this.blocksService.removeAll(),
@@ -39,7 +43,7 @@ export class CommonService {
       ]);
     } catch (e) {
       // TODO(milestone-x): Data removal fails when reverting to snapshot (QueryFailedError: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed)
-      this.logger.error("Failed to remove blockchain data", e);
+      this.logger.error("Failed to remove other data", e);
       throw e;
     }
   }
