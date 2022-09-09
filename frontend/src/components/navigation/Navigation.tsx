@@ -27,7 +27,7 @@ const Navigation: FunctionComponent<{
 }> = (props) => {
   const { isShowBackButtonVisible, isNavigationDrawerVisible } =
     useNavigation();
-  const { isLoggedIn } = useFlow();
+  const { user, isLoggedIn } = useFlow();
   const history = useHistory();
   const { createSnapshot } = useProjectActions();
   const tabCount = useTabCount();
@@ -90,7 +90,7 @@ const Navigation: FunctionComponent<{
             {isLoggedIn && (
               <SimpleButton
                 className={classes.userButton}
-                onClick={props.toggleSidebar}
+                onClick={() => history.push(`/accounts/details/${user?.addr}`)}
               >
                 <UserIcon />
               </SimpleButton>

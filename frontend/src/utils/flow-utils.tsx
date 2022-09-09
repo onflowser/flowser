@@ -15,7 +15,12 @@ import { ReactComponent as ExecutedIcon } from "../assets/icons/executed-tx-icon
 
 export class FlowUtils {
   static getUserAvatarUrl(address: string): string {
-    const appName = "Flowser"; // TODO: Read this from fcl-js config
+    // TODO(milestone-x): Read this from fcl-js config
+    const isServiceAccount = address === "0xf8d6e0586b0a20c7";
+    if (isServiceAccount) {
+      return "http://localhost:8701/settings.svg";
+    }
+    const appName = "Flowser";
     return `https://avatars.onflow.org/avatar/avatar/${address}-${appName}.svg`;
   }
 

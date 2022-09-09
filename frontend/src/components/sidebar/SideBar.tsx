@@ -38,6 +38,11 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
     history.push(`/start/configure/${currentProject?.id}`);
   };
 
+  function onClickUserProfile() {
+    history.push(`/accounts/details/${user?.addr}`);
+    toggleSidebar();
+  }
+
   return (
     <Drawer
       open={toggled}
@@ -64,7 +69,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           <span className={classes.menuSectionTitle}>EMULATOR</span>
           {isLoggedIn && (
             <SidebarButton
-              onClick={switchProject}
+              onClick={onClickUserProfile}
               title={user?.addr}
               footer={flowBalance}
               icon={<UserIcon />}
