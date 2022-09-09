@@ -115,7 +115,7 @@ const Main: FunctionComponent = () => {
           const snapshot = snapshotLookupByBlockId.get(block.id);
           return (
             <Value>
-              {snapshot?.description ?? "null"}
+              {snapshot?.description ?? "-"}
               {snapshot && (
                 <SimpleButton
                   style={{ marginLeft: 5 }}
