@@ -4,254 +4,51 @@
 @import "styles/rules";
 @import "styles/animations";
 
-.loader {
-  height: 100vh !important;
-  display: flex;
-}
-
 .root {
   display: flex;
   flex-direction: column;
+  align-items: center;
 
-  .backButtonWrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0);
-    margin-top: -20px;
-    &:not(.isConfig) {
-      margin: 50px 0 0 50px;
-    }
-    cursor: pointer;
-
-    .backButton {
-      width: 20px;
-      height: 16px;
-    }
-
-    transition: background 0.1s;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-  }
-
-  .inner {
-    align-self: center;
-    max-width: 1200px;
+  .innerWrapper {
+    max-width: 1000px;
+    margin-top: $spacing-xl;
     width: 100%;
 
-    @media screen and (max-width: 1600px) {
-      max-width: 800px;
-    }
+    .section {
+      margin-top: $spacing-xl;
 
-    justify-content: center;
-    align-items: center;
+      .card {
+        padding: $spacing-l * 2;
+        margin-bottom: $spacing-base;
+      }
 
-    .backButton {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-    }
+      .radioCard {
+        display: flex;
+        justify-content: space-between;
 
-    .top {
-      display: flex;
-      justify-content: center;
-      margin-top: $spacing-l * 4;
-      margin-bottom: $spacing-l * 4;
-
-      h2 {
-        color: $yellow;
-        font-size: $font-size-h2;
+        .radioField {
+          flex: 1;
+          max-width: 300px;
+        }
       }
     }
 
-    .card {
-      display: flex;
-      flex-direction: column;
-      padding: $spacing-l * 4 $spacing-l * 6;
-
-      @media screen and (max-width: 1600px) {
-        padding: $spacing-l * 4 $spacing-l * 4;
-      }
-
-      .versionWrapper {
-        margin-top: $spacing-xl;
-        display: flex;
-        justify-content: center;
-        a {
-          color: $blue;
-        }
-      }
-
-      .projectNameSection {
-        display: flex;
-        align-items: baseline;
-
-        .errorMessage {
-          margin-left: $spacing-l;
-        }
-
-        .nameInputWrapper {
-          border-radius: $border-radius-input;
-          background-color: #4c515e;
-          height: 48px;
-          padding: 0 $spacing-l * 2;
-          margin-left: $spacing-l * 3;
-          display: flex;
-          align-items: center;
-          flex: 3;
-
-          input {
-            height: 40px;
-            background: none;
-            flex: 1;
-            border: none;
-            outline: none;
-            color: $color-grey;
-            font-family: $font-family-inter;
-            font-size: $font-size-large;
-          }
-        }
-      }
-
-      .sectionTitle {
-        margin-top: $spacing-xl;
-        margin-bottom: $spacing-l;
-        font-size: $font-size-xlarge;
-        color: $yellow;
-      }
-
-      .section {
-        display: flex;
-        margin-bottom: $spacing-l * 3;
-        flex-direction: column;
-
-        .row {
-          display: flex;
-          align-items: center;
-          margin-bottom: $spacing-l;
-          height: 44px;
-
-          & > * {
-            flex: 1;
-          }
-
-          & > span:first-child {
-            color: $light-grey;
-            font-size: $font-size-normal;
-            max-width: 12vw;
-
-            @media screen and (max-width: 1600px) {
-              max-width: 25vw;
-            }
-          }
-
-          *:nth-child(2) {
-            max-width: 162px;
-          }
-
-          span:last-child {
-            color: $color-grey;
-            font-family: $font-family-inter-light;
-            margin-left: $spacing-base * 2;
-            font-size: 13px;
-            font-weight: 200;
-          }
-        }
-
-        .toggleButton {
-          display: flex;
-          justify-content: space-between;
-          & > span {
-            font-size: $font-size-normal !important;
-            font-weight: normal !important;
-            color: $color-grey !important;
-            margin: 0 !important;
-          }
-        }
-
-        .radioInputs {
-          display: flex;
-          color: $color-grey;
-
-          & > div:first-child {
-            margin-right: $spacing-l * 3;
-
-            & > div > span {
-              @media screen and (max-width: 1600px) {
-                min-width: 140px;
-              }
-            }
-          }
-
-          & > div:last-child {
-            margin-left: $spacing-l * 3;
-
-            & > div > span {
-              @media screen and (max-width: 1600px) {
-                min-width: 180px;
-              }
-            }
-          }
-
-          & > div {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-
-            h6 {
-              font-size: $font-size-normal;
-              color: $light-grey;
-
-              span {
-                margin-left: $spacing-base;
-                font-weight: 100;
-                font-size: $font-size-small;
-                color: $color-grey;
-              }
-            }
-
-            & > div:nth-child(2) {
-              margin-top: $spacing-l * 2;
-            }
-
-            & > div:not(:first-child) {
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              @media screen and (max-width: 1600px) {
-                justify-content: flex-start;
-              }
-              align-items: center;
-              margin-bottom: $spacing-l;
-
-              & > * {
-                margin-right: $spacing-base;
-              }
-            }
-          }
-        }
-
-        .footerButtons {
-          display: flex;
-          justify-content: space-between;
-          * + * {
-            margin-left: $spacing-base;
-          }
-        }
-      }
+    .title {
+      color: $light-grey;
     }
   }
-}
 
-.errorMessage {
-  color: lighten($color-red, 10%) !important;
-  font-size: $font-size-small !important;
-  font-weight: 400 !important;
-  @include pulse(1.5s);
+  .footer {
+    margin: $spacing-xl * 2 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .footerButton {
+      margin: 0 $spacing-base;
+    }
+    .versionWrapper {
+      margin-top: $spacing-xl;
+    }
+  }
 }

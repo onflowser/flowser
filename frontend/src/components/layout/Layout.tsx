@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState } from "react";
+import React, { FC, FunctionComponent, useCallback, useState } from "react";
 import classes from "./Layout.module.scss";
 import Navigation from "../navigation/Navigation";
 import Content from "../content/Content";
@@ -6,9 +6,28 @@ import Logs from "../../pages/logs/Logs";
 import { useLogDrawer } from "../../hooks/use-log-drawer";
 import { useGetCurrentProject } from "../../hooks/use-api";
 import { SideBar } from "components/sidebar/SideBar";
-import { Route, RouteProps } from "react-router-dom";
+import { Route, RouteProps, useHistory } from "react-router-dom";
+import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
+import classNames from "classnames";
 
-export const RouteWithLayout = (props: RouteProps) => (
+export const RouteWithBackButton: FC<RouteProps> = (props) => {
+  const history = useHistory();
+  return (
+    <div>
+      <div className={classNames(classes.backButtonWrapper)}>
+        <IconBackButton
+          onClick={() => {
+            history.goBack();
+          }}
+          className={classes.backButton}
+        />
+      </div>
+      <Route {...props} />
+    </div>
+  );
+};
+
+export const RouteWithLayout: FC<RouteProps> = (props) => (
   <Layout>
     <Route {...props} />
   </Layout>

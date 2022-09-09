@@ -5,12 +5,14 @@ import classNames from "classnames";
 export type ToggleButtonProps = {
   value?: boolean;
   disabled?: boolean;
+  className?: string;
   onChange?: (state: boolean) => void;
 };
 
 const ToggleButton: FunctionComponent<ToggleButtonProps> = ({
   value: active = false,
   disabled = false,
+  className,
   onChange = () => false,
 }) => {
   function onClick() {
@@ -20,7 +22,7 @@ const ToggleButton: FunctionComponent<ToggleButtonProps> = ({
   }
 
   return (
-    <div className={classes.root}>
+    <div className={classNames(classes.root, className)}>
       <div onClick={onClick}>
         {/* FIXME: max-width is applied on Configuration screen and breaks this layout */}
         <span

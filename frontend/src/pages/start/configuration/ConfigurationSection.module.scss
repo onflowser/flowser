@@ -1,0 +1,32 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $spacing-base;
+    .title {
+      color: $light-grey;
+      font-size: $font-size-big;
+    }
+    .toggleWrapper {
+      display: flex;
+      span {
+        color: $light-grey;
+        font-size: $font-size-normal;
+        margin-right: $spacing-base;
+      }
+    }
+  }
+  .separatorLine {
+    width: 100%;
+    height: 1px;
+    background: $light-grey;
+    opacity: 0.2;
+  }
+  .body {
+    margin-top: $spacing-base;
+  }
+}
