@@ -154,10 +154,7 @@ function ProjectsListContent() {
   if (!showProjectList) {
     return (
       <div className={classes.bodyCenter}>
-        <div>
-          To start, you need to create a project or <br />
-          <Link to="">open</Link> an existing folder
-        </div>
+        <div>To start, you need to create a project.</div>
       </div>
     );
   }

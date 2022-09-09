@@ -3,7 +3,6 @@ import { useHistory, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
 import Card from "../../../components/card/Card";
-import Label from "../../../components/label/Label";
 import Button from "../../../components/button/Button";
 import { routes } from "../../../constants/routes";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
@@ -117,8 +116,8 @@ export const Configuration: FunctionComponent = () => {
     }
   }
 
-  if (formik.isSubmitting) {
-    return <FullScreenLoading className={classes.loader} />;
+  if (formik.isSubmitting || isLoading) {
+    return <FullScreenLoading />;
   }
 
   return (

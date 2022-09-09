@@ -5,13 +5,11 @@ import { Configuration } from "./configuration/Configuration";
 
 const Start: FunctionComponent = () => {
   return (
-    <div>
-      <Switch>
-        <Route exact path={`/start`} component={Main} />
-        <Route path={`/start/configure/:id?`} component={Configuration} />
-        <Redirect from="*" to={`/start`} />
-      </Switch>
-    </div>
+    <Switch>
+      <Route exact path={`/start`} component={Main} />
+      <Route path={`/start/configure/:id?`} component={Configuration} />
+      <Redirect from="*" to={`/start`} />
+    </Switch>
   );
 };
 
