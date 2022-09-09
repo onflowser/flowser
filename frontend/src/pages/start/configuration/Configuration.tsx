@@ -25,8 +25,6 @@ import {
   FieldProps,
   ToggleField,
 } from "./FormFields";
-import { useNavigation } from "hooks/use-navigation";
-import { ReactComponent as IconBackButton } from "../../../assets/icons/back-button.svg";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -124,18 +122,6 @@ export const Configuration: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <div
-        className={classNames(classes.backButtonWrapper, {
-          [classes.isConfig]: !!id,
-        })}
-      >
-        <IconBackButton
-          onClick={() => {
-            history.goBack();
-          }}
-          className={classes.backButton}
-        />
-      </div>
       <div className={classes.innerWrapper}>
         <header>
           <h1 className={classes.title}>Project settings</h1>
