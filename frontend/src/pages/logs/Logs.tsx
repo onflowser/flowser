@@ -18,7 +18,7 @@ import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
-import { useGetPollingLogs } from "../../hooks/use-api";
+import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
 import { Log, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 
@@ -37,6 +37,8 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   // TODO(milestone-x): why are logs not sorted correctly in useGetPollingLogs hooK?
   const sortedLogs = useMemo(() => logs.sort((a, b) => a.id - b.id), [logs]);
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
+  const { data } = useGetCurrentProject();
+  const isCapturingEmulatorLogs = data?.project?.emulator?.run;
   const { filteredData } = useFilterData(sortedLogs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
 
@@ -112,6 +114,11 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const endPositionDrag = useCallback(() => {
     setTrackMousePosition(false);
   }, []);
+
+  if (!isCapturingEmulatorLogs) {
+    // TODO(milestone-5): Should we show some kind of notice somewhere?
+    return null;
+  }
 
   return (
     <div
