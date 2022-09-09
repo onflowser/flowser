@@ -1,42 +1,52 @@
-@import 'styles/spacings';
+@import "styles/spacings";
+@import "styles/animations";
 
-.container {
-  margin-bottom: $spacing-l * 2;
-  padding: $spacing-base * 3;
-}
+.bigCard {
+  margin-bottom: $spacing-xl;
 
-.header {
-  display: flex;
-  margin-bottom: $spacing-base;
-  & > * {
-    margin-right: $spacing-l;
-    & > *:first-child {
-      margin-right: $spacing-s;
-    }
-  }
-}
-
-.body {
-  & > * {
+  .bigCardContent {
     display: flex;
-    margin-bottom: $spacing-base;
-    & > *:first-child {
-      display: inline-block;
-      width: 150px;
-    }
-  }
-  & > *:last-child {
-    margin-bottom: 0;
-  }
-}
 
-.footer {
-  display: flex;
-  margin-top: $spacing-xl;
-  & > * {
-    margin-right: $spacing-l;
-    & > *:first-child {
-      margin-right: $spacing-s;
+    margin-bottom: $spacing-l * 1.5;
+    margin-top: $spacing-l * 1.5;
+
+    .bigCardColumn {
+      display: flex;
+      flex-direction: column;
+      margin-right: $spacing-xl * 2;
+
+      & > div {
+        display: flex;
+        margin-top: $spacing-s / 2;
+        margin-bottom: $spacing-s / 2;
+
+        .label {
+          margin-left: $spacing-xl * 2;
+          min-width: 130px;
+          display: inline-flex;
+        }
+
+        .value {
+          font-weight: bold;
+          margin-right: $spacing-base;
+
+          .elipsis {
+            max-width: 13vw;
+            display: inline-block;
+            overflow: hidden;
+          }
+        }
+      }
+    }
+    @media screen and (max-width: 1000px) {
+      .bigCardColumn {
+        margin-right: 0px;
+        & > div {
+          .label {
+            margin-left: $spacing-base;
+          }
+        }
+      }
     }
   }
 }

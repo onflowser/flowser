@@ -7,34 +7,6 @@
   max-width: 1690px;
   width: 100%;
 
-  .bigCard {
-    margin-bottom: $spacing-l * 2;
-    margin-bottom: $spacing-base;
-
-    .bigCardContent {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: $spacing-l * 1.5;
-      margin-top: $spacing-l * 1.5;
-
-      & > div {
-        display: flex;
-        margin-top: $spacing-s / 2;
-        margin-bottom: $spacing-s / 2;
-        
-        .label {
-          margin-left: $spacing-xl * 2;
-          min-width: 120px;
-          display: inline-flex;
-        }
-
-        .value {
-          font-weight: bold;
-        }
-      }
-    }
-  }
-
   .transactionListItem {
     display: flex;
     flex-direction: column;

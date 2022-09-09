@@ -36,6 +36,10 @@ import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
 import { BaseStorageCard } from "./BaseStorageCard";
 import classNames from "classnames";
 import { useUrlQuery } from "../../../hooks/use-url-query";
+import {
+  DetailsCard,
+  DetailsCardProps,
+} from "components/details-card/DetailsCard";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -177,29 +181,29 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  return (
-    <div className={classes.root}>
-      <Card className={classes.bigCard}>
-        <div className={classes.bigCardContent}>
-          <div>
-            <Label variant="medium" className={classes.label}>
-              Address
-            </Label>
-            <Value variant="small" className={classes.value}>
-              {account.address}
-            </Value>
-          </div>
-          <div>
-            <Label variant="medium" className={classes.label}>
-              Balance
-            </Label>
-            <Value variant="small" className={classes.value}>
+  const detailsColumns: DetailsCardProps = {
+    columns: [
+      [
+        {
+          label: "Address",
+          value: account.address,
+        },
+        {
+          label: "Balance",
+          value: (
+            <>
               {account.balance}
               <span className={classes.currency}>FLOW</span>
-            </Value>
-          </div>
-        </div>
-      </Card>
+            </>
+          ),
+        },
+      ],
+    ],
+  };
+
+  return (
+    <div className={classes.root}>
+      <DetailsCard columns={detailsColumns.columns} />
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={account.storage?.length}>
           <div className={classes.grid}>

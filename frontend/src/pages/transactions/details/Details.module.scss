@@ -69,57 +69,15 @@
       overflow: hidden;
     }
   }
-
-  .bigCard {
-    margin-bottom: $spacing-xl;
-
-    .bigCardContent {
-      display: flex;
-
-      margin-bottom: $spacing-l * 1.5;
-      margin-top: $spacing-l * 1.5;
-
-      .bigCardColumn {
-        display: flex;
-        flex-direction: column;
-        margin-right: $spacing-xl * 2;
-
-        & > div {
-          display: flex;
-          margin-top: $spacing-s / 2;
-          margin-bottom: $spacing-s / 2;
-
-          .label {
-            margin-left: $spacing-xl * 2;
-            min-width: 130px;
-            display: inline-flex;
-          }
-
-          .value {
-            font-weight: bold;
-            margin-right: $spacing-base;
-
-            .elipsis {
-              max-width: 13vw;
-              display: inline-block;
-              overflow: hidden;
-            }
-          }
-        }
-      }
-      @media screen and (max-width: 1000px) {
-        .bigCardColumn {
-          margin-right: 0px;
-          & > div {
-            .label {
-              margin-left: $spacing-base;
-            }
-          }
-        }
-      }
-    }
-  }
 }
+
+.elipsis {
+  max-width: 13vw;
+  display: inline-block;
+  overflow: hidden;
+  margin-right: $spacing-base;
+}
+
 
 .tableRow {
   display: flex;

@@ -6,32 +6,4 @@
   align-self: center;
   max-width: 1690px;
   width: 100%;
-
-  .bigCard {
-    margin-bottom: $spacing-l * 2;
-    padding: $spacing-base * 3;
-
-    .bigCardContent {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: $spacing-base;
-      margin-top: $spacing-base;
-
-      & > div {
-        display: flex;
-        margin-top: $spacing-s / 2;
-        margin-bottom: $spacing-s / 2;
-
-        .label {
-          margin-left: $spacing-xl * 2;
-          min-width: 100px;
-          display: inline-flex;
-        }
-
-        .value {
-          font-weight: bold;
-        }
-      }
-    }
-  }
 }
