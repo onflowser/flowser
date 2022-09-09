@@ -17,8 +17,8 @@
 
       & > div {
         display: flex;
-        margin-top: $spacing-s / 2;
-        margin-bottom: $spacing-s / 2;
+        margin-top: $spacing-s * 0.5;
+        margin-bottom: $spacing-s * 0.5;
 
         .label {
           margin-left: $spacing-xl * 2;
