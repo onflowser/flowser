@@ -11,6 +11,7 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { LogEntity } from "../../logs/entities/log.entity";
 import { LogsService } from "../../logs/logs.service";
 import { LogSource } from "@flowser/shared";
+import { ShutdownHandler, ShutdownSignal } from "../../common/shutdown-handler";
 
 export enum FlowEmulatorState {
   STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)
@@ -25,7 +26,9 @@ type FlowEmulatorLog = {
 };
 
 @Injectable()
-export class FlowEmulatorService implements ProjectContextLifecycle {
+export class FlowEmulatorService
+  implements ShutdownHandler, ProjectContextLifecycle
+{
   private readonly logger = new Logger(FlowEmulatorService.name);
   private projectContext: ProjectEntity | undefined;
 
@@ -35,6 +38,10 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   public logs: string[] = [];
 
   constructor(private logsService: LogsService) {}
+
+  public async onShutdown(signal: ShutdownSignal) {
+    await this.stop();
+  }
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;

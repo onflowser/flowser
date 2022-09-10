@@ -30,7 +30,6 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import { FlowCoreEventType } from "@flowser/shared";
-import { ConfigService } from "../../common/config.service";
 
 type BlockData = {
   block: FlowBlock;

@@ -3,12 +3,21 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { FlowCliOutput } from "../utils/cli-output";
 import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ShutdownHandler, ShutdownSignal } from "../../common/shutdown-handler";
 
 @Injectable()
-export class FlowCliService implements ProjectContextLifecycle {
+export class FlowCliService
+  implements ShutdownHandler, ProjectContextLifecycle
+{
   private readonly logger = new Logger(FlowCliService.name);
   private projectContext: ProjectEntity | undefined;
   public devWalletProcess: ChildProcessWithoutNullStreams;
+
+  constructor() {}
+
+  public async onShutdown(signal: ShutdownSignal) {
+    await this.stopDevWallet();
+  }
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
