@@ -32,9 +32,15 @@ async function createWindow() {
   );
 
   try {
-    const app = await createApp();
-    app.enableCors();
-    app.listen(6061);
+    await createApp({
+      database: {
+        type: "sqlite",
+        name: ":memory:",
+      },
+      common: {
+        httpServerPort: 6061,
+      },
+    });
   } catch (e) {
     console.error("Failed to start @flowser/backend", e);
   }

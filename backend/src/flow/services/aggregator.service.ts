@@ -1,4 +1,3 @@
-import { env } from "../../config";
 import { Injectable, Logger } from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import {
@@ -31,6 +30,7 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import { FlowCoreEventType } from "@flowser/shared";
+import { ConfigService } from "../../common/config.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -77,7 +77,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   // TODO(milestone-x): Next interval shouldn't start before this function resolves
-  @Interval(env.DATA_FETCH_INTERVAL)
+  @Interval(1000)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
       return;
