@@ -4,6 +4,9 @@ import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { Config, ConfigService } from "./common/config.service";
 
+export { FlowEmulatorService } from "./flow/services/emulator.service";
+export { FlowCliService } from "./flow/services/cli.service";
+
 export async function createApp(config: Config): Promise<INestApplication> {
   ConfigService.setConfiguration(config);
 

@@ -1,12 +1,19 @@
 import * as path from "path";
 import { app, BrowserWindow, shell, dialog } from "electron";
-import { createApp } from "@flowser/backend";
+import {
+  createApp,
+  FlowEmulatorService,
+  FlowCliService,
+} from "@flowser/backend";
 import fixPath from "fix-path";
+import { INestApplication } from "@nestjs/common";
 
 fixPath();
 
 const minWidth = 800;
 const minHeight = 600;
+
+let backend: INestApplication;
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -34,7 +41,7 @@ async function createWindow() {
   try {
     const userDataPath = app.getPath("userData");
     const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
-    await createApp({
+    backend = await createApp({
       database: {
         type: "sqlite",
         name: databaseFilePath,
@@ -67,4 +74,12 @@ app.on("activate", function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+
+app.on("will-quit", async function () {
+  // Make sure to stop all child processes, so that they don't become orphans
+  const flowEmulatorService = backend.get(FlowEmulatorService);
+  const flowCliService = backend.get(FlowCliService);
+  await flowCliService.stopDevWallet();
+  await flowEmulatorService.stop();
 });
