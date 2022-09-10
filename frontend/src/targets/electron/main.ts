@@ -5,10 +5,15 @@ import fixPath from "fix-path";
 
 fixPath();
 
+const minWidth = 800;
+const minHeight = 600;
+
 async function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: minWidth,
+    height: minHeight,
+    minWidth,
+    minHeight,
   });
 
   // Open urls in the user's browser
