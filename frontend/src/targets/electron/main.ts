@@ -1,5 +1,5 @@
 import * as path from "path";
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, shell, dialog } from "electron";
 import { createApp } from "@flowser/backend";
 import fixPath from "fix-path";
 
@@ -32,10 +32,12 @@ async function createWindow() {
   );
 
   try {
+    const userDataPath = app.getPath("userData");
+    const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
     await createApp({
       database: {
         type: "sqlite",
-        name: ":memory:",
+        name: databaseFilePath,
       },
       common: {
         httpServerPort: 6061,
@@ -43,6 +45,10 @@ async function createWindow() {
     });
   } catch (e) {
     console.error("Failed to start @flowser/backend", e);
+    dialog.showMessageBox(win, {
+      message: `Failed to start @flowser/backend: ${String(e)}`,
+      type: "error",
+    });
   }
 }
 
