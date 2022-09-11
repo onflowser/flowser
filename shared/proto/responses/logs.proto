@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/logs.proto";
-import "responses/common.proto";
+import "responses/core.proto";
 
 message GetAllLogsResponse {
   repeated Log logs = 1;

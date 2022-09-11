@@ -1,5 +1,5 @@
 // @ts-nocheck
-// Some common types are exported multiple types from protoc generated files multiple times.
+// Some core types are exported multiple types from protoc generated files multiple times.
 // This raises build-time errors - let's just suppress them for now.
 
 // Common

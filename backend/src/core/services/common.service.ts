@@ -1,12 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { ContractsService } from "../accounts/services/contracts.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { TransactionsService } from "../transactions/transactions.service";
-import { BlocksService } from "../blocks/blocks.service";
-import { EventsService } from "../events/events.service";
-import { LogsService } from "../logs/logs.service";
-import { KeysService } from "../accounts/services/keys.service";
-import { AccountStorageService } from "../accounts/services/storage.service";
+import { ContractsService } from "../../accounts/services/contracts.service";
+import { AccountsService } from "../../accounts/services/accounts.service";
+import { TransactionsService } from "../../transactions/transactions.service";
+import { BlocksService } from "../../blocks/blocks.service";
+import { EventsService } from "../../events/events.service";
+import { LogsService } from "../../logs/logs.service";
+import { KeysService } from "../../accounts/services/keys.service";
+import { AccountStorageService } from "../../accounts/services/storage.service";
 
 @Injectable()
 export class CommonService {

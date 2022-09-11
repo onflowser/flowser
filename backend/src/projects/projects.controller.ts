@@ -22,7 +22,7 @@ import {
   CreateProjectResponse,
   GetPollingProjectsRequest,
 } from "@flowser/shared";
-import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowConfigService } from "../flow/services/config.service";
 
 @Controller("projects")

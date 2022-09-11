@@ -2,7 +2,7 @@ import { writeFile } from "fs";
 import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { createApp } from "./index";
-import { ConfigService } from "./common/config.service";
+import { ConfigService } from "./core/services/config.service";
 const packageJson = require("../package.json");
 
 export function getOpenApiDocument(app: INestApplication) {

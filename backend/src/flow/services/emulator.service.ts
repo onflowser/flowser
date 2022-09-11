@@ -11,7 +11,7 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { LogEntity } from "../../logs/entities/log.entity";
 import { LogsService } from "../../logs/logs.service";
 import { LogSource } from "@flowser/shared";
-import { ShutdownHandler, ShutdownSignal } from "../../common/shutdown-handler";
+import { ShutdownHandler, ShutdownSignal } from "../../core/shutdown-handler";
 
 export enum FlowEmulatorState {
   STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)

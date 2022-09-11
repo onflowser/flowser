@@ -7,7 +7,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { BlocksService } from "./blocks.service";
-import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
 import {
   GetAllBlocksResponse,

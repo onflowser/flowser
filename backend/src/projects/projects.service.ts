@@ -34,7 +34,7 @@ import {
 } from "@flowser/shared";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import * as fs from "fs";
-import { CommonService } from "../common/common.service";
+import { CommonService } from "../core/services/common.service";
 
 @Injectable()
 export class ProjectsService {

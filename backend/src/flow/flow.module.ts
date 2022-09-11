@@ -16,7 +16,7 @@ import { FlowActionsService } from "./services/actions.service";
 import { FlowAccountStorageService } from "./services/storage.service";
 import { SnapshotEntity } from "./entities/snapshot.entity";
 import { FlowSnapshotService } from "./services/snapshot.service";
-import { CommonModule } from "../common/common.module";
+import { CoreModule } from "../core/core.module";
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { CommonModule } from "../common/common.module";
     BlocksModule,
     EventsModule,
     TransactionsModule,
-    CommonModule,
+    CoreModule,
   ],
   controllers: [FlowController],
   providers: [

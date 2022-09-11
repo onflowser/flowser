@@ -3,7 +3,7 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { FlowCliOutput } from "../utils/cli-output";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { ShutdownHandler, ShutdownSignal } from "../../common/shutdown-handler";
+import { ShutdownHandler, ShutdownSignal } from "../../core/shutdown-handler";
 
 @Injectable()
 export class FlowCliService

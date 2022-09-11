@@ -20,7 +20,7 @@ import {
   GetPollingEmulatorSnapshotsRequest,
   GetProjectObjectsResponse,
 } from "@flowser/shared";
-import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowConfigService } from "./services/config.service";
 
 @Controller("flow")
