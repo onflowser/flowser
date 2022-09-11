@@ -6,6 +6,10 @@ on:
     branches:
       - '*'
 
+# https://github.com/electron-userland/electron-builder/issues/3179
+env:
+  USE_HARD_LINKS: false
+
 jobs:
   publish:
     runs-on: ${{ matrix.os }}
