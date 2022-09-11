@@ -14,6 +14,7 @@
     "build:desktop:win": "yarn run build:desktop --win",
     "build:desktop:mac": "yarn run build:desktop --mac",
     "build:desktop:linux": "yarn run build:desktop --linux",
+    "build:desktop:all": "yarn run build:desktop --win --mac --linux",
     "start": "lerna run start --parallel",
     "cleanup": "lerna run cleanup --parallel && rm -rf node_modules app/node_modules app/build app/release flowdb",
     "build": "lerna run build --scope @flowser/backend --scope @flowser/shared && lerna run build --scope @flowser/frontend",

@@ -33,5 +33,5 @@ jobs:
       - name: Bootstrap project
         run: yarn run bootstrap
 
-      - name: Build project
-        run: yarn run build
+      - name: Build desktop app
+        run: yarn run build:desktop:all
