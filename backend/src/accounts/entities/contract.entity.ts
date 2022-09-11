@@ -2,7 +2,6 @@ import { PollingEntity } from "../../common/entities/polling.entity";
 import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
-import { env } from "../../config";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount } from "../../flow/services/gateway.service";
 import { AccountContract } from "@flowser/shared";
@@ -18,7 +17,7 @@ export class AccountContractEntity extends PollingEntity {
   @PrimaryColumn()
   name: string;
 
-  @Column(AccountContractEntity.getCodeFieldType())
+  @Column("text")
   code: string;
 
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
@@ -55,11 +54,5 @@ export class AccountContractEntity extends PollingEntity {
     contract.name = name;
     contract.code = code;
     return contract;
-  }
-
-  private static getCodeFieldType() {
-    return ["mariadb", "mysql"].includes(env.DATABASE_TYPE)
-      ? "mediumtext"
-      : "text";
   }
 }

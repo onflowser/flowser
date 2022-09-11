@@ -13,7 +13,7 @@ import classNames from "classnames";
 export const RouteWithBackButton: FC<RouteProps> = (props) => {
   const history = useHistory();
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       <div className={classNames(classes.backButtonWrapper)}>
         <IconBackButton
           onClick={() => {

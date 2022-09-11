@@ -102,6 +102,9 @@ function mergePackageJsonFiles(first, second) {
     scripts: {
       "build-electron":
         "electron-builder -c.extraMetadata.main=build/electron/main.js",
+      "build-mac": "yarn run build-electron --mac",
+      "build-win": "yarn run build-electron --win",
+      "build-linux": "yarn run build-electron --linux",
     },
     dependencies: mergedDependencies,
     devPackages: mergedDevDependencies,

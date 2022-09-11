@@ -1,32 +1,33 @@
-import { env } from "./config";
 import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionOptions";
 import { DataSource, DataSourceOptions } from "typeorm";
+import { ConfigService } from "./common/config.service";
 
 export function getDatabaseOptions(): DataSourceOptions {
+  const { database } = ConfigService.getConfig();
   const commonOptions = {
     autoLoadEntities: true,
     synchronize: true,
   };
-  switch (env.DATABASE_TYPE) {
+  switch (database.type) {
     case "sqlite":
       return {
         type: "sqlite",
-        database: env.DATABASE_NAME,
+        database: database.name,
         ...commonOptions,
       } as SqliteConnectionOptions;
     case "mysql":
       return {
-        type: env.DATABASE_TYPE,
-        host: env.DATABASE_HOST,
-        port: env.DATABASE_PORT,
-        username: env.DATABASE_USERNAME,
-        password: env.DATABASE_PASSWORD,
-        database: env.DATABASE_NAME,
+        type: database.type,
+        host: database.host,
+        port: database.port,
+        username: database.username,
+        password: database.password,
+        database: database.name,
         timezone: "Z",
         ...commonOptions,
       };
     default:
-      throw new Error(`Database type ${env.DATABASE_TYPE} not supported`);
+      throw new Error(`Database type ${database.type} not supported`);
   }
 }
 

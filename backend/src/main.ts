@@ -1,39 +1,21 @@
-import { INestApplication } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { writeFile } from "fs";
-import { env } from "./config";
 import { createApp } from "./index";
-const packageJson = require("../package.json");
+import { ConfigService } from "./common/config.service";
+import { SwaggerModule } from "@nestjs/swagger";
+import { getOpenApiDocument } from "./docs";
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await createApp();
+  ConfigService.setConfiguration(ConfigService.readFromEnv());
 
-  setupOpenApiDocs(app);
+  const app = await createApp(ConfigService.readFromEnv());
 
-  app.enableCors();
-  await app.listen(env.HTTP_PORT);
+  SwaggerModule.setup("api", app, getOpenApiDocument(app));
 
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
-}
-
-function setupOpenApiDocs(app: INestApplication) {
-  const config = new DocumentBuilder()
-    .setTitle("Flowser")
-    .setDescription("The Flowser API description")
-    .setVersion(packageJson.version)
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  if (env.GENERATE_API_DOCS_FILE) {
-    writeFile("openapi.json", JSON.stringify(document, null, 4), () =>
-      console.log("Generated openapi.json file in project root.")
-    );
-  }
-  SwaggerModule.setup("api", app, document);
 }
 
 bootstrap();

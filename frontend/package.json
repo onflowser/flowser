@@ -72,7 +72,7 @@
     "prebuild:web": "cp src/targets/web/index.tsx src/index.tsx",
     "prebuild:electron": "cp src/targets/electron/index.tsx src/index.tsx",
     "build": "yarn run electron:build",
-    "electron:serve": "yarn run prebuild:electron && concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
+    "electron:serve": "yarn run prebuild:electron && yarn run build:electron-main && concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
     "electron:build": "yarn run prebuild:electron && yarn build:react && yarn run build:electron-main && echo \"Run app/scripts/build.sh to build the actuall electron app.\"",
     "electron:start": "wait-on tcp:6060 && electron ."
   },

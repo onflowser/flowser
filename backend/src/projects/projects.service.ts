@@ -42,6 +42,7 @@ export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
 
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
+  // TODO: Refactor this to event based mechanism
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
     [
       this.flowCliService,

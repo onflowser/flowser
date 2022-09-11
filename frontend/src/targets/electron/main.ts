@@ -1,14 +1,26 @@
 import * as path from "path";
-import { app, BrowserWindow, shell } from "electron";
-import { createApp } from "@flowser/backend";
+import { app, BrowserWindow, shell, dialog } from "electron";
+import {
+  createApp,
+  FlowEmulatorService,
+  FlowCliService,
+} from "@flowser/backend";
 import fixPath from "fix-path";
+import { INestApplication } from "@nestjs/common";
 
 fixPath();
 
+const minWidth = 800;
+const minHeight = 600;
+
+let backend: INestApplication;
+
 async function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: minWidth,
+    height: minHeight,
+    minWidth,
+    minHeight,
   });
 
   // Open urls in the user's browser
@@ -27,11 +39,23 @@ async function createWindow() {
   );
 
   try {
-    const app = await createApp();
-    app.enableCors();
-    app.listen(6061);
+    const userDataPath = app.getPath("userData");
+    const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
+    backend = await createApp({
+      database: {
+        type: "sqlite",
+        name: databaseFilePath,
+      },
+      common: {
+        httpServerPort: 6061,
+      },
+    });
   } catch (e) {
     console.error("Failed to start @flowser/backend", e);
+    dialog.showMessageBox(win, {
+      message: `Failed to start @flowser/backend: ${String(e)}`,
+      type: "error",
+    });
   }
 }
 
@@ -50,4 +74,12 @@ app.on("activate", function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+
+app.on("will-quit", async function () {
+  // Make sure to stop all child processes, so that they don't become orphans
+  const flowEmulatorService = backend.get(FlowEmulatorService);
+  const flowCliService = backend.get(FlowCliService);
+  await flowCliService.stopDevWallet();
+  await flowEmulatorService.stop();
 });

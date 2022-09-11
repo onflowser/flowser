@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import "../config/flow-fcl";
 // @ts-ignore
 import * as fcl from "@onflow/fcl";
 // @ts-ignore
 import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
+import { useGetCurrentProject } from "./use-api";
+import { Project } from "@flowser/shared";
 
 export type FlowScriptArgumentValue = string | number;
 export type FlowScriptArgumentType = string;
@@ -15,10 +16,34 @@ export type FlowScriptArgument = {
   type: FlowScriptArgumentType;
 };
 
+export function setFclConfig(project: Project): void {
+  const devWalletPort = project.devWallet?.port ?? 8701;
+  const devWalletHost = "localhost";
+  const devWalletUrl = `http://${devWalletHost}:${devWalletPort}`;
+  fcl
+    .config()
+    // flowser app details
+    .put("app.detail.icon", `${process.env.REACT_APP_URL}/favicon.ico`)
+    .put("app.detail.title", "Flowser")
+    // Point App at Emulator
+    // TODO(milestone-3): Use the value stored in flow.json
+    .put("accessNode.api", "http://localhost:8888")
+    // Point FCL at dev-wallet (default port)
+    .put("discovery.wallet", `${devWalletUrl}/fcl/authn`);
+}
+
 export function useFlow() {
+  const { data } = useGetCurrentProject();
+  const { project } = data ?? {};
   const [user, setUser] = useState<any>({ loggedIn: null });
   const [isLoggingIn, setLoggingIn] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    if (project) {
+      setFclConfig(project);
+    }
+  }, [project]);
 
   useEffect(() => fcl.currentUser().subscribe(setUser), []);
 
