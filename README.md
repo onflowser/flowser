@@ -29,7 +29,6 @@ git clone https://github.com/onflowser/flowser
 The following system dependencies are required:
 - Node.js (tested on v14.19)
 - Yarn (tested on v1.22)
-- TypeScript compiler - [tsc](https://www.typescriptlang.org/) (tested on v4.7.4)
 - Protocol Buffers compiler - [protoc](https://grpc.io/docs/protoc-installation/) (tested on v3.21)
 - [flow-cli](https://docs.onflow.org/flow-cli/install/)
 
