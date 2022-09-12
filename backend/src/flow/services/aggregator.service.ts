@@ -17,7 +17,6 @@ import { AccountEntity } from "../../accounts/entities/account.entity";
 import { EventEntity } from "../../events/entities/event.entity";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { BlockEntity } from "../../blocks/entities/block.entity";
-import { LogsService } from "../../logs/logs.service";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
@@ -63,7 +62,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
     private flowSubscriptionService: FlowSubscriptionService,
-    private logsService: LogsService,
     private configService: FlowConfigService
   ) {}
 

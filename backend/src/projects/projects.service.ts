@@ -16,7 +16,6 @@ import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
-import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/cli.service";
 import { ContractsService } from "../accounts/services/contracts.service";
@@ -66,7 +65,6 @@ export class ProjectsService {
     private contractsService: ContractsService,
     private blocksService: BlocksService,
     private eventsService: EventsService,
-    private logsService: LogsService,
     private transactionsService: TransactionsService,
     private commonService: CommonService,
     private flowDevWalletService: FlowDevWalletService

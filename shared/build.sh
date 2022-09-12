@@ -1,3 +1,5 @@
+rm -rf ./src/generated
+
 mkdir -p ./src/generated
 
 protoc -I=./proto \

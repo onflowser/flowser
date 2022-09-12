@@ -10,7 +10,6 @@ import { AccountsModule } from "./accounts/accounts.module";
 import { BlocksModule } from "./blocks/blocks.module";
 import { TransactionsModule } from "./transactions/transactions.module";
 import { EventsModule } from "./events/events.module";
-import { LogsModule } from "./logs/logs.module";
 import { FlowModule } from "./flow/flow.module";
 import { CoreModule } from "./core/core.module";
 import { getDatabaseOptions } from "./database";
@@ -28,7 +27,6 @@ import { ProcessesModule } from "./processes/processes.module";
     BlocksModule,
     TransactionsModule,
     EventsModule,
-    LogsModule,
     FlowModule,
     CoreModule,
     ProcessesModule,

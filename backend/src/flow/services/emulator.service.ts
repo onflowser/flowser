@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { hashAlgorithmToJSON, signatureAlgorithmToJSON } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { LogsService } from "../../logs/logs.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
-import { ManagedProcess } from "../../processes/managed-process";
+import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 
 type FlowEmulatorLog = {
   level: "debug" | "info" | "error";
@@ -17,10 +16,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   private readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
 
-  constructor(
-    private logsService: LogsService,
-    private processManagerService: ProcessManagerService
-  ) {}
+  constructor(private processManagerService: ProcessManagerService) {}
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
@@ -35,7 +31,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   }
 
   async start() {
-    const managedProcess = new ManagedProcess({
+    const managedProcess = new ManagedProcessEntity({
       id: this.processId,
       command: {
         name: "flow",

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { ManagedProcess } from "../../processes/managed-process";
+import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { LogSource } from "@flowser/shared";
 
 @Injectable()
@@ -17,7 +17,7 @@ export class FlowCliService implements ProjectContextLifecycle {
   }
 
   async getCliVersion() {
-    const childProcess = new ManagedProcess({
+    const childProcess = new ManagedProcessEntity({
       command: {
         name: "flow",
         args: ["version"],

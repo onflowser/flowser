@@ -3,9 +3,15 @@ import {
   spawn,
   SpawnOptionsWithoutStdio,
 } from "child_process";
-import { Log, LogSource } from "@flowser/shared";
+import {
+  LogSource,
+  ManagedProcess,
+  ManagedProcessLog,
+  ManagedProcessState,
+} from "@flowser/shared";
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
+
 const commandExists = require("command-exists");
 
 export type ManagedProcessOptions = {
@@ -17,24 +23,22 @@ export type ManagedProcessOptions = {
   };
 };
 
-export enum ManagedProcessState {
-  NOT_RUNNING,
-  RUNNING,
-  ERROR,
-}
-
-export class ManagedProcess {
-  private readonly logger = new Logger(ManagedProcess.name);
+export class ManagedProcessEntity {
+  private readonly logger = new Logger(ManagedProcessEntity.name);
   public readonly id: string;
   public options: ManagedProcessOptions;
   public childProcess: ChildProcessWithoutNullStreams | undefined;
   public state: ManagedProcessState;
-  public logs: Log[];
+  public logs: ManagedProcessLog[];
+  public createdAt: Date;
+  public updatedAt: Date;
 
   constructor(options: ManagedProcessOptions) {
     this.id = options.id ?? randomUUID();
     this.options = options;
     this.logs = [];
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
   }
 
   async commandExists() {
@@ -91,17 +95,29 @@ export class ManagedProcess {
     });
   }
 
+  public toProto(): ManagedProcess {
+    const { name, args } = this.options.command;
+    return {
+      id: this.id,
+      command: { name, args },
+      state: this.state,
+      logs: this.logs,
+      updatedAt: this.updatedAt.toISOString(),
+      createdAt: this.createdAt.toISOString(),
+    };
+  }
+
   private onPostSpawn() {
     this.childProcess.on("spawn", () => {
-      this.state = ManagedProcessState.RUNNING;
+      this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
     });
     this.childProcess.on("exit", (code) => {
       this.logger.debug(`Process ${this.id} exited with code ${code}`);
-      if (code > 0) {
-        this.state = ManagedProcessState.ERROR;
-      } else {
-        this.state = ManagedProcessState.NOT_RUNNING;
-      }
+      this.setState(
+        code > 0
+          ? ManagedProcessState.MANAGED_PROCESS_STATE_ERROR
+          : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING
+      );
     });
 
     this.childProcess.stdout.on("data", (data) =>
@@ -124,7 +140,7 @@ export class ManagedProcess {
     const lines: string[] = data.toString().split("\n");
     const createdAt = new Date().toString();
     const logs = lines.map(
-      (line, index): Log => ({
+      (line, index): ManagedProcessLog => ({
         id: this.logs.length + index,
         source,
         data: line,
@@ -134,5 +150,9 @@ export class ManagedProcess {
     );
 
     this.logs.push(...logs);
+  }
+
+  private setState(state: ManagedProcessState) {
+    this.state = state;
   }
 }

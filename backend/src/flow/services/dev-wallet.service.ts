@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
-import { ManagedProcess } from "../../processes/managed-process";
+import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 
 @Injectable()
 export class FlowDevWalletService implements ProjectContextLifecycle {
@@ -26,7 +26,7 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
 
   async start() {
     // TODO(milestone-3): only start if not yet running on known port (e.g. by user)
-    const devWalletProcess = new ManagedProcess({
+    const devWalletProcess = new ManagedProcessEntity({
       id: this.processId,
       command: {
         name: "flow",
