@@ -40,6 +40,6 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
         },
       },
     });
-    await this.processManagerService.run(devWalletProcess);
+    await this.processManagerService.start(devWalletProcess);
   }
 }

@@ -18,10 +18,12 @@ export class ProcessManagerService {
     return [...this.processLookupById.values()];
   }
 
-  async run(process: ManagedProcess) {
-    if (!this.processLookupById.has(process.id)) {
-      this.processLookupById.set(process.id, process);
+  async start(process: ManagedProcess) {
+    const existingProcess = this.processLookupById.get(process.id);
+    if (existingProcess) {
+      await existingProcess.stop();
     }
+    this.processLookupById.set(process.id, process);
 
     await process.start();
   }
@@ -32,9 +34,6 @@ export class ProcessManagerService {
   }
 
   async stop(processId: string) {
-    if (!this.processLookupById.has(processId)) {
-      throw new Error("Process not found");
-    }
-    await this.processLookupById.get(processId).stop();
+    await this.processLookupById.get(processId)?.stop();
   }
 }

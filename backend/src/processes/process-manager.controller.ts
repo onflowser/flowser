@@ -19,7 +19,7 @@ export class ProcessManagerController {
         args: body.args,
       },
     });
-    await this.processManagerService.run(managedProcess);
+    await this.processManagerService.start(managedProcess);
   }
 
   @Delete(":id")
