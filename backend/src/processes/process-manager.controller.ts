@@ -19,6 +19,7 @@ export class ProcessManagerController {
         args: body.args,
       },
     });
+    console.log(await managedProcess.commandExists());
     await this.processManagerService.run(managedProcess);
   }
 

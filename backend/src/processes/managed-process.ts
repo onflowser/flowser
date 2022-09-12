@@ -5,6 +5,8 @@ import {
 } from "child_process";
 import { Log, LogSource } from "@flowser/shared";
 import { randomUUID } from "crypto";
+import { Logger } from "@nestjs/common";
+const commandExists = require("command-exists");
 
 export type ManagedProcessOptions = {
   command: {
@@ -21,6 +23,7 @@ export enum ManagedProcessState {
 }
 
 export class ManagedProcess {
+  private readonly logger = new Logger(ManagedProcess.name);
   public readonly id: string;
   public options: ManagedProcessOptions;
   public childProcess: ChildProcessWithoutNullStreams | undefined;
@@ -39,6 +42,15 @@ export class ManagedProcess {
     process.once("SIGTERM", async () => {
       await this.stop();
     });
+  }
+
+  async commandExists() {
+    try {
+      await commandExists(this.options.command.name);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   async start() {
@@ -85,6 +97,7 @@ export class ManagedProcess {
       this.state = ManagedProcessState.RUNNING;
     });
     this.childProcess.on("exit", (code) => {
+      this.logger.debug(`Process ${this.id} exited with code ${code}`);
       if (code > 0) {
         this.state = ManagedProcessState.ERROR;
       } else {

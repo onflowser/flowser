@@ -37,6 +37,7 @@
     "axios": "^0.21.4",
     "class-transformer": "0.4.0",
     "class-validator": "^0.13.1",
+    "command-exists": "^1.2.9",
     "envalid": "^7.3.1",
     "kebab-case": "^1.0.1",
     "reflect-metadata": "^0.1.13",
@@ -46,8 +47,8 @@
     "typeorm": "^0.3.6"
   },
   "peerDependencies": {
-    "sqlite3": "^5.0.10",
-    "mysql2": "^2.3.3"
+    "mysql2": "^2.3.3",
+    "sqlite3": "^5.0.10"
   },
   "devDependencies": {
     "@nestjs/schematics": "^8.0.0",

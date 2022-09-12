@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "entities/core.proto";
+import "entities/common.proto";
 
 message Project {
   string id = 1;
