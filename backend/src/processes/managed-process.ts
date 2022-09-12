@@ -35,14 +35,6 @@ export class ManagedProcess {
     this.id = options.id ?? randomUUID();
     this.options = options;
     this.logs = [];
-
-    // Gracefully shutdown child process in case parent receives a kill signal
-    process.once("SIGINT", async () => {
-      await this.stop();
-    });
-    process.once("SIGTERM", async () => {
-      await this.stop();
-    });
   }
 
   async commandExists() {

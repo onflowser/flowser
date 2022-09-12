@@ -7,6 +7,11 @@ export class ProcessManagerService {
 
   constructor() {
     this.processLookupById = new Map();
+
+    // Gracefully shutdown child process in case parent receives a kill signal
+    // FIXME: This doesn't work well with fast refresh
+    process.once("SIGINT", this.stopAll.bind(this));
+    process.once("SIGTERM", this.stopAll.bind(this));
   }
 
   async getAll() {
