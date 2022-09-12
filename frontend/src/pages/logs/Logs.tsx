@@ -19,7 +19,7 @@ import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
-import { Log, LogSource } from "@flowser/shared";
+import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 
 type LogsProps = {
@@ -192,7 +192,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   );
 };
 
-function LogLine({ log }: { log: Log }) {
+function LogLine({ log }: { log: ManagedProcessLog }) {
   const { highlightLogKeywords } = useSyntaxHighlighter();
 
   return (
