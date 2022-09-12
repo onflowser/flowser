@@ -153,6 +153,7 @@ export class ManagedProcessEntity {
   }
 
   private setState(state: ManagedProcessState) {
+    this.updatedAt = new Date();
     this.state = state;
   }
 }

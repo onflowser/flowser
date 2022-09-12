@@ -45,16 +45,6 @@ export class ProcessManagerService {
     );
   }
 
-  getAllLogs() {
-    const allLogs = this.getAll()
-      .map((process) => process.logs)
-      .flat();
-    return allLogs.sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-  }
-
   getAll() {
     const allProcesses = [...this.processLookupById.values()];
     return allProcesses.sort(
