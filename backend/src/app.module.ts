@@ -14,6 +14,7 @@ import { LogsModule } from "./logs/logs.module";
 import { FlowModule } from "./flow/flow.module";
 import { CoreModule } from "./core/core.module";
 import { getDatabaseOptions } from "./database";
+import { ProcessesModule } from "./processes/processes.module";
 
 @Global()
 @Module({
@@ -30,6 +31,7 @@ import { getDatabaseOptions } from "./database";
     LogsModule,
     FlowModule,
     CoreModule,
+    ProcessesModule,
   ],
   controllers: [AppController],
 })
