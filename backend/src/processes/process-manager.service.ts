@@ -21,6 +21,11 @@ export class ProcessManagerService {
     await process.start();
   }
 
+  async stopAll() {
+    const processes = [...this.processLookupById.values()];
+    await Promise.all(processes.map((process) => process.stop()));
+  }
+
   async stop(processId: string) {
     if (!this.processLookupById.has(processId)) {
       throw new Error("Process not found");

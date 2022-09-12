@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   PreconditionFailedException,
@@ -35,6 +34,7 @@ import {
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
+import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
 
 @Injectable()
 export class ProjectsService {
@@ -50,6 +50,7 @@ export class ProjectsService {
       this.flowConfigService,
       this.flowAggregatorService,
       this.flowEmulatorService,
+      this.flowDevWalletService,
     ];
 
   constructor(
@@ -68,7 +69,8 @@ export class ProjectsService {
     private eventsService: EventsService,
     private logsService: LogsService,
     private transactionsService: TransactionsService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private flowDevWalletService: FlowDevWalletService
   ) {}
 
   getCurrentProject() {

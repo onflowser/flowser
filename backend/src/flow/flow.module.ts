@@ -12,11 +12,12 @@ import { LogsModule } from "../logs/logs.module";
 import { FlowCliService } from "./services/cli.service";
 import { FlowSubscriptionService } from "./services/subscription.service";
 import { FlowConfigService } from "./services/config.service";
-import { FlowActionsService } from "./services/actions.service";
 import { FlowAccountStorageService } from "./services/storage.service";
 import { SnapshotEntity } from "./entities/snapshot.entity";
 import { FlowSnapshotService } from "./services/snapshot.service";
 import { CoreModule } from "../core/core.module";
+import { FlowDevWalletService } from "./services/dev-wallet.service";
+import { ProcessesModule } from "../processes/processes.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CoreModule } from "../core/core.module";
     EventsModule,
     TransactionsModule,
     CoreModule,
+    ProcessesModule,
   ],
   controllers: [FlowController],
   providers: [
@@ -37,9 +39,9 @@ import { CoreModule } from "../core/core.module";
     FlowCliService,
     FlowSubscriptionService,
     FlowConfigService,
-    FlowActionsService,
     FlowAccountStorageService,
     FlowSnapshotService,
+    FlowDevWalletService,
   ],
   exports: [
     FlowAggregatorService,
@@ -47,7 +49,7 @@ import { CoreModule } from "../core/core.module";
     FlowEmulatorService,
     FlowCliService,
     FlowConfigService,
-    FlowActionsService,
+    FlowDevWalletService,
   ],
 })
 export class FlowModule {}

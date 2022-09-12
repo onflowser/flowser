@@ -1,10 +1,6 @@
 import * as path from "path";
 import { app, BrowserWindow, shell, dialog } from "electron";
-import {
-  createApp,
-  FlowEmulatorService,
-  FlowCliService,
-} from "@flowser/backend";
+import { createApp, ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
 import { INestApplication } from "@nestjs/common";
 
@@ -78,8 +74,6 @@ app.on("activate", function () {
 
 app.on("will-quit", async function () {
   // Make sure to stop all child processes, so that they don't become orphans
-  const flowEmulatorService = backend.get(FlowEmulatorService);
-  const flowCliService = backend.get(FlowCliService);
-  await flowCliService.stopDevWallet();
-  await flowEmulatorService.stop();
+  const processManagerService = backend.get(ProcessManagerService);
+  await processManagerService.stopAll();
 });

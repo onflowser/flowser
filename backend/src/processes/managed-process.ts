@@ -9,6 +9,7 @@ import { Logger } from "@nestjs/common";
 const commandExists = require("command-exists");
 
 export type ManagedProcessOptions = {
+  id?: string;
   command: {
     name: string;
     args: string[];
@@ -31,7 +32,7 @@ export class ManagedProcess {
   public logs: Log[];
 
   constructor(options: ManagedProcessOptions) {
-    this.id = randomUUID();
+    this.id = options.id ?? randomUUID();
     this.options = options;
     this.logs = [];
 
@@ -51,6 +52,12 @@ export class ManagedProcess {
     } catch (e) {
       return false;
     }
+  }
+
+  async waitOnExit() {
+    return new Promise<void>((resolve) => {
+      this.childProcess.on("exit", resolve);
+    });
   }
 
   async start() {
