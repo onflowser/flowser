@@ -3,7 +3,8 @@ import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
 import { ReactComponent as SettingsIcon } from "../../assets/icons/settings-circle.svg";
-import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle .svg";
+import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle.svg";
+import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
 import IconButton from "components/icon-button/IconButton";
@@ -84,7 +85,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             <SidebarButton
               onClick={sendTransaction}
               title="Send transaction"
-              icon={<ConnectIcon />}
+              icon={<SendTxIcon />}
             />
           )}
           {isLoggedIn ? (
