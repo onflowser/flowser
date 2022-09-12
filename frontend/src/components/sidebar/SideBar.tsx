@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactElement, useCallback } from "react";
+import React, { ReactElement, useCallback } from "react";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
@@ -8,7 +8,10 @@ import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
 import IconButton from "components/icon-button/IconButton";
 import { SimpleButton } from "../simple-button/SimpleButton";
-import { useGetCurrentProject } from "../../hooks/use-api";
+import {
+  useGetCurrentProject,
+  useGetPollingProcesses,
+} from "../../hooks/use-api";
 import { useHistory } from "react-router-dom";
 import { useProjectActions } from "../../contexts/project-actions.context";
 import { useFlow } from "../../hooks/use-flow";
@@ -16,6 +19,7 @@ import { routes } from "../../constants/routes";
 import classNames from "classnames";
 import { UserIcon } from "../user-icon/UserIcon";
 import { useGetAccountBalance } from "../../hooks/use-account-balance";
+import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
 
 export type Sidebar = {
   toggled: boolean;
@@ -24,11 +28,12 @@ export type Sidebar = {
 
 export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
-  const { data } = useGetCurrentProject();
+  const { data: currentProjectData } = useGetCurrentProject();
   const { login, logout, user, isLoggedIn } = useFlow();
   const { switchProject, sendTransaction } = useProjectActions();
-  const { project: currentProject } = data ?? {};
   const { flow: flowBalance } = useGetAccountBalance(user?.addr);
+  const { data: processes } = useGetPollingProcesses();
+  const { project: currentProject } = currentProjectData ?? {};
 
   const createProject = useCallback(() => {
     history.push(`/${routes.start}/configure`);
@@ -96,6 +101,11 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             />
           )}
         </div>
+        <div>
+          {processes.map((process) => (
+            <ManagedProcessItem key={process.id} process={process} />
+          ))}
+        </div>
         <div className={classNames(classes.menuItem, classes.footer)}>
           <IconButton
             onClick={createProject}
@@ -105,7 +115,6 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           >
             NEW PROJECT
           </IconButton>
-          {/* TODO(milestone-5): Show emulator status? */}
         </div>
       </div>
     </Drawer>
@@ -132,4 +141,41 @@ function SidebarButton({
       </div>
     </SimpleButton>
   );
+}
+
+function ManagedProcessItem({ process }: { process: ManagedProcess }) {
+  return (
+    <div className={classNames(classes.menuItem, classes.processItem)}>
+      <span>{processIdToName(process.id)}</span>
+      <div>
+        <ManagedProcessStatus state={process.state} />
+      </div>
+    </div>
+  );
+}
+
+function ManagedProcessStatus({ state }: { state: ManagedProcessState }) {
+  return (
+    <div
+      className={classNames(classes.processStatus, {
+        [classes.processStatusError]:
+          state === ManagedProcessState.MANAGED_PROCESS_STATE_ERROR,
+        [classes.processStatusNotRunning]:
+          state === ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING,
+        [classes.processStatusRunning]:
+          state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING,
+      })}
+    />
+  );
+}
+
+function processIdToName(processId: string) {
+  switch (processId) {
+    case "dev-wallet":
+      return "Dev Wallet";
+    case "emulator":
+      return "Emulator";
+    default:
+      return "Unknown";
+  }
 }

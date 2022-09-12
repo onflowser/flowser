@@ -8,6 +8,7 @@
   display: flex;
   justify-content: flex-start;
   font-size: $font-size-large;
+  z-index: 1001 !important;
 
   .menu {
     display: flex;
@@ -71,6 +72,28 @@
       .menuItemHeader {
         color: $grey
       }
+    }
+
+    .processItem {
+      justify-content: space-between;
+    }
+
+    .processStatus {
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+    }
+
+    .processStatusError {
+      background: $color-red;
+    }
+
+    .processStatusRunning {
+      background: $strong-green;
+    }
+
+    .processStatusNotRunning {
+      background: $yellow;
     }
 
     .footer {
