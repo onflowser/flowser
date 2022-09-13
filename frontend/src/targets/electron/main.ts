@@ -11,6 +11,20 @@ const minHeight = 600;
 
 let backend: INestApplication;
 
+async function startBackend() {
+  const userDataPath = app.getPath("userData");
+  const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
+  backend = await createApp({
+    database: {
+      type: "sqlite",
+      name: databaseFilePath,
+    },
+    common: {
+      httpServerPort: 6061,
+    },
+  });
+}
+
 async function createWindow() {
   const win = new BrowserWindow({
     width: minWidth,
@@ -34,25 +48,15 @@ async function createWindow() {
       : `file://${path.join(__dirname, "../react/index.html")}`
   );
 
-  try {
-    const userDataPath = app.getPath("userData");
-    const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
-    backend = await createApp({
-      database: {
-        type: "sqlite",
-        name: databaseFilePath,
-      },
-      common: {
-        httpServerPort: 6061,
-      },
-    });
-  } catch (e) {
-    console.error("Failed to start @flowser/backend", e);
-    dialog.showMessageBox(win, {
-      message: `Failed to start @flowser/backend: ${String(e)}`,
-      type: "error",
-    });
+  async function handleStart() {
+    try {
+      await startBackend();
+    } catch (e) {
+      await handleBackendError(e, win, () => handleStart());
+    }
   }
+
+  await handleStart();
 }
 
 app.on("ready", createWindow);
@@ -77,3 +81,41 @@ app.on("will-quit", async function () {
   const processManagerService = backend.get(ProcessManagerService);
   await processManagerService.stopAll();
 });
+
+type ErrorWithCode = { code: string };
+
+function isErrorWithCode(error: unknown): error is ErrorWithCode {
+  return typeof error === "object" && error !== null && "code" in error;
+}
+
+async function handleBackendError(
+  error: unknown,
+  window: BrowserWindow,
+  onRestart: () => void
+) {
+  console.error("Error when starting backend:", error);
+  if (isErrorWithCode(error)) {
+    const isAddressInUse = error.code === "EADDRINUSE";
+    if (isAddressInUse) {
+      const result = await dialog.showMessageBox(window, {
+        message: `Failed to start Flowser server on port 6061. Please make sure no other processes are running on that port and click restart.`,
+        buttons: ["Restart"],
+        type: "error",
+      });
+      const clickedRestart = result.response === 0;
+      if (clickedRestart) {
+        onRestart();
+      }
+    } else {
+      dialog.showMessageBox(window, {
+        message: `Error occurred when starting Flowser app: ${String(error)}`,
+        type: "error",
+      });
+    }
+  } else {
+    dialog.showMessageBox(window, {
+      message: `Unknown error occurred. Try to restart Flowser app.`,
+      type: "error",
+    });
+  }
+}
