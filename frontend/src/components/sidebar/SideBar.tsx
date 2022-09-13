@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback } from "react";
+import React, { ReactElement, useCallback, useState } from "react";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
@@ -149,13 +149,20 @@ function SidebarButton({
 
 function ManagedProcessItem({ process }: { process: ManagedProcess }) {
   const { processesService } = ServiceRegistry.getInstance();
+  const [isRestarting, setRestarting] = useState(false);
   const { handleError } = useErrorHandler(ManagedProcessItem.name);
 
   async function onRestart() {
+    setRestarting(true);
     try {
       await processesService.restart({ processId: process.id });
     } catch (e) {
       handleError(e);
+    } finally {
+      // The restart in most cases happens so quickly that it isn't even visible in the UI
+      // This could fool the user that nothing happened, so let's fake a larger delay.
+      const fakeRestartDelay = 200;
+      setTimeout(() => setRestarting(false), fakeRestartDelay);
     }
   }
 
@@ -166,22 +173,32 @@ function ManagedProcessItem({ process }: { process: ManagedProcess }) {
         <SimpleButton className={classes.restartButton} onClick={onRestart}>
           <RestartIcon />
         </SimpleButton>
-        <ManagedProcessStatus state={process.state} />
+        <ManagedProcessStatus
+          isRestarting={isRestarting}
+          state={process.state}
+        />
       </div>
     </div>
   );
 }
 
-function ManagedProcessStatus({ state }: { state: ManagedProcessState }) {
+function ManagedProcessStatus({
+  state,
+  isRestarting,
+}: {
+  isRestarting: boolean;
+  state: ManagedProcessState;
+}) {
+  const isNotRunning =
+    state === ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
+  const isRunning = state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING;
+  const isError = state === ManagedProcessState.MANAGED_PROCESS_STATE_ERROR;
   return (
     <div
       className={classNames(classes.processStatus, {
-        [classes.processStatusError]:
-          state === ManagedProcessState.MANAGED_PROCESS_STATE_ERROR,
-        [classes.processStatusNotRunning]:
-          state === ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING,
-        [classes.processStatusRunning]:
-          state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING,
+        [classes.processStatusError]: isError,
+        [classes.processStatusNotRunning]: isRestarting || isNotRunning,
+        [classes.processStatusRunning]: isRunning,
       })}
     />
   );

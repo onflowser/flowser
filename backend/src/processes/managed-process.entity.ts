@@ -59,8 +59,7 @@ export class ManagedProcessEntity {
   async start() {
     const { name, args, options } = this.options.command;
 
-    const isRunning = this.childProcess?.exitCode === null;
-    if (isRunning) {
+    if (this.isRunning()) {
       throw new Error("Process is already running");
     }
 
@@ -76,22 +75,23 @@ export class ManagedProcessEntity {
     });
   }
 
-  async stop() {
-    const isRunning = this.childProcess?.exitCode === null;
-    if (!isRunning) {
+  async stop(killSignal?: NodeJS.Signals) {
+    if (!this.isRunning()) {
       return;
     }
-    return new Promise<void>((resolve, reject) => {
-      const isKilledSuccessfully = this.childProcess.kill("SIGINT");
-      this.childProcess.on("error", (error) => {
+    return new Promise<number>(async (resolve, reject) => {
+      const isKilledSuccessfully = this.childProcess.kill(
+        killSignal ?? "SIGINT"
+      );
+      this.childProcess.once("error", (error) => {
         reject(error);
       });
-      if (isKilledSuccessfully) {
-        this.onPostShutdown();
-        resolve();
-      } else {
-        reject();
+      if (!isKilledSuccessfully) {
+        await this.stop("SIGKILL");
       }
+      this.childProcess.once("exit", (exitCode) => {
+        resolve(exitCode);
+      });
     });
   }
 
@@ -109,6 +109,7 @@ export class ManagedProcessEntity {
 
   private onPostSpawn() {
     this.childProcess.on("spawn", () => {
+      this.logger.debug(`Process ${this.id} started`);
       this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
     });
     this.childProcess.on("exit", (code) => {
@@ -118,6 +119,7 @@ export class ManagedProcessEntity {
           ? ManagedProcessState.MANAGED_PROCESS_STATE_ERROR
           : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING
       );
+      this.onPostShutdown();
     });
 
     this.childProcess.stdout.on("data", (data) =>
@@ -155,5 +157,9 @@ export class ManagedProcessEntity {
   private setState(state: ManagedProcessState) {
     this.updatedAt = new Date();
     this.state = state;
+  }
+
+  private isRunning() {
+    return this.childProcess?.exitCode === null;
   }
 }
