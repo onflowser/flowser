@@ -63,10 +63,10 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   useEffect(() => {
     // TODO(ui): scroll to bottom only when drawer is not "in use"
-    const hasStdErrLogs = logs.some(
-      (log) => log.source === LogSource.LOG_SOURCE_STDERR
-    );
-    if (hasStdErrLogs) {
+    const hasErrorLogs = logs
+      .filter((log) => log.isNew)
+      .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
+    if (hasErrorLogs) {
       // TODO(milestone-5): Uncomment below line
       // setSize("small"); -- this is temporary
       toast.error("Flow emulator encountered errors", {
