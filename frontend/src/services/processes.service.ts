@@ -9,6 +9,13 @@ import { TransportService } from "./transports/transport.service";
 export class ProcessesService {
   constructor(private readonly transport: TransportService) {}
 
+  restart({ processId }: { processId: string }): Promise<void> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: `/api/processes/${processId}/restart`,
+    });
+  }
+
   getAllLogsByProcessWithPolling({
     processId,
     ...data

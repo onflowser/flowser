@@ -7,6 +7,7 @@ import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle
 import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
+import { ReactComponent as RestartIcon } from "../../assets/icons/restart.svg";
 import IconButton from "components/icon-button/IconButton";
 import { SimpleButton } from "../simple-button/SimpleButton";
 import {
@@ -21,6 +22,8 @@ import classNames from "classnames";
 import { UserIcon } from "../user-icon/UserIcon";
 import { useGetAccountBalance } from "../../hooks/use-account-balance";
 import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
+import { ServiceRegistry } from "../../services/service-registry";
+import { useErrorHandler } from "../../hooks/use-error-handler";
 
 export type Sidebar = {
   toggled: boolean;
@@ -145,10 +148,24 @@ function SidebarButton({
 }
 
 function ManagedProcessItem({ process }: { process: ManagedProcess }) {
+  const { processesService } = ServiceRegistry.getInstance();
+  const { handleError } = useErrorHandler(ManagedProcessItem.name);
+
+  async function onRestart() {
+    try {
+      await processesService.restart({ processId: process.id });
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
   return (
     <div className={classNames(classes.menuItem, classes.processItem)}>
       <span>{processIdToName(process.id)}</span>
-      <div>
+      <div className={classes.processItemActions}>
+        <SimpleButton className={classes.restartButton} onClick={onRestart}>
+          <RestartIcon />
+        </SimpleButton>
         <ManagedProcessStatus state={process.state} />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ManagedProcessEntity } from "./managed-process.entity";
 import { ManagedProcessLog } from "@flowser/shared";
 
@@ -70,5 +70,14 @@ export class ProcessManagerService {
 
   async stop(processId: string) {
     await this.processLookupById.get(processId)?.stop();
+  }
+
+  async restart(processId: string) {
+    const process = this.processLookupById.get(processId);
+    if (!process) {
+      throw new NotFoundException("Process not found");
+    }
+    await process.stop();
+    await process.start();
   }
 }
