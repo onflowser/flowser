@@ -1,9 +1,9 @@
 import {
   Injectable,
   InternalServerErrorException,
-  PreconditionFailedException,
   Logger,
   NotFoundException,
+  PreconditionFailedException,
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
@@ -28,12 +28,18 @@ import {
   Emulator,
   Gateway,
   GatewayStatus,
+  HashAlgorithm,
   Project,
+  ProjectRequirement,
+  ProjectRequirementType,
+  SignatureAlgorithm,
 } from "@flowser/shared";
-import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
+
+const commandExists = require("command-exists");
+const semver = require("semver");
 
 @Injectable()
 export class ProjectsService {
@@ -76,6 +82,39 @@ export class ProjectsService {
     } else {
       throw new NotFoundException("No current project");
     }
+  }
+
+  async getMissingRequirements(): Promise<ProjectRequirement[]> {
+    const missingRequirements: ProjectRequirement[] = [];
+    try {
+      await commandExists("flow");
+    } catch (e) {
+      missingRequirements.push(
+        ProjectRequirement.fromPartial({
+          type: ProjectRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI,
+        })
+      );
+      return missingRequirements;
+    }
+
+    const flowCliInfo = await this.flowCliService.getInfo();
+    const foundVersion = semver.coerce(flowCliInfo.version).version;
+    const minSupportedVersion = "0.39.4";
+    const isSupportedFlowCliVersion = semver.lte(
+      minSupportedVersion,
+      foundVersion
+    );
+    if (!isSupportedFlowCliVersion) {
+      missingRequirements.push({
+        type: ProjectRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION,
+        missingVersionRequirement: {
+          minSupportedVersion,
+          foundVersion,
+        },
+      });
+    }
+
+    return missingRequirements;
   }
 
   async cleanupProject() {

@@ -29,6 +29,7 @@ import {
   GetPollingEmulatorSnapshotsResponse,
   GetProjectObjectsResponse,
   GetPollingManagedProcessesResponse,
+  GetProjectRequirementsResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -235,6 +236,13 @@ export function useGetCurrentProject() {
     error,
     ...rest,
   };
+}
+
+export function useGetProjectRequirements() {
+  return useQuery<GetProjectRequirementsResponse>(
+    `/projects/requirements`,
+    () => projectsService.getRequirements()
+  );
 }
 
 export function useGetProjectObjects() {

@@ -12,13 +12,11 @@ import {
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
 
-const commandExists = require("command-exists");
-
 export type ManagedProcessOptions = {
   id?: string;
   command: {
     name: string;
-    args: string[];
+    args?: string[];
     options?: SpawnOptionsWithoutStdio;
   };
 };
@@ -39,15 +37,6 @@ export class ManagedProcessEntity {
     this.logs = [];
     this.createdAt = new Date();
     this.updatedAt = new Date();
-  }
-
-  async commandExists() {
-    try {
-      await commandExists(this.options.command.name);
-      return true;
-    } catch (e) {
-      return false;
-    }
   }
 
   async waitOnExit() {

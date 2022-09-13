@@ -16,7 +16,7 @@ export class FlowCliService implements ProjectContextLifecycle {
     this.projectContext = undefined;
   }
 
-  async getCliVersion() {
+  async getInfo() {
     const childProcess = new ManagedProcessEntity({
       command: {
         name: "flow",

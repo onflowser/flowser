@@ -21,6 +21,7 @@ import {
   UpdateProjectResponse,
   CreateProjectResponse,
   GetPollingProjectsRequest,
+  GetProjectRequirementsResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowConfigService } from "../flow/services/config.service";
@@ -40,6 +41,13 @@ export class ProjectsController {
         project: project.toProto(),
       })
     );
+  }
+
+  @Get("requirements")
+  async getProjectRequirements() {
+    return GetProjectRequirementsResponse.toJSON({
+      missingRequirements: await this.projectsService.getMissingRequirements(),
+    });
   }
 
   @Get()

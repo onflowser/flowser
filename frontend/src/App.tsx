@@ -28,6 +28,7 @@ import { ProjectActionsProvider } from "./contexts/project-actions.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
+import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -81,6 +82,7 @@ export const FlowserClientApp = () => {
 export const FlowserRoutes = () => {
   return (
     <BrowserRouterEvents>
+      <ProjectRequirements />
       <Switch>
         <Route path={`/${routes.start}`} component={Start} />
         <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
