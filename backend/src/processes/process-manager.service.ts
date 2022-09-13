@@ -10,9 +10,13 @@ export class ProcessManagerService {
     this.processLookupById = new Map();
 
     // Gracefully shutdown child process in case parent receives a kill signal
-    // FIXME: This doesn't work well with fast refresh
-    process.once("SIGINT", this.stopAll.bind(this));
-    process.once("SIGTERM", this.stopAll.bind(this));
+    process.once("SIGINT", this.onTerminate.bind(this));
+    process.once("SIGTERM", this.onTerminate.bind(this));
+  }
+
+  async onTerminate() {
+    await this.stopAll();
+    process.exit(0);
   }
 
   findAllProcessesNewerThanTimestamp(timestamp: Date): ManagedProcessEntity[] {
@@ -64,8 +68,7 @@ export class ProcessManagerService {
   }
 
   async stopAll() {
-    const processes = [...this.processLookupById.values()];
-    await Promise.all(processes.map((process) => process.stop()));
+    await Promise.all(this.getAll().map((process) => process.stop()));
   }
 
   async stop(processId: string) {
