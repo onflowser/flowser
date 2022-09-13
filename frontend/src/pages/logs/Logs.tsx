@@ -34,13 +34,15 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const tinyLogRef = createRef<HTMLDivElement>();
   const nonTinyLogRef = createRef<HTMLDivElement>();
   const { data: logs } = useGetPollingLogs();
-  // TODO(milestone-x): why are logs not sorted correctly in useGetPollingLogs hooK?
   const sortedLogs = useMemo(
     () =>
       logs
         // Exclude logs that indicate that our backend called the emulator
         .filter((log) => !log.data.includes("GetLatestBlock called"))
-        .sort((a, b) => a.id - b.id),
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        ),
     [logs]
   );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
