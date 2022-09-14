@@ -38,7 +38,10 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     () =>
       logs
         // Exclude logs that indicate that our backend called the emulator
-        .filter((log) => !log.data.includes("GetLatestBlock called"))
+        .filter((log) => {
+          const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
+          return !isBackendCallLog;
+        })
         .sort(
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
