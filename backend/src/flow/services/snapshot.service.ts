@@ -10,7 +10,7 @@ import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios from "axios";
 import { randomUUID } from "crypto";
-import { CommonService } from "../../common/common.service";
+import { CommonService } from "../../core/services/common.service";
 
 type SnapshotResponse = {
   blockId: string;

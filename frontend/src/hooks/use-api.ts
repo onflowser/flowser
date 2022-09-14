@@ -7,7 +7,8 @@ import {
   Transaction,
   Block,
   Event,
-  Log,
+  ManagedProcessLog,
+  ManagedProcess,
   GetFlowserVersionResponse,
   GetAllProjectsResponse,
   GetSingleProjectResponse,
@@ -27,6 +28,8 @@ import {
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
   GetProjectObjectsResponse,
+  GetPollingManagedProcessesResponse,
+  GetProjectRequirementsResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -39,7 +42,7 @@ const {
   storageService,
   blocksService,
   eventsService,
-  logsService,
+  processesService,
   accountsService,
   snapshotService,
 } = ServiceRegistry.getInstance();
@@ -172,11 +175,30 @@ export function useGetPollingEventsByTransaction(
   });
 }
 
-export function useGetPollingLogs(): TimeoutPollingHook<Log> {
-  return useTimeoutPolling<Log, GetPollingLogsResponse>({
-    resourceKey: "/logs/polling",
+export function useGetPollingLogs(): TimeoutPollingHook<ManagedProcessLog> {
+  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
+    resourceKey: "/processes/logs/polling",
     resourceIdKey: "id",
-    fetcher: (data) => logsService.getAllWithPolling(data),
+    fetcher: (data) => processesService.getAllLogsWithPolling(data),
+  });
+}
+
+export function useGetPollingLogsByProcess(
+  processId: string
+): TimeoutPollingHook<ManagedProcessLog> {
+  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
+    resourceKey: `/processes/${processId}/logs/polling`,
+    resourceIdKey: "id",
+    fetcher: (data) =>
+      processesService.getAllLogsByProcessWithPolling({ processId, ...data }),
+  });
+}
+
+export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
+  return useTimeoutPolling<ManagedProcess, GetPollingManagedProcessesResponse>({
+    resourceKey: `/processes`,
+    resourceIdKey: "id",
+    fetcher: (data) => processesService.getAllProcessesWithPolling(data),
   });
 }
 
@@ -214,6 +236,13 @@ export function useGetCurrentProject() {
     error,
     ...rest,
   };
+}
+
+export function useGetProjectRequirements() {
+  return useQuery<GetProjectRequirementsResponse>(
+    `/projects/requirements`,
+    () => projectsService.getRequirements()
+  );
 }
 
 export function useGetProjectObjects() {

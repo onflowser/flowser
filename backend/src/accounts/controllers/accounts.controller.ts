@@ -7,7 +7,7 @@ import {
   Post,
 } from "@nestjs/common";
 import { AccountsService } from "../services/accounts.service";
-import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../../core/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
 import {
   GetPollingAccountsResponse,

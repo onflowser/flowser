@@ -2,6 +2,21 @@ syntax = "proto3";
 
 import "entities/common.proto";
 
+enum ProjectRequirementType {
+  PROJECT_REQUIREMENT_UNSPECIFIED = 0;
+  PROJECT_REQUIREMENT_MISSING_FLOW_CLI = 1;
+  PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION = 2;
+}
+
+message ProjectRequirement {
+  ProjectRequirementType type = 1;
+  MissingVersion missing_version_requirement = 2;
+  message MissingVersion {
+    string found_version = 1;
+    string min_supported_version = 2;
+  }
+}
+
 message Project {
   string id = 1;
   string name = 2;

@@ -1,12 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { ContractsService } from "../accounts/services/contracts.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { TransactionsService } from "../transactions/transactions.service";
-import { BlocksService } from "../blocks/blocks.service";
-import { EventsService } from "../events/events.service";
-import { LogsService } from "../logs/logs.service";
-import { KeysService } from "../accounts/services/keys.service";
-import { AccountStorageService } from "../accounts/services/storage.service";
+import { ContractsService } from "../../accounts/services/contracts.service";
+import { AccountsService } from "../../accounts/services/accounts.service";
+import { TransactionsService } from "../../transactions/transactions.service";
+import { BlocksService } from "../../blocks/blocks.service";
+import { EventsService } from "../../events/events.service";
+import { KeysService } from "../../accounts/services/keys.service";
+import { AccountStorageService } from "../../accounts/services/storage.service";
 
 @Injectable()
 export class CommonService {
@@ -17,7 +16,6 @@ export class CommonService {
     private blocksService: BlocksService,
     private transactionsService: TransactionsService,
     private eventsService: EventsService,
-    private logsService: LogsService,
     private accountKeysService: KeysService,
     private accountStorageService: AccountStorageService
   ) {}
@@ -33,7 +31,6 @@ export class CommonService {
       await Promise.all([
         this.accountsService.removeAll(),
         this.blocksService.removeAll(),
-        this.logsService.removeAll(),
         this.transactionsService.removeAll(),
       ]);
       // Must be deleted last, because of the relation to blocks & transactions

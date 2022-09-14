@@ -20,7 +20,7 @@ import {
   GetPollingEmulatorSnapshotsRequest,
   GetProjectObjectsResponse,
 } from "@flowser/shared";
-import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowConfigService } from "./services/config.service";
 
 @Controller("flow")
@@ -35,7 +35,7 @@ export class FlowController {
 
   @Get("version")
   async getVersion() {
-    const info = await this.flowCliService.getVersion();
+    const info = await this.flowCliService.getInfo();
     return GetFlowCliInfoResponse.toJSON(info);
   }
 

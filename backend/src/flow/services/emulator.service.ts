@@ -1,23 +1,9 @@
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import {
-  Injectable,
-  Logger,
-  ServiceUnavailableException,
-} from "@nestjs/common";
-import { EventEmitter } from "events";
-import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
+import { Injectable } from "@nestjs/common";
+import { hashAlgorithmToJSON, signatureAlgorithmToJSON } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { LogEntity } from "../../logs/entities/log.entity";
-import { LogsService } from "../../logs/logs.service";
-import { LogSource } from "@flowser/shared";
-import { ShutdownHandler, ShutdownSignal } from "../../common/shutdown-handler";
-
-export enum FlowEmulatorState {
-  STOPPED = "stopped", // emulator is not running (exited or hasn't yet been started)
-  STARTED = "started", // emulator has been started, but is not yet running (it may error out)
-  RUNNING = "running", // emulator is safely running without initialisation errors
-}
+import { ProcessManagerService } from "../../processes/process-manager.service";
+import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 
 type FlowEmulatorLog = {
   level: "debug" | "info" | "error";
@@ -26,36 +12,16 @@ type FlowEmulatorLog = {
 };
 
 @Injectable()
-export class FlowEmulatorService
-  implements ShutdownHandler, ProjectContextLifecycle
-{
-  private readonly logger = new Logger(FlowEmulatorService.name);
+export class FlowEmulatorService implements ProjectContextLifecycle {
+  public static readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
 
-  public events: EventEmitter = new EventEmitter();
-  public state: FlowEmulatorState = FlowEmulatorState.STOPPED;
-  public emulatorProcess: ChildProcessWithoutNullStreams;
-  public logs: string[] = [];
-
-  constructor(private logsService: LogsService) {}
-
-  public async onShutdown(signal: ShutdownSignal) {
-    await this.stop();
-  }
+  constructor(private processManagerService: ProcessManagerService) {}
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
     if (this.projectContext.shouldRunEmulator()) {
-      await this.stop();
-      try {
-        await this.start();
-      } catch (e: any) {
-        const emulatorError = this.getEmulatorError();
-        throw new ServiceUnavailableException(
-          emulatorError?.message ?? `Can not start emulator`,
-          e.message
-        );
-      }
+      await this.start();
     }
   }
 
@@ -65,173 +31,28 @@ export class FlowEmulatorService
   }
 
   async start() {
-    const flags = this.getFlags();
-    this.logger.debug(
-      `starting with (${flags.length}) flags: ${flags.join(" ")}`
-    );
-
-    // TODO(milestone-3): check if emulator (or any other process) is already running on emulator ports
-    return new Promise((resolve, reject) => {
-      try {
-        this.emulatorProcess = spawn("flow", ["emulator", ...flags], {
+    const managedProcess = new ManagedProcessEntity({
+      id: FlowEmulatorService.processId,
+      command: {
+        name: "flow",
+        args: ["emulator", ...this.getFlags()],
+        options: {
           cwd: this.projectContext.filesystemPath,
-        });
-      } catch (e) {
-        this.logger.debug("Failed to run emulator", e);
-        this.setState(FlowEmulatorState.STOPPED);
-        reject(e);
-      }
-
-      this.emulatorProcess.stdout.on("data", (data) => {
-        this.handleOutput(LogSource.LOG_SOURCE_STDOUT, data);
-
-        if (
-          this.isState(FlowEmulatorState.STOPPED) &&
-          this.findLog("starting")
-        ) {
-          // emulator is starting (could still exit due to init error)
-          this.setState(FlowEmulatorState.STARTED);
-          // assume that if no error is thrown in 1s, the emulator is running
-          // this line is needed, because if verbose flag is not included
-          // emulator may not emit any more logs in the near future
-          // therefore we can't reliably tell if emulator started successfully
-          setTimeout(() => {
-            this.onServerRunning();
-            resolve(true);
-          }, 1000);
-        }
-        // next line after "🌱  Starting HTTP server ..." is either "❗  Server error...", some other line, or no line
-        // TODO(milestone-x): logic for determining if emulator started successfully could be improved
-        // https://github.com/onflowser/flowser/issues/33
-        else if (
-          this.isState(FlowEmulatorState.STARTED) &&
-          !this.findLog("server error")
-        ) {
-          // emulator successfully started
-          this.onServerRunning();
-          resolve(true);
-        }
-      });
-
-      this.emulatorProcess.stderr.on("data", (data) => {
-        this.logger.debug("Emulator stderr: ", data.toString());
-        this.handleOutput(LogSource.LOG_SOURCE_STDERR, data);
-      });
-
-      this.emulatorProcess.on("close", (code, signal) => {
-        const error =
-          this.getEmulatorError() ||
-          new Error(`Emulator closed: ${code} (${signal})`);
-        this.setState(FlowEmulatorState.STOPPED);
-        this.logger.error("Emulator closed: " + error);
-        this.printLogs();
-        reject(error);
-      });
-
-      this.emulatorProcess.on("error", (error) => {
-        this.logger.error("Emulator error: " + error);
-        this.printLogs();
-        reject(error);
-      });
+        },
+      },
     });
+    await this.processManagerService.start(managedProcess);
   }
 
-  private handleOutput(source: LogSource, data: any) {
-    const lines = data
-      .toString()
-      .split("\n")
-      .filter((e) => !!e);
-
-    // temporarily store the logs in memory for possible examination
-    this.logs.push(...lines);
-
-    const formattedLines =
-      source === LogSource.LOG_SOURCE_STDOUT
-        ? FlowEmulatorService.formatLogLines(lines)
-        : lines;
-
-    formattedLines.forEach((line) => {
-      return this.logsService.create(LogEntity.create(source, line));
-    });
-  }
-
-  findLog(query) {
-    // traverse the most recent logs first (start from the end)
-    for (let i = this.logs.length - 1; i >= 0; i--) {
-      const line = this.logs[i];
-      if (line.toLowerCase().includes(query.toLowerCase())) {
-        // a log match is found
-        return line;
-      }
-    }
-    return null;
-  }
-
-  stop() {
-    return new Promise((resolve) => {
-      if (this.isStarted()) {
-        this.logger.debug(`stopping pid: ${this.emulatorProcess.pid}`);
-        const isKilled = this.emulatorProcess.kill(); // send SIGTERM signal
-        // resolve only when the emulator process exits
-        this.events.on(FlowEmulatorState.STOPPED, () => {
-          this.logger.debug(`Process ${this.emulatorProcess.pid} stopped`);
-          resolve(isKilled);
-        });
-      } else {
-        this.logger.debug(`already stopped, skipping`);
-        resolve(true);
-      }
-    });
-  }
-
-  // called when emulator is up and running
-  async onServerRunning() {
-    // ensure correct state transition STARTED => RUNNING
-    if (!this.isState(FlowEmulatorState.STARTED)) {
-      return;
-    }
-    this.setState(FlowEmulatorState.RUNNING);
-  }
-
-  isStarted() {
-    return (
-      !this.emulatorProcess?.killed &&
-      [FlowEmulatorState.STARTED, FlowEmulatorState.RUNNING].includes(
-        this.state
-      )
-    );
-  }
-
-  isRunning() {
-    return (
-      !this.emulatorProcess?.killed && this.state === FlowEmulatorState.RUNNING
-    );
-  }
-
-  public getEmulatorError() {
-    // TODO(milestone-3): Better log parsing - move logic to Log.entity class
-    for (let i = this.logs.length - 1; i > 0; i--) {
-      if (this.logs[i].includes("level=error")) {
-        const errorLine = FlowEmulatorService.parseLogLine(this.logs[i]);
-        return errorLine.error ? new Error(errorLine.error) : null;
-      }
-    }
-    return null;
-  }
-
-  private setState(state: FlowEmulatorState) {
-    this.logger.debug(`emulator state changed: ${state}`);
-    this.events.emit(state);
-    this.state = state;
-  }
-
-  private isState(state: FlowEmulatorState) {
-    return this.state === state;
+  async stop() {
+    await this.processManagerService.stop(FlowEmulatorService.processId);
   }
 
   private getFlags() {
     const { flag } = FlowEmulatorService;
     const { emulator } = this.projectContext ?? {};
+
+    const formatTokenSupply = (tokenSupply: number) => tokenSupply.toFixed(1);
 
     // keep those parameters up to date with the currently used flow-cli version
     // https://github.com/onflow/flow-emulator#configuration
@@ -247,13 +68,11 @@ export class FlowEmulatorService
       flag("service-pub-key", emulator.servicePublicKey),
       flag(
         "service-sig-algo",
-        FlowEmulatorService.formatSignatureAlgo(
-          emulator.serviceSignatureAlgorithm
-        )
+        signatureAlgorithmToJSON(emulator.serviceSignatureAlgorithm)
       ),
       flag(
         "service-hash-algo",
-        FlowEmulatorService.formatHashAlgo(emulator.serviceHashAlgorithm)
+        hashAlgorithmToJSON(emulator.serviceHashAlgorithm)
       ),
       flag("init", emulator.performInit),
       flag("rest-debug", emulator.enableRestDebug),
@@ -261,10 +80,7 @@ export class FlowEmulatorService
       flag("persist", emulator.persist),
       flag("dbpath", emulator.databasePath),
       flag("simple-addresses", emulator.useSimpleAddresses),
-      flag(
-        "token-supply",
-        FlowEmulatorService.formatTokenSupply(emulator.tokenSupply)
-      ),
+      flag("token-supply", formatTokenSupply(emulator.tokenSupply)),
       flag("transaction-expiry", emulator.transactionExpiry),
       flag("storage-limit", emulator.storageLimit),
       flag("storage-per-flow", emulator.storagePerFlow),
@@ -273,43 +89,6 @@ export class FlowEmulatorService
       flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
       flag("script-gas-limit", emulator.scriptGasLimit),
     ].filter(Boolean);
-  }
-
-  static formatTokenSupply(tokenSupply: number) {
-    // format to 1 decimal place precision
-    return tokenSupply.toFixed(1);
-  }
-
-  static formatHashAlgo(hashAlgo: HashAlgorithm): string {
-    switch (hashAlgo) {
-      case HashAlgorithm.SHA2_256:
-        return "SHA2_256";
-      case HashAlgorithm.SHA2_384:
-        return "SHA2_384";
-      case HashAlgorithm.SHA3_256:
-        return "SHA3_256";
-      case HashAlgorithm.SHA3_384:
-        return "SHA3_384";
-      case HashAlgorithm.KECCAK_256:
-        return "KECCAK_256";
-      case HashAlgorithm.KMAC128_BLS_BLS12_381:
-        return "KMAC128_BLS_BLS12_381";
-      default:
-        throw new Error("Hash algorithm not supported");
-    }
-  }
-
-  static formatSignatureAlgo(signAlgo: SignatureAlgorithm): string {
-    switch (signAlgo) {
-      case SignatureAlgorithm.ECDSA_P256:
-        return "ECDSA_P256";
-      case SignatureAlgorithm.ECDSA_secp256k1:
-        return "ECDSA_secp256k1";
-      case SignatureAlgorithm.BLS_BLS12_381:
-        return "BLS_BLS12_381";
-      default:
-        throw new Error("Signature algorithm not supported");
-    }
   }
 
   static formatLogLines(lines: string[]) {
@@ -379,12 +158,5 @@ export class FlowEmulatorService
   private static flag(name: string, userValue: any, defaultValue?: any) {
     const value = userValue || defaultValue;
     return value ? `--${name}=${value}` : undefined;
-  }
-
-  private printLogs() {
-    if (this.logs.length > 0) {
-      this.logger.debug("Emulator stdout: ");
-      console.log(this.logs.join("\n"));
-    }
   }
 }

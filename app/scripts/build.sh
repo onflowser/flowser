@@ -11,6 +11,6 @@ cp -r ../../frontend/dist ${BUILD_PATH}/electron
 # Note that some reason, electron-builder doesn't work with npx
 # https://github.com/electron-userland/electron-builder/issues/3984
 
-PLATFORM_ARG=$1 # valid values: --win, --mac, --linux
+PLATFORM_ARG=$1 # valid values: win, mac, linux, all
 
-yarn run build-electron "${PLATFORM_ARG}"
+yarn run "build-${PLATFORM_ARG}"

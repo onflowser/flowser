@@ -8,6 +8,7 @@
   display: flex;
   justify-content: flex-start;
   font-size: $font-size-large;
+  z-index: 1001 !important;
 
   .menu {
     display: flex;
@@ -71,6 +72,57 @@
       .menuItemHeader {
         color: $grey
       }
+    }
+
+    .processItemsWrapper {
+      margin-bottom: $spacing-xl * 2;
+    }
+
+    .processItem {
+      justify-content: space-between;
+      .label {
+        font-size: $font-size-normal;
+      }
+      .processItemActions {
+        display: flex;
+        align-items: center;
+        .restartButton {
+          width: 15px;
+          height: 15px;
+          margin-right: $spacing-base;
+          &:hover {
+            svg {
+              transform: scale(1.1) rotate(40deg);
+            }
+          }
+          svg {
+            transition: 0.3s ease-in-out;
+            width: 100%;
+            height: 100%;
+            path {
+              fill: $grey;
+            }
+          }
+        }
+      }
+    }
+
+    .processStatus {
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+    }
+
+    .processStatusError {
+      background: $color-red-light;
+    }
+
+    .processStatusRunning {
+      background: $strong-green;
+    }
+
+    .processStatusNotRunning {
+      background: $grey;
     }
 
     .footer {

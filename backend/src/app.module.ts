@@ -10,10 +10,10 @@ import { AccountsModule } from "./accounts/accounts.module";
 import { BlocksModule } from "./blocks/blocks.module";
 import { TransactionsModule } from "./transactions/transactions.module";
 import { EventsModule } from "./events/events.module";
-import { LogsModule } from "./logs/logs.module";
 import { FlowModule } from "./flow/flow.module";
-import { CommonModule } from "./common/common.module";
+import { CoreModule } from "./core/core.module";
 import { getDatabaseOptions } from "./database";
+import { ProcessesModule } from "./processes/processes.module";
 
 @Global()
 @Module({
@@ -27,9 +27,9 @@ import { getDatabaseOptions } from "./database";
     BlocksModule,
     TransactionsModule,
     EventsModule,
-    LogsModule,
     FlowModule,
-    CommonModule,
+    CoreModule,
+    ProcessesModule,
   ],
   controllers: [AppController],
 })

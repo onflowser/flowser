@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { PollingEntity } from "../../common/entities/polling.entity";
+import { PollingEntity } from "../../core/entities/polling.entity";
 import { EmulatorSnapshot } from "@flowser/shared";
 
 @Entity()

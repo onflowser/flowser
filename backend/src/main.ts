@@ -1,5 +1,5 @@
 import { createApp } from "./index";
-import { ConfigService } from "./common/config.service";
+import { ConfigService } from "./core/services/config.service";
 import { SwaggerModule } from "@nestjs/swagger";
 import { getOpenApiDocument } from "./docs";
 
