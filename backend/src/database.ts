@@ -1,6 +1,6 @@
 import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionOptions";
 import { DataSource, DataSourceOptions } from "typeorm";
-import { ConfigService } from "./common/config.service";
+import { ConfigService } from "./core/services/config.service";
 
 export function getDatabaseOptions(): DataSourceOptions {
   const { database } = ConfigService.getConfig();

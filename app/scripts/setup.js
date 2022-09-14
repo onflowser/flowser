@@ -105,6 +105,7 @@ function mergePackageJsonFiles(first, second) {
       "build-mac": "yarn run build-electron --mac",
       "build-win": "yarn run build-electron --win",
       "build-linux": "yarn run build-electron --linux",
+      "build-all": "yarn run build-electron --linux --mac --win",
     },
     dependencies: mergedDependencies,
     devPackages: mergedDevDependencies,

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { PollingEntity } from "../../common/entities/polling.entity";
+import { PollingEntity } from "../../core/entities/polling.entity";
 import { FlowBlock } from "../../flow/services/gateway.service";
 import { Block, CollectionGuarantee } from "@flowser/shared";
 import { typeOrmProtobufTransformer } from "../../utils";

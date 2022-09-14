@@ -1,4 +1,4 @@
-import { PollingEntity } from "../../common/entities/polling.entity";
+import { PollingEntity } from "../../core/entities/polling.entity";
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import {
   Transaction,

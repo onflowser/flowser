@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { PollingEntity } from "../../common/entities/polling.entity";
+import { PollingEntity } from "../../core/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { FlowAccount, FlowKey } from "../../flow/services/gateway.service";

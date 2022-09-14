@@ -7,7 +7,7 @@ import {
   Post,
 } from "@nestjs/common";
 import { ContractsService } from "../services/contracts.service";
-import { PollingResponseInterceptor } from "../../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../../core/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
 import {
   GetSingleContractResponse,

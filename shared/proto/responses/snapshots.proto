@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/snapshots.proto";
-import "responses/common.proto";
+import "responses/core.proto";
 
 message GetAllEmulatorSnapshotsResponse {
   repeated EmulatorSnapshot snapshots = 1;

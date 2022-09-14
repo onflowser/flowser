@@ -19,7 +19,7 @@ import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
-import { Log, LogSource } from "@flowser/shared";
+import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 
 type LogsProps = {
@@ -34,8 +34,21 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const tinyLogRef = createRef<HTMLDivElement>();
   const nonTinyLogRef = createRef<HTMLDivElement>();
   const { data: logs } = useGetPollingLogs();
-  // TODO(milestone-x): why are logs not sorted correctly in useGetPollingLogs hooK?
-  const sortedLogs = useMemo(() => logs.sort((a, b) => a.id - b.id), [logs]);
+  const sortedLogs = useMemo(
+    () =>
+      logs
+        // Exclude logs that indicate which our backend called the emulator
+        // To reduce unnecessary clutter
+        .filter((log) => {
+          const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
+          return !isBackendCallLog;
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        ),
+    [logs]
+  );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { data } = useGetCurrentProject();
   const isCapturingEmulatorLogs = data?.project?.emulator?.run;
@@ -63,12 +76,10 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   useEffect(() => {
     // TODO(ui): scroll to bottom only when drawer is not "in use"
-    const hasStdErrLogs = logs.some(
-      (log) => log.source === LogSource.LOG_SOURCE_STDERR
-    );
-    if (hasStdErrLogs) {
-      // TODO(milestone-5): Uncomment below line
-      // setSize("small"); -- this is temporary
+    const hasErrorLogs = logs
+      .filter((log) => log.isNew)
+      .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
+    if (hasErrorLogs) {
       toast.error("Flow emulator encountered errors", {
         duration: 4000,
       });
@@ -192,7 +203,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   );
 };
 
-function LogLine({ log }: { log: Log }) {
+function LogLine({ log }: { log: ManagedProcessLog }) {
   const { highlightLogKeywords } = useSyntaxHighlighter();
 
   return (

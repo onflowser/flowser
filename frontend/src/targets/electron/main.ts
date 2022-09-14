@@ -1,10 +1,6 @@
 import * as path from "path";
 import { app, BrowserWindow, shell, dialog } from "electron";
-import {
-  createApp,
-  FlowEmulatorService,
-  FlowCliService,
-} from "@flowser/backend";
+import { createApp, ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
 import { INestApplication } from "@nestjs/common";
 
@@ -14,6 +10,20 @@ const minWidth = 800;
 const minHeight = 600;
 
 let backend: INestApplication;
+
+async function startBackend() {
+  const userDataPath = app.getPath("userData");
+  const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
+  backend = await createApp({
+    database: {
+      type: "sqlite",
+      name: databaseFilePath,
+    },
+    common: {
+      httpServerPort: 6061,
+    },
+  });
+}
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -38,32 +48,22 @@ async function createWindow() {
       : `file://${path.join(__dirname, "../react/index.html")}`
   );
 
-  try {
-    const userDataPath = app.getPath("userData");
-    const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
-    backend = await createApp({
-      database: {
-        type: "sqlite",
-        name: databaseFilePath,
-      },
-      common: {
-        httpServerPort: 6061,
-      },
-    });
-  } catch (e) {
-    console.error("Failed to start @flowser/backend", e);
-    dialog.showMessageBox(win, {
-      message: `Failed to start @flowser/backend: ${String(e)}`,
-      type: "error",
-    });
+  async function handleStart() {
+    try {
+      await startBackend();
+    } catch (e) {
+      await handleBackendError(e, win, () => handleStart());
+    }
   }
+
+  await handleStart();
 }
 
 app.on("ready", createWindow);
 
 // Quit when all windows are closed.
 app.on("window-all-closed", function () {
-  // On OS X it is common for applications and their menu bar
+  // On OS X it is core for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== "darwin") {
     app.quit();
@@ -71,15 +71,51 @@ app.on("window-all-closed", function () {
 });
 
 app.on("activate", function () {
-  // On OS X it's common to re-create a window in the app when the
+  // On OS X it's core to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
 app.on("will-quit", async function () {
   // Make sure to stop all child processes, so that they don't become orphans
-  const flowEmulatorService = backend.get(FlowEmulatorService);
-  const flowCliService = backend.get(FlowCliService);
-  await flowCliService.stopDevWallet();
-  await flowEmulatorService.stop();
+  const processManagerService = backend.get(ProcessManagerService);
+  await processManagerService.stopAll();
 });
+
+type ErrorWithCode = { code: string };
+
+function isErrorWithCode(error: unknown): error is ErrorWithCode {
+  return typeof error === "object" && error !== null && "code" in error;
+}
+
+async function handleBackendError(
+  error: unknown,
+  window: BrowserWindow,
+  onRestart: () => void
+) {
+  console.error("Error when starting backend:", error);
+  if (isErrorWithCode(error)) {
+    const isAddressInUse = error.code === "EADDRINUSE";
+    if (isAddressInUse) {
+      const result = await dialog.showMessageBox(window, {
+        message: `Failed to start Flowser server on port 6061. Please make sure no other processes are running on that port and click restart.`,
+        buttons: ["Restart"],
+        type: "error",
+      });
+      const clickedRestart = result.response === 0;
+      if (clickedRestart) {
+        onRestart();
+      }
+    } else {
+      dialog.showMessageBox(window, {
+        message: `Error occurred when starting Flowser app: ${String(error)}`,
+        type: "error",
+      });
+    }
+  } else {
+    dialog.showMessageBox(window, {
+      message: `Unknown error occurred. Try to restart Flowser app.`,
+      type: "error",
+    });
+  }
+}

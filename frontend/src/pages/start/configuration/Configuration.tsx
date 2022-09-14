@@ -350,7 +350,7 @@ export const Configuration: FunctionComponent = () => {
           <div className={classes.versionWrapper}>
             <a
               target="_blank"
-              href={`https://github.com/onflow/flow-cli/commit/${flowCliInfo?.commitHash}`}
+              href={`https://github.com/onflow/flow-cli/releases/tag/${flowCliInfo?.version}`}
               rel="noreferrer"
             >
               Emulator version: {flowCliInfo?.version || "-"}

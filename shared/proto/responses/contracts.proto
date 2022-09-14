@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/accounts.proto";
-import "responses/common.proto";
+import "responses/core.proto";
 
 message GetAllContractsResponse {
   repeated AccountContract contracts = 1;

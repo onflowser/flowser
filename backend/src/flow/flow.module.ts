@@ -8,26 +8,26 @@ import { TransactionsModule } from "../transactions/transactions.module";
 import { FlowGatewayService } from "./services/gateway.service";
 import { FlowController } from "./flow.controller";
 import { FlowEmulatorService } from "./services/emulator.service";
-import { LogsModule } from "../logs/logs.module";
 import { FlowCliService } from "./services/cli.service";
 import { FlowSubscriptionService } from "./services/subscription.service";
 import { FlowConfigService } from "./services/config.service";
-import { FlowActionsService } from "./services/actions.service";
 import { FlowAccountStorageService } from "./services/storage.service";
 import { SnapshotEntity } from "./entities/snapshot.entity";
 import { FlowSnapshotService } from "./services/snapshot.service";
-import { CommonModule } from "../common/common.module";
+import { CoreModule } from "../core/core.module";
+import { FlowDevWalletService } from "./services/dev-wallet.service";
+import { ProcessesModule } from "../processes/processes.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SnapshotEntity]),
-    LogsModule,
     BlocksModule,
     AccountsModule,
     BlocksModule,
     EventsModule,
     TransactionsModule,
-    CommonModule,
+    CoreModule,
+    ProcessesModule,
   ],
   controllers: [FlowController],
   providers: [
@@ -37,9 +37,9 @@ import { CommonModule } from "../common/common.module";
     FlowCliService,
     FlowSubscriptionService,
     FlowConfigService,
-    FlowActionsService,
     FlowAccountStorageService,
     FlowSnapshotService,
+    FlowDevWalletService,
   ],
   exports: [
     FlowAggregatorService,
@@ -47,7 +47,7 @@ import { CommonModule } from "../common/common.module";
     FlowEmulatorService,
     FlowCliService,
     FlowConfigService,
-    FlowActionsService,
+    FlowDevWalletService,
   ],
 })
 export class FlowModule {}
