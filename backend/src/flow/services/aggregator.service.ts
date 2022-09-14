@@ -28,7 +28,17 @@ import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
-import { FlowCoreEventType } from "@flowser/shared";
+import { FlowCoreEventType, ManagedProcessState } from "@flowser/shared";
+import {
+  ProcessManagerEvent,
+  ProcessManagerService,
+} from "../../processes/process-manager.service";
+import {
+  ManagedProcessEntity,
+  ManagedProcessEvent,
+} from "../../processes/managed-process.entity";
+import { CommonService } from "../../core/services/common.service";
+import { FlowEmulatorService } from "./emulator.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -49,6 +59,7 @@ export type ExtendedFlowEvent = FlowEvent & {
 @Injectable()
 export class FlowAggregatorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
+  private emulatorProcess: ManagedProcessEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
 
   constructor(
@@ -62,15 +73,63 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
     private flowSubscriptionService: FlowSubscriptionService,
-    private configService: FlowConfigService
+    private configService: FlowConfigService,
+    private processManagerService: ProcessManagerService,
+    private commonService: CommonService
   ) {}
 
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
+    this.processManagerService.on(
+      ProcessManagerEvent.PROCESS_ADDED,
+      this.onProcessAddedOrUpdated.bind(this)
+    );
+    this.processManagerService.on(
+      ProcessManagerEvent.PROCESS_UPDATED,
+      this.onProcessAddedOrUpdated.bind(this)
+    );
   }
 
   onExitProjectContext(): void {
     this.projectContext = undefined;
+    this.processManagerService.removeListener(
+      ProcessManagerEvent.PROCESS_ADDED,
+      this.onProcessAddedOrUpdated.bind(this)
+    );
+    this.processManagerService.removeListener(
+      ProcessManagerEvent.PROCESS_UPDATED,
+      this.onProcessAddedOrUpdated.bind(this)
+    );
+    this.emulatorProcess?.removeListener(
+      ManagedProcessEvent.STATE_CHANGE,
+      this.onProcessStateChange.bind(this)
+    );
+  }
+
+  private onProcessAddedOrUpdated(process: ManagedProcessEntity) {
+    const isEmulatorProcess = process.id === FlowEmulatorService.processId;
+    if (isEmulatorProcess) {
+      this.logger.debug(`Emulator was started or updated`);
+      // Remove any previous listeners
+      this.emulatorProcess?.removeListener(
+        ManagedProcessEvent.STATE_CHANGE,
+        this.onProcessStateChange.bind(this)
+      );
+      // Update internal process instance & reattach listener
+      this.emulatorProcess = process;
+      this.emulatorProcess.on(
+        ManagedProcessEvent.STATE_CHANGE,
+        this.onProcessStateChange.bind(this)
+      );
+    }
+  }
+
+  private async onProcessStateChange(state: ManagedProcessState) {
+    if (state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING) {
+      this.logger.debug("Emulator process was started, reindexing");
+      // Reindex all blockchain data when the emulator is started (restarted)
+      await this.commonService.removeBlockchainData();
+    }
   }
 
   // TODO(milestone-x): Next interval shouldn't start before this function resolves
@@ -369,6 +428,9 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   async updateAccountsStorage() {
     const allAddresses = await this.accountService.findAllAddresses();
+    this.logger.debug(
+      `Processing storages for accounts: ${allAddresses.join(", ")}`
+    );
     await Promise.all(
       allAddresses.map((address) => this.processAccountStorage(address))
     );

@@ -13,7 +13,7 @@ type FlowEmulatorLog = {
 
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
-  private readonly processId = "emulator";
+  public static readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
 
   constructor(private processManagerService: ProcessManagerService) {}
@@ -32,7 +32,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async start() {
     const managedProcess = new ManagedProcessEntity({
-      id: this.processId,
+      id: FlowEmulatorService.processId,
       command: {
         name: "flow",
         args: ["emulator", ...this.getFlags()],
@@ -45,7 +45,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   }
 
   async stop() {
-    await this.processManagerService.stop(this.processId);
+    await this.processManagerService.stop(FlowEmulatorService.processId);
   }
 
   private getFlags() {

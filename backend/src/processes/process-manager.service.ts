@@ -1,12 +1,19 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ManagedProcessEntity } from "./managed-process.entity";
 import { ManagedProcessLog } from "@flowser/shared";
+import { EventEmitter } from "node:events";
+
+export enum ProcessManagerEvent {
+  PROCESS_ADDED = "process_added",
+  PROCESS_UPDATED = "process_updated",
+}
 
 @Injectable()
-export class ProcessManagerService {
+export class ProcessManagerService extends EventEmitter {
   private readonly processLookupById: Map<string, ManagedProcessEntity>;
 
   constructor() {
+    super();
     this.processLookupById = new Map();
 
     // Gracefully shutdown child process in case parent receives a kill signal
@@ -57,12 +64,20 @@ export class ProcessManagerService {
     );
   }
 
+  get(processId: string) {
+    return this.processLookupById.get(processId);
+  }
+
   async start(process: ManagedProcessEntity) {
     const existingProcess = this.processLookupById.get(process.id);
     if (existingProcess) {
       await existingProcess.stop();
+      this.processLookupById.set(process.id, process);
+      this.emit(ProcessManagerEvent.PROCESS_UPDATED, process);
+    } else {
+      this.processLookupById.set(process.id, process);
+      this.emit(ProcessManagerEvent.PROCESS_ADDED, process);
     }
-    this.processLookupById.set(process.id, process);
 
     await process.start();
   }

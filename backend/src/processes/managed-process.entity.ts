@@ -11,6 +11,7 @@ import {
 } from "@flowser/shared";
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
+import { EventEmitter } from "node:events";
 
 export type ManagedProcessOptions = {
   id?: string;
@@ -21,7 +22,11 @@ export type ManagedProcessOptions = {
   };
 };
 
-export class ManagedProcessEntity {
+export enum ManagedProcessEvent {
+  STATE_CHANGE = "state_change",
+}
+
+export class ManagedProcessEntity extends EventEmitter {
   private readonly logger = new Logger(ManagedProcessEntity.name);
   public readonly id: string;
   public options: ManagedProcessOptions;
@@ -32,6 +37,7 @@ export class ManagedProcessEntity {
   public updatedAt: Date;
 
   constructor(options: ManagedProcessOptions) {
+    super();
     this.id = options.id ?? randomUUID();
     this.options = options;
     this.logs = [];
@@ -146,6 +152,7 @@ export class ManagedProcessEntity {
   private setState(state: ManagedProcessState) {
     this.updatedAt = new Date();
     this.state = state;
+    this.emit(ManagedProcessEvent.STATE_CHANGE, state);
   }
 
   private isRunning() {
