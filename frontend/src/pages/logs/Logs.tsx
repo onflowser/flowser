@@ -37,7 +37,8 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const sortedLogs = useMemo(
     () =>
       logs
-        // Exclude logs that indicate that our backend called the emulator
+        // Exclude logs that indicate which our backend called the emulator
+        // To reduce unnecessary clutter
         .filter((log) => {
           const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
           return !isBackendCallLog;
@@ -79,8 +80,6 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       .filter((log) => log.isNew)
       .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
     if (hasErrorLogs) {
-      // TODO(milestone-5): Uncomment below line
-      // setSize("small"); -- this is temporary
       toast.error("Flow emulator encountered errors", {
         duration: 4000,
       });

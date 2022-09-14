@@ -25,7 +25,6 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
   }
 
   async start() {
-    // TODO(milestone-3): only start if not yet running on known port (e.g. by user)
     const devWalletProcess = new ManagedProcessEntity({
       id: this.processId,
       command: {

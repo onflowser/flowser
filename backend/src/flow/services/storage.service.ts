@@ -13,7 +13,7 @@ import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.e
  */
 
 // TODO(milestone-3): Defining shared for all possible cadence shared would be quite difficult.
-// We could define just some of the most core shared like Resource, Path, Dictionary,.. to save time
+// We could define just some of the most common shared like Resource, Path, Dictionary,.. to save time
 // ... or we could define all shared and put them in a shared (npm) library?
 // Object that is stored under /private or /public domains.
 // https://github.com/onflow/cadence/blob/master/values.go
