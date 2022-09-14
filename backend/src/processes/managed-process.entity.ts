@@ -80,7 +80,18 @@ export class ManagedProcessEntity extends EventEmitter {
         reject(error);
       });
       if (!isKilledSuccessfully) {
-        this.childProcess.kill("SIGINT");
+        // If the SIGINT signal doesn't work, force kill with SIGINT
+        this.childProcess.kill("SIGKILL");
+
+        // If nothing works, (for now) just resolve after a timeout
+        // TODO(milestone-5): This only happens on windows, should be investigated
+        // See https://www.notion.so/flowser/Can-t-open-an-existing-project-on-windows-5b1d4217630b459197a22597756b8ccb
+        setTimeout(() => {
+          this.logger.debug(
+            `Couldn't kill process ${this.id} within 2s timeout (pid=${this.childProcess.pid})`
+          );
+          resolve(-1);
+        }, 2000);
       }
       this.childProcess.once("exit", (exitCode) => {
         resolve(exitCode);
