@@ -106,19 +106,22 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           )}
         </div>
         <div>
-          {processes.map((process) => (
-            <ManagedProcessItem key={process.id} process={process} />
-          ))}
-        </div>
-        <div className={classNames(classes.menuItem, classes.footer)}>
-          <IconButton
-            onClick={createProject}
-            icon={<PlusIcon></PlusIcon>}
-            iconPosition="before"
-            className={classes.button}
-          >
-            NEW PROJECT
-          </IconButton>
+          <div className={classes.menuDivider} />
+          <div className={classes.processItemsWrapper}>
+            {processes.map((process) => (
+              <ManagedProcessItem key={process.id} process={process} />
+            ))}
+          </div>
+          <div className={classNames(classes.menuItem, classes.footer)}>
+            <IconButton
+              onClick={createProject}
+              icon={<PlusIcon></PlusIcon>}
+              iconPosition="before"
+              className={classes.button}
+            >
+              NEW PROJECT
+            </IconButton>
+          </div>
         </div>
       </div>
     </Drawer>
@@ -168,7 +171,7 @@ function ManagedProcessItem({ process }: { process: ManagedProcess }) {
 
   return (
     <div className={classNames(classes.menuItem, classes.processItem)}>
-      <span>{processIdToName(process.id)}</span>
+      <span className={classes.label}>{processIdToName(process.id)}</span>
       <div className={classes.processItemActions}>
         <SimpleButton className={classes.restartButton} onClick={onRestart}>
           <RestartIcon />

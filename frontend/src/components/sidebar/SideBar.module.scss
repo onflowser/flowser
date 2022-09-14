@@ -74,14 +74,21 @@
       }
     }
 
+    .processItemsWrapper {
+      margin-bottom: $spacing-xl * 2;
+    }
+
     .processItem {
       justify-content: space-between;
+      .label {
+        font-size: $font-size-normal;
+      }
       .processItemActions {
         display: flex;
         align-items: center;
         .restartButton {
-          width: 20px;
-          height: 20px;
+          width: 15px;
+          height: 15px;
           margin-right: $spacing-base;
           &:hover {
             svg {
@@ -107,7 +114,7 @@
     }
 
     .processStatusError {
-      background: $color-red;
+      background: $color-red-light;
     }
 
     .processStatusRunning {
@@ -115,7 +122,7 @@
     }
 
     .processStatusNotRunning {
-      background: $yellow;
+      background: $grey;
     }
 
     .footer {
