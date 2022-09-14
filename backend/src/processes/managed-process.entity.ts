@@ -47,7 +47,7 @@ export class ManagedProcessEntity extends EventEmitter {
 
   async waitOnExit() {
     return new Promise<void>((resolve) => {
-      this.childProcess.on("exit", resolve);
+      this.childProcess.once("exit", resolve);
     });
   }
 
@@ -61,28 +61,26 @@ export class ManagedProcessEntity extends EventEmitter {
     return new Promise<void>((resolve, reject) => {
       this.childProcess = spawn(name, args, options);
       this.onPostSpawn();
-      this.childProcess.on("spawn", () => {
+      this.childProcess.once("spawn", () => {
         resolve();
       });
-      this.childProcess.on("error", (error) => {
+      this.childProcess.once("error", (error) => {
         reject(error);
       });
     });
   }
 
-  async stop(killSignal?: NodeJS.Signals) {
+  async stop() {
     if (!this.isRunning()) {
       return;
     }
     return new Promise<number>(async (resolve, reject) => {
-      const isKilledSuccessfully = this.childProcess.kill(
-        killSignal ?? "SIGINT"
-      );
+      const isKilledSuccessfully = this.childProcess.kill("SIGINT");
       this.childProcess.once("error", (error) => {
         reject(error);
       });
       if (!isKilledSuccessfully) {
-        await this.stop("SIGKILL");
+        this.childProcess.kill("SIGINT");
       }
       this.childProcess.once("exit", (exitCode) => {
         resolve(exitCode);
@@ -103,11 +101,11 @@ export class ManagedProcessEntity extends EventEmitter {
   }
 
   private onPostSpawn() {
-    this.childProcess.on("spawn", () => {
+    this.childProcess.once("spawn", () => {
       this.logger.debug(`Process ${this.id} started`);
       this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
     });
-    this.childProcess.on("exit", (code) => {
+    this.childProcess.once("exit", (code) => {
       this.logger.debug(`Process ${this.id} exited with code ${code}`);
       this.setState(
         code > 0
@@ -127,8 +125,6 @@ export class ManagedProcessEntity extends EventEmitter {
 
   private onPostShutdown() {
     // Make sure to remove all listeners to prevent memory leaks
-    this.childProcess.removeAllListeners("spawn");
-    this.childProcess.removeAllListeners("exit");
     this.childProcess.stdout.removeAllListeners("data");
     this.childProcess.stderr.removeAllListeners("data");
   }
