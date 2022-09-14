@@ -24,6 +24,7 @@ import { useGetAccountBalance } from "../../hooks/use-account-balance";
 import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
 import { ServiceRegistry } from "../../services/service-registry";
 import { useErrorHandler } from "../../hooks/use-error-handler";
+import { Spinner } from "../spinner/Spinner";
 
 export type Sidebar = {
   toggled: boolean;
@@ -164,7 +165,7 @@ function ManagedProcessItem({ process }: { process: ManagedProcess }) {
     } finally {
       // The restart in most cases happens so quickly that it isn't even visible in the UI
       // This could fool the user that nothing happened, so let's fake a larger delay.
-      const fakeRestartDelay = 200;
+      const fakeRestartDelay = 500;
       setTimeout(() => setRestarting(false), fakeRestartDelay);
     }
   }
@@ -196,11 +197,14 @@ function ManagedProcessStatus({
     state === ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
   const isRunning = state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING;
   const isError = state === ManagedProcessState.MANAGED_PROCESS_STATE_ERROR;
+  if (isRestarting) {
+    return <Spinner size={14} />;
+  }
   return (
     <div
       className={classNames(classes.processStatus, {
         [classes.processStatusError]: isError,
-        [classes.processStatusNotRunning]: isRestarting || isNotRunning,
+        [classes.processStatusNotRunning]: isNotRunning,
         [classes.processStatusRunning]: isRunning,
       })}
     />
