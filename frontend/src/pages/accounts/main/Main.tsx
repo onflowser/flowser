@@ -13,6 +13,7 @@ import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
+import { TextUtils } from "../../../utils/text-utils";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -30,7 +31,9 @@ const columns = [
   }),
   columnHelper.accessor("balance", {
     header: () => <Label variant="medium">BALANCE</Label>,
-    cell: (info) => <Value>{info.getValue()} FLOW</Value>,
+    cell: (info) => (
+      <Value>{TextUtils.readableNumber(info.getValue())} FLOW</Value>
+    ),
   }),
   columnHelper.accessor("keys", {
     header: () => <Label variant="medium">KEY COUNT</Label>,

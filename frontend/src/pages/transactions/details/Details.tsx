@@ -14,7 +14,6 @@ import TransactionStatusBadge from "../../../components/status/TransactionStatus
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
-import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
@@ -31,14 +30,13 @@ import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
-  DetailsCardProps,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
 
 type RouteParams = {
   transactionId: string;
 };
 
-// EVENTS SUBTABLE
 const columnHelperEvents = createColumnHelper<ComputedEventData>();
 const columnsEvents = [
   columnHelperEvents.display({
@@ -138,7 +136,6 @@ const Details: FunctionComponent = () => {
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};
-  const { formatDate } = useFormattedDate();
   const openLog = (status: boolean, id: string) => {
     setOpenedLog(!status ? id : "");
   };
@@ -161,9 +158,7 @@ const Details: FunctionComponent = () => {
       }),
       columnHelper.accessor("createdAt", {
         header: () => <Label variant="medium">TIMESTAMP</Label>,
-        cell: (info) => (
-          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
-        ),
+        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
       }),
       columnHelper.accessor("type", {
         header: () => <Label variant="medium">TYPE</Label>,
@@ -244,8 +239,8 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
-        label: "Time Stamp",
-        value: formatDate(transaction.createdAt),
+        label: "Timestamp",
+        value: TextUtils.shortDate(transaction.createdAt),
       },
       {
         label: "Time",

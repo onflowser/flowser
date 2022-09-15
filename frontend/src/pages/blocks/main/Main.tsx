@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import { useFilterData } from "../../../hooks/use-filter-data";
 import { useSearch } from "../../../hooks/use-search";
 import Label from "../../../components/label/Label";
@@ -24,8 +23,7 @@ import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
-
-const { formatDate } = useFormattedDate();
+import { TextUtils } from "../../../utils/text-utils";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -97,7 +95,7 @@ const Main: FunctionComponent = () => {
       }),
       columnHelper.accessor("timestamp", {
         header: () => <Label variant="medium">TIME</Label>,
-        cell: (info) => <Value>{formatDate(info.getValue())}</Value>,
+        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
       }),
       columnHelper.accessor("blockSeals", {
         header: () => <Label variant="medium">BLOCK SEALS</Label>,

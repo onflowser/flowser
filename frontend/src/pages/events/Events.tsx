@@ -6,7 +6,6 @@ import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../../components/ellipsis/Ellipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
-import { useFormattedDate } from "../../hooks/use-formatted-date";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
 import NoResults from "../../components/no-results/NoResults";
@@ -20,6 +19,7 @@ import { ComputedEventData, EventUtils } from "../../utils/event-utils";
 import CopyButton from "../../components/copy-button/CopyButton";
 import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
+import { TextUtils } from "../../utils/text-utils";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -57,7 +57,6 @@ const subTableColumns = [
 
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
-  const { formatDate } = useFormattedDate();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { data, firstFetch } = useGetPollingEvents();
   const { filteredData } = useFilterData(data, searchTerm);
@@ -102,9 +101,7 @@ const Events: FunctionComponent = () => {
       }),
       columnHelper.accessor("createdAt", {
         header: () => <Label variant="medium">TIMESTAMP</Label>,
-        cell: (info) => (
-          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
-        ),
+        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
       }),
       columnHelper.display({
         id: "caret",

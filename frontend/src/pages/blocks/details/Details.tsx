@@ -22,12 +22,12 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
-import { useFormattedDate } from "hooks/use-formatted-date";
 import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
 
 type RouteParams = {
   blockId: string;
@@ -98,8 +98,6 @@ const Details: FunctionComponent = () => {
   const { isLoading, data } = useGetBlock(blockId);
   const { block } = data ?? {};
   const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
-  const createdDate = block ? new Date(block.timestamp).toISOString() : "-";
-  const { formatDate } = useFormattedDate();
 
   useEffect(() => {
     showNavigationDrawer(true);
@@ -130,12 +128,12 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
-        label: "Time Stamp",
-        value: formatDate(createdDate),
+        label: "Timestamp",
+        value: TextUtils.shortDate(block.createdAt),
       },
       {
         label: "Time",
-        value: <ReactTimeAgo date={createdDate} />,
+        value: <ReactTimeAgo date={block.createdAt} />,
       },
     ],
   ];
