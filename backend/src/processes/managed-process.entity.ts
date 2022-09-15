@@ -60,7 +60,7 @@ export class ManagedProcessEntity extends EventEmitter {
 
     return new Promise<void>((resolve, reject) => {
       this.childProcess = spawn(name, args, options);
-      this.onPostSpawn();
+      this.attachEventListeners();
       this.childProcess.once("spawn", () => {
         resolve();
       });
@@ -83,15 +83,13 @@ export class ManagedProcessEntity extends EventEmitter {
         // If the SIGINT signal doesn't work, force kill with SIGINT
         this.childProcess.kill("SIGKILL");
 
-        // If nothing works, (for now) just resolve after a timeout
-        // TODO(milestone-5): This only happens on windows, should be investigated
-        // See https://www.notion.so/flowser/Can-t-open-an-existing-project-on-windows-5b1d4217630b459197a22597756b8ccb
+        const rejectionTimeout = 2;
         setTimeout(() => {
-          this.logger.debug(
-            `Couldn't kill process ${this.id} within 2s timeout (pid=${this.childProcess.pid})`
+          const timeoutError = new Error(
+            `Couldn't kill process ${this.id} within ${rejectionTimeout}s timeout`
           );
-          resolve(-1);
-        }, 2000);
+          reject(timeoutError);
+        }, rejectionTimeout * 1000);
       }
       this.childProcess.once("exit", (exitCode) => {
         resolve(exitCode);
@@ -111,19 +109,21 @@ export class ManagedProcessEntity extends EventEmitter {
     };
   }
 
-  private onPostSpawn() {
+  private attachEventListeners() {
     this.childProcess.once("spawn", () => {
       this.logger.debug(`Process ${this.id} started`);
       this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
     });
-    this.childProcess.once("exit", (code) => {
-      this.logger.debug(`Process ${this.id} exited with code ${code}`);
+    this.childProcess.once("exit", (code, signal) => {
+      this.logger.debug(
+        `Process ${this.id} exited (code=${code}, signal=${signal})`
+      );
       this.setState(
         code > 0
           ? ManagedProcessState.MANAGED_PROCESS_STATE_ERROR
           : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING
       );
-      this.onPostShutdown();
+      this.detachEventListeners();
     });
 
     this.childProcess.stdout.on("data", (data) =>
@@ -134,7 +134,7 @@ export class ManagedProcessEntity extends EventEmitter {
     );
   }
 
-  private onPostShutdown() {
+  private detachEventListeners() {
     // Make sure to remove all listeners to prevent memory leaks
     this.childProcess.stdout.removeAllListeners("data");
     this.childProcess.stderr.removeAllListeners("data");
@@ -162,7 +162,7 @@ export class ManagedProcessEntity extends EventEmitter {
     this.emit(ManagedProcessEvent.STATE_CHANGE, state);
   }
 
-  private isRunning() {
-    return this.childProcess?.exitCode === null;
+  public isRunning() {
+    return this.state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING;
   }
 }
