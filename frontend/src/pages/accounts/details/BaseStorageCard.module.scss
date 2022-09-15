@@ -12,6 +12,7 @@
   .header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background: rgb(127, 137, 174);
     background: linear-gradient(
       90deg,
@@ -26,22 +27,28 @@
       rgba(124, 150, 175, 1) 89%,
       rgba(136, 160, 169, 1) 100%
     );
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0 0;
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+      filter: brightness(1.4);
+    }
 
     .type {
-      margin: 5px;
-      margin-left: 20px;
+      margin: $spacing-s;
+      margin-left: $spacing-l;
       font-size: $font-size-xsmall;
       font-weight: 600;
       color: $background;
       text-transform: uppercase;
     }
 
-    .circleOpen {
-      display: inline-block;
-      margin: 5px;
-      margin-right: 14px;
-      margin-top: 7px;
+    .circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: $spacing-s;
+      margin-right: $spacing-l;
       border-radius: 50%;
       border-style: none;
       height: 20px;
@@ -49,49 +56,9 @@
       background-color: $background;
       transition: 0.3s;
 
-      .iconOpen {
-        font-size: 18px;
-        margin-left: 4.3px;
-        margin-top: -3px;
+      .icon {
+        font-size: $font-size-large;
         color: #8693b0;
-      }
-    }
-
-    .circleOpen:hover {
-      background-color: $purple;
-      cursor: pointer;
-
-      .iconOpen {
-        color: $background;
-      }
-    }
-
-    .circleClosed {
-      display: inline-block;
-      margin: 5px;
-      margin-right: 14px;
-      margin-top: 7px;
-      border-radius: 50%;
-      border-style: none;
-      height: 20px;
-      width: 20px;
-      background-color: $background;
-      transition: 0.3s;
-
-      .iconClosed {
-        font-size: 21px;
-        margin-left: 5.4px;
-        margin-top: -2.5px;
-        color: #8693b0;
-      }
-    }
-
-    .circleClosed:hover {
-      background-color: $yellow;
-      cursor: pointer;
-
-      .iconClosed {
-        color: $background;
       }
     }
   }

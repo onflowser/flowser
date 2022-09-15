@@ -60,7 +60,7 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
             Cancel
           </Button>
           <Button loading={loading} variant="middle" onClick={onConfirm}>
-            Send
+            Create
           </Button>
         </>
       }
