@@ -9,6 +9,9 @@
 	<br>
 </div>
 
+> **News:** We are currently developing Flowser desktop app, as part of the [Flow developer grant #27](https://github.com/onflow/developer-grants/issues/27). Follow us on [Twitter](https://twitter.com/onflowser) or join our [Discord server](https://discord.gg/2Nx3s8yD) for more updates.
+
+
 Flowser is a convenient development tool for [Flow blockchain](https://www.onflow.org/). It does all the heavy work of managing the Flow emulator, inspecting the current blockchain state and interacting with the network for you!
 
 You can find more information on our documentation website: [docs.flowser.dev](https://docs.flowser.dev).
