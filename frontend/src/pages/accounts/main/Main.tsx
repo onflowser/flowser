@@ -1,12 +1,11 @@
 import React, { FunctionComponent, useEffect } from "react";
-import classes from "./Main.module.scss";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import NoResults from "../../../components/no-results/NoResults";
+import { NoResults } from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingAccounts } from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
@@ -64,9 +63,7 @@ const Main: FunctionComponent = () => {
   return (
     <>
       {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
+      {firstFetch && filteredData.length === 0 && <NoResults />}
       {filteredData.length > 0 && (
         <Table<DecoratedPollingEntity<Account>>
           columns={columns}

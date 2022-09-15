@@ -3,7 +3,7 @@ import classes from "./Main.module.scss";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import NoResults from "../../../components/no-results/NoResults";
+import { NoResults } from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
@@ -95,9 +95,7 @@ const Main: FunctionComponent = () => {
         columns={columns}
       />
       {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
+      {firstFetch && filteredData.length === 0 && <NoResults />}
     </>
   );
 };

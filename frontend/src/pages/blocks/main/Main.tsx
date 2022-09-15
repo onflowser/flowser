@@ -7,7 +7,7 @@ import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
-import NoResults from "../../../components/no-results/NoResults";
+import { NoResults } from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";

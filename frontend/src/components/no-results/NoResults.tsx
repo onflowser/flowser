@@ -1,19 +1,20 @@
+import classNames from "classnames";
 import React, { FunctionComponent } from "react";
-import { ReactComponent as NoResultsIcon } from "../../assets/icons/no-results.svg";
 import classes from "./NoResults.module.scss";
 
 type NoResultsProps = {
   className?: string;
 };
 
-const NoResults: FunctionComponent<NoResultsProps> = ({ className }) => {
+export const NoResults: FunctionComponent<NoResultsProps> = ({ className }) => {
   return (
-    <div className={`${classes.root} ${className}`}>
-      <NoResultsIcon />
-      <h3>It looks like there is nothing here.</h3>
-      <p>No results found</p>
+    <div className={classNames(classes.root, className)}>
+      <div className={classes.innerWrapper}>
+        <span className={classes.title}>
+          It looks like there is nothing here.
+        </span>
+        <span className={classes.description}>No results found</span>
+      </div>
     </div>
   );
 };
-
-export default NoResults;

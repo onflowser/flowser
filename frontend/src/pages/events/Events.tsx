@@ -8,7 +8,7 @@ import Ellipsis from "../../components/ellipsis/Ellipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import NoResults from "../../components/no-results/NoResults";
+import { NoResults } from "../../components/no-results/NoResults";
 import FullScreenLoading from "../../components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
 import { useGetPollingEvents } from "../../hooks/use-api";
@@ -186,9 +186,7 @@ const Events: FunctionComponent = () => {
         )}
       />
       {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
+      {firstFetch && filteredData.length === 0 && <NoResults />}
     </>
   );
 };
