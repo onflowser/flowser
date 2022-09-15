@@ -48,11 +48,7 @@
       }
 
       .searchBox {
-        width: 362px;
-
-        @media (max-width: 1290px) {
-          width: min-content;
-        }
+        width: min-content;
       }
 
       .userButton {
@@ -65,7 +61,7 @@
       }
 
       .snapshotButton {
-        @media (max-width: 970px) {
+        @media (max-width: 1100px) {
           display: none;
         }
         background: #ffffff1d;
@@ -93,15 +89,8 @@
           .sidebarButton {
             display: none;
           }
-
-          @media (min-width: 1000px) {
-            .searchBox {
-              width: 362px !important;
-
-              @media (max-width: 1125px) {
-                width: 250px !important;
-              }
-            }
+          .searchBox {
+            width: 100% !important;
           }
         }
       }
