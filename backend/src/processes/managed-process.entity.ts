@@ -47,7 +47,7 @@ export class ManagedProcessEntity extends EventEmitter {
 
   async waitOnExit() {
     return new Promise<void>((resolve) => {
-      this.childProcess.on("exit", resolve);
+      this.childProcess.once("exit", resolve);
     });
   }
 
@@ -60,29 +60,36 @@ export class ManagedProcessEntity extends EventEmitter {
 
     return new Promise<void>((resolve, reject) => {
       this.childProcess = spawn(name, args, options);
-      this.onPostSpawn();
-      this.childProcess.on("spawn", () => {
+      this.attachEventListeners();
+      this.childProcess.once("spawn", () => {
         resolve();
       });
-      this.childProcess.on("error", (error) => {
+      this.childProcess.once("error", (error) => {
         reject(error);
       });
     });
   }
 
-  async stop(killSignal?: NodeJS.Signals) {
+  async stop() {
     if (!this.isRunning()) {
       return;
     }
     return new Promise<number>(async (resolve, reject) => {
-      const isKilledSuccessfully = this.childProcess.kill(
-        killSignal ?? "SIGINT"
-      );
+      const isKilledSuccessfully = this.childProcess.kill("SIGINT");
       this.childProcess.once("error", (error) => {
         reject(error);
       });
       if (!isKilledSuccessfully) {
-        await this.stop("SIGKILL");
+        // If the SIGINT signal doesn't work, force kill with SIGINT
+        this.childProcess.kill("SIGKILL");
+
+        const rejectionTimeout = 2;
+        setTimeout(() => {
+          const timeoutError = new Error(
+            `Couldn't kill process ${this.id} within ${rejectionTimeout}s timeout`
+          );
+          reject(timeoutError);
+        }, rejectionTimeout * 1000);
       }
       this.childProcess.once("exit", (exitCode) => {
         resolve(exitCode);
@@ -102,19 +109,21 @@ export class ManagedProcessEntity extends EventEmitter {
     };
   }
 
-  private onPostSpawn() {
-    this.childProcess.on("spawn", () => {
+  private attachEventListeners() {
+    this.childProcess.once("spawn", () => {
       this.logger.debug(`Process ${this.id} started`);
       this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
     });
-    this.childProcess.on("exit", (code) => {
-      this.logger.debug(`Process ${this.id} exited with code ${code}`);
+    this.childProcess.once("exit", (code, signal) => {
+      this.logger.debug(
+        `Process ${this.id} exited (code=${code}, signal=${signal})`
+      );
       this.setState(
         code > 0
           ? ManagedProcessState.MANAGED_PROCESS_STATE_ERROR
           : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING
       );
-      this.onPostShutdown();
+      this.detachEventListeners();
     });
 
     this.childProcess.stdout.on("data", (data) =>
@@ -125,10 +134,8 @@ export class ManagedProcessEntity extends EventEmitter {
     );
   }
 
-  private onPostShutdown() {
+  private detachEventListeners() {
     // Make sure to remove all listeners to prevent memory leaks
-    this.childProcess.removeAllListeners("spawn");
-    this.childProcess.removeAllListeners("exit");
     this.childProcess.stdout.removeAllListeners("data");
     this.childProcess.stderr.removeAllListeners("data");
   }
@@ -155,7 +162,7 @@ export class ManagedProcessEntity extends EventEmitter {
     this.emit(ManagedProcessEvent.STATE_CHANGE, state);
   }
 
-  private isRunning() {
-    return this.childProcess?.exitCode === null;
+  public isRunning() {
+    return this.state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING;
   }
 }

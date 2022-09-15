@@ -48,7 +48,14 @@
   },
   "linux": {
     "target": [
-      "AppImage"
+      {
+        "target": "AppImage",
+        "arch": "x64"
+      },
+      {
+        "target": "deb",
+        "arch": "x64"
+      }
     ],
     "category": "Development"
   },

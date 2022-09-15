@@ -58,6 +58,7 @@
     "yup": "^0.32.11"
   },
   "scripts": {
+    "postinstall": "electron-builder install-app-deps",
     "cleanup": "rm -rf node_modules",
     "start": "yarn run prebuild:web && yarn run start:react",
     "start:react": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",

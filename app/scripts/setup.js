@@ -99,6 +99,11 @@ function mergePackageJsonFiles(first, second) {
   return {
     name: "@flowser/app",
     version: "0.0.1",
+    homepage: "https://flowser.dev",
+    author: {
+      email: "bartolomej.kozorog@gmail.com",
+      name: "Flowser",
+    },
     scripts: {
       "build-electron":
         "electron-builder -c.extraMetadata.main=build/electron/main.js",
@@ -108,6 +113,6 @@ function mergePackageJsonFiles(first, second) {
       "build-all": "yarn run build-electron --linux --mac --win",
     },
     dependencies: mergedDependencies,
-    devPackages: mergedDevDependencies,
+    devDependencies: mergedDevDependencies,
   };
 }

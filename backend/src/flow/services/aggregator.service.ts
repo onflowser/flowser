@@ -138,6 +138,9 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     if (!this.projectContext) {
       return;
     }
+    if (!this.emulatorProcess?.isRunning()) {
+      return;
+    }
 
     // Service account is present only on emulator chain
     if (!(await this.isServiceAccountProcessed())) {
