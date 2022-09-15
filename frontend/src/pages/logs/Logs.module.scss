@@ -27,12 +27,11 @@
     }
 
     .leftContainer {
-      min-width: 84px;
+      display: flex;
 
       span {
         margin-left: 5px;
-        margin-top: 5px;
-        position: absolute;
+        color: $purple;
       }
     }
 
@@ -66,6 +65,10 @@
 
       .control {
         cursor: pointer;
+        path {
+          stroke: $purple;
+          fill: $purple;
+        }
       }
 
       .control + .control {
@@ -73,7 +76,8 @@
       }
 
       .searchBox {
-        width: 451px;
+        width: min-content;
+        height: 40px;
       }
     }
   }

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { ReactComponent as CaretIconSvg } from "../../assets/icons/caret.svg";
 import classes from "./CaretIcon.module.scss";
@@ -13,7 +14,7 @@ export const CaretIcon: FunctionComponent<CaretIconProps> = ({
   isOpen = false,
   onChange = () => false,
   inverted = false,
-  ...restProps
+  className,
 }) => {
   const [state, setState] = useState(isOpen);
 
@@ -28,9 +29,10 @@ export const CaretIcon: FunctionComponent<CaretIconProps> = ({
 
   return (
     <CaretIconSvg
-      className={`${classes.root} ${restProps.className} ${
-        state ? classes.isOpen : ""
-      } ${inverted ? classes.inverted : ""}`}
+      className={classNames(classes.root, className, {
+        [classes.isOpen]: state,
+        [classes.inverted]: inverted,
+      })}
       onClick={onToggle}
     />
   );
