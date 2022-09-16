@@ -6,7 +6,7 @@ import { INestApplication } from "@nestjs/common";
 
 fixPath();
 
-const minWidth = 800;
+const minWidth = 900;
 const minHeight = 600;
 
 let backend: INestApplication;
@@ -14,6 +14,9 @@ let backend: INestApplication;
 async function startBackend() {
   const userDataPath = app.getPath("userData");
   const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
+  if (backend) {
+    await backend.close();
+  }
   backend = await createApp({
     database: {
       type: "sqlite",
@@ -31,6 +34,7 @@ async function createWindow() {
     height: minHeight,
     minWidth,
     minHeight,
+    autoHideMenuBar: true,
   });
 
   // Open urls in the user's browser
@@ -51,8 +55,13 @@ async function createWindow() {
   async function handleStart() {
     try {
       await startBackend();
-    } catch (e) {
-      await handleBackendError(e, win, () => handleStart());
+    } catch (error) {
+      await handleBackendError({
+        error,
+        window: win,
+        onRestart: handleStart,
+        onQuit: app.quit,
+      });
     }
   }
 
@@ -88,23 +97,33 @@ function isErrorWithCode(error: unknown): error is ErrorWithCode {
   return typeof error === "object" && error !== null && "code" in error;
 }
 
-async function handleBackendError(
-  error: unknown,
-  window: BrowserWindow,
-  onRestart: () => void
-) {
+async function handleBackendError({
+  error,
+  window,
+  onRestart,
+  onQuit,
+}: {
+  error: unknown;
+  window: BrowserWindow;
+  onRestart: () => void;
+  onQuit: () => void;
+}) {
   console.error("Error when starting backend:", error);
   if (isErrorWithCode(error)) {
     const isAddressInUse = error.code === "EADDRINUSE";
     if (isAddressInUse) {
       const result = await dialog.showMessageBox(window, {
         message: `Failed to start Flowser server on port 6061. Please make sure no other processes are running on that port and click restart.`,
-        buttons: ["Restart"],
+        buttons: ["Restart", "Quit"],
         type: "error",
       });
-      const clickedRestart = result.response === 0;
-      if (clickedRestart) {
-        onRestart();
+      const restartClicked = 0;
+      const quitClicked = 1;
+      switch (result.response) {
+        case restartClicked:
+          return onRestart();
+        case quitClicked:
+          return onQuit();
       }
     } else {
       dialog.showMessageBox(window, {
