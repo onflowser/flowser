@@ -36,7 +36,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const { data: currentProjectData } = useGetCurrentProject();
   const { login, logout, user, isLoggedIn } = useFlow();
   const { switchProject, sendTransaction } = useProjectActions();
-  const { flow: flowBalance } = useGetAccountBalance(user?.addr);
+  const { flow: flowBalance } = useGetAccountBalance(user?.addr ?? "");
   const { data: processes } = useGetPollingProcesses();
   const { project: currentProject } = currentProjectData ?? {};
 
@@ -80,7 +80,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           {isLoggedIn && (
             <SidebarButton
               onClick={onClickUserProfile}
-              title={user?.addr}
+              title={user?.addr ?? "-"}
               footer={flowBalance}
               icon={<UserIcon />}
             />

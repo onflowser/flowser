@@ -27,14 +27,13 @@ export class CommonService {
         this.contractsService.removeAll(),
         this.accountKeysService.removeAll(),
         this.accountStorageService.removeAll(),
+        this.transactionsService.removeAll(),
+        this.eventsService.removeAll(),
       ]);
       await Promise.all([
         this.accountsService.removeAll(),
         this.blocksService.removeAll(),
-        this.transactionsService.removeAll(),
       ]);
-      // Must be deleted last, because of the relation to blocks & transactions
-      await this.eventsService.removeAll();
     } catch (e) {
       this.logger.error("Failed to remove other data", e);
       throw e;

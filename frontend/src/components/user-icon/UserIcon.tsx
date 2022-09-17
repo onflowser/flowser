@@ -4,8 +4,9 @@ import { useFlow } from "../../hooks/use-flow";
 
 export function UserIcon(): ReactElement | null {
   const { isLoggedIn, user } = useFlow();
+  const { addr } = user;
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !addr) {
     return null;
   }
 
@@ -13,7 +14,7 @@ export function UserIcon(): ReactElement | null {
     <img
       style={{ borderRadius: "50%", backgroundColor: "ghostwhite" }}
       alt=""
-      src={FlowUtils.getUserAvatarUrl(user?.addr)}
+      src={FlowUtils.getUserAvatarUrl(addr)}
     />
   );
 }
