@@ -136,7 +136,7 @@ const Details: FunctionComponent = () => {
       },
       {
         label: "Timestamp",
-        value: TextUtils.shortDate(block.createdAt),
+        value: TextUtils.longDate(block.createdAt),
       },
       {
         label: "Time",

@@ -230,7 +230,7 @@ const Details: FunctionComponent = () => {
       },
       {
         label: "Timestamp",
-        value: TextUtils.shortDate(transaction.createdAt),
+        value: TextUtils.longDate(transaction.createdAt),
       },
       {
         label: "Time",

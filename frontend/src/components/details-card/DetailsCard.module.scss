@@ -1,19 +1,36 @@
 @import "styles/spacings";
 @import "styles/animations";
 
-.bigCard {
+.root {
+  padding: $spacing-l $spacing-xl;
   margin-bottom: $spacing-xl;
 
-  .bigCardContent {
+  .content {
     display: flex;
 
     margin-bottom: $spacing-l * 1.5;
     margin-top: $spacing-l * 1.5;
 
-    .bigCardColumn {
+    @media (max-width: 800px) {
+      flex-direction: column;
+    }
+
+    .column {
       display: flex;
       flex-direction: column;
-      margin-right: $spacing-xl * 2;
+
+      &:not(:last-child) {
+        margin-right: $spacing-xl * 3;
+      }
+
+      @media (max-width: 1000px) {
+        margin-right: $spacing-xl !important;
+      }
+
+      @media (max-width: 800px) {
+        margin-right: 0 !important;
+        margin-bottom: $spacing-xl;
+      }
 
       & > div {
         display: flex;
@@ -21,29 +38,17 @@
         margin-bottom: $spacing-s * 0.5;
 
         .label {
-          margin-left: $spacing-xl * 2;
           min-width: 130px;
           display: inline-flex;
         }
 
         .value {
           font-weight: bold;
-          margin-right: $spacing-base;
 
           .elipsis {
             max-width: 13vw;
             display: inline-block;
             overflow: hidden;
-          }
-        }
-      }
-    }
-    @media screen and (max-width: 1000px) {
-      .bigCardColumn {
-        margin-right: 0px;
-        & > div {
-          .label {
-            margin-left: $spacing-base;
           }
         }
       }
