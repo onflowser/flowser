@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useState, useMemo } from "react";
 import classes from "./Events.module.scss";
+import tableClasses from "../../components/table/Table.module.scss";
 import Card from "../../components/card/Card";
 import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
@@ -19,8 +20,8 @@ import { ComputedEventData, EventUtils } from "../../utils/event-utils";
 import CopyButton from "../../components/copy-button/CopyButton";
 import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
-import { TextUtils } from "../../utils/text-utils";
 import ReactTimeago from "react-timeago";
+import classNames from "classnames";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -143,7 +144,7 @@ const Events: FunctionComponent = () => {
         columns={columns}
         renderCustomHeader={(headerGroup) => (
           <Card
-            className={classes.tableRow}
+            className={classNames(tableClasses.tableRow, classes.tableRow)}
             key={headerGroup.id}
             variant="header-row"
           >
@@ -163,9 +164,9 @@ const Events: FunctionComponent = () => {
         renderCustomRow={(row) => (
           <>
             <Card
-              className={classes.tableRow}
+              className={classNames(tableClasses.tableRow, classes.tableRow)}
               key={row.id}
-              showIntroAnimation={true}
+              showIntroAnimation={row.original.isNew}
               variant="table-line"
             >
               {row.getVisibleCells().map((cell) => (
