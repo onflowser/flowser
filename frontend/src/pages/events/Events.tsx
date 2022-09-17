@@ -20,6 +20,7 @@ import CopyButton from "../../components/copy-button/CopyButton";
 import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
 import { TextUtils } from "../../utils/text-utils";
+import ReactTimeago from "react-timeago";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -100,8 +101,12 @@ const Events: FunctionComponent = () => {
         ),
       }),
       columnHelper.accessor("createdAt", {
-        header: () => <Label variant="medium">TIMESTAMP</Label>,
-        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
+        header: () => <Label variant="medium">TIME</Label>,
+        cell: (info) => (
+          <Value>
+            <ReactTimeago date={info.getValue()} />
+          </Value>
+        ),
       }),
       columnHelper.display({
         id: "caret",

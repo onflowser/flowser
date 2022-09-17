@@ -16,10 +16,10 @@ export class TextUtils {
       return dateFormat(value, "hh:MM:ss");
     }
     if (isThisMonth(date)) {
-      return dateFormat(value, "dd hh:MM");
+      return dateFormat(value, "dS hh:MM");
     }
     if (isThisYear(date)) {
-      return dateFormat(value, "dd mmm");
+      return dateFormat(value, "dS mmm");
     }
     return dateFormat(value, "dS mmm yyyy");
   }

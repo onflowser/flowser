@@ -13,6 +13,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { TextUtils } from "../../../utils/text-utils";
+import ReactTimeago from "react-timeago";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -41,6 +42,14 @@ const columns = [
   columnHelper.accessor("transactions", {
     header: () => <Label variant="medium">TX COUNT</Label>,
     cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
+  }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">CREATED</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
+      </Value>
+    ),
   }),
 ];
 

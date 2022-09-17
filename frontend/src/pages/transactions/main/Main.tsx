@@ -16,6 +16,7 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Table from "../../../components/table/Table";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
+import ReactTimeago from "react-timeago";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
@@ -65,6 +66,14 @@ const columns = [
       <div>
         <GrcpStatus status={info.row.original.status} />
       </div>
+    ),
+  }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">TIME</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
+      </Value>
     ),
   }),
 ];

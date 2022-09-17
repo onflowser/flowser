@@ -23,7 +23,7 @@ import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
-import { TextUtils } from "../../../utils/text-utils";
+import ReactTimeago from "react-timeago";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -93,10 +93,6 @@ const Main: FunctionComponent = () => {
           </Value>
         ),
       }),
-      columnHelper.accessor("timestamp", {
-        header: () => <Label variant="medium">TIME</Label>,
-        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
-      }),
       columnHelper.accessor("blockSeals", {
         header: () => <Label variant="medium">BLOCK SEALS</Label>,
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
@@ -125,6 +121,14 @@ const Main: FunctionComponent = () => {
             </Value>
           );
         },
+      }),
+      columnHelper.accessor("timestamp", {
+        header: () => <Label variant="medium">TIME</Label>,
+        cell: (info) => (
+          <Value>
+            <ReactTimeago date={info.getValue()} />
+          </Value>
+        ),
       }),
     ],
     [filteredData, snapshotLookupByBlockId]
