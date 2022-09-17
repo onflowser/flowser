@@ -23,6 +23,8 @@ export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
   persist: boolean;
   @ApiProperty()
+  snapshot: boolean;
+  @ApiProperty()
   restServerPort: number;
   @ApiProperty()
   run: boolean;

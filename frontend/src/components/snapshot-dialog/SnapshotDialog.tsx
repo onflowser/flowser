@@ -36,7 +36,7 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
       handleError(e);
       if (!data?.project?.emulator?.run) {
         toast(
-          "Make sure you are using the '--persist' flag when running emulator",
+          "Make sure you are using the '--snapshot' flag when running emulator",
           { duration: 4000 }
         );
       }

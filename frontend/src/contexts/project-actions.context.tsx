@@ -90,9 +90,12 @@ export function ProjectActionsProvider({
   const createSnapshot = useCallback(() => {
     const { persist } = currentProject?.project?.emulator ?? {};
     if (!persist) {
-      toast("Snapshots can only be created in 'persist' emulator mode", {
-        duration: 5000,
-      });
+      toast(
+        "Snapshots can only be created when enabling the 'snapshot' option",
+        {
+          duration: 5000,
+        }
+      );
     } else {
       setShowSnapshotModal(true);
     }

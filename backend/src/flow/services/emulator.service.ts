@@ -78,6 +78,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       flag("rest-debug", emulator.enableRestDebug),
       flag("grpc-debug", emulator.enableGrpcDebug),
       flag("persist", emulator.persist),
+      flag("snapshot", emulator.snapshot),
       flag("dbpath", emulator.databasePath),
       flag("simple-addresses", emulator.useSimpleAddresses),
       flag("token-supply", formatTokenSupply(emulator.tokenSupply)),

@@ -14,6 +14,7 @@ import Table from "../../../components/table/Table";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Block } from "@flowser/shared";
 import {
+  useGetCurrentProject,
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../../../hooks/use-api";
@@ -34,6 +35,8 @@ const Main: FunctionComponent = () => {
   const { showNavigationDrawer } = useNavigation();
   const { showDialog } = useConfirmDialog();
 
+  const { data: projectResponse } = useGetCurrentProject();
+  const { project } = projectResponse ?? {};
   const { data: blocks, firstFetch, fetchAll } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
@@ -46,6 +49,13 @@ const Main: FunctionComponent = () => {
   );
 
   async function onRevertToBlock(blockId: string) {
+    const isSnapshotEnabled = project?.emulator?.snapshot;
+    if (!isSnapshotEnabled) {
+      toast.error(
+        "Can't revert, because 'snapshot' option is not enabled in settings"
+      );
+      return;
+    }
     const block = blocks.find((block) => block.id === blockId);
     showDialog({
       title: "Revert to snapshot",
