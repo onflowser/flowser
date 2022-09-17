@@ -28,6 +28,7 @@ import {
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatus } from "../../../components/status/GrcpStatus";
 
 type RouteParams = {
   blockId: string;
@@ -73,13 +74,19 @@ const txTableColumns = [
       </Value>
     ),
   }),
-  txTableColHelper.accessor("status", {
-    header: () => <Label variant="medium">STATUS</Label>,
+  txTableColHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">EXECUTION STATUS</Label>,
     cell: (info) => (
       <div>
-        <Value>
-          <ExecutionStatus status={info.getValue()} />
-        </Value>
+        <ExecutionStatus status={info.row.original.status} />
+      </div>
+    ),
+  }),
+  txTableColHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">GRCP STATUS</Label>,
+    cell: (info) => (
+      <div>
+        <GrcpStatus status={info.row.original.status} />
       </div>
     ),
   }),

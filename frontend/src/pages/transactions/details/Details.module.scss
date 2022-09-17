@@ -75,9 +75,11 @@
   max-width: 13vw;
   display: inline-block;
   overflow: hidden;
-  margin-right: $spacing-base;
 }
 
+.txStatusBadge {
+  margin-left: $spacing-base;
+}
 
 .tableRow {
   display: flex;

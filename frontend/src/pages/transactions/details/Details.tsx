@@ -10,7 +10,7 @@ import {
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import Card from "../../../components/card/Card";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import TransactionStatusBadge from "../../../components/status/TransactionStatusBadge";
+import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
@@ -32,6 +32,9 @@ import {
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
+import { FlowUtils } from "../../../utils/flow-utils";
+import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
 
 type RouteParams = {
   transactionId: string;
@@ -222,20 +225,7 @@ const Details: FunctionComponent = () => {
       {
         label: "Transaction",
         value: (
-          <>
-            <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
-            <TransactionStatusBadge status={transaction.status} />
-          </>
-        ),
-      },
-      {
-        label: "Block ID",
-        value: (
-          <NavLink to={`/blocks/details/${transaction.blockId}`}>
-            <Ellipsis className={classes.elipsis}>
-              {transaction.blockId}
-            </Ellipsis>
-          </NavLink>
+          <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
         ),
       },
       {
@@ -246,8 +236,36 @@ const Details: FunctionComponent = () => {
         label: "Time",
         value: <ReactTimeAgo date={transaction.createdAt} />,
       },
+      {
+        label: "Execution status",
+        value: (
+          <ExecutionStatusBadge
+            className={classes.txStatusBadge}
+            status={transaction.status}
+          />
+        ),
+      },
+      {
+        label: "GRCP Status",
+        value: (
+          <GrcpStatusBadge
+            className={classes.txStatusBadge}
+            status={transaction.status}
+          />
+        ),
+      },
     ],
     [
+      {
+        label: "Block ID",
+        value: (
+          <NavLink to={`/blocks/details/${transaction.blockId}`}>
+            <Ellipsis className={classes.elipsis}>
+              {transaction.blockId}
+            </Ellipsis>
+          </NavLink>
+        ),
+      },
       {
         label: "Proposer",
         value: (
@@ -290,6 +308,10 @@ const Details: FunctionComponent = () => {
         label: "Sequence nb.",
         value: <>{transaction.proposalKey?.sequenceNumber ?? "-"}</>,
       },
+      {
+        label: "Gas limit",
+        value: `${transaction?.gasLimit}`,
+      },
     ],
   ];
 
@@ -297,6 +319,16 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
+        {transaction?.status?.errorMessage && (
+          <DetailsTabItem
+            label="ERROR"
+            value={FlowUtils.getGrcpStatusName(transaction?.status?.grcpStatus)}
+          >
+            <TransactionErrorMessage
+              errorMessage={transaction?.status?.errorMessage}
+            />
+          </DetailsTabItem>
+        )}
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript
             script={transaction.script}
@@ -393,7 +425,6 @@ const Details: FunctionComponent = () => {
             )}
           />
         </DetailsTabItem>
-        <DetailsTabItem label="GAS LIMIT" value={transaction?.gasLimit} />
       </DetailsTabs>
     </div>
   );

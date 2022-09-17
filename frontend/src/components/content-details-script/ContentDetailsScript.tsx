@@ -19,7 +19,7 @@ const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
 }) => {
   return (
     <Card variant="black" className={classes.root}>
-      {args?.length && (
+      {args && args.length > 0 && (
         <>
           <div className={classes.params}>
             <Label className={classes.argsTitle}>ARGS:</Label>

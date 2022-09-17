@@ -15,6 +15,7 @@ import { NavLink } from "react-router-dom";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Table from "../../../components/table/Table";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
+import { GrcpStatus } from "../../../components/status/GrcpStatus";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
@@ -50,27 +51,19 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("proposalKey", {
-    header: () => <Label variant="medium">PROPOSER</Label>,
-    cell: (info) => (
-      <Value>
-        {info.getValue() ? (
-          <NavLink
-            to={`/accounts/details/${info.row.original.proposalKey?.address}`}
-          >
-            {info.row.original.proposalKey?.address}
-          </NavLink>
-        ) : (
-          "-"
-        )}
-      </Value>
-    ),
-  }),
-  columnHelper.accessor("status", {
-    header: () => <Label variant="medium">STATUS</Label>,
+  columnHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">EXECUTION STATUS</Label>,
     cell: (info) => (
       <div>
-        <ExecutionStatus status={info.getValue()} />
+        <ExecutionStatus status={info.row.original.status} />
+      </div>
+    ),
+  }),
+  columnHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">GRCP STATUS</Label>,
+    cell: (info) => (
+      <div>
+        <GrcpStatus status={info.row.original.status} />
       </div>
     ),
   }),
