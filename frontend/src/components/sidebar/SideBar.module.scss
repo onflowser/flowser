@@ -22,7 +22,7 @@
       height: 1px;
       opacity: 0.4;
       background: $light-grey;
-      margin-top: $spacing-l;
+      margin-top: $spacing-l * 1.5;
       margin-bottom: $spacing-l * 1.5;
     }
 
@@ -36,7 +36,7 @@
 
     .menuItem {
       display: flex;
-      padding: $spacing-base 0;
+      padding: $spacing-base * 0.6 0;
       align-items: center;
 
       .menuItemMainWrapper {

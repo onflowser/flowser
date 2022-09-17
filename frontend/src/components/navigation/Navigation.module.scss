@@ -60,15 +60,6 @@
         }
       }
 
-      .snapshotButton {
-        @media (max-width: 1100px) {
-          display: none;
-        }
-        background: #ffffff1d;
-        border: $blue 1px solid;
-        color: $blue;
-      }
-
       .sidebarButton {
         background: none;
         border: none;
