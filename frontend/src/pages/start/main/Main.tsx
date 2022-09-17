@@ -170,7 +170,7 @@ function ProjectsListContent() {
       </div>
       <ul className={classes.projectListBody}>
         {filteredProjects.map((project) => (
-          <li key={project.id} className={classes.projectWrapper}>
+          <li key={project.id} className={classes.projectItem}>
             <span
               className={classes.projectName}
               onClick={() => onQuickstart(project)}
