@@ -59,7 +59,7 @@ const Main: FunctionComponent = () => {
   const { data: accounts, firstFetch } = useGetPollingAccounts();
 
   useEffect(() => {
-    setPlaceholder("search for block numbers or tx hashes");
+    setPlaceholder("Search accounts");
     showNavigationDrawer(false);
   }, []);
 

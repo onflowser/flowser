@@ -41,7 +41,7 @@ const Main: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    setPlaceholder("Search for block ids, parent ids, time, ...");
+    setPlaceholder("Search blocks");
     showNavigationDrawer(false);
     disableSearchBar(false);
   }, []);

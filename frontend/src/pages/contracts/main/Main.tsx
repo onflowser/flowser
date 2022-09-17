@@ -47,7 +47,7 @@ const Main: FunctionComponent = () => {
   const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
-    setPlaceholder("search for contracts");
+    setPlaceholder("Search contracts");
     showNavigationDrawer(false);
   }, []);
 

@@ -85,7 +85,7 @@ const Main: FunctionComponent = () => {
   const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
-    setPlaceholder("search for block numbers or tx hashes");
+    setPlaceholder("Search transactions");
     showNavigationDrawer(false);
     disableSearchBar(!data.length);
   }, [data]);

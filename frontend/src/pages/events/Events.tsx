@@ -128,7 +128,7 @@ const Events: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    setPlaceholder("Search for block id, type, transaction ...");
+    setPlaceholder("Search events");
     disableSearchBar(!data.length);
   }, [data]);
 
