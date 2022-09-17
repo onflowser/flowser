@@ -87,7 +87,10 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           )}
           {isLoggedIn && (
             <SidebarButton
-              onClick={sendTransaction}
+              onClick={() => {
+                toggleSidebar();
+                sendTransaction();
+              }}
               title="Send transaction"
               icon={<SendTxIcon />}
             />

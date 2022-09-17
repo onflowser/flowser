@@ -138,7 +138,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     if (!this.projectContext) {
       return;
     }
-    if (!this.emulatorProcess?.isRunning()) {
+    if (
+      this.projectContext.emulator.run &&
+      !this.emulatorProcess?.isRunning()
+    ) {
       return;
     }
 
