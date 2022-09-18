@@ -88,7 +88,10 @@ function mergePackageJsonFiles(first, second) {
   const mergedDevDependencies = Object.assign(
     {},
     first.devDependencies,
-    second.devDependencies
+    second.devDependencies,
+    {
+      "electron-icon-maker": "^0.0.5",
+    }
   );
   const mergedDependencies = Object.assign(
     {},
