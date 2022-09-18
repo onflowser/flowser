@@ -43,6 +43,8 @@
       display: inline-block;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-size: $font-size-normal;
+      white-space: nowrap;
       max-width: 100%;
     }
   }

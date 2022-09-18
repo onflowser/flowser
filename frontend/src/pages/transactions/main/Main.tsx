@@ -3,7 +3,7 @@ import classes from "./Main.module.scss";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import NoResults from "../../../components/no-results/NoResults";
+import { NoResults } from "../../../components/no-results/NoResults";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
@@ -15,6 +15,8 @@ import { NavLink } from "react-router-dom";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import Table from "../../../components/table/Table";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
+import { GrcpStatus } from "../../../components/status/GrcpStatus";
+import ReactTimeago from "react-timeago";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
@@ -50,28 +52,28 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("proposalKey", {
-    header: () => <Label variant="medium">PROPOSER</Label>,
-    cell: (info) => (
-      <Value>
-        {info.getValue() ? (
-          <NavLink
-            to={`/accounts/details/${info.row.original.proposalKey?.address}`}
-          >
-            {info.row.original.proposalKey?.address}
-          </NavLink>
-        ) : (
-          "-"
-        )}
-      </Value>
-    ),
-  }),
-  columnHelper.accessor("status", {
-    header: () => <Label variant="medium">STATUS</Label>,
+  columnHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">EXECUTION STATUS</Label>,
     cell: (info) => (
       <div>
-        <ExecutionStatus status={info.getValue()} />
+        <ExecutionStatus status={info.row.original.status} />
       </div>
+    ),
+  }),
+  columnHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">GRCP STATUS</Label>,
+    cell: (info) => (
+      <div>
+        <GrcpStatus status={info.row.original.status} />
+      </div>
+    ),
+  }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">TIME</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
+      </Value>
     ),
   }),
 ];
@@ -83,7 +85,7 @@ const Main: FunctionComponent = () => {
   const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
-    setPlaceholder("search for block numbers or tx hashes");
+    setPlaceholder("Search transactions");
     showNavigationDrawer(false);
     disableSearchBar(!data.length);
   }, [data]);
@@ -95,9 +97,7 @@ const Main: FunctionComponent = () => {
         columns={columns}
       />
       {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
+      {firstFetch && filteredData.length === 0 && <NoResults />}
     </>
   );
 };

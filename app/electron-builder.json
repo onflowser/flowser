@@ -23,28 +23,50 @@
     },
     "type": "distribution",
     "hardenedRuntime": true,
-    "entitlements": "src/assets/entitlements.mac.plist",
-    "entitlementsInherit": "src/assets/entitlements.mac.plist",
-    "gatekeeperAssess": false
+    "icon": "build/react/static/app-icon/icons/mac/icon.icns",
+    "entitlements": "src/entitlements.mac.plist",
+    "category": "public.app-category.developer-tools"
   },
   "dmg": {
     "contents": [
       {
-        "x": 130,
-        "y": 220
+        "x": 219,
+        "y": 358,
+        "type": "dir",
+        "name": "Flowser.app"
       },
       {
-        "x": 410,
-        "y": 220,
+        "x": 439,
+        "y": 358,
         "type": "link",
+        "name": "Applications",
         "path": "/Applications"
+      }
+    ],
+    "artifactName": "Flowser-${version}-${os}.${ext}"
+  },
+  "win": {
+    "icon": "build/react/static/app-icon/icons/win/icon.ico",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      {
+        "target": "appx",
+        "arch": [
+          "x64"
+        ]
       }
     ]
   },
-  "win": {
-    "target": [
-      "nsis"
-    ]
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true,
+    "artifactName": "Flowser-${version}-${os}-${arch}-setup.${ext}"
   },
   "linux": {
     "target": [
@@ -57,7 +79,10 @@
         "arch": "x64"
       }
     ],
-    "category": "Development"
+    "category": "Development",
+    "icon": "build/react/static/app-icon/icons/png/",
+    "executableName": "Flowser",
+    "artifactName": "flowser-${version}-${os}-${arch}.${ext}"
   },
   "extraResources": [
     "./assets/**"

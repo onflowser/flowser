@@ -8,7 +8,7 @@
   align-self: center;
   max-width: 1690px;
   width: 100%;
-  
+
   .currency {
     color: $strong-green;
     margin-left: $spacing-s;
@@ -43,7 +43,11 @@
   color: $color-grey;
   font-family: $font-family-inter;
   margin-bottom: $spacing-base;
-  margin-top: $spacing-base;
+  flex-wrap: wrap;
+  & > * {
+    margin-top: $spacing-base;
+    margin-right: $spacing-base;
+  }
 }
 
 .keysRoot {
@@ -54,6 +58,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    align-items: center;
   }
 }
 

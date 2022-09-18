@@ -40,7 +40,7 @@ export class ConfigService {
         default: "sqlite",
         choices: ["mysql", "mariadb", "sqlite"],
       }),
-      DATABASE_NAME: str({ default: ":memory:" }),
+      DATABASE_NAME: str({ default: "database.sqlite" }),
       DATABASE_HOST: str({ default: "localhost" }),
       DATABASE_PORT: num({ default: 3306 }),
       DATABASE_USERNAME: str({ default: "" }),

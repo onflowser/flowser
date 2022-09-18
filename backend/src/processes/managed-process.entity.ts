@@ -8,10 +8,12 @@ import {
   ManagedProcess,
   ManagedProcessLog,
   ManagedProcessState,
+  managedProcessStateToJSON,
 } from "@flowser/shared";
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
 import { EventEmitter } from "node:events";
+import { removeAnsiEscapeCodes } from "../utils";
 
 export type ManagedProcessOptions = {
   id?: string;
@@ -41,6 +43,7 @@ export class ManagedProcessEntity extends EventEmitter {
     this.id = options.id ?? randomUUID();
     this.options = options;
     this.logs = [];
+    this.state = ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -142,12 +145,13 @@ export class ManagedProcessEntity extends EventEmitter {
 
   private handleData(source: LogSource, data: any) {
     const lines: string[] = data.toString().split("\n");
+    this.logger.debug(`Received ${lines.length} logs from ${this.id}:`, lines);
     const createdAt = new Date().toString();
     const logs = lines.map(
       (line, index): ManagedProcessLog => ({
         id: this.logs.length + index,
         source,
-        data: line,
+        data: removeAnsiEscapeCodes(line),
         createdAt,
         updatedAt: createdAt,
       })
@@ -157,6 +161,11 @@ export class ManagedProcessEntity extends EventEmitter {
   }
 
   private setState(state: ManagedProcessState) {
+    this.logger.debug(
+      `Process ${this.id} state changed from ${managedProcessStateToJSON(
+        this.state
+      )} to ${managedProcessStateToJSON(state)}`
+    );
     this.updatedAt = new Date();
     this.state = state;
     this.emit(ManagedProcessEvent.STATE_CHANGE, state);

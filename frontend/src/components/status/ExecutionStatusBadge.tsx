@@ -2,20 +2,25 @@ import React, { FunctionComponent } from "react";
 import { ExecutionStatusCode, TransactionStatus } from "@flowser/shared";
 import classes from "./TransactionStatusBadge.module.scss";
 import { FlowUtils } from "../../utils/flow-utils";
+import classNames from "classnames";
 
 type ExecutionStatusCodeProps = {
   status: TransactionStatus | undefined;
+  className?: string;
 };
 
-const TransactionStatusBadge: FunctionComponent<ExecutionStatusCodeProps> = ({
-  status,
-}) => {
+export const ExecutionStatusBadge: FunctionComponent<
+  ExecutionStatusCodeProps
+> = ({ status, className }) => {
   const statusName = FlowUtils.getExecutionStatusName(status?.executionStatus);
   const backgroundColor = getBackgroundColor(status?.executionStatus);
   const color = getTextColor(status?.executionStatus);
 
   return (
-    <div className={classes.root} style={{ backgroundColor, color }}>
+    <div
+      className={classNames(classes.root, className)}
+      style={{ backgroundColor, color }}
+    >
       {statusName}
     </div>
   );
@@ -58,5 +63,3 @@ function getTextColor(statusCode: ExecutionStatusCode | undefined) {
       return "#837E7E";
   }
 }
-
-export default TransactionStatusBadge;

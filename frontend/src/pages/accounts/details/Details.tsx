@@ -86,7 +86,7 @@ const columnsKeys = [
           </Ellipsis>
           <CopyButton value={info.row.original.publicKey} />
         </div>
-        <div className={`${classes.badges} ${classes.row}`}>
+        <div className={classNames(classes.badges, classes.row)}>
           <Badge>WEIGHT: {info.row.original.weight}</Badge>
           <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
           <Badge>INDEX: {info.row.original.index}</Badge>

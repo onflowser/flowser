@@ -7,9 +7,10 @@ import toast from "react-hot-toast";
 import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
-import { useGetCurrentProject } from "../hooks/use-api";
+import { useGetCurrentProject, useGetPollingBlocks } from "../hooks/use-api";
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
+import { useErrorHandler } from "../hooks/use-error-handler";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
@@ -17,6 +18,7 @@ export type ProjectActionsContextState = {
 
   sendTransaction: () => void;
   createSnapshot: () => void;
+  revertToBlock: (blockId: string) => void;
 
   isRemovingProject: boolean;
   removeProject: (project: Project) => void;
@@ -35,12 +37,14 @@ export function ProjectActionsProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { projectsService } = ServiceRegistry.getInstance();
+  const { projectsService, snapshotService } = ServiceRegistry.getInstance();
 
   const history = useHistory();
+  const { handleError } = useErrorHandler(ProjectActionsProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
   const { data: currentProject } = useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
+  const { data: blocks, fetchAll } = useGetPollingBlocks();
 
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
@@ -90,9 +94,12 @@ export function ProjectActionsProvider({
   const createSnapshot = useCallback(() => {
     const { persist } = currentProject?.project?.emulator ?? {};
     if (!persist) {
-      toast("Snapshots can only be created in 'persist' emulator mode", {
-        duration: 5000,
-      });
+      toast(
+        "Snapshots can only be created when enabling the 'snapshot' option",
+        {
+          duration: 5000,
+        }
+      );
     } else {
       setShowSnapshotModal(true);
     }
@@ -108,6 +115,39 @@ export function ProjectActionsProvider({
     }
   }, [isLoggedIn]);
 
+  const revertToBlock = useCallback(async (blockId: string) => {
+    const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
+    if (!isSnapshotEnabled) {
+      toast.error(
+        "Can't revert, because 'snapshot' option is not enabled in settings"
+      );
+      return;
+    }
+    const block = blocks.find((block) => block.id === blockId);
+    showDialog({
+      title: "Revert to snapshot",
+      body: (
+        <span style={{ textAlign: "center" }}>
+          Do you want to revert the emulator blockchain state to the block with
+          height <code>{block?.height}</code>?
+        </span>
+      ),
+      confirmBtnLabel: "REVERT",
+      cancelBtnLabel: "CANCEL",
+      onConfirm: async () => {
+        try {
+          const snapshot = await snapshotService.revertTo({
+            blockId,
+          });
+          fetchAll();
+          toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
+        } catch (e) {
+          handleError(e);
+        }
+      },
+    });
+  }, []);
+
   return (
     <ProjectActionsContext.Provider
       value={{
@@ -116,6 +156,7 @@ export function ProjectActionsProvider({
         createSnapshot,
         sendTransaction,
         isRemovingProject,
+        revertToBlock,
         removeProject,
       }}
     >

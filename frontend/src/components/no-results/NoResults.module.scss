@@ -5,17 +5,23 @@
 
 .root {
   @include fadeInAnimation(2s);
+  height: 50vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
 
-  h3 {
-    margin-top: $spacing-l * 2;
-    font-size: $font-size-large;
-  }
+  .innerWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .title {
+      font-size: $font-size-large;
+      color: $light-grey;
+    }
 
-  p {
-    margin-top: $spacing-l;
-    color: $color-not-active-button-text-grey;
+    .description {
+      margin-top: $spacing-l;
+      color: $color-not-active-button-text-grey;
+    }
   }
 }

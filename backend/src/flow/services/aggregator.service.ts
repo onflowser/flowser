@@ -80,6 +80,9 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
+    this.emulatorProcess = this.processManagerService.get(
+      FlowEmulatorService.processId
+    );
     this.processManagerService.on(
       ProcessManagerEvent.PROCESS_ADDED,
       this.onProcessAddedOrUpdated.bind(this)
@@ -138,7 +141,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     if (!this.projectContext) {
       return;
     }
-    if (!this.emulatorProcess?.isRunning()) {
+    if (
+      this.projectContext.emulator.run &&
+      !this.emulatorProcess?.isRunning()
+    ) {
       return;
     }
 

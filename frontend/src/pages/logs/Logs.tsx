@@ -21,6 +21,8 @@ import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
 import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
+import classNames from "classnames";
+import { SimpleButton } from "../../components/simple-button/SimpleButton";
 
 type LogsProps = {
   className?: string;
@@ -133,7 +135,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   return (
     <div
-      className={`${classes.root} ${className}`}
+      className={classNames(classes.root, className)}
       style={logDrawerSize === "custom" ? { top: mouseEvent?.clientY } : {}}
     >
       <VerticalDragLine
@@ -143,14 +145,23 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       />
 
       <div
-        className={`${classes.header} ${
-          logDrawerSize !== "tiny" ? classes.expanded : ""
-        }`}
+        className={classNames(classes.header, {
+          [classes.expanded]: logDrawerSize !== "tiny",
+        })}
       >
-        <span className={classes.leftContainer}>
+        <SimpleButton
+          className={classes.leftContainer}
+          onClick={() => {
+            if (logDrawerSize === "tiny") {
+              changeLogDrawerSize("small");
+            } else {
+              changeLogDrawerSize("tiny");
+            }
+          }}
+        >
           <LogsIcon />
           <span>LOGS</span>
-        </span>
+        </SimpleButton>
 
         {logDrawerSize === "tiny" && (
           <div className={classes.midContainer} ref={tinyLogRef}>

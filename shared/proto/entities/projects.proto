@@ -78,4 +78,5 @@ message Emulator {
   bool enable_grpc_debug = 25;
   bool enable_rest_debug = 26;
   bool use_simple_addresses = 27;
+  bool snapshot = 29;
 }

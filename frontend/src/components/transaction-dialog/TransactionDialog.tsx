@@ -4,15 +4,14 @@ import Button from "../button/Button";
 import classes from "./TransactionDialog.module.scss";
 import { FlowScriptArgument, useFlow } from "../../hooks/use-flow";
 import { toast } from "react-hot-toast";
-import { ReactComponent as TxIcon } from "../../assets/icons/bottle.svg";
 import ScriptArguments from "./ScriptArguments";
 import CadenceEditor from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../ellipsis/Ellipsis";
 import { CommonUtils } from "../../utils/common-utils";
 import splitbee from "@splitbee/web";
-import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 import { ActionDialog } from "../action-dialog/ActionDialog";
+import { TransactionErrorMessage } from "../status/ErrorMessage";
 
 export type TransactionDialogProps = {
   show?: boolean;
@@ -26,8 +25,6 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   const [args, setArgs] = useState<FlowScriptArgument[]>([]);
   const [loading, setLoading] = useState(false);
   const { sendTransaction } = useFlow();
-  const { highlightCadenceSyntax } = useSyntaxHighlighter();
-  const highlightedError = highlightCadenceSyntax(longError);
 
   function onClose() {
     setShow(false);
@@ -98,12 +95,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
     return (
       <Dialog className={classes.dialog} onClose={onClose}>
         <div className={classes.root} style={{ padding: 0 }}>
-          <pre
-            style={{ height: 500, overflow: "scroll" }}
-            dangerouslySetInnerHTML={{
-              __html: highlightedError.replaceAll("\\n", "<br/>"),
-            }}
-          />
+          <TransactionErrorMessage errorMessage={longError} />
           <div className={classes.actions}>
             <Button
               loading={loading}

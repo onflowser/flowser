@@ -17,25 +17,23 @@ export type DetailsCardProps = {
 
 export const DetailsCard: FC<DetailsCardProps> = ({ columns }) => {
   return (
-    <div className={classes.root}>
-      <Card className={classes.bigCard}>
-        <div className={classes.bigCardContent}>
-          {columns?.map((rows, index) => (
-            <div className={classes.bigCardColumn} key={index}>
-              {rows?.map((row, i) => (
-                <div key={i}>
-                  <Label variant="medium" className={classes.label}>
-                    {row.label}
-                  </Label>
-                  <Value variant="small" className={classes.value}>
-                    {row.value}
-                  </Value>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
+    <Card className={classes.root}>
+      <div className={classes.content}>
+        {columns?.map((rows, index) => (
+          <div className={classes.column} key={index}>
+            {rows?.map((row, i) => (
+              <div key={i}>
+                <Label variant="medium" className={classes.label}>
+                  {row.label}
+                </Label>
+                <Value variant="small" className={classes.value}>
+                  {row.value}
+                </Value>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 };

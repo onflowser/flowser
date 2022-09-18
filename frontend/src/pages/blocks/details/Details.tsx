@@ -22,12 +22,13 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
-import { useFormattedDate } from "hooks/use-formatted-date";
 import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatus } from "../../../components/status/GrcpStatus";
 
 type RouteParams = {
   blockId: string;
@@ -73,13 +74,19 @@ const txTableColumns = [
       </Value>
     ),
   }),
-  txTableColHelper.accessor("status", {
-    header: () => <Label variant="medium">STATUS</Label>,
+  txTableColHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">EXECUTION STATUS</Label>,
     cell: (info) => (
       <div>
-        <Value>
-          <ExecutionStatus status={info.getValue()} />
-        </Value>
+        <ExecutionStatus status={info.row.original.status} />
+      </div>
+    ),
+  }),
+  txTableColHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">GRCP STATUS</Label>,
+    cell: (info) => (
+      <div>
+        <GrcpStatus status={info.row.original.status} />
       </div>
     ),
   }),
@@ -98,8 +105,6 @@ const Details: FunctionComponent = () => {
   const { isLoading, data } = useGetBlock(blockId);
   const { block } = data ?? {};
   const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
-  const createdDate = block ? new Date(block.timestamp).toISOString() : "-";
-  const { formatDate } = useFormattedDate();
 
   useEffect(() => {
     showNavigationDrawer(true);
@@ -130,12 +135,12 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
-        label: "Time Stamp",
-        value: formatDate(createdDate),
+        label: "Timestamp",
+        value: TextUtils.longDate(block.createdAt),
       },
       {
         label: "Time",
-        value: <ReactTimeAgo date={createdDate} />,
+        value: <ReactTimeAgo date={block.createdAt} />,
       },
     ],
   ];

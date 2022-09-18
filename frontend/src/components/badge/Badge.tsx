@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Badge.module.scss";
 
@@ -9,7 +10,7 @@ const Badge: FunctionComponent<BadgeProps> = ({
   ...restProps
 }) => {
   return (
-    <span {...restProps} className={`${classes.root} ${className}`}>
+    <span {...restProps} className={classNames(classes.root, className)}>
       {children}
     </span>
   );

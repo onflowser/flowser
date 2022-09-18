@@ -35,7 +35,9 @@ export function setFclConfig(project: Project): void {
 export function useFlow() {
   const { data } = useGetCurrentProject();
   const { project } = data ?? {};
-  const [user, setUser] = useState<any>({ loggedIn: null });
+  const [user, setUser] = useState<{ loggedIn: null; addr?: string }>({
+    loggedIn: null,
+  });
   const [isLoggingIn, setLoggingIn] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
 

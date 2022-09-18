@@ -150,8 +150,9 @@
       flex-direction: column;
       align-items: stretch;
 
-      .projectWrapper {
-        padding: 32px 125px 28px 35px;
+      .projectItem {
+        padding: $spacing-l * 1.5 $spacing-l;
+        padding-right: $spacing-xl;
         display: flex;
         flex-direction: row;
         justify-content: space-between;

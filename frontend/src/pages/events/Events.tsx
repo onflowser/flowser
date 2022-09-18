@@ -1,15 +1,15 @@
 import React, { FunctionComponent, useEffect, useState, useMemo } from "react";
 import classes from "./Events.module.scss";
+import tableClasses from "../../components/table/Table.module.scss";
 import Card from "../../components/card/Card";
 import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import Ellipsis from "../../components/ellipsis/Ellipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
-import { useFormattedDate } from "../../hooks/use-formatted-date";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import NoResults from "../../components/no-results/NoResults";
+import { NoResults } from "../../components/no-results/NoResults";
 import FullScreenLoading from "../../components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
 import { useGetPollingEvents } from "../../hooks/use-api";
@@ -20,6 +20,8 @@ import { ComputedEventData, EventUtils } from "../../utils/event-utils";
 import CopyButton from "../../components/copy-button/CopyButton";
 import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
+import ReactTimeago from "react-timeago";
+import classNames from "classnames";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -57,7 +59,6 @@ const subTableColumns = [
 
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
-  const { formatDate } = useFormattedDate();
   const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
   const { data, firstFetch } = useGetPollingEvents();
   const { filteredData } = useFilterData(data, searchTerm);
@@ -101,9 +102,11 @@ const Events: FunctionComponent = () => {
         ),
       }),
       columnHelper.accessor("createdAt", {
-        header: () => <Label variant="medium">TIMESTAMP</Label>,
+        header: () => <Label variant="medium">TIME</Label>,
         cell: (info) => (
-          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
+          <Value>
+            <ReactTimeago date={info.getValue()} />
+          </Value>
         ),
       }),
       columnHelper.display({
@@ -125,7 +128,7 @@ const Events: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    setPlaceholder("Search for block id, type, transaction ...");
+    setPlaceholder("Search events");
     disableSearchBar(!data.length);
   }, [data]);
 
@@ -141,7 +144,7 @@ const Events: FunctionComponent = () => {
         columns={columns}
         renderCustomHeader={(headerGroup) => (
           <Card
-            className={classes.tableRow}
+            className={classNames(tableClasses.tableRow, classes.tableRow)}
             key={headerGroup.id}
             variant="header-row"
           >
@@ -161,9 +164,9 @@ const Events: FunctionComponent = () => {
         renderCustomRow={(row) => (
           <>
             <Card
-              className={classes.tableRow}
+              className={classNames(tableClasses.tableRow, classes.tableRow)}
               key={row.id}
-              showIntroAnimation={true}
+              showIntroAnimation={row.original.isNew}
               variant="table-line"
             >
               {row.getVisibleCells().map((cell) => (
@@ -189,9 +192,7 @@ const Events: FunctionComponent = () => {
         )}
       />
       {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
+      {firstFetch && filteredData.length === 0 && <NoResults />}
     </>
   );
 };

@@ -8,25 +8,7 @@
   display: flex;
 }
 
-.noResults {
-  margin-top: $spacing-l * 6;
-}
-
 .tableRow {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: $spacing-base;
-  align-items: center;
-
-  & > div {
-    width: 100%;
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    justify-content: flex-start;
-    margin: 0 $spacing-base 0 $spacing-base;
-  }
-
   .typeColumn {
     flex: 3;
   }

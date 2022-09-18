@@ -35,8 +35,9 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
   const { data: currentProjectData } = useGetCurrentProject();
   const { login, logout, user, isLoggedIn } = useFlow();
-  const { switchProject, sendTransaction } = useProjectActions();
-  const { flow: flowBalance } = useGetAccountBalance(user?.addr);
+  const { switchProject, sendTransaction, createSnapshot } =
+    useProjectActions();
+  const { flow: flowBalance } = useGetAccountBalance(user?.addr ?? "");
   const { data: processes } = useGetPollingProcesses();
   const { project: currentProject } = currentProjectData ?? {};
 
@@ -80,14 +81,17 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           {isLoggedIn && (
             <SidebarButton
               onClick={onClickUserProfile}
-              title={user?.addr}
+              title={user?.addr ?? "-"}
               footer={flowBalance}
               icon={<UserIcon />}
             />
           )}
           {isLoggedIn && (
             <SidebarButton
-              onClick={sendTransaction}
+              onClick={() => {
+                toggleSidebar();
+                sendTransaction();
+              }}
               title="Send transaction"
               icon={<SendTxIcon />}
             />
@@ -105,14 +109,23 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
               icon={<ConnectIcon />}
             />
           )}
-        </div>
-        <div>
+          <SidebarButton
+            onClick={() => {
+              toggleSidebar();
+              createSnapshot();
+            }}
+            title="Create snapshot"
+            icon={<ConnectIcon />}
+          />
           <div className={classes.menuDivider} />
+          <span className={classes.menuSectionTitle}>PROCESSES</span>
           <div className={classes.processItemsWrapper}>
             {processes.map((process) => (
               <ManagedProcessItem key={process.id} process={process} />
             ))}
           </div>
+        </div>
+        <div>
           <div className={classNames(classes.menuItem, classes.footer)}>
             <IconButton
               onClick={createProject}

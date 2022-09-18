@@ -10,11 +10,10 @@ import {
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import Card from "../../../components/card/Card";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import TransactionStatusBadge from "../../../components/status/TransactionStatusBadge";
+import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
-import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
@@ -31,14 +30,16 @@ import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
-  DetailsCardProps,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
+import { FlowUtils } from "../../../utils/flow-utils";
+import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
 
 type RouteParams = {
   transactionId: string;
 };
 
-// EVENTS SUBTABLE
 const columnHelperEvents = createColumnHelper<ComputedEventData>();
 const columnsEvents = [
   columnHelperEvents.display({
@@ -138,7 +139,6 @@ const Details: FunctionComponent = () => {
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};
-  const { formatDate } = useFormattedDate();
   const openLog = (status: boolean, id: string) => {
     setOpenedLog(!status ? id : "");
   };
@@ -161,9 +161,7 @@ const Details: FunctionComponent = () => {
       }),
       columnHelper.accessor("createdAt", {
         header: () => <Label variant="medium">TIMESTAMP</Label>,
-        cell: (info) => (
-          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
-        ),
+        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
       }),
       columnHelper.accessor("type", {
         header: () => <Label variant="medium">TYPE</Label>,
@@ -227,12 +225,37 @@ const Details: FunctionComponent = () => {
       {
         label: "Transaction",
         value: (
-          <>
-            <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
-            <TransactionStatusBadge status={transaction.status} />
-          </>
+          <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
         ),
       },
+      {
+        label: "Timestamp",
+        value: TextUtils.longDate(transaction.createdAt),
+      },
+      {
+        label: "Time",
+        value: <ReactTimeAgo date={transaction.createdAt} />,
+      },
+      {
+        label: "Execution status",
+        value: (
+          <ExecutionStatusBadge
+            className={classes.txStatusBadge}
+            status={transaction.status}
+          />
+        ),
+      },
+      {
+        label: "GRCP Status",
+        value: (
+          <GrcpStatusBadge
+            className={classes.txStatusBadge}
+            status={transaction.status}
+          />
+        ),
+      },
+    ],
+    [
       {
         label: "Block ID",
         value: (
@@ -243,16 +266,6 @@ const Details: FunctionComponent = () => {
           </NavLink>
         ),
       },
-      {
-        label: "Time Stamp",
-        value: formatDate(transaction.createdAt),
-      },
-      {
-        label: "Time",
-        value: <ReactTimeAgo date={transaction.createdAt} />,
-      },
-    ],
-    [
       {
         label: "Proposer",
         value: (
@@ -295,6 +308,10 @@ const Details: FunctionComponent = () => {
         label: "Sequence nb.",
         value: <>{transaction.proposalKey?.sequenceNumber ?? "-"}</>,
       },
+      {
+        label: "Gas limit",
+        value: `${transaction?.gasLimit}`,
+      },
     ],
   ];
 
@@ -302,6 +319,16 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
+        {transaction?.status?.errorMessage && (
+          <DetailsTabItem
+            label="ERROR"
+            value={FlowUtils.getGrcpStatusName(transaction?.status?.grcpStatus)}
+          >
+            <TransactionErrorMessage
+              errorMessage={transaction?.status?.errorMessage}
+            />
+          </DetailsTabItem>
+        )}
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript
             script={transaction.script}
@@ -398,7 +425,6 @@ const Details: FunctionComponent = () => {
             )}
           />
         </DetailsTabItem>
-        <DetailsTabItem label="GAS LIMIT" value={transaction?.gasLimit} />
       </DetailsTabs>
     </div>
   );

@@ -294,6 +294,12 @@ export const Configuration: FunctionComponent = () => {
                 formik={formik}
               />
               <EmulatorToggleField
+                label="Snapshot"
+                path="snapshot"
+                description="Enable snapshot support (this option automatically enables persistence)"
+                formik={formik}
+              />
+              <EmulatorToggleField
                 label="Simple Addresses"
                 path="simpleAddresses"
                 description="Use sequential addresses starting with 0x1"

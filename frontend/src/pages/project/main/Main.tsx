@@ -13,30 +13,16 @@ import {
 } from "../../../hooks/use-limited-array";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ProjectItemBadge } from "./ProjectItemBadge";
-import { EmulatorSnapshot } from "@flowser/shared";
-import { ServiceRegistry } from "../../../services/service-registry";
-import toast from "react-hot-toast";
-import { useErrorHandler } from "../../../hooks/use-error-handler";
+import { useProjectActions } from "../../../contexts/project-actions.context";
+import ReactTimeago from "react-timeago";
 
 export const Main: FunctionComponent = () => {
-  const { handleError } = useErrorHandler("Project");
-  const { snapshotService } = ServiceRegistry.getInstance();
+  const { revertToBlock } = useProjectActions();
   const { data: projectObjects } = useGetProjectObjects();
   const { data: snapshots } = useGetPollingEmulatorSnapshots();
   const { contracts } = projectObjects ?? { contracts: [] };
   const limitedContracts = useLimitedArray(contracts);
   const limitedSnapshots = useLimitedArray(snapshots);
-
-  async function onRevertToSnapshot(snapshot: EmulatorSnapshot) {
-    try {
-      await snapshotService.revertTo({
-        blockId: snapshot.blockId,
-      });
-      toast.success(`Reverted to block ${snapshot.blockId}`);
-    } catch (e) {
-      handleError(e);
-    }
-  }
 
   return (
     <div className={classes.root}>
@@ -53,10 +39,10 @@ export const Main: FunctionComponent = () => {
                 <li key={snapshot.id}>
                   <ProjectItem
                     title={snapshot.description}
-                    footer={snapshot.createdAt}
+                    footer={<ReactTimeago date={snapshot.createdAt} />}
                     rightSection={
                       <ProjectItemBadge
-                        onClick={() => onRevertToSnapshot(snapshot)}
+                        onClick={() => revertToBlock(snapshot.blockId)}
                       >
                         Revert
                       </ProjectItemBadge>
