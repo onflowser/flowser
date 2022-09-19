@@ -92,8 +92,8 @@ export function ProjectActionsProvider({
   }, []);
 
   const createSnapshot = useCallback(() => {
-    const { persist } = currentProject?.project?.emulator ?? {};
-    if (!persist) {
+    const { snapshot } = currentProject?.project?.emulator ?? {};
+    if (!snapshot) {
       toast(
         "Snapshots can only be created when enabling the 'snapshot' option",
         {
