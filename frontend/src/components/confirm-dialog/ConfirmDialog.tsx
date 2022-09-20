@@ -1,10 +1,10 @@
-import React, { FunctionComponent, MouseEventHandler } from "react";
+import React, { FunctionComponent, useState } from "react";
 import Button from "../button/Button";
 import { ActionDialog, ActionDialogProps } from "../action-dialog/ActionDialog";
 
-type ConfirmDialogProps = ActionDialogProps & {
-  onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
-  onConfirm: MouseEventHandler<HTMLButtonElement> | undefined;
+export type ConfirmDialogProps = ActionDialogProps & {
+  onClose: () => void | Promise<void>;
+  onConfirm: () => void | Promise<void>;
   confirmBtnLabel?: string;
   cancelBtnLabel?: string;
   className?: string;
@@ -20,6 +20,17 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
   children,
   className = "",
 }) => {
+  const [isLoading, setLoading] = useState(false);
+
+  async function handleConfirm() {
+    setLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <ActionDialog
       title={title}
@@ -30,7 +41,7 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
           <Button outlined={true} variant="middle" onClick={onClose}>
             {cancelBtnLabel}
           </Button>
-          <Button variant="middle" onClick={onConfirm}>
+          <Button loading={isLoading} variant="middle" onClick={handleConfirm}>
             {confirmBtnLabel}
           </Button>
         </>
