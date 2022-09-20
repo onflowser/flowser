@@ -28,6 +28,7 @@
     "category": "public.app-category.developer-tools"
   },
   "dmg": {
+    "background": "build/react/static/macos-background.tiff",
     "contents": [
       {
         "x": 219,
