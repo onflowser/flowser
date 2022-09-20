@@ -28,6 +28,7 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
       await onConfirm();
     } finally {
       setLoading(false);
+      onClose();
     }
   }
 

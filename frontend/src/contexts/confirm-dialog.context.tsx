@@ -38,7 +38,7 @@ export function ConfirmDialogProvider({
   >();
   const isShowingDialog = dialogProps !== undefined;
   const defaultOnConfirm = () => {
-    return;
+    hideDialog();
   };
 
   function showDialog(props: OpenConfirmDialogProps) {

@@ -70,6 +70,14 @@ const Main: FunctionComponent = () => {
         header: () => <Label variant="medium">SIGNATURES</Label>,
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
+      columnHelper.accessor("timestamp", {
+        header: () => <Label variant="medium">TIME</Label>,
+        cell: (info) => (
+          <Value>
+            <ReactTimeago date={info.getValue()} />
+          </Value>
+        ),
+      }),
       columnHelper.display({
         id: "snapshot",
         header: () => <Label variant="medium">SNAPSHOT</Label>,
@@ -90,14 +98,6 @@ const Main: FunctionComponent = () => {
             </Value>
           );
         },
-      }),
-      columnHelper.accessor("timestamp", {
-        header: () => <Label variant="medium">TIME</Label>,
-        cell: (info) => (
-          <Value>
-            <ReactTimeago date={info.getValue()} />
-          </Value>
-        ),
       }),
     ],
     [filteredData, snapshotLookupByBlockId]
