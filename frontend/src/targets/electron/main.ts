@@ -35,7 +35,10 @@ async function createWindow() {
 
   async function handleStart() {
     try {
-      await worker.start();
+      const userDataPath = app.getPath("userData");
+      await worker.start({
+        userDataPath,
+      });
     } catch (error) {
       await handleBackendError({
         error,
