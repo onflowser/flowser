@@ -1,6 +1,5 @@
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import path from "path";
-import { app } from "electron";
 import { createApp } from "@flowser/backend";
 import { INestApplication } from "@nestjs/common";
 
@@ -22,11 +21,14 @@ async function startBackend({ userDataPath }: { userDataPath: string }) {
   });
 }
 
-export let start: () => Promise<unknown>;
+export type StartWorkerOptions = {
+  userDataPath: string;
+};
+
+export let start: (options: StartWorkerOptions) => Promise<unknown>;
 
 if (isMainThread) {
-  start = async function () {
-    const userDataPath = app.getPath("userData");
+  start = async function ({ userDataPath }: StartWorkerOptions) {
     return new Promise((resolve, reject) => {
       const worker = new Worker(__filename, {
         workerData: {
