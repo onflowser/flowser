@@ -13,7 +13,6 @@
   flex-direction: column;
   align-items: center;
   .logo {
-    width: 100px;
     @include pulse(1s);
   }
   .text {
