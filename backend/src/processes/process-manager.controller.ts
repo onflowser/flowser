@@ -20,9 +20,24 @@ import { PollingResponseInterceptor } from "../core/interceptors/polling-respons
 export class ProcessManagerController {
   constructor(private processManagerService: ProcessManagerService) {}
 
+  @Post(":id/start")
+  async startProcess(@Param("id") processId) {
+    return this.processManagerService.start(processId);
+  }
+
+  @Post(":id/stop")
+  async stopProcess(@Param("id") processId) {
+    return this.processManagerService.stop(processId);
+  }
+
   @Post(":id/restart")
   async restartProcess(@Param("id") processId) {
     return this.processManagerService.restart(processId);
+  }
+
+  @Get("debug")
+  async debugInfo() {
+    return this.processManagerService.getAll();
   }
 
   @Post("/polling")

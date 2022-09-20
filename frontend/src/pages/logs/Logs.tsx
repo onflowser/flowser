@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
@@ -33,9 +34,18 @@ const SEARCH_CONTEXT_NAME = "logs";
 const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
-  const tinyLogRef = createRef<HTMLDivElement>();
-  const nonTinyLogRef = createRef<HTMLDivElement>();
+  const tinyLogRef = useRef<HTMLDivElement>(null);
+  const nonTinyLogRef = useRef<HTMLDivElement>(null);
   const { data: logs } = useGetPollingLogs();
+  const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
+  const logWrapperElement = logWrapperRef.current;
+  const scrollBottom =
+    (logWrapperElement?.scrollTop ?? 0) +
+    (logWrapperElement?.clientHeight ?? 0);
+  const scrollHeight = logWrapperElement?.scrollHeight ?? 0;
+  const scrollDistanceToBottom = Math.abs(scrollBottom - scrollHeight);
+  const shouldScrollToBottom = scrollDistanceToBottom < 10;
+
   const sortedLogs = useMemo(
     () =>
       logs
@@ -58,13 +68,15 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const mouseEvent = useMouseMove(trackMousePosition);
 
   const scrollToBottom = (smooth = true) => {
-    const ref = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
-    if (ref.current) {
+    if (!shouldScrollToBottom) {
+      return;
+    }
+    if (logWrapperRef.current) {
       const options: ScrollToOptions = {
-        top: ref.current.scrollHeight,
+        top: logWrapperRef.current.scrollHeight,
         behavior: smooth ? "smooth" : "auto",
       };
-      ref.current.scrollTo(options);
+      logWrapperRef.current.scrollTo(options);
     }
   };
 
@@ -74,10 +86,9 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [logDrawerSize]);
+  }, [logDrawerSize, shouldScrollToBottom]);
 
   useEffect(() => {
-    // TODO(ui): scroll to bottom only when drawer is not "in use"
     const hasErrorLogs = logs
       .filter((log) => log.isNew)
       .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
