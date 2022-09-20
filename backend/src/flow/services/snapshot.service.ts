@@ -11,6 +11,11 @@ import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios from "axios";
 import { randomUUID } from "crypto";
 import { CommonService } from "../../core/services/common.service";
+import {
+  CreateEmulatorSnapshotRequest,
+  GetPollingEmulatorSnapshotsRequest,
+  RevertToEmulatorSnapshotRequest,
+} from "@flowser/shared";
 
 type SnapshotResponse = {
   blockId: string;
@@ -28,7 +33,7 @@ export class FlowSnapshotService {
     private readonly commonService: CommonService
   ) {}
 
-  async create(description: string) {
+  async create(request: CreateEmulatorSnapshotRequest) {
     // TODO(milestone-3): use value from emulator config object
     const snapshotId = randomUUID();
     const response = await this.createOrRevertSnapshotRequest(snapshotId);
@@ -57,14 +62,16 @@ export class FlowSnapshotService {
     const snapshot = new SnapshotEntity();
     snapshot.id = snapshotId;
     snapshot.blockId = snapshotData.blockId;
-    snapshot.description = description;
+    snapshot.projectId = request.projectId;
+    snapshot.description = request.description;
 
     return this.snapshotRepository.save(snapshot);
   }
 
-  async revertTo(blockId: string) {
+  async revertTo(request: RevertToEmulatorSnapshotRequest) {
     const existingSnapshot = await this.snapshotRepository.findOneBy({
-      blockId,
+      projectId: request.projectId,
+      blockId: request.blockId,
     });
 
     if (!existingSnapshot) {
@@ -88,15 +95,14 @@ export class FlowSnapshotService {
     return existingSnapshot;
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<SnapshotEntity[]> {
+  findAllByProjectNewerThanTimestamp(
+    request: GetPollingEmulatorSnapshotsRequest
+  ): Promise<SnapshotEntity[]> {
     return this.snapshotRepository.find({
-      where: { createdAt: MoreThan(timestamp) },
-      order: { createdAt: "DESC" },
-    });
-  }
-
-  async findAll() {
-    return this.snapshotRepository.find({
+      where: {
+        createdAt: MoreThan(new Date(request.timestamp)),
+        projectId: request.projectId,
+      },
       order: { createdAt: "DESC" },
     });
   }

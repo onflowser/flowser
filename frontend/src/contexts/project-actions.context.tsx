@@ -7,7 +7,11 @@ import toast from "react-hot-toast";
 import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
-import { useGetCurrentProject, useGetPollingBlocks } from "../hooks/use-api";
+import {
+  useCurrentProjectId,
+  useGetCurrentProject,
+  useGetPollingBlocks,
+} from "../hooks/use-api";
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
 import { useErrorHandler } from "../hooks/use-error-handler";
@@ -42,6 +46,7 @@ export function ProjectActionsProvider({
   const history = useHistory();
   const { handleError } = useErrorHandler(ProjectActionsProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
+  const projectId = useCurrentProjectId();
   const { data: currentProject } = useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
   const { data: blocks, fetchAll } = useGetPollingBlocks();
@@ -75,7 +80,7 @@ export function ProjectActionsProvider({
     });
   }
 
-  const switchProject = useCallback(async () => {
+  async function switchProject() {
     setIsSwitching(true);
     try {
       await projectsService.unUseCurrentProject();
@@ -89,9 +94,9 @@ export function ProjectActionsProvider({
     } finally {
       setIsSwitching(false);
     }
-  }, []);
+  }
 
-  const createSnapshot = useCallback(() => {
+  function createSnapshot() {
     const { snapshot } = currentProject?.project?.emulator ?? {};
     if (!snapshot) {
       toast(
@@ -103,9 +108,9 @@ export function ProjectActionsProvider({
     } else {
       setShowSnapshotModal(true);
     }
-  }, [currentProject]);
+  }
 
-  const sendTransaction = useCallback(() => {
+  function sendTransaction() {
     if (!isLoggedIn) {
       toast("You need to login with wallet to send transactions", {
         duration: 5000,
@@ -113,43 +118,44 @@ export function ProjectActionsProvider({
     } else {
       setShowTxDialog(true);
     }
-  }, [isLoggedIn]);
+  }
 
-  const revertToBlock = useCallback(
-    async (blockId: string) => {
-      const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
-      if (!isSnapshotEnabled) {
-        toast.error(
-          "Can't revert, because 'snapshot' option is not enabled in settings"
-        );
-        return;
-      }
-      const block = blocks.find((block) => block.id === blockId);
-      showDialog({
-        title: "Revert to snapshot",
-        body: (
-          <span style={{ textAlign: "center" }}>
-            Do you want to revert the emulator blockchain state to the block
-            with height <code>{block?.height}</code>?
-          </span>
-        ),
-        confirmBtnLabel: "REVERT",
-        cancelBtnLabel: "CANCEL",
-        onConfirm: async () => {
-          try {
-            const snapshot = await snapshotService.revertTo({
-              blockId,
-            });
-            fetchAll();
-            toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
-          } catch (e) {
-            handleError(e);
-          }
-        },
-      });
-    },
-    [currentProject]
-  );
+  async function revertToBlock(blockId: string) {
+    if (!projectId) {
+      return;
+    }
+    const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
+    if (!isSnapshotEnabled) {
+      toast.error(
+        "Can't revert, because 'snapshot' option is not enabled in settings"
+      );
+      return;
+    }
+    const block = blocks.find((block) => block.id === blockId);
+    showDialog({
+      title: "Revert to snapshot",
+      body: (
+        <span style={{ textAlign: "center" }}>
+          Do you want to revert the emulator blockchain state to the block with
+          height <code>{block?.height}</code>?
+        </span>
+      ),
+      confirmBtnLabel: "REVERT",
+      cancelBtnLabel: "CANCEL",
+      onConfirm: async () => {
+        try {
+          const snapshot = await snapshotService.revertTo({
+            blockId,
+            projectId,
+          });
+          fetchAll();
+          toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
+        } catch (e) {
+          handleError(e);
+        }
+      },
+    });
+  }
 
   return (
     <ProjectActionsContext.Provider

@@ -18,75 +18,80 @@ export type DecoratedPollingEntity<T> = T & {
 };
 
 type UseTimeoutPollingProps<
-  T extends PollingEntity,
-  R extends PollingResponse<T[]>
+  Entity extends PollingEntity,
+  Response extends PollingResponse<Entity[]>,
+  Request = unknown
 > = {
   resourceKey: string;
-  resourceIdKey: keyof T;
-  fetcher: ({ timestamp }: { timestamp: number }) => Promise<R>;
+  resourceIdKey: keyof Entity;
+  params?: Omit<Request, "timestamp">;
+  fetcher: (
+    params: { timestamp: number } & Omit<Request, "timestamp">
+  ) => Promise<Response>;
   interval?: number;
   newestFirst?: boolean;
 };
 
 export const useTimeoutPolling = <
-  T extends PollingEntity,
-  R extends PollingResponse<T[]>
+  Entity extends PollingEntity,
+  Response extends PollingResponse<Entity[]>,
+  Request = unknown
 >(
-  props: UseTimeoutPollingProps<T, R>
-): TimeoutPollingHook<T> => {
+  props: UseTimeoutPollingProps<Entity, Response, Request>
+): TimeoutPollingHook<Entity> => {
   const [lastPollingTime, setLastPollingTime] = useState(0);
   const [stop, setStop] = useState(false);
-  const [data, setData] = useState<DecoratedPollingEntity<T>[]>([]);
+  const [data, setData] = useState<DecoratedPollingEntity<Entity>[]>([]);
   const [firstFetch, setFirstFetch] = useState(false);
 
   const fetchCallback = useCallback(() => {
-    return props.fetcher({ timestamp: lastPollingTime });
-  }, [lastPollingTime]);
+    return props.fetcher(
+      Object.assign({ timestamp: lastPollingTime }, props.params)
+    );
+  }, [lastPollingTime, props.params]);
 
   useEffect(() => fetchAll(), [props.resourceKey]);
 
-  const { isFetching, error, refetch } = useQuery<PollingResponse<T[]>, Error>(
-    props.resourceKey,
-    fetchCallback,
-    {
-      onSuccess: (response) => {
-        if (response.data.length) {
-          const latestTimestamp = response.meta?.latestTimestamp ?? 0;
+  const { isFetching, error, refetch } = useQuery<
+    PollingResponse<Entity[]>,
+    Error
+  >(props.resourceKey, fetchCallback, {
+    onSuccess: (response) => {
+      if (response.data.length) {
+        const latestTimestamp = response.meta?.latestTimestamp ?? 0;
 
-          const hasCompleteData = latestTimestamp === lastPollingTime;
-          if (hasCompleteData) {
-            return;
-          }
+        const hasCompleteData = latestTimestamp === lastPollingTime;
+        if (hasCompleteData) {
+          return;
+        }
 
-          if (latestTimestamp > 0) {
-            setLastPollingTime(latestTimestamp);
-          }
+        if (latestTimestamp > 0) {
+          setLastPollingTime(latestTimestamp);
+        }
 
-          const newItems = mergeAndDecorateItems(
-            data,
-            response.data,
-            props.resourceIdKey
+        const newItems = mergeAndDecorateItems(
+          data,
+          response.data,
+          props.resourceIdKey
+        );
+
+        if (props.newestFirst ?? true) {
+          const sortedNewItems = newItems.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
 
-          if (props.newestFirst ?? true) {
-            const sortedNewItems = newItems.sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-            );
-
-            setData(sortedNewItems);
-          } else {
-            setData(newItems);
-          }
+          setData(sortedNewItems);
+        } else {
+          setData(newItems);
         }
-      },
-      enabled: !stop,
-      refetchInterval: props.interval || 1000,
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: false,
-    }
-  );
+      }
+    },
+    enabled: !stop,
+    refetchInterval: props.interval || 1000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     if (!isFetching && !firstFetch) {

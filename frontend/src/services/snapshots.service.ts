@@ -1,5 +1,4 @@
 import {
-  GetAllEmulatorSnapshotsResponse,
   GetPollingEmulatorSnapshotsResponse,
   CreateEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotRequest,
@@ -36,17 +35,9 @@ export class SnapshotService {
     });
   }
 
-  getAll(): Promise<GetAllEmulatorSnapshotsResponse> {
-    return this.transport.send({
-      requestMethod: "GET",
-      resourceIdentifier: "/api/flow/snapshots",
-      responseProtobuf: GetAllEmulatorSnapshotsResponse,
-    });
-  }
-
-  getAllWithPolling(data: {
-    timestamp: number;
-  }): Promise<GetPollingEmulatorSnapshotsResponse> {
+  getAllWithPolling(
+    data: GetPollingEmulatorSnapshotsRequest
+  ): Promise<GetPollingEmulatorSnapshotsResponse> {
     return this.transport.send({
       requestMethod: "POST",
       resourceIdentifier: "/api/flow/snapshots/polling",
