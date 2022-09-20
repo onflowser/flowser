@@ -7,6 +7,7 @@ import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle
 import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
+import { ReactComponent as CreateSnapshotIcon } from "../../assets/icons/create-snapshot.svg";
 import { ReactComponent as RestartIcon } from "../../assets/icons/restart.svg";
 import IconButton from "components/icon-button/IconButton";
 import { SimpleButton } from "../simple-button/SimpleButton";
@@ -78,6 +79,16 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           />
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>EMULATOR</span>
+          <SidebarButton
+            onClick={() => {
+              toggleSidebar();
+              createSnapshot();
+            }}
+            title="Create snapshot"
+            icon={<CreateSnapshotIcon />}
+          />
+          <div className={classes.menuDivider} />
+          <span className={classes.menuSectionTitle}>WALLET</span>
           {isLoggedIn && (
             <SidebarButton
               onClick={onClickUserProfile}
@@ -109,14 +120,6 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
               icon={<ConnectIcon />}
             />
           )}
-          <SidebarButton
-            onClick={() => {
-              toggleSidebar();
-              createSnapshot();
-            }}
-            title="Create snapshot"
-            icon={<ConnectIcon />}
-          />
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>PROCESSES</span>
           <div className={classes.processItemsWrapper}>

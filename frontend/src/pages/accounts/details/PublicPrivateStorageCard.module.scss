@@ -9,7 +9,7 @@
   border-radius: 10px;
   height: 196px;
   overflow: hidden;
-  background-color: #4c536c;
+  backdrop-filter: opacity(0.1);
 
   .content {
     margin-left: 19px;
