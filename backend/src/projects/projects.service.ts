@@ -119,8 +119,7 @@ export class ProjectsService {
 
   async cleanupProject() {
     try {
-      // remove all existing data of previously used project
-      // TODO(milestone-x): persist data for projects by default?
+      // Remove all cached data of previously used project
       await this.commonService.removeBlockchainData();
     } catch (e) {
       throw new InternalServerErrorException("Database cleanup failed");
