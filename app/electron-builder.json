@@ -43,7 +43,7 @@
         "path": "/Applications"
       }
     ],
-    "artifactName": "Flowser-${version}-${os}.${ext}"
+    "artifactName": "Flowser-${version}-${os}-${arch}.${ext}"
   },
   "win": {
     "icon": "build/react/static/app-icon/icons/win/icon.ico",
