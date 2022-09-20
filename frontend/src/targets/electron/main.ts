@@ -1,32 +1,13 @@
 import * as path from "path";
 import { app, BrowserWindow, shell, dialog } from "electron";
-import { createApp, ProcessManagerService } from "@flowser/backend";
+import { ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
-import { INestApplication } from "@nestjs/common";
+import * as worker from "./worker";
 
 fixPath();
 
 const minWidth = 900;
 const minHeight = 600;
-
-let backend: INestApplication;
-
-async function startBackend() {
-  const userDataPath = app.getPath("userData");
-  const databaseFilePath = path.join(userDataPath, "flowser.sqlite");
-  if (backend) {
-    await backend.close();
-  }
-  backend = await createApp({
-    database: {
-      type: "sqlite",
-      name: databaseFilePath,
-    },
-    common: {
-      httpServerPort: 6061,
-    },
-  });
-}
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -54,7 +35,7 @@ async function createWindow() {
 
   async function handleStart() {
     try {
-      await startBackend();
+      await worker.start();
     } catch (error) {
       await handleBackendError({
         error,
@@ -87,8 +68,10 @@ app.on("activate", function () {
 
 app.on("will-quit", async function () {
   // Make sure to stop all child processes, so that they don't become orphans
-  const processManagerService = backend.get(ProcessManagerService);
-  await processManagerService.stopAll();
+  if (worker.backend) {
+    const processManagerService = worker.backend.get(ProcessManagerService);
+    await processManagerService.stopAll();
+  }
 });
 
 type ErrorWithCode = { code: string };
