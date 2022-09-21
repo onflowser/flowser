@@ -24,14 +24,12 @@ async function createWindow() {
     return { action: "deny" };
   });
 
-  const isDev = !app.isPackaged;
-  win.loadURL(
-    // This path is currently set to "react", because that's the folder used in @flowser/app package
-    // Refer to the app/README for more info on the current build process.
-    isDev
-      ? "http://localhost:6060"
-      : `file://${path.join(__dirname, "../react/index.html")}`
-  );
+  win.webContents.on("did-fail-load", () => {
+    console.log("did-fail-load");
+    win.loadURL(getClientAppUrl());
+  });
+
+  win.loadURL(getClientAppUrl());
 
   async function handleStart() {
     try {
@@ -147,4 +145,13 @@ async function handleBackendError({
       type: "error",
     });
   }
+}
+
+function getClientAppUrl() {
+  const isDev = !app.isPackaged;
+  // This path is currently set to "react", because that's the folder used in @flowser/app package
+  // Refer to the app/README for more info on the current build process.
+  return isDev
+    ? "http://localhost:6060"
+    : `file://${path.join(__dirname, "../react/index.html")}`;
 }
