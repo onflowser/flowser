@@ -134,12 +134,6 @@ const Main: FunctionComponent = () => {
       )}
       {filteredData.length > 0 && (
         <Table<DecoratedPollingEntity<Block>>
-          columns={columns}
-          data={filteredData}
-        ></Table>
-      )}
-      {filteredData.length > 0 && (
-        <Table<DecoratedPollingEntity<Block>>
           data={filteredData}
           columns={columns}
           renderCustomHeader={(headerGroup) => (
