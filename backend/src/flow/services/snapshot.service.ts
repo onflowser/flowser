@@ -51,6 +51,7 @@ export class FlowSnapshotService {
 
     const existingSnapshot = await this.snapshotRepository.findOneBy({
       blockId: snapshotData.blockId,
+      projectId: request.projectId,
     });
 
     if (existingSnapshot) {
@@ -82,6 +83,11 @@ export class FlowSnapshotService {
       existingSnapshot.id
     );
 
+    // TODO(milestone-x): Handle snapshot data deleted by user
+    // What happens if the user removes snapshot data (in ./flowdb)
+    // and tries to revert to the stored snapshot?
+    // We could check whether the returned snapshot blockId
+    // matches the blockId in our stored snapshot entity
     if (response.status !== 200) {
       this.logger.error(
         `Got ${response.status} response from emulator`,
