@@ -69,11 +69,31 @@ app.on("activate", function () {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-app.on("will-quit", async function () {
+app.on("before-quit", async function (e) {
+  if (!worker.backend) {
+    console.error("worker.backend is not defined");
+    return;
+  }
   // Make sure to stop all child processes, so that they don't become orphans
-  if (worker.backend) {
-    const processManagerService = worker.backend.get(ProcessManagerService);
+  const processManagerService = worker.backend.get(ProcessManagerService);
+  const isCleanupComplete = processManagerService.isStoppedAll();
+  if (isCleanupComplete) {
+    return;
+  }
+  console.log("Doing cleanup before exit");
+  // Prevent app termination before cleanup is done
+  e.preventDefault();
+  try {
     await processManagerService.stopAll();
+  } catch (e) {
+    dialog.showMessageBox({
+      message: `Unexpected error, couldn't stop Flowser child processes. Make sure to kill them manually.`,
+      type: "error",
+    });
+  } finally {
+    worker.backend.close();
+    console.log("Cleanup complete");
+    app.quit();
   }
 });
 
