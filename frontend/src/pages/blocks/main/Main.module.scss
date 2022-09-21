@@ -4,8 +4,8 @@
 .card {
   display: flex;
   justify-content: space-between;
-  padding: $spacing-base $spacing-l;
-  margin-bottom: $spacing-base;
+  
+ 
 
   & > div {
     display: flex;
@@ -24,5 +24,4 @@
   max-width: 13vw;
   min-width: 10vw;
   display: inline-block;
-  overflow: hidden;
 }

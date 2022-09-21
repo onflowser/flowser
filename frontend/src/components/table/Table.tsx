@@ -63,7 +63,11 @@ function Table<TData>({
           renderCustomHeader(headerGroup)
         ) : (
           <Card
-            className={classNames(classes.tableRow, headerRowClass)}
+            className={classNames(
+              classes.tableRow,
+              classes.headerRow,
+              headerRowClass
+            )}
             key={headerGroup.id}
             variant="header-row"
           >

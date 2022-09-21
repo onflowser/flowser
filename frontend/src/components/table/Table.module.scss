@@ -5,9 +5,9 @@
 .tableRow {
   display: flex;
   justify-content: space-between;
-  margin-bottom: $spacing-base;
-  padding-bottom: $spacing-base;
-  padding-top: $spacing-base;
+  margin-bottom: $spacing-s;
+  padding-bottom: $spacing-base * 0.8;
+  padding-top: $spacing-base * 0.8;
 
   & > div {
     display: flex;
@@ -17,6 +17,13 @@
     align-items: center;
   }
 }
+
+.headerRow {
+  margin-bottom: $spacing-base;
+  padding-bottom: $spacing-base;
+  padding-top: $spacing-base;
+}
+
 .noResults {
   margin-top: $spacing-l * 6;
 }

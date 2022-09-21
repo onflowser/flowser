@@ -144,7 +144,11 @@ const Events: FunctionComponent = () => {
         columns={columns}
         renderCustomHeader={(headerGroup) => (
           <Card
-            className={classNames(tableClasses.tableRow, classes.tableRow)}
+            className={classNames(
+              tableClasses.tableRow,
+              classes.tableRow,
+              tableClasses.headerRow
+            )}
             key={headerGroup.id}
             variant="header-row"
           >

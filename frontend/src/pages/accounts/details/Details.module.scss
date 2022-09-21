@@ -34,7 +34,7 @@
 
 .hash {
   display: inline-block;
-  overflow: hidden;
+ 
   max-width: 90vw;
   margin: $spacing-base;
 }
@@ -53,6 +53,7 @@
 .keysRoot {
   display: flex;
   flex-direction: column;
+  font-size: $font-size-small;
 
   .row {
     display: flex;
