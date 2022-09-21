@@ -94,7 +94,7 @@ const txTableColumns = [
 
 const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
-  const { disableSearchBar, updateSearchBar } = useSearch();
+  const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const breadcrumbs: Breadcrumb[] = [
@@ -109,7 +109,6 @@ const Details: FunctionComponent = () => {
   useEffect(() => {
     showNavigationDrawer(true);
     setBreadcrumbs(breadcrumbs);
-    disableSearchBar(true);
   }, []);
 
   if (isLoading || !block) {

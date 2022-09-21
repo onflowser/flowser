@@ -7,8 +7,6 @@ import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
-import { NoResults } from "../../../components/no-results/NoResults";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
@@ -25,7 +23,7 @@ import { useProjectActions } from "../../../contexts/project-actions.context";
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
+  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { revertToBlock } = useProjectActions();
 
@@ -43,7 +41,6 @@ const Main: FunctionComponent = () => {
   useEffect(() => {
     setPlaceholder("Search blocks");
     showNavigationDrawer(false);
-    disableSearchBar(false);
   }, []);
 
   const columns = useMemo(
@@ -104,18 +101,11 @@ const Main: FunctionComponent = () => {
   );
 
   return (
-    <>
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
-      {filteredData.length > 0 && (
-        <Table<DecoratedPollingEntity<Block>>
-          columns={columns}
-          data={filteredData}
-        ></Table>
-      )}
-    </>
+    <Table<DecoratedPollingEntity<Block>>
+      isInitialLoading={firstFetch}
+      columns={columns}
+      data={filteredData}
+    />
   );
 };
 

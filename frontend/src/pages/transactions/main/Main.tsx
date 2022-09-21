@@ -3,8 +3,6 @@ import classes from "./Main.module.scss";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import { NoResults } from "../../../components/no-results/NoResults";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
@@ -52,7 +50,7 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("status.grcpStatus", {
+  columnHelper.accessor("status.executionStatus", {
     header: () => <Label variant="medium">EXECUTION STATUS</Label>,
     cell: (info) => (
       <div>
@@ -79,7 +77,7 @@ const columns = [
 ];
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
+  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { data, firstFetch } = useGetPollingTransactions();
   const { filteredData } = useFilterData(data, searchTerm);
@@ -87,18 +85,14 @@ const Main: FunctionComponent = () => {
   useEffect(() => {
     setPlaceholder("Search transactions");
     showNavigationDrawer(false);
-    disableSearchBar(!data.length);
-  }, [data]);
+  }, []);
 
   return (
-    <>
-      <Table<DecoratedPollingEntity<Transaction>>
-        data={filteredData}
-        columns={columns}
-      />
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && <NoResults />}
-    </>
+    <Table<DecoratedPollingEntity<Transaction>>
+      isInitialLoading={firstFetch}
+      data={filteredData}
+      columns={columns}
+    />
   );
 };
 

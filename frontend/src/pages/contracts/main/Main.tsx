@@ -5,8 +5,6 @@ import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import { NoResults } from "../../../components/no-results/NoResults";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingContracts } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
@@ -52,16 +50,11 @@ const Main: FunctionComponent = () => {
   }, []);
 
   return (
-    <>
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && <NoResults />}
-      {filteredData.length > 0 && (
-        <Table<DecoratedPollingEntity<AccountContract>>
-          columns={columns}
-          data={data}
-        />
-      )}
-    </>
+    <Table<DecoratedPollingEntity<AccountContract>>
+      isInitialLoading={firstFetch}
+      columns={columns}
+      data={filteredData}
+    />
   );
 };
 

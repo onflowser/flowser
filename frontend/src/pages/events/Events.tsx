@@ -9,8 +9,6 @@ import Ellipsis from "../../components/ellipsis/Ellipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import { NoResults } from "../../components/no-results/NoResults";
-import FullScreenLoading from "../../components/fullscreen-loading/FullScreenLoading";
 import splitbee from "@splitbee/web";
 import { useGetPollingEvents } from "../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
@@ -59,7 +57,7 @@ const subTableColumns = [
 
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
+  const { searchTerm, setPlaceholder } = useSearch();
   const { data, firstFetch } = useGetPollingEvents();
   const { filteredData } = useFilterData(data, searchTerm);
   const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
@@ -129,8 +127,7 @@ const Events: FunctionComponent = () => {
 
   useEffect(() => {
     setPlaceholder("Search events");
-    disableSearchBar(!data.length);
-  }, [data]);
+  }, []);
 
   const openLog = (status: boolean, id: string) => {
     setOpenedLog(!status ? id : "");
@@ -138,62 +135,55 @@ const Events: FunctionComponent = () => {
   };
 
   return (
-    <>
-      <Table<DecoratedPollingEntity<Event>>
-        data={filteredData}
-        columns={columns}
-        renderCustomHeader={(headerGroup) => (
+    <Table<DecoratedPollingEntity<Event>>
+      isInitialLoading={firstFetch}
+      data={filteredData}
+      columns={columns}
+      renderCustomHeader={(headerGroup) => (
+        <Card
+          className={classNames(tableClasses.tableRow, classes.tableRow)}
+          key={headerGroup.id}
+          variant="header-row"
+        >
+          {headerGroup.headers.map((header) => (
+            <div
+              key={header.id}
+              className={header.column.columnDef.meta?.className}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </div>
+          ))}
+        </Card>
+      )}
+      renderCustomRow={(row) => (
+        <React.Fragment key={row.original.id}>
           <Card
             className={classNames(tableClasses.tableRow, classes.tableRow)}
-            key={headerGroup.id}
-            variant="header-row"
+            showIntroAnimation={row.original.isNew}
+            variant="table-line"
           >
-            {headerGroup.headers.map((header) => (
+            {row.getVisibleCells().map((cell) => (
               <div
-                key={header.id}
-                className={header.column.columnDef.meta?.className}
+                key={cell.id}
+                className={cell.column.columnDef.meta?.className}
               >
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext()
-                )}
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </div>
             ))}
           </Card>
-        )}
-        renderCustomRow={(row) => (
-          <>
-            <Card
-              className={classNames(tableClasses.tableRow, classes.tableRow)}
-              key={row.id}
-              showIntroAnimation={row.original.isNew}
-              variant="table-line"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <div
-                  key={cell.id}
-                  className={cell.column.columnDef.meta?.className}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </div>
-              ))}
-            </Card>
-            {openedLog === row.id && row.original && (
-              <div>
-                <Table<ComputedEventData>
-                  data={EventUtils.computeEventData(row.original.data)}
-                  columns={subTableColumns}
-                  bodyRowClass={classes.subTableRow}
-                  headerRowClass={classes.subTableRow}
-                />
-              </div>
-            )}
-          </>
-        )}
-      />
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && <NoResults />}
-    </>
+          {openedLog === row.id && row.original && (
+            <div>
+              <Table<ComputedEventData>
+                data={EventUtils.computeEventData(row.original.data)}
+                columns={subTableColumns}
+                bodyRowClass={classes.subTableRow}
+                headerRowClass={classes.subTableRow}
+              />
+            </div>
+          )}
+        </React.Fragment>
+      )}
+    />
   );
 };
 

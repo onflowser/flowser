@@ -2,14 +2,14 @@ import { useQuery } from "react-query";
 import { useCallback, useEffect, useState } from "react";
 import { PollingResponse, PollingEntity } from "@flowser/shared";
 
-export interface TimeoutPollingHook<T extends PollingEntity> {
+export interface TimeoutPollingHook<Response extends PollingEntity> {
   stopPolling: () => void;
   startPolling: () => void;
   fetchAll: () => void;
   isFetching: boolean;
   firstFetch: boolean;
   error: Error | null;
-  data: DecoratedPollingEntity<T>[];
+  data: DecoratedPollingEntity<Response>[];
 }
 
 export type DecoratedPollingEntity<T> = T & {
@@ -32,6 +32,9 @@ type UseTimeoutPollingProps<
   newestFirst?: boolean;
 };
 
+/**
+ * @deprecated This should be removed soon.
+ */
 export const useTimeoutPolling = <
   Entity extends PollingEntity,
   Response extends PollingResponse<Entity[]>,
@@ -88,7 +91,7 @@ export const useTimeoutPolling = <
       }
     },
     enabled: !stop,
-    refetchInterval: props.interval || 1000,
+    refetchInterval: props.interval ?? 2000,
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: false,
   });
@@ -125,15 +128,47 @@ export const useTimeoutPolling = <
   };
 };
 
+export function useTimeoutPollingV2<
+  Entity extends PollingEntity,
+  Response extends PollingResponse<Entity[]>,
+  Request = unknown
+>(
+  props: UseTimeoutPollingProps<Entity, Response, Request>
+): TimeoutPollingHook<Entity> {
+  const {
+    data: response,
+    isFetching,
+    error,
+  } = useQuery<PollingResponse<Entity[]>, Error>(
+    props.resourceKey,
+    () => props.fetcher(Object.assign({ timestamp: 0 }, props.params)),
+    {
+      refetchInterval: props.interval ?? 2000,
+    }
+  );
+
+  return {
+    data: remapDataIsNew(response?.data, false),
+    firstFetch: !response && isFetching,
+    startPolling: () => null,
+    stopPolling: () => null,
+    fetchAll: () => null,
+    isFetching,
+    error,
+  };
+}
+
 function remapDataIsNew<T extends PollingEntity>(
-  data: T[],
+  data: T[] | undefined,
   isNew: boolean
 ): DecoratedPollingEntity<T>[] {
-  return data.map((item) => ({
-    ...item,
-    isNew,
-    isUpdated: false,
-  }));
+  return (
+    data?.map((item) => ({
+      ...item,
+      isNew,
+      isUpdated: false,
+    })) ?? []
+  );
 }
 
 function mergeAndDecorateItems<T extends PollingEntity>(

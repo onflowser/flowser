@@ -1,4 +1,4 @@
-import { TimeoutPollingHook, useTimeoutPolling } from "./use-timeout-polling";
+import { TimeoutPollingHook, useTimeoutPollingV2 } from "./use-timeout-polling";
 import {
   Account,
   AccountContract,
@@ -49,7 +49,7 @@ const {
 } = ServiceRegistry.getInstance();
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
-  return useTimeoutPolling<Account, GetPollingAccountsResponse>({
+  return useTimeoutPollingV2<Account, GetPollingAccountsResponse>({
     resourceKey: "/accounts/polling",
     resourceIdKey: "address",
     fetcher: (data) => accountsService.getAllWithPolling(data),
@@ -65,7 +65,7 @@ export function useGetAccount(address: string) {
 export function useGetPollingTransactionsByAccount(
   accountAddress: string
 ): TimeoutPollingHook<Transaction> {
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     Transaction,
     GetPollingTransactionsResponse,
     {
@@ -82,7 +82,7 @@ export function useGetPollingTransactionsByAccount(
 export function useGetPollingContractsByAccount(
   accountAddress: string
 ): TimeoutPollingHook<AccountContract> {
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     AccountContract,
     GetPollingContractsResponse,
     {
@@ -103,7 +103,7 @@ export function useGetPollingContractsByAccount(
 export function useGetPollingStorageByAccount(
   accountAddress: string
 ): TimeoutPollingHook<AccountStorageItem> {
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     AccountStorageItem,
     GetPollingStorageResponse,
     {
@@ -120,7 +120,7 @@ export function useGetPollingStorageByAccount(
 export function useGetPollingKeysByAccount(
   accountAddress: string
 ): TimeoutPollingHook<AccountKey> {
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     AccountKey,
     GetPollingKeysResponse,
     {
@@ -135,7 +135,7 @@ export function useGetPollingKeysByAccount(
 }
 
 export function useGetPollingContracts(): TimeoutPollingHook<AccountContract> {
-  return useTimeoutPolling<AccountContract, GetPollingContractsResponse>({
+  return useTimeoutPollingV2<AccountContract, GetPollingContractsResponse>({
     resourceKey: "/contracts/polling",
     resourceIdKey: "id",
     fetcher: (data) => contractsService.getAllWithPolling(data),
@@ -149,7 +149,7 @@ export function useGetContract(contractId: string) {
 }
 
 export function useGetPollingTransactions(): TimeoutPollingHook<Transaction> {
-  return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
+  return useTimeoutPollingV2<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/transactions/polling",
     resourceIdKey: "id",
     fetcher: (data) => transactionsService.getAllWithPolling(data),
@@ -157,7 +157,7 @@ export function useGetPollingTransactions(): TimeoutPollingHook<Transaction> {
 }
 
 export function useGetPollingBlocks(): TimeoutPollingHook<Block> {
-  return useTimeoutPolling<Block, GetPollingBlocksResponse>({
+  return useTimeoutPollingV2<Block, GetPollingBlocksResponse>({
     resourceKey: "/blocks/polling",
     resourceIdKey: "id",
     fetcher: (data) => blocksService.getAllWithPolling(data),
@@ -171,7 +171,7 @@ export function useGetBlock(blockId: string) {
 }
 
 export function useGetPollingEvents(): TimeoutPollingHook<Event> {
-  return useTimeoutPolling<Event, GetPollingEventsResponse>({
+  return useTimeoutPollingV2<Event, GetPollingEventsResponse>({
     resourceKey: "/events/polling",
     resourceIdKey: "id",
     fetcher: (data) => eventsService.getAllWithPolling(data),
@@ -181,7 +181,7 @@ export function useGetPollingEvents(): TimeoutPollingHook<Event> {
 export function useGetPollingEventsByTransaction(
   transactionId: string
 ): TimeoutPollingHook<Event> {
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     Event,
     GetPollingEventsResponse,
     { transactionId: string }
@@ -194,7 +194,7 @@ export function useGetPollingEventsByTransaction(
 }
 
 export function useGetPollingLogs(): TimeoutPollingHook<ManagedProcessLog> {
-  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
+  return useTimeoutPollingV2<ManagedProcessLog, GetPollingLogsResponse>({
     resourceKey: "/processes/logs/polling",
     resourceIdKey: "id",
     fetcher: (data) => processesService.getAllLogsWithPolling(data),
@@ -204,7 +204,7 @@ export function useGetPollingLogs(): TimeoutPollingHook<ManagedProcessLog> {
 export function useGetPollingLogsByProcess(
   processId: string
 ): TimeoutPollingHook<ManagedProcessLog> {
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     ManagedProcessLog,
     GetPollingLogsResponse,
     { processId: string }
@@ -217,7 +217,10 @@ export function useGetPollingLogsByProcess(
 }
 
 export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
-  return useTimeoutPolling<ManagedProcess, GetPollingManagedProcessesResponse>({
+  return useTimeoutPollingV2<
+    ManagedProcess,
+    GetPollingManagedProcessesResponse
+  >({
     resourceKey: `/processes`,
     resourceIdKey: "id",
     fetcher: (data) => processesService.getAllProcessesWithPolling(data),
@@ -227,7 +230,7 @@ export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
 export function useGetPollingTransactionsByBlock(
   blockId: string
 ): TimeoutPollingHook<Transaction> {
-  return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
+  return useTimeoutPollingV2<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/block/transactions/polling",
     resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
@@ -306,7 +309,7 @@ export function useGetFlowCliInfo() {
 
 export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSnapshot> {
   const projectId = useCurrentProjectId() ?? "";
-  return useTimeoutPolling<
+  return useTimeoutPollingV2<
     EmulatorSnapshot,
     GetPollingEmulatorSnapshotsResponse,
     GetPollingEmulatorSnapshotsRequest

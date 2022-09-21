@@ -5,8 +5,6 @@ import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import { NoResults } from "../../../components/no-results/NoResults";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetPollingAccounts } from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -54,7 +52,7 @@ const columns = [
 ];
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
+  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { data: accounts, firstFetch } = useGetPollingAccounts();
 
@@ -63,23 +61,14 @@ const Main: FunctionComponent = () => {
     showNavigationDrawer(false);
   }, []);
 
-  useEffect(() => {
-    disableSearchBar(!accounts.length);
-  }, [accounts]);
-
   const { filteredData } = useFilterData(accounts, searchTerm);
 
   return (
-    <>
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && <NoResults />}
-      {filteredData.length > 0 && (
-        <Table<DecoratedPollingEntity<Account>>
-          columns={columns}
-          data={filteredData}
-        ></Table>
-      )}
-    </>
+    <Table<DecoratedPollingEntity<Account>>
+      isInitialLoading={firstFetch}
+      columns={columns}
+      data={filteredData}
+    />
   );
 };
 
