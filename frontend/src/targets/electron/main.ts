@@ -85,13 +85,17 @@ app.on("before-quit", async function (e) {
   e.preventDefault();
   try {
     await processManagerService.stopAll();
+    // In case flowser project is currently open,
+    // the close() function will not resolve.
+    // This is probably due to the incoming polling requests.
+    // TODO(milestone-6): Stop polling on the client
+    await worker.backend.close();
   } catch (e) {
     dialog.showMessageBox({
-      message: `Unexpected error, couldn't stop Flowser child processes. Make sure to kill them manually.`,
+      message: `Couldn't shutdown successfully. Some flow processes may be still running in the background.`,
       type: "error",
     });
   } finally {
-    worker.backend.close();
     console.log("Cleanup complete");
     app.quit();
   }
