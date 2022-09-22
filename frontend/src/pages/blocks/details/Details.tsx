@@ -19,7 +19,7 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
 import ReactTimeAgo from "react-timeago";
 import {
@@ -43,7 +43,9 @@ const txTableColumns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -53,7 +55,9 @@ const txTableColumns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),

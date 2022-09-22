@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { CSSProperties, FunctionComponent } from "react";
 import classes from "./Value.module.scss";
 import classNames from "classnames";
 
@@ -6,16 +6,19 @@ type ValueVariant = "small" | "normal" | "medium" | "large";
 
 type ValueProps = {
   className?: string;
+  style?: CSSProperties;
   variant?: ValueVariant;
 };
 
 const Value: FunctionComponent<ValueProps> = ({
   children,
   className,
+  style,
   variant = "normal",
 }) => {
   return (
     <span
+      style={style}
       className={classNames(
         classes.root,
         getClassForVariant(variant),

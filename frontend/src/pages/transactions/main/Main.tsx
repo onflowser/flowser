@@ -9,7 +9,7 @@ import { Transaction } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import Table from "../../../components/table/Table";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
@@ -25,7 +25,9 @@ const columns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -35,7 +37,9 @@ const columns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/blocks/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -45,7 +49,9 @@ const columns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),

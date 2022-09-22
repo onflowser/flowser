@@ -5,7 +5,7 @@ import Card from "../../components/card/Card";
 import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import Ellipsis from "../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../components/ellipsis/MiddleEllipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
@@ -20,6 +20,7 @@ import { flexRender } from "@tanstack/react-table";
 import ReactTimeago from "react-timeago";
 import classNames from "classnames";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { Ellipsis } from "../../components/ellipsis/Ellipsis";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -27,15 +28,19 @@ const subTableColumns = [
     header: () => <Label variant="medium">ARGUMENT NAME</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.subTableValue}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.subTableValue}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
   subTableColumnHelper.accessor("type", {
     header: () => <Label variant="medium">ARGUMENT TYPE</Label>,
     cell: (info) => (
-      <Value>
-        <Ellipsis className={classes.subTableValue}>{info.getValue()}</Ellipsis>
+      <Value style={{ width: "100%" }}>
+        <MiddleEllipsis className={classes.subTableValue}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -43,10 +48,7 @@ const subTableColumns = [
     header: () => <Label variant="medium">ARGUMENT VALUE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis
-          style={{ whiteSpace: "nowrap", marginRight: 5 }}
-          className={classes.subTableValue}
-        >
+        <Ellipsis elementName="pre" className={classes.subTableValue}>
           {info.getValue()}
         </Ellipsis>
         <CopyButton value={info.getValue()} />
@@ -69,9 +71,9 @@ const Events: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/blocks/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hashEvents}>
+              <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
@@ -81,9 +83,9 @@ const Events: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/transactions/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hashEvents}>
+              <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
@@ -94,8 +96,8 @@ const Events: FunctionComponent = () => {
           className: classes.typeColumn,
         },
         cell: (info) => (
-          <Value>
-            <pre style={{ whiteSpace: "nowrap" }}>{info.getValue()}</pre>
+          <Value style={{ width: "100%" }}>
+            <Ellipsis elementName="pre">{info.getValue()}</Ellipsis>
           </Value>
         ),
       }),

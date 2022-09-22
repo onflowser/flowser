@@ -3,7 +3,7 @@ import CadenceSourceCode from "../cadence-source-code/CadenceSourceCode";
 import Card from "../card/Card";
 import classes from "./ContentDetailsScript.module.scss";
 import Label from "../label/Label";
-import Ellipsis from "../ellipsis/Ellipsis";
+import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import Value from "../value/Value";
 import { CadenceObject } from "@flowser/shared";
 import { CadenceUtils } from "../../utils/cadence-utils";
@@ -37,9 +37,9 @@ const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
 
                 <Label>VALUE:</Label>
                 <Value className={classes.value}>
-                  <Ellipsis className={classes.argValue}>
+                  <MiddleEllipsis className={classes.argValue}>
                     {CadenceUtils.getDisplayValue(arg)}
-                  </Ellipsis>
+                  </MiddleEllipsis>
                 </Value>
 
                 {/* FIXME: fix getEventDataValue function */}

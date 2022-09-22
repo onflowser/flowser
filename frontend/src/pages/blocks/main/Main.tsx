@@ -5,7 +5,7 @@ import { useSearch } from "../../../hooks/use-search";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
@@ -64,7 +64,9 @@ const Main: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/blocks/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+              <MiddleEllipsis className={classes.hash}>
+                {info.getValue()}
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),

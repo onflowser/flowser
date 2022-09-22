@@ -11,7 +11,7 @@ import ContentDetailsScript from "../../../components/content-details-script/Con
 import Card from "../../../components/card/Card";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
 import {
@@ -50,7 +50,9 @@ const columnsEvents = [
     header: () => <Label variant="medium">NAME</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.ellipsis}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -58,7 +60,9 @@ const columnsEvents = [
     header: () => <Label variant="medium">TYPE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.ellipsis}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -66,9 +70,12 @@ const columnsEvents = [
     header: () => <Label variant="medium">VALUE</Label>,
     cell: (info) => (
       <div>
-        <Ellipsis style={{ whiteSpace: "nowrap" }} className={classes.subtable}>
+        <MiddleEllipsis
+          style={{ whiteSpace: "nowrap" }}
+          className={classes.subtable}
+        >
           {info.getValue()}
-        </Ellipsis>
+        </MiddleEllipsis>
         <CopyButton value={info.getValue()} />
       </div>
     ),
@@ -93,7 +100,9 @@ const columnsEnvelope = [
     header: () => <Label variant="medium">SIGNATURE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.hash}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -121,7 +130,9 @@ const columnsPayload = [
     header: () => <Label variant="medium">SIGNATURE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.hash}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -152,9 +163,9 @@ const Details: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/blocks/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hashEvents}>
+              <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
@@ -176,9 +187,9 @@ const Details: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/transactions/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hashEvents}>
+              <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
@@ -225,7 +236,9 @@ const Details: FunctionComponent = () => {
       {
         label: "Transaction",
         value: (
-          <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
+          <MiddleEllipsis className={classes.elipsis}>
+            {transaction.id}
+          </MiddleEllipsis>
         ),
       },
       {
@@ -260,9 +273,9 @@ const Details: FunctionComponent = () => {
         label: "Block ID",
         value: (
           <NavLink to={`/blocks/details/${transaction.blockId}`}>
-            <Ellipsis className={classes.elipsis}>
+            <MiddleEllipsis className={classes.elipsis}>
               {transaction.blockId}
-            </Ellipsis>
+            </MiddleEllipsis>
           </NavLink>
         ),
       },
@@ -361,7 +374,9 @@ const Details: FunctionComponent = () => {
               <div>
                 <Label className={classes.label}>SIGNATURE</Label>
                 <Value>
-                  <Ellipsis className={classes.hash}>{item.signature}</Ellipsis>
+                  <MiddleEllipsis className={classes.hash}>
+                    {item.signature}
+                  </MiddleEllipsis>
                 </Value>
               </div>
               <div>

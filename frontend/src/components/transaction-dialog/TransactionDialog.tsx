@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import ScriptArguments from "./ScriptArguments";
 import CadenceEditor from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
-import Ellipsis from "../ellipsis/Ellipsis";
+import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import { CommonUtils } from "../../utils/common-utils";
 import splitbee from "@splitbee/web";
 import { ActionDialog } from "../action-dialog/ActionDialog";
@@ -64,9 +64,9 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
           <span className={classes.toast}>
             Transaction {` `}
             <NavLink to={`/transactions/details/${transactionId}`}>
-              <Ellipsis className={classes.transactionId}>
+              <MiddleEllipsis className={classes.transactionId}>
                 {transactionId}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
             {` `}sent!
           </span>
