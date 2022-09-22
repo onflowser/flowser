@@ -20,7 +20,6 @@ import {
   useGetPollingStorageByAccount,
 } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import {
   AccountContract,
   AccountKey,
@@ -38,6 +37,7 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 export type AccountDetailsRouteParams = {
   accountId: string;

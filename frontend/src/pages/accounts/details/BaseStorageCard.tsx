@@ -1,11 +1,11 @@
 import React, { ReactElement } from "react";
 import classes from "./BaseStorageCard.module.scss";
-import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
 import ReactJson from "react-json-view";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;

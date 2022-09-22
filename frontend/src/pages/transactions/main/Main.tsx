@@ -5,7 +5,6 @@ import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
 import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Transaction } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
@@ -15,6 +14,7 @@ import Table from "../../../components/table/Table";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import ReactTimeago from "react-timeago";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();

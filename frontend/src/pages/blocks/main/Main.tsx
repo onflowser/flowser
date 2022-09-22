@@ -9,7 +9,6 @@ import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Block } from "@flowser/shared";
 import {
   useGetPollingBlocks,
@@ -19,6 +18,7 @@ import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import ReactTimeago from "react-timeago";
 import { useProjectActions } from "../../../contexts/project-actions.context";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 

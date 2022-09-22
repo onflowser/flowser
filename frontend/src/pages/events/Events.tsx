@@ -12,7 +12,6 @@ import CaretIcon from "../../components/caret-icon/CaretIcon";
 import splitbee from "@splitbee/web";
 import { useGetPollingEvents } from "../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../utils/event-utils";
 import CopyButton from "../../components/copy-button/CopyButton";
@@ -20,6 +19,7 @@ import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
 import ReactTimeago from "react-timeago";
 import classNames from "classnames";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [

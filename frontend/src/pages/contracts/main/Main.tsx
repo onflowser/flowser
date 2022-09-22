@@ -7,9 +7,9 @@ import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
 import { useGetPollingContracts } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import Table from "../../../components/table/Table";
 import { AccountContract } from "@flowser/shared";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 // CONTRACTS TABLE
 const columnHelper =

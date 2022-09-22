@@ -11,10 +11,10 @@ import {
   useReactTable,
   RowData,
 } from "@tanstack/react-table";
-import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 import { CommonUtils } from "../../utils/common-utils";
 import { NoResults } from "../no-results/NoResults";
 import FullScreenLoading from "../fullscreen-loading/FullScreenLoading";
+import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
 
 type CustomTableProps<TData> = {
   renderCustomHeader?: (header: HeaderGroup<TableData<TData>>) => ReactElement;
@@ -100,7 +100,7 @@ function Table<TData>({
           <Card
             className={classNames(classes.tableRow, bodyRowClass)}
             key={row.id}
-            showIntroAnimation={showIntroAnimation(row)}
+            showIntroAnimation={showIntroAnimation(row.original)}
             variant="table-line"
           >
             {row.getVisibleCells().map((cell) => (

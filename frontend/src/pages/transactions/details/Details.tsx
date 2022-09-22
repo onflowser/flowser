@@ -21,7 +21,6 @@ import {
 import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
 import Table from "../../../components/table/Table";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
@@ -35,6 +34,7 @@ import { TextUtils } from "../../../utils/text-utils";
 import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type RouteParams = {
   transactionId: string;

@@ -9,9 +9,9 @@ import { useGetPollingAccounts } from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { TextUtils } from "../../../utils/text-utils";
 import ReactTimeago from "react-timeago";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
