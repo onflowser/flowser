@@ -50,14 +50,14 @@ const Main: FunctionComponent = () => {
   const columns = useMemo(
     () => [
       columnHelper.accessor("height", {
-        header: () => <Label variant="medium">BLOCK HEIGHT</Label>,
+        header: () => <Label variant="medium">HEIGHT</Label>,
         meta: {
           className: classes.blockHeight,
         },
         cell: (info) => <Value>{info.getValue()}</Value>,
       }),
       columnHelper.accessor("id", {
-        header: () => <Label variant="medium">BLOCK ID</Label>,
+        header: () => <Label variant="medium">ID</Label>,
         meta: {
           className: classes.blockID,
         },
@@ -70,14 +70,14 @@ const Main: FunctionComponent = () => {
         ),
       }),
       columnHelper.accessor("blockSeals", {
-        header: () => <Label variant="medium">BLOCK SEALS</Label>,
+        header: () => <Label variant="medium">SEALS COUNT</Label>,
         meta: {
           className: classes.blockSeals,
         },
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
       columnHelper.accessor("signatures", {
-        header: () => <Label variant="medium">SIGNATURES</Label>,
+        header: () => <Label variant="medium">SIGS COUNT</Label>,
         meta: {
           className: classes.signatures,
         },
