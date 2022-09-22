@@ -73,18 +73,6 @@
           padding-left: 6px;
         }
       }
-
-      @media (max-width: 1290px) {
-        &:focus-within {
-          .snapshotButton,
-          .sidebarButton {
-            display: none;
-          }
-          .searchBox {
-            width: 100% !important;
-          }
-        }
-      }
     }
   }
 
