@@ -1,4 +1,4 @@
-import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionOptions";
+import { BetterSqlite3ConnectionOptions } from "typeorm/driver/better-sqlite3/BetterSqlite3ConnectionOptions";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { ConfigService } from "./core/services/config.service";
 
@@ -11,10 +11,10 @@ export function getDatabaseOptions(): DataSourceOptions {
   switch (database.type) {
     case "sqlite":
       return {
-        type: "sqlite",
+        type: "better-sqlite3",
         database: database.name,
         ...commonOptions,
-      } as SqliteConnectionOptions;
+      } as BetterSqlite3ConnectionOptions;
     case "mysql":
       return {
         type: database.type,

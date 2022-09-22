@@ -49,7 +49,7 @@
   },
   "peerDependencies": {
     "mysql2": "^2.3.3",
-    "sqlite3": "^5.0.10"
+    "better-sqlite3": "^7.6.2"
   },
   "devDependencies": {
     "@nestjs/schematics": "^8.0.0",
