@@ -15,6 +15,7 @@ import {
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
 import { useErrorHandler } from "../hooks/use-error-handler";
+import { useQueryClient } from "react-query";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
@@ -43,6 +44,7 @@ export function ProjectActionsProvider({
 }): ReactElement {
   const { projectsService, snapshotService } = ServiceRegistry.getInstance();
 
+  const queryClient = useQueryClient();
   const history = useHistory();
   const { handleError } = useErrorHandler(ProjectActionsProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
@@ -82,18 +84,28 @@ export function ProjectActionsProvider({
 
   async function switchProject() {
     setIsSwitching(true);
-    try {
-      await projectsService.unUseCurrentProject();
-    } catch (e) {
-      // nothing critical happened, ignore the error
-      console.warn("Couldn't stop the emulator: ", e);
-    }
-    history.replace(`/${routes.start}`);
-    try {
-      await logout(); // logout from dev-wallet, because config may change
-    } finally {
-      setIsSwitching(false);
-    }
+    const execute = async () => {
+      try {
+        await projectsService.unUseCurrentProject();
+      } catch (e) {
+        // nothing critical happened, ignore the error
+        console.warn("Couldn't stop the emulator: ", e);
+      }
+      history.replace(`/${routes.start}`);
+      try {
+        await logout(); // logout from dev-wallet, because config may change
+      } finally {
+        setIsSwitching(false);
+      }
+      // Clear the entire cache,
+      // so that previous data isn't there when using another project
+      queryClient.clear();
+    };
+    toast.promise(execute(), {
+      loading: "Closing project...",
+      success: "Project closed!",
+      error: "Something went wrong, try again!",
+    });
   }
 
   function createSnapshot() {

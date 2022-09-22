@@ -70,11 +70,8 @@ export function useFlow() {
     setLoggingOut(true);
     try {
       await fcl.unauthenticate();
-      toast("Logged out!");
-      splitbee.track("DevWallet: logout");
-    } catch (e: any) {
-      console.log(e);
-      toast.error(`Logout failed: ${e.message}`);
+    } catch (e: unknown) {
+      console.error("Fcl logout failed", e);
     } finally {
       setLoggingOut(false);
     }
