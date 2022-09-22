@@ -1,7 +1,8 @@
 BUILD_PATH=../build
 # Needs to be set to the "buildResources" directory
 # See https://www.electron.build/icons
-APP_ICON_PATH=../build/react/static/app-icon
+STATIC_ASSETS_PATH=../build/react/static
+APP_ICON_PATH=$STATIC_ASSETS_PATH/app-icon
 
 # Cleanup
 rm -rf $BUILD_PATH
@@ -24,5 +25,8 @@ mkdir -p $APP_ICON_PATH
 
 # Generate app icons
 ../node_modules/.bin/electron-icon-maker --input=../src/icon.png --output=$APP_ICON_PATH
+
+# Copy MacOS installation background image
+cp ../static/macos-background.tiff $STATIC_ASSETS_PATH
 
 yarn run "build-${PLATFORM_ARG}"
