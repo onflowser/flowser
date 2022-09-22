@@ -82,6 +82,10 @@ export class ProcessManagerService extends EventEmitter {
     await process.start();
   }
 
+  isStoppedAll() {
+    return this.getAll().every((process) => !process.isRunning());
+  }
+
   async stopAll() {
     await Promise.all(this.getAll().map((process) => process.stop()));
   }

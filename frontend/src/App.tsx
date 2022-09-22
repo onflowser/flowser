@@ -29,6 +29,7 @@ import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
 import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
+import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -66,15 +67,17 @@ const queryClient = new QueryClient();
 export const FlowserClientApp = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ConfirmDialogProvider>
-          <ProjectActionsProvider>
-            <UiStateContextProvider>
-              <FlowserRoutes />
-            </UiStateContextProvider>
-          </ProjectActionsProvider>
-        </ConfirmDialogProvider>
-      </BrowserRouter>
+      <TimeoutPollingProvider>
+        <BrowserRouter>
+          <ConfirmDialogProvider>
+            <ProjectActionsProvider>
+              <UiStateContextProvider>
+                <FlowserRoutes />
+              </UiStateContextProvider>
+            </ProjectActionsProvider>
+          </ConfirmDialogProvider>
+        </BrowserRouter>
+      </TimeoutPollingProvider>
     </QueryClientProvider>
   );
 };

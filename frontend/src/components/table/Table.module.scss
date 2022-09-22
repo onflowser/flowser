@@ -2,28 +2,26 @@
 @import "styles/animations";
 @import "styles/colors";
 
-.tableRow {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: $spacing-s;
-  padding-bottom: $spacing-base * 0.8;
-  padding-top: $spacing-base * 0.8;
-
-  & > div {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    justify-content: flex-start;
-    align-items: center;
+.root {
+  .headerRow {
+    margin-bottom: $spacing-base;
+    padding-bottom: $spacing-base;
+    padding-top: $spacing-base;
   }
-}
 
-.headerRow {
-  margin-bottom: $spacing-base;
-  padding-bottom: $spacing-base;
-  padding-top: $spacing-base;
-}
+  .tableRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $spacing-s;
+    padding-bottom: $spacing-base * 0.8;
+    padding-top: $spacing-base * 0.8;
 
-.noResults {
-  margin-top: $spacing-l * 6;
+    & > div {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      justify-content: flex-start;
+      align-items: center;
+    }
+  }
 }

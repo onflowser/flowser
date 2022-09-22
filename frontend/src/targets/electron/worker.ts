@@ -1,6 +1,4 @@
-import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import path from "path";
-import { app } from "electron";
 import { createApp } from "@flowser/backend";
 import { INestApplication } from "@nestjs/common";
 
@@ -22,28 +20,13 @@ async function startBackend({ userDataPath }: { userDataPath: string }) {
   });
 }
 
-export let start: () => Promise<unknown>;
+export type StartWorkerOptions = {
+  userDataPath: string;
+};
 
-if (isMainThread) {
-  start = async function () {
-    const userDataPath = app.getPath("userData");
-    return new Promise((resolve, reject) => {
-      const worker = new Worker(__filename, {
-        workerData: {
-          userDataPath,
-        },
-      });
-      worker.on("message", resolve);
-      worker.on("error", reject);
-      worker.on("exit", (code) => {
-        if (code !== 0)
-          reject(new Error(`Worker stopped with exit code ${code}`));
-      });
-    });
-  };
-} else {
-  const { userDataPath } = workerData;
-  startBackend({
-    userDataPath,
-  }).then(() => parentPort?.postMessage("Backend started"));
-}
+// TODO(milestone-x): We should spawn the backend in a separate thread or process
+// This was already attempted in https://github.com/onflowser/flowser/pull/120,
+// but it lead to critical threading-related issues with node-sqlite3
+export const start = async (options: StartWorkerOptions): Promise<void> => {
+  await startBackend(options);
+};

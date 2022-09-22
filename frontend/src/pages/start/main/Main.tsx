@@ -7,7 +7,7 @@ import React, {
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
-import logo from "../../../assets/images/logo_with_text.svg";
+import logo from "../../../assets/images/long_logo.svg";
 import trash from "../../../assets/icons/trash.svg";
 import newProject from "../../../assets/icons/new_project.svg";
 import openProject from "../../../assets/icons/open_project.svg";

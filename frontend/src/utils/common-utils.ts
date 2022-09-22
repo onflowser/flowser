@@ -1,5 +1,5 @@
-import { DecoratedPollingEntity } from "../hooks/use-timeout-polling";
 import { ErrorData } from "@flowser/shared";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 export class CommonUtils {
   static isDecoratedPollingEntity<Entity>(

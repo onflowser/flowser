@@ -11,8 +11,10 @@ import {
   useReactTable,
   RowData,
 } from "@tanstack/react-table";
-import { DecoratedPollingEntity } from "../../hooks/use-timeout-polling";
 import { CommonUtils } from "../../utils/common-utils";
+import { NoResults } from "../no-results/NoResults";
+import FullScreenLoading from "../fullscreen-loading/FullScreenLoading";
+import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
 
 type CustomTableProps<TData> = {
   renderCustomHeader?: (header: HeaderGroup<TableData<TData>>) => ReactElement;
@@ -20,6 +22,7 @@ type CustomTableProps<TData> = {
   headerRowClass?: string;
   bodyRowClass?: string;
   footerRowClass?: string;
+  isInitialLoading?: boolean;
 };
 
 export type TableProps<TData> = Pick<
@@ -41,6 +44,7 @@ declare module "@tanstack/table-core" {
 }
 
 function Table<TData>({
+  isInitialLoading,
   columns,
   data,
   renderCustomRow,
@@ -56,8 +60,16 @@ function Table<TData>({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (!isInitialLoading && data.length === 0) {
+    return <NoResults />;
+  }
+
+  if (isInitialLoading) {
+    return <FullScreenLoading />;
+  }
+
   return (
-    <div className={className}>
+    <div className={classNames(classes.root, className)}>
       {table.getHeaderGroups().map((headerGroup) =>
         renderCustomHeader ? (
           renderCustomHeader(headerGroup)
@@ -92,7 +104,7 @@ function Table<TData>({
           <Card
             className={classNames(classes.tableRow, bodyRowClass)}
             key={row.id}
-            showIntroAnimation={showIntroAnimation(row)}
+            showIntroAnimation={showIntroAnimation(row.original)}
             variant="table-line"
           >
             {row.getVisibleCells().map((cell) => (

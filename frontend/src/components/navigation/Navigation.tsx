@@ -38,94 +38,92 @@ const Navigation: FunctionComponent<{
   }, []);
 
   return (
-    <>
-      <div className={classNames(classes.navigationContainer, props.className)}>
-        <div className={classes.mainContainer}>
-          <div className={classes.navLinksContainer}>
-            <NavigationItem
-              to={`/${routes.accounts}`}
-              totalCounter={tabCount.accounts}
-            >
-              ACCOUNTS
-            </NavigationItem>
-            <NavigationItem
-              to={`/${routes.blocks}`}
-              totalCounter={tabCount.blocks}
-            >
-              BLOCKS
-            </NavigationItem>
-            <NavigationItem
-              to={`/${routes.transactions}`}
-              totalCounter={tabCount.transactions}
-            >
-              TRANSACTIONS
-            </NavigationItem>
-            <NavigationItem
-              to={`/${routes.contracts}`}
-              totalCounter={tabCount.contracts}
-            >
-              CONTRACTS
-            </NavigationItem>
-            <NavigationItem
-              to={`/${routes.events}`}
-              totalCounter={tabCount.events}
-            >
-              EVENTS
-            </NavigationItem>
-            <NavigationItem
-              to={`/${routes.project}`}
-              totalCounter={tabCount.project}
-            >
-              PROJECT
-            </NavigationItem>
-          </div>
-
-          <div className={classes.rightContainer}>
-            <Search className={classes.searchBox} responsive={true} />
-            {isLoggedIn && (
-              <SimpleButton
-                className={classes.userButton}
-                onClick={() => history.push(`/accounts/details/${user?.addr}`)}
-              >
-                <UserIcon />
-              </SimpleButton>
-            )}
-            <Button
-              className={classes.sidebarButton}
-              onClick={props.toggleSidebar}
-            >
-              <img
-                src={
-                  isEmulatorWorking
-                    ? isSidebarOpen
-                      ? sideMenuOpen
-                      : sideMenuClosed
-                    : isSidebarOpen
-                    ? sideMenuOpenEmuNoWork
-                    : sideMenuClosedEmuNoWork
-                }
-                className={classNames({
-                  [classes.sidebarOpen]: isSidebarOpen,
-                  [classes.emulatorWorking]: isEmulatorWorking,
-                })}
-                alt="sidebar toggle button"
-              />
-            </Button>
-          </div>
+    <div className={classNames(classes.navigationContainer, props.className)}>
+      <div className={classes.mainContainer}>
+        <div className={classes.navLinksContainer}>
+          <NavigationItem
+            to={`/${routes.accounts}`}
+            totalCounter={tabCount.accounts}
+          >
+            ACCOUNTS
+          </NavigationItem>
+          <NavigationItem
+            to={`/${routes.blocks}`}
+            totalCounter={tabCount.blocks}
+          >
+            BLOCKS
+          </NavigationItem>
+          <NavigationItem
+            to={`/${routes.transactions}`}
+            totalCounter={tabCount.transactions}
+          >
+            TRANSACTIONS
+          </NavigationItem>
+          <NavigationItem
+            to={`/${routes.contracts}`}
+            totalCounter={tabCount.contracts}
+          >
+            CONTRACTS
+          </NavigationItem>
+          <NavigationItem
+            to={`/${routes.events}`}
+            totalCounter={tabCount.events}
+          >
+            EVENTS
+          </NavigationItem>
+          <NavigationItem
+            to={`/${routes.project}`}
+            totalCounter={tabCount.project}
+          >
+            PROJECT
+          </NavigationItem>
         </div>
-        {/* NAVIGATION DRAWER */}
-        {isNavigationDrawerVisible && (
-          <div className={classes.navigationDrawerContainer}>
-            {isShowBackButtonVisible && (
-              <div className={classes.backButtonWrapper} onClick={onBack}>
-                <IconBackButton className={classes.backButton} />
-              </div>
-            )}
-            <Breadcrumbs className={classes.breadcrumbs} />
-          </div>
-        )}
+
+        <div className={classes.rightContainer}>
+          <Search className={classes.searchBox} responsive={true} />
+          {isLoggedIn && (
+            <SimpleButton
+              className={classes.userButton}
+              onClick={() => history.push(`/accounts/details/${user?.addr}`)}
+            >
+              <UserIcon />
+            </SimpleButton>
+          )}
+          <Button
+            className={classes.sidebarButton}
+            onClick={props.toggleSidebar}
+          >
+            <img
+              src={
+                isEmulatorWorking
+                  ? isSidebarOpen
+                    ? sideMenuOpen
+                    : sideMenuClosed
+                  : isSidebarOpen
+                  ? sideMenuOpenEmuNoWork
+                  : sideMenuClosedEmuNoWork
+              }
+              className={classNames({
+                [classes.sidebarOpen]: isSidebarOpen,
+                [classes.emulatorWorking]: isEmulatorWorking,
+              })}
+              alt="sidebar toggle button"
+            />
+          </Button>
+        </div>
       </div>
-    </>
+      {/* NAVIGATION DRAWER */}
+      {isNavigationDrawerVisible && (
+        <div className={classes.navigationDrawerContainer}>
+          {isShowBackButtonVisible && (
+            <div className={classes.backButtonWrapper} onClick={onBack}>
+              <IconBackButton className={classes.backButton} />
+            </div>
+          )}
+          <Breadcrumbs className={classes.breadcrumbs} />
+        </div>
+      )}
+    </div>
   );
 };
 

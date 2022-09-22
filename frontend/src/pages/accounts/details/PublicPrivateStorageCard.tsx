@@ -3,8 +3,8 @@ import classes from "./PublicPrivateStorageCard.module.scss";
 import { StorageDomainBadge } from "./StorageDomainBadge";
 import { NavLink } from "react-router-dom";
 import { ReactComponent as LinkIcon } from "../../../assets/icons/link.svg";
-import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type StorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;

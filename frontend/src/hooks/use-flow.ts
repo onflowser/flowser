@@ -16,10 +16,7 @@ export type FlowScriptArgument = {
   type: FlowScriptArgumentType;
 };
 
-export function setFclConfig(project: Project): void {
-  const devWalletPort = project.devWallet?.port ?? 8701;
-  const devWalletHost = "localhost";
-  const devWalletUrl = `http://${devWalletHost}:${devWalletPort}`;
+export function setFclConfig(devWalletUrl: string): void {
   fcl
     .config()
     // flowser app details
@@ -41,9 +38,13 @@ export function useFlow() {
   const [isLoggingIn, setLoggingIn] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
 
+  const devWalletPort = project?.devWallet?.port ?? 8701;
+  const devWalletHost = "localhost";
+  const devWalletUrl = `http://${devWalletHost}:${devWalletPort}`;
+
   useEffect(() => {
     if (project) {
-      setFclConfig(project);
+      setFclConfig(devWalletUrl);
     }
   }, [project]);
 
@@ -80,6 +81,13 @@ export function useFlow() {
   }
 
   async function login() {
+    if (!project?.devWallet?.run) {
+      // TODO(milestone-x): Check if wallet is online with GET {devWalletUrl}/api request
+      toast.error(
+        "You need to enable the dev wallet option in Flowser settings"
+      );
+      return;
+    }
     setLoggingIn(true);
     try {
       const result = await fcl.authenticate();
