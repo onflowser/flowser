@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { createContext, useContext } from "react";
 import { routes } from "../constants/routes";
 import { useHistory } from "react-router-dom";
@@ -7,7 +7,11 @@ import toast from "react-hot-toast";
 import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
-import { useGetCurrentProject, useGetPollingBlocks } from "../hooks/use-api";
+import {
+  useCurrentProjectId,
+  useGetCurrentProject,
+  useGetPollingBlocks,
+} from "../hooks/use-api";
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
 import { useErrorHandler } from "../hooks/use-error-handler";
@@ -42,6 +46,7 @@ export function ProjectActionsProvider({
   const history = useHistory();
   const { handleError } = useErrorHandler(ProjectActionsProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
+  const projectId = useCurrentProjectId();
   const { data: currentProject } = useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
   const { data: blocks, fetchAll } = useGetPollingBlocks();
@@ -75,7 +80,7 @@ export function ProjectActionsProvider({
     });
   }
 
-  const switchProject = useCallback(async () => {
+  async function switchProject() {
     setIsSwitching(true);
     try {
       await projectsService.unUseCurrentProject();
@@ -89,9 +94,9 @@ export function ProjectActionsProvider({
     } finally {
       setIsSwitching(false);
     }
-  }, []);
+  }
 
-  const createSnapshot = useCallback(() => {
+  function createSnapshot() {
     const { snapshot } = currentProject?.project?.emulator ?? {};
     if (!snapshot) {
       toast(
@@ -103,9 +108,9 @@ export function ProjectActionsProvider({
     } else {
       setShowSnapshotModal(true);
     }
-  }, [currentProject]);
+  }
 
-  const sendTransaction = useCallback(() => {
+  function sendTransaction() {
     if (!isLoggedIn) {
       toast("You need to login with wallet to send transactions", {
         duration: 5000,
@@ -113,9 +118,12 @@ export function ProjectActionsProvider({
     } else {
       setShowTxDialog(true);
     }
-  }, [isLoggedIn]);
+  }
 
-  const revertToBlock = useCallback(async (blockId: string) => {
+  async function revertToBlock(blockId: string) {
+    if (!projectId) {
+      return;
+    }
     const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
     if (!isSnapshotEnabled) {
       toast.error(
@@ -138,6 +146,7 @@ export function ProjectActionsProvider({
         try {
           const snapshot = await snapshotService.revertTo({
             blockId,
+            projectId,
           });
           fetchAll();
           toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
@@ -146,7 +155,7 @@ export function ProjectActionsProvider({
         }
       },
     });
-  }, []);
+  }
 
   return (
     <ProjectActionsContext.Provider

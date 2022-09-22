@@ -24,14 +24,12 @@ async function createWindow() {
     return { action: "deny" };
   });
 
-  const isDev = !app.isPackaged;
-  win.loadURL(
-    // This path is currently set to "react", because that's the folder used in @flowser/app package
-    // Refer to the app/README for more info on the current build process.
-    isDev
-      ? "http://localhost:6060"
-      : `file://${path.join(__dirname, "../react/index.html")}`
-  );
+  win.webContents.on("did-fail-load", () => {
+    console.log("did-fail-load");
+    win.loadURL(getClientAppUrl());
+  });
+
+  win.loadURL(getClientAppUrl());
 
   async function handleStart() {
     try {
@@ -69,11 +67,35 @@ app.on("activate", function () {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-app.on("will-quit", async function () {
+app.on("before-quit", async function (e) {
+  if (!worker.backend) {
+    console.error("worker.backend is not defined");
+    return;
+  }
   // Make sure to stop all child processes, so that they don't become orphans
-  if (worker.backend) {
-    const processManagerService = worker.backend.get(ProcessManagerService);
+  const processManagerService = worker.backend.get(ProcessManagerService);
+  const isCleanupComplete = processManagerService.isStoppedAll();
+  if (isCleanupComplete) {
+    return;
+  }
+  console.log("Doing cleanup before exit");
+  // Prevent app termination before cleanup is done
+  e.preventDefault();
+  try {
     await processManagerService.stopAll();
+    // In case flowser project is currently open,
+    // the close() function will not resolve.
+    // This is probably due to the incoming polling requests.
+    // TODO(milestone-6): Stop polling on the client
+    await worker.backend.close();
+  } catch (e) {
+    dialog.showMessageBox({
+      message: `Couldn't shutdown successfully. Some flow processes may be still running in the background.`,
+      type: "error",
+    });
+  } finally {
+    console.log("Cleanup complete");
+    app.quit();
   }
 });
 
@@ -123,4 +145,13 @@ async function handleBackendError({
       type: "error",
     });
   }
+}
+
+function getClientAppUrl() {
+  const isDev = !app.isPackaged;
+  // This path is currently set to "react", because that's the folder used in @flowser/app package
+  // Refer to the app/README for more info on the current build process.
+  return isDev
+    ? "http://localhost:6060"
+    : `file://${path.join(__dirname, "../react/index.html")}`;
 }

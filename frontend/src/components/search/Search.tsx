@@ -17,8 +17,7 @@ const Search: FunctionComponent<SearchProps> = ({
   context = "default",
   responsive,
 }) => {
-  const { searchTerm, setSearchTerm, placeholder, searchDisabled } =
-    useSearch(context);
+  const { searchTerm, setSearchTerm, placeholder } = useSearch(context);
 
   const onSearchChange = useCallback((event) => {
     const term = event.target.value;
@@ -34,7 +33,8 @@ const Search: FunctionComponent<SearchProps> = ({
   return (
     <div
       className={classNames(classes.root, className, {
-        [classes.disabled]: searchDisabled,
+        // TODO(milestone-x): Add back "disabled" functionality if needed
+        [classes.disabled]: false,
         [classes.responsive]: responsive,
       })}
       onClick={() => {
@@ -48,7 +48,6 @@ const Search: FunctionComponent<SearchProps> = ({
         onChange={onSearchChange}
         value={searchTerm}
         placeholder={placeholder}
-        disabled={searchDisabled}
       />
       {!!searchTerm && (
         <CancelIcon

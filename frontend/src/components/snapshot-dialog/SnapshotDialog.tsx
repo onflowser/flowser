@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { ServiceRegistry } from "../../services/service-registry";
 import Input from "../input/Input";
 import { ActionDialog } from "../action-dialog/ActionDialog";
-import { useGetCurrentProject } from "../../hooks/use-api";
+import { useCurrentProjectId, useGetCurrentProject } from "../../hooks/use-api";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 
 export type SnapshotDialogProps = {
@@ -14,6 +14,7 @@ export type SnapshotDialogProps = {
 };
 
 export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
+  const projectId = useCurrentProjectId();
   const { data } = useGetCurrentProject();
   const { handleError } = useErrorHandler(SnapshotDialog.name);
   const { snapshotService } = ServiceRegistry.getInstance();
@@ -25,10 +26,14 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
   }
 
   async function onConfirm() {
+    if (!projectId) {
+      return;
+    }
     setLoading(true);
     try {
       await snapshotService.create({
         description,
+        projectId,
       });
       toast.success("Snapshot created");
       onClose();

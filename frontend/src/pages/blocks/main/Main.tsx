@@ -7,11 +7,8 @@ import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
-import { NoResults } from "../../../components/no-results/NoResults";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Block } from "@flowser/shared";
 import {
   useGetPollingBlocks,
@@ -21,11 +18,12 @@ import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import ReactTimeago from "react-timeago";
 import { useProjectActions } from "../../../contexts/project-actions.context";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
+  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { revertToBlock } = useProjectActions();
 
@@ -43,7 +41,6 @@ const Main: FunctionComponent = () => {
   useEffect(() => {
     setPlaceholder("Search blocks");
     showNavigationDrawer(false);
-    disableSearchBar(false);
   }, []);
 
   const columns = useMemo(
@@ -70,6 +67,14 @@ const Main: FunctionComponent = () => {
         header: () => <Label variant="medium">SIGNATURES</Label>,
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
+      columnHelper.accessor("timestamp", {
+        header: () => <Label variant="medium">TIME</Label>,
+        cell: (info) => (
+          <Value>
+            <ReactTimeago date={info.getValue()} />
+          </Value>
+        ),
+      }),
       columnHelper.display({
         id: "snapshot",
         header: () => <Label variant="medium">SNAPSHOT</Label>,
@@ -91,31 +96,16 @@ const Main: FunctionComponent = () => {
           );
         },
       }),
-      columnHelper.accessor("timestamp", {
-        header: () => <Label variant="medium">TIME</Label>,
-        cell: (info) => (
-          <Value>
-            <ReactTimeago date={info.getValue()} />
-          </Value>
-        ),
-      }),
     ],
     [filteredData, snapshotLookupByBlockId]
   );
 
   return (
-    <>
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
-      {filteredData.length > 0 && (
-        <Table<DecoratedPollingEntity<Block>>
-          columns={columns}
-          data={filteredData}
-        ></Table>
-      )}
-    </>
+    <Table<DecoratedPollingEntity<Block>>
+      isInitialLoading={firstFetch}
+      columns={columns}
+      data={filteredData}
+    />
   );
 };
 

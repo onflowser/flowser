@@ -7,7 +7,7 @@
   align-items: center;
 
   .statusLabel {
-    margin-left: $spacing-s;
+    margin-left: $spacing-base;
     color: $grey;
     font-size: $font-size-large;
     @media (max-width: 1000px) {

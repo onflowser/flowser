@@ -17,7 +17,6 @@ import {
 } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import Ellipsis from "../../../components/ellipsis/Ellipsis";
@@ -29,6 +28,7 @@ import {
 } from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type RouteParams = {
   blockId: string;
@@ -94,7 +94,7 @@ const txTableColumns = [
 
 const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
-  const { disableSearchBar, updateSearchBar } = useSearch();
+  const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const breadcrumbs: Breadcrumb[] = [
@@ -109,7 +109,6 @@ const Details: FunctionComponent = () => {
   useEffect(() => {
     showNavigationDrawer(true);
     setBreadcrumbs(breadcrumbs);
-    disableSearchBar(true);
   }, []);
 
   if (isLoading || !block) {
