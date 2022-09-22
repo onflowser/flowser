@@ -10,8 +10,5 @@
     margin-left: $spacing-base;
     color: $grey;
     font-size: $font-size-small;
-    @media (max-width: 1000px) {
-      display: none;
-    }
   }
 }
