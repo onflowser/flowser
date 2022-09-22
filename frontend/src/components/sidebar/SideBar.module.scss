@@ -12,10 +12,11 @@
 
   .menu {
     display: flex;
+    width: 100%;
     flex-direction: column;
     margin: $spacing-l * 2;
     justify-content: space-between;
-    
+
 
     .menuDivider {
       width: 100%;
