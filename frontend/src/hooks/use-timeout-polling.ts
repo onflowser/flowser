@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PollingResponse, PollingEntity } from "@flowser/shared";
 
 export interface TimeoutPollingHook<Response extends PollingEntity> {
@@ -147,8 +147,10 @@ export function useTimeoutPollingV2<
     }
   );
 
+  const data = useMemo(() => remapDataIsNew(response?.data, false), [response]);
+
   return {
-    data: remapDataIsNew(response?.data, false),
+    data,
     firstFetch: !response && isFetching,
     startPolling: () => null,
     stopPolling: () => null,

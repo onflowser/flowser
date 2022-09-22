@@ -18,7 +18,6 @@ import {
   useGetPollingContractsByAccount,
   useGetPollingKeysByAccount,
   useGetPollingStorageByAccount,
-  useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
@@ -113,7 +112,6 @@ const Details: FunctionComponent = () => {
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
   // TODO(milestone-5): Should we show all transactions of account?
-  const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
@@ -202,7 +200,7 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
-        <DetailsTabItem label="STORAGE" value={account.storage?.length}>
+        <DetailsTabItem label="STORAGE" value={storageItems?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
               <PublicPrivateStorageCard key={item.id} content={item} />

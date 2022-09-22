@@ -43,7 +43,7 @@ export class FlowSnapshotService {
         `Got ${response.status} response from emulator`,
         response.data
       );
-      // Most likely reason for failure is that emulator wasn't started with "persist" flag
+      // Most likely reason for failure is that emulator wasn't started with "--snapshot" flag
       throw new InternalServerErrorException("Failed to create snapshot");
     }
 

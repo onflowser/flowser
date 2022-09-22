@@ -103,6 +103,7 @@ export function useGetPollingContractsByAccount(
 export function useGetPollingStorageByAccount(
   accountAddress: string
 ): TimeoutPollingHook<AccountStorageItem> {
+  console.log("account address", accountAddress);
   return useTimeoutPollingV2<
     AccountStorageItem,
     GetPollingStorageResponse,
