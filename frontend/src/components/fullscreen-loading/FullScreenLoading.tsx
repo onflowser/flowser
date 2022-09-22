@@ -26,7 +26,7 @@ const FullScreenLoading: FC<FullScreenLoadingProps> = ({
 
   return (
     <div className={classNames(classes.container, className)}>
-      <Spinner className={classes.logo} size={100} borderWidth={6} />
+      <Spinner className={classes.logo} size={60} borderWidth={6} />
       <p className={classes.text}>Loading {dots}</p>
     </div>
   );
