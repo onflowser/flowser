@@ -6,8 +6,8 @@ import * as worker from "./worker";
 
 fixPath();
 
-const minWidth = 900;
-const minHeight = 600;
+const minWidth = 1100;
+const minHeight = 800;
 
 async function createWindow() {
   const win = new BrowserWindow({

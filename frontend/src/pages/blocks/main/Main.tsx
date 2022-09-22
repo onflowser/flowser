@@ -5,7 +5,7 @@ import { useSearch } from "../../../hooks/use-search";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
@@ -19,6 +19,10 @@ import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.s
 import ReactTimeago from "react-timeago";
 import { useProjectActions } from "../../../contexts/project-actions.context";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import Card from "components/card/Card";
+import tableClasses from "../../../components/table/Table.module.scss";
+import { flexRender } from "@tanstack/react-table";
+import classNames from "classnames";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -46,29 +50,46 @@ const Main: FunctionComponent = () => {
   const columns = useMemo(
     () => [
       columnHelper.accessor("height", {
-        header: () => <Label variant="medium">BLOCK HEIGHT</Label>,
+        header: () => <Label variant="medium">HEIGHT</Label>,
+        meta: {
+          className: classes.blockHeight,
+        },
         cell: (info) => <Value>{info.getValue()}</Value>,
       }),
       columnHelper.accessor("id", {
-        header: () => <Label variant="medium">BLOCK ID</Label>,
+        header: () => <Label variant="medium">ID</Label>,
+        meta: {
+          className: classes.blockID,
+        },
         cell: (info) => (
           <Value>
             <NavLink to={`/blocks/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+              <MiddleEllipsis className={classes.hash}>
+                {info.getValue()}
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
       }),
       columnHelper.accessor("blockSeals", {
-        header: () => <Label variant="medium">BLOCK SEALS</Label>,
+        header: () => <Label variant="medium">SEALS COUNT</Label>,
+        meta: {
+          className: classes.blockSeals,
+        },
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
       columnHelper.accessor("signatures", {
-        header: () => <Label variant="medium">SIGNATURES</Label>,
+        header: () => <Label variant="medium">SIGS COUNT</Label>,
+        meta: {
+          className: classes.signatures,
+        },
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
       columnHelper.accessor("timestamp", {
         header: () => <Label variant="medium">TIME</Label>,
+        meta: {
+          className: classes.time,
+        },
         cell: (info) => (
           <Value>
             <ReactTimeago date={info.getValue()} />
@@ -78,6 +99,9 @@ const Main: FunctionComponent = () => {
       columnHelper.display({
         id: "snapshot",
         header: () => <Label variant="medium">SNAPSHOT</Label>,
+        meta: {
+          className: classes.snapshot,
+        },
         cell: (info) => {
           const block = info.row.original;
           const snapshot = snapshotLookupByBlockId.get(block.id);
@@ -103,8 +127,47 @@ const Main: FunctionComponent = () => {
   return (
     <Table<DecoratedPollingEntity<Block>>
       isInitialLoading={firstFetch}
-      columns={columns}
       data={filteredData}
+      columns={columns}
+      renderCustomHeader={(headerGroup) => (
+        <Card
+          className={classNames(
+            tableClasses.tableRow,
+            classes.tableRow,
+            tableClasses.headerRow
+          )}
+          key={headerGroup.id}
+          variant="header-row"
+        >
+          {headerGroup.headers.map((header) => (
+            <div
+              key={header.id}
+              className={header.column.columnDef.meta?.className}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </div>
+          ))}
+        </Card>
+      )}
+      renderCustomRow={(row) => (
+        <>
+          <Card
+            className={classNames(tableClasses.tableRow, classes.tableRow)}
+            key={row.id}
+            showIntroAnimation={row.original.isNew}
+            variant="table-line"
+          >
+            {row.getVisibleCells().map((cell) => (
+              <div
+                key={cell.id}
+                className={cell.column.columnDef.meta?.className}
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </div>
+            ))}
+          </Card>
+        </>
+      )}
     />
   );
 };

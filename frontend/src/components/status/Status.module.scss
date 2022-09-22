@@ -9,9 +9,6 @@
   .statusLabel {
     margin-left: $spacing-base;
     color: $grey;
-    font-size: $font-size-large;
-    @media (max-width: 1000px) {
-      display: none;
-    }
+    font-size: $font-size-small;
   }
 }

@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import classes from "./EventDetailsTable.module.scss";
-import Ellipsis from "../ellipsis/Ellipsis";
+import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import CopyButton from "../copy-button/CopyButton";
 import { EventUtils } from "../../utils/event-utils";
 
@@ -28,18 +28,22 @@ const EventDetailsTable: FunctionComponent<EventDetailsTableProps> = ({
         <div key={index} className={classes.row}>
           <div></div>
           <div>
-            <Ellipsis className={classes.ellipsis}>{item.name}</Ellipsis>
+            <MiddleEllipsis className={classes.ellipsis}>
+              {item.name}
+            </MiddleEllipsis>
           </div>
           <div>
-            <Ellipsis className={classes.ellipsis}>{item.type}</Ellipsis>
+            <MiddleEllipsis className={classes.ellipsis}>
+              {item.type}
+            </MiddleEllipsis>
           </div>
           <div>
-            <Ellipsis
+            <MiddleEllipsis
               style={{ whiteSpace: "nowrap" }}
               className={classes.ellipsis}
             >
               {item.value}
-            </Ellipsis>
+            </MiddleEllipsis>
             <CopyButton value={item.value} />
           </div>
         </div>

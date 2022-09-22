@@ -27,7 +27,7 @@ import {
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import Badge from "../../../components/badge/Badge";
 import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
 import { BaseStorageCard } from "./BaseStorageCard";
@@ -80,9 +80,9 @@ const columnsKeys = [
     cell: (info) => (
       <div className={classes.keysRoot}>
         <div className={classes.row}>
-          <Ellipsis className={classes.hash}>
+          <MiddleEllipsis className={classes.hash}>
             {info.row.original.publicKey}
-          </Ellipsis>
+          </MiddleEllipsis>
           <CopyButton value={info.row.original.publicKey} />
         </div>
         <div className={classNames(classes.badges, classes.row)}>

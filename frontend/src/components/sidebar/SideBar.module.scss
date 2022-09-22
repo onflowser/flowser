@@ -12,10 +12,10 @@
 
   .menu {
     display: flex;
-    width: 100%;
     flex-direction: column;
     margin: $spacing-l * 2;
     justify-content: space-between;
+    
 
     .menuDivider {
       width: 100%;
@@ -76,10 +76,6 @@
       .menuItemHeader {
         color: $grey
       }
-    }
-
-    .processItemsWrapper {
-      margin-bottom: $spacing-xl * 2;
     }
 
     .processItem {

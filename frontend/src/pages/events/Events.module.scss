@@ -10,6 +10,8 @@
 
 .tableRow {
   .typeColumn {
+    margin-right: $spacing-s;
+    overflow: hidden;
     flex: 3;
   }
 
@@ -40,6 +42,6 @@
 
 .subTableRow {
   height: 10px;
-  margin-bottom: 10px;
+
 }
 

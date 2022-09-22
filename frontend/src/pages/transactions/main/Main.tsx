@@ -9,7 +9,7 @@ import { Transaction } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import Table from "../../../components/table/Table";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
@@ -21,11 +21,13 @@ const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
 const columns = [
   columnHelper.accessor("id", {
-    header: () => <Label variant="medium">TRANSACTION ID</Label>,
+    header: () => <Label variant="medium">ID</Label>,
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -35,7 +37,9 @@ const columns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/blocks/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -45,13 +49,15 @@ const columns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
   }),
   columnHelper.accessor("status.executionStatus", {
-    header: () => <Label variant="medium">EXECUTION STATUS</Label>,
+    header: () => <Label variant="medium">EXECUTION</Label>,
     cell: (info) => (
       <div>
         <ExecutionStatus status={info.row.original.status} />
@@ -59,7 +65,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("status.grcpStatus", {
-    header: () => <Label variant="medium">GRCP STATUS</Label>,
+    header: () => <Label variant="medium">GRCP</Label>,
     cell: (info) => (
       <div>
         <GrcpStatus status={info.row.original.status} />
