@@ -3,6 +3,7 @@
   "extends": null,
   "appId": "dev.flowser.app",
   "electronVersion": "20.1.0",
+  "afterSign": "./scripts/notarize.js",
   "files": [
     "build/electron/**/*",
     "build/react/**/*",
@@ -25,9 +26,11 @@
     "hardenedRuntime": true,
     "icon": "build/react/static/app-icon/icons/mac/icon.icns",
     "entitlements": "src/entitlements.mac.plist",
+    "entitlementsInherit": "src/entitlements.mac.plist",
     "category": "public.app-category.developer-tools"
   },
   "dmg": {
+    "sign": false,
     "background": "build/react/static/macos-background.tiff",
     "contents": [
       {

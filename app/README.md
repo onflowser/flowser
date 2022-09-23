@@ -20,7 +20,8 @@ This is because the dependencies from other packages (e.g. `@flowser/backend`) w
 
 ## Solution
 
-To solve this problem, we've created a merged `package.json` file, that combines dependencies from all other packages (currently `@flowser/backend` and `@flowser/frontend`).
+To solve this problem, we've created a merged `package.json` file, that combines dependencies from all other packages (currently `@flowser/backend` and `@flowser/frontend`) 
+along with the `src/package.json` file, which acts as a template.
 
 Then we need to install those packages to the `app/node_modules` directory without "hoisting" them to the project root - https://classic.yarnpkg.com/blog/2018/02/15/nohoist.
 

@@ -1,2 +1,3 @@
-package.json
+./package.json
+.env
 build
