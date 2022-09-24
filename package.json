@@ -11,6 +11,7 @@
     "start:desktop:prod:macos-arm": "yarn run build:desktop && ./app/release/build/mac-arm64/Flowser.app/Contents/MacOS/Flowser",
     "start:desktop": "lerna run build --scope @flowser/backend && cd frontend && yarn run electron:serve",
     "build:desktop": "yarn run build && cd app/scripts && node setup.js && sh build.sh",
+    "build:desktop:only": "cd app/scripts && node setup.js && sh build.sh mac",
     "build:desktop:win": "yarn run build:desktop win",
     "build:desktop:mac": "yarn run build:desktop mac",
     "build:desktop:linux": "yarn run build:desktop linux",
