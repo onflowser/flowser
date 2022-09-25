@@ -6,7 +6,6 @@ import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import { useGetCurrentProject } from "./use-api";
-import { Project } from "@flowser/shared";
 import { useQueryClient } from "react-query";
 
 export type FlowScriptArgumentValue = string | number;

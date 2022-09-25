@@ -33,6 +33,7 @@ import {
   ProjectRequirement,
   ProjectRequirementType,
   SignatureAlgorithm,
+  GetProjectStatusResponse,
 } from "@flowser/shared";
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
@@ -82,6 +83,14 @@ export class ProjectsService {
     } else {
       throw new NotFoundException("No current project");
     }
+  }
+
+  async getProjectStatus(): Promise<GetProjectStatusResponse> {
+    const totalBlocksToProcess =
+      await this.flowAggregatorService.getTotalBlocksToProcess();
+    return {
+      totalBlocksToProcess,
+    };
   }
 
   async getMissingRequirements(): Promise<ProjectRequirement[]> {

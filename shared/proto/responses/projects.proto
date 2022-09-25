@@ -8,6 +8,11 @@ message GetProjectRequirementsResponse {
   repeated ProjectRequirement missing_requirements = 1;
 }
 
+message GetProjectStatusResponse {
+  // Number of blocks that our backend needs to process.
+  uint32 total_blocks_to_process = 1;
+}
+
 message GetAllProjectsResponse {
   repeated Project projects = 1;
 }

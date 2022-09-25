@@ -3,6 +3,7 @@ import {
   GetPollingProjectsRequest,
   GetProjectObjectsResponse,
   GetProjectRequirementsResponse,
+  GetProjectStatusResponse,
   Project,
   UpdateProjectResponse,
   UseProjectResponse,
@@ -34,6 +35,14 @@ export class ProjectsService {
       requestMethod: "GET",
       resourceIdentifier: `/api/projects/requirements`,
       responseProtobuf: GetProjectRequirementsResponse,
+    });
+  }
+
+  getStatus(): Promise<GetProjectStatusResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/status`,
+      responseProtobuf: GetProjectStatusResponse,
     });
   }
 
