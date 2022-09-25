@@ -121,7 +121,7 @@ const Main: FunctionComponent = () => {
         },
       }),
     ],
-    [filteredData, snapshotLookupByBlockId]
+    [snapshotLookupByBlockId]
   );
 
   return (
