@@ -68,8 +68,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
   private fileListenerController: AbortController | undefined;
   private config: FlowCliConfig = {};
-  // TODO(milestone-3): Config may not always be present in the project root
-  // Handle cases when it's not or just alert the user that config must be put in root
   private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
 
