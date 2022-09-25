@@ -123,9 +123,7 @@ const Details: FunctionComponent = () => {
     [
       {
         label: "Block ID",
-        value: (
-          <NavLink to={`/blocks/details/${block.parentId}`}>{block.id}</NavLink>
-        ),
+        value: block.id,
       },
       {
         label: "Parent ID",
