@@ -2,6 +2,10 @@ import { mkdir, rm, stat } from "fs/promises";
 import { ProtobufLikeObject } from "@flowser/shared";
 const kebabCase = require("kebab-case");
 
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object";
+}
+
 export function removeAnsiEscapeCodes(data: string) {
   // See in action: https://regex101.com/r/PoqKom/1
   // TODO: Consider using https://github.com/chalk/ansi-regex
