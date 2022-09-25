@@ -148,8 +148,8 @@ export class ManagedProcessEntity extends EventEmitter {
     this.logger.debug(`Received ${lines.length} logs from ${this.id}:`, lines);
     const createdAt = new Date().toString();
     const logs = lines.map(
-      (line, index): ManagedProcessLog => ({
-        id: this.logs.length + index,
+      (line): ManagedProcessLog => ({
+        id: randomUUID(),
         source,
         data: removeAnsiEscapeCodes(line),
         createdAt,

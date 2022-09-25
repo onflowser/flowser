@@ -22,7 +22,7 @@ enum ManagedProcessState {
 }
 
 message ManagedProcessLog {
-  int32 id = 1;
+  string id = 1;
   string data = 2;
   LogSource source = 3;
   string created_at = 4;
