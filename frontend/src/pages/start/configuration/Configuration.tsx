@@ -10,7 +10,13 @@ import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import classNames from "classnames";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
-import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
+import {
+  DevWallet,
+  Emulator,
+  Gateway,
+  Project,
+  UpdateProjectResponse,
+} from "@flowser/shared";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
@@ -56,16 +62,27 @@ export const Configuration: FunctionComponent = () => {
         const response = isExistingProject
           ? await projectService.updateProject(formik.values)
           : await projectService.createProject(formik.values);
-        if (response.project) {
-          await projectService.useProject(response.project.id);
-        }
-        history.replace(`/${routes.firstRouteAfterStart}`);
+        await runProject(response);
       } catch (e) {
         handleError(e);
         window.scrollTo(0, 0);
       }
     },
   });
+
+  async function runProject(response: UpdateProjectResponse) {
+    const { project } = response;
+    if (!project) {
+      return;
+    }
+    try {
+      await projectService.useProject(project.id);
+      history.replace(`/${routes.firstRouteAfterStart}`);
+    } catch (e) {
+      history.replace(`/start/configure/${project.id}`);
+      handleError(e);
+    }
+  }
 
   useEffect(() => {
     if (!formik.isValid) {
