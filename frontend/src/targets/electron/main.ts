@@ -1,5 +1,5 @@
 import * as path from "path";
-import { app, BrowserWindow, shell, dialog } from "electron";
+import { app, BrowserWindow, shell, dialog, ipcMain } from "electron";
 import { ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
 import * as worker from "./worker";
@@ -16,7 +16,22 @@ async function createWindow() {
     minWidth,
     minHeight,
     autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
+
+  async function showDirectoryPicker() {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory"],
+    });
+    if (result.canceled) {
+      return undefined;
+    }
+    return result.filePaths[0];
+  }
+
+  ipcMain.handle("showDirectoryPicker", showDirectoryPicker);
 
   // Open urls in the user's browser
   win.webContents.setWindowOpenHandler((data) => {

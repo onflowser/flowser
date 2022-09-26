@@ -16,10 +16,23 @@ if (process.env.NODE_ENV !== "development") {
 
 const queryClient = new QueryClient();
 
+// Define preload.ts functions
+declare global {
+  interface Window {
+    platformAdapter: {
+      showDirectoryPicker: () => Promise<string | undefined>;
+    };
+  }
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <FlowserClientApp />
+      <FlowserClientApp
+        platformAdapter={{
+          onPickProjectPath: window.platformAdapter.showDirectoryPicker,
+        }}
+      />
     </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById("root")

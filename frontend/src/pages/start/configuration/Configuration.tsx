@@ -31,6 +31,7 @@ import {
   FieldProps,
   ToggleField,
 } from "./FormFields";
+import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -41,6 +42,7 @@ export const Configuration: FunctionComponent = () => {
   const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
 
+  const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
   const { handleError } = useErrorHandler(Configuration.name);
@@ -155,8 +157,14 @@ export const Configuration: FunctionComponent = () => {
               />
               <TextField
                 label="Project root path"
-                description="Specify the filesystem path to your project"
+                description="Specify the path to your project (where flow.json is located)"
                 path="filesystemPath"
+                onClick={async () => {
+                  const path = await onPickProjectPath?.();
+                  if (path) {
+                    formik.setFieldValue("filesystemPath", path);
+                  }
+                }}
                 formik={formik}
               />
             </Card>
