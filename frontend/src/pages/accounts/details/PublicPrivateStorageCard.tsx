@@ -5,6 +5,8 @@ import { NavLink } from "react-router-dom";
 import { ReactComponent as LinkIcon } from "../../../assets/icons/link.svg";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+// @ts-ignore .png import error
+import gradient from "../../../assets/images/gradient.png";
 
 type StorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
@@ -24,6 +26,7 @@ export function PublicPrivateStorageCard({
     : "#";
   return (
     <div className={classes.root}>
+      <img className={classes.background} src={gradient} alt="" />
       <div className={classes.content}>
         <StorageDomainBadge pathDomain={content.pathDomain} />
         <div className={classes.identifier}>{content.pathIdentifier}</div>

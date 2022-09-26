@@ -68,7 +68,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("status.grcpStatus", {
-    header: () => <Label variant="medium">GRCP</Label>,
+    header: () => <Label variant="medium">API</Label>,
     cell: (info) => (
       <div>
         <GrcpStatus status={info.row.original.status} />

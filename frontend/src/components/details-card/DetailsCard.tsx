@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import Label from "components/label/Label";
 import Value from "components/value/Value";
 import React, { FC, ReactElement } from "react";
@@ -13,11 +14,12 @@ export type DetailsCardColumn = DetailsCardRow[];
 
 export type DetailsCardProps = {
   columns: DetailsCardColumn[];
+  className?: string;
 };
 
-export const DetailsCard: FC<DetailsCardProps> = ({ columns }) => {
+export const DetailsCard: FC<DetailsCardProps> = ({ columns, className }) => {
   return (
-    <Card className={classes.root}>
+    <Card className={classNames(classes.root, className)}>
       <div className={classes.content}>
         {columns?.map((rows, index) => (
           <div className={classes.column} key={index}>

@@ -236,10 +236,20 @@ const Details: FunctionComponent = () => {
       {
         label: "Transaction",
         value: (
-          <MiddleEllipsis className={classes.elipsis}>
-            {transaction.id}
-          </MiddleEllipsis>
+          <>
+            <MiddleEllipsis className={classes.elipsis}>
+              {transaction.id}
+            </MiddleEllipsis>
+            <ExecutionStatusBadge
+              className={classes.txStatusBadge}
+              status={transaction.status}
+            />
+          </>
         ),
+      },
+      {
+        label: "API Status",
+        value: <GrcpStatusBadge status={transaction.status} />,
       },
       {
         label: "Timestamp",
@@ -250,26 +260,6 @@ const Details: FunctionComponent = () => {
         value: <ReactTimeAgo date={transaction.createdAt} />,
       },
       {
-        label: "Execution status",
-        value: (
-          <ExecutionStatusBadge
-            className={classes.txStatusBadge}
-            status={transaction.status}
-          />
-        ),
-      },
-      {
-        label: "GRCP Status",
-        value: (
-          <GrcpStatusBadge
-            className={classes.txStatusBadge}
-            status={transaction.status}
-          />
-        ),
-      },
-    ],
-    [
-      {
         label: "Block ID",
         value: (
           <NavLink to={`/blocks/details/${transaction.blockId}`}>
@@ -279,6 +269,8 @@ const Details: FunctionComponent = () => {
           </NavLink>
         ),
       },
+    ],
+    [
       {
         label: "Proposer",
         value: (

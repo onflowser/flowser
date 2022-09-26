@@ -27,8 +27,11 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   const { sendTransaction } = useFlow();
 
   function onClose() {
+    setCode("");
+    setShowLongError(false);
+    setLongError("");
+    setArgs([]);
     setShow(false);
-    splitbee.track(`TransactionDialog: cancel`);
   }
 
   function validateArgs() {

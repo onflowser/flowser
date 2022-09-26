@@ -68,8 +68,9 @@ function getTextColor(statusCode: GrcpStatusCode | undefined) {
     case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
     case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
     case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
-    case GrcpStatusCode.GRCP_STATUS_OK:
       return "#FFFFF";
+    case GrcpStatusCode.GRCP_STATUS_OK:
+      return "#218300";
     case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
     default:
       return "#D0D2D6";
