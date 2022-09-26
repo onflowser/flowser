@@ -109,15 +109,15 @@ const Main: FunctionComponent = () => {
           const snapshot = snapshotLookupByBlockId.get(block.id);
           return (
             <Value>
-              {snapshot?.description ?? "-"}
               {snapshot && (
                 <SimpleButton
-                  style={{ marginLeft: 5 }}
+                  style={{ marginRight: 10 }}
                   onClick={() => revertToBlock(block.id)}
                 >
                   <SnapshotIcon />
                 </SimpleButton>
               )}
+              {snapshot?.description ?? "-"}
             </Value>
           );
         },

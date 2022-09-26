@@ -236,7 +236,7 @@ export class ProjectsService {
         restServerPort,
         grpcServerPort,
         adminServerPort: 8080,
-        persist: true,
+        persist: false,
         snapshot: true,
         performInit: false,
         withContracts: false,

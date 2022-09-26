@@ -45,37 +45,37 @@ const Navigation: FunctionComponent<{
             to={`/${routes.accounts}`}
             totalCounter={tabCount.accounts}
           >
-            ACCOUNTS
+            Accounts
           </NavigationItem>
           <NavigationItem
             to={`/${routes.blocks}`}
             totalCounter={tabCount.blocks}
           >
-            BLOCKS
+            Blocks
           </NavigationItem>
           <NavigationItem
             to={`/${routes.transactions}`}
             totalCounter={tabCount.transactions}
           >
-            TRANSACTIONS
+            Transactions
           </NavigationItem>
           <NavigationItem
             to={`/${routes.contracts}`}
             totalCounter={tabCount.contracts}
           >
-            CONTRACTS
+            Contracts
           </NavigationItem>
           <NavigationItem
             to={`/${routes.events}`}
             totalCounter={tabCount.events}
           >
-            EVENTS
+            Events
           </NavigationItem>
           <NavigationItem
             to={`/${routes.project}`}
             totalCounter={tabCount.project}
           >
-            PROJECT
+            Project
           </NavigationItem>
         </div>
 

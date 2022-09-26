@@ -85,7 +85,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   };
 
   useEffect(() => {
-    setPlaceholder("search logs");
+    setPlaceholder("Search logs");
   }, []);
 
   useEffect(() => {
