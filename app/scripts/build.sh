@@ -29,4 +29,11 @@ mkdir -p $APP_ICON_PATH
 # Copy MacOS installation background image
 cp ../static/macos-background.tiff $STATIC_ASSETS_PATH
 
+
+if [ "$PLATFORM_ARG" == "mac" ] || [ "$PLATFORM_ARG" == "all" ]
+then
+  echo "Building sqlite3 for arm64"
+  yarn run install:mac:arm
+fi
+
 yarn run "build-${PLATFORM_ARG}"

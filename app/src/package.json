@@ -11,7 +11,8 @@
     "build-mac": "yarn run build-electron --mac",
     "build-win": "yarn run build-electron --win",
     "build-linux": "yarn run build-electron --linux",
-    "build-all": "yarn run build-electron --linux --mac --win"
+    "build-all": "yarn run build-electron --linux --mac --win",
+    "install:mac:arm": "cd ../node_modules/sqlite3 && ../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source"
   },
   "devDependencies": {
     "electron-notarize": "^1.2.1",
