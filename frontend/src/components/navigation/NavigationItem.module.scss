@@ -3,6 +3,8 @@
 @import "styles/spacings";
 
 .root {
+  max-width: 150px;
+  width: 100%;
   .navLink {
     display: flex;
     color: $light-grey;
