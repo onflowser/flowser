@@ -82,6 +82,14 @@ export class ProcessManagerService extends EventEmitter {
     await process.start();
   }
 
+  /**
+   * Starts the process and waits until it terminates (exits).
+   */
+  async runUntilTermination(process: ManagedProcessEntity) {
+    await this.start(process);
+    await process.waitOnExit();
+  }
+
   isStoppedAll() {
     return this.getAll().every((process) => !process.isRunning());
   }

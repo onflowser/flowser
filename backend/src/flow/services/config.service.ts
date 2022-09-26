@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  PreconditionFailedException,
-} from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
@@ -73,16 +69,19 @@ export class FlowConfigService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (!fs.existsSync(this.getConfigPath())) {
-      throw new PreconditionFailedException("flow.json config file is missing");
-    }
-    await this.load();
-    this.attachListeners();
+    await this.reload();
   }
 
   onExitProjectContext() {
     this.detachListeners();
     this.projectContext = undefined;
+  }
+
+  public async reload() {
+    this.logger.debug("Reloading flow.json config");
+    this.detachListeners();
+    await this.load();
+    this.attachListeners();
   }
 
   private async attachListeners() {
@@ -146,9 +145,13 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return [];
   }
 
-  async load() {
-    const data = await this.readProjectFile(this.configFileName);
-    this.config = JSON.parse(data);
+  private async load() {
+    try {
+      const data = await this.readProjectFile(this.configFileName);
+      this.config = JSON.parse(data);
+    } catch (e) {
+      this.logger.debug("Config read error", e);
+    }
   }
 
   async save() {
@@ -173,6 +176,10 @@ export class FlowConfigService implements ProjectContextLifecycle {
 
   getConfigPath() {
     return this.buildProjectPath(this.configFileName);
+  }
+
+  public hasConfigFile() {
+    return fs.existsSync(this.getConfigPath());
   }
 
   private async readProjectFile(pathPostfix: string) {

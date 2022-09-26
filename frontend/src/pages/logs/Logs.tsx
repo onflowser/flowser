@@ -93,7 +93,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       .filter((log) => log.isNew)
       .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
     if (hasErrorLogs) {
-      toast.error("Flow emulator encountered errors", {
+      toast.error("Some process encountered errors", {
         duration: 4000,
       });
     }

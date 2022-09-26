@@ -2,6 +2,7 @@ syntax = "proto3";
 
 message ManagedProcess {
   string id = 1;
+  string name = 7;
   CommandOption command = 2;
   ManagedProcessState state = 3;
   repeated ManagedProcessLog logs = 4;

@@ -22,11 +22,13 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   async onExitProjectContext() {
     this.projectContext = undefined;
     await this.stop();
+    this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
   async start() {
     const managedProcess = new ManagedProcessEntity({
       id: FlowEmulatorService.processId,
+      name: "Flow emulator",
       command: {
         name: "flow",
         args: ["emulator", ...this.getFlags()],

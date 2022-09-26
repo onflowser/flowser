@@ -39,8 +39,17 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const { switchProject, sendTransaction, createSnapshot } =
     useProjectActions();
   const { flow: flowBalance } = useGetAccountBalance(user?.addr ?? "");
-  const { data: processes } = useGetPollingProcesses();
+  const { data: unsortedProcesses } = useGetPollingProcesses();
   const { project: currentProject } = currentProjectData ?? {};
+
+  const processes = unsortedProcesses.sort((a) => {
+    // Show running processes at the top
+    if (a.state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
 
   const createProject = useCallback(() => {
     history.push(`/${routes.start}/configure`);
@@ -188,7 +197,7 @@ function ManagedProcessItem({ process }: { process: ManagedProcess }) {
 
   return (
     <div className={classNames(classes.menuItem, classes.processItem)}>
-      <span className={classes.label}>{processIdToName(process.id)}</span>
+      <span className={classes.label}>{process.name}</span>
       <div className={classes.processItemActions}>
         <SimpleButton className={classes.restartButton} onClick={onRestart}>
           <RestartIcon />
@@ -225,15 +234,4 @@ function ManagedProcessStatus({
       })}
     />
   );
-}
-
-function processIdToName(processId: string) {
-  switch (processId) {
-    case "dev-wallet":
-      return "Dev Wallet";
-    case "emulator":
-      return "Emulator";
-    default:
-      return "Unknown";
-  }
 }
