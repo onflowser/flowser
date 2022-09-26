@@ -87,7 +87,7 @@ const txTableColumns = [
     ),
   }),
   txTableColHelper.accessor("status.grcpStatus", {
-    header: () => <Label variant="medium">GRCP STATUS</Label>,
+    header: () => <Label variant="medium">API STATUS</Label>,
     cell: (info) => (
       <div>
         <GrcpStatus status={info.row.original.status} />
