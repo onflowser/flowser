@@ -39,18 +39,8 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const { switchProject, sendTransaction, createSnapshot } =
     useProjectActions();
   const { flow: flowBalance } = useGetAccountBalance(user?.addr ?? "");
-  const { data: unsortedProcesses } = useGetPollingProcesses();
+  const { data: processes } = useGetPollingProcesses();
   const { project: currentProject } = currentProjectData ?? {};
-
-  const processes = unsortedProcesses.sort((a) => {
-    // Show running processes at the top
-    if (a.state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING) {
-      return -1;
-    } else {
-      return 0;
-    }
-  });
-
   const createProject = useCallback(() => {
     history.push(`/${routes.start}/configure`);
   }, []);
