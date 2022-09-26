@@ -5,12 +5,6 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 
-type FlowEmulatorLog = {
-  level: "debug" | "info" | "error";
-  time: string;
-  [key: string]: string;
-};
-
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
   public static readonly processId = "emulator";
@@ -28,11 +22,13 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   async onExitProjectContext() {
     this.projectContext = undefined;
     await this.stop();
+    this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
   async start() {
     const managedProcess = new ManagedProcessEntity({
       id: FlowEmulatorService.processId,
+      name: "Flow emulator",
       command: {
         name: "flow",
         args: ["emulator", ...this.getFlags()],

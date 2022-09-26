@@ -14,6 +14,7 @@ const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
   style,
 }) => {
   const elRef = useRef<HTMLSpanElement>(null);
+  const [show, setShow] = useState(false);
   const [state, setState] = useState(children);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
           children.substring(children.length - half);
         setState(ellipsisText);
       }
+      setShow(true);
     };
 
     resize();
@@ -42,7 +44,11 @@ const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
   }, []);
 
   return (
-    <span ref={elRef} className={className} style={style}>
+    <span
+      ref={elRef}
+      className={className}
+      style={{ ...style, opacity: show ? 1 : 0, transition: "0.3s ease" }}
+    >
       {state}
     </span>
   );

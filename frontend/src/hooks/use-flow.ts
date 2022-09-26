@@ -6,7 +6,7 @@ import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import { useGetCurrentProject } from "./use-api";
-import { Project } from "@flowser/shared";
+import { useQueryClient } from "react-query";
 
 export type FlowScriptArgumentValue = string | number;
 export type FlowScriptArgumentType = string;
@@ -37,6 +37,7 @@ export function useFlow() {
   });
   const [isLoggingIn, setLoggingIn] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
+  const queryClient = useQueryClient();
 
   const devWalletPort = project?.devWallet?.port ?? 8701;
   const devWalletHost = "localhost";
@@ -73,6 +74,10 @@ export function useFlow() {
     } catch (e: unknown) {
       console.error("Fcl logout failed", e);
     } finally {
+      // Resource keys currently don't include the project id
+      // That's why we need to clear all (project scoped) cache
+      // But in the future we'd want to include project id in all resource keys and urls
+      queryClient.clear();
       setLoggingOut(false);
     }
   }

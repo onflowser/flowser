@@ -2,6 +2,7 @@ syntax = "proto3";
 
 message ManagedProcess {
   string id = 1;
+  string name = 7;
   CommandOption command = 2;
   ManagedProcessState state = 3;
   repeated ManagedProcessLog logs = 4;
@@ -22,7 +23,7 @@ enum ManagedProcessState {
 }
 
 message ManagedProcessLog {
-  int32 id = 1;
+  string id = 1;
   string data = 2;
   LogSource source = 3;
   string created_at = 4;

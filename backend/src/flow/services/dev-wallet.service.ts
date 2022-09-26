@@ -6,7 +6,7 @@ import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 
 @Injectable()
 export class FlowDevWalletService implements ProjectContextLifecycle {
-  private readonly processId = "dev-wallet";
+  static readonly processId = "dev-wallet";
   private projectContext: ProjectEntity;
 
   constructor(private readonly processManagerService: ProcessManagerService) {}
@@ -20,13 +20,17 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
 
   async onExitProjectContext() {
     if (this.projectContext?.devWallet?.run) {
-      await this.processManagerService.stop(this.processId);
+      await this.processManagerService.stop(FlowDevWalletService.processId);
+      this.processManagerService
+        .get(FlowDevWalletService.processId)
+        ?.clearLogs();
     }
   }
 
   async start() {
     const devWalletProcess = new ManagedProcessEntity({
-      id: this.processId,
+      id: FlowDevWalletService.processId,
+      name: "Dev wallet",
       command: {
         name: "flow",
         args: [

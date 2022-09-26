@@ -13,6 +13,7 @@ import { Block } from "@flowser/shared";
 import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
+  useIsInitialLoad,
 } from "../../../hooks/use-api";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
@@ -32,6 +33,7 @@ const Main: FunctionComponent = () => {
   const { revertToBlock } = useProjectActions();
 
   const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { isInitialLoad } = useIsInitialLoad();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
   const snapshotLookupByBlockId = useMemo(
@@ -121,12 +123,12 @@ const Main: FunctionComponent = () => {
         },
       }),
     ],
-    [filteredData, snapshotLookupByBlockId]
+    [snapshotLookupByBlockId]
   );
 
   return (
     <Table<DecoratedPollingEntity<Block>>
-      isInitialLoading={firstFetch}
+      isInitialLoading={firstFetch || isInitialLoad}
       data={filteredData}
       columns={columns}
       renderCustomHeader={(headerGroup) => (

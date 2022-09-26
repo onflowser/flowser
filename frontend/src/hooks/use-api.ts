@@ -29,6 +29,7 @@ import {
   GetProjectObjectsResponse,
   GetPollingManagedProcessesResponse,
   GetProjectRequirementsResponse,
+  GetProjectStatusResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -36,6 +37,7 @@ import {
   useTimeoutPolling,
   TimeoutPollingHook,
 } from "contexts/timeout-polling.context";
+import { useEffect, useState } from "react";
 
 const {
   projectsService,
@@ -237,6 +239,36 @@ export function useGetProjectRequirements() {
   return useQuery<GetProjectRequirementsResponse>(
     `/projects/requirements`,
     () => projectsService.getRequirements()
+  );
+}
+
+export function useIsInitialLoad(): { isInitialLoad: boolean } {
+  const [enabled, setEnabled] = useState(true);
+  const { data } = useGetProjectStatus({
+    refetchInterval: 1000,
+    enabled,
+  });
+
+  useEffect(() => {
+    const isInitialLoadComplete = data?.totalBlocksToProcess === 0;
+    if (isInitialLoadComplete) {
+      setEnabled(false);
+    }
+  }, [data]);
+
+  return {
+    isInitialLoad: !data || data.totalBlocksToProcess > 0,
+  };
+}
+
+export function useGetProjectStatus(options?: {
+  refetchInterval?: number;
+  enabled?: boolean;
+}) {
+  return useQuery<GetProjectStatusResponse>(
+    `/projects/status`,
+    () => projectsService.getStatus(),
+    options
   );
 }
 

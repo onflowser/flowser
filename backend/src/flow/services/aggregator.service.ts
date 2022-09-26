@@ -39,6 +39,7 @@ import {
 } from "../../processes/managed-process.entity";
 import { CommonService } from "../../core/services/common.service";
 import { FlowEmulatorService } from "./emulator.service";
+import { start } from "repl";
 
 type BlockData = {
   block: FlowBlock;
@@ -133,6 +134,11 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       // Reindex all blockchain data when the emulator is started (restarted)
       await this.commonService.removeBlockchainData();
     }
+  }
+
+  async getTotalBlocksToProcess() {
+    const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
+    return endBlockHeight - startBlockHeight;
   }
 
   // TODO(milestone-x): Next interval shouldn't start before this function resolves

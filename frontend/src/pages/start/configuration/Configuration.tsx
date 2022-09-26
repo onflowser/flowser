@@ -10,7 +10,13 @@ import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import classNames from "classnames";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
-import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
+import {
+  DevWallet,
+  Emulator,
+  Gateway,
+  Project,
+  UpdateProjectResponse,
+} from "@flowser/shared";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
@@ -25,6 +31,7 @@ import {
   FieldProps,
   ToggleField,
 } from "./FormFields";
+import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -35,6 +42,7 @@ export const Configuration: FunctionComponent = () => {
   const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
 
+  const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
   const { handleError } = useErrorHandler(Configuration.name);
@@ -56,16 +64,27 @@ export const Configuration: FunctionComponent = () => {
         const response = isExistingProject
           ? await projectService.updateProject(formik.values)
           : await projectService.createProject(formik.values);
-        if (response.project) {
-          await projectService.useProject(response.project.id);
-        }
-        history.replace(`/${routes.firstRouteAfterStart}`);
+        await runProject(response);
       } catch (e) {
         handleError(e);
         window.scrollTo(0, 0);
       }
     },
   });
+
+  async function runProject(response: UpdateProjectResponse) {
+    const { project } = response;
+    if (!project) {
+      return;
+    }
+    try {
+      await projectService.useProject(project.id);
+      history.replace(`/${routes.firstRouteAfterStart}`);
+    } catch (e) {
+      history.replace(`/start/configure/${project.id}`);
+      handleError(e);
+    }
+  }
 
   useEffect(() => {
     if (!formik.isValid) {
@@ -138,8 +157,14 @@ export const Configuration: FunctionComponent = () => {
               />
               <TextField
                 label="Project root path"
-                description="Specify the filesystem path to your project"
+                description="Specify the path to your project (where flow.json is located)"
                 path="filesystemPath"
+                onClick={async () => {
+                  const path = await onPickProjectPath?.();
+                  if (path) {
+                    formik.setFieldValue("filesystemPath", path);
+                  }
+                }}
                 formik={formik}
               />
             </Card>

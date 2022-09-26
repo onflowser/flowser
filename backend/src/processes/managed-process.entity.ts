@@ -13,10 +13,10 @@ import {
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
 import { EventEmitter } from "node:events";
-import { removeAnsiEscapeCodes } from "../utils";
 
 export type ManagedProcessOptions = {
   id?: string;
+  name: string;
   command: {
     name: string;
     args?: string[];
@@ -31,6 +31,7 @@ export enum ManagedProcessEvent {
 export class ManagedProcessEntity extends EventEmitter {
   private readonly logger = new Logger(ManagedProcessEntity.name);
   public readonly id: string;
+  private readonly name: string;
   public options: ManagedProcessOptions;
   public childProcess: ChildProcessWithoutNullStreams | undefined;
   public state: ManagedProcessState;
@@ -41,6 +42,7 @@ export class ManagedProcessEntity extends EventEmitter {
   constructor(options: ManagedProcessOptions) {
     super();
     this.id = options.id ?? randomUUID();
+    this.name = options.name;
     this.options = options;
     this.logs = [];
     this.state = ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
@@ -100,10 +102,15 @@ export class ManagedProcessEntity extends EventEmitter {
     });
   }
 
+  public clearLogs() {
+    this.logs = [];
+  }
+
   public toProto(): ManagedProcess {
     const { name, args } = this.options.command;
     return {
       id: this.id,
+      name: this.name,
       command: { name, args },
       state: this.state,
       logs: this.logs,
@@ -148,10 +155,10 @@ export class ManagedProcessEntity extends EventEmitter {
     this.logger.debug(`Received ${lines.length} logs from ${this.id}:`, lines);
     const createdAt = new Date().toString();
     const logs = lines.map(
-      (line, index): ManagedProcessLog => ({
-        id: this.logs.length + index,
+      (line): ManagedProcessLog => ({
+        id: randomUUID(),
         source,
-        data: removeAnsiEscapeCodes(line),
+        data: line,
         createdAt,
         updatedAt: createdAt,
       })
