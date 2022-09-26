@@ -1,14 +1,12 @@
-import {
-  Injectable,
-  Logger,
-  PreconditionFailedException,
-} from "@nestjs/common";
-import { readFile, writeFile } from "fs/promises";
+import { Injectable, Logger } from "@nestjs/common";
+import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
+import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
+import { isObject } from "../../utils";
 
 type FlowAddress = string;
 
@@ -64,23 +62,48 @@ export type FlowCliConfig = {
 @Injectable()
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
+  private fileListenerController: AbortController | undefined;
   private config: FlowCliConfig = {};
-  // TODO(milestone-3): Config may not always be present in the project root
-  // Handle cases when it's not or just alert the user that config must be put in root
   private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (!fs.existsSync(this.getConfigPath())) {
-      throw new PreconditionFailedException("flow.json config file is missing");
-    }
-    // TODO(milestone-x): listen on flow.json changes, reload config and restart emulator, etc...
-    await this.load();
+    await this.reload();
   }
 
   onExitProjectContext() {
+    this.detachListeners();
     this.projectContext = undefined;
+  }
+
+  public async reload() {
+    this.logger.debug("Reloading flow.json config");
+    this.detachListeners();
+    await this.load();
+    this.attachListeners();
+  }
+
+  private async attachListeners() {
+    this.fileListenerController = new AbortController();
+    const { signal } = this.fileListenerController;
+    try {
+      // @ts-ignore AbortController type (because it's a polyfill)
+      const watcher = watch(this.getConfigPath(), { signal });
+      for await (const event of watcher) {
+        // TODO(milestone-x): Refresh dependant services when config changes
+        await this.load();
+      }
+    } catch (error) {
+      this.logger.debug("watch error", error);
+      if (isObject(error) && error["name"] !== "AbortError") {
+        throw error;
+      }
+    }
+  }
+
+  private detachListeners() {
+    this.fileListenerController?.abort();
   }
 
   async getContractTemplates(): Promise<ContractTemplate[]> {
@@ -122,9 +145,13 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return [];
   }
 
-  async load() {
-    const data = await this.readProjectFile(this.configFileName);
-    this.config = JSON.parse(data);
+  private async load() {
+    try {
+      const data = await this.readProjectFile(this.configFileName);
+      this.config = JSON.parse(data);
+    } catch (e) {
+      this.logger.debug("Config read error", e);
+    }
   }
 
   async save() {
@@ -148,7 +175,11 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   getConfigPath() {
-    return this.buildProjectPath("flow.json");
+    return this.buildProjectPath(this.configFileName);
+  }
+
+  public hasConfigFile() {
+    return fs.existsSync(this.getConfigPath());
   }
 
   private async readProjectFile(pathPostfix: string) {

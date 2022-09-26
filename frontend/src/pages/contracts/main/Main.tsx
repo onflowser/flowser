@@ -5,7 +5,10 @@ import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import { useGetPollingContracts } from "../../../hooks/use-api";
+import {
+  useGetPollingContracts,
+  useIsInitialLoad,
+} from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { AccountContract } from "@flowser/shared";
@@ -43,6 +46,7 @@ const Main: FunctionComponent = () => {
   const { showNavigationDrawer } = useNavigation();
   const { data, firstFetch } = useGetPollingContracts();
   const { filteredData } = useFilterData(data, searchTerm);
+  const { isInitialLoad } = useIsInitialLoad();
 
   useEffect(() => {
     setPlaceholder("Search contracts");
@@ -51,7 +55,7 @@ const Main: FunctionComponent = () => {
 
   return (
     <Table<DecoratedPollingEntity<AccountContract>>
-      isInitialLoading={firstFetch}
+      isInitialLoading={firstFetch || isInitialLoad}
       columns={columns}
       data={filteredData}
     />

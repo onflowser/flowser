@@ -4,7 +4,6 @@ import {
   Redirect,
   Route,
   RouteComponentProps,
-  RouteProps,
   Switch,
   withRouter,
 } from "react-router-dom";
@@ -30,6 +29,10 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
 import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
+import {
+  PlatformAdapterProvider,
+  PlatformAdapterState,
+} from "./contexts/platform-adapter.context";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -64,7 +67,14 @@ const BrowserRouterEvents = withRouter(
 
 const queryClient = new QueryClient();
 
-export const FlowserClientApp = () => {
+export type FlowserClientAppProps = {
+  platformAdapter?: PlatformAdapterState;
+};
+
+export const FlowserClientApp = ({
+  platformAdapter,
+}: FlowserClientAppProps): ReactElement => {
+  console.log("Using FlowserClientApp with", platformAdapter);
   return (
     <QueryClientProvider client={queryClient}>
       <TimeoutPollingProvider>
@@ -72,7 +82,9 @@ export const FlowserClientApp = () => {
           <ConfirmDialogProvider>
             <ProjectActionsProvider>
               <UiStateContextProvider>
-                <FlowserRoutes />
+                <PlatformAdapterProvider {...platformAdapter}>
+                  <FlowserRoutes />
+                </PlatformAdapterProvider>
               </UiStateContextProvider>
             </ProjectActionsProvider>
           </ConfirmDialogProvider>
@@ -82,7 +94,7 @@ export const FlowserClientApp = () => {
   );
 };
 
-export const FlowserRoutes = () => {
+export const FlowserRoutes = (): ReactElement => {
   return (
     <BrowserRouterEvents>
       <ProjectRequirements />

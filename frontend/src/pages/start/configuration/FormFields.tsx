@@ -8,7 +8,7 @@ import classes from "./FormFields.module.scss";
 import ToggleButton from "../../../components/toggle-button/ToggleButton";
 import { FormikErrors } from "formik";
 
-export type FieldProps = Pick<InputProps, "type" | "disabled"> & {
+export type FieldProps = InputProps & {
   label?: string;
   description?: string;
   path: string;

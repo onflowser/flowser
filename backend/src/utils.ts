@@ -1,26 +1,8 @@
-import { mkdir, rm, stat } from "fs/promises";
+import { rm } from "fs/promises";
 import { ProtobufLikeObject } from "@flowser/shared";
-const kebabCase = require("kebab-case");
 
-export function removeAnsiEscapeCodes(data: string) {
-  // See in action: https://regex101.com/r/PoqKom/1
-  // TODO: Consider using https://github.com/chalk/ansi-regex
-  return data.replace(/(\u001b)|(\\x1b)\[[^m]*m/g, "");
-}
-
-// create directory if it does not already exist
-export async function mkdirIfEnoent(path: string) {
-  try {
-    await stat(path);
-    console.debug(`directory "${path}" exists, skipping creation`);
-  } catch (e: any) {
-    if (e.code === "ENOENT") {
-      console.debug(`directory "${path}" not found, creating`);
-      await mkdir(path);
-    } else {
-      throw e;
-    }
-  }
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object";
 }
 
 export function isArray(value: unknown): value is unknown[] {
@@ -50,17 +32,6 @@ export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
         : protobuf.toJSON(value);
     },
   };
-}
-
-export function toKebabCase(string: string) {
-  const kebab = kebabCase(string);
-  // kebabCase("WebkitTransform"); => "-webkit-transform"
-  // remove "-" prefix
-  return kebab.substring(1, kebab.length).replace(/ /g, "");
-}
-
-export function randomString() {
-  return `${Math.round(Math.random() * Math.pow(10, 20))}`;
 }
 
 export function ensurePrefixedAddress(address: string | null | undefined) {

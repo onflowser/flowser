@@ -33,6 +33,7 @@ import {
   ProjectRequirement,
   ProjectRequirementType,
   SignatureAlgorithm,
+  GetProjectStatusResponse,
 } from "@flowser/shared";
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
@@ -47,11 +48,13 @@ export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
 
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
+  // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
     [
+      // Config service must be defined before cli service!
+      this.flowConfigService,
       this.flowCliService,
       this.flowGatewayService,
-      this.flowConfigService,
       this.flowAggregatorService,
       this.flowEmulatorService,
       this.flowDevWalletService,
@@ -82,6 +85,14 @@ export class ProjectsService {
     } else {
       throw new NotFoundException("No current project");
     }
+  }
+
+  async getProjectStatus(): Promise<GetProjectStatusResponse> {
+    const totalBlocksToProcess =
+      await this.flowAggregatorService.getTotalBlocksToProcess();
+    return {
+      totalBlocksToProcess,
+    };
   }
 
   async getMissingRequirements(): Promise<ProjectRequirement[]> {
@@ -142,11 +153,9 @@ export class ProjectsService {
 
     // Provide project context to services that need it
     try {
-      await Promise.all(
-        this.servicesWithProjectLifecycleContext.map((service) =>
-          service.onEnterProjectContext(this.currentProject)
-        )
-      );
+      for (const service of this.servicesWithProjectLifecycleContext) {
+        await service.onEnterProjectContext(this.currentProject);
+      }
     } catch (e: unknown) {
       this.logger.debug("Project context initialization failed", e);
       throw new InternalServerErrorException(
