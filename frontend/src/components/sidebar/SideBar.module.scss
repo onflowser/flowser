@@ -42,41 +42,6 @@
       display: flex;
       padding: $spacing-base * 0.6 0;
       align-items: center;
-
-      .menuItemMainWrapper {
-        display: flex;
-        flex-direction: column;
-        margin-left: $spacing-s;
-        align-items: flex-start;
-      }
-
-      .menuItemHeader {
-        transition: 0.3s;
-        color: $light-grey;
-      }
-
-      .menuItemFooter {
-        color: $light-grey;
-        opacity: 0.5;
-        font-size: $font-size-small;
-      }
-
-      .menuItemIcon {
-        height: 30px;
-        width: 30px;
-
-        & > * {
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-    }
-
-    .menuItem:hover {
-      .menuItemHeader {
-        color: $grey
-      }
     }
 
     .processItem {

@@ -4,6 +4,7 @@ import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
 import { ReactComponent as SettingsIcon } from "../../assets/icons/settings-circle.svg";
 import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle.svg";
+import { ReactComponent as LogoutIcon } from "../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
@@ -26,6 +27,7 @@ import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
 import { ServiceRegistry } from "../../services/service-registry";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 import { Spinner } from "../spinner/Spinner";
+import { ActionButton } from "../action-button/ActionButton";
 
 export type Sidebar = {
   toggled: boolean;
@@ -66,19 +68,19 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
       <div className={classes.menu}>
         <div>
           <span className={classes.menuSectionTitle}>FLOWSER</span>
-          <SidebarButton
+          <ActionButton
             onClick={switchProject}
             title="Switch project"
             icon={<SwitchIcon />}
           />
-          <SidebarButton
+          <ActionButton
             onClick={openSettings}
             title="Settings"
             icon={<SettingsIcon />}
           />
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>EMULATOR</span>
-          <SidebarButton
+          <ActionButton
             onClick={() => {
               toggleSidebar();
               createSnapshot();
@@ -89,7 +91,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>WALLET</span>
           {isLoggedIn && (
-            <SidebarButton
+            <ActionButton
               onClick={onClickUserProfile}
               title={user?.addr ?? "-"}
               footer={flowBalance}
@@ -97,7 +99,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             />
           )}
           {isLoggedIn && (
-            <SidebarButton
+            <ActionButton
               onClick={() => {
                 toggleSidebar();
                 sendTransaction();
@@ -107,13 +109,13 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             />
           )}
           {isLoggedIn ? (
-            <SidebarButton
+            <ActionButton
               onClick={logout}
               title="Disconnect wallet"
-              icon={<ConnectIcon />}
+              icon={<LogoutIcon />}
             />
           ) : (
-            <SidebarButton
+            <ActionButton
               onClick={login}
               title="Connect wallet"
               icon={<ConnectIcon />}
@@ -141,28 +143,6 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
         </div>
       </div>
     </Drawer>
-  );
-}
-
-function SidebarButton({
-  onClick,
-  title,
-  footer,
-  icon,
-}: {
-  onClick: () => void;
-  title: string;
-  footer?: string;
-  icon: ReactElement;
-}) {
-  return (
-    <SimpleButton className={classes.menuItem} onClick={onClick}>
-      <div className={classes.menuItemIcon}>{icon}</div>
-      <div className={classes.menuItemMainWrapper}>
-        <div className={classes.menuItemHeader}>{title}</div>
-        {footer && <span className={classes.menuItemFooter}>{footer}</span>}
-      </div>
-    </SimpleButton>
   );
 }
 
