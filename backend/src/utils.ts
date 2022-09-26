@@ -5,12 +5,6 @@ export function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
 }
 
-export function removeAnsiEscapeCodes(data: string) {
-  // See in action: https://regex101.com/r/PoqKom/1
-  // TODO: Consider using https://github.com/chalk/ansi-regex
-  return data.replace(/(\u001b)|(\\x1b)\[[^m]*m/g, "");
-}
-
 export function isArray(value: unknown): value is unknown[] {
   return typeof value === "object" && "map" in value;
 }

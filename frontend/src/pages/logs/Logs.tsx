@@ -1,5 +1,4 @@
 import React, {
-  createRef,
   FunctionComponent,
   useCallback,
   useEffect,
@@ -24,6 +23,7 @@ import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../../components/simple-button/SimpleButton";
+import AnsiHtmlConvert from "ansi-to-html";
 
 type LogsProps = {
   className?: string;
@@ -55,6 +55,10 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
           const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
           return !isBackendCallLog;
         })
+        .map((log) => ({
+          ...log,
+          data: new AnsiHtmlConvert().toHtml(log.data),
+        }))
         .sort(
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()

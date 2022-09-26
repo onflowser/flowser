@@ -13,7 +13,6 @@ import {
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
 import { EventEmitter } from "node:events";
-import { removeAnsiEscapeCodes } from "../utils";
 
 export type ManagedProcessOptions = {
   id?: string;
@@ -159,7 +158,7 @@ export class ManagedProcessEntity extends EventEmitter {
       (line): ManagedProcessLog => ({
         id: randomUUID(),
         source,
-        data: removeAnsiEscapeCodes(line),
+        data: line,
         createdAt,
         updatedAt: createdAt,
       })
