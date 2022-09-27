@@ -6,8 +6,9 @@ Because of that, this is just a workaround solution for now.
 
 ## Building
 
-1. Run `node scripts/setup.js` to prepare the workspace for building
-2. Run `sh scrits/build.sh` to build the app 
+1. Put Apple credentials (`APPLEID`, `APPLEIDPASS`) in `.env` file
+2. Run `node scripts/setup.js` to prepare the workspace for building
+3. Run `sh scrits/build.sh` to build the app 
 
 
 ## Context
