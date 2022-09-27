@@ -4,6 +4,9 @@
   "appId": "dev.flowser.app",
   "electronVersion": "20.1.0",
   "afterSign": "./scripts/notarize.js",
+  "asarUnpack": [
+    "node_modules/sqlite3/lib/binding/**"
+  ],
   "files": [
     "build/electron/**/*",
     "build/react/**/*",

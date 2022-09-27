@@ -30,3 +30,12 @@ Electron builder should now correctly resolve those packages and include them in
 ## Related
 
 - https://spectrum.chat/theia/general/monorepo-with-both-lerna-yarn-workspaces-and-electron-builder~663b407c-f857-4916-b2a4-f63b5c360460
+
+## Known issues
+
+### Sqlite3 not unpacked
+For some reason electron-builder doesn't automatically unpack sqlite3 bindings,
+so we are enforcing that manually by providing `asarUnpack` config.
+
+Possible related issues:
+- https://github.com/electron/electron-packager/issues/21
