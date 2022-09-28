@@ -91,10 +91,9 @@ export function useFlow() {
   async function login() {
     if (!project?.devWallet?.run) {
       // TODO(milestone-x): Check if wallet is online with GET {devWalletUrl}/api request
-      toast.error(
-        "You need to enable the dev wallet option in Flowser settings"
+      toast(
+        "Make sure you started the dev wallet with `flow dev-wallet` command"
       );
-      return;
     }
     setLoggingIn(true);
     try {
