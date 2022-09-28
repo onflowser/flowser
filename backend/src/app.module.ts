@@ -14,11 +14,16 @@ import { FlowModule } from "./flow/flow.module";
 import { CoreModule } from "./core/core.module";
 import { getDatabaseOptions } from "./database";
 import { ProcessesModule } from "./processes/processes.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 @Global()
 @Module({
   providers: [AppService],
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "static"),
+    }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({ useFactory: getDatabaseOptions }),
     ScheduleModule.forRoot(),
