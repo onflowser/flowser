@@ -128,7 +128,7 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
 };
 
 function ProjectsListContent() {
-  const { projects } = useGetAllProjects()?.data ?? {};
+  const { data: projects } = useGetAllProjects();
   const { searchTerm, setPlaceholder } = useSearch("projectSearch");
   const { removeProject } = useProjectActions();
   const { handleError } = useErrorHandler(ProjectsListContent.name);

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "App.scss";
 import { FlowserClientApp } from "App";
 import reportWebVitals from "reportWebVitals";
-import { QueryClientProvider, QueryClient } from "react-query";
 import splitbee from "@splitbee/web";
+// Note that imports paths must be relative to project root
+// because this file is copied to src/index.tsx before build
+import { ExitLoader } from "targets/electron/components/exit-loader/ExitLoader";
 
 // init analytics
 if (process.env.NODE_ENV !== "development") {
@@ -14,26 +16,38 @@ if (process.env.NODE_ENV !== "development") {
   });
 }
 
-const queryClient = new QueryClient();
-
-// Define preload.ts functions
 declare global {
   interface Window {
     platformAdapter: {
       showDirectoryPicker: () => Promise<string | undefined>;
+      handleExit: (callback: () => void) => void;
     };
   }
 }
 
-ReactDOM.render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+function Root() {
+  const [isExiting, setIsExiting] = useState(false);
+
+  window.platformAdapter.handleExit(() => {
+    setIsExiting(true);
+  });
+
+  return (
+    <>
+      {isExiting && <ExitLoader />}
       <FlowserClientApp
+        enableTimeoutPolling={!isExiting}
         platformAdapter={{
           onPickProjectPath: window.platformAdapter.showDirectoryPicker,
         }}
       />
-    </QueryClientProvider>
+    </>
+  );
+}
+
+ReactDOM.render(
+  <React.StrictMode>
+    <Root />
   </React.StrictMode>,
   document.getElementById("root")
 );

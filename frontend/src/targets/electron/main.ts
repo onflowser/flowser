@@ -9,8 +9,10 @@ fixPath();
 const minWidth = 1100;
 const minHeight = 800;
 
+let win: BrowserWindow;
+
 async function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: minWidth,
     height: minHeight,
     minWidth,
@@ -97,11 +99,10 @@ app.on("before-quit", async function (e) {
   // Prevent app termination before cleanup is done
   e.preventDefault();
   try {
+    // Notify renderer process
+    win.webContents.send("exit");
+
     await processManagerService.stopAll();
-    // In case flowser project is currently open,
-    // the close() function will not resolve.
-    // This is probably due to the incoming polling requests.
-    // TODO(milestone-6): Stop polling on the client
     await worker.backend.close();
   } catch (e) {
     dialog.showMessageBox({

@@ -67,7 +67,7 @@ export class ProjectsController {
     );
   }
 
-  @Post("/polling")
+  @Post("polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingProjectsResponse))
   async findAllNew(@Body() data) {
     const request = GetPollingProjectsRequest.fromJSON(data);
@@ -101,7 +101,7 @@ export class ProjectsController {
     );
   }
 
-  @Get("/default")
+  @Get("default")
   async default() {
     return GetSingleProjectResponse.toJSON(
       GetSingleProjectResponse.fromPartial({

@@ -65,19 +65,22 @@ const BrowserRouterEvents = withRouter(
   }
 );
 
-const queryClient = new QueryClient();
+const defaultQueryClient = new QueryClient();
 
 export type FlowserClientAppProps = {
   platformAdapter?: PlatformAdapterState;
+  queryClient?: QueryClient;
+  enableTimeoutPolling?: boolean;
 };
 
 export const FlowserClientApp = ({
   platformAdapter,
+  queryClient,
+  enableTimeoutPolling = true,
 }: FlowserClientAppProps): ReactElement => {
-  console.log("Using FlowserClientApp with", platformAdapter);
   return (
-    <QueryClientProvider client={queryClient}>
-      <TimeoutPollingProvider>
+    <QueryClientProvider client={queryClient || defaultQueryClient}>
+      <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <BrowserRouter>
           <ConfirmDialogProvider>
             <ProjectActionsProvider>

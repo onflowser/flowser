@@ -16,17 +16,19 @@ export type FlowScriptArgument = {
   type: FlowScriptArgumentType;
 };
 
-export function setFclConfig(devWalletUrl: string): void {
+export function setFclConfig(options: {
+  devWalletUrl: string;
+  accessNodePort: number;
+}): void {
   fcl
     .config()
     // flowser app details
-    .put("app.detail.icon", `${process.env.REACT_APP_URL}/favicon.ico`)
+    .put("app.detail.icon", `http://localhost:6061/icon.png`)
     .put("app.detail.title", "Flowser")
     // Point App at Emulator
-    // TODO(milestone-3): Use the value stored in flow.json
-    .put("accessNode.api", "http://localhost:8888")
+    .put("accessNode.api", `http://localhost:${options.accessNodePort}`)
     // Point FCL at dev-wallet (default port)
-    .put("discovery.wallet", `${devWalletUrl}/fcl/authn`);
+    .put("discovery.wallet", `${options.devWalletUrl}/fcl/authn`);
 }
 
 export function useFlow() {
@@ -39,13 +41,17 @@ export function useFlow() {
   const [isLoggingOut, setLoggingOut] = useState(false);
   const queryClient = useQueryClient();
 
+  const accessNodePort = project?.emulator?.restServerPort ?? 8888;
   const devWalletPort = project?.devWallet?.port ?? 8701;
   const devWalletHost = "localhost";
   const devWalletUrl = `http://${devWalletHost}:${devWalletPort}`;
 
   useEffect(() => {
     if (project) {
-      setFclConfig(devWalletUrl);
+      setFclConfig({
+        devWalletUrl,
+        accessNodePort,
+      });
     }
   }, [project]);
 
@@ -85,10 +91,9 @@ export function useFlow() {
   async function login() {
     if (!project?.devWallet?.run) {
       // TODO(milestone-x): Check if wallet is online with GET {devWalletUrl}/api request
-      toast.error(
-        "You need to enable the dev wallet option in Flowser settings"
+      toast(
+        "Make sure you started the dev wallet with `flow dev-wallet` command"
       );
-      return;
     }
     setLoggingIn(true);
     try {
