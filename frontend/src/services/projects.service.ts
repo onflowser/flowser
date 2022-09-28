@@ -22,7 +22,7 @@ export class ProjectsService {
     timestamp: number;
   }): Promise<GetPollingProjectsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/projects/polling`,
       requestData: data,
       requestProtobuf: GetPollingProjectsRequest,

@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { PollingEntity, PollingResponse } from "@flowser/shared";
 import { useQuery } from "react-query";
@@ -34,20 +35,24 @@ type UseTimeoutPollingProps<
   newestFirst?: boolean;
 };
 
-type TimeoutPolingState = {
+export type TimeoutPolingState = {
+  enabled: boolean;
   lastTimeoutPollingLookup: Map<string, number>;
   setTimeoutPolling: (resourceKey: string, timestamp: number) => void;
 };
 
 const TimeoutPollingContext = createContext({} as TimeoutPolingState);
 
+export function useTimeoutPollingState(): TimeoutPolingState {
+  return useContext(TimeoutPollingContext);
+}
+
 export function useTimeoutPolling<
   Entity extends PollingEntity,
   Response extends PollingResponse<Entity[]>
 >(props: UseTimeoutPollingProps<Entity, Response>): TimeoutPollingHook<Entity> {
-  const { lastTimeoutPollingLookup, setTimeoutPolling } = useContext(
-    TimeoutPollingContext
-  );
+  const { lastTimeoutPollingLookup, setTimeoutPolling, enabled } =
+    useTimeoutPollingState();
   const lastPollingTime = lastTimeoutPollingLookup.get(props.resourceKey) ?? 0;
   const {
     data: response,
@@ -58,6 +63,7 @@ export function useTimeoutPolling<
     () => props.fetcher({ timestamp: 0 }),
     {
       refetchInterval: props.interval ?? 2000,
+      enabled,
     }
   );
 
@@ -85,7 +91,9 @@ export function useTimeoutPolling<
 
 export function TimeoutPollingProvider({
   children,
+  enabled = true,
 }: {
+  enabled?: boolean;
   children: ReactElement;
 }): ReactElement {
   const lastPollingTimeLookupRef = useRef(new Map());
@@ -99,6 +107,7 @@ export function TimeoutPollingProvider({
       value={{
         lastTimeoutPollingLookup: lastPollingTimeLookupRef.current,
         setTimeoutPolling,
+        enabled,
       }}
     >
       {children}

@@ -30,12 +30,15 @@ import {
   GetPollingManagedProcessesResponse,
   GetProjectRequirementsResponse,
   GetProjectStatusResponse,
+  Project,
+  GetPollingProjectsResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
 import {
   useTimeoutPolling,
   TimeoutPollingHook,
+  useTimeoutPollingState,
 } from "contexts/timeout-polling.context";
 import { useEffect, useState } from "react";
 
@@ -250,7 +253,7 @@ export function useIsInitialLoad(): { isInitialLoad: boolean } {
   });
 
   useEffect(() => {
-    const isInitialLoadComplete = data?.totalBlocksToProcess === 0;
+    const isInitialLoadComplete = data && data?.totalBlocksToProcess <= 0;
     if (isInitialLoadComplete) {
       setEnabled(false);
     }
@@ -273,23 +276,23 @@ export function useGetProjectStatus(options?: {
 }
 
 export function useGetProjectObjects() {
+  const { enabled } = useTimeoutPollingState();
   return useQuery<GetProjectObjectsResponse>(
     `/flow/objects`,
     () => projectsService.getAllProjectObjects(),
     {
       refetchInterval: 1000,
+      enabled,
     }
   );
 }
 
 export function useGetAllProjects() {
-  return useQuery<GetAllProjectsResponse>(
-    `/projects`,
-    () => projectsService.getAll(),
-    {
-      refetchInterval: 1000,
-    }
-  );
+  return useTimeoutPolling<Project, GetPollingProjectsResponse>({
+    resourceKey: "/projects/polling",
+    fetcher: ({ timestamp }) =>
+      projectsService.getAllWithPolling({ timestamp }),
+  });
 }
 
 export function useGetFlowserVersion() {

@@ -1,28 +1,15 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC } from "react";
 import classes from "./FullScreenLoading.module.scss";
 import classNames from "classnames";
 import { Spinner } from "../spinner/Spinner";
+import { useProgressDots } from "../../hooks/use-progress-dots";
 
 type FullScreenLoadingProps = {
-  dotInterval?: number;
   className?: string;
 };
 
-const FullScreenLoading: FC<FullScreenLoadingProps> = ({
-  dotInterval = 300,
-  className,
-}) => {
-  const [dots, setDots] = useState("");
-
-  useEffect(() => {
-    const dotArray = [".", "..", "...", "...."];
-    let count = 0;
-    const interval = setInterval(() => {
-      count++;
-      setDots(dotArray[count % dotArray.length]);
-    }, dotInterval);
-    return () => clearInterval(interval);
-  }, []);
+const FullScreenLoading: FC<FullScreenLoadingProps> = ({ className }) => {
+  const { dots } = useProgressDots();
 
   return (
     <div className={classNames(classes.container, className)}>
