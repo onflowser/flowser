@@ -4,6 +4,9 @@ export enum AnalyticEvent {
   PROJECT_STARTED = "project_started",
 }
 
+// TODO(milestone-6): Enable before release
+const enableAnalytics = false;
+
 export class MixpanelService {
   constructor() {
     this.init();
@@ -14,6 +17,10 @@ export class MixpanelService {
   }
 
   track(event: AnalyticEvent, properties?: Dict): void {
+    if (!enableAnalytics) {
+      console.log("Analytics disabled. Skipping event ", event);
+      return;
+    }
     try {
       mixpanel.track(event, properties);
     } catch (e) {
