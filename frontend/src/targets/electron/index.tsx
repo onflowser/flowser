@@ -3,19 +3,10 @@ import ReactDOM from "react-dom";
 import "App.scss";
 import { FlowserClientApp } from "App";
 import reportWebVitals from "reportWebVitals";
-import splitbee from "@splitbee/web";
 // Note that imports paths must be relative to project root
 // because this file is copied to src/index.tsx before build
 import { ExitLoader } from "targets/electron/components/exit-loader/ExitLoader";
 import { SentryRendererService } from "targets/electron/services/sentry-renderer.service";
-
-// init analytics
-if (process.env.NODE_ENV !== "development") {
-  splitbee.init({
-    token: "B3B9T4Z4SRQ3",
-    disableCookie: true,
-  });
-}
 
 declare global {
   interface Window {

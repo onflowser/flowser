@@ -3813,11 +3813,6 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@splitbee/web@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.npmjs.org/@splitbee/web/-/web-0.3.0.tgz"
-  integrity sha512-jNPDKg0GQGa4jCaBc6JQsv0NHmBA80WCwZE49nFyhcbo32WF0GyqXeice7ZApy7OUHI16bAUAzm4MOQw3gvxfQ==
-
 "@sqltools/formatter@^1.2.2":
   version "1.2.3"
   resolved "https://registry.npmjs.org/@sqltools/formatter/-/formatter-1.2.3.tgz"

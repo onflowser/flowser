@@ -9,7 +9,6 @@ import MiddleEllipsis from "../../components/ellipsis/MiddleEllipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import splitbee from "@splitbee/web";
 import { useGetPollingEvents, useIsInitialLoad } from "../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";

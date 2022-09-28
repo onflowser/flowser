@@ -7,7 +7,6 @@ import Button from "../../../components/button/Button";
 import { routes } from "../../../constants/routes";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { toast } from "react-hot-toast";
-import splitbee from "@splitbee/web";
 import classNames from "classnames";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
 import {
@@ -60,7 +59,6 @@ export const Configuration: FunctionComponent = () => {
     }),
     onSubmit: async () => {
       try {
-        splitbee.track("Configuration: update/create");
         const response = isExistingProject
           ? await projectService.updateProject(formik.values)
           : await projectService.createProject(formik.values);

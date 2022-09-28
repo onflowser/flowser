@@ -16,7 +16,6 @@ import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
-import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
 import { ManagedProcessLog, LogSource } from "@flowser/shared";
@@ -108,16 +107,13 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const onCaretChange = useCallback((state) => {
     if (state === false) {
       changeLogDrawerSize("small");
-      splitbee.track(`Logs: size small`);
     } else {
       changeLogDrawerSize("tiny");
-      splitbee.track(`Logs: size tiny`);
     }
   }, []);
 
   const changeLogDrawerSize = useCallback((size: LogDrawerSize) => {
     setSize(size);
-    splitbee.track(`Logs: size ${size}`);
     setTimeout(() => {
       scrollToBottom(false);
     }, 100);

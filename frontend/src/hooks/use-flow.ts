@@ -4,7 +4,6 @@ import * as fcl from "@onflow/fcl";
 // @ts-ignore
 import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
-import splitbee from "@splitbee/web";
 import { useGetCurrentProject } from "./use-api";
 import { useQueryClient } from "react-query";
 
@@ -100,7 +99,6 @@ export function useFlow() {
       const result = await fcl.authenticate();
       if (result.loggedIn) {
         toast("Logged in!");
-        splitbee.track("DevWallet: login");
       }
     } catch (e: any) {
       toast.error(`Login failed: ${e.message}`);
