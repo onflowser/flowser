@@ -24,6 +24,8 @@ import { useProjectActions } from "../../../contexts/project-actions.context";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
+import { useAnalytics } from "../../../hooks/use-analytics";
+import { AnalyticEvent } from "../../../services/mixpanel.service";
 
 type ProjectTab = {
   id: string;
@@ -133,6 +135,7 @@ function ProjectsListContent() {
   const { removeProject } = useProjectActions();
   const { handleError } = useErrorHandler(ProjectsListContent.name);
   const history = useHistory();
+  const { track } = useAnalytics();
   const projectService = ServiceRegistry.getInstance().projectsService;
   const showProjectList = projects && projects.length > 0;
 
@@ -143,6 +146,7 @@ function ProjectsListContent() {
   const runProject = async (project: Project) => {
     try {
       await projectService.useProject(project.id);
+      track(AnalyticEvent.PROJECT_STARTED);
       history.push(`/${routes.firstRouteAfterStart}`);
     } catch (e: unknown) {
       handleError(e);
