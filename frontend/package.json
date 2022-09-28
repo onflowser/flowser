@@ -14,6 +14,7 @@
     "@flowser/shared": "0.0.1",
     "@onflow/fcl": "^1.2.0",
     "@onflow/types": "^1.0.3",
+    "@sentry/electron": "^4.0.2",
     "@splitbee/web": "^0.3.0",
     "@tanstack/react-table": "^8.5.11",
     "@testing-library/jest-dom": "^5.14.1",

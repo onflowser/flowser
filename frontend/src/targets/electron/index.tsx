@@ -7,6 +7,7 @@ import splitbee from "@splitbee/web";
 // Note that imports paths must be relative to project root
 // because this file is copied to src/index.tsx before build
 import { ExitLoader } from "targets/electron/components/exit-loader/ExitLoader";
+import { SentryRendererService } from "targets/electron/services/sentry-renderer.service";
 
 // init analytics
 if (process.env.NODE_ENV !== "development") {
@@ -24,6 +25,9 @@ declare global {
     };
   }
 }
+
+const sentryService = new SentryRendererService();
+sentryService.init();
 
 function Root() {
   const [isExiting, setIsExiting] = useState(false);
