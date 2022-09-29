@@ -12,7 +12,6 @@ import { FlowCliService } from "./services/cli.service";
 import { FlowSnapshotService } from "./services/snapshot.service";
 import {
   GetFlowCliInfoResponse,
-  GetAllEmulatorSnapshotsResponse,
   GetPollingEmulatorSnapshotsResponse,
   CreateEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotRequest,
@@ -20,7 +19,7 @@ import {
   GetPollingEmulatorSnapshotsRequest,
   GetProjectObjectsResponse,
 } from "@flowser/shared";
-import { PollingResponseInterceptor } from "../common/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowConfigService } from "./services/config.service";
 
 @Controller("flow")
@@ -35,16 +34,8 @@ export class FlowController {
 
   @Get("version")
   async getVersion() {
-    const info = await this.flowCliService.getVersion();
+    const info = await this.flowCliService.getInfo();
     return GetFlowCliInfoResponse.toJSON(info);
-  }
-
-  @Get("snapshots")
-  async getSnapshots() {
-    const snapshots = await this.flowSnapshotService.findAll();
-    return GetAllEmulatorSnapshotsResponse.toJSON({
-      snapshots: snapshots.map((snapshot) => snapshot.toProto()),
-    });
   }
 
   @Get("objects")
@@ -67,16 +58,17 @@ export class FlowController {
   )
   async getSnapshotsWithPolling(@Body() data) {
     const request = GetPollingEmulatorSnapshotsRequest.fromJSON(data);
-    const snapshots = await this.flowSnapshotService.findAllNewerThanTimestamp(
-      new Date(request.timestamp)
-    );
+    const snapshots =
+      await this.flowSnapshotService.findAllByProjectNewerThanTimestamp(
+        request
+      );
     return snapshots.map((snapshot) => snapshot.toProto());
   }
 
   @Post("snapshots")
   async createSnapshot(@Body() body) {
     const request = CreateEmulatorSnapshotRequest.fromJSON(body);
-    const snapshot = await this.flowSnapshotService.create(request.description);
+    const snapshot = await this.flowSnapshotService.create(request);
     return RevertToEmulatorSnapshotResponse.toJSON(
       RevertToEmulatorSnapshotResponse.fromPartial({
         snapshot: snapshot.toProto(),
@@ -87,7 +79,7 @@ export class FlowController {
   @Put("snapshots")
   async revertToSnapshot(@Body() body) {
     const request = RevertToEmulatorSnapshotRequest.fromJSON(body);
-    const snapshot = await this.flowSnapshotService.revertTo(request.blockId);
+    const snapshot = await this.flowSnapshotService.revertTo(request);
     return RevertToEmulatorSnapshotResponse.toJSON(
       RevertToEmulatorSnapshotResponse.fromPartial({
         snapshot: snapshot.toProto(),

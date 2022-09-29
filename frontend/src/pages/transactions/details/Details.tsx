@@ -10,11 +10,10 @@ import {
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import Card from "../../../components/card/Card";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import TransactionStatusBadge from "../../../components/status/TransactionStatusBadge";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
-import { useFormattedDate } from "../../../hooks/use-formatted-date";
 import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
@@ -22,7 +21,6 @@ import {
 import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
 import Table from "../../../components/table/Table";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
 import CopyButton from "../../../components/copy-button/CopyButton";
@@ -31,14 +29,17 @@ import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
-  DetailsCardProps,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
+import { FlowUtils } from "../../../utils/flow-utils";
+import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type RouteParams = {
   transactionId: string;
 };
 
-// EVENTS SUBTABLE
 const columnHelperEvents = createColumnHelper<ComputedEventData>();
 const columnsEvents = [
   columnHelperEvents.display({
@@ -49,7 +50,9 @@ const columnsEvents = [
     header: () => <Label variant="medium">NAME</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.ellipsis}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -57,7 +60,9 @@ const columnsEvents = [
     header: () => <Label variant="medium">TYPE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.ellipsis}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.ellipsis}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -65,9 +70,12 @@ const columnsEvents = [
     header: () => <Label variant="medium">VALUE</Label>,
     cell: (info) => (
       <div>
-        <Ellipsis style={{ whiteSpace: "nowrap" }} className={classes.subtable}>
+        <MiddleEllipsis
+          style={{ whiteSpace: "nowrap" }}
+          className={classes.subtable}
+        >
           {info.getValue()}
-        </Ellipsis>
+        </MiddleEllipsis>
         <CopyButton value={info.getValue()} />
       </div>
     ),
@@ -92,7 +100,9 @@ const columnsEnvelope = [
     header: () => <Label variant="medium">SIGNATURE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.hash}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -120,7 +130,9 @@ const columnsPayload = [
     header: () => <Label variant="medium">SIGNATURE</Label>,
     cell: (info) => (
       <Value>
-        <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+        <MiddleEllipsis className={classes.hash}>
+          {info.getValue()}
+        </MiddleEllipsis>
       </Value>
     ),
   }),
@@ -138,7 +150,6 @@ const Details: FunctionComponent = () => {
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};
-  const { formatDate } = useFormattedDate();
   const openLog = (status: boolean, id: string) => {
     setOpenedLog(!status ? id : "");
   };
@@ -152,18 +163,16 @@ const Details: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/blocks/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hashEvents}>
+              <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
       }),
       columnHelper.accessor("createdAt", {
         header: () => <Label variant="medium">TIMESTAMP</Label>,
-        cell: (info) => (
-          <Value>{formatDate(new Date(info.getValue()).toISOString())}</Value>
-        ),
+        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
       }),
       columnHelper.accessor("type", {
         header: () => <Label variant="medium">TYPE</Label>,
@@ -178,9 +187,9 @@ const Details: FunctionComponent = () => {
         cell: (info) => (
           <Value>
             <NavLink to={`/transactions/details/${info.getValue()}`}>
-              <Ellipsis className={classes.hashEvents}>
+              <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
-              </Ellipsis>
+              </MiddleEllipsis>
             </NavLink>
           </Value>
         ),
@@ -228,28 +237,37 @@ const Details: FunctionComponent = () => {
         label: "Transaction",
         value: (
           <>
-            <Ellipsis className={classes.elipsis}>{transaction.id}</Ellipsis>
-            <TransactionStatusBadge status={transaction.status} />
+            <MiddleEllipsis className={classes.elipsis}>
+              {transaction.id}
+            </MiddleEllipsis>
+            <ExecutionStatusBadge
+              className={classes.txStatusBadge}
+              status={transaction.status}
+            />
           </>
         ),
+      },
+      {
+        label: "API Status",
+        value: <GrcpStatusBadge status={transaction.status} />,
+      },
+      {
+        label: "Timestamp",
+        value: TextUtils.longDate(transaction.createdAt),
+      },
+      {
+        label: "Time",
+        value: <ReactTimeAgo date={transaction.createdAt} />,
       },
       {
         label: "Block ID",
         value: (
           <NavLink to={`/blocks/details/${transaction.blockId}`}>
-            <Ellipsis className={classes.elipsis}>
+            <MiddleEllipsis className={classes.elipsis}>
               {transaction.blockId}
-            </Ellipsis>
+            </MiddleEllipsis>
           </NavLink>
         ),
-      },
-      {
-        label: "Time Stamp",
-        value: formatDate(transaction.createdAt),
-      },
-      {
-        label: "Time",
-        value: <ReactTimeAgo date={transaction.createdAt} />,
       },
     ],
     [
@@ -295,6 +313,10 @@ const Details: FunctionComponent = () => {
         label: "Sequence nb.",
         value: <>{transaction.proposalKey?.sequenceNumber ?? "-"}</>,
       },
+      {
+        label: "Gas limit",
+        value: `${transaction?.gasLimit}`,
+      },
     ],
   ];
 
@@ -302,6 +324,16 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
+        {transaction?.status?.errorMessage && (
+          <DetailsTabItem
+            label="ERROR"
+            value={FlowUtils.getGrcpStatusName(transaction?.status?.grcpStatus)}
+          >
+            <TransactionErrorMessage
+              errorMessage={transaction?.status?.errorMessage}
+            />
+          </DetailsTabItem>
+        )}
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript
             script={transaction.script}
@@ -334,7 +366,9 @@ const Details: FunctionComponent = () => {
               <div>
                 <Label className={classes.label}>SIGNATURE</Label>
                 <Value>
-                  <Ellipsis className={classes.hash}>{item.signature}</Ellipsis>
+                  <MiddleEllipsis className={classes.hash}>
+                    {item.signature}
+                  </MiddleEllipsis>
                 </Value>
               </div>
               <div>
@@ -398,7 +432,6 @@ const Details: FunctionComponent = () => {
             )}
           />
         </DetailsTabItem>
-        <DetailsTabItem label="GAS LIMIT" value={transaction?.gasLimit} />
       </DetailsTabs>
     </div>
   );

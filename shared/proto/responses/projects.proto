@@ -2,7 +2,16 @@ syntax = "proto3";
 
 import "entities/projects.proto";
 import "entities/config.proto";
-import "responses/common.proto";
+import "responses/core.proto";
+
+message GetProjectRequirementsResponse {
+  repeated ProjectRequirement missing_requirements = 1;
+}
+
+message GetProjectStatusResponse {
+  // Number of blocks that our backend needs to process.
+  uint32 total_blocks_to_process = 1;
+}
 
 message GetAllProjectsResponse {
   repeated Project projects = 1;

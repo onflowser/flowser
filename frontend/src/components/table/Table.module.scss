@@ -2,18 +2,24 @@
 @import "styles/animations";
 @import "styles/colors";
 
+.headerRow {
+  margin-bottom: $spacing-base;
+  padding-bottom: $spacing-base;
+  padding-top: $spacing-base;
+}
+
 .tableRow {
   display: flex;
   justify-content: space-between;
-  margin-bottom: $spacing-base;
+  margin-bottom: $spacing-s;
+  padding-bottom: $spacing-base * 0.8;
+  padding-top: $spacing-base * 0.8;
 
   & > div {
     display: flex;
     flex: 1;
     width: 100%;
     justify-content: flex-start;
+    align-items: center;
   }
-}
-.noResults {
-  margin-top: $spacing-l * 6;
 }

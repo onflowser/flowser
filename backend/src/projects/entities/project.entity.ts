@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { typeOrmProtobufTransformer } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
-import { PollingEntity } from "../../common/entities/polling.entity";
+import { PollingEntity } from "../../core/entities/polling.entity";
 import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
 import { UpdateProjectDto } from "../dto/update-project.dto";
 import * as crypto from "crypto";

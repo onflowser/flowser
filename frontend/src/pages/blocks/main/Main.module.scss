@@ -4,8 +4,8 @@
 .card {
   display: flex;
   justify-content: space-between;
-  padding: $spacing-base $spacing-l;
-  margin-bottom: $spacing-base;
+  
+ 
 
   & > div {
     display: flex;
@@ -20,13 +20,36 @@
   }
 }
 
-.noResults {
-  margin-top: $spacing-l * 6;
-}
-
 .hash {
-  max-width: 13vw;
+  max-width: 21vw;
   min-width: 10vw;
   display: inline-block;
-  overflow: hidden;
+}
+
+.tableRow {
+
+  .blockHeight {
+    flex: 0.8;
+  }
+
+  .blockID{
+    flex: 1.3;
+  }
+
+  .blockSeals {
+    flex: 0.8
+  }
+
+  .signatures {
+    flex: 0.8
+  }
+
+  .snapshot {
+    flex: 1.2
+  }
+
+  .time {
+    flex: 0.8
+  }
+
 }

@@ -60,10 +60,18 @@ export const useSyntaxHighlighter = (): UseSyntaxHighlighterHook => {
 
   const highlightLogKeywords = (logLine: string) => {
     const syntax = {
-      blue: ["INFO", "txID", "blockID", "blockHeight", "address"],
-      red: ["ERR"],
-      yellow: ["WARN", "DEBU"],
-      green: ["EVT"],
+      blue: [
+        "level",
+        "time",
+        "txID",
+        "blockID",
+        "blockHeight",
+        "address",
+        "msg",
+      ],
+      red: ["error"],
+      yellow: [],
+      green: ["event"],
       lightGrey: [],
       darkGrey: [],
     };

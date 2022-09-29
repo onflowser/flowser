@@ -4,7 +4,6 @@ import {
   Redirect,
   Route,
   RouteComponentProps,
-  RouteProps,
   Switch,
   withRouter,
 } from "react-router-dom";
@@ -28,6 +27,12 @@ import { ProjectActionsProvider } from "./contexts/project-actions.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
+import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
+import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
+import {
+  PlatformAdapterProvider,
+  PlatformAdapterState,
+} from "./contexts/platform-adapter.context";
 
 // TODO(milestone-x): temporary disabled, move analytics to a separate hook
 // if (process.env.NODE_ENV !== "development") {
@@ -60,27 +65,42 @@ const BrowserRouterEvents = withRouter(
   }
 );
 
-const queryClient = new QueryClient();
+const defaultQueryClient = new QueryClient();
 
-export const FlowserClientApp = () => {
+export type FlowserClientAppProps = {
+  platformAdapter?: PlatformAdapterState;
+  queryClient?: QueryClient;
+  enableTimeoutPolling?: boolean;
+};
+
+export const FlowserClientApp = ({
+  platformAdapter,
+  queryClient,
+  enableTimeoutPolling = true,
+}: FlowserClientAppProps): ReactElement => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ConfirmDialogProvider>
-          <ProjectActionsProvider>
-            <UiStateContextProvider>
-              <FlowserRoutes />
-            </UiStateContextProvider>
-          </ProjectActionsProvider>
-        </ConfirmDialogProvider>
-      </BrowserRouter>
+    <QueryClientProvider client={queryClient || defaultQueryClient}>
+      <TimeoutPollingProvider enabled={enableTimeoutPolling}>
+        <BrowserRouter>
+          <ConfirmDialogProvider>
+            <ProjectActionsProvider>
+              <UiStateContextProvider>
+                <PlatformAdapterProvider {...platformAdapter}>
+                  <FlowserRoutes />
+                </PlatformAdapterProvider>
+              </UiStateContextProvider>
+            </ProjectActionsProvider>
+          </ConfirmDialogProvider>
+        </BrowserRouter>
+      </TimeoutPollingProvider>
     </QueryClientProvider>
   );
 };
 
-export const FlowserRoutes = () => {
+export const FlowserRoutes = (): ReactElement => {
   return (
     <BrowserRouterEvents>
+      <ProjectRequirements />
       <Switch>
         <Route path={`/${routes.start}`} component={Start} />
         <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />

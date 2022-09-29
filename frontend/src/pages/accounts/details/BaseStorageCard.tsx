@@ -1,10 +1,11 @@
 import React, { ReactElement } from "react";
 import classes from "./BaseStorageCard.module.scss";
-import { DecoratedPollingEntity } from "hooks/use-timeout-polling";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
 import ReactJson from "react-json-view";
+import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type ExtendableStorageCardProps = {
   content: DecoratedPollingEntity<AccountStorageItem>;
@@ -24,27 +25,18 @@ export function BaseStorageCard({
     [classes.gridItemExtended]: isExpanded,
   });
 
-  const extendClassToggle = classNames({
-    [classes.circleOpen]: !isExpanded,
-    [classes.circleClosed]: isExpanded,
-  });
-
   const storageDataPaths = getDataTypeKeysInStorageData(content.data);
 
   return (
     <div id={content.id} className={extendClass}>
-      <div className={classes.header}>
+      <SimpleButton className={classes.header} onClick={() => onToggleExpand()}>
         <div className={classes.type}>
           {FlowUtils.getLowerCasedPathDomain(content.pathDomain)}
         </div>
-        <div className={extendClassToggle} onClick={() => onToggleExpand()}>
-          {isExpanded ? (
-            <div className={classes.iconClosed}>-</div>
-          ) : (
-            <div className={classes.iconOpen}>+</div>
-          )}
+        <div className={classes.circle}>
+          <div className={classes.icon}>{isExpanded ? "-" : "+"}</div>
         </div>
-      </div>
+      </SimpleButton>
       <div className={classes.body}>
         <div className={classes.title}>{content.pathIdentifier}</div>
         {isExpanded ? (

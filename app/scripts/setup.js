@@ -3,14 +3,17 @@ const path = require("path");
 const child_process = require("child_process");
 
 const appRootDir = path.join(__dirname, "..");
+const appSrcDir = path.join(appRootDir, "src");
 const backendRootDir = path.join(appRootDir, "..", "backend");
 const frontendRootDir = path.join(appRootDir, "..", "frontend");
 
+const templatePackageJson = readPackageFile(appSrcDir);
 const backendPackageJson = readPackageFile(backendRootDir);
 const frontendPackageJson = readPackageFile(frontendRootDir);
 
 (async function run() {
   const mergedPackageJson = mergePackageJsonFiles(
+    templatePackageJson,
     backendPackageJson,
     frontendPackageJson
   );
@@ -84,29 +87,19 @@ function getFlowserPackages(packageJson) {
   );
 }
 
-function mergePackageJsonFiles(first, second) {
+function mergePackageJsonFiles(templateFile, ...packageFiles) {
   const mergedDevDependencies = Object.assign(
-    {},
-    first.devDependencies,
-    second.devDependencies
+    templateFile.devDependencies ?? {},
+    ...packageFiles.map((file) => file.devDependencies)
   );
   const mergedDependencies = Object.assign(
-    {},
-    first.dependencies,
-    second.dependencies
+    templateFile.dependencies ?? {},
+    ...packageFiles.map((file) => file.dependencies)
   );
 
   return {
-    name: "@flowser/app",
-    version: "0.0.1",
-    scripts: {
-      "build-electron":
-        "electron-builder -c.extraMetadata.main=build/electron/main.js",
-      "build-mac": "yarn run build-electron --mac",
-      "build-win": "yarn run build-electron --win",
-      "build-linux": "yarn run build-electron --linux",
-    },
+    ...templateFile,
     dependencies: mergedDependencies,
-    devPackages: mergedDevDependencies,
+    devDependencies: mergedDevDependencies,
   };
 }

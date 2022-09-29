@@ -18,10 +18,8 @@ import {
   useGetPollingContractsByAccount,
   useGetPollingKeysByAccount,
   useGetPollingStorageByAccount,
-  useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import {
   AccountContract,
   AccountKey,
@@ -29,7 +27,7 @@ import {
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import Badge from "../../../components/badge/Badge";
 import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
 import { BaseStorageCard } from "./BaseStorageCard";
@@ -39,6 +37,16 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import Card from "../../../components/card/Card";
+import { ActionButton } from "../../../components/action-button/ActionButton";
+import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
+import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
+import { useFlow } from "../../../hooks/use-flow";
+import { useProjectActions } from "../../../contexts/project-actions.context";
+import { UserIcon } from "../../../components/user-icon/UserIcon";
+// @ts-ignore .png import error
+import gradient from "../../../assets/images/gradient.png";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -81,12 +89,12 @@ const columnsKeys = [
     cell: (info) => (
       <div className={classes.keysRoot}>
         <div className={classes.row}>
-          <Ellipsis className={classes.hash}>
+          <MiddleEllipsis className={classes.hash}>
             {info.row.original.publicKey}
-          </Ellipsis>
+          </MiddleEllipsis>
           <CopyButton value={info.row.original.publicKey} />
         </div>
-        <div className={`${classes.badges} ${classes.row}`}>
+        <div className={classNames(classes.badges, classes.row)}>
           <Badge>WEIGHT: {info.row.original.weight}</Badge>
           <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
           <Badge>INDEX: {info.row.original.index}</Badge>
@@ -113,7 +121,6 @@ const Details: FunctionComponent = () => {
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
   // TODO(milestone-5): Should we show all transactions of account?
-  const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
@@ -200,9 +207,12 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns} />
+      <div className={classes.header}>
+        <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
+        <ProfileActionsCard currentAddress={accountId} />
+      </div>
       <DetailsTabs>
-        <DetailsTabItem label="STORAGE" value={account.storage?.length}>
+        <DetailsTabItem label="STORAGE" value={storageItems?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
               <PublicPrivateStorageCard key={item.id} content={item} />
@@ -257,5 +267,34 @@ const Details: FunctionComponent = () => {
     </div>
   );
 };
+
+function ProfileActionsCard({ currentAddress }: { currentAddress: string }) {
+  const { logout, user, isLoggedIn } = useFlow();
+  const { sendTransaction } = useProjectActions();
+
+  if (!isLoggedIn || currentAddress !== user.addr) {
+    return null;
+  }
+  return (
+    <Card className={classes.actionCard}>
+      <img className={classes.background} src={gradient} alt="" />
+      <div className={classes.avatarWrapper}>
+        <UserIcon size={50} />
+      </div>
+      <div className={classes.actionsWrapper}>
+        <ActionButton
+          onClick={() => sendTransaction()}
+          title="Send transaction"
+          icon={<SendTxIcon />}
+        />
+        <ActionButton
+          onClick={logout}
+          title="Disconnect wallet"
+          icon={<LogoutIcon />}
+        />
+      </div>
+    </Card>
+  );
+}
 
 export default Details;

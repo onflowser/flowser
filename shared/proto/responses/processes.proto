@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+import "entities/processes.proto";
+import "responses/core.proto";
+
+message GetPollingManagedProcessesRequest {
+  uint32 timestamp = 1;
+  string process_id = 2;
+}
+
+message GetAllManagedProcessesResponse {
+  repeated ManagedProcess processes = 1;
+}
+
+message GetPollingManagedProcessesResponse {
+  repeated ManagedProcess data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetAllLogsResponse {
+  repeated ManagedProcessLog logs = 1;
+}
+
+message GetPollingLogsRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingLogsResponse {
+  repeated ManagedProcessLog data = 1;
+  PollingMetaData meta = 2;
+}

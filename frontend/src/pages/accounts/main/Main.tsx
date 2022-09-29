@@ -1,18 +1,20 @@
 import React, { FunctionComponent, useEffect } from "react";
-import classes from "./Main.module.scss";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import NoResults from "../../../components/no-results/NoResults";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import { useGetPollingAccounts } from "../../../hooks/use-api";
+import {
+  useGetPollingAccounts,
+  useIsInitialLoad,
+} from "../../../hooks/use-api";
 import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
+import { TextUtils } from "../../../utils/text-utils";
+import ReactTimeago from "react-timeago";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -30,7 +32,9 @@ const columns = [
   }),
   columnHelper.accessor("balance", {
     header: () => <Label variant="medium">BALANCE</Label>,
-    cell: (info) => <Value>{info.getValue()} FLOW</Value>,
+    cell: (info) => (
+      <Value>{TextUtils.readableNumber(info.getValue())} FLOW</Value>
+    ),
   }),
   columnHelper.accessor("keys", {
     header: () => <Label variant="medium">KEY COUNT</Label>,
@@ -40,37 +44,35 @@ const columns = [
     header: () => <Label variant="medium">TX COUNT</Label>,
     cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
   }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">CREATED</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
+      </Value>
+    ),
+  }),
 ];
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
+  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { data: accounts, firstFetch } = useGetPollingAccounts();
+  const { isInitialLoad } = useIsInitialLoad();
 
   useEffect(() => {
-    setPlaceholder("search for block numbers or tx hashes");
+    setPlaceholder("Search accounts");
     showNavigationDrawer(false);
   }, []);
-
-  useEffect(() => {
-    disableSearchBar(!accounts.length);
-  }, [accounts]);
 
   const { filteredData } = useFilterData(accounts, searchTerm);
 
   return (
-    <>
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
-      {filteredData.length > 0 && (
-        <Table<DecoratedPollingEntity<Account>>
-          columns={columns}
-          data={filteredData}
-        ></Table>
-      )}
-    </>
+    <Table<DecoratedPollingEntity<Account>>
+      isInitialLoading={firstFetch || isInitialLoad}
+      columns={columns}
+      data={filteredData}
+    />
   );
 };
 

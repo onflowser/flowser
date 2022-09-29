@@ -12,7 +12,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: $table-line-background;
+    background: $dark-violet;
     height: 65px;
     box-sizing: border-box;
     border-bottom-right-radius: $border-radius-card;
@@ -48,11 +48,7 @@
       }
 
       .searchBox {
-        width: 362px;
-
-        @media (max-width: 1290px) {
-          width: min-content;
-        }
+        width: min-content;
       }
 
       .userButton {
@@ -62,15 +58,6 @@
           width: 100%;
           height: 100%;
         }
-      }
-
-      .snapshotButton {
-        @media (max-width: 970px) {
-          display: none;
-        }
-        background: #ffffff1d;
-        border: $blue 1px solid;
-        color: $blue;
       }
 
       .sidebarButton {
@@ -84,25 +71,6 @@
 
         .sidebarOpen {
           padding-left: 6px;
-        }
-      }
-
-      @media (max-width: 1290px) {
-        &:focus-within {
-          .snapshotButton,
-          .sidebarButton {
-            display: none;
-          }
-
-          @media (min-width: 1000px) {
-            .searchBox {
-              width: 362px !important;
-
-              @media (max-width: 1125px) {
-                width: 250px !important;
-              }
-            }
-          }
         }
       }
     }

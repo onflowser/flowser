@@ -6,8 +6,9 @@ Because of that, this is just a workaround solution for now.
 
 ## Building
 
-1. Run `node scripts/setup.js` to prepare the workspace for building
-2. Run `sh scrits/build.sh` to build the app 
+1. Put Apple credentials (`APPLEID`, `APPLEIDPASS`) in `.env` file
+2. Run `node scripts/setup.js` to prepare the workspace for building
+3. Run `sh scrits/build.sh` to build the app 
 
 
 ## Context
@@ -20,7 +21,8 @@ This is because the dependencies from other packages (e.g. `@flowser/backend`) w
 
 ## Solution
 
-To solve this problem, we've created a merged `package.json` file, that combines dependencies from all other packages (currently `@flowser/backend` and `@flowser/frontend`).
+To solve this problem, we've created a merged `package.json` file, that combines dependencies from all other packages (currently `@flowser/backend` and `@flowser/frontend`) 
+along with the `src/package.json` file, which acts as a template.
 
 Then we need to install those packages to the `app/node_modules` directory without "hoisting" them to the project root - https://classic.yarnpkg.com/blog/2018/02/15/nohoist.
 
@@ -29,3 +31,12 @@ Electron builder should now correctly resolve those packages and include them in
 ## Related
 
 - https://spectrum.chat/theia/general/monorepo-with-both-lerna-yarn-workspaces-and-electron-builder~663b407c-f857-4916-b2a4-f63b5c360460
+
+## Known issues
+
+### Sqlite3 not unpacked
+For some reason electron-builder doesn't automatically unpack sqlite3 bindings,
+so we are enforcing that manually by providing `asarUnpack` config.
+
+Possible related issues:
+- https://github.com/electron/electron-packager/issues/21

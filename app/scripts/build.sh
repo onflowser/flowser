@@ -1,4 +1,8 @@
 BUILD_PATH=../build
+# Needs to be set to the "buildResources" directory
+# See https://www.electron.build/icons
+STATIC_ASSETS_PATH=../build/react/static
+APP_ICON_PATH=$STATIC_ASSETS_PATH/app-icon
 
 # Cleanup
 rm -rf $BUILD_PATH
@@ -11,6 +15,18 @@ cp -r ../../frontend/dist ${BUILD_PATH}/electron
 # Note that some reason, electron-builder doesn't work with npx
 # https://github.com/electron-userland/electron-builder/issues/3984
 
-PLATFORM_ARG=$1 # valid values: --win, --mac, --linux
+PLATFORM_ARG=$1 # valid values: win, mac, linux, all
 
-yarn run build-electron "${PLATFORM_ARG}"
+# The linux build fails if this directory doesn't exist
+# For some reason it's not automatically created
+mkdir ../release/build/@flowser
+
+mkdir -p $APP_ICON_PATH
+
+# Generate app icons
+../node_modules/.bin/electron-icon-maker --input=../src/icon.png --output=$APP_ICON_PATH
+
+# Copy MacOS installation background image
+cp ../static/macos-background.tiff $STATIC_ASSETS_PATH
+
+yarn run "build-${PLATFORM_ARG}"

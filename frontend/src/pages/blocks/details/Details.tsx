@@ -17,17 +17,18 @@ import {
 } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../hooks/use-timeout-polling";
 import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
-import Ellipsis from "../../../components/ellipsis/Ellipsis";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
-import { useFormattedDate } from "hooks/use-formatted-date";
 import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatus } from "../../../components/status/GrcpStatus";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type RouteParams = {
   blockId: string;
@@ -42,7 +43,9 @@ const txTableColumns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -52,7 +55,9 @@ const txTableColumns = [
     cell: (info) => (
       <Value>
         <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <Ellipsis className={classes.hash}>{info.getValue()}</Ellipsis>
+          <MiddleEllipsis className={classes.hash}>
+            {info.getValue()}
+          </MiddleEllipsis>
         </NavLink>
       </Value>
     ),
@@ -73,13 +78,19 @@ const txTableColumns = [
       </Value>
     ),
   }),
-  txTableColHelper.accessor("status", {
-    header: () => <Label variant="medium">STATUS</Label>,
+  txTableColHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">EXECUTION STATUS</Label>,
     cell: (info) => (
       <div>
-        <Value>
-          <ExecutionStatus status={info.getValue()} />
-        </Value>
+        <ExecutionStatus status={info.row.original.status} />
+      </div>
+    ),
+  }),
+  txTableColHelper.accessor("status.grcpStatus", {
+    header: () => <Label variant="medium">API STATUS</Label>,
+    cell: (info) => (
+      <div>
+        <GrcpStatus status={info.row.original.status} />
       </div>
     ),
   }),
@@ -87,7 +98,7 @@ const txTableColumns = [
 
 const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
-  const { disableSearchBar, updateSearchBar } = useSearch();
+  const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const breadcrumbs: Breadcrumb[] = [
@@ -98,13 +109,10 @@ const Details: FunctionComponent = () => {
   const { isLoading, data } = useGetBlock(blockId);
   const { block } = data ?? {};
   const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
-  const createdDate = block ? new Date(block.timestamp).toISOString() : "-";
-  const { formatDate } = useFormattedDate();
 
   useEffect(() => {
     showNavigationDrawer(true);
     setBreadcrumbs(breadcrumbs);
-    disableSearchBar(true);
   }, []);
 
   if (isLoading || !block) {
@@ -115,9 +123,7 @@ const Details: FunctionComponent = () => {
     [
       {
         label: "Block ID",
-        value: (
-          <NavLink to={`/blocks/details/${block.parentId}`}>{block.id}</NavLink>
-        ),
+        value: block.id,
       },
       {
         label: "Parent ID",
@@ -130,12 +136,12 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
-        label: "Time Stamp",
-        value: formatDate(createdDate),
+        label: "Timestamp",
+        value: TextUtils.longDate(block.createdAt),
       },
       {
         label: "Time",
-        value: <ReactTimeAgo date={createdDate} />,
+        value: <ReactTimeAgo date={block.createdAt} />,
       },
     ],
   ];

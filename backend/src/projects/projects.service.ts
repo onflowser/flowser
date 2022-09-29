@@ -1,10 +1,9 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
-  PreconditionFailedException,
   Logger,
   NotFoundException,
+  PreconditionFailedException,
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
@@ -17,7 +16,6 @@ import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
-import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/cli.service";
 import { ContractsService } from "../accounts/services/contracts.service";
@@ -30,11 +28,19 @@ import {
   Emulator,
   Gateway,
   GatewayStatus,
+  HashAlgorithm,
   Project,
+  ProjectRequirement,
+  ProjectRequirementType,
+  SignatureAlgorithm,
+  GetProjectStatusResponse,
 } from "@flowser/shared";
-import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import * as fs from "fs";
-import { CommonService } from "../common/common.service";
+import { CommonService } from "../core/services/common.service";
+import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
+
+const commandExists = require("command-exists");
+const semver = require("semver");
 
 @Injectable()
 export class ProjectsService {
@@ -42,14 +48,16 @@ export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
 
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
-  // TODO: Refactor this to event based mechanism
+  // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
     [
+      // Config service must be defined before cli service!
+      this.flowConfigService,
       this.flowCliService,
       this.flowGatewayService,
-      this.flowConfigService,
       this.flowAggregatorService,
       this.flowEmulatorService,
+      this.flowDevWalletService,
     ];
 
   constructor(
@@ -66,9 +74,9 @@ export class ProjectsService {
     private contractsService: ContractsService,
     private blocksService: BlocksService,
     private eventsService: EventsService,
-    private logsService: LogsService,
     private transactionsService: TransactionsService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private flowDevWalletService: FlowDevWalletService
   ) {}
 
   getCurrentProject() {
@@ -79,10 +87,50 @@ export class ProjectsService {
     }
   }
 
+  async getProjectStatus(): Promise<GetProjectStatusResponse> {
+    const totalBlocksToProcess =
+      await this.flowAggregatorService.getTotalBlocksToProcess();
+    return {
+      totalBlocksToProcess,
+    };
+  }
+
+  async getMissingRequirements(): Promise<ProjectRequirement[]> {
+    const missingRequirements: ProjectRequirement[] = [];
+    try {
+      await commandExists("flow");
+    } catch (e) {
+      missingRequirements.push(
+        ProjectRequirement.fromPartial({
+          type: ProjectRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI,
+        })
+      );
+      return missingRequirements;
+    }
+
+    const flowCliInfo = await this.flowCliService.getInfo();
+    const foundVersion = semver.coerce(flowCliInfo.version).version;
+    const minSupportedVersion = "0.40.0";
+    const isSupportedFlowCliVersion = semver.lte(
+      minSupportedVersion,
+      foundVersion
+    );
+    if (!isSupportedFlowCliVersion) {
+      missingRequirements.push({
+        type: ProjectRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION,
+        missingVersionRequirement: {
+          minSupportedVersion,
+          foundVersion,
+        },
+      });
+    }
+
+    return missingRequirements;
+  }
+
   async cleanupProject() {
     try {
-      // remove all existing data of previously used project
-      // TODO(milestone-x): persist data for projects by default?
+      // Remove all cached data of previously used project
       await this.commonService.removeBlockchainData();
     } catch (e) {
       throw new InternalServerErrorException("Database cleanup failed");
@@ -105,11 +153,9 @@ export class ProjectsService {
 
     // Provide project context to services that need it
     try {
-      await Promise.all(
-        this.servicesWithProjectLifecycleContext.map((service) =>
-          service.onEnterProjectContext(this.currentProject)
-        )
-      );
+      for (const service of this.servicesWithProjectLifecycleContext) {
+        await service.onEnterProjectContext(this.currentProject);
+      }
     } catch (e: unknown) {
       this.logger.debug("Project context initialization failed", e);
       throw new InternalServerErrorException(
@@ -190,7 +236,8 @@ export class ProjectsService {
         restServerPort,
         grpcServerPort,
         adminServerPort: 8080,
-        persist: true,
+        persist: false,
+        snapshot: true,
         performInit: false,
         withContracts: false,
         blockTime: 0,

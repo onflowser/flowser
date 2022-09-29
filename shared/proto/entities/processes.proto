@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+message ManagedProcess {
+  string id = 1;
+  string name = 7;
+  CommandOption command = 2;
+  ManagedProcessState state = 3;
+  repeated ManagedProcessLog logs = 4;
+  string created_at = 5;
+  string updated_at = 6;
+
+  message CommandOption {
+    string name = 1;
+    repeated string args = 2;
+  }
+}
+
+enum ManagedProcessState {
+  MANAGED_PROCESS_STATE_UNSPECIFIED = 0;
+  MANAGED_PROCESS_STATE_NOT_RUNNING = 1;
+  MANAGED_PROCESS_STATE_RUNNING = 2;
+  MANAGED_PROCESS_STATE_ERROR = 3;
+}
+
+message ManagedProcessLog {
+  string id = 1;
+  string data = 2;
+  LogSource source = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+enum LogSource {
+  LOG_SOURCE_UNSPECIFIED = 0;
+  LOG_SOURCE_STDOUT = 1;
+  LOG_SOURCE_STDERR = 2;
+}

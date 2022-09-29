@@ -8,7 +8,40 @@
   align-self: center;
   max-width: 1690px;
   width: 100%;
-  
+
+  .header {
+    display: flex;
+    margin-bottom: $spacing-xl;
+    .detailsCard {
+      flex: 3;
+      margin-bottom: 0;
+      margin-right: $spacing-base;
+    }
+    .actionCard {
+      position: relative;
+      flex: 2;
+      display: flex;
+      align-items: center;
+      padding: $spacing-l $spacing-xl;
+      .avatarWrapper {
+        display: flex;
+        margin-right: $spacing-l * 1.5;
+      }
+      .actionsWrapper, .avatarWrapper {
+        z-index: 1;
+      }
+      .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.25;
+      }
+    }
+  }
+
   .currency {
     color: $strong-green;
     margin-left: $spacing-s;
@@ -34,7 +67,7 @@
 
 .hash {
   display: inline-block;
-  overflow: hidden;
+
   max-width: 90vw;
   margin: $spacing-base;
 }
@@ -43,17 +76,23 @@
   color: $color-grey;
   font-family: $font-family-inter;
   margin-bottom: $spacing-base;
-  margin-top: $spacing-base;
+  flex-wrap: wrap;
+  & > * {
+    margin-top: $spacing-base;
+    margin-right: $spacing-base;
+  }
 }
 
 .keysRoot {
   display: flex;
   flex-direction: column;
+  font-size: $font-size-small;
 
   .row {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    align-items: center;
   }
 }
 

@@ -7,14 +7,12 @@ import React, {
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
-import logo from "../../../assets/images/logo_with_text.svg";
+import logo from "../../../assets/images/long_logo.svg";
 import trash from "../../../assets/icons/trash.svg";
 import newProject from "../../../assets/icons/new_project.svg";
 import openProject from "../../../assets/icons/open_project.svg";
 import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
-import splitbee from "@splitbee/web";
-import { toast } from "react-hot-toast";
 import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
@@ -25,6 +23,7 @@ import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import { useProjectActions } from "../../../contexts/project-actions.context";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
+import { useErrorHandler } from "../../../hooks/use-error-handler";
 
 type ProjectTab = {
   id: string;
@@ -129,9 +128,10 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
 };
 
 function ProjectsListContent() {
-  const { projects } = useGetAllProjects()?.data ?? {};
+  const { data: projects } = useGetAllProjects();
   const { searchTerm, setPlaceholder } = useSearch("projectSearch");
   const { removeProject } = useProjectActions();
+  const { handleError } = useErrorHandler(ProjectsListContent.name);
   const history = useHistory();
   const projectService = ServiceRegistry.getInstance().projectsService;
   const showProjectList = projects && projects.length > 0;
@@ -140,14 +140,13 @@ function ProjectsListContent() {
     setPlaceholder("Search projects");
   }, []);
 
-  const onQuickstart = async (project: Project) => {
+  const runProject = async (project: Project) => {
     try {
       await projectService.useProject(project.id);
-      splitbee.track(`Start: use ${project}`);
       history.push(`/${routes.firstRouteAfterStart}`);
     } catch (e: unknown) {
-      console.error("Can't open project:", e);
-      toast.error("Can't open project");
+      handleError(e);
+      history.replace(`/start/configure/${project.id}`);
     }
   };
 
@@ -170,10 +169,10 @@ function ProjectsListContent() {
       </div>
       <ul className={classes.projectListBody}>
         {filteredProjects.map((project) => (
-          <li key={project.id} className={classes.projectWrapper}>
+          <li key={project.id} className={classes.projectItem}>
             <span
               className={classes.projectName}
-              onClick={() => onQuickstart(project)}
+              onClick={() => runProject(project)}
             >
               {project.name}
             </span>

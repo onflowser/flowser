@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import Label from "components/label/Label";
 import Value from "components/value/Value";
 import React, { FC, ReactElement } from "react";
@@ -13,29 +14,28 @@ export type DetailsCardColumn = DetailsCardRow[];
 
 export type DetailsCardProps = {
   columns: DetailsCardColumn[];
+  className?: string;
 };
 
-export const DetailsCard: FC<DetailsCardProps> = ({ columns }) => {
+export const DetailsCard: FC<DetailsCardProps> = ({ columns, className }) => {
   return (
-    <div className={classes.root}>
-      <Card className={classes.bigCard}>
-        <div className={classes.bigCardContent}>
-          {columns?.map((rows, index) => (
-            <div className={classes.bigCardColumn} key={index}>
-              {rows?.map((row, i) => (
-                <div key={i}>
-                  <Label variant="medium" className={classes.label}>
-                    {row.label}
-                  </Label>
-                  <Value variant="small" className={classes.value}>
-                    {row.value}
-                  </Value>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
+    <Card className={classNames(classes.root, className)}>
+      <div className={classes.content}>
+        {columns?.map((rows, index) => (
+          <div className={classes.column} key={index}>
+            {rows?.map((row, i) => (
+              <div key={i}>
+                <Label variant="medium" className={classes.label}>
+                  {row.label}
+                </Label>
+                <Value variant="small" className={classes.value}>
+                  {row.value}
+                </Value>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 };

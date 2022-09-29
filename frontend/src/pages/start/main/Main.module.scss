@@ -28,7 +28,7 @@
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
-      align-items: flex-end;
+      align-items: center;
 
       .logoWrapper {
         display: flex;
@@ -36,7 +36,7 @@
         align-items: center;
 
         .logo {
-          height: 70px;
+          max-width: 150px;
           width: 100%;
         }
       }
@@ -150,8 +150,9 @@
       flex-direction: column;
       align-items: stretch;
 
-      .projectWrapper {
-        padding: 32px 125px 28px 35px;
+      .projectItem {
+        padding: $spacing-l * 1.5 $spacing-l;
+        padding-right: $spacing-xl;
         display: flex;
         flex-direction: row;
         justify-content: space-between;

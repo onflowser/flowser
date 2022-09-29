@@ -1,4 +1,3 @@
-import { TimeoutPollingHook, useTimeoutPolling } from "./use-timeout-polling";
 import {
   Account,
   AccountContract,
@@ -7,7 +6,8 @@ import {
   Transaction,
   Block,
   Event,
-  Log,
+  ManagedProcessLog,
+  ManagedProcess,
   GetFlowserVersionResponse,
   GetAllProjectsResponse,
   GetSingleProjectResponse,
@@ -27,9 +27,20 @@ import {
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
   GetProjectObjectsResponse,
+  GetPollingManagedProcessesResponse,
+  GetProjectRequirementsResponse,
+  GetProjectStatusResponse,
+  Project,
+  GetPollingProjectsResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
+import {
+  useTimeoutPolling,
+  TimeoutPollingHook,
+  useTimeoutPollingState,
+} from "contexts/timeout-polling.context";
+import { useEffect, useState } from "react";
 
 const {
   projectsService,
@@ -39,7 +50,7 @@ const {
   storageService,
   blocksService,
   eventsService,
-  logsService,
+  processesService,
   accountsService,
   snapshotService,
 } = ServiceRegistry.getInstance();
@@ -47,7 +58,6 @@ const {
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
   return useTimeoutPolling<Account, GetPollingAccountsResponse>({
     resourceKey: "/accounts/polling",
-    resourceIdKey: "address",
     fetcher: (data) => accountsService.getAllWithPolling(data),
   });
 }
@@ -63,11 +73,10 @@ export function useGetPollingTransactionsByAccount(
 ): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
     resourceKey: `/accounts/${accountAddress}/transactions/polling`,
-    resourceIdKey: "id",
-    fetcher: ({ timestamp }) =>
+    fetcher: (data) =>
       transactionsService.getAllByAccountWithPolling({
+        ...data,
         accountAddress,
-        timestamp,
       }),
   });
 }
@@ -77,7 +86,6 @@ export function useGetPollingContractsByAccount(
 ): TimeoutPollingHook<AccountContract> {
   return useTimeoutPolling<AccountContract, GetPollingContractsResponse>({
     resourceKey: `/accounts/${accountAddress}/contracts/polling`,
-    resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
       contractsService.getAllByAccountWithPolling({
         accountAddress,
@@ -91,12 +99,8 @@ export function useGetPollingStorageByAccount(
 ): TimeoutPollingHook<AccountStorageItem> {
   return useTimeoutPolling<AccountStorageItem, GetPollingStorageResponse>({
     resourceKey: `/accounts/${accountAddress}/storage/polling`,
-    resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
-      storageService.getAllByAccountWithPolling({
-        accountAddress,
-        timestamp,
-      }),
+      storageService.getAllByAccountWithPolling({ timestamp, accountAddress }),
   });
 }
 
@@ -105,11 +109,10 @@ export function useGetPollingKeysByAccount(
 ): TimeoutPollingHook<AccountKey> {
   return useTimeoutPolling<AccountKey, GetPollingKeysResponse>({
     resourceKey: `/accounts/${accountAddress}/keys/polling`,
-    resourceIdKey: "index",
     fetcher: ({ timestamp }) =>
       accountsService.getAllKeysByAccountWithPolling({
-        accountAddress,
         timestamp,
+        accountAddress,
       }),
   });
 }
@@ -117,8 +120,8 @@ export function useGetPollingKeysByAccount(
 export function useGetPollingContracts(): TimeoutPollingHook<AccountContract> {
   return useTimeoutPolling<AccountContract, GetPollingContractsResponse>({
     resourceKey: "/contracts/polling",
-    resourceIdKey: "id",
-    fetcher: (data) => contractsService.getAllWithPolling(data),
+    fetcher: ({ timestamp }) =>
+      contractsService.getAllWithPolling({ timestamp }),
   });
 }
 
@@ -131,16 +134,15 @@ export function useGetContract(contractId: string) {
 export function useGetPollingTransactions(): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/transactions/polling",
-    resourceIdKey: "id",
-    fetcher: (data) => transactionsService.getAllWithPolling(data),
+    fetcher: ({ timestamp }) =>
+      transactionsService.getAllWithPolling({ timestamp }),
   });
 }
 
 export function useGetPollingBlocks(): TimeoutPollingHook<Block> {
   return useTimeoutPolling<Block, GetPollingBlocksResponse>({
     resourceKey: "/blocks/polling",
-    resourceIdKey: "id",
-    fetcher: (data) => blocksService.getAllWithPolling(data),
+    fetcher: ({ timestamp }) => blocksService.getAllWithPolling({ timestamp }),
   });
 }
 
@@ -153,8 +155,7 @@ export function useGetBlock(blockId: string) {
 export function useGetPollingEvents(): TimeoutPollingHook<Event> {
   return useTimeoutPolling<Event, GetPollingEventsResponse>({
     resourceKey: "/events/polling",
-    resourceIdKey: "id",
-    fetcher: (data) => eventsService.getAllWithPolling(data),
+    fetcher: ({ timestamp }) => eventsService.getAllWithPolling({ timestamp }),
   });
 }
 
@@ -163,20 +164,37 @@ export function useGetPollingEventsByTransaction(
 ): TimeoutPollingHook<Event> {
   return useTimeoutPolling<Event, GetPollingEventsResponse>({
     resourceKey: `/transaction/${transactionId}/events/polling`,
-    resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
       eventsService.getAllWithPollingByTransaction({
-        transactionId,
         timestamp,
+        transactionId,
       }),
   });
 }
 
-export function useGetPollingLogs(): TimeoutPollingHook<Log> {
-  return useTimeoutPolling<Log, GetPollingLogsResponse>({
-    resourceKey: "/logs/polling",
-    resourceIdKey: "id",
-    fetcher: (data) => logsService.getAllWithPolling(data),
+export function useGetPollingLogs(): TimeoutPollingHook<ManagedProcessLog> {
+  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
+    resourceKey: "/processes/logs/polling",
+    fetcher: ({ timestamp }) =>
+      processesService.getAllLogsWithPolling({ timestamp }),
+  });
+}
+
+export function useGetPollingLogsByProcess(
+  processId: string
+): TimeoutPollingHook<ManagedProcessLog> {
+  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
+    resourceKey: `/processes/${processId}/logs/polling`,
+    fetcher: ({ timestamp }) =>
+      processesService.getAllLogsByProcessWithPolling({ timestamp, processId }),
+  });
+}
+
+export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
+  return useTimeoutPolling<ManagedProcess, GetPollingManagedProcessesResponse>({
+    resourceKey: `/processes`,
+    fetcher: ({ timestamp }) =>
+      processesService.getAllProcessesWithPolling({ timestamp }),
   });
 }
 
@@ -185,7 +203,6 @@ export function useGetPollingTransactionsByBlock(
 ): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/block/transactions/polling",
-    resourceIdKey: "id",
     fetcher: ({ timestamp }) =>
       transactionsService.getAllByBlockWithPolling({
         blockId,
@@ -202,6 +219,11 @@ export function useGetTransaction(transactionId: string) {
   );
 }
 
+export function useCurrentProjectId(): string | undefined {
+  const { data } = useGetCurrentProject();
+  return data?.project?.id;
+}
+
 export function useGetCurrentProject() {
   const { data, error, ...rest } = useQuery<GetSingleProjectResponse>(
     `/projects/current`,
@@ -216,24 +238,61 @@ export function useGetCurrentProject() {
   };
 }
 
+export function useGetProjectRequirements() {
+  return useQuery<GetProjectRequirementsResponse>(
+    `/projects/requirements`,
+    () => projectsService.getRequirements()
+  );
+}
+
+export function useIsInitialLoad(): { isInitialLoad: boolean } {
+  const [enabled, setEnabled] = useState(true);
+  const { data } = useGetProjectStatus({
+    refetchInterval: 1000,
+    enabled,
+  });
+
+  useEffect(() => {
+    const isInitialLoadComplete = data && data?.totalBlocksToProcess <= 0;
+    if (isInitialLoadComplete) {
+      setEnabled(false);
+    }
+  }, [data]);
+
+  return {
+    isInitialLoad: !data || data.totalBlocksToProcess > 0,
+  };
+}
+
+export function useGetProjectStatus(options?: {
+  refetchInterval?: number;
+  enabled?: boolean;
+}) {
+  return useQuery<GetProjectStatusResponse>(
+    `/projects/status`,
+    () => projectsService.getStatus(),
+    options
+  );
+}
+
 export function useGetProjectObjects() {
+  const { enabled } = useTimeoutPollingState();
   return useQuery<GetProjectObjectsResponse>(
     `/flow/objects`,
     () => projectsService.getAllProjectObjects(),
     {
       refetchInterval: 1000,
+      enabled,
     }
   );
 }
 
 export function useGetAllProjects() {
-  return useQuery<GetAllProjectsResponse>(
-    `/projects`,
-    () => projectsService.getAll(),
-    {
-      refetchInterval: 1000,
-    }
-  );
+  return useTimeoutPolling<Project, GetPollingProjectsResponse>({
+    resourceKey: "/projects/polling",
+    fetcher: ({ timestamp }) =>
+      projectsService.getAllWithPolling({ timestamp }),
+  });
 }
 
 export function useGetFlowserVersion() {
@@ -249,15 +308,13 @@ export function useGetFlowCliInfo() {
 }
 
 export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSnapshot> {
+  const projectId = useCurrentProjectId() ?? "";
   return useTimeoutPolling<
     EmulatorSnapshot,
     GetPollingEmulatorSnapshotsResponse
   >({
-    resourceKey: "/snapshots/polling",
-    resourceIdKey: "id",
+    resourceKey: `/${projectId}/snapshots/polling`,
     fetcher: ({ timestamp }) =>
-      snapshotService.getAllWithPolling({
-        timestamp,
-      }),
+      snapshotService.getAllWithPolling({ timestamp, projectId }),
   });
 }

@@ -8,6 +8,7 @@
   display: flex;
   justify-content: flex-start;
   font-size: $font-size-large;
+  z-index: 1001 !important;
 
   .menu {
     display: flex;
@@ -16,12 +17,13 @@
     margin: $spacing-l * 2;
     justify-content: space-between;
 
+
     .menuDivider {
       width: 100%;
       height: 1px;
       opacity: 0.4;
       background: $light-grey;
-      margin-top: $spacing-l;
+      margin-top: $spacing-l * 1.5;
       margin-bottom: $spacing-l * 1.5;
     }
 
@@ -30,47 +32,69 @@
       color: $light-grey;
       font-size: $font-size-normal;
       margin-bottom: $spacing-base;
-      opacity: 0.5;
+      font-weight: 600;
+      background: $gradient-1;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .menuItem {
       display: flex;
-      padding: $spacing-base 0;
+      padding: $spacing-base * 0.6 0;
       align-items: center;
-
-      .menuItemMainWrapper {
-        display: flex;
-        flex-direction: column;
-        margin-left: $spacing-base;
-        align-items: flex-start;
-      }
-
-      .menuItemHeader {
-        transition: 0.3s;
-        color: $light-grey;
-      }
-
-      .menuItemFooter {
-        color: $light-grey;
-        opacity: 0.5;
-        font-size: $font-size-small;
-      }
-
-      .menuItemIcon {
-        height: 40px;
-        width: 40px;
-        & > * {
-          width: 100%;
-          height: 100%;
-        }
-      }
-
     }
 
-    .menuItem:hover {
-      .menuItemHeader {
-        color: $grey
+    .processItem {
+      justify-content: space-between;
+
+      .label {
+        font-size: $font-size-normal;
       }
+
+      .processItemActions {
+        display: flex;
+        align-items: center;
+
+        .restartButton {
+          width: 15px;
+          height: 15px;
+          margin-right: $spacing-base;
+
+          &:hover {
+            svg {
+              transform: scale(1.1) rotate(40deg);
+            }
+          }
+
+          svg {
+            transition: 0.3s ease-in-out;
+            width: 100%;
+            height: 100%;
+
+            path {
+              fill: $grey;
+            }
+          }
+        }
+      }
+    }
+
+    .processStatus {
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+    }
+
+    .processStatusError {
+      background: $color-red-light;
+    }
+
+    .processStatusRunning {
+      background: $strong-green;
+    }
+
+    .processStatusNotRunning {
+      background: $grey;
     }
 
     .footer {

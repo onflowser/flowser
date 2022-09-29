@@ -8,26 +8,10 @@
   display: flex;
 }
 
-.noResults {
-  margin-top: $spacing-l * 6;
-}
-
 .tableRow {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: $spacing-base;
-  align-items: center;
-
-  & > div {
-    width: 100%;
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    justify-content: flex-start;
-    margin: 0 $spacing-base 0 $spacing-base;
-  }
-
   .typeColumn {
+    margin-right: $spacing-s;
+    overflow: hidden;
     flex: 3;
   }
 
@@ -58,6 +42,6 @@
 
 .subTableRow {
   height: 10px;
-  margin-bottom: 10px;
+
 }
 

@@ -6,7 +6,7 @@ import { AccountsService } from "./accounts.service";
 import { BlocksService } from "./blocks.service";
 import { ContractsService } from "./contracts.service";
 import { EventsService } from "./events.service";
-import { LogsService } from "./logs.service";
+import { ProcessesService } from "./processes.service";
 import { StorageService } from "./storage.service";
 import { TransactionsService } from "./transactions.service";
 import { SnapshotService } from "./snapshots.service";
@@ -19,7 +19,7 @@ export class ServiceRegistry {
   public blocksService: BlocksService;
   public contractsService: ContractsService;
   public eventsService: EventsService;
-  public logsService: LogsService;
+  public processesService: ProcessesService;
   public storageService: StorageService;
   public transactionsService: TransactionsService;
   public snapshotService: SnapshotService;
@@ -31,7 +31,7 @@ export class ServiceRegistry {
     this.blocksService = new BlocksService(transport);
     this.contractsService = new ContractsService(transport);
     this.eventsService = new EventsService(transport);
-    this.logsService = new LogsService(transport);
+    this.processesService = new ProcessesService(transport);
     this.storageService = new StorageService(transport);
     this.transactionsService = new TransactionsService(transport);
     this.storageService = new StorageService(transport);

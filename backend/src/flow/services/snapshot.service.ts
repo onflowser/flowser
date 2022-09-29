@@ -10,7 +10,12 @@ import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios from "axios";
 import { randomUUID } from "crypto";
-import { CommonService } from "../../common/common.service";
+import { CommonService } from "../../core/services/common.service";
+import {
+  CreateEmulatorSnapshotRequest,
+  GetPollingEmulatorSnapshotsRequest,
+  RevertToEmulatorSnapshotRequest,
+} from "@flowser/shared";
 
 type SnapshotResponse = {
   blockId: string;
@@ -28,7 +33,7 @@ export class FlowSnapshotService {
     private readonly commonService: CommonService
   ) {}
 
-  async create(description: string) {
+  async create(request: CreateEmulatorSnapshotRequest) {
     // TODO(milestone-3): use value from emulator config object
     const snapshotId = randomUUID();
     const response = await this.createOrRevertSnapshotRequest(snapshotId);
@@ -38,7 +43,7 @@ export class FlowSnapshotService {
         `Got ${response.status} response from emulator`,
         response.data
       );
-      // Most likely reason for failure is that emulator wasn't started with "persist" flag
+      // Most likely reason for failure is that emulator wasn't started with "--snapshot" flag
       throw new InternalServerErrorException("Failed to create snapshot");
     }
 
@@ -46,6 +51,7 @@ export class FlowSnapshotService {
 
     const existingSnapshot = await this.snapshotRepository.findOneBy({
       blockId: snapshotData.blockId,
+      projectId: request.projectId,
     });
 
     if (existingSnapshot) {
@@ -57,14 +63,16 @@ export class FlowSnapshotService {
     const snapshot = new SnapshotEntity();
     snapshot.id = snapshotId;
     snapshot.blockId = snapshotData.blockId;
-    snapshot.description = description;
+    snapshot.projectId = request.projectId;
+    snapshot.description = request.description;
 
     return this.snapshotRepository.save(snapshot);
   }
 
-  async revertTo(blockId: string) {
+  async revertTo(request: RevertToEmulatorSnapshotRequest) {
     const existingSnapshot = await this.snapshotRepository.findOneBy({
-      blockId,
+      projectId: request.projectId,
+      blockId: request.blockId,
     });
 
     if (!existingSnapshot) {
@@ -75,6 +83,11 @@ export class FlowSnapshotService {
       existingSnapshot.id
     );
 
+    // TODO(milestone-x): Handle snapshot data deleted by user
+    // What happens if the user removes snapshot data (in ./flowdb)
+    // and tries to revert to the stored snapshot?
+    // We could check whether the returned snapshot blockId
+    // matches the blockId in our stored snapshot entity
     if (response.status !== 200) {
       this.logger.error(
         `Got ${response.status} response from emulator`,
@@ -88,15 +101,14 @@ export class FlowSnapshotService {
     return existingSnapshot;
   }
 
-  findAllNewerThanTimestamp(timestamp: Date): Promise<SnapshotEntity[]> {
+  findAllByProjectNewerThanTimestamp(
+    request: GetPollingEmulatorSnapshotsRequest
+  ): Promise<SnapshotEntity[]> {
     return this.snapshotRepository.find({
-      where: { createdAt: MoreThan(timestamp) },
-      order: { createdAt: "DESC" },
-    });
-  }
-
-  async findAll() {
-    return this.snapshotRepository.find({
+      where: {
+        createdAt: MoreThan(new Date(request.timestamp)),
+        projectId: request.projectId,
+      },
       order: { createdAt: "DESC" },
     });
   }

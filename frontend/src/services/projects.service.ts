@@ -2,6 +2,8 @@ import {
   CreateProjectResponse,
   GetPollingProjectsRequest,
   GetProjectObjectsResponse,
+  GetProjectRequirementsResponse,
+  GetProjectStatusResponse,
   Project,
   UpdateProjectResponse,
   UseProjectResponse,
@@ -20,11 +22,27 @@ export class ProjectsService {
     timestamp: number;
   }): Promise<GetPollingProjectsResponse> {
     return this.transport.send({
-      requestMethod: "GET",
+      requestMethod: "POST",
       resourceIdentifier: `/api/projects/polling`,
       requestData: data,
       requestProtobuf: GetPollingProjectsRequest,
       responseProtobuf: GetPollingProjectsResponse,
+    });
+  }
+
+  getRequirements(): Promise<GetProjectRequirementsResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/requirements`,
+      responseProtobuf: GetProjectRequirementsResponse,
+    });
+  }
+
+  getStatus(): Promise<GetProjectStatusResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/projects/status`,
+      responseProtobuf: GetProjectStatusResponse,
     });
   }
 

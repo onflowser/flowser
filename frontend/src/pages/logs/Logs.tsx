@@ -1,9 +1,9 @@
 import React, {
-  createRef,
   FunctionComponent,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
@@ -19,8 +19,11 @@ import { useFilterData } from "../../hooks/use-filter-data";
 import splitbee from "@splitbee/web";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
-import { Log, LogSource } from "@flowser/shared";
+import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
+import classNames from "classnames";
+import { SimpleButton } from "../../components/simple-button/SimpleButton";
+import AnsiHtmlConvert from "ansi-to-html";
 
 type LogsProps = {
   className?: string;
@@ -31,11 +34,37 @@ const SEARCH_CONTEXT_NAME = "logs";
 const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
-  const tinyLogRef = createRef<HTMLDivElement>();
-  const nonTinyLogRef = createRef<HTMLDivElement>();
+  const tinyLogRef = useRef<HTMLDivElement>(null);
+  const nonTinyLogRef = useRef<HTMLDivElement>(null);
   const { data: logs } = useGetPollingLogs();
-  // TODO(milestone-x): why are logs not sorted correctly in useGetPollingLogs hooK?
-  const sortedLogs = useMemo(() => logs.sort((a, b) => a.id - b.id), [logs]);
+  const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
+  const logWrapperElement = logWrapperRef.current;
+  const scrollBottom =
+    (logWrapperElement?.scrollTop ?? 0) +
+    (logWrapperElement?.clientHeight ?? 0);
+  const scrollHeight = logWrapperElement?.scrollHeight ?? 0;
+  const scrollDistanceToBottom = Math.abs(scrollBottom - scrollHeight);
+  const shouldScrollToBottom = scrollDistanceToBottom < 10;
+
+  const sortedLogs = useMemo(
+    () =>
+      logs
+        // Exclude logs that indicate which our backend called the emulator
+        // To reduce unnecessary clutter
+        .filter((log) => {
+          const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
+          return !isBackendCallLog;
+        })
+        .map((log) => ({
+          ...log,
+          data: new AnsiHtmlConvert().toHtml(log.data),
+        }))
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        ),
+    [logs]
+  );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { data } = useGetCurrentProject();
   const isCapturingEmulatorLogs = data?.project?.emulator?.run;
@@ -43,33 +72,32 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const mouseEvent = useMouseMove(trackMousePosition);
 
   const scrollToBottom = (smooth = true) => {
-    const ref = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
-    if (ref.current) {
+    if (!shouldScrollToBottom) {
+      return;
+    }
+    if (logWrapperRef.current) {
       const options: ScrollToOptions = {
-        top: ref.current.scrollHeight,
+        top: logWrapperRef.current.scrollHeight,
         behavior: smooth ? "smooth" : "auto",
       };
-      ref.current.scrollTo(options);
+      logWrapperRef.current.scrollTo(options);
     }
   };
 
   useEffect(() => {
-    setPlaceholder("search logs");
+    setPlaceholder("Search logs");
   }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [logDrawerSize]);
+  }, [logDrawerSize, shouldScrollToBottom]);
 
   useEffect(() => {
-    // TODO(ui): scroll to bottom only when drawer is not "in use"
-    const hasStdErrLogs = logs.some(
-      (log) => log.source === LogSource.LOG_SOURCE_STDERR
-    );
-    if (hasStdErrLogs) {
-      // TODO(milestone-5): Uncomment below line
-      // setSize("small"); -- this is temporary
-      toast.error("Flow emulator encountered errors", {
+    const hasErrorLogs = logs
+      .filter((log) => log.isNew)
+      .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
+    if (hasErrorLogs) {
+      toast.error("Some process encountered errors", {
         duration: 4000,
       });
     }
@@ -122,7 +150,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   return (
     <div
-      className={`${classes.root} ${className}`}
+      className={classNames(classes.root, className)}
       style={logDrawerSize === "custom" ? { top: mouseEvent?.clientY } : {}}
     >
       <VerticalDragLine
@@ -132,14 +160,23 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       />
 
       <div
-        className={`${classes.header} ${
-          logDrawerSize !== "tiny" ? classes.expanded : ""
-        }`}
+        className={classNames(classes.header, {
+          [classes.expanded]: logDrawerSize !== "tiny",
+        })}
       >
-        <span className={classes.leftContainer}>
+        <SimpleButton
+          className={classes.leftContainer}
+          onClick={() => {
+            if (logDrawerSize === "tiny") {
+              changeLogDrawerSize("small");
+            } else {
+              changeLogDrawerSize("tiny");
+            }
+          }}
+        >
           <LogsIcon />
           <span>LOGS</span>
-        </span>
+        </SimpleButton>
 
         {logDrawerSize === "tiny" && (
           <div className={classes.midContainer} ref={tinyLogRef}>
@@ -192,7 +229,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   );
 };
 
-function LogLine({ log }: { log: Log }) {
+function LogLine({ log }: { log: ManagedProcessLog }) {
   const { highlightLogKeywords } = useSyntaxHighlighter();
 
   return (

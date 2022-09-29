@@ -6,7 +6,7 @@ import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
 import splitbee from "@splitbee/web";
 import { useGetCurrentProject } from "./use-api";
-import { Project } from "@flowser/shared";
+import { useQueryClient } from "react-query";
 
 export type FlowScriptArgumentValue = string | number;
 export type FlowScriptArgumentType = string;
@@ -16,32 +16,42 @@ export type FlowScriptArgument = {
   type: FlowScriptArgumentType;
 };
 
-export function setFclConfig(project: Project): void {
-  const devWalletPort = project.devWallet?.port ?? 8701;
-  const devWalletHost = "localhost";
-  const devWalletUrl = `http://${devWalletHost}:${devWalletPort}`;
+export function setFclConfig(options: {
+  devWalletUrl: string;
+  accessNodePort: number;
+}): void {
   fcl
     .config()
     // flowser app details
-    .put("app.detail.icon", `${process.env.REACT_APP_URL}/favicon.ico`)
+    .put("app.detail.icon", `http://localhost:6061/icon.png`)
     .put("app.detail.title", "Flowser")
     // Point App at Emulator
-    // TODO(milestone-3): Use the value stored in flow.json
-    .put("accessNode.api", "http://localhost:8888")
+    .put("accessNode.api", `http://localhost:${options.accessNodePort}`)
     // Point FCL at dev-wallet (default port)
-    .put("discovery.wallet", `${devWalletUrl}/fcl/authn`);
+    .put("discovery.wallet", `${options.devWalletUrl}/fcl/authn`);
 }
 
 export function useFlow() {
   const { data } = useGetCurrentProject();
   const { project } = data ?? {};
-  const [user, setUser] = useState<any>({ loggedIn: null });
+  const [user, setUser] = useState<{ loggedIn: null; addr?: string }>({
+    loggedIn: null,
+  });
   const [isLoggingIn, setLoggingIn] = useState(false);
   const [isLoggingOut, setLoggingOut] = useState(false);
+  const queryClient = useQueryClient();
+
+  const accessNodePort = project?.emulator?.restServerPort ?? 8888;
+  const devWalletPort = project?.devWallet?.port ?? 8701;
+  const devWalletHost = "localhost";
+  const devWalletUrl = `http://${devWalletHost}:${devWalletPort}`;
 
   useEffect(() => {
     if (project) {
-      setFclConfig(project);
+      setFclConfig({
+        devWalletUrl,
+        accessNodePort,
+      });
     }
   }, [project]);
 
@@ -67,17 +77,24 @@ export function useFlow() {
     setLoggingOut(true);
     try {
       await fcl.unauthenticate();
-      toast("Logged out!");
-      splitbee.track("DevWallet: logout");
-    } catch (e: any) {
-      console.log(e);
-      toast.error(`Logout failed: ${e.message}`);
+    } catch (e: unknown) {
+      console.error("Fcl logout failed", e);
     } finally {
+      // Resource keys currently don't include the project id
+      // That's why we need to clear all (project scoped) cache
+      // But in the future we'd want to include project id in all resource keys and urls
+      queryClient.clear();
       setLoggingOut(false);
     }
   }
 
   async function login() {
+    if (!project?.devWallet?.run) {
+      // TODO(milestone-x): Check if wallet is online with GET {devWalletUrl}/api request
+      toast(
+        "Make sure you started the dev wallet with `flow dev-wallet` command"
+      );
+    }
     setLoggingIn(true);
     try {
       const result = await fcl.authenticate();
