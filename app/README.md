@@ -6,7 +6,7 @@ Because of that, this is just a workaround solution for now.
 
 ## Building
 
-1. Put Apple credentials (`APPLEID`, `APPLEIDPASS`) in `.env` file
+1. Put Apple credentials (`APPLE_ID`, `APPLE_ID_PASS`) in `.env` file
 2. Run `node scripts/setup.js` to prepare the workspace for building
 3. Run `sh scrits/build.sh` to build the app 
 
