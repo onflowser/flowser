@@ -3,10 +3,7 @@ import classes from "./Main.module.scss";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
-import {
-  useGetPollingTransactions,
-  useIsInitialLoad,
-} from "../../../hooks/use-api";
+import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Transaction } from "@flowser/shared";
 import Label from "../../../components/label/Label";
@@ -89,7 +86,6 @@ const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { data, firstFetch } = useGetPollingTransactions();
-  const { isInitialLoad } = useIsInitialLoad();
   const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
@@ -99,7 +95,7 @@ const Main: FunctionComponent = () => {
 
   return (
     <Table<DecoratedPollingEntity<Transaction>>
-      isInitialLoading={firstFetch || isInitialLoad}
+      isInitialLoading={firstFetch}
       data={filteredData}
       columns={columns}
     />
