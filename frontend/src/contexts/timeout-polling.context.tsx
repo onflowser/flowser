@@ -5,10 +5,10 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { PollingEntity, PollingResponse } from "@flowser/shared";
 import { useQuery } from "react-query";
+import { useIsInitialLoad } from "../hooks/use-api";
 
 export interface TimeoutPollingHook<Response extends PollingEntity> {
   stopPolling: () => void;
@@ -33,6 +33,7 @@ type UseTimeoutPollingProps<
   fetcher: (params: { timestamp: number }) => Promise<Response>;
   interval?: number;
   newestFirst?: boolean;
+  enabled?: boolean;
 };
 
 export type TimeoutPolingState = {
@@ -47,12 +48,33 @@ export function useTimeoutPollingState(): TimeoutPolingState {
   return useContext(TimeoutPollingContext);
 }
 
+export function useProjectTimeoutPolling<
+  Entity extends PollingEntity,
+  Response extends PollingResponse<Entity[]>
+>(props: UseTimeoutPollingProps<Entity, Response>): TimeoutPollingHook<Entity> {
+  const { isInitialLoad } = useIsInitialLoad();
+
+  const timeoutPollingState = useTimeoutPolling<Entity, Response>({
+    ...props,
+    enabled: !isInitialLoad,
+  });
+
+  return {
+    ...timeoutPollingState,
+    firstFetch: isInitialLoad || timeoutPollingState.firstFetch,
+  };
+}
+
 export function useTimeoutPolling<
   Entity extends PollingEntity,
   Response extends PollingResponse<Entity[]>
 >(props: UseTimeoutPollingProps<Entity, Response>): TimeoutPollingHook<Entity> {
-  const { lastTimeoutPollingLookup, setTimeoutPolling, enabled } =
-    useTimeoutPollingState();
+  const { enabled = true } = props;
+  const {
+    lastTimeoutPollingLookup,
+    setTimeoutPolling,
+    enabled: isGloballyEnabled,
+  } = useTimeoutPollingState();
   const lastPollingTime = lastTimeoutPollingLookup.get(props.resourceKey) ?? 0;
   const {
     data: response,
@@ -63,7 +85,7 @@ export function useTimeoutPolling<
     () => props.fetcher({ timestamp: 0 }),
     {
       refetchInterval: props.interval ?? 2000,
-      enabled,
+      enabled: isGloballyEnabled && enabled,
     }
   );
 

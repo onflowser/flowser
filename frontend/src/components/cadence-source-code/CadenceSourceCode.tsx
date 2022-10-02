@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
-import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 import "./CadenceSourceCode.module.scss";
+import { TextUtils } from "../../utils/text-utils";
 
 type CadenceSourceCodeProps = {
   script: string;
@@ -9,12 +9,13 @@ type CadenceSourceCodeProps = {
 const CadenceSourceCode: FunctionComponent<CadenceSourceCodeProps> = ({
   script,
 }) => {
-  const { highlightCadenceSyntax } = useSyntaxHighlighter();
-  const highlighted = highlightCadenceSyntax(script);
-
   return (
     <pre>
-      <code dangerouslySetInnerHTML={{ __html: highlighted }}></code>
+      <code
+        dangerouslySetInnerHTML={{
+          __html: TextUtils.highlightCadenceSyntax(script),
+        }}
+      ></code>
     </pre>
   );
 };

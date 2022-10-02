@@ -3,7 +3,7 @@
 @import 'styles/typography';
 
 .root {
-  z-index: 1000;
+  z-index: 99;
   position: relative;
   padding: 0 $spacing-l * 2;
   padding-bottom: $spacing-l;
