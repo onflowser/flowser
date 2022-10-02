@@ -25,7 +25,7 @@ async function createWindow() {
 
   async function showDirectoryPicker() {
     const result = await dialog.showOpenDialog({
-      properties: ["openDirectory"],
+      properties: ["openDirectory", "createDirectory"],
     });
     if (result.canceled) {
       return undefined;
