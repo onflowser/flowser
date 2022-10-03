@@ -187,8 +187,8 @@ export const Configuration: FunctionComponent = () => {
           </ConfigurationSection>
           <ConfigurationSection
             title="Dev wallet"
+            collapseChildren
             className={classes.section}
-            toggleButtonTitle="Run dev wallet"
             isEnabled={formik.values.devWallet?.run}
             onToggleEnabled={(isEnabled) =>
               formik.setFieldValue("devWallet.run", isEnabled)
@@ -206,8 +206,8 @@ export const Configuration: FunctionComponent = () => {
           </ConfigurationSection>
           <ConfigurationSection
             title="Emulator"
+            collapseChildren
             className={classes.section}
-            toggleButtonTitle="Run flow emulator"
             isEnabled={formik.values.emulator?.run}
             onToggleEnabled={(isEnabled) =>
               formik.setFieldValue("emulator.run", isEnabled)

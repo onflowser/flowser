@@ -7,16 +7,43 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: $spacing-base;
-    .title {
-      color: $light-grey;
-      font-size: $font-size-big;
-    }
-    .toggleWrapper {
+    .leftSection {
       display: flex;
-      span {
+      .title {
         color: $light-grey;
-        font-size: $font-size-normal;
+        font-size: $font-size-big;
+      }
+      .toggleWrapper {
+        display: flex;
+        margin-left: $spacing-base;
+        span {
+          color: $light-grey;
+          font-size: $font-size-normal;
+          margin-right: $spacing-base;
+        }
+      }
+    }
+    .rightSection {
+      display: flex;
+      align-items: center;
+      span {
+        color: $color-grey;
         margin-right: $spacing-base;
+      }
+      .openIcon, .closeIcon {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+      .openIcon {
+        path {
+          fill: $color-grey;
+        }
+      }
+      .closeIcon {
+        path {
+          fill: $color-light-gray;
+        }
       }
     }
   }
