@@ -54,6 +54,7 @@ export const Configuration: FunctionComponent = () => {
 
   const formik = useFormik({
     validationSchema: projectSchema,
+    validateOnChange: false,
     initialValues: Project.fromPartial({
       filesystemPath: "",
       devWallet: DevWallet.fromPartial({}),
