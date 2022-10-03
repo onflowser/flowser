@@ -112,7 +112,7 @@ export function ProjectActionsProvider({
     const { snapshot } = currentProject?.project?.emulator ?? {};
     if (!snapshot) {
       toast(
-        "Snapshots can only be created when enabling the 'snapshot' option",
+        "Snapshots can only be created when enabling the 'snapshot' option in settings",
         {
           duration: 5000,
         }
