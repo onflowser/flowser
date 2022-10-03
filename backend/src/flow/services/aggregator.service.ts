@@ -155,7 +155,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
     // Service account is present only on emulator chain
     if (!(await this.isServiceAccountProcessed())) {
-      await this.processStaticAccounts();
+      await this.processDefaultAccounts();
     }
 
     const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
@@ -387,6 +387,11 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     const unSerializedAccount = AccountEntity.create(flowAccount);
+    if (
+      this.getDefaultAccountsAddresses().includes(unSerializedAccount.address)
+    ) {
+      unSerializedAccount.isDefaultAccount = true;
+    }
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
       AccountContractEntity.create(
         flowAccount,
@@ -467,24 +472,14 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     return this.accountService.accountExists(serviceAccountAddress);
   }
 
-  async processStaticAccounts() {
+  async processDefaultAccounts() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
-    const serviceAccountAddress = ensurePrefixedAddress(
-      this.configService.getServiceAccountAddress()
-    );
-    const staticAccountAddresses = [
-      serviceAccountAddress,
-      // See: https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
-      "0xee82856bf20e2aa6",
-      "0xe5a8b7f23e8b548f",
-      "0x0ae53cb6e3f42a79",
-    ];
 
     await queryRunner.startTransaction();
     try {
       await Promise.all(
-        staticAccountAddresses.map((address) =>
+        this.getDefaultAccountsAddresses().map((address) =>
           this.storeNewAccountWithContractsAndKeys(address)
         )
       );
@@ -494,5 +489,18 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  getDefaultAccountsAddresses() {
+    const serviceAccountAddress = ensurePrefixedAddress(
+      this.configService.getServiceAccountAddress()
+    );
+    return [
+      serviceAccountAddress,
+      // See: https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
+      "0xee82856bf20e2aa6",
+      "0xe5a8b7f23e8b548f",
+      "0x0ae53cb6e3f42a79",
+    ];
   }
 }
