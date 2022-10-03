@@ -39,7 +39,6 @@ import {
 } from "../../processes/managed-process.entity";
 import { CommonService } from "../../core/services/common.service";
 import { FlowEmulatorService } from "./emulator.service";
-import { start } from "repl";
 
 type BlockData = {
   block: FlowBlock;
@@ -476,9 +475,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     );
     const staticAccountAddresses = [
       serviceAccountAddress,
-      // TODO(milestone-5): Are these account addresses always the same?
-      // https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
-      // https://github.com/onflow/flow-go/blob/138e1c32d8bb51e891b2babcd2c7a38c0db41f73/fvm/bootstrap.go#L894-L903
+      // See: https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
       "0xee82856bf20e2aa6",
       "0xe5a8b7f23e8b548f",
       "0x0ae53cb6e3f42a79",

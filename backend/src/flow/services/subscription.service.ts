@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { FlowGatewayService, FlowTransactionStatus } from "./gateway.service";
 import { TransactionsService } from "../../transactions/transactions.service";
-import { TransactionStatus } from "@flowser/shared";
 
 @Injectable()
 export class FlowSubscriptionService {
@@ -26,11 +25,12 @@ export class FlowSubscriptionService {
 
   private async updateTransactionStatus(
     transactionId: string,
-    status: FlowTransactionStatus
+    flowStatus: FlowTransactionStatus
   ) {
-    return this.transactionService.updateStatus(
-      transactionId,
-      TransactionStatus.fromJSON(status)
-    );
+    return this.transactionService.updateStatus(transactionId, {
+      errorMessage: flowStatus.errorMessage,
+      grcpStatus: flowStatus.statusCode,
+      executionStatus: flowStatus.status,
+    });
   }
 }

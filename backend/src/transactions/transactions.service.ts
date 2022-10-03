@@ -17,7 +17,7 @@ export class TransactionsService {
 
   updateStatus(transactionId: string, status: TransactionStatus) {
     return this.transactionRepository.update(transactionId, {
-      status,
+      status: TransactionStatus.toJSON(status),
       updatedAt: new Date(),
     });
   }
