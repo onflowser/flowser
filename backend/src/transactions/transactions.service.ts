@@ -11,15 +11,14 @@ export class TransactionsService {
     private transactionRepository: Repository<TransactionEntity>
   ) {}
 
-  create(transaction: TransactionEntity) {
+  createOrUpdate(transaction: TransactionEntity) {
     return this.transactionRepository.save(transaction);
   }
 
-  updateStatus(transactionId: string, status: TransactionStatus) {
-    return this.transactionRepository.update(transactionId, {
-      status: TransactionStatus.toJSON(status),
-      updatedAt: new Date(),
-    });
+  async updateStatus(transactionId: string, status: TransactionStatus) {
+    const transaction = await this.findOne(transactionId);
+    transaction.status = status;
+    await this.createOrUpdate(transaction);
   }
 
   findAll() {

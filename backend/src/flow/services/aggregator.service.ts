@@ -377,7 +377,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     // TODO: Should we also mark all tx.authorizers as updated?
     const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
-      this.transactionService.create(
+      this.transactionService.createOrUpdate(
         TransactionEntity.create(block, transaction, status)
       ),
       this.accountService.markUpdated(payerAddress),
