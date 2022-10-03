@@ -20,7 +20,7 @@ import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { spacings } from "../../../styles/spacings";
 
 export const Main: FunctionComponent = () => {
-  const { revertToBlock } = useProjectActions();
+  const { checkoutBlock } = useProjectActions();
   const { data: projectObjects } = useGetProjectObjects();
   const { data: snapshots } = useGetPollingEmulatorSnapshots();
   const { contracts } = projectObjects ?? { contracts: [] };
@@ -54,9 +54,9 @@ export const Main: FunctionComponent = () => {
                     footer={<ReactTimeago date={snapshot.createdAt} />}
                     rightSection={
                       <ProjectItemBadge
-                        onClick={() => revertToBlock(snapshot.blockId)}
+                        onClick={() => checkoutBlock(snapshot.blockId)}
                       >
-                        Revert
+                        Jump to
                       </ProjectItemBadge>
                     }
                   />
