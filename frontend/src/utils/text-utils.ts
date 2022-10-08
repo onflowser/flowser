@@ -31,43 +31,6 @@ export class TextUtils {
     return dateFormat(value, "dS mmm yyyy, hh:MM:ss");
   }
 
-  // TODO(milestone-6): Replace with proper code editor
-  static highlightCadenceSyntax(source: string): string {
-    source = Prism.highlight(source, Prism.languages.javascript, "javascript");
-
-    const cadenceKeywords = [
-      "pub",
-      "fun",
-      "self",
-      "emit",
-      "execute",
-      "prepare",
-      "destroy",
-      "priv",
-    ];
-
-    const importantCadenceKeywords = [
-      "transaction",
-      "resource",
-      "event",
-      "contract",
-    ];
-
-    cadenceKeywords.forEach((keyword: string) => {
-      const regStr = `\\b(${keyword})\\b`;
-      const regex = new RegExp(regStr, "g");
-      source = source.replace(regex, '<span class="token inserted">$1</span>');
-    });
-
-    importantCadenceKeywords.forEach((keyword: string) => {
-      const regStr = `\\b(${keyword})\\b`;
-      const regex = new RegExp(regStr, "g");
-      source = source.replace(regex, '<span class="token cadence">$1</span>');
-    });
-
-    return source;
-  }
-
   static highlightLogKeywords(logLine: string): string {
     const syntax = {
       blue: [

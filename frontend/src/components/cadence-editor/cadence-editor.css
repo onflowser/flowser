@@ -1,0 +1,9 @@
+/* Main editor container */
+.cadence-editor .cm-editor {
+    background: none;
+}
+/* Line number container */
+.cadence-editor .cm-gutters {
+    /* Default background color */
+    background: #202a40;
+}

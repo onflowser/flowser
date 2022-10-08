@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { TextUtils } from "../../utils/text-utils";
+import { CadenceEditor } from "../cadence-editor/CadenceEditor";
 
 export type TransactionErrorMessageProps = {
   errorMessage: string;
@@ -8,15 +8,5 @@ export type TransactionErrorMessageProps = {
 export function TransactionErrorMessage({
   errorMessage,
 }: TransactionErrorMessageProps): ReactElement {
-  return (
-    <pre
-      style={{ height: 500, overflow: "scroll" }}
-      dangerouslySetInnerHTML={{
-        __html: TextUtils.highlightCadenceSyntax(errorMessage).replaceAll(
-          "\\n",
-          "<br/>"
-        ),
-      }}
-    />
-  );
+  return <CadenceEditor value={errorMessage} editable={false} />;
 }
