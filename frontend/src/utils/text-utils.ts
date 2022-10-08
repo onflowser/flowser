@@ -2,7 +2,6 @@ import dateFormat from "dateformat";
 import { isToday, isThisMonth, isThisYear } from "date-fns";
 import { ManagedProcessLog } from "@flowser/shared";
 import AnsiHtmlConvert from "ansi-to-html";
-import Prism from "prismjs";
 
 export class TextUtils {
   static readableNumber(value: number): string {
