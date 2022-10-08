@@ -14,6 +14,7 @@ message Account {
   repeated Transaction transactions = 7;
   string created_at = 8;
   string updated_at = 9;
+  bool is_default_account = 10;
 }
 
 message AccountKey {

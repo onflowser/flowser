@@ -20,7 +20,7 @@ type CustomTableProps<TData> = {
   renderCustomHeader?: (header: HeaderGroup<TableData<TData>>) => ReactElement;
   renderCustomRow?: (row: Row<TableData<TData>>) => ReactElement;
   headerRowClass?: string;
-  bodyRowClass?: string;
+  bodyRowClass?: string | ((row: Row<TableData<TData>>) => string);
   footerRowClass?: string;
   isInitialLoading?: boolean;
 };
@@ -102,7 +102,12 @@ function Table<TData>({
           renderCustomRow(row)
         ) : (
           <Card
-            className={classNames(classes.tableRow, bodyRowClass)}
+            className={classNames(
+              classes.tableRow,
+              typeof bodyRowClass === "function"
+                ? bodyRowClass(row)
+                : bodyRowClass
+            )}
             key={row.id}
             showIntroAnimation={showIntroAnimation(row.original)}
             variant="table-line"

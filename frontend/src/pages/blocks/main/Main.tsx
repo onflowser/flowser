@@ -29,7 +29,7 @@ const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
-  const { revertToBlock } = useProjectActions();
+  const { checkoutBlock } = useProjectActions();
 
   const { data: blocks, firstFetch } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
@@ -110,7 +110,7 @@ const Main: FunctionComponent = () => {
               {snapshot && (
                 <SimpleButton
                   style={{ marginRight: 10 }}
-                  onClick={() => revertToBlock(block.id)}
+                  onClick={() => checkoutBlock(block.id)}
                 >
                   <SnapshotIcon />
                 </SimpleButton>

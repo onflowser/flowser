@@ -15,9 +15,12 @@ import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ProjectItemBadge } from "./ProjectItemBadge";
 import { useProjectActions } from "../../../contexts/project-actions.context";
 import ReactTimeago from "react-timeago";
+import { ExternalLink } from "../../../components/link/ExternalLink";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { spacings } from "../../../styles/spacings";
 
 export const Main: FunctionComponent = () => {
-  const { revertToBlock } = useProjectActions();
+  const { checkoutBlock } = useProjectActions();
   const { data: projectObjects } = useGetProjectObjects();
   const { data: snapshots } = useGetPollingEmulatorSnapshots();
   const { contracts } = projectObjects ?? { contracts: [] };
@@ -34,7 +37,16 @@ export const Main: FunctionComponent = () => {
           </div>
           <div className={classes.itemsWrapper}>
             <ul className={classes.snapshotsList}>
-              {snapshots.length === 0 && <span>No snapshots created yet</span>}
+              {snapshots.length === 0 && (
+                <>
+                  <p>You haven{`'`}t created any snapshots yet</p>
+                  <SizedBox height={spacings.base} />
+                  <p>
+                    Snapshots provide a way to store your local blockchain at
+                    different points in time (aka. blocks).
+                  </p>
+                </>
+              )}
               {limitedSnapshots.data.map((snapshot) => (
                 <li key={snapshot.id}>
                   <ProjectItem
@@ -42,9 +54,9 @@ export const Main: FunctionComponent = () => {
                     footer={<ReactTimeago date={snapshot.createdAt} />}
                     rightSection={
                       <ProjectItemBadge
-                        onClick={() => revertToBlock(snapshot.blockId)}
+                        onClick={() => checkoutBlock(snapshot.blockId)}
                       >
-                        Revert
+                        Jump to
                       </ProjectItemBadge>
                     }
                   />
@@ -66,7 +78,22 @@ export const Main: FunctionComponent = () => {
           </div>
           <div className={classes.itemsWrapper}>
             {contracts.length === 0 && (
-              <span>No contracts defined in flow.json</span>
+              <>
+                <p>No contracts defined in flow.json</p>
+                <SizedBox height={spacings.base} />
+                <p>
+                  Get started with Cadence smart contract development on{" "}
+                  <ExternalLink href="https://developers.flow.com/cadence/language/contracts">
+                    flow developer portal
+                  </ExternalLink>
+                  .
+                </p>
+                <p>
+                  ... or see how to define your Cadence files in flow
+                  configuration{" "}
+                  <ExternalLink href="https://developers.flow.com/tools/flow-cli/configuration#contracts" />
+                </p>
+              </>
             )}
             {limitedContracts.data.map((contract) => (
               <div key={contract.filePath} className={classes.item}>
