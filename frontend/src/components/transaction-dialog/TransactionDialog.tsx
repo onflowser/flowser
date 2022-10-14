@@ -5,7 +5,7 @@ import classes from "./TransactionDialog.module.scss";
 import { FlowScriptArgument, useFlow } from "../../hooks/use-flow";
 import { toast } from "react-hot-toast";
 import ScriptArguments from "./ScriptArguments";
-import CadenceEditor from "../cadence-editor/CadenceEditor";
+import { CadenceEditor } from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import { CommonUtils } from "../../utils/common-utils";
@@ -140,7 +140,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
             Transaction error occurred, click to view!
           </button>
         )}
-        <CadenceEditor value={code} onChange={setCode} />
+        <CadenceEditor value={code} onChange={setCode} minHeight="200px" />
         <ScriptArguments className={classes.arguments} onChange={setArgs} />
       </>
     </ActionDialog>
