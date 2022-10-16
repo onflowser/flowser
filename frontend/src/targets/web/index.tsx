@@ -3,15 +3,10 @@ import ReactDOM from "react-dom";
 import "App.scss";
 import { FlowserClientApp } from "App";
 import reportWebVitals from "reportWebVitals";
-import { QueryClientProvider, QueryClient } from "react-query";
-
-const queryClient = new QueryClient();
 
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <FlowserClientApp />
-    </QueryClientProvider>
+    <FlowserClientApp />
   </React.StrictMode>,
   document.getElementById("root")
 );

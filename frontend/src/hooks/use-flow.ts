@@ -6,6 +6,8 @@ import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
 import { useGetCurrentProject } from "./use-api";
 import { useQueryClient } from "react-query";
+import { useAnalytics } from "./use-analytics";
+import { AnalyticEvent } from "../services/mixpanel.service";
 
 export type FlowScriptArgumentValue = string | number;
 export type FlowScriptArgumentType = string;
@@ -31,6 +33,7 @@ export function setFclConfig(options: {
 }
 
 export function useFlow() {
+  const { track } = useAnalytics();
   const { data } = useGetCurrentProject();
   const { project } = data ?? {};
   const [user, setUser] = useState<{ loggedIn: null; addr?: string }>({
@@ -57,6 +60,8 @@ export function useFlow() {
   useEffect(() => fcl.currentUser().subscribe(setUser), []);
 
   async function sendTransaction(code: string, args: FlowScriptArgument[]) {
+    track(AnalyticEvent.SEND_TRANSACTION);
+
     const transactionId = await fcl.mutate({
       cadence: code,
       args: (arg: any, t: any) => args.map((e) => arg(e.value, t[e.type])),
@@ -73,6 +78,8 @@ export function useFlow() {
   }
 
   async function logout() {
+    track(AnalyticEvent.DISCONNECT_WALLET);
+
     setLoggingOut(true);
     try {
       await fcl.unauthenticate();
@@ -88,6 +95,8 @@ export function useFlow() {
   }
 
   async function login() {
+    track(AnalyticEvent.CONNECT_WALLET);
+
     if (!project?.devWallet?.run) {
       // TODO(milestone-x): Check if wallet is online with GET {devWalletUrl}/api request
       toast(

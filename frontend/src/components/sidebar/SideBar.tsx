@@ -28,6 +28,8 @@ import { ServiceRegistry } from "../../services/service-registry";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 import { Spinner } from "../spinner/Spinner";
 import { ActionButton } from "../action-button/ActionButton";
+import { useAnalytics } from "../../hooks/use-analytics";
+import { AnalyticEvent } from "../../services/mixpanel.service";
 
 export type Sidebar = {
   toggled: boolean;
@@ -36,6 +38,7 @@ export type Sidebar = {
 
 export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
+  const { track } = useAnalytics();
   const { data: currentProjectData } = useGetCurrentProject();
   const { login, logout, user, isLoggedIn } = useFlow();
   const { switchProject, sendTransaction, createSnapshot } =
@@ -48,6 +51,8 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   }, []);
 
   const openSettings = () => {
+    track(AnalyticEvent.CLICK_PROJECT_SETTINGS);
+
     history.push(`/start/configure/${currentProject?.id}`);
   };
 
@@ -82,6 +87,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           <span className={classes.menuSectionTitle}>EMULATOR</span>
           <ActionButton
             onClick={() => {
+              track(AnalyticEvent.CLICK_CREATE_SNAPSHOT);
               toggleSidebar();
               createSnapshot();
             }}
@@ -101,6 +107,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           {isLoggedIn && (
             <ActionButton
               onClick={() => {
+                track(AnalyticEvent.CLICK_CREATE_SNAPSHOT);
                 toggleSidebar();
                 sendTransaction();
               }}
@@ -147,11 +154,17 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
 }
 
 function ManagedProcessItem({ process }: { process: ManagedProcess }) {
+  const { track } = useAnalytics();
   const { processesService } = ServiceRegistry.getInstance();
   const [isRestarting, setRestarting] = useState(false);
   const { handleError } = useErrorHandler(ManagedProcessItem.name);
 
   async function onRestart() {
+    track(AnalyticEvent.RESTART_PROCESS, {
+      processId: process.id,
+      processName: process.name,
+    });
+
     setRestarting(true);
     try {
       await processesService.restart({ processId: process.id });

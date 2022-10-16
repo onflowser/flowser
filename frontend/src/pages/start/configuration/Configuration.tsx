@@ -32,6 +32,8 @@ import {
 } from "./FormFields";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 import { useFlow } from "../../../hooks/use-flow";
+import { AnalyticEvent } from "../../../services/mixpanel.service";
+import { useAnalytics } from "../../../hooks/use-analytics";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -42,6 +44,7 @@ export const Configuration: FunctionComponent = () => {
   const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
 
+  const { track } = useAnalytics();
   const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
@@ -77,6 +80,10 @@ export const Configuration: FunctionComponent = () => {
   });
 
   async function runProject() {
+    if (!isExistingProject) {
+      track(AnalyticEvent.PROJECT_CREATED);
+    }
+
     let response: UpdateProjectResponse;
     try {
       response = isExistingProject
