@@ -35,8 +35,6 @@ export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
   servicePrivateKey: string;
   @ApiProperty()
-  servicePublicKey: string;
-  @ApiProperty()
   serviceSignatureAlgorithm: number;
   @ApiProperty()
   simpleAddresses: boolean;

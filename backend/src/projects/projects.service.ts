@@ -242,7 +242,6 @@ export class ProjectsService {
         withContracts: false,
         blockTime: 0,
         servicePrivateKey: undefined,
-        servicePublicKey: undefined,
         databasePath: "./flowdb",
         tokenSupply: 1000000000,
         transactionExpiry: 10,

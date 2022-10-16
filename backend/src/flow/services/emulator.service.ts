@@ -64,7 +64,6 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       flag("block-time", emulator.blockTime),
       flag("contracts", emulator.withContracts),
       flag("service-priv-key", emulator.servicePrivateKey),
-      flag("service-pub-key", emulator.servicePublicKey),
       flag(
         "service-sig-algo",
         signatureAlgorithmToJSON(emulator.serviceSignatureAlgorithm)

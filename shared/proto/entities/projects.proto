@@ -59,7 +59,6 @@ message Emulator {
   uint32 admin_server_port = 21;
   uint32 block_time = 4;
   string service_private_key = 5;
-  string service_public_key = 6;
   string database_path = 7;
   uint32 token_supply = 8;
   uint32 transaction_expiry = 9;

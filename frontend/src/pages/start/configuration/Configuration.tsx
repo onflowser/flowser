@@ -246,12 +246,6 @@ export const Configuration: FunctionComponent = () => {
                 formik={formik}
               />
               <EmulatorTextField
-                label="Service Public Key"
-                path="servicePublicKey"
-                description="Public key used for the service account"
-                formik={formik}
-              />
-              <EmulatorTextField
                 label="Block time"
                 path="blockTime"
                 description="Time between sealed blocks. Valid units are ns, us (or µs), ms, s, m, h"
