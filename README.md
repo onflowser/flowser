@@ -2,7 +2,7 @@
 	<br>
 	<img alt="Flowser logo" src="./frontend/src/assets/images/long_logo.svg" width="300" height="200">
 	<p>
-		<b>Easily start you local Flow network & inspect the state.</b>
+		<b>Supercharged project development on Flow 🏄‍♂️ ⚡</b>
 	</p>
 	<br>
 	<br>
@@ -13,12 +13,15 @@
 
 Flowser is a convenient development tool for [Flow blockchain](https://www.onflow.org/). It does all the heavy work of managing the Flow emulator, inspecting the current blockchain state and interacting with the network for you!
 
-You can find more information on our documentation website: [docs.flowser.dev](https://docs.flowser.dev).
+## Key Features
 
-For a quick walk-through of the tool itself, see [FlipFest video demo](https://www.youtube.com/watch?v=yMs5awvGnlY&t=417s) or our demo from [Flow Office Hours](https://www.youtube.com/watch?v=LSHwwX4yZJI&t=1496s).
+- **Easy to use**: Simplifies your development workflow
+- **Transparent development**: See the whole state of your local Flow blockchain in real-time
+- **Snapshot management**: Create and checkout [blockchain state snapshots](https://github.com/onflow/flow-emulator#managing-emulator-state) - similar to how Git works
+- **Development wallet**: Built in [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) integration for easy blockchain interactions
+- **Account storage inspection**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
 
-
-## 👋 Get started
+## Development
 
 ### 1. Clone flowser repository
 
@@ -47,36 +50,22 @@ yarn run bootstrap
 
 ### 3. Start Flowser
 
-### Website
+### As website
+
+This is the recommended way for quick prototyping purposes, because it's faster.
+
+Note that if you use this command, the app won't be run in the Electron environment, so it's always recommended to also test it with as a desktop app too.
 
 ```bash
 yarn run start
 ```
 
-### Desktop app
+### As desktop app
 
 ```bash
 yarn run start:desktop
 ```
 
-### 4. Open in browser
+## License
 
-Flowser should automatically open in your default browser.
-
-Good job, you can now start flowsing around the flow blockchain 🏄.
-
-## 🤝 Contributing
-
-For feature suggestions, check out our [issues](https://github.com/onflowser/flowser/issues/new) and [discussions](https://github.com/onflowser/flowser/discussions) pages.
-
-If you want to contribute to Flowser, see our [Development Guide](https://docs.flowser.dev/resources/development).
-
-## ✌️ Contributors
-
-- [`jgololicic`](http://github.com/jgololicic)
-- [`bartolomej`](http://github.com/bartolomej)
-- [`monikaxh`](http://github.com/monikaxh)
-
-## 🙌 Credits
-
-- [@bluesign](https://github.com/bluesign) - provided a useful [script](https://gist.github.com/bluesign/df24b31a61bf4cd11f88efb6edd78925) for indexing flow emulator db
+Flowser is [MIT licensed](./LICENSE).
