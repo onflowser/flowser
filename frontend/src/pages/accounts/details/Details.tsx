@@ -48,7 +48,7 @@ import { UserIcon } from "../../../components/user-icon/UserIcon";
 // @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
-import { AnalyticEvent } from "../../../services/mixpanel.service";
+import { AnalyticEvent } from "../../../services/analytics.service";
 
 export type AccountDetailsRouteParams = {
   accountId: string;

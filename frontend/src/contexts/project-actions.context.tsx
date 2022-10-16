@@ -21,7 +21,7 @@ import TransactionDialog from "../components/transaction-dialog/TransactionDialo
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
-import { AnalyticEvent } from "../services/mixpanel.service";
+import { AnalyticEvent } from "../services/analytics.service";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;

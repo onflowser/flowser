@@ -1,9 +1,9 @@
 import { ServiceRegistry } from "../services/service-registry";
 
 export function useAnalytics() {
-  const { mixpanelService } = ServiceRegistry.getInstance();
+  const { analyticsService } = ServiceRegistry.getInstance();
 
   return {
-    track: mixpanelService.track,
+    track: analyticsService.track,
   };
 }

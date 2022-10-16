@@ -32,7 +32,7 @@ import {
 } from "./FormFields";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 import { useFlow } from "../../../hooks/use-flow";
-import { AnalyticEvent } from "../../../services/mixpanel.service";
+import { AnalyticEvent } from "../../../services/analytics.service";
 import { useAnalytics } from "../../../hooks/use-analytics";
 
 const projectSchema = yup.object().shape({

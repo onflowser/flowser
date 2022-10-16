@@ -25,7 +25,7 @@ import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { useAnalytics } from "../../../hooks/use-analytics";
-import { AnalyticEvent } from "../../../services/mixpanel.service";
+import { AnalyticEvent } from "../../../services/analytics.service";
 
 type ProjectTab = {
   id: string;

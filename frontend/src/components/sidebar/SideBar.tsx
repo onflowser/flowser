@@ -29,7 +29,7 @@ import { useErrorHandler } from "../../hooks/use-error-handler";
 import { Spinner } from "../spinner/Spinner";
 import { ActionButton } from "../action-button/ActionButton";
 import { useAnalytics } from "../../hooks/use-analytics";
-import { AnalyticEvent } from "../../services/mixpanel.service";
+import { AnalyticEvent } from "../../services/analytics.service";
 
 export type Sidebar = {
   toggled: boolean;

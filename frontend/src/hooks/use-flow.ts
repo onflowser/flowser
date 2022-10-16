@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import { useGetCurrentProject } from "./use-api";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "./use-analytics";
-import { AnalyticEvent } from "../services/mixpanel.service";
+import { AnalyticEvent } from "../services/analytics.service";
 
 export type FlowScriptArgumentValue = string | number;
 export type FlowScriptArgumentType = string;

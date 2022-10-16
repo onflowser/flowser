@@ -2,6 +2,7 @@ import mixpanel, { Dict } from "mixpanel-browser";
 import { queryClient } from "../config/react-query";
 import { getCurrentProjectKey } from "../hooks/use-api";
 import { GetSingleProjectResponse } from "@flowser/shared";
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 export enum AnalyticEvent {
   PROJECT_REMOVED = "project_removed",
@@ -26,14 +27,25 @@ export enum AnalyticEvent {
 
 const enableAnalytics = process.env.NODE_ENV === "production";
 
-export class MixpanelService {
+export class AnalyticsService {
   constructor() {
     this.init();
   }
-  init(): void {
+  async init(): Promise<void> {
     mixpanel.init("1b358339dc3d7476217983016b83fcab", {
       debug: !enableAnalytics,
     });
+
+    try {
+      const fingerprint = await FingerprintJS.load();
+      const { visitorId, confidence } = await fingerprint.get();
+      mixpanel.identify(visitorId);
+      console.log(
+        `Identifying user ${visitorId} with confidence ${confidence.score}`
+      );
+    } catch (e) {
+      console.error("Failed to identify user", e);
+    }
   }
 
   track(event: AnalyticEvent, properties: Dict = {}): void {
