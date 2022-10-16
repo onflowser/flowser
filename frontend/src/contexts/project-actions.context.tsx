@@ -1,5 +1,9 @@
-import React, { ReactElement, useState } from "react";
-import { createContext, useContext } from "react";
+import React, {
+  createContext,
+  ReactElement,
+  useContext,
+  useState,
+} from "react";
 import { routes } from "../constants/routes";
 import { useHistory } from "react-router-dom";
 import { useFlow } from "../hooks/use-flow";
@@ -16,6 +20,8 @@ import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useQueryClient } from "react-query";
+import { useAnalytics } from "../hooks/use-analytics";
+import { AnalyticEvent } from "../services/analytics.service";
 
 export type ProjectActionsContextState = {
   isSwitching: boolean;
@@ -44,6 +50,7 @@ export function ProjectActionsProvider({
 }): ReactElement {
   const { projectsService, snapshotService } = ServiceRegistry.getInstance();
 
+  const { track } = useAnalytics();
   const queryClient = useQueryClient();
   const history = useHistory();
   const { handleError } = useErrorHandler(ProjectActionsProvider.name);
@@ -59,6 +66,8 @@ export function ProjectActionsProvider({
   const [isRemovingProject, setIsRemovingProject] = useState(false);
 
   const confirmProjectRemove = async (project: Project) => {
+    track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
+
     setIsRemovingProject(true);
     try {
       await projectsService.removeProject(project.id);
@@ -109,6 +118,8 @@ export function ProjectActionsProvider({
   }
 
   function createSnapshot() {
+    track(AnalyticEvent.CREATE_SNAPSHOT);
+
     const { snapshot } = currentProject?.project?.emulator ?? {};
     if (!snapshot) {
       toast(
@@ -123,6 +134,8 @@ export function ProjectActionsProvider({
   }
 
   function sendTransaction() {
+    track(AnalyticEvent.CLICK_SEND_TRANSACTION);
+
     if (!isLoggedIn) {
       toast("You need to login with wallet to send transactions", {
         duration: 5000,
@@ -133,6 +146,8 @@ export function ProjectActionsProvider({
   }
 
   async function checkoutBlock(blockId: string) {
+    track(AnalyticEvent.CLICK_CHECKOUT_SNAPSHOT);
+
     if (!projectId) {
       return;
     }
@@ -155,6 +170,8 @@ export function ProjectActionsProvider({
       confirmBtnLabel: "REVERT",
       cancelBtnLabel: "CANCEL",
       onConfirm: async () => {
+        track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+
         try {
           const snapshot = await snapshotService.checkoutBlock({
             blockId,

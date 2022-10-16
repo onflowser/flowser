@@ -9,7 +9,6 @@ import { CadenceEditor } from "../cadence-editor/CadenceEditor";
 import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import { CommonUtils } from "../../utils/common-utils";
-import splitbee from "@splitbee/web";
 import { ActionDialog } from "../action-dialog/ActionDialog";
 import { TransactionErrorMessage } from "../status/ErrorMessage";
 
@@ -76,7 +75,6 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
         ),
         { duration: 100000 }
       );
-      splitbee.track(`TransactionDialog: send`);
     } catch (e: any) {
       if (e.message) {
         toast.error(e.message, { duration: 5000 });

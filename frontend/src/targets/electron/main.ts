@@ -3,6 +3,7 @@ import { app, BrowserWindow, shell, dialog, ipcMain } from "electron";
 import { ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
 import * as worker from "./worker";
+import { SentryMainService } from "./services/sentry-main.service";
 
 fixPath();
 
@@ -10,6 +11,9 @@ const minWidth = 1100;
 const minHeight = 800;
 
 let win: BrowserWindow;
+
+const sentryService = new SentryMainService();
+sentryService.init();
 
 async function createWindow() {
   win = new BrowserWindow({

@@ -7,7 +7,6 @@ import Button from "../../../components/button/Button";
 import { routes } from "../../../constants/routes";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { toast } from "react-hot-toast";
-import splitbee from "@splitbee/web";
 import classNames from "classnames";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
 import {
@@ -33,6 +32,8 @@ import {
 } from "./FormFields";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 import { useFlow } from "../../../hooks/use-flow";
+import { AnalyticEvent } from "../../../services/analytics.service";
+import { useAnalytics } from "../../../hooks/use-analytics";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -43,6 +44,7 @@ export const Configuration: FunctionComponent = () => {
   const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
 
+  const { track } = useAnalytics();
   const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
@@ -62,7 +64,6 @@ export const Configuration: FunctionComponent = () => {
       gateway: Gateway.fromPartial({}),
     }),
     onSubmit: async () => {
-      splitbee.track("Configuration: update/create");
       if (isLoggedIn) {
         toast.promise(logout(), {
           loading: "Signing out ...",
@@ -79,6 +80,10 @@ export const Configuration: FunctionComponent = () => {
   });
 
   async function runProject() {
+    if (!isExistingProject) {
+      track(AnalyticEvent.PROJECT_CREATED);
+    }
+
     let response: UpdateProjectResponse;
     try {
       response = isExistingProject

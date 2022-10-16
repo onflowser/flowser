@@ -226,9 +226,11 @@ export function useCurrentProjectId(): string | undefined {
   return data?.project?.id;
 }
 
+export const getCurrentProjectKey = "/projects/current";
+
 export function useGetCurrentProject() {
   const { data, error, ...rest } = useQuery<GetSingleProjectResponse>(
-    `/projects/current`,
+    getCurrentProjectKey,
     () => projectsService.getCurrentProject()
   );
 

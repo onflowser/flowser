@@ -25,7 +25,7 @@ import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
 import { ProjectActionsProvider } from "./contexts/project-actions.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
 import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
@@ -33,14 +33,7 @@ import {
   PlatformAdapterProvider,
   PlatformAdapterState,
 } from "./contexts/platform-adapter.context";
-
-// TODO(milestone-x): temporary disabled, move analytics to a separate hook
-// if (process.env.NODE_ENV !== "development") {
-//   splitbee.init({
-//     token: "B3B9T4Z4SRQ3",
-//     disableCookie: true,
-//   });
-// }
+import { queryClient } from "./config/react-query";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -65,21 +58,17 @@ const BrowserRouterEvents = withRouter(
   }
 );
 
-const defaultQueryClient = new QueryClient();
-
 export type FlowserClientAppProps = {
   platformAdapter?: PlatformAdapterState;
-  queryClient?: QueryClient;
   enableTimeoutPolling?: boolean;
 };
 
 export const FlowserClientApp = ({
   platformAdapter,
-  queryClient,
   enableTimeoutPolling = true,
 }: FlowserClientAppProps): ReactElement => {
   return (
-    <QueryClientProvider client={queryClient || defaultQueryClient}>
+    <QueryClientProvider client={queryClient}>
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <BrowserRouter>
           <ConfirmDialogProvider>
