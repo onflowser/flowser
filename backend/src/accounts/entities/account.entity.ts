@@ -19,6 +19,9 @@ export class AccountEntity extends PollingEntity {
   @Column()
   code: string;
 
+  @Column({ default: false })
+  isDefaultAccount: boolean;
+
   @OneToMany(() => AccountKeyEntity, (key) => key.account, {
     eager: true,
   })
@@ -61,6 +64,7 @@ export class AccountEntity extends PollingEntity {
       transactions: this.transactions.map((transaction) =>
         transaction.toProto()
       ),
+      isDefaultAccount: this.isDefaultAccount,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };

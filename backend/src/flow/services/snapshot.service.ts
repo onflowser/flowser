@@ -69,7 +69,7 @@ export class FlowSnapshotService {
     return this.snapshotRepository.save(snapshot);
   }
 
-  async revertTo(request: RevertToEmulatorSnapshotRequest) {
+  async checkout(request: RevertToEmulatorSnapshotRequest) {
     const existingSnapshot = await this.snapshotRepository.findOneBy({
       projectId: request.projectId,
       blockId: request.blockId,
@@ -93,7 +93,7 @@ export class FlowSnapshotService {
         `Got ${response.status} response from emulator`,
         response.data
       );
-      throw new InternalServerErrorException("Failed to revert to snapshot");
+      throw new InternalServerErrorException("Failed to move to snapshot");
     }
 
     await this.commonService.removeBlockchainData();

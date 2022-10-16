@@ -87,18 +87,18 @@ export class ManagedProcessEntity extends EventEmitter {
       if (!isKilledSuccessfully) {
         // If the SIGINT signal doesn't work, force kill with SIGINT
         this.childProcess.kill("SIGKILL");
-
-        const rejectionTimeout = 2;
-        setTimeout(() => {
-          const timeoutError = new Error(
-            `Couldn't kill process ${this.id} within ${rejectionTimeout}s timeout`
-          );
-          reject(timeoutError);
-        }, rejectionTimeout * 1000);
       }
       this.childProcess.once("exit", (exitCode) => {
         resolve(exitCode);
       });
+      // In the worst case, just inform the user that shutdown failed
+      const rejectionTimeoutSec = 6;
+      setTimeout(() => {
+        const timeoutError = new Error(
+          `Couldn't kill process ${this.id} (pid=${this.childProcess.pid}) within ${rejectionTimeoutSec}s timeout`
+        );
+        reject(timeoutError);
+      }, rejectionTimeoutSec * 1000);
     });
   }
 

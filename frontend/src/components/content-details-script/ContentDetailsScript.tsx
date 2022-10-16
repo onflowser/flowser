@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import CadenceSourceCode from "../cadence-source-code/CadenceSourceCode";
 import Card from "../card/Card";
 import classes from "./ContentDetailsScript.module.scss";
 import Label from "../label/Label";
@@ -7,6 +6,7 @@ import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import Value from "../value/Value";
 import { CadenceObject } from "@flowser/shared";
 import { CadenceUtils } from "../../utils/cadence-utils";
+import { CadenceEditor } from "../cadence-editor/CadenceEditor";
 
 export type ContentDetailsScriptProps = {
   script: string;
@@ -50,7 +50,7 @@ const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
           <Label className={classes.codeTitle}>CODE:</Label>
         </>
       )}
-      <CadenceSourceCode script={script} />
+      <CadenceEditor value={script} editable={false} />
     </Card>
   );
 };

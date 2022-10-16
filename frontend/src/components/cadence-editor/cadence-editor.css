@@ -1,0 +1,17 @@
+/* Main editor container */
+.cadence-editor .cm-editor {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+}
+
+.cm-focused {
+    outline: none !important;
+    border-color: #cfc5f8 !important;
+}
+
+/* Line number container */
+.cadence-editor .cm-gutters {
+    /* Default background color */
+    background: #202a40;
+}

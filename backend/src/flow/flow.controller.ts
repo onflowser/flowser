@@ -77,9 +77,9 @@ export class FlowController {
   }
 
   @Put("snapshots")
-  async revertToSnapshot(@Body() body) {
+  async checkoutSnapshot(@Body() body) {
     const request = RevertToEmulatorSnapshotRequest.fromJSON(body);
-    const snapshot = await this.flowSnapshotService.revertTo(request);
+    const snapshot = await this.flowSnapshotService.checkout(request);
     return RevertToEmulatorSnapshotResponse.toJSON(
       RevertToEmulatorSnapshotResponse.fromPartial({
         snapshot: snapshot.toProto(),

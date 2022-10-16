@@ -39,7 +39,6 @@ import {
 } from "../../processes/managed-process.entity";
 import { CommonService } from "../../core/services/common.service";
 import { FlowEmulatorService } from "./emulator.service";
-import { start } from "repl";
 
 type BlockData = {
   block: FlowBlock;
@@ -156,7 +155,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
     // Service account is present only on emulator chain
     if (!(await this.isServiceAccountProcessed())) {
-      await this.processStaticAccounts();
+      await this.processDefaultAccounts();
     }
 
     const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
@@ -378,7 +377,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     // TODO: Should we also mark all tx.authorizers as updated?
     const payerAddress = ensurePrefixedAddress(transaction.payer);
     return Promise.all([
-      this.transactionService.create(
+      this.transactionService.createOrUpdate(
         TransactionEntity.create(block, transaction, status)
       ),
       this.accountService.markUpdated(payerAddress),
@@ -388,6 +387,11 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     const unSerializedAccount = AccountEntity.create(flowAccount);
+    if (
+      this.getDefaultAccountsAddresses().includes(unSerializedAccount.address)
+    ) {
+      unSerializedAccount.isDefaultAccount = true;
+    }
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
       AccountContractEntity.create(
         flowAccount,
@@ -468,26 +472,14 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     return this.accountService.accountExists(serviceAccountAddress);
   }
 
-  async processStaticAccounts() {
+  async processDefaultAccounts() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
-    const serviceAccountAddress = ensurePrefixedAddress(
-      this.configService.getServiceAccountAddress()
-    );
-    const staticAccountAddresses = [
-      serviceAccountAddress,
-      // TODO(milestone-5): Are these account addresses always the same?
-      // https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
-      // https://github.com/onflow/flow-go/blob/138e1c32d8bb51e891b2babcd2c7a38c0db41f73/fvm/bootstrap.go#L894-L903
-      "0xee82856bf20e2aa6",
-      "0xe5a8b7f23e8b548f",
-      "0x0ae53cb6e3f42a79",
-    ];
 
     await queryRunner.startTransaction();
     try {
       await Promise.all(
-        staticAccountAddresses.map((address) =>
+        this.getDefaultAccountsAddresses().map((address) =>
           this.storeNewAccountWithContractsAndKeys(address)
         )
       );
@@ -497,5 +489,18 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  getDefaultAccountsAddresses() {
+    const serviceAccountAddress = ensurePrefixedAddress(
+      this.configService.getServiceAccountAddress()
+    );
+    return [
+      serviceAccountAddress,
+      // See: https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
+      "0xee82856bf20e2aa6",
+      "0xe5a8b7f23e8b548f",
+      "0x0ae53cb6e3f42a79",
+    ];
   }
 }

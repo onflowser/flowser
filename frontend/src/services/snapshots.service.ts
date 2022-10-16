@@ -23,7 +23,7 @@ export class SnapshotService {
     });
   }
 
-  revertTo(
+  checkoutBlock(
     data: RevertToEmulatorSnapshotRequest
   ): Promise<RevertToEmulatorSnapshotResponse> {
     return this.transport.send({

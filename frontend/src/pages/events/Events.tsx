@@ -9,7 +9,7 @@ import MiddleEllipsis from "../../components/ellipsis/MiddleEllipsis";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import { useGetPollingEvents, useIsInitialLoad } from "../../hooks/use-api";
+import { useGetPollingEvents } from "../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../utils/event-utils";
@@ -61,7 +61,6 @@ const Events: FunctionComponent = () => {
   const { searchTerm, setPlaceholder } = useSearch();
   const { data, firstFetch } = useGetPollingEvents();
   const { filteredData } = useFilterData(data, searchTerm);
-  const { isInitialLoad } = useIsInitialLoad();
   const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
   const columns = useMemo(
@@ -138,7 +137,7 @@ const Events: FunctionComponent = () => {
   return (
     <Table<DecoratedPollingEntity<Event>>
       isInitialLoading={firstFetch}
-      data={filteredData || isInitialLoad}
+      data={filteredData}
       columns={columns}
       renderCustomHeader={(headerGroup) => (
         <Card

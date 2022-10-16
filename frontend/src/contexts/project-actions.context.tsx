@@ -23,7 +23,7 @@ export type ProjectActionsContextState = {
 
   sendTransaction: () => void;
   createSnapshot: () => void;
-  revertToBlock: (blockId: string) => void;
+  checkoutBlock: (blockId: string) => void;
 
   isRemovingProject: boolean;
   removeProject: (project: Project) => void;
@@ -112,7 +112,7 @@ export function ProjectActionsProvider({
     const { snapshot } = currentProject?.project?.emulator ?? {};
     if (!snapshot) {
       toast(
-        "Snapshots can only be created when enabling the 'snapshot' option",
+        "Snapshots can only be created when enabling the 'snapshot' option in settings",
         {
           duration: 5000,
         }
@@ -132,7 +132,7 @@ export function ProjectActionsProvider({
     }
   }
 
-  async function revertToBlock(blockId: string) {
+  async function checkoutBlock(blockId: string) {
     if (!projectId) {
       return;
     }
@@ -145,10 +145,10 @@ export function ProjectActionsProvider({
     }
     const block = blocks.find((block) => block.id === blockId);
     showDialog({
-      title: "Revert to snapshot",
+      title: "Jump to snapshot",
       body: (
         <span style={{ textAlign: "center" }}>
-          Do you want to revert the emulator blockchain state to the block with
+          Do you want to move to the emulator blockchain state to the block with
           height <code>{block?.height}</code>?
         </span>
       ),
@@ -156,12 +156,14 @@ export function ProjectActionsProvider({
       cancelBtnLabel: "CANCEL",
       onConfirm: async () => {
         try {
-          const snapshot = await snapshotService.revertTo({
+          const snapshot = await snapshotService.checkoutBlock({
             blockId,
             projectId,
           });
           fetchAll();
-          toast.success(`Reverted to "${snapshot.snapshot?.description}"`);
+          toast.success(
+            `Moved to snapshot "${snapshot.snapshot?.description}"`
+          );
         } catch (e) {
           handleError(e);
         }
@@ -177,7 +179,7 @@ export function ProjectActionsProvider({
         createSnapshot,
         sendTransaction,
         isRemovingProject,
-        revertToBlock,
+        checkoutBlock,
         removeProject,
       }}
     >

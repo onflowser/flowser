@@ -31,6 +31,7 @@ import {
   ToggleField,
 } from "./FormFields";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
+import { useFlow } from "../../../hooks/use-flow";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -44,6 +45,7 @@ export const Configuration: FunctionComponent = () => {
   const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
+  const { isLoggedIn, logout } = useFlow();
   const { handleError } = useErrorHandler(Configuration.name);
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
@@ -51,6 +53,7 @@ export const Configuration: FunctionComponent = () => {
 
   const formik = useFormik({
     validationSchema: projectSchema,
+    validateOnChange: false,
     initialValues: Project.fromPartial({
       filesystemPath: "",
       devWallet: DevWallet.fromPartial({}),
@@ -58,19 +61,33 @@ export const Configuration: FunctionComponent = () => {
       gateway: Gateway.fromPartial({}),
     }),
     onSubmit: async () => {
-      try {
-        const response = isExistingProject
-          ? await projectService.updateProject(formik.values)
-          : await projectService.createProject(formik.values);
-        await runProject(response);
-      } catch (e) {
-        handleError(e);
-        window.scrollTo(0, 0);
+      if (isLoggedIn) {
+        toast.promise(logout(), {
+          loading: "Signing out ...",
+          success: "Signed out",
+          error: "Sign out failed!",
+        });
       }
+      toast.promise(runProject(), {
+        loading: "Running project",
+        success: "Project started",
+        error: "Failed to start project",
+      });
     },
   });
 
-  async function runProject(response: UpdateProjectResponse) {
+  async function runProject() {
+    let response: UpdateProjectResponse;
+    try {
+      response = isExistingProject
+        ? await projectService.updateProject(formik.values)
+        : await projectService.createProject(formik.values);
+    } catch (e) {
+      handleError(e);
+      window.scrollTo(0, 0);
+      throw e;
+    }
+
     const { project } = response;
     if (!project) {
       return;
@@ -169,8 +186,8 @@ export const Configuration: FunctionComponent = () => {
           </ConfigurationSection>
           <ConfigurationSection
             title="Dev wallet"
+            collapseChildren
             className={classes.section}
-            toggleButtonTitle="Run dev wallet"
             isEnabled={formik.values.devWallet?.run}
             onToggleEnabled={(isEnabled) =>
               formik.setFieldValue("devWallet.run", isEnabled)
@@ -188,8 +205,8 @@ export const Configuration: FunctionComponent = () => {
           </ConfigurationSection>
           <ConfigurationSection
             title="Emulator"
+            collapseChildren
             className={classes.section}
-            toggleButtonTitle="Run flow emulator"
             isEnabled={formik.values.emulator?.run}
             onToggleEnabled={(isEnabled) =>
               formik.setFieldValue("emulator.run", isEnabled)

@@ -13,7 +13,6 @@ import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
 import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
 import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import { useSyntaxHighlighter } from "../../hooks/use-syntax-highlighter";
 import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
@@ -22,7 +21,7 @@ import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../../components/simple-button/SimpleButton";
-import AnsiHtmlConvert from "ansi-to-html";
+import { TextUtils } from "../../utils/text-utils";
 
 type LogsProps = {
   className?: string;
@@ -54,10 +53,6 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
           const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
           return !isBackendCallLog;
         })
-        .map((log) => ({
-          ...log,
-          data: new AnsiHtmlConvert().toHtml(log.data),
-        }))
         .sort(
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -226,8 +221,6 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 };
 
 function LogLine({ log }: { log: ManagedProcessLog }) {
-  const { highlightLogKeywords } = useSyntaxHighlighter();
-
   return (
     <pre
       className={classes.line}
@@ -236,7 +229,7 @@ function LogLine({ log }: { log: ManagedProcessLog }) {
         log.source === LogSource.LOG_SOURCE_STDERR ? { color: "#D02525" } : {}
       }
       dangerouslySetInnerHTML={{
-        __html: highlightLogKeywords(log.data),
+        __html: TextUtils.formatProcessLog(log),
       }}
     />
   );
