@@ -1,7 +1,9 @@
 import React, { createContext, ReactElement, useContext } from "react";
+import { MonitoringServiceInt } from "../services/monitoring.service";
 
 export type PlatformAdapterState = {
   onPickProjectPath?: () => Promise<string | undefined>;
+  monitoringService?: MonitoringServiceInt;
 };
 
 const PlatformAdapterContext = createContext<PlatformAdapterState>({});

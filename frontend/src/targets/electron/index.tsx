@@ -33,6 +33,7 @@ function Root() {
       <FlowserClientApp
         enableTimeoutPolling={!isExiting}
         platformAdapter={{
+          monitoringService: sentryService,
           onPickProjectPath: window.platformAdapter.showDirectoryPicker,
         }}
       />

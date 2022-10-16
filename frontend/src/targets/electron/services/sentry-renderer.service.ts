@@ -1,7 +1,11 @@
 import * as Sentry from "@sentry/electron/renderer";
 import { FingerprintService } from "../../../services/fingerprint.service";
+import {
+  CaptureErrorOptions,
+  MonitoringServiceInt,
+} from "../../../services/monitoring.service";
 
-export class SentryRendererService {
+export class SentryRendererService implements MonitoringServiceInt {
   private fingerprintService: FingerprintService;
   constructor() {
     this.fingerprintService = new FingerprintService();
@@ -18,7 +22,8 @@ export class SentryRendererService {
       console.log("Failed to identify user:", e);
     }
   }
-  async capture(exception: unknown): Promise<void> {
-    Sentry.captureException(exception);
+
+  captureError(error: unknown, options?: CaptureErrorOptions): void {
+    Sentry.captureException(error, options);
   }
 }
