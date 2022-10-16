@@ -22,8 +22,7 @@ export enum AnalyticEvent {
   RESTART_PROCESS = "restart_process",
 }
 
-// TODO(milestone-6): Enable before release
-const enableAnalytics = false;
+const enableAnalytics = process.env.NODE_ENV === "production";
 
 export class MixpanelService {
   constructor() {
