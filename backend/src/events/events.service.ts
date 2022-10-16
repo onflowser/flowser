@@ -1,18 +1,17 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateEventDto } from "./dto/create-event.dto";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Event } from "./entities/event.entity";
-import { MongoRepository } from "typeorm";
+import { EventEntity } from "./entities/event.entity";
+import { MoreThan, Repository } from "typeorm";
 
 @Injectable()
 export class EventsService {
   constructor(
-    @InjectRepository(Event)
-    private eventRepository: MongoRepository<Event>
+    @InjectRepository(EventEntity)
+    private eventRepository: Repository<EventEntity>
   ) {}
 
-  create(createEventDto: CreateEventDto) {
-    return this.eventRepository.save(createEventDto);
+  create(event: EventEntity) {
+    return this.eventRepository.save(event);
   }
 
   findAll() {
@@ -21,14 +20,12 @@ export class EventsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Event[]> {
+  findAllNewerThanTimestamp(timestamp): Promise<EventEntity[]> {
     return this.eventRepository.find({
-      where: {
-        $or: [
-          { createdAt: { $gt: timestamp } },
-          { updatedAt: { $gt: timestamp } },
-        ],
-      },
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
       order: { createdAt: "DESC" },
     });
   }
@@ -43,20 +40,11 @@ export class EventsService {
   findAllByTransactionNewerThanTimestamp(transactionId: string, timestamp) {
     return this.eventRepository.find({
       where: {
-        createdAt: { $gt: timestamp },
+        createdAt: MoreThan(timestamp),
         transactionId,
       },
       order: { createdAt: "DESC" },
     });
-  }
-
-  async findOne(id: string) {
-    const [event] = await this.eventRepository.find({ where: { id } });
-    if (event) {
-      return event;
-    } else {
-      throw new NotFoundException("Event not found");
-    }
   }
 
   removeAll() {

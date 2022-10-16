@@ -1,87 +1,128 @@
 {
-    "name": "frontend",
-    "version": "1.0.0",
-    "private": true,
-    "dependencies": {
-        "@onflow/fcl": "^0.0.77",
-        "@onflow/types": "^0.0.5",
-        "@splitbee/web": "^0.3.0",
-        "@testing-library/jest-dom": "^5.14.1",
-        "@testing-library/react": "^11.2.7",
-        "@testing-library/user-event": "^12.8.3",
-        "@types/dateformat": "^3.0.1",
-        "@types/jest": "^26.0.24",
-        "@types/joi": "^17.2.3",
-        "@types/node": "^12.20.27",
-        "@types/prismjs": "^1.16.6",
-        "@types/react": "^17.0.24",
-        "@types/react-dom": "^17.0.9",
-        "@types/react-router-dom": "^5.3.0",
-        "@types/react-timeago": "^4.1.3",
-        "axios": "^0.21.4",
-        "copy-to-clipboard": "^3.3.1",
-        "dateformat": "^5.0.1",
-        "husky": "^7.0.2",
-        "joi": "^17.4.2",
-        "prismjs": "^1.25.0",
-        "react": "^17.0.2",
-        "react-dom": "^17.0.2",
-        "react-hot-toast": "^2.1.1",
-        "react-loader-spinner": "^4.0.0",
-        "react-query": "^3.24.4",
-        "react-router-dom": "^5.3.0",
-        "react-scripts": "4.0.3",
-        "react-timeago": "^6.2.1",
-        "typescript": "^4.4.3",
-        "web-vitals": "^1.1.2"
-    },
-    "scripts": {
-        "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
-        "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject",
-        "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-        "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-        "prepare": "cd ../ && husky install ./frontend/.husky"
-    },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
-    },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    },
-    "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.31.2",
-        "@typescript-eslint/parser": "^4.31.2",
-        "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-prettier": "^4.0.0",
-        "eslint-plugin-react": "^7.26.0",
-        "lint-staged": "^11.1.2",
-        "prettier": "^2.4.1",
-        "sass": "^1.42.1"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*": [
-            "eslint --quiet --fix",
-            "prettier --write"
-        ]
-    },
-    "proxy": "http://backend:3001"
+  "name": "@flowser/frontend",
+  "author": {
+    "name": "Flowser",
+    "url": "https://flowser.dev"
+  },
+  "description": "Easily start you local Flow blockchain & inspect the state.",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/main.js",
+  "homepage": "./",
+  "dependencies": {
+    "@codemirror/legacy-modes": "^6.1.0",
+    "@fingerprintjs/fingerprintjs": "^3.3.6",
+    "@flowser/backend": "0.0.1",
+    "@flowser/shared": "0.0.1",
+    "@onflow/fcl": "^1.2.0",
+    "@onflow/types": "^1.0.3",
+    "@sentry/electron": "^4.0.2",
+    "@tanstack/react-table": "^8.5.11",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/dateformat": "^3.0.1",
+    "@types/jest": "^26.0.24",
+    "@types/joi": "^17.2.3",
+    "@types/node": "^12.20.27",
+    "@types/react": "^17.0.24",
+    "@types/react-dom": "^17.0.9",
+    "@types/react-router-dom": "^5.3.0",
+    "@types/react-timeago": "^4.1.3",
+    "@uiw/codemirror-extensions-basic-setup": "^4.12.4",
+    "@uiw/codemirror-theme-github": "^4.12.4",
+    "@uiw/react-codemirror": "^4.12.4",
+    "ansi-to-html": "^0.7.2",
+    "axios": "^0.21.4",
+    "classnames": "^2.3.1",
+    "concurrently": "^7.3.0",
+    "copy-to-clipboard": "^3.3.1",
+    "cross-env": "^7.0.3",
+    "dateformat": "^5.0.1",
+    "electron-is-dev": "^2.0.0",
+    "fix-path": "3.0.0",
+    "formik": "^2.2.9",
+    "husky": "^7.0.2",
+    "joi": "^17.4.2",
+    "mixpanel-browser": "^2.45.0",
+    "prismjs": "^1.25.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-hot-toast": "^2.1.1",
+    "react-json-view": "^1.21.3",
+    "react-loader-spinner": "^4.0.0",
+    "react-modern-drawer": "^1.1.2",
+    "react-pro-sidebar": "^0.7.1",
+    "react-query": "^3.24.4",
+    "react-router-dom": "^5.3.0",
+    "react-scripts": "4.0.3",
+    "react-timeago": "^6.2.1",
+    "sqlite3": "^5.0.11",
+    "typescript": "^4.4.3",
+    "wait-on": "^6.0.1",
+    "web-vitals": "^1.1.2",
+    "yup": "^0.32.11"
+  },
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "cleanup": "rm -rf node_modules",
+    "start": "yarn run prebuild:web && yarn run start:react",
+    "start:react": "PORT=6060 DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build:react": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build:electron-main": "tsc --project tsconfig.electron.json",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "cd ../ && husky install ./frontend/.husky",
+    "install:m1": "cd ../node_modules/sqlite3 && ../.bin/node-pre-gyp install --target_arch=arm64 --build-from-source",
+    "prebuild:web": "cp src/targets/web/index.tsx src/index.tsx",
+    "prebuild:electron": "cp src/targets/electron/index.tsx src/index.tsx",
+    "build": "yarn run electron:build",
+    "electron:serve": "yarn run prebuild:electron && yarn run build:electron-main && concurrently -k \"cross-env BROWSER=none yarn start:react\" \"yarn electron:start\"",
+    "electron:build": "yarn run prebuild:electron && yarn build:react && yarn run build:electron-main && echo \"Run app/scripts/build.sh to build the actuall electron app.\"",
+    "electron:start": "wait-on tcp:6060 && electron ."
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/mixpanel-browser": "^2.38.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.2",
+    "@typescript-eslint/parser": "^4.31.2",
+    "electron": "20.1.0",
+    "electron-builder": "^23.3.3",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.26.0",
+    "lint-staged": "^11.1.2",
+    "prettier": "^2.4.1",
+    "sass": "^1.42.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,js,tsx}": [
+      "eslint --quiet --fix",
+      "prettier --write"
+    ]
+  }
 }

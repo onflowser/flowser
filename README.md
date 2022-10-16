@@ -1,7 +1,6 @@
 <div align="center">
 	<br>
-	<img alt="Flowser logo" src="https://flowser.dev/images/logo.svg" width="150" height="150">
-	<h1>Flowser</h1>
+	<img alt="Flowser logo" src="./frontend/src/assets/images/long_logo.svg" width="300" height="200">
 	<p>
 		<b>Easily start you local Flow network & inspect the state.</b>
 	</p>
@@ -29,34 +28,40 @@ git clone https://github.com/onflowser/flowser
 
 ### 2. Install dependencies
 
-You need to have Docker and docker-compose installed on your system in order to run Flowser. 
+The following system dependencies are required:
+- Node.js (tested on v14.19)
+- Yarn (tested on v1.22)
+- TypeScript compiler - [tsc](https://www.typescriptlang.org/) (tested on v4.7.4)
+- Protocol Buffers compiler - [protoc](https://grpc.io/docs/protoc-installation/) (tested on v3.21)
+- [flow-cli](https://docs.onflow.org/flow-cli/install/)
 
-See: [Docker installation instructions](https://www.docker.com/get-started)
+> If you're using [nvm](https://github.com/nvm-sh/nvm) for Node.js version management, then just run `nvm use` in project root.
+
+After prerequisites are installed, you can run the following command to set up local environment:
+
+```bash
+yarn run bootstrap
+```
+
+> It's recommended that you don't use your global installation of @nestjs/cli, because that can cause some unexpected issues.
 
 ### 3. Start Flowser
 
-This command will start Flowser with default configuration (recommended).
+### Website
 
 ```bash
-bash run.sh start
-
-# or use npm if you have node already installed
-npm run prod:start
+yarn run start
 ```
 
-If flowser started successfully, you should see the bellow output:
-```
-Creating frontend-prod ... done
-Creating database      ... done
-Creating backend-prod  ... done
-Creating dev-wallet    ... done
-```
+### Desktop app
 
-If you encounter any issues during app build or container start, check out our [Troubleshooting Guide](https://docs.flowser.dev/resources/development/#troubleshooting).
+```bash
+yarn run start:desktop
+```
 
 ### 4. Open in browser
 
-After flowser had successfully started, you can open the app in your favourite browser at [http://localhost:6060](http://localhost:6060) 🥳.
+Flowser should automatically open in your default browser.
 
 Good job, you can now start flowsing around the flow blockchain 🏄.
 

@@ -4,53 +4,133 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
-  Query,
-  ServiceUnavailableException,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { Project } from "./entities/project.entity";
-import { defaultEmulatorFlags } from "./data/default-emulator-flags";
 import { ApiParam } from "@nestjs/swagger";
+import {
+  GetAllProjectsResponse,
+  GetSingleProjectResponse,
+  GetPollingProjectsResponse,
+  GetProjectObjectsResponse,
+  UseProjectResponse,
+  UpdateProjectResponse,
+  CreateProjectResponse,
+  GetPollingProjectsRequest,
+  GetProjectRequirementsResponse,
+  GetProjectStatusResponse,
+} from "@flowser/shared";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
+import { FlowConfigService } from "../flow/services/config.service";
 
 @Controller("projects")
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly flowConfigService: FlowConfigService
+  ) {}
 
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(Project.init(createProjectDto));
+    const project = await this.projectsService.create(createProjectDto);
+    return CreateProjectResponse.toJSON(
+      CreateProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
+  }
+
+  @Get("requirements")
+  async getProjectRequirements() {
+    return GetProjectRequirementsResponse.toJSON({
+      missingRequirements: await this.projectsService.getMissingRequirements(),
+    });
+  }
+
+  @Get("status")
+  async getStatus() {
+    const statusResponse = await this.projectsService.getProjectStatus();
+    return GetProjectStatusResponse.toJSON(statusResponse);
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  async findAll() {
+    const projects = await this.projectsService.findAll();
+    return GetAllProjectsResponse.toJSON(
+      GetAllProjectsResponse.fromPartial({
+        projects: projects.map((project) => project.toProto()),
+      })
+    );
+  }
+
+  @Post("polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingProjectsResponse))
+  async findAllNew(@Body() data) {
+    const request = GetPollingProjectsRequest.fromJSON(data);
+    const projects = await this.projectsService.findAllNewerThanTimestamp(
+      new Date(request.timestamp)
+    );
+    return projects.map((project) => project.toProto());
   }
 
   @Get("current")
-  findCurrent() {
-    return this.projectsService.getCurrentProject();
+  async findCurrent() {
+    const project = await this.projectsService.getCurrentProject();
+    return GetSingleProjectResponse.toJSON(
+      GetSingleProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 
-  @Get("/default")
+  @Get("current/objects")
+  async findCurrentProjectObjects() {
+    const [transactions, contracts] = await Promise.all([
+      this.flowConfigService.getTransactionTemplates(),
+      this.flowConfigService.getContractTemplates(),
+    ]);
+    return GetProjectObjectsResponse.toJSON(
+      GetProjectObjectsResponse.fromPartial({
+        transactions,
+        contracts,
+      })
+    );
+  }
+
+  @Get("default")
   async default() {
-    return defaultEmulatorFlags;
+    return GetSingleProjectResponse.toJSON(
+      GetSingleProjectResponse.fromPartial({
+        project: await this.projectsService.getDefaultProject(),
+      })
+    );
   }
 
   @ApiParam({ name: "id", type: String })
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.projectsService.findOne(id);
+  async findOne(@Param("id") id: string) {
+    const project = await this.projectsService.findOne(id);
+    return GetSingleProjectResponse.fromPartial({
+      project: project.toProto(),
+    });
   }
 
   @ApiParam({ name: "id", type: String })
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(id, updateProjectDto);
+  async update(
+    @Param("id") id: string,
+    @Body() updateProjectDto: UpdateProjectDto
+  ) {
+    const project = await this.projectsService.update(id, updateProjectDto);
+    return UpdateProjectResponse.toJSON(
+      UpdateProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 
   @Delete("/use")
@@ -61,19 +141,18 @@ export class ProjectsController {
 
   @ApiParam({ name: "id", type: String })
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.projectsService.remove(id);
+  async remove(@Param("id") id: string) {
+    await this.projectsService.remove(id);
   }
 
   @ApiParam({ name: "id", type: String })
   @Post("/use/:id")
-  async useProject(@Param("id") id: string): Promise<Project> {
-    return await this.projectsService.useProject(id);
-  }
-
-  @ApiParam({ name: "id", type: String })
-  @Post("/:id/seed/accounts")
-  async seed(@Param("id") id: string, @Query("n", ParseIntPipe) n: number) {
-    return this.projectsService.seedAccounts(id, n);
+  async useProject(@Param("id") id: string) {
+    const project = await this.projectsService.useProject(id);
+    return UseProjectResponse.toJSON(
+      UseProjectResponse.fromPartial({
+        project: project.toProto(),
+      })
+    );
   }
 }

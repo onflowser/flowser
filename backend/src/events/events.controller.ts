@@ -3,50 +3,60 @@ import {
   Get,
   Param,
   UseInterceptors,
-  Query,
-  ParseIntPipe,
+  Body,
+  Post,
 } from "@nestjs/common";
 import { EventsService } from "./events.service";
-import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { ApiParam } from "@nestjs/swagger";
+import {
+  GetAllEventsResponse,
+  GetPollingEventsRequest,
+  GetPollingEventsByTransactionRequest,
+  GetPollingEventsResponse,
+} from "@flowser/shared";
 
 @Controller()
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get("/events")
-  findAll() {
-    return this.eventsService.findAll();
+  async findAll() {
+    const events = await this.eventsService.findAll();
+    return GetAllEventsResponse.toJSON({
+      events: events.map((event) => event.toProto()),
+    });
   }
 
   @ApiParam({ name: "id", type: String })
   @Get("/transactions/:id/events")
-  findAllByTransaction(@Param("id") transactionId) {
-    return this.eventsService.findAllByTransaction(transactionId);
+  async findAllByTransaction(@Param("id") transactionId) {
+    const events = await this.eventsService.findAllByTransaction(transactionId);
+    return GetAllEventsResponse.toJSON({
+      events: events.map((event) => event.toProto()),
+    });
   }
 
   @ApiParam({ name: "id", type: String })
-  @Get("/transactions/:id/events/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNewByTransaction(
-    @Param("id") transactionId,
-    @Query("timestamp", ParseIntPipe) timestamp
-  ) {
-    return this.eventsService.findAllByTransactionNewerThanTimestamp(
-      transactionId,
-      timestamp
+  @Post("/transactions/:id/events/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
+  async findAllNewByTransaction(@Body() data) {
+    const request = GetPollingEventsByTransactionRequest.fromJSON(data);
+    const events =
+      await this.eventsService.findAllByTransactionNewerThanTimestamp(
+        request.transactionId,
+        new Date(request.timestamp)
+      );
+    return events.map((event) => event.toProto());
+  }
+
+  @Post("/events/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
+  async findAllNew(@Body() data) {
+    const request = GetPollingEventsRequest.fromJSON(data);
+    const events = await this.eventsService.findAllNewerThanTimestamp(
+      new Date(request.timestamp)
     );
-  }
-
-  @Get("/events/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseIntPipe) timestamp) {
-    return this.eventsService.findAllNewerThanTimestamp(timestamp);
-  }
-
-  @ApiParam({ name: "id", type: String })
-  @Get("/events/:id")
-  findOne(@Param("id") id: string) {
-    return this.eventsService.findOne(id);
+    return events.map((event) => event.toProto());
   }
 }

@@ -1,37 +1,187 @@
-import React, { FunctionComponent, useEffect } from "react";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import { useSearch } from "../../../shared/hooks/search";
+import React, { FunctionComponent, useEffect, useState } from "react";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
-import Value from "../../../shared/components/value/Value";
-import Card from "../../../shared/components/card/Card";
-import Storage from "./Storage";
-import Label from "../../../shared/components/label/Label";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
-import ContentDetailsKeys from "./ContentDetailsKeys";
-import CopyButton from "../../../shared/components/copy-button/CopyButton";
+import Value from "../../../components/value/Value";
+import Label from "../../../components/label/Label";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import CopyButton from "../../../components/copy-button/CopyButton";
 import {
   DetailsTabItem,
   DetailsTabs,
-} from "../../../shared/components/details-tabs/DetailsTabs";
-import CollapsibleCard from "../../../shared/components/collapsible-card/CollapsibleCard";
-import { useDetailsQuery } from "../../../shared/hooks/details-query";
-import { useParams } from "react-router-dom";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import TransactionListItem from "../../../shared/components/transaction-list-item/TransactionListItem";
-import Fragment from "../../../shared/components/fragment/Fragment";
+} from "../../../components/details-tabs/DetailsTabs";
+import { NavLink, useParams } from "react-router-dom";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import Fragment from "../../../components/fragment/Fragment";
+import {
+  useGetAccount,
+  useGetPollingContractsByAccount,
+  useGetPollingKeysByAccount,
+  useGetPollingStorageByAccount,
+} from "../../../hooks/use-api";
+import { createColumnHelper } from "@tanstack/table-core";
+import {
+  AccountContract,
+  AccountKey,
+  AccountStorageDomain,
+} from "@flowser/shared";
+import { FlowUtils } from "../../../utils/flow-utils";
+import Table from "../../../components/table/Table";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import Badge from "../../../components/badge/Badge";
+import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
+import { BaseStorageCard } from "./BaseStorageCard";
+import classNames from "classnames";
+import { useUrlQuery } from "../../../hooks/use-url-query";
+import {
+  DetailsCard,
+  DetailsCardColumn,
+} from "components/details-card/DetailsCard";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import Card from "../../../components/card/Card";
+import { ActionButton } from "../../../components/action-button/ActionButton";
+import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
+import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
+import { useFlow } from "../../../hooks/use-flow";
+import { useProjectActions } from "../../../contexts/project-actions.context";
+import { UserIcon } from "../../../components/user-icon/UserIcon";
+// @ts-ignore .png import error
+import gradient from "../../../assets/images/gradient.png";
+import { useAnalytics } from "../../../hooks/use-analytics";
+import { AnalyticEvent } from "../../../services/analytics.service";
 
-type RouteParams = {
+export type AccountDetailsRouteParams = {
   accountId: string;
 };
 
-const Details: FunctionComponent<any> = () => {
-  const { accountId } = useParams<RouteParams>();
+// CONTRACTS TABLE
+const columnHelperContracts =
+  createColumnHelper<DecoratedPollingEntity<AccountContract>>();
+
+const columnsContract = [
+  columnHelperContracts.accessor("name", {
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/contracts/details/${info.row.original.id}`}>
+          {info.row.original.name}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelperContracts.accessor("accountAddress", {
+    header: () => <Label variant="medium">ACCOUNT</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+];
+
+// KEYS TABLE
+const columnHelperKeys =
+  createColumnHelper<DecoratedPollingEntity<AccountKey>>();
+
+const columnsKeys = [
+  columnHelperKeys.accessor("accountAddress", {
+    header: () => <Label variant="medium">KEY</Label>,
+    cell: (info) => (
+      <div className={classes.keysRoot}>
+        <div className={classes.row}>
+          <MiddleEllipsis className={classes.hash}>
+            {info.row.original.publicKey}
+          </MiddleEllipsis>
+          <CopyButton value={info.row.original.publicKey} />
+        </div>
+        <div className={classNames(classes.badges, classes.row)}>
+          <Badge>WEIGHT: {info.row.original.weight}</Badge>
+          <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
+          <Badge>INDEX: {info.row.original.index}</Badge>
+          <Badge>
+            SIGN CURVE:{" "}
+            {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo)}
+          </Badge>
+          <Badge>
+            HASH ALGO.: {FlowUtils.getHashAlgoName(info.row.original.hashAlgo)}
+          </Badge>
+          <Badge>REVOKED: {info.row.original.revoked ? "YES" : "NO"}</Badge>
+        </div>
+      </div>
+    ),
+  }),
+];
+
+const Details: FunctionComponent = () => {
+  const { track } = useAnalytics();
+  const { accountId } = useParams<AccountDetailsRouteParams>();
+  const urlQueryParams = useUrlQuery();
+  const focusedStorageId = urlQueryParams.get("focusedStorageId");
   const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data, isLoading } = useDetailsQuery<any>(
-    `/api/accounts/${accountId}`
+  const { showNavigationDrawer } = useNavigation();
+  const { data, isLoading } = useGetAccount(accountId);
+  // TODO(milestone-5): Should we show all transactions of account?
+  const { data: contracts } = useGetPollingContractsByAccount(accountId);
+  const { data: storageItems } = useGetPollingStorageByAccount(accountId);
+  const { data: keys } = useGetPollingKeysByAccount(accountId);
+  const { account } = data ?? {};
+  const [expandedCardIds, setExpandedCardIds] = useState(
+    new Set<string>(focusedStorageId ? [focusedStorageId] : [])
   );
+
+  useEffect(() => {
+    if (focusedStorageId) {
+      expandCardById(focusedStorageId);
+      // We need to wait for the virtual nodes to be added to the browser DOM.
+      // This is achieved with setTimeout call - wait for the next window pain.
+      // There might be a better React way to do this.
+      setTimeout(() => {
+        const targetDomNode = document.getElementById(focusedStorageId);
+        window.scrollTo(0, targetDomNode?.offsetTop ?? 0);
+      });
+    }
+  }, [focusedStorageId, storageItems]);
+
+  const expandCardById = (id: string) => {
+    setExpandedCardIds((prev) => new Set(prev.add(id)));
+  };
+
+  const minimizeCardById = (id: string) => {
+    expandedCardIds.delete(id);
+    setExpandedCardIds(new Set(expandedCardIds));
+  };
+
+  const toggleCardExpand = (id: string) => {
+    if (expandedCardIds.has(id)) {
+      track(AnalyticEvent.CLICK_MINIMIZE_STORAGE_CARD, {
+        storageId: id,
+      });
+      minimizeCardById(id);
+    } else {
+      track(AnalyticEvent.CLICK_EXPAND_STORAGE_CARD, {
+        storageId: id,
+      });
+      expandCardById(id);
+    }
+  };
+
+  const privateStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PRIVATE
+  );
+  const publicStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
+  );
+  const baseStorageItems = storageItems.filter(
+    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
+  );
+
+  const privateAndPublicStorageItems = [
+    ...publicStorageItems,
+    ...privateStorageItems,
+  ];
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -40,106 +190,121 @@ const Details: FunctionComponent<any> = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
   }, []);
 
-  if (isLoading || !data) {
+  if (isLoading || !account) {
     return <FullScreenLoading />;
   }
 
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Address",
+        value: account.address,
+      },
+      {
+        label: "Balance",
+        value: (
+          <>
+            {account.balance}
+            <span className={classes.currency}>FLOW</span>
+          </>
+        ),
+      },
+    ],
+  ];
+
   return (
     <div className={classes.root}>
-      <div className={classes.firstRow}>
-        <Label variant="large">ADDRESS</Label>
-        <Value variant="large">{data.address}</Value>
-        <CopyButton value={data.address} />
+      <div className={classes.header}>
+        <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
+        <ProfileActionsCard currentAddress={accountId} />
       </div>
-      <Card className={classes.bigCard}>
-        <div>
-          <Label variant="large" className={classes.label}>
-            BALANCE
-          </Label>
-          <Value variant="large">{data.balance} FLOW</Value>
-        </div>
-      </Card>
       <DetailsTabs>
-        <DetailsTabItem label="STORAGE" value={data.storage?.length}>
-          {data.storage?.length && <Storage data={data.storage} />}
+        <DetailsTabItem label="STORAGE" value={storageItems?.length}>
+          <div className={classes.grid}>
+            {privateAndPublicStorageItems.map((item) => (
+              <PublicPrivateStorageCard key={item.id} content={item} />
+            ))}
+          </div>
+          <div className={classes.gridExtendable}>
+            {baseStorageItems.map((item) => (
+              <BaseStorageCard
+                key={item.id}
+                content={item}
+                onToggleExpand={() => toggleCardExpand(item.id)}
+                isExpanded={expandedCardIds.has(item.id)}
+                className={classNames({
+                  [classes.gridItemExtended]: expandedCardIds.has(item.id),
+                })}
+              />
+            ))}
+          </div>
         </DetailsTabItem>
-        {!!data.code && (
+        <DetailsTabItem
+          label="CONTRACTS"
+          value={contracts.length}
+          onClick={() =>
+            updateSearchBar("search for contracts", !contracts.length)
+          }
+        >
+          <Table<DecoratedPollingEntity<AccountContract>>
+            columns={columnsContract}
+            data={contracts}
+          />
+        </DetailsTabItem>
+        <DetailsTabItem label="KEYS" value={keys.length}>
+          <Fragment
+            onMount={() => updateSearchBar("search for keys", !keys.length)}
+          >
+            <Table<DecoratedPollingEntity<AccountKey>>
+              columns={columnsKeys}
+              data={keys}
+            />
+          </Fragment>
+        </DetailsTabItem>
+        {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">
             <Fragment
               onMount={() => updateSearchBar("search for scripts", true)}
             >
-              <ContentDetailsScript script={data.code} />
+              <ContentDetailsScript script={account.code} />
             </Fragment>
           </DetailsTabItem>
         )}
-        {!!data.transactions && (
-          <DetailsTabItem label="TRANSACTIONS" value={data.transactions.length}>
-            <Fragment
-              onMount={() =>
-                updateSearchBar(
-                  "search for transactions",
-                  !data.transactions.length
-                )
-              }
-            >
-              {data.transactions.map((item: any, i: number) => (
-                <TransactionListItem
-                  key={i}
-                  id={item.id}
-                  referenceBlockId={item.referenceBlockId}
-                  statusCode={item.status.statusCode}
-                  payer={item.payer}
-                  proposer={item.proposalKey.address}
-                />
-              ))}
-            </Fragment>
-          </DetailsTabItem>
-        )}
-        <DetailsTabItem
-          label="CONTRACTS"
-          value={data.contracts.length}
-          onClick={() =>
-            updateSearchBar("search for contracts", !data.contracts.length)
-          }
-        >
-          {data.contracts.map((contract: any, index: number) => (
-            <CollapsibleCard
-              key={index}
-              isNew={contract.isNew}
-              header="CONTRACT NAME"
-              subheader={contract.name}
-              variant="black"
-              className={classes.script}
-            >
-              <Fragment
-                onMount={() =>
-                  updateSearchBar(
-                    "search for contracts",
-                    !data.contracts.length
-                  )
-                }
-              >
-                <ContentDetailsScript script={contract.code} />
-              </Fragment>
-            </CollapsibleCard>
-          ))}
-        </DetailsTabItem>
-        <DetailsTabItem label="KEYS" value={data.keys.length}>
-          <Fragment
-            onMount={() =>
-              updateSearchBar("search for keys", !data.keys.length)
-            }
-          >
-            <ContentDetailsKeys keys={data.keys} />
-          </Fragment>
-        </DetailsTabItem>
       </DetailsTabs>
     </div>
   );
 };
+
+function ProfileActionsCard({ currentAddress }: { currentAddress: string }) {
+  const { logout, user, isLoggedIn } = useFlow();
+  const { sendTransaction } = useProjectActions();
+
+  if (!isLoggedIn || currentAddress !== user.addr) {
+    return null;
+  }
+  return (
+    <Card className={classes.actionCard}>
+      <img className={classes.background} src={gradient} alt="" />
+      <div className={classes.avatarWrapper}>
+        <UserIcon size={50} />
+      </div>
+      <div className={classes.actionsWrapper}>
+        <ActionButton
+          onClick={() => sendTransaction()}
+          title="Send transaction"
+          icon={<SendTxIcon />}
+        />
+        <ActionButton
+          onClick={logout}
+          title="Disconnect wallet"
+          icon={<LogoutIcon />}
+        />
+      </div>
+    </Card>
+  );
+}
 
 export default Details;

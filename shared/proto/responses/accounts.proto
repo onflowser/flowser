@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "entities/accounts.proto";
+import "responses/core.proto";
+
+message GetAllAccountsResponse {
+  repeated Account accounts = 1;
+}
+
+message GetPollingAccountsRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingAccountsResponse {
+  repeated Account data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetPollingKeysRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingKeysResponse {
+  repeated AccountKey data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetPollingStorageRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingStorageResponse {
+  repeated AccountStorageItem data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetSingleAccountResponse {
+  Account account = 1;
+}

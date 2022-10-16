@@ -1,0 +1,27 @@
+@import 'styles/spacings';
+@import 'styles/colors';
+@import 'styles/typography';
+@import 'styles/animations';
+
+.root {
+  @include fadeInAnimation(2s);
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .innerWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .title {
+      font-size: $font-size-large;
+      color: $light-grey;
+    }
+
+    .description {
+      margin-top: $spacing-l;
+      color: $color-not-active-button-text-grey;
+    }
+  }
+}

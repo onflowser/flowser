@@ -1,5 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { AppService } from "./app.service";
+import { GetFlowserVersionResponse } from "@flowser/shared";
 
 @Controller()
 export class AppController {
@@ -7,6 +8,7 @@ export class AppController {
 
   @Get("version")
   getVersion() {
-    return this.appService.flowserVersion();
+    const version = this.appService.flowserVersion();
+    return GetFlowserVersionResponse.fromJSON(version);
   }
 }

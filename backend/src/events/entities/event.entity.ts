@@ -1,20 +1,20 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../core/entities/polling.entity";
+import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
+import { ExtendedFlowEvent } from "../../flow/services/aggregator.service";
+import { Event } from "@flowser/shared";
 
 @Entity({ name: "events" })
-export class Event extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
-  @Index({ unique: true })
+export class EventEntity extends PollingEntity {
   id: string;
 
-  @Column()
+  @PrimaryColumn()
   transactionId: string;
 
-  @Column()
+  @PrimaryColumn()
   blockId: string;
+
+  @PrimaryColumn()
+  eventIndex: number;
 
   @Column()
   type: string;
@@ -22,16 +22,36 @@ export class Event extends PollingEntity {
   @Column()
   transactionIndex: number;
 
-  @Column()
-  eventIndex: number;
-
-  @Column()
+  @Column("simple-json")
   data: object;
 
-  static init(flowEventObject): Event {
-    return Object.assign(new Event(), {
-      ...flowEventObject,
-      id: `${flowEventObject.transactionId}:${flowEventObject.type}:${flowEventObject.eventIndex}`,
-    });
+  @AfterLoad()
+  private computeId() {
+    this.id = `${this.transactionId}.${this.eventIndex}`;
+  }
+
+  toProto(): Event {
+    return {
+      id: this.id,
+      transactionId: this.transactionId,
+      blockId: this.blockId,
+      eventIndex: this.eventIndex,
+      type: this.type,
+      transactionIndex: this.transactionIndex,
+      data: this.data,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
+
+  static create(flowEvent: ExtendedFlowEvent): EventEntity {
+    const event = new EventEntity();
+    event.type = flowEvent.type;
+    event.transactionIndex = flowEvent.transactionIndex;
+    event.transactionId = flowEvent.transactionId;
+    event.blockId = flowEvent.blockId;
+    event.eventIndex = flowEvent.eventIndex;
+    event.data = flowEvent.data;
+    return event;
   }
 }

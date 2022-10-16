@@ -1,313 +1,55 @@
-@import 'styles/spacings';
-@import 'styles/colors';
-@import 'styles/typography';
-@import 'styles/rules';
-@import 'styles/animations';
-
-.loader {
-  height: 100vh !important;
-  display: flex;
-}
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+@import "styles/rules";
+@import "styles/animations";
 
 .root {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 0 $spacing-xl;
 
-  .inner {
-    align-self: center;
-    max-width: 1690px;
+  .innerWrapper {
+    max-width: 1000px;
+    margin-top: $spacing-xl;
     width: 100%;
 
-    @media screen and (max-width: 1600px) {
-      max-width: 800px;
-    }
+    .section {
+      margin-top: $spacing-xl;
 
-    justify-content: center;
-    align-items: center;
-
-    .backButton {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-    }
-
-    .top {
-      display: flex;
-      justify-content: center;
-      margin-top: $spacing-l * 4;
-      margin-bottom: $spacing-l * 4;
-
-      h2 {
-        color: $color-main-yellow;
-        font-size: $font-size-h2;
-      }
-    }
-
-    .bottom {
-      display: flex;
-      flex-direction: column;
-      padding: $spacing-l * 4 $spacing-l * 6;
-
-      .errors {
-        background-color: darken($color-status-expired, 5%);
-        color: $color-white;
-        flex: 1;
-        //opacity: 1;
-        padding: $spacing-base $spacing-base * 2;
-        border-radius: $border-radius-card;
-        margin-bottom: $spacing-l * 2;
-        @include fadeInAnimation(1s);
+      .card {
+        padding: $spacing-l * 2;
+        margin-bottom: $spacing-base;
       }
 
-      @media screen and (max-width: 1600px) {
-        padding: $spacing-l * 4 $spacing-l * 4;
-      }
-
-      .versionWrapper {
-        margin-top: $spacing-xl;
+      .radioCard {
         display: flex;
-        justify-content: center;
-        a {
-          color: $color-link-blue;
-        }
-      }
+        justify-content: space-between;
 
-      .bottom1 {
-        display: flex;
-        align-items: baseline;
-
-        .errorMessage {
-          margin-left: $spacing-l;
-        }
-
-        .nameInput {
-          border-radius: $border-radius-input;
-          background-color: #4C515E;
-          height: 48px;
-          padding: 0 $spacing-l * 2;
-          margin-left: $spacing-l * 3;
-          display: flex;
-          align-items: center;
-          flex: 3;
-
-          input {
-            height: 40px;
-            background: none;
-            flex: 1;
-            border: none;
-            outline: none;
-            color: $color-grey;
-            font-family: $font-family-oswald;
-            font-size: $font-size-large;
-          }
-        }
-      }
-
-      .bottom2 {
-        display: flex;
-        flex-direction: row;
-        margin-top: $spacing-l * 4;
-
-        @media screen and (max-width: 1600px) {
-          flex-direction: column;
-        }
-
-        .left {
-          display: flex;
-          flex-direction: column;
+        .radioField {
           flex: 1;
-          padding-right: $spacing-l * 5;
-
-          @media screen and (max-width: 1600px) {
-            padding-right: 0;
-          }
-
-          .row {
-            display: flex;
-            align-items: center;
-            margin-bottom: $spacing-l;
-            height: 44px;
-
-            & > * {
-              flex: 1;
-            }
-
-            span:first-child {
-              color: $color-white;
-              font-size: $font-size-normal;
-              max-width: 12vw;
-
-              @media screen and (max-width: 1600px) {
-                max-width: 25vw;
-              }
-
-            }
-
-            *:nth-child(2) {
-              max-width: 162px;
-            }
-
-            span:last-child {
-              color: $color-grey;
-              font-family: $font-family-oswald-light;
-              margin-left: $spacing-base * 2;
-              font-size: 13px;
-              font-weight: 200;
-            }
-          }
-        }
-
-        .right {
-          display: flex;
-          flex: 1;
-          flex-direction: column;
-          color: $color-grey;
-          padding-left: $spacing-l * 5;
-
-          @media screen and (max-width: 1600px) {
-            margin-top: $spacing-l * 3;
-            padding-left: 0;
-          }
-
-          .firstPart {
-            display: flex;
-
-            & > div:first-child {
-              margin-right: $spacing-l * 3;
-
-              & > div > span {
-
-                @media screen and (max-width: 1600px) {
-                  min-width: 140px;
-                }
-              }
-            }
-
-            & > div:last-child {
-              margin-left: $spacing-l * 3;
-
-              & > div > span {
-                @media screen and (max-width: 1600px) {
-                  min-width: 180px;
-                }
-              }
-            }
-
-            & > div {
-              display: flex;
-              flex: 1;
-              flex-direction: column;
-
-              h6 {
-                font-size: $font-size-normal;
-                color: $color-white;
-
-                span {
-                  margin-left: $spacing-base;
-                  font-weight: 100;
-                  font-size: $font-size-small;
-                  color: $color-grey;
-                }
-              }
-
-              & > div:nth-child(2) {
-                margin-top: $spacing-l * 2;
-              }
-
-              & > div:not(:first-child) {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                @media screen and (max-width: 1600px) {
-                  justify-content: flex-start;
-                }
-                align-items: center;
-                margin-bottom: $spacing-l;
-
-
-                & > * {
-                  margin-right: $spacing-base;
-                }
-              }
-            }
-          }
-
-          .secondPart {
-            margin-top: $spacing-l * 6;
-            display: flex;
-            flex-direction: column;
-
-            @media screen and (max-width: 1600px) {
-              margin-top: $spacing-l * 2;
-            }
-
-            .row {
-              display: flex;
-              height: 50px;
-              align-items: center;
-
-              & > span:first-child {
-                font-size: $font-size-normal;
-                color: $color-white;
-                max-width: 200px;
-                min-width: 200px;
-                @media screen and (max-width: 1600px) {
-                  max-width: 160px;
-                  min-width: 160px;
-                }
-              }
-
-              & > div {
-                width: 190px;
-                font-size: $font-size-small;
-                display: flex;
-                align-items: center;
-
-                & > span:first-child {
-                  margin-right: $spacing-l
-                }
-
-                & > span:last-child {
-                  margin-left: $spacing-l;
-                }
-              }
-
-              & > span:last-child {
-                font-size: $font-size-small;
-                font-weight: 100;
-                min-width: 200px;
-                text-align: start;
-
-                @media screen and (max-width: 1600px) {
-                  min-width: 240px;
-                }
-              }
-            }
-          }
-        }
-
-        .buttons {
-          display: flex;
-          justify-content: space-between;
-          margin-top: $spacing-l * 6;
-          @media screen and (max-width: 1600px) {
-            margin-top: $spacing-l * 4;
-          }
-
-          * + * {
-            margin-left: $spacing-base;
-          }
+          max-width: 300px;
         }
       }
+    }
+
+    .title {
+      color: $light-grey;
     }
   }
-}
 
-.errorMessage {
-  color: lighten($color-status-expired, 10%) !important;
-  font-size: $font-size-small !important;
-  font-weight: 400 !important;
-  @include pulse(1.5s);
+  .footer {
+    margin: $spacing-xl * 2 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
+    .footerButton {
+      margin: 0 $spacing-base;
+    }
+    .versionWrapper {
+      margin-top: $spacing-xl;
+    }
+  }
 }

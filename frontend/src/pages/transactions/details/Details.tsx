@@ -1,43 +1,219 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useState, useMemo } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
-import DetailsCard from "../../../shared/components/details-card/DetailsCard";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import classes from "./Details.module.scss";
 import {
   DetailsTabItem,
   DetailsTabs,
-} from "../../../shared/components/details-tabs/DetailsTabs";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
-import Card from "../../../shared/components/card/Card";
-import TimeAgo from "../../../shared/components/time-ago/TimeAgo";
-import DateWithCalendar from "../../../shared/components/date-with-calendar/DateWithCalendar";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import TransactionStatusCode from "../../../shared/components/transaction-status-code/TransactionStatusCode";
-import Ellipsis from "../../../shared/components/ellipsis/Ellipsis";
-import EventDetailsTable from "../../../shared/components/event-details-table/EventDetailsTable";
-import { useTimeoutPolling } from "../../../shared/hooks/timeout-polling";
-import { useDetailsQuery } from "../../../shared/hooks/details-query";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import CaretIcon from "../../../shared/components/caret-icon/CaretIcon";
-import { useFormattedDate } from "../../../shared/hooks/formatted-date";
+} from "../../../components/details-tabs/DetailsTabs";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import Card from "../../../components/card/Card";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import CaretIcon from "../../../components/caret-icon/CaretIcon";
+import {
+  useGetPollingEventsByTransaction,
+  useGetTransaction,
+} from "../../../hooks/use-api";
+import { createColumnHelper } from "@tanstack/table-core";
+import { SignableObject } from "@flowser/shared";
+import Table from "../../../components/table/Table";
+import { Event } from "@flowser/shared";
+import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
+import CopyButton from "../../../components/copy-button/CopyButton";
+import { flexRender } from "@tanstack/react-table";
+import ReactTimeAgo from "react-timeago";
+import {
+  DetailsCard,
+  DetailsCardColumn,
+} from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
+import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
+import { FlowUtils } from "../../../utils/flow-utils";
+import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type RouteParams = {
   transactionId: string;
 };
 
-const Details: FunctionComponent<any> = () => {
-  const { formatDate } = useFormattedDate();
+const columnHelperEvents = createColumnHelper<ComputedEventData>();
+const columnsEvents = [
+  columnHelperEvents.display({
+    id: "tableTitle",
+    header: () => <Label variant="medium">VALUES</Label>,
+  }),
+  columnHelperEvents.accessor("name", {
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <MiddleEllipsis className={classes.ellipsis}>
+          {info.getValue()}
+        </MiddleEllipsis>
+      </Value>
+    ),
+  }),
+  columnHelperEvents.accessor("type", {
+    header: () => <Label variant="medium">TYPE</Label>,
+    cell: (info) => (
+      <Value>
+        <MiddleEllipsis className={classes.ellipsis}>
+          {info.getValue()}
+        </MiddleEllipsis>
+      </Value>
+    ),
+  }),
+  columnHelperEvents.accessor("value", {
+    header: () => <Label variant="medium">VALUE</Label>,
+    cell: (info) => (
+      <div>
+        <MiddleEllipsis
+          style={{ whiteSpace: "nowrap" }}
+          className={classes.subtable}
+        >
+          {info.getValue()}
+        </MiddleEllipsis>
+        <CopyButton value={info.getValue()} />
+      </div>
+    ),
+  }),
+];
+
+// ENVELOPE SIGNATURES TABLE
+const columnsHelperEnvelope = createColumnHelper<SignableObject>();
+
+const columnsEnvelope = [
+  columnsHelperEnvelope.accessor("address", {
+    header: () => <Label variant="medium">ACCOUNT ADDRESS</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnsHelperEnvelope.accessor("signature", {
+    header: () => <Label variant="medium">SIGNATURE</Label>,
+    cell: (info) => (
+      <Value>
+        <MiddleEllipsis className={classes.hash}>
+          {info.getValue()}
+        </MiddleEllipsis>
+      </Value>
+    ),
+  }),
+  columnsHelperEnvelope.accessor("keyId", {
+    header: () => <Label variant="medium">KEY ID</Label>,
+    cell: (info) => <Value>{info.getValue()}</Value>,
+  }),
+];
+
+// PAYLOAD SIGNATURES TABLE
+const columnsHelperPayload = createColumnHelper<SignableObject>();
+
+const columnsPayload = [
+  columnsHelperPayload.accessor("address", {
+    header: () => <Label variant="medium">ADDRESS</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`/accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnsHelperPayload.accessor("signature", {
+    header: () => <Label variant="medium">SIGNATURE</Label>,
+    cell: (info) => (
+      <Value>
+        <MiddleEllipsis className={classes.hash}>
+          {info.getValue()}
+        </MiddleEllipsis>
+      </Value>
+    ),
+  }),
+  columnsHelperPayload.accessor("keyId", {
+    header: () => <Label variant="medium">KEY ID</Label>,
+    cell: (info) => <Value>{info.getValue()}</Value>,
+  }),
+];
+
+const Details: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
   const { transactionId } = useParams<RouteParams>();
   const { setBreadcrumbs, showSearchBar } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data, isLoading } = useDetailsQuery(
-    `/api/transactions/${transactionId}`
-  );
-  const { data: events } = useTimeoutPolling(
-    `/api/transactions/${transactionId}/events/polling`,
-    "_id"
+  const { showNavigationDrawer } = useNavigation();
+  const { data, isLoading } = useGetTransaction(transactionId);
+  const { data: events } = useGetPollingEventsByTransaction(transactionId);
+  const { transaction } = data ?? {};
+  const openLog = (status: boolean, id: string) => {
+    setOpenedLog(!status ? id : "");
+  };
+  const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
+
+  // EVENTS TABLE
+  const columnsEventsParent = useMemo(
+    () => [
+      columnHelper.accessor("blockId", {
+        header: () => <Label variant="medium">BLOCK ID</Label>,
+        cell: (info) => (
+          <Value>
+            <NavLink to={`/blocks/details/${info.getValue()}`}>
+              <MiddleEllipsis className={classes.hashEvents}>
+                {info.getValue()}
+              </MiddleEllipsis>
+            </NavLink>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("createdAt", {
+        header: () => <Label variant="medium">TIMESTAMP</Label>,
+        cell: (info) => <Value>{TextUtils.shortDate(info.getValue())}</Value>,
+      }),
+      columnHelper.accessor("type", {
+        header: () => <Label variant="medium">TYPE</Label>,
+        cell: (info) => (
+          <Value>
+            <pre style={{ whiteSpace: "nowrap" }}>{info.getValue()}</pre>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("transactionId", {
+        header: () => <Label variant="medium">TX ID</Label>,
+        cell: (info) => (
+          <Value>
+            <NavLink to={`/transactions/details/${info.getValue()}`}>
+              <MiddleEllipsis className={classes.hashEvents}>
+                {info.getValue()}
+              </MiddleEllipsis>
+            </NavLink>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("transactionIndex", {
+        header: () => <Label variant="medium">TX INDEX</Label>,
+        cell: (info) => <Value>{info.getValue()}</Value>,
+      }),
+      columnHelper.accessor("eventIndex", {
+        header: () => <Label variant="medium">EVENT INDEX</Label>,
+        cell: ({ row, getValue }) => (
+          <div className={classes.caretIcon}>
+            <Value>{getValue()}</Value>
+            <CaretIcon
+              inverted={true}
+              className={classes.icon}
+              isOpen={openedLog === row.id}
+              onChange={(status) => openLog(status, row.id)}
+            />
+          </div>
+        ),
+      }),
+    ],
+    [openedLog]
   );
 
   const breadcrumbs: Breadcrumb[] = [
@@ -47,76 +223,81 @@ const Details: FunctionComponent<any> = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
     showSearchBar(false);
   }, []);
 
-  const openLog = (status: boolean, id: string) => {
-    setOpenedLog(!status ? id : "");
-  };
-
-  if (isLoading || !data) {
+  if (isLoading || !transaction) {
     return <FullScreenLoading />;
   }
 
-  return (
-    <div className={classes.root}>
-      <DetailsCard
-        Header={() => (
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Transaction",
+        value: (
           <>
-            <div>
-              <Label variant="large">TRANSACTION</Label>
-              <Value variant="large">{data.id}</Value>
-            </div>
-            <div>
-              <TransactionStatusCode statusCode={data.status.statusCode} />
-            </div>
+            <MiddleEllipsis className={classes.elipsis}>
+              {transaction.id}
+            </MiddleEllipsis>
+            <ExecutionStatusBadge
+              className={classes.txStatusBadge}
+              status={transaction.status}
+            />
           </>
-        )}
-        Footer={() => (
+        ),
+      },
+      {
+        label: "API Status",
+        value: <GrcpStatusBadge status={transaction.status} />,
+      },
+      {
+        label: "Timestamp",
+        value: TextUtils.longDate(transaction.createdAt),
+      },
+      {
+        label: "Time",
+        value: <ReactTimeAgo date={transaction.createdAt} />,
+      },
+      {
+        label: "Block ID",
+        value: (
+          <NavLink to={`/blocks/details/${transaction.blockId}`}>
+            <MiddleEllipsis className={classes.elipsis}>
+              {transaction.blockId}
+            </MiddleEllipsis>
+          </NavLink>
+        ),
+      },
+    ],
+    [
+      {
+        label: "Proposer",
+        value: (
+          <NavLink
+            to={
+              transaction.proposalKey
+                ? `/accounts/details/${transaction.proposalKey.address}`
+                : "#"
+            }
+          >
+            {transaction.proposalKey?.address ?? "-"}
+          </NavLink>
+        ),
+      },
+      {
+        label: "Payer",
+        value: (
+          <NavLink to={`/accounts/details/${transaction.payer}`}>
+            {transaction.payer}
+          </NavLink>
+        ),
+      },
+      {
+        label: "Authorizers",
+        value: (
           <>
-            <TimeAgo date={new Date(data.createdAt).toISOString()} />
-            <DateWithCalendar date={new Date(data.createdAt).toISOString()} />
-          </>
-        )}
-      >
-        <div className={classes.firstLine}>
-          <Label variant="large">BLOCK ID</Label>
-          <Value variant="large">
-            <NavLink to={`/blocks/details/${data.referenceBlockId}`}>
-              {data.referenceBlockId}
-            </NavLink>
-          </Value>
-        </div>
-        <div className={classes.twoColumns}>
-          <Label variant="large">PROPOSER</Label>
-          <Value variant="large">
-            <NavLink to={`/accounts/details/${data.proposalKey.address}`}>
-              {data.proposalKey.address}
-            </NavLink>
-          </Value>
-          <Label variant="large" className={classes.inlineLabel}>
-            Sequence number:
-          </Label>
-          <Value variant="large" className={classes.inlineValue}>
-            {data.proposalKey.sequenceNumber}
-          </Value>
-        </div>
-        <div>
-          <Label variant="large">PAYER</Label>
-          <Value variant="large">
-            <NavLink to={`/accounts/details/${data.payer}`}>
-              {data.payer}
-            </NavLink>
-          </Value>
-        </div>
-        <div>
-          <Label variant="large" className={classes.authorizersLabel}>
-            AUTHORIZERS
-          </Label>
-          <Value variant="large">
-            {data.authorizers.map((address: string) => (
+            {transaction.authorizers.map((address: string) => (
               <NavLink
                 key={address}
                 className={classes.authorizersAddress}
@@ -125,120 +306,131 @@ const Details: FunctionComponent<any> = () => {
                 {address}
               </NavLink>
             ))}
-          </Value>
-        </div>
-      </DetailsCard>
+          </>
+        ),
+      },
+      {
+        label: "Sequence nb.",
+        value: <>{transaction.proposalKey?.sequenceNumber ?? "-"}</>,
+      },
+      {
+        label: "Gas limit",
+        value: `${transaction?.gasLimit}`,
+      },
+    ],
+  ];
+
+  return (
+    <div className={classes.root}>
+      <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
+        {transaction?.status?.errorMessage && (
+          <DetailsTabItem
+            label="ERROR"
+            value={FlowUtils.getGrcpStatusName(transaction?.status?.grcpStatus)}
+          >
+            <TransactionErrorMessage
+              errorMessage={transaction?.status?.errorMessage}
+            />
+          </DetailsTabItem>
+        )}
         <DetailsTabItem label="SCRIPT" value="<>">
-          <ContentDetailsScript script={data.script} args={data.args} />
-        </DetailsTabItem>
-        <DetailsTabItem label="GAS LIMIT" value={9000} />
-        <DetailsTabItem
-          label="PAYLOAD SIGNATURES"
-          value={data.payloadSignatures?.length || 0}
-        >
-          {data.payloadSignatures &&
-            data.payloadSignatures.map((item: any, i: number) => (
-              <Card key={i} className={classes.listCard}>
-                <div>
-                  <Label className={classes.label}>ACCOUNT ADDRESS</Label>
-                  <Value>
-                    <NavLink to={`/accounts/details/${item.address}`}>
-                      {item.address}
-                    </NavLink>
-                  </Value>
-                </div>
-                <div>
-                  <Label className={classes.label}>SIGNATURE</Label>
-                  <Value>
-                    <Ellipsis className={classes.hash}>
-                      {item.signature}
-                    </Ellipsis>
-                  </Value>
-                </div>
-                <div>
-                  <Label className={classes.label}>KEY ID</Label>
-                  <Value>{item.keyId}</Value>
-                </div>
-                <div></div>
-              </Card>
-            ))}
+          <ContentDetailsScript
+            script={transaction.script}
+            args={transaction.args}
+          />
         </DetailsTabItem>
         <DetailsTabItem
           label="ENVELOPE SIGNATURES"
-          value={data.envelopeSignatures?.length || 0}
+          value={transaction.envelopeSignatures.length}
         >
-          {data.envelopeSignatures &&
-            data.envelopeSignatures.map((item: any, i: number) => (
-              <Card key={i} className={classes.listCard}>
-                <div>
-                  <Label className={classes.label}>ACCOUNT ADDRESS</Label>
-                  <Value>
-                    <NavLink to={`/accounts/details/${item.address}`}>
-                      {item.address}
-                    </NavLink>
-                  </Value>
-                </div>
-                <div>
-                  <Label className={classes.label}>SIGNATURE</Label>
-                  <Value>
-                    <Ellipsis className={classes.hash}>
-                      {item.signature}
-                    </Ellipsis>
-                  </Value>
-                </div>
-                <div>
-                  <Label className={classes.label}>KEY ID</Label>
-                  <Value>{item.keyId}</Value>
-                </div>
-                <div></div>
-              </Card>
-            ))}
+          <Table<SignableObject>
+            data={transaction.envelopeSignatures}
+            columns={columnsEnvelope}
+          />
         </DetailsTabItem>
-        <DetailsTabItem label="EVENTS" value={data.status.eventsCount}>
-          {events &&
-            events.map((item: any, i) => (
-              <React.Fragment key={i}>
+        <DetailsTabItem
+          label="PAYLOAD SIGNATURES"
+          value={transaction.payloadSignatures?.length || 0}
+        >
+          {transaction.payloadSignatures.map((item) => (
+            <Card key={item.keyId} className={classes.listCard}>
+              <div>
+                <Label className={classes.label}>ACCOUNT ADDRESS</Label>
+                <Value>
+                  <NavLink to={`/accounts/details/${item.address}`}>
+                    {item.address}
+                  </NavLink>
+                </Value>
+              </div>
+              <div>
+                <Label className={classes.label}>SIGNATURE</Label>
+                <Value>
+                  <MiddleEllipsis className={classes.hash}>
+                    {item.signature}
+                  </MiddleEllipsis>
+                </Value>
+              </div>
+              <div>
+                <Label className={classes.label}>KEY ID</Label>
+                <Value>{item.keyId}</Value>
+              </div>
+              <div></div>
+            </Card>
+          ))}
+          <Table<SignableObject>
+            data={transaction.payloadSignatures}
+            columns={columnsPayload}
+          />
+        </DetailsTabItem>
+        <DetailsTabItem label="EVENTS" value={events.length}>
+          <Table<DecoratedPollingEntity<Event>>
+            data={events}
+            columns={columnsEventsParent}
+            renderCustomHeader={(headerGroup) => (
+              <Card
+                className={`${classes.tableRow}`}
+                key={headerGroup.id}
+                variant="header-row"
+              >
+                {headerGroup.headers.map((header) => (
+                  <div key={header.id}>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </div>
+                ))}
+              </Card>
+            )}
+            renderCustomRow={(row) => (
+              <>
                 <Card
-                  className={`${classes.card} ${
-                    item.isNew ? classes.isNew : ""
-                  }`}
+                  className={classes.tableRow}
+                  key={row.id}
+                  showIntroAnimation={true}
+                  variant="table-line"
                 >
+                  {row.getVisibleCells().map((cell) => (
+                    <div key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </div>
+                  ))}
+                </Card>
+                {openedLog === row.id && row.original && (
                   <div>
-                    <Label>TIMESTAMP</Label>
-                    <Value>
-                      {formatDate(new Date(item.createdAt).toISOString())}
-                    </Value>
-                  </div>
-                  <div>
-                    <Label>TYPE</Label>
-                    <Value>{item.type}</Value>
-                  </div>
-                  <div>
-                    <Label title="TRANSACTION INDEX">TX INDEX</Label>
-                    <Value>{item.transactionIndex}</Value>
-                  </div>
-                  <div>
-                    <Label>EVENT INDEX</Label>
-                    <Value>{item.eventIndex}</Value>
-                  </div>
-                  <div>
-                    <CaretIcon
-                      inverted={true}
-                      isOpen={openedLog === item.id}
-                      className={classes.control}
-                      onChange={(status) => openLog(status, item.id)}
+                    <Table<ComputedEventData>
+                      data={EventUtils.computeEventData(row.original.data)}
+                      columns={columnsEvents}
                     />
                   </div>
-                </Card>
-                {openedLog === item.id && (
-                  <EventDetailsTable
-                    className={classes.detailsTable}
-                    data={item.data}
-                  />
                 )}
-              </React.Fragment>
-            ))}
+              </>
+            )}
+          />
         </DetailsTabItem>
       </DetailsTabs>
     </div>

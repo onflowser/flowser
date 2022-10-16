@@ -1,0 +1,91 @@
+@import "styles/colors";
+@import "styles/rules";
+@import "styles/typography";
+
+.button {
+  position: relative;
+  background-color: $yellow;
+  border-radius: $border-radius-button;
+  color: $background;
+  font-size: $font-size-big;
+  font-family: $font-family-inter;
+  letter-spacing: $character-spacing-medium;
+  font-style: normal;
+  font-weight: bold;
+  border: 2px solid $yellow;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.92;
+  }
+}
+
+.loaderWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  &, & > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  svg {
+    overflow: visible;
+  }
+  svg * {
+    stroke-width: 5px;
+  }
+}
+
+.hiddenChildren {
+  visibility: hidden;
+  * {
+    visibility: hidden;
+  }
+}
+
+.normal {
+  background: $yellow;
+  height: 32px;
+  padding: 0 18px;
+  font-size: $font-size-xsmall !important;
+}
+
+.middle {
+  width: 127px;
+  height: 43px;
+  font-size: $font-size-xsmall !important;
+}
+
+.big {
+  width: 216px;
+  height: 65px;
+  font-size: $font-size-big !important;
+}
+
+.disabled {
+  background: $color-not-active-button-grey;
+  color: $color-not-active-button-text-grey;
+  border: 2px solid $color-not-active-button-grey;
+  cursor: default;
+  font-size: $font-size-normal;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.big {
+    font-size: $font-size-small;
+  }
+}
+
+.outlined {
+  background: none;
+  color: $yellow;
+
+  &.disabled {
+    color: $color-not-active-button-text-grey;
+  }
+}

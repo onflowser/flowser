@@ -1,6 +1,7 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "strict": false,
+    "strict": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -13,11 +14,11 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "strictNullChecks": false,
     "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false
   }
 }

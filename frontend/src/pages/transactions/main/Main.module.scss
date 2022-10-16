@@ -1,10 +1,9 @@
-@import 'styles/spacings';
-@import 'styles/animations';
+@import "styles/spacings";
+@import "styles/animations";
 
-.isNew {
-  @include addNewContentAnimation(.4s);
-}
-
-.noResults {
-  margin-top: $spacing-l * 6;
+.hash {
+  max-width: 15vw;
+  min-width: 10vw;
+  display: inline-block;
+  
 }

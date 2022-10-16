@@ -1,12 +1,17 @@
 import { IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Gateway, GatewayStatus } from "@flowser/shared";
 
-export class GatewayConfigurationDto {
+export class GatewayConfigurationDto implements Gateway {
   @ApiProperty()
   @IsNotEmpty()
-  port: number;
+  grpcServerAddress: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  address: string;
+  restServerAddress: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  status: GatewayStatus;
 }

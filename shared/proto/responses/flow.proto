@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message GetFlowCliInfoResponse {
+  string version = 1;
+}

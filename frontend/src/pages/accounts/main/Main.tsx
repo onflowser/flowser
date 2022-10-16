@@ -1,73 +1,78 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
-import classes from "./Main.module.scss";
-import Card from "../../../shared/components/card/Card";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
-import { useNavigation } from "../../../shared/hooks/navigation";
+import React, { FunctionComponent, useEffect } from "react";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
+import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
-import { useSearch } from "../../../shared/hooks/search";
-import { useFilterData } from "../../../shared/hooks/filter-data";
-import { useTimeoutPolling } from "../../../shared/hooks/timeout-polling";
-import NoResults from "../../../shared/components/no-results/NoResults";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
+import { useSearch } from "../../../hooks/use-search";
+import { useFilterData } from "../../../hooks/use-filter-data";
+import { useGetPollingAccounts } from "../../../hooks/use-api";
+import Table from "../../../components/table/Table";
+import { createColumnHelper } from "@tanstack/react-table";
+import { Account } from "@flowser/shared";
+import { TextUtils } from "../../../utils/text-utils";
+import ReactTimeago from "react-timeago";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import classes from "./Main.module.scss";
 
-const Main: FunctionComponent<any> = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { data: transactions, firstFetch } = useTimeoutPolling<any>(
-    "/api/accounts/polling",
-    "id"
-  );
+const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
+
+// ACCOUNTS TABLE
+const columns = [
+  columnHelper.accessor("address", {
+    header: () => <Label variant="medium">ADDRESS</Label>,
+    cell: (info) => (
+      <Value>
+        <NavLink to={`accounts/details/${info.getValue()}`}>
+          {info.getValue()}
+        </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("balance", {
+    header: () => <Label variant="medium">BALANCE</Label>,
+    cell: (info) => (
+      <Value>{TextUtils.readableNumber(info.getValue())} FLOW</Value>
+    ),
+  }),
+  columnHelper.accessor("keys", {
+    header: () => <Label variant="medium">KEY COUNT</Label>,
+    cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
+  }),
+  columnHelper.accessor("transactions", {
+    header: () => <Label variant="medium">TX COUNT</Label>,
+    cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
+  }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">CREATED</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
+      </Value>
+    ),
+  }),
+];
+
+const Main: FunctionComponent = () => {
+  const { searchTerm, setPlaceholder } = useSearch();
+  const { showNavigationDrawer } = useNavigation();
+  const { data: accounts, firstFetch } = useGetPollingAccounts();
 
   useEffect(() => {
-    setPlaceholder("search for block numbers or tx hashes");
+    setPlaceholder("Search accounts");
     showNavigationDrawer(false);
-    showSubNavigation(true);
   }, []);
 
-  useEffect(() => {
-    disableSearchBar(!transactions.length);
-  }, [transactions]);
-
-  const { filteredData } = useFilterData(transactions, searchTerm);
+  const { filteredData } = useFilterData(accounts, searchTerm);
 
   return (
-    <>
-      {filteredData &&
-        filteredData.map((item, i) => (
-          <Card
-            key={item.address + item.txCount + item.keys?.length}
-            className={`${classes.card} ${
-              item.isNew || item.isUpdated ? classes.isNew : ""
-            }`}
-          >
-            <div>
-              <Label>ADDRESS</Label>
-              <Value>
-                <NavLink to={`/accounts/details/${item.address}`}>
-                  {item.address}
-                </NavLink>
-              </Value>
-            </div>
-            <div>
-              <Label>BALANCE</Label>
-              <Value>{item.balance}</Value>
-            </div>
-            <div>
-              <Label>KEY COUNT</Label>
-              <Value>{item.keys?.length}</Value>
-            </div>
-            <div>
-              <Label>TX COUNT</Label>
-              <Value>{item.txCount}</Value>
-            </div>
-          </Card>
-        ))}
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
-      )}
-    </>
+    <Table<DecoratedPollingEntity<Account>>
+      isInitialLoading={firstFetch}
+      columns={columns}
+      data={filteredData}
+      bodyRowClass={(row) =>
+        row.original.isDefaultAccount ? classes.defaultAccountRow : ""
+      }
+    />
   );
 };
 

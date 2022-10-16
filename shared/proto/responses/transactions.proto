@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "entities/transactions.proto";
+import "responses/core.proto";
+
+message GetAllTransactionsResponse {
+  repeated Transaction transactions = 1;
+}
+
+message GetPollingTransactionsRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingTransactionsResponse {
+  repeated Transaction data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetPollingTransactionsByBlockRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingTransactionsByBlockResponse {
+  repeated Transaction data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetPollingTransactionsByAccountRequest {
+  uint32 timestamp = 1;
+}
+
+message GetPollingTransactionsByAccountResponse {
+  repeated Transaction data = 1;
+  PollingMetaData meta = 2;
+}
+
+message GetSingleTransactionResponse {
+  Transaction transaction = 1;
+}

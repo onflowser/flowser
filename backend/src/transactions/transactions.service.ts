@@ -1,30 +1,24 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateTransactionDto } from "./dto/create-transaction.dto";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Transaction } from "./entities/transaction.entity";
-import { MongoRepository } from "typeorm";
+import { TransactionEntity } from "./entities/transaction.entity";
+import { MoreThan, Repository } from "typeorm";
+import { TransactionStatus } from "@flowser/shared";
 
 @Injectable()
 export class TransactionsService {
   constructor(
-    @InjectRepository(Transaction)
-    private transactionRepository: MongoRepository<Transaction>
+    @InjectRepository(TransactionEntity)
+    private transactionRepository: Repository<TransactionEntity>
   ) {}
 
-  create(createTransactionDto: CreateTransactionDto) {
-    return this.transactionRepository.save(createTransactionDto);
+  createOrUpdate(transaction: TransactionEntity) {
+    return this.transactionRepository.save(transaction);
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<Transaction[]> {
-    return this.transactionRepository.find({
-      where: {
-        $or: [
-          { createdAt: { $gt: timestamp } },
-          { updatedAt: { $gt: timestamp } },
-        ],
-      },
-      order: { createdAt: "DESC" },
-    });
+  async updateStatus(transactionId: string, status: TransactionStatus) {
+    const transaction = await this.findOne(transactionId);
+    transaction.status = status;
+    await this.createOrUpdate(transaction);
   }
 
   findAll() {
@@ -35,30 +29,45 @@ export class TransactionsService {
 
   findAllByBlock(blockId: string) {
     return this.transactionRepository.find({
-      where: { referenceBlockId: blockId },
+      where: { blockId },
       order: { createdAt: "DESC" },
     });
   }
 
-  findAllByBlockNewerThanTimestamp(blockId: string, timestamp) {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<TransactionEntity[]> {
     return this.transactionRepository.find({
-      where: {
-        referenceBlockId: blockId,
-        createdAt: { $gt: timestamp },
-      },
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  findAllNewerThanTimestampByBlock(blockId: string, timestamp: Date) {
+    return this.transactionRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), blockId },
+        { createdAt: MoreThan(timestamp), blockId },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  findAllNewerThanTimestampByAccount(payerAddress: string, timestamp: Date) {
+    return this.transactionRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), payerAddress },
+        { createdAt: MoreThan(timestamp), payerAddress },
+      ],
       order: { createdAt: "DESC" },
     });
   }
 
   async findOne(id: string) {
-    const [transaction] = await this.transactionRepository.find({
+    return this.transactionRepository.findOneOrFail({
       where: { id },
     });
-    if (transaction) {
-      return transaction;
-    } else {
-      throw new NotFoundException("Transaction not found");
-    }
   }
 
   removeAll() {

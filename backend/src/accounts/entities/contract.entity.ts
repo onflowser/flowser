@@ -1,22 +1,58 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import { PollingEntity } from "../../core/entities/polling.entity";
+import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { AccountEntity } from "./account.entity";
+import { BadRequestException } from "@nestjs/common";
+import { ensurePrefixedAddress } from "../../utils";
+import { FlowAccount } from "../../flow/services/gateway.service";
+import { AccountContract } from "@flowser/shared";
 
 @Entity({ name: "contracts" })
-export class AccountContract extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
+export class AccountContractEntity extends PollingEntity {
+  // Encodes both accountAddress and name into the id.
+  id: string;
 
-  @Column()
+  @PrimaryColumn()
+  accountAddress: string;
+
+  @PrimaryColumn()
   name: string;
 
-  @Column()
+  @Column("text")
   code: string;
 
-  static init(accountAddress: string, name: string, code: string) {
-    return Object.assign<AccountContract, any>(new AccountContract(), {
-      id: `${accountAddress}.${name}`,
-      name,
-      code,
-    });
+  @ManyToOne(() => AccountEntity, (account) => account.contracts)
+  account: AccountEntity;
+
+  public static parseId(id: string) {
+    const idParts = id.split(".");
+    if (idParts.length !== 2) {
+      throw new BadRequestException("Invalid contract id");
+    }
+    const [accountAddress, name] = idParts;
+    return { accountAddress, name };
+  }
+
+  @AfterLoad()
+  private computeId() {
+    this.id = `${this.accountAddress}.${this.name}`;
+  }
+
+  toProto(): AccountContract {
+    return {
+      id: this.id,
+      accountAddress: this.accountAddress,
+      name: this.name,
+      code: this.code,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
+
+  static create(account: FlowAccount, name: string, code: string) {
+    const contract = new AccountContractEntity();
+    contract.accountAddress = ensurePrefixedAddress(account.address);
+    contract.name = name;
+    contract.code = code;
+    return contract;
   }
 }

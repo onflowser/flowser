@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10.667" height="16"
+     viewBox="0 0 10.667 16">
+    <path id="logs_icon" data-name="logs icon"
+          d="M11.334,19h4.445a.889.889,0,1,0,0-1.778H11.334a.889.889,0,0,0,0,1.778Zm1.41-8L6.261,4.517A.889.889,0,0,1,7.517,3.261l7.111,7.111a.888.888,0,0,1,0,1.257L7.517,18.74a.889.889,0,1,1-1.257-1.257Z"
+          transform="translate(-6 -3)" fill="#CFC5F8" fill-rule="evenodd"/>
+</svg>

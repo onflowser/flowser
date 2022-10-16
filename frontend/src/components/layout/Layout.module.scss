@@ -1,0 +1,62 @@
+@import "styles/spacings";
+@import "styles/colors";
+
+$grid-gap: 30px;
+
+.backButtonWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0);
+  margin-top: -20px;
+  &:not(.isConfig) {
+    margin: 50px 0 0 50px;
+  }
+  cursor: pointer;
+
+  .backButton {
+    width: 20px;
+    height: 16px;
+  }
+
+  transition: background 0.1s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.layoutContainer {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .content {
+    margin: $grid-gap $spacing-l 0;
+    /* Visual effect: log component will overlap bottom part of content */
+    padding-bottom: 100px;
+    color: $light-grey;
+    align-items: stretch;
+  }
+
+  .logs {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    &.opened {
+      top: 50%;
+    }
+
+    &.expanded {
+      top: 118px;
+    }
+  }
+}

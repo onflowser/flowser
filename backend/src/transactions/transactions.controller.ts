@@ -3,51 +3,93 @@ import {
   Get,
   Param,
   UseInterceptors,
-  Query,
-  ParseIntPipe,
+  Body,
+  Post,
 } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
-import { PollingResponseInterceptor } from "../shared/interceptors/polling-response.interceptor";
+import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { ApiParam, ApiQuery } from "@nestjs/swagger";
+
+import {
+  GetAllTransactionsResponse,
+  GetPollingTransactionsByAccountRequest,
+  GetPollingTransactionsByBlockRequest,
+  GetPollingTransactionsRequest,
+  GetPollingTransactionsResponse,
+  GetSingleTransactionResponse,
+} from "@flowser/shared";
 
 @Controller()
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Get("/transactions")
-  findAll() {
-    return this.transactionsService.findAll();
+  async findAll() {
+    const transactions = await this.transactionsService.findAll();
+    return GetAllTransactionsResponse.fromPartial({
+      transactions: transactions.map((transaction) => transaction.toProto()),
+    });
   }
 
-  @Get("/transactions/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNew(@Query("timestamp", ParseIntPipe) timestamp) {
-    return this.transactionsService.findAllNewerThanTimestamp(timestamp);
+  @Post("/transactions/polling")
+  @UseInterceptors(
+    new PollingResponseInterceptor(GetPollingTransactionsResponse)
+  )
+  async findAllNew(@Body() data) {
+    const request = GetPollingTransactionsRequest.fromJSON(data);
+    const transactions =
+      await this.transactionsService.findAllNewerThanTimestamp(
+        new Date(request.timestamp)
+      );
+    return transactions.map((transaction) => transaction.toProto());
   }
 
   @ApiParam({ name: "id", type: String })
   @Get("/blocks/:id/transactions")
-  findAllByBlock(@Param("id") blockId) {
-    return this.transactionsService.findAllByBlock(blockId);
+  async findAllByBlock(@Param("id") blockId) {
+    const transactions = await this.transactionsService.findAllByBlock(blockId);
+    return GetAllTransactionsResponse.fromPartial({
+      transactions: transactions.map((transaction) => transaction.toProto()),
+    });
+  }
+
+  @ApiParam({ name: "id", type: String })
+  @Post("/blocks/:id/transactions/polling")
+  @UseInterceptors(
+    new PollingResponseInterceptor(GetPollingTransactionsResponse)
+  )
+  async findAllNewByBlock(@Param("id") blockId, @Body() data) {
+    const request = GetPollingTransactionsByBlockRequest.fromJSON(data);
+    const transactions =
+      await this.transactionsService.findAllNewerThanTimestampByBlock(
+        blockId,
+        new Date(request.timestamp)
+      );
+    return transactions.map((transaction) => transaction.toProto());
   }
 
   @ApiParam({ name: "id", type: String })
   @ApiQuery({ name: "timestamp", type: Number })
-  @Get("/blocks/:id/transactions/polling")
-  @UseInterceptors(PollingResponseInterceptor)
-  findAllNewByBlock(
-    @Param("id") blockId,
-    @Query("timestamp", ParseIntPipe) timestamp
-  ) {
-    return this.transactionsService.findAllByBlockNewerThanTimestamp(
-      blockId,
-      timestamp
-    );
+  @Post("/accounts/:address/transactions/polling")
+  @UseInterceptors(
+    new PollingResponseInterceptor(GetPollingTransactionsResponse)
+  )
+  async findAllNewByAccount(@Param("address") accountAddress, @Body() data) {
+    const request = GetPollingTransactionsByAccountRequest.fromJSON(data);
+    const transactions =
+      await this.transactionsService.findAllNewerThanTimestampByAccount(
+        accountAddress,
+        new Date(request.timestamp)
+      );
+    return transactions.map((transaction) => transaction.toProto());
   }
 
   @ApiParam({ name: "id", type: String })
   @Get("/transactions/:id")
-  findOne(@Param("id") id: string) {
-    return this.transactionsService.findOne(id);
+  async findOne(@Param("id") id: string) {
+    const transaction = await this.transactionsService.findOne(id);
+    return GetSingleTransactionResponse.fromPartial({
+      transaction: transaction.toProto(),
+    });
   }
 }

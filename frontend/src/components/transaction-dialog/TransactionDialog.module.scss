@@ -1,0 +1,42 @@
+@import 'styles/colors';
+@import 'styles/spacings';
+@import 'styles/typography';
+@import 'styles/animations';
+
+.dialog {
+  min-width: 800px !important;
+  max-width: 800px !important;
+}
+
+.toast {
+  .transactionId {
+    max-width: 20vw;
+    display: inline-block;
+    overflow: hidden;
+  }
+  a {
+    color: $background;
+    font-weight: bolder;
+    vertical-align: middle;
+  }
+}
+
+.root {
+
+  .arguments {
+    margin-top: $spacing-base * 3;
+  }
+
+  .errorButton {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: $color-red;
+    font-size: $font-size-large;
+    margin-bottom: $spacing-base;
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+}

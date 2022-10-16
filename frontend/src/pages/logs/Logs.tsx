@@ -1,82 +1,116 @@
 import React, {
-  createRef,
   FunctionComponent,
   useCallback,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
-import Search from "../../shared/components/search/Search";
-import { ReactComponent as ExpandIcon } from "../../shared/assets/icons/expand.svg";
-import { ReactComponent as ShrinkIcon } from "../../shared/assets/icons/shrink.svg";
-import { ReactComponent as LogsIcon } from "../../shared/assets/icons/logs.svg";
-import { LogDrawerSize, useLogDrawer } from "../../shared/hooks/log-drawer";
-import CaretIcon from "../../shared/components/caret-icon/CaretIcon";
-import { useSyntaxHighlighter } from "../../shared/hooks/syntax-highlighter";
-import { useTimeoutPolling } from "../../shared/hooks/timeout-polling";
-import { useSearch } from "../../shared/hooks/search";
-import { useFilterData } from "../../shared/hooks/filter-data";
-import splitbee from "@splitbee/web";
-import { useMouseMove } from "../../shared/hooks/mouse-position";
+import Search from "../../components/search/Search";
+import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
+import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
+import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
+import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
+import CaretIcon from "../../components/caret-icon/CaretIcon";
+import { useSearch } from "../../hooks/use-search";
+import { useFilterData } from "../../hooks/use-filter-data";
+import { useMouseMove } from "../../hooks/use-mouse-move";
+import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
+import { ManagedProcessLog, LogSource } from "@flowser/shared";
+import { toast } from "react-hot-toast";
+import classNames from "classnames";
+import { SimpleButton } from "../../components/simple-button/SimpleButton";
+import { TextUtils } from "../../utils/text-utils";
 
-interface OwnProps {
+type LogsProps = {
   className?: string;
-}
+};
 
-type Props = OwnProps;
 const SEARCH_CONTEXT_NAME = "logs";
 
-const Logs: FunctionComponent<Props> = ({ className }) => {
+const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
-  const { highlightLogKeywords } = useSyntaxHighlighter();
-  const miniLogRef = createRef<HTMLDivElement>();
-  const bigLogRef = createRef<HTMLDivElement>();
-  const { data } = useTimeoutPolling("/api/logs/polling", "_id", 1000, false);
-  const logs = data ? data.map((log: any) => log.data) : [];
+  const tinyLogRef = useRef<HTMLDivElement>(null);
+  const nonTinyLogRef = useRef<HTMLDivElement>(null);
+  const { data: logs } = useGetPollingLogs();
+  const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
+  const logWrapperElement = logWrapperRef.current;
+  const scrollBottom =
+    (logWrapperElement?.scrollTop ?? 0) +
+    (logWrapperElement?.clientHeight ?? 0);
+  const scrollHeight = logWrapperElement?.scrollHeight ?? 0;
+  const scrollDistanceToBottom = Math.abs(scrollBottom - scrollHeight);
+  const shouldScrollToBottom = scrollDistanceToBottom < 10;
+
+  const sortedLogs = useMemo(
+    () =>
+      logs
+        // Exclude logs that indicate which our backend called the emulator
+        // To reduce unnecessary clutter
+        .filter((log) => {
+          const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
+          return !isBackendCallLog;
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        ),
+    [logs]
+  );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
-  const { filteredData } = useFilterData(logs, searchTerm);
+  const { data } = useGetCurrentProject();
+  const isCapturingEmulatorLogs = data?.project?.emulator?.run;
+  const { filteredData } = useFilterData(sortedLogs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
 
-  const scrollToBottom = (
-    ref: React.RefObject<HTMLDivElement>,
-    smooth = true
-  ) => {
-    if (ref.current) {
+  const scrollToBottom = (smooth = true) => {
+    if (!shouldScrollToBottom) {
+      return;
+    }
+    if (logWrapperRef.current) {
       const options: ScrollToOptions = {
-        top: ref.current.scrollHeight,
-        left: 0,
+        top: logWrapperRef.current.scrollHeight,
         behavior: smooth ? "smooth" : "auto",
       };
-      ref.current.scrollTo(options);
+      logWrapperRef.current.scrollTo(options);
     }
   };
 
   useEffect(() => {
-    setPlaceholder("search logs");
+    setPlaceholder("Search logs");
   }, []);
 
   useEffect(() => {
-    scrollToBottom(miniLogRef);
-    scrollToBottom(bigLogRef);
-  }, [data]);
+    scrollToBottom();
+  }, [logDrawerSize, shouldScrollToBottom]);
+
+  useEffect(() => {
+    const hasErrorLogs = logs
+      .filter((log) => log.isNew)
+      .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
+    if (hasErrorLogs) {
+      toast.error("Some process encountered errors", {
+        duration: 4000,
+      });
+    }
+
+    scrollToBottom();
+  }, [logs]);
 
   const onCaretChange = useCallback((state) => {
     if (state === false) {
       changeLogDrawerSize("small");
-      splitbee.track(`Logs: size small`);
     } else {
       changeLogDrawerSize("tiny");
-      splitbee.track(`Logs: size tiny`);
     }
   }, []);
 
   const changeLogDrawerSize = useCallback((size: LogDrawerSize) => {
     setSize(size);
-    splitbee.track(`Logs: size ${size}`);
     setTimeout(() => {
-      scrollToBottom(bigLogRef, false);
-      scrollToBottom(miniLogRef, false);
+      scrollToBottom(false);
     }, 100);
   }, []);
 
@@ -100,9 +134,14 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
     setTrackMousePosition(false);
   }, []);
 
+  if (!isCapturingEmulatorLogs) {
+    // TODO(milestone-5): Should we show some kind of notice somewhere?
+    return null;
+  }
+
   return (
     <div
-      className={`${classes.root} ${className}`}
+      className={classNames(classes.root, className)}
       style={logDrawerSize === "custom" ? { top: mouseEvent?.clientY } : {}}
     >
       <VerticalDragLine
@@ -112,22 +151,28 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
       />
 
       <div
-        className={`${classes.header} ${
-          logDrawerSize !== "tiny" ? classes.expanded : ""
-        }`}
+        className={classNames(classes.header, {
+          [classes.expanded]: logDrawerSize !== "tiny",
+        })}
       >
-        <span className={classes.leftContainer}>
+        <SimpleButton
+          className={classes.leftContainer}
+          onClick={() => {
+            if (logDrawerSize === "tiny") {
+              changeLogDrawerSize("small");
+            } else {
+              changeLogDrawerSize("tiny");
+            }
+          }}
+        >
           <LogsIcon />
           <span>LOGS</span>
-        </span>
+        </SimpleButton>
 
         {logDrawerSize === "tiny" && (
-          <div className={classes.midContainer} ref={miniLogRef}>
-            {filteredData.map((log: any, key: number) => (
-              <pre
-                key={key}
-                dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}
-              ></pre>
+          <div className={classes.midContainer} ref={tinyLogRef}>
+            {filteredData.map((log) => (
+              <LogLine key={log.id} log={log} />
             ))}
           </div>
         )}
@@ -165,19 +210,30 @@ const Logs: FunctionComponent<Props> = ({ className }) => {
       </div>
 
       {logDrawerSize !== "tiny" && (
-        <div className={classes.bigLogsContainer} ref={bigLogRef}>
-          {filteredData.map((log: any, key: number) => (
-            <pre
-              className={classes.line}
-              key={key}
-              dangerouslySetInnerHTML={{ __html: highlightLogKeywords(log) }}
-            />
+        <div className={classes.bigLogsContainer} ref={nonTinyLogRef}>
+          {filteredData.map((log) => (
+            <LogLine key={log.id} log={log} />
           ))}
         </div>
       )}
     </div>
   );
 };
+
+function LogLine({ log }: { log: ManagedProcessLog }) {
+  return (
+    <pre
+      className={classes.line}
+      style={
+        // TODO(ui): use color from color pallet
+        log.source === LogSource.LOG_SOURCE_STDERR ? { color: "#D02525" } : {}
+      }
+      dangerouslySetInnerHTML={{
+        __html: TextUtils.formatProcessLog(log),
+      }}
+    />
+  );
+}
 
 type VerticalDragLineProps = {
   startPositionDrag: (e: React.MouseEvent) => void;

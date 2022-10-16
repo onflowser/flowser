@@ -1,22 +1,25 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
-import DetailsCard from "../../../shared/components/details-card/DetailsCard";
-import ContentDetailsScript from "../../../shared/components/content-details-script/ContentDetailsScript";
-import { Breadcrumb, useNavigation } from "../../../shared/hooks/navigation";
-import { useDetailsQuery } from "../../../shared/hooks/details-query";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
+import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import { useGetContract } from "../../../hooks/use-api";
+import classes from "./Details.module.scss";
+import {
+  DetailsCard,
+  DetailsCardColumn,
+} from "components/details-card/DetailsCard";
 
 type RouteParams = {
   contractId: string;
 };
 
-const Details: FunctionComponent<any> = () => {
+const Details: FunctionComponent = () => {
   const { contractId } = useParams<RouteParams>();
   const { setBreadcrumbs, showSearchBar } = useNavigation();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { isLoading, data } = useDetailsQuery(`/api/contracts/${contractId}`);
+  const { showNavigationDrawer } = useNavigation();
+  const { isLoading, data } = useGetContract(contractId);
+  const { contract } = data ?? {};
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/contracts", label: "Contracts" },
@@ -25,32 +28,35 @@ const Details: FunctionComponent<any> = () => {
 
   useEffect(() => {
     showNavigationDrawer(true);
-    showSubNavigation(false);
     setBreadcrumbs(breadcrumbs);
     showSearchBar(false);
   }, []);
 
-  if (isLoading || !data) {
+  if (isLoading || !contract) {
     return <FullScreenLoading />;
   }
 
+  const detailsColumns: DetailsCardColumn[] = [
+    [
+      {
+        label: "Name",
+        value: contract.name,
+      },
+      {
+        label: "Account",
+        value: (
+          <NavLink to={`/accounts/details/${contract.accountAddress}`}>
+            {contract.accountAddress}
+          </NavLink>
+        ),
+      },
+    ],
+  ];
+
   return (
-    <div>
-      <DetailsCard>
-        <div>
-          <Label variant="large">NAME</Label>
-          <Value variant="large">{data.name}</Value>
-        </div>
-        <div>
-          <Label variant="large">ACCOUNT</Label>
-          <Value variant="large">
-            <NavLink to={`/accounts/details/${data.accountAddress}`}>
-              {data.accountAddress}
-            </NavLink>
-          </Value>
-        </div>
-      </DetailsCard>
-      <ContentDetailsScript script={data.code} />
+    <div className={classes.root}>
+      <DetailsCard columns={detailsColumns} />
+      <ContentDetailsScript script={contract.code} />
     </div>
   );
 };

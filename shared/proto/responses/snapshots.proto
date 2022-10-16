@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+import "entities/snapshots.proto";
+import "responses/core.proto";
+
+message GetPollingEmulatorSnapshotsRequest {
+  uint32 timestamp = 1;
+  string project_id = 2;
+}
+
+message GetPollingEmulatorSnapshotsResponse {
+  repeated EmulatorSnapshot data = 1;
+  PollingMetaData meta = 2;
+}
+
+message CreateEmulatorSnapshotRequest {
+  string description = 1;
+  string project_id = 2;
+}
+
+message CreateEmulatorSnapshotResponse {
+  ErrorData error = 1;
+  EmulatorSnapshot snapshot = 2;
+}
+
+message RevertToEmulatorSnapshotRequest {
+  string block_id = 1;
+  string project_id = 2;
+}
+
+message RevertToEmulatorSnapshotResponse {
+  ErrorData error = 1;
+  EmulatorSnapshot snapshot = 2;
+}

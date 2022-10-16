@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+
+message Block {
+  string id = 1;
+  string parent_id = 2;
+  int32 height = 3;
+  string timestamp = 4;
+  repeated CollectionGuarantee collection_guarantees = 5;
+
+  // TODO: We should define a custom message for block_seals
+  // But for now it's ok because we don't even use this field in our app
+  // See: https://github.com/onflow/fcl-js/blob/master/packages/protobuf/src/proto/flow/entities/block_seal.proto
+  repeated google.protobuf.Struct block_seals = 6;
+  repeated string signatures = 7;
+
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message CollectionGuarantee {
+  string collection_id = 1;
+  repeated string signatures = 2;
+}

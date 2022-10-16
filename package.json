@@ -1,5 +1,6 @@
 {
   "name": "flowser",
+  "private": true,
   "version": "1.0.0",
   "description": "Easily inspect and debug Flow blockchain ⛓",
   "main": "index.js",
@@ -7,21 +8,20 @@
     "doc": "docs"
   },
   "scripts": {
-    "bootstrap": "npm i && lerna bootstrap && npm run prepare",
-    "prepare": "husky install",
-    "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\"",
-
-    "dev:start": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d",
-    "dev:stop": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml down",
-    "dev:build": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml build",
-    "dev:logs": "docker-compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml logs -f",
-    "dev:rebuild": "npm run dev:stop && npm run dev:build && npm run dev:start",
-
-    "prod:start": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d",
-    "prod:stop": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down",
-    "prod:build": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml build",
-    "prod:logs": "docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml logs -f",
-    "prod:rebuild": "npm run prod:stop && npm run prod:build && npm run prod:start"
+    "start:desktop:prod:macos-arm": "yarn run build:desktop && ./app/release/build/mac-arm64/Flowser.app/Contents/MacOS/Flowser",
+    "start:desktop": "lerna run build --scope @flowser/backend && cd frontend && yarn run electron:serve",
+    "build:desktop": "yarn run build && cd app/scripts && node setup.js && sh build.sh",
+    "build:desktop:win": "yarn run build:desktop win",
+    "build:desktop:mac": "yarn run build:desktop mac",
+    "build:desktop:linux": "yarn run build:desktop linux",
+    "build:desktop:all": "yarn run build:desktop all",
+    "start": "lerna run start --parallel",
+    "cleanup": "lerna run cleanup --parallel && rm -rf node_modules app/node_modules app/build app/release flowdb",
+    "build": "lerna run build --scope @flowser/backend --scope @flowser/shared && lerna run build --scope @flowser/frontend",
+    "bootstrap": "yarn install && yarn run lerna:bootstrap && husky install",
+    "lerna:bootstrap": "lerna bootstrap",
+    "build:libs": " npx lerna run build --scope @flowser/types --scope @flowser/frontend",
+    "format-all": "npx prettier --write \"{backend,frontend}/src/**/*.{ts,tsx,js}\""
   },
   "repository": {
     "type": "git",
@@ -40,8 +40,15 @@
   },
   "homepage": "https://github.com/onflowser/flowser#readme",
   "devDependencies": {
-    "lerna": "^4.0.0",
     "husky": "^8.0.1",
+    "lerna": "^4.0.0",
     "lint-staged": "^12.4.2"
+  },
+  "workspaces": {
+    "packages": [
+      "./backend",
+      "./frontend",
+      "./shared"
+    ]
   }
 }

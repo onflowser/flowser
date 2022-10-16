@@ -1,48 +1,82 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  ServiceUnavailableException,
+  PreconditionFailedException,
 } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { MongoRepository } from "typeorm";
-import { Project } from "./entities/project.entity";
+import { MoreThan, Repository } from "typeorm";
+import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FlowGatewayService } from "../flow/services/flow-gateway.service";
-import { FlowAggregatorService } from "../flow/services/flow-aggregator.service";
-import { FlowEmulatorService } from "../flow/services/flow-emulator.service";
+import { FlowGatewayService } from "../flow/services/gateway.service";
+import { FlowAggregatorService } from "../flow/services/aggregator.service";
+import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
-import { LogsService } from "../logs/logs.service";
 import { TransactionsService } from "../transactions/transactions.service";
-import { FlowCliService } from "../flow/services/flow-cli.service";
-import { plainToClass } from "class-transformer";
-import { StorageDataService } from "../flow/services/storage-data.service";
-import config from "../config";
-import { GatewayConfigurationEntity } from "./entities/gateway-configuration.entity";
+import { FlowCliService } from "../flow/services/cli.service";
+import { ContractsService } from "../accounts/services/contracts.service";
+import { KeysService } from "../accounts/services/keys.service";
+import { FlowConfigService } from "../flow/services/config.service";
+import { ProjectContextLifecycle } from "../flow/utils/project-context";
+import { AccountStorageService } from "../accounts/services/storage.service";
+import {
+  DevWallet,
+  Emulator,
+  Gateway,
+  GatewayStatus,
+  HashAlgorithm,
+  Project,
+  ProjectRequirement,
+  ProjectRequirementType,
+  SignatureAlgorithm,
+  GetProjectStatusResponse,
+} from "@flowser/shared";
+import * as fs from "fs";
+import { CommonService } from "../core/services/common.service";
+import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
+
+const commandExists = require("command-exists");
+const semver = require("semver");
 
 @Injectable()
 export class ProjectsService {
-  private currentProject: Project;
+  private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
+  // For now let's not forget to manually add services with ProjectContextLifecycle interface
+  // Order is important, because some actions have dependencies
+  private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
+    [
+      // Config service must be defined before cli service!
+      this.flowConfigService,
+      this.flowCliService,
+      this.flowGatewayService,
+      this.flowAggregatorService,
+      this.flowEmulatorService,
+      this.flowDevWalletService,
+    ];
+
   constructor(
-    @InjectRepository(Project)
-    private projectRepository: MongoRepository<Project>,
+    @InjectRepository(ProjectEntity)
+    private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
     private flowAggregatorService: FlowAggregatorService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
+    private flowConfigService: FlowConfigService,
     private accountsService: AccountsService,
+    private accountKeysService: KeysService,
+    private accountStorageService: AccountStorageService,
+    private contractsService: ContractsService,
     private blocksService: BlocksService,
     private eventsService: EventsService,
-    private logsService: LogsService,
     private transactionsService: TransactionsService,
-    private storageDataService: StorageDataService
+    private commonService: CommonService,
+    private flowDevWalletService: FlowDevWalletService
   ) {}
 
   getCurrentProject() {
@@ -53,68 +87,80 @@ export class ProjectsService {
     }
   }
 
+  async getProjectStatus(): Promise<GetProjectStatusResponse> {
+    const totalBlocksToProcess =
+      await this.flowAggregatorService.getTotalBlocksToProcess();
+    return {
+      totalBlocksToProcess,
+    };
+  }
+
+  async getMissingRequirements(): Promise<ProjectRequirement[]> {
+    const missingRequirements: ProjectRequirement[] = [];
+    try {
+      await commandExists("flow");
+    } catch (e) {
+      missingRequirements.push(
+        ProjectRequirement.fromPartial({
+          type: ProjectRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI,
+        })
+      );
+      return missingRequirements;
+    }
+
+    const flowCliInfo = await this.flowCliService.getInfo();
+    const foundVersion = semver.coerce(flowCliInfo.version).version;
+    const minSupportedVersion = "0.41.1";
+    const isSupportedFlowCliVersion = semver.lte(
+      minSupportedVersion,
+      foundVersion
+    );
+    if (!isSupportedFlowCliVersion) {
+      missingRequirements.push({
+        type: ProjectRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION,
+        missingVersionRequirement: {
+          minSupportedVersion,
+          foundVersion,
+        },
+      });
+    }
+
+    return missingRequirements;
+  }
+
   async cleanupProject() {
     try {
-      // remove all existing data of previously used project
-      // TODO: persist data for projects with "persist" flag
-      await Promise.all([
-        this.accountsService.removeAll(),
-        this.blocksService.removeAll(),
-        this.eventsService.removeAll(),
-
-        this.logsService.removeAll(),
-        this.transactionsService.removeAll(),
-      ]);
+      // Remove all cached data of previously used project
+      await this.commonService.removeBlockchainData();
     } catch (e) {
       throw new InternalServerErrorException("Database cleanup failed");
     }
 
     this.currentProject = undefined;
-    this.flowAggregatorService.configureProjectContext(this.currentProject);
-    this.flowGatewayService.configureDataSourceGateway(
-      this.currentProject?.gateway
+    await Promise.all(
+      this.servicesWithProjectLifecycleContext.map((service) =>
+        service.onExitProjectContext()
+      )
     );
-
-    // user may have previously used a custom emulator project
-    // make sure that in any running emulators are stopped
-    await this.flowAggregatorService.stopEmulator();
-    this.storageDataService.stop();
   }
 
   async useProject(id: string) {
     await this.cleanupProject();
 
     this.currentProject = await this.findOne(id);
-    this.configureGateway();
 
-    // update project context
-    this.flowGatewayService.configureDataSourceGateway(
-      this.currentProject?.gateway
-    );
-    this.flowAggregatorService.configureProjectContext(this.currentProject);
+    // TODO(milestone-3): validate that project has a valid flow.json config
 
-    if (this.currentProject.emulator) {
-      this.flowCliService.configure(id, this.currentProject.emulator);
-      this.flowEmulatorService.configureProjectContext(this.currentProject);
-      await this.flowCliService.cleanup(); // ensure clean environment
-
-      try {
-        await this.flowAggregatorService.startEmulator();
-      } catch (e) {
-        throw new ServiceUnavailableException(
-          `Can not start emulator with project ${id}`,
-          e.message
-        );
+    // Provide project context to services that need it
+    try {
+      for (const service of this.servicesWithProjectLifecycleContext) {
+        await service.onEnterProjectContext(this.currentProject);
       }
-
-      try {
-        await this.storageDataService.start();
-      } catch (e) {
-        throw new ServiceUnavailableException(
-          "Data storage service error",
-          e.message
-        );
-      }
+    } catch (e: unknown) {
+      this.logger.debug("Project context initialization failed", e);
+      throw new InternalServerErrorException(
+        e ?? "Project context initialization failed"
+      );
     }
 
     this.logger.debug(`using project: ${id}`);
@@ -122,78 +168,45 @@ export class ProjectsService {
     return this.currentProject;
   }
 
-  configureGateway() {
-    if (this.currentProject.isFlowserManagedEmulator()) {
-      // fcl connects to a REST API provided by accessNode.api
-      this.currentProject.gateway = new GatewayConfigurationEntity(
-        "http://127.0.0.1",
-        8080
-      );
-    } else if (this.currentProject.isUserManagedEmulator()) {
-      // user must run emulator on non-default flow emulator port
-      this.currentProject.gateway.port = config.userManagedEmulatorPort;
+  async create(createProjectDto: CreateProjectDto) {
+    const projectFolderExists = fs.existsSync(createProjectDto.filesystemPath);
+    if (!projectFolderExists) {
+      throw new PreconditionFailedException("Project folder not found");
     }
+    const project = ProjectEntity.create(createProjectDto);
+    await this.projectRepository.insert(project);
+    return project;
   }
 
-  async seedAccounts(id: string, n: number) {
-    if (this.currentProject.id === id) {
-      return this.flowEmulatorService.initialiseAccounts(n);
-    } else {
-      throw new ConflictException("This project is not currently used.");
-    }
-  }
-
-  create(createProjectDto: CreateProjectDto) {
-    return this.projectRepository
-      .save(createProjectDto)
-      .catch(this.handleMongoError);
-  }
-
-  async findAll(): Promise<Project[]> {
+  async findAll(): Promise<ProjectEntity[]> {
     const projects = await this.projectRepository.find({
       order: { updatedAt: "DESC" },
     });
     return Promise.all(
-      projects.map(async (project) => {
-        if (project.gateway) {
-          const { address, port } = project.gateway;
-          const pingable =
-            project.isOfficialNetwork() ||
-            (await FlowGatewayService.isPingable(address, port));
-          return plainToClass(Project, { ...project, pingable });
-        } else {
-          return project;
-        }
-      })
+      projects.map(async (project) => this.setComputedFields(project))
     );
   }
 
-  async findOne(id: string): Promise<Project> {
-    const project = await this.projectRepository.findOne({ id });
-    if (!project) {
-      throw new NotFoundException("Project not found");
-    }
+  findAllNewerThanTimestamp(timestamp: Date): Promise<ProjectEntity[]> {
+    return this.projectRepository.find({
+      where: [
+        { createdAt: MoreThan(timestamp) },
+        { updatedAt: MoreThan(timestamp) },
+      ],
+      order: { updatedAt: "DESC" },
+    });
+  }
 
-    if (project.gateway) {
-      const { port, address } = project.gateway;
-      const pingable =
-        project.isOfficialNetwork() ||
-        (await FlowGatewayService.isPingable(address, port));
-      return plainToClass(Project, { ...project, pingable });
-    } else {
-      return project;
-    }
+  async findOne(id: string): Promise<ProjectEntity> {
+    const project = await this.projectRepository.findOneByOrFail({ id });
+    return this.setComputedFields(project);
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
-    return this.projectRepository
-      .findOneAndUpdate(
-        { id },
-        { $set: { ...updateProjectDto, updatedAt: new Date().getTime() } },
-        { upsert: true, returnOriginal: false }
-      )
-      .then((res) => res.value)
-      .catch(this.handleMongoError);
+    const project = ProjectEntity.create(updateProjectDto);
+    project.markUpdated();
+    await this.projectRepository.update({ id }, project);
+    return project;
   }
 
   async remove(id: string) {
@@ -203,12 +216,55 @@ export class ProjectsService {
     return this.projectRepository.delete({ id });
   }
 
-  private handleMongoError(error) {
-    switch (error.code) {
-      case 11000:
-        throw new ConflictException("Project name already exists");
-      default:
-        throw new InternalServerErrorException(error.message);
+  async getDefaultProject() {
+    const restServerPort = 8888;
+    const grpcServerPort = 3569;
+
+    return Project.fromPartial({
+      name: "New Project",
+      gateway: Gateway.fromPartial({
+        restServerAddress: `http://localhost:${restServerPort}`,
+        grpcServerAddress: `http://localhost:${grpcServerPort}`,
+      }),
+      devWallet: DevWallet.fromJSON({
+        run: true,
+        port: 8701,
+      }),
+      emulator: Emulator.fromPartial({
+        run: true,
+        verboseLogging: true,
+        restServerPort,
+        grpcServerPort,
+        adminServerPort: 8080,
+        persist: false,
+        snapshot: true,
+        performInit: false,
+        withContracts: false,
+        blockTime: 0,
+        servicePrivateKey: undefined,
+        databasePath: "./flowdb",
+        tokenSupply: 1000000000,
+        transactionExpiry: 10,
+        storagePerFlow: undefined,
+        minAccountBalance: undefined,
+        transactionMaxGasLimit: 9999,
+        scriptGasLimit: 100000,
+        serviceSignatureAlgorithm: SignatureAlgorithm.ECDSA_P256,
+        serviceHashAlgorithm: HashAlgorithm.SHA3_256,
+        storageLimit: true,
+        transactionFees: false,
+        simpleAddresses: false,
+      }),
+    });
+  }
+
+  private async setComputedFields(project: ProjectEntity) {
+    if (project.hasGatewayConfiguration()) {
+      // Assume non-emulator networks are always online
+      project.gateway.status = project.shouldRunEmulator()
+        ? await FlowGatewayService.getGatewayStatus(project.gateway)
+        : GatewayStatus.GATEWAY_STATUS_ONLINE;
     }
+    return project;
   }
 }

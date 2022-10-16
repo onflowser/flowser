@@ -1,97 +1,174 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { useFormattedDate } from "../../../shared/hooks/formatted-date";
-import { useFilterData } from "../../../shared/hooks/filter-data";
-import { useSearch } from "../../../shared/hooks/search";
-import Card from "../../../shared/components/card/Card";
-import Label from "../../../shared/components/label/Label";
-import Value from "../../../shared/components/value/Value";
+import { useFilterData } from "../../../hooks/use-filter-data";
+import { useSearch } from "../../../hooks/use-search";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
-import Ellipsis from "../../../shared/components/ellipsis/Ellipsis";
-import { useNavigation } from "../../../shared/hooks/navigation";
-import { useTimeoutPolling } from "../../../shared/hooks/timeout-polling";
-import NoResults from "../../../shared/components/no-results/NoResults";
-import FullScreenLoading from "../../../shared/components/fullscreen-loading/FullScreenLoading";
-import { isInitialParentId } from "../../../shared/functions/utils";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import { useNavigation } from "../../../hooks/use-navigation";
+import { createColumnHelper } from "@tanstack/table-core";
+import Table from "../../../components/table/Table";
+import { Block } from "@flowser/shared";
+import {
+  useGetPollingBlocks,
+  useGetPollingEmulatorSnapshots,
+} from "../../../hooks/use-api";
+import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
+import ReactTimeago from "react-timeago";
+import { useProjectActions } from "../../../contexts/project-actions.context";
+import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import Card from "components/card/Card";
+import tableClasses from "../../../components/table/Table.module.scss";
+import { flexRender } from "@tanstack/react-table";
+import classNames from "classnames";
 
-const Main: FunctionComponent<any> = () => {
-  const { searchTerm, setPlaceholder, disableSearchBar } = useSearch();
-  const { showNavigationDrawer, showSubNavigation } = useNavigation();
-  const { formatDate } = useFormattedDate();
-  const { data: transactions, firstFetch } = useTimeoutPolling(
-    "/api/blocks/polling",
-    "_id"
+const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
+
+const Main: FunctionComponent = () => {
+  const { searchTerm, setPlaceholder } = useSearch();
+  const { showNavigationDrawer } = useNavigation();
+  const { checkoutBlock } = useProjectActions();
+
+  const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
+  const { filteredData } = useFilterData(blocks, searchTerm);
+  const snapshotLookupByBlockId = useMemo(
+    () =>
+      new Map(
+        emulatorSnapshots.map((snapshot) => [snapshot.blockId, snapshot])
+      ),
+    [emulatorSnapshots]
   );
 
   useEffect(() => {
-    setPlaceholder("Search for block ids, parent ids, time, ...");
+    setPlaceholder("Search blocks");
     showNavigationDrawer(false);
-    showSubNavigation(true);
-    disableSearchBar(false);
   }, []);
 
-  const { filteredData } = useFilterData(transactions, searchTerm);
-
-  // TODO: some items only include isUpdated and isNew fields
-  console.log(filteredData.filter((e: any) => !e.signatures));
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("height", {
+        header: () => <Label variant="medium">HEIGHT</Label>,
+        meta: {
+          className: classes.blockHeight,
+        },
+        cell: (info) => <Value>{info.getValue()}</Value>,
+      }),
+      columnHelper.accessor("id", {
+        header: () => <Label variant="medium">ID</Label>,
+        meta: {
+          className: classes.blockID,
+        },
+        cell: (info) => (
+          <Value>
+            <NavLink to={`/blocks/details/${info.getValue()}`}>
+              <MiddleEllipsis className={classes.hash}>
+                {info.getValue()}
+              </MiddleEllipsis>
+            </NavLink>
+          </Value>
+        ),
+      }),
+      columnHelper.accessor("blockSeals", {
+        header: () => <Label variant="medium">SEALS COUNT</Label>,
+        meta: {
+          className: classes.blockSeals,
+        },
+        cell: (info) => <Value>{info.getValue()?.length}</Value>,
+      }),
+      columnHelper.accessor("signatures", {
+        header: () => <Label variant="medium">SIGS COUNT</Label>,
+        meta: {
+          className: classes.signatures,
+        },
+        cell: (info) => <Value>{info.getValue()?.length}</Value>,
+      }),
+      columnHelper.accessor("timestamp", {
+        header: () => <Label variant="medium">TIME</Label>,
+        meta: {
+          className: classes.time,
+        },
+        cell: (info) => (
+          <Value>
+            <ReactTimeago date={info.getValue()} />
+          </Value>
+        ),
+      }),
+      columnHelper.display({
+        id: "snapshot",
+        header: () => <Label variant="medium">SNAPSHOT</Label>,
+        meta: {
+          className: classes.snapshot,
+        },
+        cell: (info) => {
+          const block = info.row.original;
+          const snapshot = snapshotLookupByBlockId.get(block.id);
+          return (
+            <Value>
+              {snapshot && (
+                <SimpleButton
+                  style={{ marginRight: 10 }}
+                  onClick={() => checkoutBlock(block.id)}
+                >
+                  <SnapshotIcon />
+                </SimpleButton>
+              )}
+              {snapshot?.description ?? "-"}
+            </Value>
+          );
+        },
+      }),
+    ],
+    [snapshotLookupByBlockId]
+  );
 
   return (
-    <>
-      {filteredData &&
-        filteredData.map((item: any) => (
-          <Card
-            key={item.height + item.id}
-            className={`${classes.card} ${item.isNew ? classes.isNew : ""}`}
-          >
-            <div>
-              <Label>BLOCK HEIGHT</Label>
-              <Value>{item.height}</Value>
+    <Table<DecoratedPollingEntity<Block>>
+      isInitialLoading={firstFetch}
+      data={filteredData}
+      columns={columns}
+      renderCustomHeader={(headerGroup) => (
+        <Card
+          className={classNames(
+            tableClasses.tableRow,
+            classes.tableRow,
+            tableClasses.headerRow
+          )}
+          key={headerGroup.id}
+          variant="header-row"
+        >
+          {headerGroup.headers.map((header) => (
+            <div
+              key={header.id}
+              className={header.column.columnDef.meta?.className}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
             </div>
-            <div>
-              <Label>BLOCK ID</Label>
-              <Value>
-                <NavLink to={`/blocks/details/${item.id}`}>
-                  <Ellipsis className={classes.hash}>{item.id}</Ellipsis>
-                </NavLink>
-              </Value>
-            </div>
-            <div>
-              <Label>PARENT ID</Label>
-              <Value>
-                {isInitialParentId(item.parentId) ? (
-                  <Ellipsis className={classes.hash}>{item.parentId}</Ellipsis>
-                ) : (
-                  <NavLink to={`/blocks/details/${item.parentId}`}>
-                    <Ellipsis className={classes.hash}>
-                      {item.parentId}
-                    </Ellipsis>
-                  </NavLink>
-                )}
-              </Value>
-            </div>
-            <div>
-              <Label>TIME</Label>
-              <Value>{formatDate(item.timestamp)}</Value>
-            </div>
-            <div>
-              <Label>COLLECTION GUARANTEES</Label>
-              <Value>{item.collectionGuarantees?.length}</Value>
-            </div>
-            <div>
-              <Label>BLOCK SEALS</Label>
-              <Value>{item.blockSeals?.length}</Value>
-            </div>
-            <div>
-              <Label>SIGNATURES</Label>
-              <Value>{item.signatures?.length}</Value>
-            </div>
-          </Card>
-        ))}
-      {!firstFetch && <FullScreenLoading />}
-      {firstFetch && filteredData.length === 0 && (
-        <NoResults className={classes.noResults} />
+          ))}
+        </Card>
       )}
-    </>
+      renderCustomRow={(row) => (
+        <>
+          <Card
+            className={classNames(tableClasses.tableRow, classes.tableRow)}
+            key={row.id}
+            showIntroAnimation={row.original.isNew}
+            variant="table-line"
+          >
+            {row.getVisibleCells().map((cell) => (
+              <div
+                key={cell.id}
+                className={cell.column.columnDef.meta?.className}
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </div>
+            ))}
+          </Card>
+        </>
+      )}
+    />
   );
 };
 

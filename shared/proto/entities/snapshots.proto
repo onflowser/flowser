@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message EmulatorSnapshot {
+  string id = 1;
+  string description = 2;
+  string block_id = 3;
+  string project_id = 4;
+  string created_at = 5;
+  // Snapshots can't be updated,
+  // but we need to include that field for compatability with PollingEntity interface.
+  string updated_at = 6;
+}

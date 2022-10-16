@@ -1,52 +1,72 @@
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
-import { AccountKey } from "./key.entity";
-import { AccountContract } from "./contract.entity";
-import { FlowAccount } from "../../flow/types";
-import { AccountsStorage } from "./storage.entity";
+import { PollingEntity } from "../../core/entities/polling.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { AccountKeyEntity } from "./key.entity";
+import { AccountContractEntity } from "./contract.entity";
+import { ensurePrefixedAddress } from "../../utils";
+import { FlowAccount } from "../../flow/services/gateway.service";
+import { Account } from "@flowser/shared";
+import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { AccountStorageItemEntity } from "./storage-item.entity";
 
 @Entity({ name: "accounts" })
-export class Account extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID | any;
-
-  @Column()
-  @Index({ unique: true })
-  id: string;
-
-  @Column()
+export class AccountEntity extends PollingEntity {
+  @PrimaryColumn()
   address: string;
 
-  @Column()
+  @Column({ type: "bigint" })
   balance: number;
 
   @Column()
   code: string;
 
-  @Column((type) => AccountKey)
-  keys: AccountKey[];
+  @Column({ default: false })
+  isDefaultAccount: boolean;
 
-  @Column((type) => AccountContract)
-  contracts: AccountContract[];
+  @OneToMany(() => AccountKeyEntity, (key) => key.account, {
+    eager: true,
+  })
+  keys: AccountKeyEntity[];
 
-  @Column((type) => AccountsStorage)
-  storage: AccountsStorage[];
+  @OneToMany(() => AccountStorageItemEntity, (storage) => storage.account, {
+    eager: true,
+  })
+  storage: AccountStorageItemEntity[];
 
-  static init(
-    flowAccountObject: FlowAccount,
-    options?: Partial<Account>
-  ): Account {
-    const { keys, contracts } = flowAccountObject;
-    const account = Object.assign<Account, FlowAccount, Partial<Account>>(
-      new Account(),
-      flowAccountObject,
-      options
+  @OneToMany(() => AccountContractEntity, (contract) => contract.account, {
+    eager: true,
+  })
+  contracts: AccountContractEntity[];
+
+  @OneToMany(() => TransactionEntity, (key) => key.payer, {
+    eager: true,
+  })
+  transactions: TransactionEntity[];
+
+  static create(flowAccount: FlowAccount): AccountEntity {
+    const account = new AccountEntity();
+    account.address = ensurePrefixedAddress(flowAccount.address);
+    account.balance = flowAccount.balance;
+    account.code = flowAccount.code;
+    account.keys = flowAccount.keys.map((key) =>
+      AccountKeyEntity.create(flowAccount, key)
     );
-    account.id = flowAccountObject.address;
-    account.keys = keys.map((key) => AccountKey.init(key));
-    account.contracts = Object.keys(contracts).map((name) =>
-      AccountContract.init(flowAccountObject.address, name, contracts[name])
-    ) as AccountContract[] & Map<string, string>;
     return account;
+  }
+
+  toProto(): Account {
+    return {
+      address: this.address,
+      balance: this.balance,
+      code: this.code,
+      storage: this.storage.map((storage) => storage.toProto()),
+      keys: this.keys.map((key) => key.toProto()),
+      contracts: this.contracts.map((contract) => contract.toProto()),
+      transactions: this.transactions.map((transaction) =>
+        transaction.toProto()
+      ),
+      isDefaultAccount: this.isDefaultAccount,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 }

@@ -1,71 +1,103 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateContractDto } from "../dto/create-contract.dto";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MongoRepository } from "typeorm";
-import { Account } from "../entities/account.entity";
-import { AccountContract } from "../entities/contract.entity";
-import { ObjectLiteral } from "typeorm/common/ObjectLiteral";
+import { MoreThan, Repository } from "typeorm";
+import { AccountContractEntity } from "../entities/contract.entity";
+import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
 
 @Injectable()
 export class ContractsService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: MongoRepository<Account>
+    @InjectRepository(AccountContractEntity)
+    private contractRepository: Repository<AccountContractEntity>
   ) {}
 
-  create(createContractDto: CreateContractDto) {
-    return this.accountRepository.save(createContractDto);
-  }
-
   async findAll() {
-    return this._findAll();
+    return this.contractRepository.find({
+      order: { createdAt: "DESC" },
+    });
   }
 
-  async findAllNewerThanTimestamp(timestamp): Promise<AccountContract[]> {
-    return this._findAll([
-      {
-        $match: {
-          $or: [
-            { createdAt: { $gt: timestamp } },
-            { updatedAt: { $gt: timestamp } },
-          ],
-        },
-      },
-      { $sort: { createdAt: -1 } },
-    ]);
+  async findAllNewerThanTimestamp(
+    timestamp: Date
+  ): Promise<AccountContractEntity[]> {
+    return this.contractRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp) },
+        { createdAt: MoreThan(timestamp) },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  async findAllNewerThanTimestampByAccount(
+    accountAddress: string,
+    timestamp: Date
+  ) {
+    return this.contractRepository.find({
+      where: [
+        { updatedAt: MoreThan(timestamp), accountAddress },
+        { createdAt: MoreThan(timestamp), accountAddress },
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  async getContractsByAccountAddress(address: string) {
+    return this.contractRepository
+      .createQueryBuilder("contract")
+      .where("contract.accountAddress = :accountAddress", {
+        accountAddress: address,
+      })
+      .getMany();
   }
 
   async findOne(id: string) {
-    const [contract] = await this._findAll([{ $match: { id: { $eq: id } } }]);
-    if (contract) {
-      return contract;
-    } else {
-      throw new NotFoundException("Contract not found");
-    }
+    const { accountAddress, name } = AccountContractEntity.parseId(id);
+    return this.contractRepository.findOneByOrFail({
+      accountAddress,
+      name,
+    });
   }
 
-  async _findAll(pipeline: ObjectLiteral[] = []) {
-    return this.accountRepository
-      .aggregate([
-        {
-          $project: {
-            address: 1,
-            contracts: {
-              $map: {
-                input: "$contracts",
-                as: "contract",
-                in: {
-                  $mergeObjects: ["$$contract", { accountAddress: "$address" }],
-                },
-              },
-            },
-          },
-        },
-        { $unwind: "$contracts" },
-        { $replaceRoot: { newRoot: "$contracts" } },
-        { $sort: { createdAt: -1 } },
-        ...pipeline,
-      ])
-      .toArray();
+  async update(contract: AccountContractEntity) {
+    return this.contractRepository.update(
+      { accountAddress: contract.accountAddress, name: contract.name },
+      contract
+    );
+  }
+
+  async updateAccountContracts(
+    accountAddress: string,
+    newContracts: AccountContractEntity[]
+  ) {
+    const oldContracts = await this.getContractsByAccountAddress(
+      accountAddress
+    );
+    const contractsDiff = computeEntitiesDiff({
+      primaryKey: "name",
+      oldEntities: oldContracts,
+      newEntities: newContracts,
+    });
+    return processEntitiesDiff<AccountContractEntity>({
+      create: (e) => this.create(e),
+      update: (e) => this.update(e),
+      delete: (e) => this.delete(e.accountAddress, e.name),
+      diff: contractsDiff,
+    });
+  }
+
+  async create(contract: AccountContractEntity) {
+    return this.contractRepository.insert(contract);
+  }
+
+  async delete(accountAddress: string, contractName: string) {
+    return this.contractRepository.delete({
+      accountAddress,
+      name: contractName,
+    });
+  }
+
+  removeAll() {
+    return this.contractRepository.delete({});
   }
 }

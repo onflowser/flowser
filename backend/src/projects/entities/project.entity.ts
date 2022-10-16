@@ -1,97 +1,92 @@
-import { Column, Entity, Index, ObjectIdColumn } from "typeorm";
-import { GatewayConfigurationEntity } from "./gateway-configuration.entity";
-import { toKebabCase } from "../../utils";
+import { Column, Entity, PrimaryColumn } from "typeorm";
+import { typeOrmProtobufTransformer } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
-import { EmulatorConfigurationEntity } from "./emulator-configuration.entity";
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { Type } from "class-transformer";
-
-export enum FlowNetworks {
-  MAINNET = "mainnet",
-  TESTNET = "testnet",
-  EMULATOR = "emulator",
-}
+import { PollingEntity } from "../../core/entities/polling.entity";
+import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
+import { UpdateProjectDto } from "../dto/update-project.dto";
+import * as crypto from "crypto";
 
 @Entity({ name: "projects" })
-export class Project extends PollingEntity {
-  @ObjectIdColumn()
-  _id: string;
-
-  @Column()
-  @Index({ unique: true })
+export class ProjectEntity extends PollingEntity {
+  @PrimaryColumn()
   id: string;
 
   @Column()
-  @Index({ unique: true })
   name: string;
 
   @Column()
-  pingable: boolean;
+  filesystemPath: string;
 
-  @Column()
-  @Type(() => GatewayConfigurationEntity)
-  gateway: GatewayConfigurationEntity;
+  @Column("simple-json", {
+    nullable: true,
+    transformer: typeOrmProtobufTransformer(DevWallet),
+  })
+  devWallet: DevWallet;
 
-  @Column()
-  @Type(() => EmulatorConfigurationEntity)
-  emulator: EmulatorConfigurationEntity;
+  // TODO(milestone-3): gateway should be synced with network settings in flow.json
+  @Column("simple-json", {
+    nullable: true,
+    transformer: typeOrmProtobufTransformer(Gateway),
+  })
+  gateway: Gateway;
 
-  @Column("boolean", { default: false })
-  isCustom: boolean = false;
+  // TODO(milestone-3): emulator should be synced with settings in flow.json
+  @Column("simple-json", {
+    nullable: true,
+    transformer: typeOrmProtobufTransformer(Emulator),
+  })
+  emulator: Emulator | null;
 
-  // data will be fetched from this block height
-  // set this undefined to start fetching from latest block
-  @Column()
-  startBlockHeight?: number | undefined = 0;
+  // Blockchain data will be fetched from this block height
+  // Set this null to start fetching from the latest block
+  @Column({ nullable: true })
+  startBlockHeight: number | null = 0;
 
-  static init(dto: CreateProjectDto) {
-    return Object.assign(new Project(), {
-      id: toKebabCase(dto.name),
-      ...dto,
-    });
+  hasGatewayConfiguration() {
+    return this.gateway !== null;
   }
 
   isStartBlockHeightDefined() {
-    return (
-      this.startBlockHeight !== undefined && this.startBlockHeight !== null
-    );
+    return this.startBlockHeight !== null;
   }
 
-  isEmulator() {
-    return this.isAnyNetwork([FlowNetworks.EMULATOR]);
+  shouldRunEmulator() {
+    return this.emulator?.run;
   }
 
-  isOfficialNetwork() {
-    return this.isAnyNetwork([FlowNetworks.MAINNET, FlowNetworks.TESTNET]);
+  toProto(): Project {
+    return {
+      id: this.id,
+      name: this.name,
+      filesystemPath: this.filesystemPath,
+      startBlockHeight: this.startBlockHeight,
+      gateway: this.gateway,
+      devWallet: this.devWallet,
+      emulator: this.emulator,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 
-  isUserManagedEmulator() {
-    return this.id === "emulator";
-  }
-
-  isFlowserManagedEmulator() {
-    return (
-      this.isAnyNetwork([FlowNetworks.EMULATOR]) &&
-      !this.isUserManagedEmulator()
-    );
-  }
-
-  isAnyNetwork(networks: FlowNetworks[]) {
-    // network type is determined by project.id
-    // only managed emulator projects can have arbitrary id values
-    // for other projects network type must equal to it's id
-    const officialNetworkIds = ["mainnet", "testnet"];
-    for (let network of networks) {
-      let isMatch = false;
-      if (network === FlowNetworks.EMULATOR) {
-        isMatch = !officialNetworkIds.includes(this.id);
-      } else {
-        isMatch = this.id === network;
-      }
-      if (isMatch) {
-        return true;
-      }
+  static create(projectDto: CreateProjectDto | UpdateProjectDto) {
+    const project = new ProjectEntity();
+    const isUpdateDto = "id" in projectDto && Boolean(projectDto.id);
+    if (isUpdateDto) {
+      project.id = projectDto.id;
+    } else {
+      project.id = crypto.randomUUID();
     }
-    return false;
+    project.name = projectDto.name;
+    project.startBlockHeight = projectDto.startBlockHeight;
+    project.filesystemPath = projectDto.filesystemPath;
+    project.gateway = projectDto.gateway
+      ? Gateway.fromJSON(projectDto.gateway)
+      : Gateway.fromPartial({
+          restServerAddress: `http://localhost:${projectDto.emulator.restServerPort}`,
+          grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
+        });
+    project.devWallet = DevWallet.fromJSON(projectDto.devWallet);
+    project.emulator = Emulator.fromJSON(projectDto.emulator);
+    return project;
   }
 }

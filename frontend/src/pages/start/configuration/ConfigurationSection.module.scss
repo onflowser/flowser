@@ -1,0 +1,59 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $spacing-base;
+    .leftSection {
+      display: flex;
+      .title {
+        color: $light-grey;
+        font-size: $font-size-big;
+      }
+      .toggleWrapper {
+        display: flex;
+        margin-left: $spacing-base;
+        span {
+          color: $light-grey;
+          font-size: $font-size-normal;
+          margin-right: $spacing-base;
+        }
+      }
+    }
+    .rightSection {
+      display: flex;
+      align-items: center;
+      span {
+        color: $color-grey;
+        margin-right: $spacing-base;
+      }
+      .openIcon, .closeIcon {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+      .openIcon {
+        path {
+          fill: $color-grey;
+        }
+      }
+      .closeIcon {
+        path {
+          fill: $color-light-gray;
+        }
+      }
+    }
+  }
+  .separatorLine {
+    width: 100%;
+    height: 1px;
+    background: $light-grey;
+    opacity: 0.2;
+  }
+  .body {
+    margin-top: $spacing-base;
+  }
+}

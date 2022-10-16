@@ -1,14 +1,12 @@
-import { Column, Entity, Index, ObjectID, ObjectIdColumn } from "typeorm";
-import { PollingEntity } from "../../shared/entities/polling.entity";
-import { CollectionGuarantee } from "./collection-guarantee.entity";
+import { Column, Entity, PrimaryColumn } from "typeorm";
+import { PollingEntity } from "../../core/entities/polling.entity";
+import { FlowBlock } from "../../flow/services/gateway.service";
+import { Block, CollectionGuarantee } from "@flowser/shared";
+import { typeOrmProtobufTransformer } from "../../utils";
 
 @Entity({ name: "blocks" })
-export class Block extends PollingEntity {
-  @ObjectIdColumn()
-  _id: ObjectID;
-
-  @Column()
-  @Index({ unique: true })
+export class BlockEntity extends PollingEntity {
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -17,19 +15,46 @@ export class Block extends PollingEntity {
   @Column()
   height: number;
 
-  @Column()
-  timestamp: string;
+  @Column("datetime")
+  timestamp: Date;
 
-  @Column((type) => CollectionGuarantee)
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(CollectionGuarantee),
+  })
   collectionGuarantees: CollectionGuarantee[];
 
-  @Column()
+  // TODO(milestone-x): Define type (Note: we aren't showing blockSeals anywhere)
+  @Column("simple-json")
   blockSeals: any[];
 
-  @Column()
+  @Column("simple-array")
   signatures: string[];
 
-  static init(flowBlockObject): Block {
-    return Object.assign(new Block(), flowBlockObject);
+  static create(flowBlock: FlowBlock): BlockEntity {
+    const block = new BlockEntity();
+    block.id = flowBlock.id;
+    block.collectionGuarantees = flowBlock.collectionGuarantees;
+    block.blockSeals = flowBlock.blockSeals;
+    // TODO(milestone-x): "signatures" field is not present in block response
+    // https://github.com/onflow/fcl-js/issues/1355
+    block.signatures = flowBlock.signatures ?? [];
+    block.timestamp = new Date(flowBlock.timestamp);
+    block.height = flowBlock.height;
+    block.parentId = flowBlock.parentId;
+    return block;
+  }
+
+  toProto(): Block {
+    return {
+      id: this.id,
+      parentId: this.parentId,
+      height: this.height,
+      timestamp: this.timestamp.toISOString(),
+      blockSeals: this.blockSeals,
+      signatures: this.signatures,
+      collectionGuarantees: this.collectionGuarantees,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
   }
 }
