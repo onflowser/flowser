@@ -1,7 +1,6 @@
 {
   "name": "flowser",
   "private": true,
-  "version": "1.0.0",
   "description": "Easily inspect and debug Flow blockchain ⛓",
   "main": "index.js",
   "directories": {

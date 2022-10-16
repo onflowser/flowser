@@ -1,6 +1,7 @@
 {
   "name": "@flowser/app",
-  "version": "0.0.1",
+  "description": "",
+  "version": "2.0.0-beta",
   "homepage": "https://flowser.dev",
   "author": {
     "email": "bartolomej.kozorog@gmail.com",
