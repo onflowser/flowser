@@ -13,7 +13,7 @@ export function useErrorHandler(componentName: string): ErrorHandlerState {
       toast.error("Unknown error");
     }
     // TODO(milestone-6): send errors to sentry?
-    console.error(`[${componentName}]:`, error);
+    console.error(`[${componentName}] handling error:`, error);
   }
 
   return { handleError };

@@ -105,6 +105,7 @@ export const Configuration: FunctionComponent = () => {
     } catch (e) {
       history.replace(`/start/configure/${project.id}`);
       handleError(e);
+      throw e;
     }
   }
 
