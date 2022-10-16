@@ -47,6 +47,8 @@ import { useProjectActions } from "../../../contexts/project-actions.context";
 import { UserIcon } from "../../../components/user-icon/UserIcon";
 // @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
+import { useAnalytics } from "../../../hooks/use-analytics";
+import { AnalyticEvent } from "../../../services/mixpanel.service";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -113,6 +115,7 @@ const columnsKeys = [
 ];
 
 const Details: FunctionComponent = () => {
+  const { track } = useAnalytics();
   const { accountId } = useParams<AccountDetailsRouteParams>();
   const urlQueryParams = useUrlQuery();
   const focusedStorageId = urlQueryParams.get("focusedStorageId");
@@ -145,6 +148,7 @@ const Details: FunctionComponent = () => {
   const expandCardById = (id: string) => {
     setExpandedCardIds((prev) => new Set(prev.add(id)));
   };
+
   const minimizeCardById = (id: string) => {
     expandedCardIds.delete(id);
     setExpandedCardIds(new Set(expandedCardIds));
@@ -152,8 +156,14 @@ const Details: FunctionComponent = () => {
 
   const toggleCardExpand = (id: string) => {
     if (expandedCardIds.has(id)) {
+      track(AnalyticEvent.CLICK_MINIMIZE_STORAGE_CARD, {
+        storageId: id,
+      });
       minimizeCardById(id);
     } else {
+      track(AnalyticEvent.CLICK_EXPAND_STORAGE_CARD, {
+        storageId: id,
+      });
       expandCardById(id);
     }
   };

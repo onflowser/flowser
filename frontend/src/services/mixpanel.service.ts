@@ -8,6 +8,8 @@ export enum AnalyticEvent {
   PROJECT_CREATED = "project_created",
   PROJECT_STARTED = "project_started",
 
+  CLICK_MINIMIZE_STORAGE_CARD = "click_minimize_storage_card",
+  CLICK_EXPAND_STORAGE_CARD = "click_expand_storage_card",
   CLICK_PROJECT_SETTINGS = "click_project_settings",
   CLICK_CREATE_SNAPSHOT = "click_create_snapshot",
   CLICK_SEND_TRANSACTION = "click_send_transaction",
@@ -29,8 +31,9 @@ export class MixpanelService {
     this.init();
   }
   init(): void {
-    const debug = process.env.NODE_ENV === "development";
-    mixpanel.init("1b358339dc3d7476217983016b83fcab", { debug });
+    mixpanel.init("1b358339dc3d7476217983016b83fcab", {
+      debug: !enableAnalytics,
+    });
   }
 
   track(event: AnalyticEvent, properties: Dict = {}): void {
@@ -45,12 +48,6 @@ export class MixpanelService {
       ) ?? {};
 
     const staticProperties = {
-      currentUrl: window.location.href,
-      screenWidth: window.screen.width,
-      screenHeight: window.screen.height,
-      browser: navigator.userAgent,
-      browserVersion: navigator.appVersion,
-      os: navigator.platform,
       projectName: project?.name,
     };
     try {
