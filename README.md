@@ -2,7 +2,7 @@
 	<br>
 	<img alt="Flowser logo" src="./frontend/src/assets/images/long_logo.svg" width="300" height="200">
 	<p>
-		<b>Supercharged project development on Flow 🏄‍♂️ ⚡</b>
+		<b>Supercharged development on Flow blockchain 🏄‍♂️ ⚡</b>
 	</p>
 	<br>
 	<br>
@@ -50,7 +50,7 @@ yarn run bootstrap
 
 ### 3. Start Flowser
 
-### As website
+#### As website
 
 This is the recommended way for quick prototyping purposes, because it's faster.
 
@@ -60,7 +60,7 @@ Note that if you use this command, the app won't be run in the Electron environm
 yarn run start
 ```
 
-### As desktop app
+#### As desktop app
 
 ```bash
 yarn run start:desktop
