@@ -1,17 +1,13 @@
 <div align="center">
-	<br>
-	<img alt="Flowser logo" src="./frontend/src/assets/images/long_logo.svg" width="300" height="200">
-	<p>
-		<b>Supercharged development on Flow blockchain 🏄‍♂️ ⚡</b>
-	</p>
-	<br>
-	<br>
+	<img alt="Flowser banner" src="https://user-images.githubusercontent.com/36109955/196263054-b42ecb52-340f-4982-bd62-404acb161d71.gif" />
+	<br />
+	<br />
 </div>
 
-> **News:** We are currently developing Flowser desktop app, as part of the [Flow developer grant #27](https://github.com/onflow/developer-grants/issues/27). Follow us on [Twitter](https://twitter.com/onflowser) or join our [Discord server](https://discord.gg/2Nx3s8yD) for more updates.
+> **News:** Our app is currently in beta and we'd love to hear your feedback! Follow us on [Twitter](https://twitter.com/onflowser) or join our [Discord server](https://discord.gg/2Nx3s8yD) for updates and feedback.
 
 
-Flowser is a convenient development tool for [Flow blockchain](https://www.onflow.org/). It does all the heavy work of managing the Flow emulator, inspecting the current blockchain state and interacting with the network for you!
+Flowser is first-of-its-kind development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing blockchain emulator, inspecting the current state, interacting with the network and much more!
 
 ## Key Features
 
@@ -20,6 +16,17 @@ Flowser is a convenient development tool for [Flow blockchain](https://www.onflo
 - **Snapshot management**: Create and checkout [blockchain state snapshots](https://github.com/onflow/flow-emulator#managing-emulator-state) - similar to how Git works
 - **Development wallet**: Built in [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) integration for easy blockchain interactions
 - **Account storage inspection**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
+
+## Get started
+
+To get started, just download the app for your platform using the links below!
+
+<a href="https://github.com/onflowser/flowser/releases" target="_blank">
+  <img width="180" alt="Download on Windows" src="https://user-images.githubusercontent.com/36109955/196265032-56e01fa3-8771-498c-a4db-bee16bdb08e8.png" />
+  <img width="180" alt="Download on MacOS" src="https://user-images.githubusercontent.com/36109955/196265049-a214d01b-7c1f-4504-a12b-1ec03743869e.png" />
+</a>
+
+If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2Nx3s8yD)!
 
 ## Development
 
