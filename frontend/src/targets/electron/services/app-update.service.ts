@@ -64,10 +64,12 @@ export class AppUpdateService {
 
     autoUpdater.on("error", (error) => {
       console.log("Error in auto-updater:", error);
-      dialog.showErrorBox(
-        "Update error",
-        error == null ? "unknown" : (error.stack || error).toString()
-      );
+      if (!options.silent) {
+        dialog.showErrorBox(
+          "Update error",
+          error == null ? "unknown" : (error.stack || error).toString()
+        );
+      }
     });
   }
 }
