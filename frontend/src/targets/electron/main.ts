@@ -4,6 +4,8 @@ import { ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
 import * as worker from "./worker";
 import { SentryMainService } from "./services/sentry-main.service";
+import { setupMenu } from "./menu";
+import { ServiceRegistry } from "./services/service-registry";
 
 fixPath();
 
@@ -12,6 +14,7 @@ const minHeight = 800;
 
 let win: BrowserWindow;
 
+const { appUpdateService } = ServiceRegistry.getInstance();
 const sentryService = new SentryMainService();
 sentryService.init();
 
@@ -27,16 +30,6 @@ async function createWindow() {
     },
   });
 
-  async function showDirectoryPicker() {
-    const result = await dialog.showOpenDialog({
-      properties: ["openDirectory", "createDirectory"],
-    });
-    if (result.canceled) {
-      return undefined;
-    }
-    return result.filePaths[0];
-  }
-
   ipcMain.handle("showDirectoryPicker", showDirectoryPicker);
 
   // Open urls in the user's browser
@@ -46,32 +39,19 @@ async function createWindow() {
   });
 
   win.webContents.on("did-fail-load", () => {
-    console.log("did-fail-load");
     win.loadURL(getClientAppUrl());
   });
 
   win.loadURL(getClientAppUrl());
 
-  async function handleStart() {
-    try {
-      const userDataPath = app.getPath("userData");
-      await worker.start({
-        userDataPath,
-      });
-    } catch (error) {
-      await handleBackendError({
-        error,
-        window: win,
-        onRestart: handleStart,
-        onQuit: app.quit,
-      });
-    }
-  }
-
   await handleStart();
 }
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  setupMenu();
+  createWindow();
+  appUpdateService.checkForUpdatesAndNotify({ silent: true });
+});
 
 // Quit when all windows are closed.
 app.on("window-all-closed", function () {
@@ -119,10 +99,30 @@ app.on("before-quit", async function (e) {
   }
 });
 
-type ErrorWithCode = { code: string };
+async function handleStart() {
+  try {
+    const userDataPath = app.getPath("userData");
+    await worker.start({
+      userDataPath,
+    });
+  } catch (error) {
+    await handleBackendError({
+      error,
+      window: win,
+      onRestart: handleStart,
+      onQuit: app.quit,
+    });
+  }
+}
 
-function isErrorWithCode(error: unknown): error is ErrorWithCode {
-  return typeof error === "object" && error !== null && "code" in error;
+async function showDirectoryPicker() {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory", "createDirectory"],
+  });
+  if (result.canceled) {
+    return undefined;
+  }
+  return result.filePaths[0];
 }
 
 async function handleBackendError({
@@ -169,9 +169,15 @@ async function handleBackendError({
 
 function getClientAppUrl() {
   const isDev = !app.isPackaged;
-  // This path is currently set to "react", because that's the folder used in @flowser/app package
+  // This path is currently set to "react", because that's the folder used in the app package
   // Refer to the app/README for more info on the current build process.
   return isDev
     ? "http://localhost:6060"
-    : `file://${path.join(__dirname, "../react/index.html")}`;
+    : `file://${path.join(__dirname, "../../../react/index.html")}`;
+}
+
+type ErrorWithCode = { code: string };
+
+function isErrorWithCode(error: unknown): error is ErrorWithCode {
+  return typeof error === "object" && error !== null && "code" in error;
 }

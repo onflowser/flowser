@@ -1,5 +1,5 @@
 {
-  "name": "@flowser/app",
+  "name": "flowser",
   "description": "",
   "version": "2.0.0-beta",
   "homepage": "https://flowser.dev",
@@ -8,7 +8,7 @@
     "name": "Flowser"
   },
   "scripts": {
-    "build-electron": "electron-builder -c.extraMetadata.main=build/electron/main.js",
+    "build-electron": "electron-builder -c.extraMetadata.main=build/electron/targets/electron/main.js",
     "build-mac": "yarn run build-electron --mac",
     "build-win": "yarn run build-electron --win",
     "build-linux": "yarn run build-electron --linux",
