@@ -220,6 +220,8 @@ export class ProjectsService {
     const restServerPort = 8888;
     const grpcServerPort = 3569;
 
+    const isWindows = process.platform === "win32";
+
     return Project.fromPartial({
       name: "New Project",
       gateway: Gateway.fromPartial({
@@ -237,7 +239,9 @@ export class ProjectsService {
         grpcServerPort,
         adminServerPort: 8080,
         persist: false,
-        snapshot: true,
+        // Snapshot should be temporarily disabled on Windows
+        // See https://github.com/onflow/flow-emulator/issues/208
+        snapshot: !isWindows,
         performInit: false,
         withContracts: false,
         blockTime: 0,
