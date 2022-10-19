@@ -4,7 +4,6 @@
   z-index: 1001;
   display: flex;
   position: fixed;
-  //border: 1px solid red;
   top: 0;
   bottom: 0;
   left: 0;
@@ -16,7 +15,6 @@
 
 
   .dialog {
-    margin-top: -20%;
     min-width: 100px;
     max-width: 600px;
     min-height: 100px;
