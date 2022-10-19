@@ -200,9 +200,8 @@ function AboutContent() {
   return (
     <div className={classes.bodyCenter}>
       <div>
-        Flowser 2022, v1.1 <br />
         Connect with us on{" "}
-        <a href="https://discord.gg/WJe6CKfp" title="Flowser discord">
+        <a href="https://discord.gg/2gx7ZsRUkD" title="Flowser discord">
           Discord
         </a>
         <br />

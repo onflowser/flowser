@@ -4,7 +4,7 @@
 	<br />
 </div>
 
-> **News:** Our app is currently in beta and we'd love to hear your feedback! Follow us on [Twitter](https://twitter.com/onflowser) or join our [Discord server](https://discord.gg/2Nx3s8yD) for updates and feedback.
+> **News:** Our app is currently in beta and we'd love to hear your feedback! Follow us on [Twitter](https://twitter.com/onflowser) or join our [Discord server](https://discord.gg/2gx7ZsRUkD) for updates and feedback.
 
 
 Flowser is first-of-its-kind development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing blockchain emulator, inspecting the current state, interacting with the network and much more!
@@ -26,7 +26,7 @@ To get started, just download the app for your platform using the links below!
   <img width="180" alt="Download on MacOS" src="https://user-images.githubusercontent.com/36109955/196265049-a214d01b-7c1f-4504-a12b-1ec03743869e.png" />
 </a>
 
-If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2Nx3s8yD)!
+If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2gx7ZsRUkD)!
 
 ## Development
 
