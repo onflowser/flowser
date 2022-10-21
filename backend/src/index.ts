@@ -1,4 +1,8 @@
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import {
+  INestApplication,
+  NestApplicationOptions,
+  ValidationPipe,
+} from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./core/filters/http-exception.filter";
@@ -6,16 +10,23 @@ import { Config, ConfigService } from "./core/services/config.service";
 
 export { ProcessManagerService } from "./processes/process-manager.service";
 
-export async function createApp(config: Config): Promise<INestApplication> {
-  ConfigService.setConfiguration(config);
+export type CreateAppOptions = {
+  config: Config;
+  nest?: NestApplicationOptions;
+};
 
-  const app = await NestFactory.create(AppModule);
+export async function createApp(
+  options: CreateAppOptions
+): Promise<INestApplication> {
+  ConfigService.setConfiguration(options.config);
+
+  const app = await NestFactory.create(AppModule, options.nest);
   app.setGlobalPrefix("/api");
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
 
   app.enableCors();
-  await app.listen(config.common.httpServerPort);
+  await app.listen(options.config.common.httpServerPort);
 
   return app;
 }

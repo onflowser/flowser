@@ -1,5 +1,8 @@
 import { cleanEnv, str, num } from "envalid";
-import { InternalServerErrorException } from "@nestjs/common";
+import {
+  InternalServerErrorException,
+  NestApplicationOptions,
+} from "@nestjs/common";
 
 export type DatabaseConfig = {
   type: "mysql" | "mariadb" | "sqlite";

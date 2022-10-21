@@ -8,7 +8,9 @@ declare const module: any;
 async function bootstrap() {
   ConfigService.setConfiguration(ConfigService.readFromEnv());
 
-  const app = await createApp(ConfigService.readFromEnv());
+  const app = await createApp({
+    config: ConfigService.readFromEnv(),
+  });
 
   SwaggerModule.setup("api", app, getOpenApiDocument(app));
 

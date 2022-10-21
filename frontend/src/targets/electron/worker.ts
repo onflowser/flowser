@@ -1,6 +1,7 @@
 import path from "path";
 import { createApp } from "@flowser/backend";
 import { INestApplication } from "@nestjs/common";
+import { Logger } from "./services/logger.service";
 
 export let backend: INestApplication;
 
@@ -10,12 +11,17 @@ async function startBackend({ userDataPath }: { userDataPath: string }) {
     await backend.close();
   }
   backend = await createApp({
-    database: {
-      type: "sqlite",
-      name: databaseFilePath,
+    config: {
+      database: {
+        type: "sqlite",
+        name: databaseFilePath,
+      },
+      common: {
+        httpServerPort: 6061,
+      },
     },
-    common: {
-      httpServerPort: 6061,
+    nest: {
+      logger: new Logger(),
     },
   });
 }

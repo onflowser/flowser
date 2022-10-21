@@ -15,7 +15,9 @@ export function getOpenApiDocument(app: INestApplication) {
 }
 
 async function generateDocs() {
-  const app = await createApp(ConfigService.readFromEnv());
+  const app = await createApp({
+    config: ConfigService.readFromEnv(),
+  });
 
   const document = getOpenApiDocument(app);
   writeFile("openapi.json", JSON.stringify(document, null, 4), () =>
