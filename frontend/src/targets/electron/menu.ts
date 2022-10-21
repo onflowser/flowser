@@ -1,13 +1,13 @@
-import { app, Menu } from "electron";
+import { app, Menu, shell } from "electron";
 import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
 import { ServiceRegistry } from "./services/service-registry";
 
 const { appUpdateService } = ServiceRegistry.getInstance();
 
-const template: MenuItemConstructorOptions[] = [];
-if (process.platform === "darwin") {
-  const name = app.getName();
-  template.unshift({
+const name = app.getName();
+
+const template: MenuItemConstructorOptions[] = [
+  {
     label: name,
     submenu: [
       {
@@ -33,8 +33,37 @@ if (process.platform === "darwin") {
         },
       },
     ],
-  });
-}
+  },
+  {
+    label: "View",
+    submenu: [
+      { role: "reload" },
+      { role: "forceReload" },
+      { role: "toggleDevTools" },
+      { type: "separator" },
+      { role: "resetZoom" },
+      { role: "zoomIn" },
+      { role: "zoomOut" },
+      { type: "separator" },
+      { role: "togglefullscreen" },
+    ],
+  },
+  {
+    label: "Window",
+    submenu: [{ role: "minimize" }, { role: "zoom" }],
+  },
+  {
+    role: "help",
+    submenu: [
+      {
+        label: "Learn More",
+        click: async () => {
+          await shell.openExternal("https://github.com/onflowser/flowser");
+        },
+      },
+    ],
+  },
+];
 
 export function setupMenu(): void {
   const menu = Menu.buildFromTemplate(template);
