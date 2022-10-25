@@ -57,14 +57,20 @@ export class ManagedProcessEntity extends EventEmitter {
   }
 
   async start() {
-    const { name, args, options } = this.options.command;
+    const { command } = this.options;
 
     if (this.isRunning()) {
       throw new Error("Process is already running");
     }
 
+    this.logger.debug(
+      `Starting ${this.name} with command: ${command.name} ${command.args.join(
+        " "
+      )}`
+    );
+
     return new Promise<void>((resolve, reject) => {
-      this.childProcess = spawn(name, args, options);
+      this.childProcess = spawn(command.name, command.args, command.options);
       this.attachEventListeners();
       this.childProcess.once("spawn", () => {
         resolve();
@@ -152,7 +158,6 @@ export class ManagedProcessEntity extends EventEmitter {
 
   private handleData(source: LogSource, data: any) {
     const lines: string[] = data.toString().split("\n");
-    this.logger.debug(`Received ${lines.length} logs from ${this.id}:`, lines);
     const createdAt = new Date().toString();
     const logs = lines.map(
       (line): ManagedProcessLog => ({
