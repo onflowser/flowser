@@ -17,7 +17,7 @@ export const ActionDialog: FC<ActionDialogProps> = ({
   ...dialogProps
 }) => {
   return (
-    <Dialog className={classes.dialog} {...dialogProps}>
+    <Dialog {...dialogProps}>
       <div className={classes.root}>
         <h3>{title}</h3>
         <div className={classNames(classes.body, bodyClass)}>{children}</div>
