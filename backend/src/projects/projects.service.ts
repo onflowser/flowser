@@ -242,7 +242,6 @@ export class ProjectsService {
         // Snapshot should be temporarily disabled on Windows
         // See https://github.com/onflow/flow-emulator/issues/208
         snapshot: !isWindows,
-        performInit: false,
         withContracts: false,
         blockTime: 0,
         servicePrivateKey: undefined,

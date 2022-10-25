@@ -81,7 +81,6 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         "service-hash-algo",
         hashAlgorithmToJSON(emulator.serviceHashAlgorithm)
       ),
-      flag("init", emulator.performInit),
       flag("rest-debug", emulator.enableRestDebug),
       flag("grpc-debug", emulator.enableGrpcDebug),
       flag("persist", emulator.persist),

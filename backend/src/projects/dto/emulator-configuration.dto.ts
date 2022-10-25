@@ -19,8 +19,6 @@ export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
   minAccountBalance: number;
   @ApiProperty()
-  performInit: boolean;
-  @ApiProperty()
   persist: boolean;
   @ApiProperty()
   snapshot: boolean;

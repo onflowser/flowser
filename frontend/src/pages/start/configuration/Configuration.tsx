@@ -360,12 +360,6 @@ export const Configuration: FunctionComponent = () => {
                 formik={formik}
               />
               <EmulatorToggleField
-                label="Init"
-                path="performInit"
-                description="Generate and set a new service account"
-                formik={formik}
-              />
-              <EmulatorToggleField
                 label="Contracts"
                 path="withContracts"
                 description="Start with contracts like FUSD, NFT and an NFT Marketplace, when the emulator starts"
