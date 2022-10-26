@@ -7,7 +7,8 @@ import React, {
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/icon-button/IconButton";
-import logo from "../../../assets/images/long_logo.svg";
+// @ts-ignore .png import error
+import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
 import newProject from "../../../assets/icons/new_project.svg";
 import openProject from "../../../assets/icons/open_project.svg";
@@ -79,7 +80,7 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
       <aside className={classes.sidebar}>
         <div className={classes.sideBarHeader}>
           <span className={classes.logoWrapper}>
-            <img className={classes.logo} src={logo} alt="FLOWSER" />
+            <img className={classes.logo} src={longLogo} alt="FLOWSER" />
           </span>
         </div>
         <ul className={classes.sideBarBody}>
@@ -200,6 +201,11 @@ function AboutContent() {
   return (
     <div className={classes.bodyCenter}>
       <div>
+        Send feedback over{" "}
+        <a href="mailto:info.flowser@gmail.com" title="Flowser email">
+          Email
+        </a>
+        <br />
         Connect with us on{" "}
         <a href="https://discord.gg/2gx7ZsRUkD" title="Flowser discord">
           Discord
@@ -211,7 +217,7 @@ function AboutContent() {
         </a>{" "}
         <br />
         Contribute on{" "}
-        <a href="https://github.com/onflowser/flowser" title="Flowser discord">
+        <a href="https://github.com/onflowser/flowser" title="Flowser github">
           Github
         </a>
       </div>
