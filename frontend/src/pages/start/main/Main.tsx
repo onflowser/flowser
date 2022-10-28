@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   useCallback,
   useEffect,
+  useState,
 } from "react";
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
@@ -27,6 +28,8 @@ import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
+import { ConsentDialog } from "../../../components/consent-dialog/ConsentDialog";
+import { useAnalyticsConsent } from "../../../hooks/use-analytics-consent";
 
 type ProjectTab = {
   id: string;
@@ -198,8 +201,21 @@ function ProjectsListContent() {
 }
 
 function AboutContent() {
+  const [showAnalyticSettings, setShowAnalyticSettings] = useState(false);
+  const [consentAnalyticsSetting, setConsentAnalyticsSetting] =
+    useAnalyticsConsent();
   return (
     <div className={classes.bodyCenter}>
+      {showAnalyticSettings && (
+        <ConsentDialog
+          onClose={() => setShowAnalyticSettings(false)}
+          consent={consentAnalyticsSetting ?? true}
+          setConsent={(consent) => {
+            setConsentAnalyticsSetting(consent);
+            setShowAnalyticSettings(false);
+          }}
+        />
+      )}
       <div>
         Send feedback over{" "}
         <a href="mailto:info.flowser@gmail.com" title="Flowser email">
@@ -219,6 +235,14 @@ function AboutContent() {
         Contribute on{" "}
         <a href="https://github.com/onflowser/flowser" title="Flowser github">
           Github
+        </a>
+        <br />
+        <br />
+        <a
+          style={{ cursor: "pointer" }}
+          onClick={() => setShowAnalyticSettings(true)}
+        >
+          Analytic settings
         </a>
       </div>
     </div>

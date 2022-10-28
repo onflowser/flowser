@@ -5,6 +5,8 @@ import { GetSingleProjectResponse } from "@flowser/shared";
 import { FingerprintService } from "./fingerprint.service";
 
 export enum AnalyticEvent {
+  PAGE_VIEW = "page_view",
+
   PROJECT_REMOVED = "project_removed",
   PROJECT_CREATED = "project_created",
   PROJECT_STARTED = "project_started",
@@ -44,6 +46,14 @@ export class AnalyticsService {
     } catch (e) {
       console.error("Failed to identify user", e);
     }
+  }
+
+  disable(): void {
+    mixpanel.opt_out_tracking();
+  }
+
+  enable(): void {
+    mixpanel.opt_in_tracking();
   }
 
   track(event: AnalyticEvent, properties: Dict = {}): void {

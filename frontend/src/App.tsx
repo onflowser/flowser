@@ -34,6 +34,10 @@ import {
   PlatformAdapterState,
 } from "./contexts/platform-adapter.context";
 import { queryClient } from "./config/react-query";
+import { ConsentDialog } from "./components/consent-dialog/ConsentDialog";
+import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
+import { ServiceRegistry } from "./services/service-registry";
+import { AnalyticEvent } from "./services/analytics.service";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -42,8 +46,13 @@ const BrowserRouterEvents = withRouter(
     location,
   }: RouteComponentProps & { children: ReactElement[] }) => {
     const { setSearchTerm } = useSearch();
+    const { analyticsService } = ServiceRegistry.getInstance();
 
     history.listen((location, action) => {
+      analyticsService.track(AnalyticEvent.PAGE_VIEW, {
+        location,
+        action,
+      });
       if (action === "PUSH") {
         setSearchTerm("");
       }
@@ -89,6 +98,7 @@ export const FlowserClientApp = ({
 export const FlowserRoutes = (): ReactElement => {
   return (
     <BrowserRouterEvents>
+      <ConsentAnalytics />
       <ProjectRequirements />
       <Switch>
         <Route path={`/${routes.start}`} component={Start} />
@@ -112,3 +122,18 @@ export const FlowserRoutes = (): ReactElement => {
     </BrowserRouterEvents>
   );
 };
+
+function ConsentAnalytics() {
+  const [consentAnalyticsSetting, setConsentAnalyticsSetting] =
+    useAnalyticsConsent();
+  const isAlreadySet = consentAnalyticsSetting !== null;
+  if (isAlreadySet) {
+    return null;
+  }
+  return (
+    <ConsentDialog
+      consent={consentAnalyticsSetting ?? true}
+      setConsent={setConsentAnalyticsSetting}
+    />
+  );
+}
