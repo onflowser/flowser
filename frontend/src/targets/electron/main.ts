@@ -1,11 +1,10 @@
 import * as path from "path";
 import { app, BrowserWindow, shell, dialog, ipcMain } from "electron";
-import { ProcessManagerService } from "@flowser/backend";
 import fixPath from "fix-path";
-import * as worker from "./worker";
 import { SentryMainService } from "./services/sentry-main.service";
 import { setupMenu } from "./menu";
 import { ServiceRegistry } from "./services/service-registry";
+import { FlowserBackend } from "./backend";
 
 fixPath();
 
@@ -69,14 +68,12 @@ app.on("activate", function () {
 });
 
 app.on("before-quit", async function (e) {
-  if (!worker.backend) {
-    console.error("worker.backend is not defined");
+  const backend = FlowserBackend.getInstance();
+  if (!backend.app) {
+    console.error("backend.app is not defined");
     return;
   }
-  // Make sure to stop all child processes, so that they don't become orphans
-  const processManagerService = worker.backend.get(ProcessManagerService);
-  const isCleanupComplete = processManagerService.isStoppedAll();
-  if (isCleanupComplete) {
+  if (backend.isCleanupComplete()) {
     return;
   }
   console.log("Doing cleanup before exit");
@@ -86,8 +83,7 @@ app.on("before-quit", async function (e) {
     // Notify renderer process
     win.webContents.send("exit");
 
-    await processManagerService.stopAll();
-    await worker.backend.close();
+    await backend.cleanupAndStop();
   } catch (e) {
     dialog.showMessageBox({
       message: `Couldn't shutdown successfully. Some flow processes may be still running in the background.`,
@@ -102,7 +98,8 @@ app.on("before-quit", async function (e) {
 async function handleStart() {
   try {
     const userDataPath = app.getPath("userData");
-    await worker.start({
+    const backend = FlowserBackend.getInstance();
+    await backend.start({
       userDataPath,
     });
   } catch (error) {
