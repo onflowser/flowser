@@ -41,40 +41,28 @@ const Navigation: FunctionComponent<{
     <div className={classNames(classes.navigationContainer, props.className)}>
       <div className={classes.mainContainer}>
         <div className={classes.navLinksContainer}>
-          <NavigationItem
-            to={`/${routes.accounts}`}
-            totalCounter={tabCount.accounts}
-          >
+          <NavigationItem to={routes.accounts} totalCounter={tabCount.accounts}>
             Accounts
           </NavigationItem>
-          <NavigationItem
-            to={`/${routes.blocks}`}
-            totalCounter={tabCount.blocks}
-          >
+          <NavigationItem to={routes.blocks} totalCounter={tabCount.blocks}>
             Blocks
           </NavigationItem>
           <NavigationItem
-            to={`/${routes.transactions}`}
+            to={routes.transactions}
             totalCounter={tabCount.transactions}
           >
             Transactions
           </NavigationItem>
           <NavigationItem
-            to={`/${routes.contracts}`}
+            to={routes.contracts}
             totalCounter={tabCount.contracts}
           >
             Contracts
           </NavigationItem>
-          <NavigationItem
-            to={`/${routes.events}`}
-            totalCounter={tabCount.events}
-          >
+          <NavigationItem to={routes.events} totalCounter={tabCount.events}>
             Events
           </NavigationItem>
-          <NavigationItem
-            to={`/${routes.project}`}
-            totalCounter={tabCount.project}
-          >
+          <NavigationItem to={routes.project} totalCounter={tabCount.project}>
             Project
           </NavigationItem>
         </div>

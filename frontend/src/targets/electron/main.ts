@@ -43,7 +43,7 @@ async function createWindow() {
 
   win.loadURL(getClientAppUrl());
 
-  await handleStart();
+  await handleBackendStart();
 }
 
 app.on("ready", () => {
@@ -95,18 +95,28 @@ app.on("before-quit", async function (e) {
   }
 });
 
-async function handleStart() {
+async function handleBackendStart() {
   try {
     const userDataPath = app.getPath("userData");
     const backend = FlowserBackend.getInstance();
     await backend.start({
       userDataPath,
     });
+
+    const tempProjectPathFlag = "project-path";
+
+    if (app.commandLine.hasSwitch(tempProjectPathFlag)) {
+      const tempProjectFilesystemPath =
+        app.commandLine.getSwitchValue(tempProjectPathFlag);
+      await backend.startProjectByFilesystemPath({
+        filesystemPath: tempProjectFilesystemPath,
+      });
+    }
   } catch (error) {
     await handleBackendError({
       error,
       window: win,
-      onRestart: handleStart,
+      onRestart: handleBackendStart,
       onQuit: app.quit,
     });
   }

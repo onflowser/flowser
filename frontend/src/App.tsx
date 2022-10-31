@@ -23,7 +23,7 @@ import Transactions from "./pages/transactions/Transactions";
 import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
 import Logs from "./pages/logs/Logs";
-import { ProjectActionsProvider } from "./contexts/project-actions.context";
+import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
 import { Project } from "./pages/project/Project";
@@ -83,13 +83,13 @@ export const FlowserClientApp = ({
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <BrowserRouter>
           <ConfirmDialogProvider>
-            <ProjectActionsProvider>
+            <ProjectProvider>
               <UiStateContextProvider>
                 <PlatformAdapterProvider {...platformAdapter}>
                   <FlowserRoutes />
                 </PlatformAdapterProvider>
               </UiStateContextProvider>
-            </ProjectActionsProvider>
+            </ProjectProvider>
           </ConfirmDialogProvider>
         </BrowserRouter>
       </TimeoutPollingProvider>
@@ -103,18 +103,15 @@ export const FlowserRoutes = (): ReactElement => {
       <ConsentAnalytics />
       <ProjectRequirements />
       <Switch>
-        <Route path={`/${routes.start}`} component={Start} />
-        <RouteWithLayout path={`/${routes.accounts}`} component={Accounts} />
-        <RouteWithLayout path={`/${routes.blocks}`} component={Blocks} />
-        <RouteWithLayout
-          path={`/${routes.transactions}`}
-          component={Transactions}
-        />
-        <RouteWithLayout path={`/${routes.contracts}`} component={Contracts} />
-        <RouteWithLayout path={`/${routes.events}`} component={Events} />
-        <RouteWithLayout path={`/${routes.logs}`} component={Logs} />
-        <RouteWithLayout path={`/${routes.project}`} component={Project} />
-        <Redirect from="*" to={`/${routes.start}`} />
+        <Route path={routes.start} component={Start} />
+        <RouteWithLayout path={routes.accounts} component={Accounts} />
+        <RouteWithLayout path={routes.blocks} component={Blocks} />
+        <RouteWithLayout path={routes.transactions} component={Transactions} />
+        <RouteWithLayout path={routes.contracts} component={Contracts} />
+        <RouteWithLayout path={routes.events} component={Events} />
+        <RouteWithLayout path={routes.logs} component={Logs} />
+        <RouteWithLayout path={routes.project} component={Project} />
+        <Redirect from="*" to={routes.start} />
       </Switch>
       <Toaster
         position="bottom-center"

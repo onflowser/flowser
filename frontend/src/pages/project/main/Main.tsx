@@ -13,7 +13,7 @@ import {
 } from "../../../hooks/use-limited-array";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ProjectItemBadge } from "./ProjectItemBadge";
-import { useProjectActions } from "../../../contexts/project-actions.context";
+import { useProjectActions } from "../../../contexts/project.context";
 import ReactTimeago from "react-timeago";
 import { ExternalLink } from "../../../components/link/ExternalLink";
 import { SizedBox } from "../../../components/sized-box/SizedBox";

@@ -13,13 +13,13 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (this.projectContext.devWallet.run) {
+    if (this.projectContext.shouldRunDevWallet()) {
       await this.start();
     }
   }
 
   async onExitProjectContext() {
-    if (this.projectContext?.devWallet?.run) {
+    if (this.projectContext?.shouldRunDevWallet()) {
       await this.processManagerService.stop(FlowDevWalletService.processId);
       this.processManagerService
         .get(FlowDevWalletService.processId)

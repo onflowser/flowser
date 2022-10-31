@@ -1,5 +1,10 @@
 import path from "path";
-import { createApp, ProcessManagerService } from "@flowser/backend";
+import {
+  createApp,
+  ProcessManagerService,
+  ProjectsService,
+  ProjectEntity,
+} from "@flowser/backend";
 import { INestApplication } from "@nestjs/common";
 import { Logger } from "./services/logger.service";
 
@@ -45,5 +50,16 @@ export class FlowserBackend {
     // Make sure to stop all child processes, so that they don't become orphans
     await processManagerService?.stopAll();
     await this.app?.close();
+  }
+
+  public async startProjectByFilesystemPath(options: {
+    filesystemPath: string;
+  }): Promise<void> {
+    const projectService = this.app?.get(ProjectsService);
+
+    const tempProject = new ProjectEntity();
+    tempProject.filesystemPath = options.filesystemPath;
+
+    await projectService?.useProject(tempProject);
   }
 }

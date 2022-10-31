@@ -43,7 +43,7 @@ import { ActionButton } from "../../../components/action-button/ActionButton";
 import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
 import { useFlow } from "../../../hooks/use-flow";
-import { useProjectActions } from "../../../contexts/project-actions.context";
+import { useProjectActions } from "../../../contexts/project.context";
 import { UserIcon } from "../../../components/user-icon/UserIcon";
 // @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
