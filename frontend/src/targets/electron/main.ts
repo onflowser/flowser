@@ -96,13 +96,28 @@ app.on("before-quit", async function (e) {
 });
 
 async function handleBackendStart() {
+  const backend = FlowserBackend.getInstance();
+
   try {
     const userDataPath = app.getPath("userData");
-    const backend = FlowserBackend.getInstance();
     await backend.start({
       userDataPath,
     });
+  } catch (error) {
+    await handleBackendError({
+      error,
+      window: win,
+      onRestart: handleBackendStart,
+      onQuit: app.quit,
+    });
+  }
 
+  app.commandLine.appendSwitch(
+    "project-path",
+    "/Users/bartkozorog/Projects/flowser-testt"
+  );
+
+  try {
     const tempProjectPathFlag = "project-path";
 
     if (app.commandLine.hasSwitch(tempProjectPathFlag)) {
@@ -112,13 +127,17 @@ async function handleBackendStart() {
         filesystemPath: tempProjectFilesystemPath,
       });
     }
-  } catch (error) {
-    await handleBackendError({
-      error,
-      window: win,
-      onRestart: handleBackendStart,
-      onQuit: app.quit,
+  } catch (e: unknown) {
+    const result = await dialog.showMessageBox(win, {
+      message: `Failed to start project`,
+      detail: isErrorWithMessage(e) ? e.message : undefined,
+      type: "error",
+      buttons: ["Quit"],
     });
+    const quitClicked = result.response == 0;
+    if (quitClicked) {
+      app.exit(1);
+    }
   }
 }
 
@@ -187,4 +206,10 @@ type ErrorWithCode = { code: string };
 
 function isErrorWithCode(error: unknown): error is ErrorWithCode {
   return typeof error === "object" && error !== null && "code" in error;
+}
+
+type ErrorWithMessage = { message: string };
+
+function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
+  return typeof error === "object" && error !== null && "message" in error;
 }
