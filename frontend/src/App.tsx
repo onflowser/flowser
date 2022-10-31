@@ -48,15 +48,17 @@ const BrowserRouterEvents = withRouter(
     const { setSearchTerm } = useSearch();
     const { analyticsService } = ServiceRegistry.getInstance();
 
-    history.listen((location, action) => {
-      analyticsService.track(AnalyticEvent.PAGE_VIEW, {
-        location,
-        action,
+    useEffect(() => {
+      history.listen((location, action) => {
+        analyticsService.track(AnalyticEvent.PAGE_VIEW, {
+          location,
+          action,
+        });
+        if (action === "PUSH") {
+          setSearchTerm("");
+        }
       });
-      if (action === "PUSH") {
-        setSearchTerm("");
-      }
-    });
+    }, []);
 
     useEffect(() => {
       // scroll to the top on every route change
