@@ -39,6 +39,10 @@ func Install() {
 			log.Println("Failed to create install directory")
 			log.Fatal(err)
 		}
+
+		// tar utility is available from Windows build 17063
+		// TODO: consider using other command or a custom implementation
+		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
 		cmd := exec.Command("tar", "-xf", assetDownloadPath, "-C", getInstallDir())
 
 		if out, err := cmd.CombinedOutput(); err != nil {
