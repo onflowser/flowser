@@ -40,15 +40,19 @@ func fileExists(filePath string) (bool, error) {
 }
 
 func Install() error {
-	assetDownloadPath := downloadLatestReleaseAsset()
+	assetDownloadPath, err := downloadLatestReleaseAsset()
+
+	if err != nil {
+		return err
+	}
+
 	defer os.Remove(assetDownloadPath)
 	switch runtime.GOOS {
 	case "darwin":
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd := exec.Command("unzip", assetDownloadPath, "-d", "/Applications")
 
-		if out, err := cmd.CombinedOutput(); err != nil {
-			log.Println(string(out))
+		if err := cmd.Run(); err != nil {
 			return err
 		}
 
@@ -67,8 +71,7 @@ func Install() error {
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
 		cmd := exec.Command("tar", "-xf", assetDownloadPath, "-C", installDir)
 
-		if out, err := cmd.CombinedOutput(); err != nil {
-			log.Println(string(out))
+		if err := cmd.Run(); err != nil {
 			return err
 		}
 
@@ -78,27 +81,30 @@ func Install() error {
 	}
 }
 
-func downloadLatestReleaseAsset() string {
+func downloadLatestReleaseAsset() (string, error) {
 	release, error := getLatestRelease()
 
 	if error != nil {
-		panic(error)
+		return "", error
 	}
 
-	resp, _ := http.Get(*release.asset.BrowserDownloadURL)
+	resp, err := http.Get(*release.asset.BrowserDownloadURL)
+
+	if err != nil {
+		return "", err
+	}
+
 	defer resp.Body.Close()
 
 	out, _ := os.Create(*release.asset.Name)
 	defer out.Close()
 
-	log.Printf("Downloading latest Flowser release %s", release.version)
-
-	_, err := io.Copy(out, resp.Body)
+	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		panic("Install failed")
+		return "", err
 	}
 
-	return out.Name()
+	return out.Name(), nil
 }
 
 type FlowserRelease struct {
@@ -110,7 +116,7 @@ func getLatestRelease() (FlowserRelease, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
-		log.Fatal(err)
+		return FlowserRelease{}, err
 	}
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
 	targetAssetName, err := getAssetName(latestVersion)
