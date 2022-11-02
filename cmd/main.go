@@ -17,7 +17,7 @@ import (
 
 func IsInstalled() bool {
 	_, err := os.Stat(getInstallDir())
-	return os.IsNotExist(err)
+	return !os.IsNotExist(err)
 }
 
 func Install() {
@@ -25,7 +25,7 @@ func Install() {
 	defer os.Remove(assetDownloadPath)
 	switch runtime.GOOS {
 	case "darwin":
-		uz := unzip.New(assetDownloadPath, "/Applications")
+		uz := unzip.New(assetDownloadPath, "./test")
 		uz.Extract()
 	default:
 		panic("Not implemented")
@@ -33,12 +33,14 @@ func Install() {
 }
 
 func downloadLatestReleaseAsset() string {
-	releaseAsset := getLatestReleaseAsset()
+	releaseAsset, releaseVersion := getLatestRelease()
 	resp, _ := http.Get(*releaseAsset.BrowserDownloadURL)
 	defer resp.Body.Close()
 
 	out, _ := os.Create(*releaseAsset.Name)
 	defer out.Close()
+
+	log.Printf("Downloading latest Flowser release %s", releaseVersion)
 
 	_, err := io.Copy(out, resp.Body)
 	if err != nil {
@@ -48,7 +50,7 @@ func downloadLatestReleaseAsset() string {
 	return out.Name()
 }
 
-func getLatestReleaseAsset() github.ReleaseAsset {
+func getLatestRelease() (github.ReleaseAsset, string) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
@@ -57,14 +59,14 @@ func getLatestReleaseAsset() github.ReleaseAsset {
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
 	for _, asset := range release.Assets {
 		if *asset.Name == getAssetName(latestVersion) {
-			return asset
+			return asset, latestVersion
 		}
 	}
 	panic("No asset found")
 }
 
 func getAssetName(version string) string {
-	isArm := runtime.GOARCH == "arm"
+	isArm := strings.HasPrefix(runtime.GOARCH, "arm")
 	switch runtime.GOOS {
 	case "darwin":
 		if isArm {
@@ -105,6 +107,7 @@ func runDarwin(location string) {
 func main() {
 	// TODO: Add proper error handling
 	// TODO: Implement windows logic
+	fmt.Println(IsInstalled())
 	Install()
 	Run("/Users/bartkozorog/Projects/flowser-test")
 }
