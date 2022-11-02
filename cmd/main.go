@@ -17,12 +17,23 @@ import (
 	"github.com/google/go-github/github"
 )
 
-func IsInstalled() bool {
-	_, err := os.Stat(getExecutableFile())
-	return !os.IsNotExist(err)
+var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
+
+func IsInstalled() (bool, error) {
+	execFilePath, execFileErr := getExecutableFile()
+
+	if execFileErr != nil {
+		return false, execFileErr
+	}
+
+	_, err := os.Stat(execFilePath)
+	if os.IsNotExist(err) {
+		return true, nil
+	}
+	return false, nil
 }
 
-func Install() {
+func Install() error {
 	assetDownloadPath := downloadLatestReleaseAsset()
 	defer os.Remove(assetDownloadPath)
 	switch runtime.GOOS {
@@ -32,25 +43,32 @@ func Install() {
 
 		if out, err := cmd.CombinedOutput(); err != nil {
 			log.Println(string(out))
-			log.Fatal(err)
+			return err
 		}
+
+		return nil
 	case "windows":
-		if err := os.Mkdir(getInstallDir(), os.ModePerm); err != nil {
-			log.Println("Failed to create install directory")
-			log.Fatal(err)
+		installDir, err := getInstallDir()
+		if err != nil {
+			return err
+		}
+		if err := os.Mkdir(installDir, os.ModePerm); err != nil {
+			return err
 		}
 
 		// tar utility is available from Windows build 17063
 		// TODO: consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
-		cmd := exec.Command("tar", "-xf", assetDownloadPath, "-C", getInstallDir())
+		cmd := exec.Command("tar", "-xf", assetDownloadPath, "-C", installDir)
 
 		if out, err := cmd.CombinedOutput(); err != nil {
 			log.Println(string(out))
-			log.Fatal(err)
+			return err
 		}
+
+		return nil
 	default:
-		panic("not implemented")
+		return errorPlatformNotSupported
 	}
 }
 
@@ -89,8 +107,12 @@ func getLatestRelease() (FlowserRelease, error) {
 		log.Fatal(err)
 	}
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
+	targetAssetName, err := getAssetName(latestVersion)
+	if err != nil {
+		return FlowserRelease{}, err
+	}
 	for _, asset := range release.Assets {
-		if *asset.Name == getAssetName(latestVersion) {
+		if *asset.Name == targetAssetName {
 			return FlowserRelease{
 				version: latestVersion,
 				asset:   asset,
@@ -100,63 +122,84 @@ func getLatestRelease() (FlowserRelease, error) {
 	return FlowserRelease{}, errors.New("no asset found")
 }
 
-func getAssetName(version string) string {
+func getAssetName(version string) (string, error) {
 	isArm := strings.HasPrefix(runtime.GOARCH, "arm")
 	switch runtime.GOOS {
 	case "darwin":
 		if isArm {
-			return fmt.Sprintf("Flowser-%s-arm64-mac.zip", version)
+			return fmt.Sprintf("Flowser-%s-arm64-mac.zip", version), nil
 		} else {
-			return fmt.Sprintf("Flowser-%s-mac.zip", version)
+			return fmt.Sprintf("Flowser-%s-mac.zip", version), nil
 		}
 	case "windows":
-		return fmt.Sprintf("Flowser-%s-win.zip", version)
+		return fmt.Sprintf("Flowser-%s-win.zip", version), nil
 	default:
-		panic("Not implemented")
+		return "", errorPlatformNotSupported
 	}
 }
 
-func getInstallDir() string {
+func getInstallDir() (string, error) {
 	switch runtime.GOOS {
 	case "darwin":
-		return "/Applications/Flowser.app"
+		return "/Applications/Flowser.app", nil
 	case "windows":
 		// TODO: Search in common install directories
 		// https://superuser.com/questions/1327037/what-choices-do-i-have-about-where-to-install-software-on-windows-10
 		user, err := user.Current()
 		if err != nil {
-			log.Fatalf(err.Error())
+			return "", err
 		}
-		return fmt.Sprintf("%s\\AppData\\Local\\Programs\\Flowser", user.HomeDir)
+		return fmt.Sprintf("%s\\AppData\\Local\\Programs\\Flowser", user.HomeDir), nil
 	default:
-		panic("Not implemented")
+		return "", errorPlatformNotSupported
 	}
 }
 
-func getExecutableFile() string {
+func getExecutableFile() (string, error) {
+	installDir, err := getInstallDir()
+	if err != nil {
+		return "", err
+	}
 	switch runtime.GOOS {
 	case "darwin":
-		return path.Join(getInstallDir(), "Contents/MacOS/Flowser")
+		return path.Join(installDir, "Contents/MacOS/Flowser"), nil
 	case "windows":
-		return path.Join(getInstallDir(), "Flowser.exe")
+		return path.Join(installDir, "Flowser.exe"), nil
 	default:
-		panic("Not implemented")
+		return "", errorPlatformNotSupported
 	}
 }
 
-func Run(location string) {
-	cmd := exec.Command(getExecutableFile(), fmt.Sprintf("--project-path=%s", location))
-	if err := cmd.Run(); err != nil {
-		log.Fatal(err)
+func Run(location string) error {
+	execFilePath, err := getExecutableFile()
+	if err != nil {
+		return err
 	}
+	cmd := exec.Command(execFilePath, fmt.Sprintf("--project-path=%s", location))
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func main() {
-	// TODO: Add proper error handling
-	if IsInstalled() {
+	isInstalled, installCheckError := IsInstalled()
+	if installCheckError != nil {
+		log.Fatalf("Installation check failed: %s", installCheckError)
+	}
+	if isInstalled {
 		log.Println("Flowser is already installed")
 	} else {
-		Install()
+		log.Println("Installing latest Flowser version")
+		installError := Install()
+		if installError != nil {
+			log.Fatalf("Failed to install: %s", installError)
+		}
+		log.Println("Flowser installed successfully")
 	}
-	Run("/path/to/flow/project")
+	log.Println("Starting Flowser")
+	runError := Run("/path/to/flow/project")
+	if runError != nil {
+		log.Fatalf("Failed to run: %s", runError)
+	}
 }
