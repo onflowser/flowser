@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/user"
+	"path"
 	"runtime"
 	"strings"
 
@@ -15,7 +18,7 @@ import (
 )
 
 func IsInstalled() bool {
-	_, err := os.Stat(getInstallDir())
+	_, err := os.Stat(getExecutableFile())
 	return !os.IsNotExist(err)
 }
 
@@ -31,13 +34,29 @@ func Install() {
 			log.Println(string(out))
 			log.Fatal(err)
 		}
+	case "windows":
+		if err := os.Mkdir(getInstallDir(), os.ModePerm); err != nil {
+			log.Println("Failed to create install directory")
+			log.Fatal(err)
+		}
+		cmd := exec.Command("tar", "-xf", assetDownloadPath, "-C", getInstallDir())
+
+		if out, err := cmd.CombinedOutput(); err != nil {
+			log.Println(string(out))
+			log.Fatal(err)
+		}
 	default:
 		panic("Not implemented")
 	}
 }
 
 func downloadLatestReleaseAsset() string {
-	releaseAsset, releaseVersion := getLatestRelease()
+	releaseAsset, releaseVersion, error := getLatestRelease()
+
+	if error != nil {
+		panic(error)
+	}
+
 	resp, _ := http.Get(*releaseAsset.BrowserDownloadURL)
 	defer resp.Body.Close()
 
@@ -54,7 +73,7 @@ func downloadLatestReleaseAsset() string {
 	return out.Name()
 }
 
-func getLatestRelease() (github.ReleaseAsset, string) {
+func getLatestRelease() (github.ReleaseAsset, string, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
@@ -63,10 +82,11 @@ func getLatestRelease() (github.ReleaseAsset, string) {
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
 	for _, asset := range release.Assets {
 		if *asset.Name == getAssetName(latestVersion) {
-			return asset, latestVersion
+			return asset, latestVersion, nil
 		}
 	}
-	panic("No asset found")
+	// TODO: Refactor to 2 return values
+	return github.ReleaseAsset{}, latestVersion, errors.New("No asset found")
 }
 
 func getAssetName(version string) string {
@@ -78,6 +98,8 @@ func getAssetName(version string) string {
 		} else {
 			return fmt.Sprintf("Flowser-%s-mac.zip", version)
 		}
+	case "windows":
+		return fmt.Sprintf("Flowser-%s-win.zip", version)
 	default:
 		panic("Not implemented")
 	}
@@ -87,22 +109,30 @@ func getInstallDir() string {
 	switch runtime.GOOS {
 	case "darwin":
 		return "/Applications/Flowser.app"
+	case "windows":
+		user, err := user.Current()
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+		return fmt.Sprintf("%s\\AppData\\Local\\Programs\\Flowser", user.HomeDir)
+	default:
+		panic("Not implemented")
+	}
+}
+
+func getExecutableFile() string {
+	switch runtime.GOOS {
+	case "darwin":
+		return path.Join(getInstallDir(), "Contents/MacOS/Flowser")
+	case "windows":
+		return path.Join(getInstallDir(), "Flowser.exe")
 	default:
 		panic("Not implemented")
 	}
 }
 
 func Run(location string) {
-	switch runtime.GOOS {
-	case "darwin":
-		runDarwin(location)
-	default:
-		panic("Not implemented")
-	}
-}
-
-func runDarwin(location string) {
-	cmd := exec.Command("/Applications/Flowser.app/Contents/MacOS/Flowser", fmt.Sprintf("--project-path=%s", location))
+	cmd := exec.Command(getExecutableFile(), fmt.Sprintf("--project-path=%s", location))
 	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -110,9 +140,8 @@ func runDarwin(location string) {
 
 func main() {
 	// TODO: Add proper error handling
-	// TODO: Implement windows logic
 	if IsInstalled() {
-		log.Println("Flowser is already installed in /Applications/Flowser.app")
+		log.Println("Flowser is already installed")
 	} else {
 		Install()
 	}
