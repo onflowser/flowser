@@ -26,11 +26,17 @@ func IsInstalled() (bool, error) {
 		return false, execFileErr
 	}
 
-	_, err := os.Stat(execFilePath)
-	if os.IsNotExist(err) {
+	return fileExists(execFilePath)
+}
+
+func fileExists(filePath string) (bool, error) {
+	if _, err := os.Stat(filePath); err == nil {
 		return true, nil
+	} else if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	} else {
+		return false, err
 	}
-	return false, nil
 }
 
 func Install() error {
