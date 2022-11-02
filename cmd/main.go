@@ -46,24 +46,24 @@ func Install() {
 			log.Fatal(err)
 		}
 	default:
-		panic("Not implemented")
+		panic("not implemented")
 	}
 }
 
 func downloadLatestReleaseAsset() string {
-	releaseAsset, releaseVersion, error := getLatestRelease()
+	release, error := getLatestRelease()
 
 	if error != nil {
 		panic(error)
 	}
 
-	resp, _ := http.Get(*releaseAsset.BrowserDownloadURL)
+	resp, _ := http.Get(*release.asset.BrowserDownloadURL)
 	defer resp.Body.Close()
 
-	out, _ := os.Create(*releaseAsset.Name)
+	out, _ := os.Create(*release.asset.Name)
 	defer out.Close()
 
-	log.Printf("Downloading latest Flowser release %s", releaseVersion)
+	log.Printf("Downloading latest Flowser release %s", release.version)
 
 	_, err := io.Copy(out, resp.Body)
 	if err != nil {
@@ -73,7 +73,12 @@ func downloadLatestReleaseAsset() string {
 	return out.Name()
 }
 
-func getLatestRelease() (github.ReleaseAsset, string, error) {
+type FlowserRelease struct {
+	version string
+	asset   github.ReleaseAsset
+}
+
+func getLatestRelease() (FlowserRelease, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
@@ -82,11 +87,13 @@ func getLatestRelease() (github.ReleaseAsset, string, error) {
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
 	for _, asset := range release.Assets {
 		if *asset.Name == getAssetName(latestVersion) {
-			return asset, latestVersion, nil
+			return FlowserRelease{
+				version: latestVersion,
+				asset:   asset,
+			}, nil
 		}
 	}
-	// TODO: Refactor to 2 return values
-	return github.ReleaseAsset{}, latestVersion, errors.New("No asset found")
+	return FlowserRelease{}, errors.New("no asset found")
 }
 
 func getAssetName(version string) string {
@@ -110,6 +117,8 @@ func getInstallDir() string {
 	case "darwin":
 		return "/Applications/Flowser.app"
 	case "windows":
+		// TODO: Search in common install directories
+		// https://superuser.com/questions/1327037/what-choices-do-i-have-about-where-to-install-software-on-windows-10
 		user, err := user.Current()
 		if err != nil {
 			log.Fatalf(err.Error())
