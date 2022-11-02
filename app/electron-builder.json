@@ -60,12 +60,24 @@
         "arch": [
           "x64"
         ]
+      },
+      {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      },
+      {
+        "target": "zip",
+        "arch": [
+          "x64"
+        ]
       }
     ]
   },
   "nsis": {
     "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
+    "allowToChangeInstallationDirectory": false,
     "deleteAppDataOnUninstall": true,
     "artifactName": "Flowser-${version}-${os}-${arch}-setup.${ext}"
   },
