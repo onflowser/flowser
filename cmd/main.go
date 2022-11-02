@@ -11,7 +11,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/artdarek/go-unzip"
 	"github.com/google/go-github/github"
 )
 
@@ -25,14 +24,13 @@ func Install() {
 	defer os.Remove(assetDownloadPath)
 	switch runtime.GOOS {
 	case "darwin":
-		// TODO: Unzipped app fails to run
-		// Termination Reason:    Namespace DYLD, Code 1 Library missing
-		// Library not loaded: '@rpath/Electron Framework.framework/Electron Framework'
-		// Referenced from: '/Users/USER/*/Flowser.app/Contents/MacOS/Flowser'
-		// Reason: tried: '' (not a mach-o file), '' (not a mach-o file), '' (no such file)
-		// (terminated at launch; ignore backtrace)
-		uz := unzip.New(assetDownloadPath, "/Applications")
-		uz.Extract()
+		// Use native unzip tool as it handles the creation of required symbolic links
+		cmd := exec.Command("unzip", assetDownloadPath, "-d", "/Applications")
+
+		if out, err := cmd.CombinedOutput(); err != nil {
+			log.Println(string(out))
+			log.Fatal(err)
+		}
 	default:
 		panic("Not implemented")
 	}
@@ -118,5 +116,5 @@ func main() {
 	} else {
 		Install()
 	}
-	// Now call Run("/path/to/flow/project")
+	Run("/path/to/flow/project")
 }
