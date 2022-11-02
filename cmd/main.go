@@ -20,10 +20,10 @@ import (
 var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
 
 func IsInstalled() (bool, error) {
-	execFilePath, execFileErr := getExecutableFile()
+	execFilePath, err := getExecutableFile()
 
-	if execFileErr != nil {
-		return false, execFileErr
+	if err != nil {
+		return false, err
 	}
 
 	return fileExists(execFilePath)
@@ -47,16 +47,12 @@ func Install() error {
 	}
 
 	defer os.Remove(assetDownloadPath)
+
+	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin":
 		// Use native unzip tool as it handles the creation of required symbolic links
-		cmd := exec.Command("unzip", assetDownloadPath, "-d", "/Applications")
-
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-
-		return nil
+		cmd = exec.Command("unzip", assetDownloadPath, "-d", "/Applications")
 	case "windows":
 		installDir, err := getInstallDir()
 		if err != nil {
@@ -67,25 +63,25 @@ func Install() error {
 		}
 
 		// tar utility is available from Windows build 17063
-		// TODO: consider using other command or a custom implementation
+		// consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
-		cmd := exec.Command("tar", "-xf", assetDownloadPath, "-C", installDir)
-
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-
-		return nil
+		cmd = exec.Command("tar", "-xf", assetDownloadPath, "-C", installDir)
 	default:
 		return errorPlatformNotSupported
 	}
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func downloadLatestReleaseAsset() (string, error) {
-	release, error := getLatestRelease()
+	release, err := getLatestRelease()
 
-	if error != nil {
-		return "", error
+	if err != nil {
+		return "", err
 	}
 
 	resp, err := http.Get(*release.asset.BrowserDownloadURL)
@@ -112,26 +108,26 @@ type FlowserRelease struct {
 	asset   github.ReleaseAsset
 }
 
-func getLatestRelease() (FlowserRelease, error) {
+func getLatestRelease() (*FlowserRelease, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
-		return FlowserRelease{}, err
+		return nil, err
 	}
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
 	targetAssetName, err := getAssetName(latestVersion)
 	if err != nil {
-		return FlowserRelease{}, err
+		return nil, err
 	}
 	for _, asset := range release.Assets {
 		if *asset.Name == targetAssetName {
-			return FlowserRelease{
+			return &FlowserRelease{
 				version: latestVersion,
 				asset:   asset,
 			}, nil
 		}
 	}
-	return FlowserRelease{}, errors.New("no asset found")
+	return nil, errors.New("no asset found")
 }
 
 func getAssetName(version string) (string, error) {
@@ -195,23 +191,23 @@ func Run(location string) error {
 }
 
 func main() {
-	isInstalled, installCheckError := IsInstalled()
-	if installCheckError != nil {
-		log.Fatalf("Installation check failed: %s", installCheckError)
+	isInstalled, err := IsInstalled()
+	if err != nil {
+		log.Fatalf("Installation check failed: %s", err)
 	}
 	if isInstalled {
 		log.Println("Flowser is already installed")
 	} else {
 		log.Println("Installing latest Flowser version")
-		installError := Install()
-		if installError != nil {
-			log.Fatalf("Failed to install: %s", installError)
+		err := Install()
+		if err != nil {
+			log.Fatalf("Failed to install: %s", err)
 		}
 		log.Println("Flowser installed successfully")
 	}
 	log.Println("Starting Flowser")
-	runError := Run("/path/to/flow/project")
-	if runError != nil {
-		log.Fatalf("Failed to run: %s", runError)
+	err = Run("/path/to/flow/project")
+	if err != nil {
+		log.Fatalf("Failed to run: %s", err)
 	}
 }
