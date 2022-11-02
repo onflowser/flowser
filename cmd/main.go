@@ -25,7 +25,13 @@ func Install() {
 	defer os.Remove(assetDownloadPath)
 	switch runtime.GOOS {
 	case "darwin":
-		uz := unzip.New(assetDownloadPath, "./test")
+		// TODO: Unzipped app fails to run
+		// Termination Reason:    Namespace DYLD, Code 1 Library missing
+		// Library not loaded: '@rpath/Electron Framework.framework/Electron Framework'
+		// Referenced from: '/Users/USER/*/Flowser.app/Contents/MacOS/Flowser'
+		// Reason: tried: '' (not a mach-o file), '' (not a mach-o file), '' (no such file)
+		// (terminated at launch; ignore backtrace)
+		uz := unzip.New(assetDownloadPath, "/Applications")
 		uz.Extract()
 	default:
 		panic("Not implemented")
@@ -107,7 +113,10 @@ func runDarwin(location string) {
 func main() {
 	// TODO: Add proper error handling
 	// TODO: Implement windows logic
-	fmt.Println(IsInstalled())
-	Install()
-	Run("/Users/bartkozorog/Projects/flowser-test")
+	if IsInstalled() {
+		log.Println("Flowser is already installed in /Applications/Flowser.app")
+	} else {
+		Install()
+	}
+	// Now call Run("/path/to/flow/project")
 }
