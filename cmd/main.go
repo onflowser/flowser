@@ -20,7 +20,8 @@ import (
 var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
 
 func IsInstalled() (bool, error) {
-	execFilePath, err := getExecutableFile()
+	platform := runtime.GOOS
+	execFilePath, err := getExecutableFile(platform)
 
 	if err != nil {
 		return false, err
@@ -39,8 +40,9 @@ func fileExists(filePath string) (bool, error) {
 	}
 }
 
-func Install() error {
-	assetDownloadPath, err := downloadLatestReleaseAsset()
+func Install(location string) error {
+	platform := runtime.GOOS
+	assetDownloadPath, err := downloadLatestReleaseAsset(platform)
 
 	if err != nil {
 		return err
@@ -49,12 +51,12 @@ func Install() error {
 	defer os.Remove(assetDownloadPath)
 
 	var cmd *exec.Cmd
-	switch runtime.GOOS {
+	switch platform {
 	case "darwin":
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", assetDownloadPath, "-d", "/Applications")
 	case "windows":
-		installDir, err := getInstallDir()
+		installDir, err := getInstallDir("windows")
 		if err != nil {
 			return err
 		}
@@ -77,8 +79,8 @@ func Install() error {
 	return nil
 }
 
-func downloadLatestReleaseAsset() (string, error) {
-	release, err := getLatestRelease()
+func downloadLatestReleaseAsset(platform string) (string, error) {
+	release, err := getLatestRelease(platform)
 
 	if err != nil {
 		return "", err
@@ -108,14 +110,14 @@ type FlowserRelease struct {
 	asset   github.ReleaseAsset
 }
 
-func getLatestRelease() (*FlowserRelease, error) {
+func getLatestRelease(platform string) (*FlowserRelease, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
 		return nil, err
 	}
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
-	targetAssetName, err := getAssetName(latestVersion)
+	targetAssetName, err := getAssetName(platform, latestVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -130,9 +132,9 @@ func getLatestRelease() (*FlowserRelease, error) {
 	return nil, errors.New("no asset found")
 }
 
-func getAssetName(version string) (string, error) {
+func getAssetName(platform string, version string) (string, error) {
 	isArm := strings.HasPrefix(runtime.GOARCH, "arm")
-	switch runtime.GOOS {
+	switch platform {
 	case "darwin":
 		if isArm {
 			return fmt.Sprintf("Flowser-%s-arm64-mac.zip", version), nil
@@ -146,8 +148,8 @@ func getAssetName(version string) (string, error) {
 	}
 }
 
-func getInstallDir() (string, error) {
-	switch runtime.GOOS {
+func getInstallDir(platform string) (string, error) {
+	switch platform {
 	case "darwin":
 		return "/Applications/Flowser.app", nil
 	case "windows":
@@ -163,12 +165,12 @@ func getInstallDir() (string, error) {
 	}
 }
 
-func getExecutableFile() (string, error) {
-	installDir, err := getInstallDir()
+func getExecutableFile(platform string) (string, error) {
+	installDir, err := getInstallDir(platform)
 	if err != nil {
 		return "", err
 	}
-	switch runtime.GOOS {
+	switch platform {
 	case "darwin":
 		return path.Join(installDir, "Contents/MacOS/Flowser"), nil
 	case "windows":
@@ -178,12 +180,13 @@ func getExecutableFile() (string, error) {
 	}
 }
 
-func Run(location string) error {
-	execFilePath, err := getExecutableFile()
+func Run(projectPath string) error {
+	platform := runtime.GOOS
+	execFilePath, err := getExecutableFile(platform)
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command(execFilePath, fmt.Sprintf("--project-path=%s", location))
+	cmd := exec.Command(execFilePath, fmt.Sprintf("--project-path=%s", projectPath))
 	if err := cmd.Run(); err != nil {
 		return err
 	}
@@ -199,7 +202,7 @@ func main() {
 		log.Println("Flowser is already installed")
 	} else {
 		log.Println("Installing latest Flowser version")
-		err := Install()
+		err := Install("")
 		if err != nil {
 			log.Fatalf("Failed to install: %s", err)
 		}
