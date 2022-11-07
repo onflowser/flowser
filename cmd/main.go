@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -19,9 +18,10 @@ import (
 
 var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
 
-func IsInstalled() (bool, error) {
+func IsInstalled(customInstallDir string) (bool, error) {
 	platform := runtime.GOOS
-	execFilePath, err := getExecutableFile(platform)
+
+	execFilePath, err := getExecutableFile(customInstallDir, platform)
 
 	if err != nil {
 		return false, err
@@ -30,7 +30,7 @@ func IsInstalled() (bool, error) {
 	return fileExists(execFilePath)
 }
 
-func Install() error {
+func Install(customInstallDir string) error {
 	platform := runtime.GOOS
 	assetDownloadPath, err := downloadLatestReleaseAsset(platform)
 
@@ -40,20 +40,18 @@ func Install() error {
 
 	defer os.Remove(assetDownloadPath)
 
+	installDir, err := getInstallDir(customInstallDir, platform)
+	if err != nil {
+		return err
+	}
+
 	var cmd *exec.Cmd
 	switch platform {
 	case "darwin":
-		installDir, err := getInstallDir(platform)
-		if err != nil {
-			return err
-		}
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", assetDownloadPath, "-d", installDir)
 	case "windows":
-		rootDir, err := getAppRootDir(platform)
-		if err != nil {
-			return err
-		}
+		rootDir := getAppRootDir(installDir, platform)
 		if err := os.Mkdir(rootDir, os.ModePerm); err != nil {
 			return err
 		}
@@ -69,13 +67,17 @@ func Install() error {
 	return cmd.Run()
 }
 
-func Run(projectPath string) error {
+func Run(customInstallPath string, flowProjectPath string) error {
 	platform := runtime.GOOS
-	execFilePath, err := getExecutableFile(platform)
+	installDir, err := getInstallDir(customInstallPath, platform)
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command(execFilePath, fmt.Sprintf("--project-path=%s", projectPath))
+	execFilePath, err := getExecutableFile(installDir, platform)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command(execFilePath, fmt.Sprintf("--project-path=%s", flowProjectPath))
 
 	return cmd.Run()
 }
@@ -158,7 +160,7 @@ func getAssetName(platform string, version string) (string, error) {
 	}
 }
 
-func getExecutableFile(platform string) (string, error) {
+func getExecutableFile(installDir string, platform string) (string, error) {
 	files := map[string]string{
 		"darwin":  "Contents/MacOS/Flowser",
 		"windows": "Flowser.exe",
@@ -167,22 +169,19 @@ func getExecutableFile(platform string) (string, error) {
 	if !ok {
 		return "", errorPlatformNotSupported
 	}
-	rootPath, err := getAppRootDir(platform)
-	if err != nil {
-		return "", nil
-	}
+	rootPath := getAppRootDir(installDir, platform)
 	return path.Join(rootPath, file), nil
 }
 
-func getAppRootDir(platform string) (string, error) {
-	installDir, err := getInstallDir(platform)
-	if err != nil {
-		return "", err
-	}
-	return path.Join(installDir, "Flowser"), nil
+func getAppRootDir(installDir string, platform string) string {
+	return path.Join(installDir, "Flowser")
 }
 
-func getInstallDir(platform string) (string, error) {
+func getInstallDir(customInstallDir string, platform string) (string, error) {
+	if customInstallDir != "" {
+		return customInstallDir, nil
+	}
+
 	switch platform {
 	case "darwin":
 		return "/Applications", nil
@@ -196,27 +195,5 @@ func getInstallDir(platform string) (string, error) {
 		return fmt.Sprintf("%s\\AppData\\Local\\Programs", user.HomeDir), nil
 	default:
 		return "", errorPlatformNotSupported
-	}
-}
-
-func main() {
-	isInstalled, err := IsInstalled()
-	if err != nil {
-		log.Fatalf("Installation check failed: %s", err)
-	}
-	if isInstalled {
-		log.Println("Flowser is already installed")
-	} else {
-		log.Println("Installing latest Flowser version")
-		err := Install()
-		if err != nil {
-			log.Fatalf("Failed to install: %s", err)
-		}
-		log.Println("Flowser installed successfully")
-	}
-	log.Println("Starting Flowser")
-	err = Run("/path/to/flow/project")
-	if err != nil {
-		log.Fatalf("Failed to run: %s", err)
 	}
 }
