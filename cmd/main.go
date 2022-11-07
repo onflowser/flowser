@@ -16,12 +16,15 @@ import (
 	"github.com/google/go-github/github"
 )
 
+type FlowserApp struct {
+	installDir string
+	platform   string
+}
+
 var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
 
-func IsInstalled(customInstallDir string) (bool, error) {
-	platform := runtime.GOOS
-
-	execFilePath, err := getExecutableFile(customInstallDir, platform)
+func (app FlowserApp) IsInstalled() (bool, error) {
+	execFilePath, err := getExecutableFile(app.installDir, app.platform)
 
 	if err != nil {
 		return false, err
@@ -30,30 +33,29 @@ func IsInstalled(customInstallDir string) (bool, error) {
 	return fileExists(execFilePath)
 }
 
-func Install(customInstallDir string) error {
-	platform := runtime.GOOS
-	assetDownloadPath, err := downloadLatestReleaseAsset(platform)
+func (app FlowserApp) Install() (string, error) {
+	assetDownloadPath, err := downloadLatestReleaseAsset(app.platform)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	defer os.Remove(assetDownloadPath)
 
-	installDir, err := getInstallDir(customInstallDir, platform)
+	installDir, err := getInstallDir(app.installDir, app.platform)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var cmd *exec.Cmd
-	switch platform {
+	switch app.platform {
 	case "darwin":
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", assetDownloadPath, "-d", installDir)
 	case "windows":
-		rootDir := getAppRootDir(installDir, platform)
+		rootDir := getAppRootDir(installDir, app.platform)
 		if err := os.Mkdir(rootDir, os.ModePerm); err != nil {
-			return err
+			return installDir, err
 		}
 
 		// tar utility is available from Windows build 17063
@@ -61,19 +63,18 @@ func Install(customInstallDir string) error {
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
 		cmd = exec.Command("tar", "-xf", assetDownloadPath, "-C", rootDir)
 	default:
-		return errorPlatformNotSupported
+		return installDir, errorPlatformNotSupported
 	}
 
-	return cmd.Run()
+	return installDir, cmd.Run()
 }
 
-func Run(customInstallPath string, flowProjectPath string) error {
-	platform := runtime.GOOS
-	installDir, err := getInstallDir(customInstallPath, platform)
+func (app FlowserApp) Run(flowProjectPath string) error {
+	installDir, err := getInstallDir(app.installDir, app.platform)
 	if err != nil {
 		return err
 	}
-	execFilePath, err := getExecutableFile(installDir, platform)
+	execFilePath, err := getExecutableFile(installDir, app.platform)
 	if err != nil {
 		return err
 	}
@@ -118,12 +119,12 @@ func downloadLatestReleaseAsset(platform string) (string, error) {
 	return out.Name(), nil
 }
 
-type FlowserRelease struct {
+type flowserRelease struct {
 	version string
 	asset   github.ReleaseAsset
 }
 
-func getLatestRelease(platform string) (*FlowserRelease, error) {
+func getLatestRelease(platform string) (*flowserRelease, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
@@ -136,7 +137,7 @@ func getLatestRelease(platform string) (*FlowserRelease, error) {
 	}
 	for _, asset := range release.Assets {
 		if *asset.Name == targetAssetName {
-			return &FlowserRelease{
+			return &flowserRelease{
 				version: latestVersion,
 				asset:   asset,
 			}, nil
@@ -174,7 +175,7 @@ func getExecutableFile(installDir string, platform string) (string, error) {
 }
 
 func getAppRootDir(installDir string, platform string) string {
-	return path.Join(installDir, "Flowser")
+	return path.Join(installDir, "Flowser.app")
 }
 
 func getInstallDir(customInstallDir string, platform string) (string, error) {
