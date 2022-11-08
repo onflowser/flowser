@@ -24,7 +24,11 @@ type FlowserApp struct {
 var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
 
 func (app FlowserApp) IsInstalled() (bool, error) {
-	execFilePath, err := getExecutableFile(app.installDir, app.platform)
+	platform := app.platform
+	if platform == "" {
+		platform = runtime.GOOS
+	}
+	execFilePath, err := getExecutableFile(app.installDir, platform)
 
 	if err != nil {
 		return false, err
@@ -34,7 +38,11 @@ func (app FlowserApp) IsInstalled() (bool, error) {
 }
 
 func (app FlowserApp) Install() (string, error) {
-	assetDownloadPath, err := downloadLatestReleaseAsset(app.platform)
+	platform := app.platform
+	if platform == "" {
+		platform = runtime.GOOS
+	}
+	assetDownloadPath, err := downloadLatestReleaseAsset(platform)
 
 	if err != nil {
 		return "", err
@@ -42,18 +50,18 @@ func (app FlowserApp) Install() (string, error) {
 
 	defer os.Remove(assetDownloadPath)
 
-	installDir, err := getInstallDir(app.installDir, app.platform)
+	installDir, err := getInstallDir(app.installDir, platform)
 	if err != nil {
 		return "", err
 	}
 
 	var cmd *exec.Cmd
-	switch app.platform {
+	switch platform {
 	case "darwin":
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", assetDownloadPath, "-d", installDir)
 	case "windows":
-		rootDir := getAppRootDir(installDir, app.platform)
+		rootDir := getAppRootDir(installDir, platform)
 		if err := os.Mkdir(rootDir, os.ModePerm); err != nil {
 			return installDir, err
 		}
@@ -70,11 +78,15 @@ func (app FlowserApp) Install() (string, error) {
 }
 
 func (app FlowserApp) Run(flowProjectPath string) error {
-	installDir, err := getInstallDir(app.installDir, app.platform)
+	platform := app.platform
+	if platform == "" {
+		platform = runtime.GOOS
+	}
+	installDir, err := getInstallDir(app.installDir, platform)
 	if err != nil {
 		return err
 	}
-	execFilePath, err := getExecutableFile(installDir, app.platform)
+	execFilePath, err := getExecutableFile(installDir, platform)
 	if err != nil {
 		return err
 	}
