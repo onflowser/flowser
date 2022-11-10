@@ -5,6 +5,7 @@ import { SentryMainService } from "./services/sentry-main.service";
 import { setupMenu } from "./menu";
 import { ServiceRegistry } from "./services/service-registry";
 import { FlowserBackend } from "./backend";
+import { ProjectEntity } from "@flowser/backend";
 
 fixPath();
 
@@ -112,20 +113,25 @@ async function handleBackendStart() {
     });
   }
 
-  app.commandLine.appendSwitch(
-    "project-path",
-    "/Users/bartkozorog/Projects/flowser-testt"
-  );
-
   try {
-    const tempProjectPathFlag = "project-path";
+    const { hasSwitch, getSwitchValue } = app.commandLine;
 
-    if (app.commandLine.hasSwitch(tempProjectPathFlag)) {
-      const tempProjectFilesystemPath =
-        app.commandLine.getSwitchValue(tempProjectPathFlag);
-      await backend.startProjectByFilesystemPath({
-        filesystemPath: tempProjectFilesystemPath,
-      });
+    const temporaryProjectFlags = {
+      projectPath: "project-path",
+    };
+
+    const shouldStartTemporaryProject = hasSwitch(
+      temporaryProjectFlags.projectPath
+    );
+
+    if (shouldStartTemporaryProject) {
+      const project = new ProjectEntity();
+
+      project.filesystemPath = getSwitchValue(
+        temporaryProjectFlags.projectPath
+      );
+
+      await backend.startTemporaryProject(project);
     }
   } catch (e: unknown) {
     const result = await dialog.showMessageBox(win, {
