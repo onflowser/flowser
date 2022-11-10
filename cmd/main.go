@@ -95,6 +95,16 @@ func (app FlowserApp) Run(flowProjectPath string) error {
 	return cmd.Run()
 }
 
+func (app FlowserApp) Remove() error {
+	platform := app.platform
+	if platform == "" {
+		platform = runtime.GOOS
+	}
+	appRootDir := getAppRootDir(app.installDir, platform)
+
+	return os.RemoveAll(appRootDir)
+}
+
 func fileExists(filePath string) (bool, error) {
 	if _, err := os.Stat(filePath); err == nil {
 		return true, nil
