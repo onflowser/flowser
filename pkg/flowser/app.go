@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"runtime"
 	"strings"
@@ -35,8 +34,8 @@ var errorPlatformNotSupported = errors.New("OS not supported, only supporting Wi
 // Run starts the Flowser application with provided path to the flow project.
 //
 // Project path if exists should be set to the folder containing flow.json, if no such path exists pass empty value.
-func (a *app) Run(projectPath string) error {
-	exe, err := a.executable()
+func (a *app) Run(installDir string, projectPath string) error {
+	exe, err := a.executable(installDir)
 	if err != nil {
 		return err
 	}
@@ -54,26 +53,18 @@ func (a *app) Run(projectPath string) error {
 //
 // Install directory is optional, if you want to default to your system location you can provide empty value.
 func (a *app) Install(installDir string) (string, error) {
-	a.installDir = installDir
-
 	downloadDir, err := downloadLatestReleaseAsset()
 	if err != nil {
 		return "", err
 	}
 
 	defer os.Remove(downloadDir)
-
-	dir, err := a.getInstallDir()
-	if err != nil {
-		return "", err
-	}
-
-	return a.unzip(downloadDir, dir)
+	return a.unzip(downloadDir, installDir)
 }
 
 // Installed checks whether the flowser application is already installed on the system.
-func (a *app) Installed() bool {
-	executable, err := a.executable()
+func (a *app) Installed(installDir string) bool {
+	executable, err := a.executable(installDir)
 	if err != nil {
 		return false
 	}
@@ -88,7 +79,7 @@ func (a *app) Installed() bool {
 func (a *app) Remove(installDir string) error {
 	a.installDir = installDir
 
-	dir, err := a.getAppDir()
+	dir, err := a.appDir(installDir)
 	if err != nil {
 		return err
 	}
@@ -104,18 +95,18 @@ func (a *app) unzip(source string, target string) (string, error) {
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", source, "-d", target)
 	case windows:
-		rootDir, err := a.getAppDir()
+		appDir, err := a.appDir(target)
 		if err != nil {
 			return "", err
 		}
 
-		if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
+		if err := os.MkdirAll(appDir, os.ModePerm); err != nil {
 			return target, err
 		}
 
 		// tar utility is available from Windows build 17063 consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
-		cmd = exec.Command("tar", "-xf", source, "-C", rootDir)
+		cmd = exec.Command("tar", "-xf", source, "-C", appDir)
 	default:
 		return "", errorPlatformNotSupported
 	}
@@ -123,40 +114,13 @@ func (a *app) unzip(source string, target string) (string, error) {
 	return target, cmd.Run()
 }
 
-// getInstallDir returns the location where we install the flowser.
-func (a *app) getInstallDir() (string, error) {
-	if a.installDir != "" {
-		return a.installDir, nil
-	}
-
-	switch runtime.GOOS {
-	case darwin:
-		return "/Applications", nil
-	case windows:
-		// TODO: Search in common install directories
-		// https://superuser.com/questions/1327037/what-choices-do-i-have-about-where-to-install-software-on-windows-10
-		user, err := user.Current()
-		if err != nil {
-			return "", fmt.Errorf("could not find user information", err)
-		}
-		return path.Join(user.HomeDir, "AppData", "Local"), nil
-	default:
-		return "", errorPlatformNotSupported
-	}
-}
-
-// getAppDir returns the location of the executable application inside the installation dir.
-func (a *app) getAppDir() (string, error) {
-	dir, err := a.getInstallDir()
-	if err != nil {
-		return "", err
-	}
-
-	return path.Join(dir, "Flowser.app"), nil
+// appDir returns the location of the executable application inside the installation dir.
+func (a *app) appDir(installDir string) (string, error) {
+	return path.Join(installDir, "Flowser.app"), nil
 }
 
 // executable returns the location of application executable.
-func (a *app) executable() (string, error) {
+func (a *app) executable(installDir string) (string, error) {
 	files := map[string]string{
 		darwin:  "Contents/MacOS/Flowser",
 		windows: "Flowser.exe",
@@ -166,7 +130,7 @@ func (a *app) executable() (string, error) {
 		return "", errorPlatformNotSupported
 	}
 
-	appDir, err := a.getAppDir()
+	appDir, err := a.appDir(installDir)
 	if err != nil {
 		return "", err
 	}
