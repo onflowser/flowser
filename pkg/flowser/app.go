@@ -65,8 +65,8 @@ func (a *App) Install(installDir string) (string, error) {
 	return a.unzip(downloadDir, dir)
 }
 
-// IsInstalled checks whether the flowser application is already installed on the system.
-func (a *App) IsInstalled() (bool, error) {
+// Installed checks whether the flowser application is already installed on the system.
+func (a *App) Installed() (bool, error) {
 	executable, err := a.executable()
 	if err != nil {
 		return false, err

@@ -13,7 +13,7 @@ func TestInstallAndRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Installed with error %s", err)
 	}
-	isInstalled, err := app.IsInstalled()
+	isInstalled, err := app.Installed()
 	if err != nil {
 		t.Fatalf("Installed with error %s", err)
 	}
