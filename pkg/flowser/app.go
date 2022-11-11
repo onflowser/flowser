@@ -21,7 +21,12 @@ const (
 	windows = "windows"
 )
 
-type App struct {
+// New create new Flowser application.
+func New() *app {
+	return &app{}
+}
+
+type app struct {
 	installDir string
 }
 
@@ -30,7 +35,7 @@ var errorPlatformNotSupported = errors.New("OS not supported, only supporting Wi
 // Run starts the Flowser application with provided path to the flow project.
 //
 // Project path if exists should be set to the folder containing flow.json, if no such path exists pass empty value.
-func (a *App) Run(projectPath string) error {
+func (a *app) Run(projectPath string) error {
 	exe, err := a.executable()
 	if err != nil {
 		return err
@@ -48,7 +53,7 @@ func (a *App) Run(projectPath string) error {
 // Install Flowser application in the provided install directory.
 //
 // Install directory is optional, if you want to default to your system location you can provide empty value.
-func (a *App) Install(installDir string) (string, error) {
+func (a *app) Install(installDir string) (string, error) {
 	a.installDir = installDir
 
 	downloadDir, err := downloadLatestReleaseAsset()
@@ -67,7 +72,7 @@ func (a *App) Install(installDir string) (string, error) {
 }
 
 // Installed checks whether the flowser application is already installed on the system.
-func (a *App) Installed() (bool, error) {
+func (a *app) Installed() (bool, error) {
 	executable, err := a.executable()
 	if err != nil {
 		return false, err
@@ -80,7 +85,7 @@ func (a *App) Installed() (bool, error) {
 // Remove Flowser application from provide directory.
 //
 // Install directory is optional, if you don't provide a value default will be used.
-func (a *App) Remove(installDir string) error {
+func (a *app) Remove(installDir string) error {
 	a.installDir = installDir
 
 	dir, err := a.getAppDir()
@@ -92,7 +97,7 @@ func (a *App) Remove(installDir string) error {
 }
 
 // unzip content from source compressed file to a target directory.
-func (a *App) unzip(source string, target string) (string, error) {
+func (a *app) unzip(source string, target string) (string, error) {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case darwin:
@@ -119,7 +124,7 @@ func (a *App) unzip(source string, target string) (string, error) {
 }
 
 // getInstallDir returns the location where we install the flowser.
-func (a *App) getInstallDir() (string, error) {
+func (a *app) getInstallDir() (string, error) {
 	if a.installDir != "" {
 		return a.installDir, nil
 	}
@@ -141,7 +146,7 @@ func (a *App) getInstallDir() (string, error) {
 }
 
 // getAppDir returns the location of the executable application inside the installation dir.
-func (a *App) getAppDir() (string, error) {
+func (a *app) getAppDir() (string, error) {
 	dir, err := a.getInstallDir()
 	if err != nil {
 		return "", err
@@ -151,7 +156,7 @@ func (a *App) getAppDir() (string, error) {
 }
 
 // executable returns the location of application executable.
-func (a *App) executable() (string, error) {
+func (a *app) executable() (string, error) {
 	files := map[string]string{
 		darwin:  "Contents/MacOS/Flowser",
 		windows: "Flowser.exe",

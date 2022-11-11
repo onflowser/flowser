@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-var app = &App{}
+var app = &app{}
 
 func TestInstallAndRun(t *testing.T) {
 	installDir, err := app.Install("")

@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	app := &flowser.App{}
+	app := flowser.New()
 
 	location, err := app.Install("")
 	if err != nil {
