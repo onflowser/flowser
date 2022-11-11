@@ -1,13 +1,13 @@
-package main
+package app
 
 import (
 	"testing"
 )
 
-var app = FlowserApp{}
+var app = &App{}
 
 func TestInstallAndRun(t *testing.T) {
-	installDir, err := app.Install()
+	installDir, err := app.Install("")
 	t.Logf("Installed to %s", installDir)
 
 	if err != nil {
@@ -25,7 +25,7 @@ func TestInstallAndRun(t *testing.T) {
 		t.Fatal("Didn't return error for invalid project path")
 	}
 
-	err = app.Remove()
+	err = app.Remove("")
 	if err != nil {
 		t.Fatalf("Failed to remove installed app: %s", err)
 	}
