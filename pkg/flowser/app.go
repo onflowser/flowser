@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/google/go-github/github"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +12,8 @@ import (
 	"path"
 	"runtime"
 	"strings"
+
+	"github.com/google/go-github/github"
 )
 
 const (

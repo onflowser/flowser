@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/onflowser/flowser/flowser"
+	"github.com/onflowser/flowser/pkg/flowser"
 )
 
 func main() {
