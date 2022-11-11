@@ -1,4 +1,4 @@
-package app
+package flowser
 
 import (
 	"testing"
