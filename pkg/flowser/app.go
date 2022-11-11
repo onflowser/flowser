@@ -72,14 +72,14 @@ func (a *app) Install(installDir string) (string, error) {
 }
 
 // Installed checks whether the flowser application is already installed on the system.
-func (a *app) Installed() (bool, error) {
+func (a *app) Installed() bool {
 	executable, err := a.executable()
 	if err != nil {
-		return false, err
+		return false
 	}
 
 	_, err = os.Stat(executable)
-	return err == nil, err
+	return err == nil
 }
 
 // Remove Flowser application from provide directory.
