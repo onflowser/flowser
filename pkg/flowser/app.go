@@ -15,23 +15,23 @@ import (
 	"strings"
 )
 
+const (
+	darwin  = "darwin"
+	windows = "windows"
+)
+
 type App struct {
 	installDir string
-	platform   string
 }
 
 var errorPlatformNotSupported = errors.New("platform not supported, only supporting windows and drawin")
 
 func (a *App) IsInstalled() (bool, error) {
-	platform := a.platform
-	if platform == "" {
-		platform = runtime.GOOS
-	}
-	installDir, err := getInstallDir(a.installDir, platform)
+	installDir, err := getInstallDir(a.installDir)
 	if err != nil {
 		return false, err
 	}
-	execFilePath, err := getExecutableFile(installDir, platform)
+	execFilePath, err := getExecutableFile(installDir)
 
 	if err != nil {
 		return false, err
@@ -41,11 +41,7 @@ func (a *App) IsInstalled() (bool, error) {
 }
 
 func (a *App) Install() (string, error) {
-	platform := a.platform
-	if platform == "" {
-		platform = runtime.GOOS
-	}
-	assetDownloadPath, err := downloadLatestReleaseAsset(platform)
+	assetDownloadPath, err := downloadLatestReleaseAsset()
 
 	defer os.Remove(assetDownloadPath)
 
@@ -53,18 +49,18 @@ func (a *App) Install() (string, error) {
 		return "", err
 	}
 
-	installDir, err := getInstallDir(a.installDir, platform)
+	installDir, err := getInstallDir(a.installDir)
 	if err != nil {
 		return "", err
 	}
 
 	var cmd *exec.Cmd
-	switch platform {
-	case "darwin":
+	switch runtime.GOOS {
+	case darwin:
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", assetDownloadPath, "-d", installDir)
-	case "windows":
-		rootDir := getAppRootDir(installDir, platform)
+	case windows:
+		rootDir := getAppRootDir(installDir)
 		if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
 			return installDir, err
 		}
@@ -84,15 +80,11 @@ func (a *App) Install() (string, error) {
 }
 
 func (a *App) Run(flowProjectPath string) error {
-	platform := a.platform
-	if platform == "" {
-		platform = runtime.GOOS
-	}
-	installDir, err := getInstallDir(a.installDir, platform)
+	installDir, err := getInstallDir(a.installDir)
 	if err != nil {
 		return err
 	}
-	execFilePath, err := getExecutableFile(installDir, platform)
+	execFilePath, err := getExecutableFile(installDir)
 	if err != nil {
 		return err
 	}
@@ -102,12 +94,7 @@ func (a *App) Run(flowProjectPath string) error {
 }
 
 func (a *App) Remove() error {
-	platform := a.platform
-	if platform == "" {
-		platform = runtime.GOOS
-	}
-	appRootDir := getAppRootDir(a.installDir, platform)
-
+	appRootDir := getAppRootDir(a.installDir)
 	return os.RemoveAll(appRootDir)
 }
 
@@ -121,8 +108,8 @@ func fileExists(filePath string) (bool, error) {
 	}
 }
 
-func downloadLatestReleaseAsset(platform string) (string, error) {
-	release, err := getLatestRelease(platform)
+func downloadLatestReleaseAsset() (string, error) {
+	release, err := getLatestRelease()
 
 	if err != nil {
 		return "", err
@@ -152,14 +139,14 @@ type flowserRelease struct {
 	asset   github.ReleaseAsset
 }
 
-func getLatestRelease(platform string) (*flowserRelease, error) {
+func getLatestRelease() (*flowserRelease, error) {
 	client := github.NewClient(nil)
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "onflowser", "flowser")
 	if err != nil {
 		return nil, err
 	}
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
-	targetAssetName, err := getAssetName(platform, latestVersion)
+	targetAssetName, err := getAssetName(latestVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -174,47 +161,47 @@ func getLatestRelease(platform string) (*flowserRelease, error) {
 	return nil, errors.New("no asset found")
 }
 
-func getAssetName(platform string, version string) (string, error) {
+func getAssetName(version string) (string, error) {
 	isArm := strings.HasPrefix(runtime.GOARCH, "arm")
-	switch platform {
-	case "darwin":
+	switch runtime.GOOS {
+	case darwin:
 		if isArm {
 			return fmt.Sprintf("Flowser-%s-arm64-mac.zip", version), nil
 		}
 		return fmt.Sprintf("Flowser-%s-mac.zip", version), nil
-	case "windows":
+	case windows:
 		return fmt.Sprintf("Flowser-%s-win.zip", version), nil
 	default:
 		return "", errorPlatformNotSupported
 	}
 }
 
-func getExecutableFile(installDir string, platform string) (string, error) {
+func getExecutableFile(installDir string) (string, error) {
 	files := map[string]string{
-		"darwin":  "Contents/MacOS/Flowser",
-		"windows": "Flowser.exe",
+		darwin:  "Contents/MacOS/Flowser",
+		windows: "Flowser.exe",
 	}
 	file, ok := files[runtime.GOOS]
 	if !ok {
 		return "", errorPlatformNotSupported
 	}
-	rootPath := getAppRootDir(installDir, platform)
+	rootPath := getAppRootDir(installDir)
 	return path.Join(rootPath, file), nil
 }
 
-func getAppRootDir(installDir string, platform string) string {
+func getAppRootDir(installDir string) string {
 	return path.Join(installDir, "Flowser.app")
 }
 
-func getInstallDir(customInstallDir string, platform string) (string, error) {
+func getInstallDir(customInstallDir string) (string, error) {
 	if customInstallDir != "" {
 		return customInstallDir, nil
 	}
 
-	switch platform {
-	case "darwin":
+	switch runtime.GOOS {
+	case darwin:
 		return "/Applications", nil
-	case "windows":
+	case windows:
 		// TODO: Search in common install directories
 		// https://superuser.com/questions/1327037/what-choices-do-i-have-about-where-to-install-software-on-windows-10
 		user, err := user.Current()
