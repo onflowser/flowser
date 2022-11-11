@@ -1,4 +1,8 @@
 /* Main editor container */
+.cadence-editor {
+    width: 100%;
+}
+
 .cadence-editor .cm-editor {
     background: none;
     border: 1px solid transparent;
