@@ -52,10 +52,10 @@ func (a *app) Run(installDir string, projectPath string) error {
 // Install Flowser application in the provided install directory.
 //
 // Install directory is optional, if you want to default to your system location you can provide empty value.
-func (a *app) Install(installDir string) (string, error) {
+func (a *app) Install(installDir string) error {
 	downloadDir, err := downloadLatestReleaseAsset()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	defer os.Remove(downloadDir)
@@ -88,7 +88,7 @@ func (a *app) Remove(installDir string) error {
 }
 
 // unzip content from source compressed file to a target directory.
-func (a *app) unzip(source string, target string) (string, error) {
+func (a *app) unzip(source string, target string) error {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case darwin:
@@ -97,21 +97,21 @@ func (a *app) unzip(source string, target string) (string, error) {
 	case windows:
 		appDir, err := a.appDir(target)
 		if err != nil {
-			return "", err
+			return err
 		}
 
 		if err := os.MkdirAll(appDir, os.ModePerm); err != nil {
-			return target, err
+			return err
 		}
 
 		// tar utility is available from Windows build 17063 consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
 		cmd = exec.Command("tar", "-xf", source, "-C", appDir)
 	default:
-		return "", errorPlatformNotSupported
+		return errorPlatformNotSupported
 	}
 
-	return target, cmd.Run()
+	return cmd.Run()
 }
 
 // appDir returns the location of the executable application inside the installation dir.
