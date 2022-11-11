@@ -28,7 +28,11 @@ func (app FlowserApp) IsInstalled() (bool, error) {
 	if platform == "" {
 		platform = runtime.GOOS
 	}
-	execFilePath, err := getExecutableFile(app.installDir, platform)
+	installDir, err := getInstallDir(app.installDir, platform)
+	if err != nil {
+		return false, err
+	}
+	execFilePath, err := getExecutableFile(installDir, platform)
 
 	if err != nil {
 		return false, err
@@ -44,11 +48,11 @@ func (app FlowserApp) Install() (string, error) {
 	}
 	assetDownloadPath, err := downloadLatestReleaseAsset(platform)
 
+	defer os.Remove(assetDownloadPath)
+
 	if err != nil {
 		return "", err
 	}
-
-	defer os.Remove(assetDownloadPath)
 
 	installDir, err := getInstallDir(app.installDir, platform)
 	if err != nil {
@@ -62,13 +66,16 @@ func (app FlowserApp) Install() (string, error) {
 		cmd = exec.Command("unzip", assetDownloadPath, "-d", installDir)
 	case "windows":
 		rootDir := getAppRootDir(installDir, platform)
-		if err := os.Mkdir(rootDir, os.ModePerm); err != nil {
+		if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
 			return installDir, err
 		}
 
 		// tar utility is available from Windows build 17063
 		// consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
+
+		// Note: This command will probably fail with below error if run with bash or wsl on Windows
+		// tar: Archive contains ‘\n\372\266\353v\363\236\331o\362\300\365’ where numeric off_t value expected
 		cmd = exec.Command("tar", "-xf", assetDownloadPath, "-C", rootDir)
 	default:
 		return installDir, errorPlatformNotSupported
@@ -215,7 +222,7 @@ func getInstallDir(customInstallDir string, platform string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return fmt.Sprintf("%s\\AppData\\Local\\Programs", user.HomeDir), nil
+		return path.Join(user.HomeDir, "AppData", "Local"), nil
 	default:
 		return "", errorPlatformNotSupported
 	}
