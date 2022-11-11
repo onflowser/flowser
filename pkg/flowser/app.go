@@ -21,91 +21,151 @@ const (
 )
 
 type App struct {
-	path string
+	installDir string
 }
 
-var errorPlatformNotSupported = errors.New("platform not supported, only supporting windows and drawin")
+var errorPlatformNotSupported = errors.New("OS not supported, only supporting Windows and Mac OS")
 
+// Run starts the Flowser application with provided path to the flow project.
+//
+// Project path if exists should be set to the folder containing flow.json, if no such path exists pass empty value.
+func (a *App) Run(projectPath string) error {
+	exe, err := a.executable()
+	if err != nil {
+		return err
+	}
+
+	if projectPath != "" {
+		projectPath = fmt.Sprintf("--project-path=%s", projectPath)
+	}
+
+	return exec.
+		Command(exe, projectPath).
+		Run()
+}
+
+// Install Flowser application in the provided install directory.
+//
+// Install directory is optional, if you want to default to your system location you can provide empty value.
+func (a *App) Install(installDir string) (string, error) {
+	a.installDir = installDir
+
+	downloadDir, err := downloadLatestReleaseAsset()
+	if err != nil {
+		return "", err
+	}
+
+	defer os.Remove(downloadDir)
+
+	dir, err := a.getInstallDir()
+	if err != nil {
+		return "", err
+	}
+
+	return a.unzip(downloadDir, dir)
+}
+
+// IsInstalled checks whether the flowser application is already installed on the system.
 func (a *App) IsInstalled() (bool, error) {
-	installDir, err := getInstallDir(a.path)
-	if err != nil {
-		return false, err
-	}
-	execFilePath, err := getExecutableFile(installDir)
-
+	executable, err := a.executable()
 	if err != nil {
 		return false, err
 	}
 
-	return fileExists(execFilePath)
+	_, err = os.Stat(executable)
+	return err == nil, err
 }
 
-func (a *App) Install() (string, error) {
-	assetDownloadPath, err := downloadLatestReleaseAsset()
+// Remove Flowser application from provide directory.
+//
+// Install directory is optional, if you don't provide a value default will be used.
+func (a *App) Remove(installDir string) error {
+	a.installDir = installDir
 
-	defer os.Remove(assetDownloadPath)
-
+	dir, err := a.getAppDir()
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	installDir, err := getInstallDir(a.path)
-	if err != nil {
-		return "", err
-	}
+	return os.RemoveAll(dir)
+}
 
+// unzip content from source compressed file to a target directory.
+func (a *App) unzip(source string, target string) (string, error) {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case darwin:
 		// Use native unzip tool as it handles the creation of required symbolic links
-		cmd = exec.Command("unzip", assetDownloadPath, "-d", installDir)
+		cmd = exec.Command("unzip", source, "-d", target)
 	case windows:
-		rootDir := getAppRootDir(installDir)
-		if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
-			return installDir, err
+		rootDir, err := a.getAppDir()
+		if err != nil {
+			return "", err
 		}
 
-		// tar utility is available from Windows build 17063
-		// consider using other command or a custom implementation
+		if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
+			return target, err
+		}
+
+		// tar utility is available from Windows build 17063 consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
-
-		// Note: This command will probably fail with below error if run with bash or wsl on Windows
-		// tar: Archive contains ‘\n\372\266\353v\363\236\331o\362\300\365’ where numeric off_t value expected
-		cmd = exec.Command("tar", "-xf", assetDownloadPath, "-C", rootDir)
+		cmd = exec.Command("tar", "-xf", source, "-C", rootDir)
 	default:
-		return installDir, errorPlatformNotSupported
+		return "", errorPlatformNotSupported
 	}
 
-	return installDir, cmd.Run()
+	return target, cmd.Run()
 }
 
-func (a *App) Run(flowProjectPath string) error {
-	installDir, err := getInstallDir(a.path)
+// getInstallDir returns the location where we install the flowser.
+func (a *App) getInstallDir() (string, error) {
+	if a.installDir != "" {
+		return a.installDir, nil
+	}
+
+	switch runtime.GOOS {
+	case darwin:
+		return "/Applications", nil
+	case windows:
+		// TODO: Search in common install directories
+		// https://superuser.com/questions/1327037/what-choices-do-i-have-about-where-to-install-software-on-windows-10
+		user, err := user.Current()
+		if err != nil {
+			return "", fmt.Errorf("could not find user information", err)
+		}
+		return path.Join(user.HomeDir, "AppData", "Local"), nil
+	default:
+		return "", errorPlatformNotSupported
+	}
+}
+
+// getAppDir returns the location of the executable application inside the installation dir.
+func (a *App) getAppDir() (string, error) {
+	dir, err := a.getInstallDir()
 	if err != nil {
-		return err
+		return "", err
 	}
-	execFilePath, err := getExecutableFile(installDir)
+
+	return path.Join(dir, "Flowser.app"), nil
+}
+
+// executable returns the location of application executable.
+func (a *App) executable() (string, error) {
+	files := map[string]string{
+		darwin:  "Contents/MacOS/Flowser",
+		windows: "Flowser.exe",
+	}
+	file, ok := files[runtime.GOOS]
+	if !ok {
+		return "", errorPlatformNotSupported
+	}
+
+	appDir, err := a.getAppDir()
 	if err != nil {
-		return err
+		return "", err
 	}
-	cmd := exec.Command(execFilePath, fmt.Sprintf("--project-path=%s", flowProjectPath))
 
-	return cmd.Run()
-}
-
-func (a *App) Remove() error {
-	appRootDir := getAppRootDir(a.path)
-	return os.RemoveAll(appRootDir)
-}
-
-func fileExists(filePath string) (bool, error) {
-	if _, err := os.Stat(filePath); err == nil {
-		return true, nil
-	} else if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	} else {
-		return false, err
-	}
+	return path.Join(appDir, file), nil
 }
 
 func downloadLatestReleaseAsset() (string, error) {
@@ -171,44 +231,6 @@ func getAssetName(version string) (string, error) {
 		return fmt.Sprintf("Flowser-%s-mac.zip", version), nil
 	case windows:
 		return fmt.Sprintf("Flowser-%s-win.zip", version), nil
-	default:
-		return "", errorPlatformNotSupported
-	}
-}
-
-func getExecutableFile(installDir string) (string, error) {
-	files := map[string]string{
-		darwin:  "Contents/MacOS/Flowser",
-		windows: "Flowser.exe",
-	}
-	file, ok := files[runtime.GOOS]
-	if !ok {
-		return "", errorPlatformNotSupported
-	}
-	rootPath := getAppRootDir(installDir)
-	return path.Join(rootPath, file), nil
-}
-
-func getAppRootDir(installDir string) string {
-	return path.Join(installDir, "Flowser.app")
-}
-
-func getInstallDir(customInstallDir string) (string, error) {
-	if customInstallDir != "" {
-		return customInstallDir, nil
-	}
-
-	switch runtime.GOOS {
-	case darwin:
-		return "/Applications", nil
-	case windows:
-		// TODO: Search in common install directories
-		// https://superuser.com/questions/1327037/what-choices-do-i-have-about-where-to-install-software-on-windows-10
-		user, err := user.Current()
-		if err != nil {
-			return "", err
-		}
-		return path.Join(user.HomeDir, "AppData", "Local"), nil
 	default:
 		return "", errorPlatformNotSupported
 	}
