@@ -21,13 +21,13 @@ const (
 )
 
 type App struct {
-	installDir string
+	path string
 }
 
 var errorPlatformNotSupported = errors.New("platform not supported, only supporting windows and drawin")
 
 func (a *App) IsInstalled() (bool, error) {
-	installDir, err := getInstallDir(a.installDir)
+	installDir, err := getInstallDir(a.path)
 	if err != nil {
 		return false, err
 	}
@@ -49,7 +49,7 @@ func (a *App) Install() (string, error) {
 		return "", err
 	}
 
-	installDir, err := getInstallDir(a.installDir)
+	installDir, err := getInstallDir(a.path)
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +80,7 @@ func (a *App) Install() (string, error) {
 }
 
 func (a *App) Run(flowProjectPath string) error {
-	installDir, err := getInstallDir(a.installDir)
+	installDir, err := getInstallDir(a.path)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (a *App) Run(flowProjectPath string) error {
 }
 
 func (a *App) Remove() error {
-	appRootDir := getAppRootDir(a.installDir)
+	appRootDir := getAppRootDir(a.path)
 	return os.RemoveAll(appRootDir)
 }
 
