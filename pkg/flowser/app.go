@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/go-github/github"
 	"io"
 	"net/http"
 	"os"
@@ -19,14 +20,14 @@ type App struct {
 	platform   string
 }
 
-var errorPlatformNotSupported error = errors.New("platform not supported, only supporting windows and drawin")
+var errorPlatformNotSupported = errors.New("platform not supported, only supporting windows and drawin")
 
-func (app App) IsInstalled() (bool, error) {
-	platform := app.platform
+func (a *App) IsInstalled() (bool, error) {
+	platform := a.platform
 	if platform == "" {
 		platform = runtime.GOOS
 	}
-	installDir, err := getInstallDir(app.installDir, platform)
+	installDir, err := getInstallDir(a.installDir, platform)
 	if err != nil {
 		return false, err
 	}
@@ -39,8 +40,8 @@ func (app App) IsInstalled() (bool, error) {
 	return fileExists(execFilePath)
 }
 
-func (app App) Install() (string, error) {
-	platform := app.platform
+func (a *App) Install() (string, error) {
+	platform := a.platform
 	if platform == "" {
 		platform = runtime.GOOS
 	}
@@ -52,7 +53,7 @@ func (app App) Install() (string, error) {
 		return "", err
 	}
 
-	installDir, err := getInstallDir(app.installDir, platform)
+	installDir, err := getInstallDir(a.installDir, platform)
 	if err != nil {
 		return "", err
 	}
@@ -82,12 +83,12 @@ func (app App) Install() (string, error) {
 	return installDir, cmd.Run()
 }
 
-func (app App) Run(flowProjectPath string) error {
-	platform := app.platform
+func (a *App) Run(flowProjectPath string) error {
+	platform := a.platform
 	if platform == "" {
 		platform = runtime.GOOS
 	}
-	installDir, err := getInstallDir(app.installDir, platform)
+	installDir, err := getInstallDir(a.installDir, platform)
 	if err != nil {
 		return err
 	}
@@ -100,12 +101,12 @@ func (app App) Run(flowProjectPath string) error {
 	return cmd.Run()
 }
 
-func (app App) Remove() error {
-	platform := app.platform
+func (a *App) Remove() error {
+	platform := a.platform
 	if platform == "" {
 		platform = runtime.GOOS
 	}
-	appRootDir := getAppRootDir(app.installDir, platform)
+	appRootDir := getAppRootDir(a.installDir, platform)
 
 	return os.RemoveAll(appRootDir)
 }
