@@ -17,7 +17,7 @@ import {
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import ReactTimeago from "react-timeago";
-import { useProjectActions } from "../../../contexts/project-actions.context";
+import { useProjectActions } from "../../../contexts/project.context";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import Card from "components/card/Card";
 import tableClasses from "../../../components/table/Table.module.scss";

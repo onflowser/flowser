@@ -22,7 +22,7 @@ import Search from "../../../components/search/Search";
 import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
-import { useProjectActions } from "../../../contexts/project-actions.context";
+import { useProjectActions } from "../../../contexts/project.context";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
@@ -66,7 +66,7 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
   const activeTab = providedTab ?? defaultTab ?? fallbackTab;
 
   const onConfigure = useCallback(() => {
-    history.push(`/${routes.start}/configure`);
+    history.push(routes.configure);
   }, []);
 
   function showOpenProjectDialog() {
@@ -151,7 +151,7 @@ function ProjectsListContent() {
     try {
       await projectService.useProject(project.id);
       track(AnalyticEvent.PROJECT_STARTED);
-      history.push(`/${routes.firstRouteAfterStart}`);
+      history.push(routes.firstRouteAfterStart);
     } catch (e: unknown) {
       handleError(e);
       history.replace(`/start/configure/${project.id}`);

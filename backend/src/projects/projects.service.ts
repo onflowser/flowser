@@ -144,10 +144,15 @@ export class ProjectsService {
     );
   }
 
-  async useProject(id: string) {
+  async usePersistedProject(id: string) {
+    const targetProject = await this.findOne(id);
+    return this.useProject(targetProject);
+  }
+
+  async useProject(project: ProjectEntity) {
     await this.cleanupProject();
 
-    this.currentProject = await this.findOne(id);
+    this.currentProject = project;
 
     // TODO(milestone-3): validate that project has a valid flow.json config
 
@@ -163,7 +168,7 @@ export class ProjectsService {
       );
     }
 
-    this.logger.debug(`using project: ${id}`);
+    this.logger.debug(`using project: ${project.id}`);
 
     return this.currentProject;
   }
