@@ -23,8 +23,9 @@ To get started, just download the app for your platform using the links below!
 
 <a href="https://github.com/onflowser/flowser/releases" target="_blank">
   <img width="180" alt="Download on Windows" src="https://user-images.githubusercontent.com/36109955/196265032-56e01fa3-8771-498c-a4db-bee16bdb08e8.png" />
-  <img width="180" alt="Download on MacOS" src="https://user-images.githubusercontent.com/36109955/196265049-a214d01b-7c1f-4504-a12b-1ec03743869e.png" />
+  <img width="180" alt="Download on MacOS" src="https://user-images.githubusercontent.com/36109955/201547261-3f6e68c2-d9d1-4399-8bee-904064a8ec34.png" />
 </a>
+
 
 If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2gx7ZsRUkD)!
 
