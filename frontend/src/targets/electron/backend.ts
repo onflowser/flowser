@@ -52,14 +52,9 @@ export class FlowserBackend {
     await this.app?.close();
   }
 
-  public async startProjectByFilesystemPath(options: {
-    filesystemPath: string;
-  }): Promise<void> {
+  public async startTemporaryProject(project: ProjectEntity): Promise<void> {
     const projectService = this.app?.get(ProjectsService);
 
-    const tempProject = new ProjectEntity();
-    tempProject.filesystemPath = options.filesystemPath;
-
-    await projectService?.useProject(tempProject);
+    await projectService?.useProject(project);
   }
 }
