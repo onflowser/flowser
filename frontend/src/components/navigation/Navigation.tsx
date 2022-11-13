@@ -18,6 +18,7 @@ import { useHistory } from "react-router-dom";
 import { UserIcon } from "../user-icon/UserIcon";
 import { useFlow } from "../../hooks/use-flow";
 import { SimpleButton } from "../simple-button/SimpleButton";
+import { SizedBox } from "../sized-box/SizedBox";
 
 const Navigation: FunctionComponent<{
   className?: string;
@@ -25,6 +26,10 @@ const Navigation: FunctionComponent<{
   toggleSidebar: () => void;
 }> = (props) => {
   const { isShowBackButtonVisible, isBreadcrumbsVisible } = useNavigation();
+  const breadCrumbsBarHeight = 50;
+  const navigationBarHeight = 65;
+  const navigationHeight =
+    (isBreadcrumbsVisible ? breadCrumbsBarHeight : 0) + navigationBarHeight;
   const { user, isLoggedIn } = useFlow();
   const history = useHistory();
   const tabCount = useTabCount();
@@ -37,79 +42,85 @@ const Navigation: FunctionComponent<{
   }, []);
 
   return (
-    <div className={classNames(classes.navigationContainer, props.className)}>
-      <div className={classes.mainContainer}>
-        <div className={classes.navLinksContainer}>
-          <NavigationItem to={routes.accounts} totalCounter={tabCount.accounts}>
-            Accounts
-          </NavigationItem>
-          <NavigationItem to={routes.blocks} totalCounter={tabCount.blocks}>
-            Blocks
-          </NavigationItem>
-          <NavigationItem
-            to={routes.transactions}
-            totalCounter={tabCount.transactions}
-          >
-            Transactions
-          </NavigationItem>
-          <NavigationItem
-            to={routes.contracts}
-            totalCounter={tabCount.contracts}
-          >
-            Contracts
-          </NavigationItem>
-          <NavigationItem to={routes.events} totalCounter={tabCount.events}>
-            Events
-          </NavigationItem>
-          <NavigationItem to={routes.project} totalCounter={tabCount.project}>
-            Project
-          </NavigationItem>
-        </div>
-
-        <div className={classes.rightContainer}>
-          <Search className={classes.searchBox} responsive={true} />
-          {isLoggedIn && (
-            <SimpleButton
-              className={classes.userButton}
-              onClick={() => history.push(`/accounts/details/${user?.addr}`)}
+    <>
+      <SizedBox height={navigationHeight} />
+      <div className={classNames(classes.navigationContainer, props.className)}>
+        <div className={classes.mainContainer}>
+          <div className={classes.navLinksContainer}>
+            <NavigationItem
+              to={routes.accounts}
+              totalCounter={tabCount.accounts}
             >
-              <UserIcon />
-            </SimpleButton>
-          )}
-          <Button
-            className={classes.sidebarButton}
-            onClick={props.toggleSidebar}
-          >
-            <img
-              src={
-                isEmulatorWorking
-                  ? isSidebarOpen
-                    ? sideMenuOpen
-                    : sideMenuClosed
-                  : isSidebarOpen
-                  ? sideMenuOpenEmuNoWork
-                  : sideMenuClosedEmuNoWork
-              }
-              className={classNames({
-                [classes.sidebarOpen]: isSidebarOpen,
-                [classes.emulatorWorking]: isEmulatorWorking,
-              })}
-              alt="sidebar toggle button"
-            />
-          </Button>
+              Accounts
+            </NavigationItem>
+            <NavigationItem to={routes.blocks} totalCounter={tabCount.blocks}>
+              Blocks
+            </NavigationItem>
+            <NavigationItem
+              to={routes.transactions}
+              totalCounter={tabCount.transactions}
+            >
+              Transactions
+            </NavigationItem>
+            <NavigationItem
+              to={routes.contracts}
+              totalCounter={tabCount.contracts}
+            >
+              Contracts
+            </NavigationItem>
+            <NavigationItem to={routes.events} totalCounter={tabCount.events}>
+              Events
+            </NavigationItem>
+            <NavigationItem to={routes.project} totalCounter={tabCount.project}>
+              Project
+            </NavigationItem>
+          </div>
+
+          <div className={classes.rightContainer}>
+            <Search className={classes.searchBox} responsive={true} />
+            {isLoggedIn && (
+              <SimpleButton
+                className={classes.userButton}
+                onClick={() => history.push(`/accounts/details/${user?.addr}`)}
+              >
+                <UserIcon />
+              </SimpleButton>
+            )}
+            <Button
+              className={classes.sidebarButton}
+              onClick={props.toggleSidebar}
+            >
+              <img
+                src={
+                  isEmulatorWorking
+                    ? isSidebarOpen
+                      ? sideMenuOpen
+                      : sideMenuClosed
+                    : isSidebarOpen
+                    ? sideMenuOpenEmuNoWork
+                    : sideMenuClosedEmuNoWork
+                }
+                className={classNames({
+                  [classes.sidebarOpen]: isSidebarOpen,
+                  [classes.emulatorWorking]: isEmulatorWorking,
+                })}
+                alt="sidebar toggle button"
+              />
+            </Button>
+          </div>
         </div>
+        {isBreadcrumbsVisible && (
+          <div className={classes.breadcrumbsContainer}>
+            {isShowBackButtonVisible && (
+              <div className={classes.backButtonWrapper} onClick={onBack}>
+                <IconBackButton className={classes.backButton} />
+              </div>
+            )}
+            <Breadcrumbs className={classes.breadcrumbs} />
+          </div>
+        )}
       </div>
-      {isBreadcrumbsVisible && (
-        <div className={classes.navigationDrawerContainer}>
-          {isShowBackButtonVisible && (
-            <div className={classes.backButtonWrapper} onClick={onBack}>
-              <IconBackButton className={classes.backButton} />
-            </div>
-          )}
-          <Breadcrumbs className={classes.breadcrumbs} />
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
