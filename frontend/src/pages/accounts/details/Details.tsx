@@ -225,7 +225,11 @@ const Details: FunctionComponent = () => {
         <DetailsTabItem label="STORAGE" value={storageItems?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
-              <PublicPrivateStorageCard key={item.id} content={item} />
+              <PublicPrivateStorageCard
+                key={item.id}
+                currentAccountAddress={account.address}
+                content={item}
+              />
             ))}
           </div>
           <div className={classes.gridExtendable}>
