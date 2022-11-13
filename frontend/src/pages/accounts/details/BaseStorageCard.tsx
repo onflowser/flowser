@@ -8,14 +8,14 @@ import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 type ExtendableStorageCardProps = {
-  content: DecoratedPollingEntity<AccountStorageItem>;
+  storageItem: DecoratedPollingEntity<AccountStorageItem>;
   onToggleExpand: () => void;
   isExpanded: boolean;
   className?: string;
 };
 
 export function BaseStorageCard({
-  content,
+  storageItem,
   onToggleExpand,
   isExpanded,
   className,
@@ -23,29 +23,30 @@ export function BaseStorageCard({
   const extendClass = classNames(className, {
     [classes.root]: true,
     [classes.gridItemExtended]: isExpanded,
+    [classes.introAnimation]: storageItem.isNew || storageItem.isUpdated,
   });
 
-  const storageDataPaths = getDataTypeKeysInStorageData(content.data);
+  const storageDataPaths = getDataTypeKeysInStorageData(storageItem.data);
 
   return (
-    <div id={content.id} className={extendClass}>
+    <div id={storageItem.id} className={extendClass}>
       <SimpleButton className={classes.header} onClick={() => onToggleExpand()}>
         <div className={classes.type}>
-          {FlowUtils.getLowerCasedPathDomain(content.pathDomain)}
+          {FlowUtils.getLowerCasedPathDomain(storageItem.pathDomain)}
         </div>
         <div className={classes.circle}>
           <div className={classes.icon}>{isExpanded ? "-" : "+"}</div>
         </div>
       </SimpleButton>
       <div className={classes.body}>
-        <div className={classes.title}>{content.pathIdentifier}</div>
+        <div className={classes.title}>{storageItem.pathIdentifier}</div>
         {isExpanded ? (
           <div className={classes.json}>
             <ReactJson
               style={{ backgroundColor: "none" }}
               theme="ashes"
               collapsed={4}
-              src={content.data as Record<string, unknown>}
+              src={storageItem.data as Record<string, unknown>}
             />
           </div>
         ) : (
