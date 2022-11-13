@@ -11,6 +11,7 @@ import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import { CommonUtils } from "../../utils/common-utils";
 import { ActionDialog } from "../action-dialog/ActionDialog";
 import { TransactionErrorMessage } from "../status/ErrorMessage";
+import { useErrorHandler } from "../../hooks/use-error-handler";
 
 export type TransactionDialogProps = {
   show?: boolean;
@@ -24,6 +25,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   const [args, setArgs] = useState<FlowScriptArgument[]>([]);
   const [loading, setLoading] = useState(false);
   const { sendTransaction } = useFlow();
+  const { handleError } = useErrorHandler(TransactionDialog.name);
 
   function onClose() {
     setCode("");
@@ -73,15 +75,22 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
             {` `}sent!
           </span>
         ),
-        { duration: 100000 }
+        { duration: 4000 }
       );
-    } catch (e: any) {
-      if (e.message) {
-        toast.error(e.message, { duration: 5000 });
-      } else {
+    } catch (error: unknown) {
+      const cadenceError =
+        typeof error === "string"
+          ? error
+          : CommonUtils.isStandardError(error)
+          ? error.message
+          : undefined;
+      // error is too long to be shown in a toaster
+      const isLongCadenceError = cadenceError && cadenceError.length > 100;
+      if (isLongCadenceError) {
         toast.error("Transaction error");
-        // error is too long to be shown in a toaster
-        setLongError(e);
+        setLongError(cadenceError);
+      } else {
+        handleError(error);
       }
     } finally {
       setLoading(false);
@@ -138,7 +147,12 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
             Transaction error occurred, click to view!
           </button>
         )}
-        <CadenceEditor value={code} onChange={setCode} minHeight="200px" />
+        <CadenceEditor
+          value={code}
+          onChange={setCode}
+          minHeight="200px"
+          maxHeight="300px"
+        />
         <ScriptArguments className={classes.arguments} onChange={setArgs} />
       </>
     </ActionDialog>
