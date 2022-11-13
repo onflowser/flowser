@@ -21,7 +21,7 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
-import { useProjectActions } from "../../../contexts/project-actions.context";
+import { useProjectActions } from "../../../contexts/project.context";
 import { ConfigurationSection } from "./ConfigurationSection";
 import {
   RadioField,
@@ -101,7 +101,7 @@ export const Configuration: FunctionComponent = () => {
     }
     try {
       await projectService.useProject(project.id);
-      history.replace(`/${routes.firstRouteAfterStart}`);
+      history.replace(routes.firstRouteAfterStart);
     } catch (e) {
       history.replace(`/start/configure/${project.id}`);
       handleError(e);

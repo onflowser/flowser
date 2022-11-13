@@ -148,7 +148,7 @@ export class ProjectsController {
   @ApiParam({ name: "id", type: String })
   @Post("/use/:id")
   async useProject(@Param("id") id: string) {
-    const project = await this.projectsService.useProject(id);
+    const project = await this.projectsService.usePersistedProject(id);
     return UseProjectResponse.toJSON(
       UseProjectResponse.fromPartial({
         project: project.toProto(),

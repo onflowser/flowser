@@ -1,6 +1,7 @@
 @import "styles/spacings";
 @import "styles/colors";
 @import "styles/typography";
+@import "styles/animations";
 
 .root {
   display: flex;
@@ -8,6 +9,10 @@
   width: 100%;
   border-radius: 10px;
   background-color: $code-background;
+
+  &.introAnimation {
+    @include addNewContentAnimation(.4s);
+  }
 
   .header {
     display: flex;

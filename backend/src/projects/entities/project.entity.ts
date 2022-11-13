@@ -51,7 +51,11 @@ export class ProjectEntity extends PollingEntity {
   }
 
   shouldRunEmulator() {
-    return this.emulator?.run;
+    return Boolean(this.emulator?.run);
+  }
+
+  shouldRunDevWallet() {
+    return Boolean(this.devWallet?.run);
   }
 
   toProto(): Project {

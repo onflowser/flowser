@@ -17,7 +17,7 @@ import {
   useGetPollingProcesses,
 } from "../../hooks/use-api";
 import { useHistory } from "react-router-dom";
-import { useProjectActions } from "../../contexts/project-actions.context";
+import { useProjectActions } from "../../contexts/project.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
@@ -47,7 +47,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const { data: processes } = useGetPollingProcesses();
   const { project: currentProject } = currentProjectData ?? {};
   const createProject = useCallback(() => {
-    history.push(`/${routes.start}/configure`);
+    history.push(routes.configure);
   }, []);
 
   const openSettings = () => {

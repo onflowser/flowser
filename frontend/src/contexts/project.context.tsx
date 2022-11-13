@@ -2,6 +2,7 @@ import React, {
   createContext,
   ReactElement,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { routes } from "../constants/routes";
@@ -24,26 +25,24 @@ import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
 
 export type ProjectActionsContextState = {
-  isSwitching: boolean;
   switchProject: () => Promise<void>;
 
   sendTransaction: () => void;
   createSnapshot: () => void;
   checkoutBlock: (blockId: string) => void;
 
-  isRemovingProject: boolean;
   removeProject: (project: Project) => void;
 };
 
-const ProjectActionsContext = createContext<ProjectActionsContextState>(
+const ProjectContext = createContext<ProjectActionsContextState>(
   {} as ProjectActionsContextState
 );
 
 export function useProjectActions(): ProjectActionsContextState {
-  return useContext(ProjectActionsContext);
+  return useContext(ProjectContext);
 }
 
-export function ProjectActionsProvider({
+export function ProjectProvider({
   children,
 }: {
   children: ReactElement;
@@ -53,31 +52,39 @@ export function ProjectActionsProvider({
   const { track } = useAnalytics();
   const queryClient = useQueryClient();
   const history = useHistory();
-  const { handleError } = useErrorHandler(ProjectActionsProvider.name);
+  const { handleError } = useErrorHandler(ProjectProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
   const projectId = useCurrentProjectId();
-  const { data: currentProject } = useGetCurrentProject();
+  const { data: currentProject, refetch: refetchCurrentProject } =
+    useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
   const { data: blocks, fetchAll } = useGetPollingBlocks();
 
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
-  const [isSwitching, setIsSwitching] = useState(false);
-  const [isRemovingProject, setIsRemovingProject] = useState(false);
+
+  useEffect(() => {
+    const isStartPage = history.location.pathname.startsWith("/start");
+    const isRunningProject = currentProject?.project;
+    if (isStartPage && isRunningProject) {
+      history.push(routes.firstRouteAfterStart);
+    }
+  }, [history.location, currentProject]);
 
   const confirmProjectRemove = async (project: Project) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
 
-    setIsRemovingProject(true);
     try {
-      await projectsService.removeProject(project.id);
-      toast(`Project "${project.name}" deleted!`);
-      history.replace(`/${routes.start}`);
+      await toast.promise(projectsService.removeProject(project.id), {
+        loading: "Deleting project",
+        error: `Failed to delete project "${project.name}"`,
+        success: `Project "${project.name}" deleted!`,
+      });
+      history.replace(routes.start);
     } catch (e) {
       toast.error("Something went wrong: can not delete custom emulator");
     } finally {
       hideDialog();
-      setIsRemovingProject(false);
     }
   };
 
@@ -92,25 +99,21 @@ export function ProjectActionsProvider({
   }
 
   async function switchProject() {
-    setIsSwitching(true);
     const execute = async () => {
       try {
         await projectsService.unUseCurrentProject();
+        refetchCurrentProject();
       } catch (e) {
         // nothing critical happened, ignore the error
         console.warn("Couldn't stop the emulator: ", e);
       }
-      history.replace(`/${routes.start}`);
-      try {
-        await logout(); // logout from dev-wallet, because config may change
-      } finally {
-        setIsSwitching(false);
-      }
+      await logout(); // logout from dev-wallet, because config may change
       // Clear the entire cache,
       // so that previous data isn't there when using another project
       queryClient.clear();
+      history.replace(routes.start);
     };
-    toast.promise(execute(), {
+    await toast.promise(execute(), {
       loading: "Closing project...",
       success: "Project closed!",
       error: "Something went wrong, try again!",
@@ -189,13 +192,11 @@ export function ProjectActionsProvider({
   }
 
   return (
-    <ProjectActionsContext.Provider
+    <ProjectContext.Provider
       value={{
-        isSwitching,
         switchProject,
         createSnapshot,
         sendTransaction,
-        isRemovingProject,
         checkoutBlock,
         removeProject,
       }}
@@ -203,6 +204,6 @@ export function ProjectActionsProvider({
       <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
       <SnapshotDialog show={showSnapshotModal} setShow={setShowSnapshotModal} />
       {children}
-    </ProjectActionsContext.Provider>
+    </ProjectContext.Provider>
   );
 }
