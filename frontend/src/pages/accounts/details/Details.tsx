@@ -228,7 +228,7 @@ const Details: FunctionComponent = () => {
               <PublicPrivateStorageCard
                 key={item.id}
                 currentAccountAddress={account.address}
-                content={item}
+                storageItem={item}
               />
             ))}
           </div>
@@ -236,7 +236,7 @@ const Details: FunctionComponent = () => {
             {baseStorageItems.map((item) => (
               <BaseStorageCard
                 key={item.id}
-                content={item}
+                storageItem={item}
                 onToggleExpand={() => toggleCardExpand(item.id)}
                 isExpanded={expandedCardIds.has(item.id)}
                 className={classNames({

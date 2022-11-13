@@ -7,31 +7,36 @@ import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 // @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
+import classNames from "classnames";
 
 type StorageCardProps = {
   currentAccountAddress: string;
-  content: DecoratedPollingEntity<AccountStorageItem>;
+  storageItem: DecoratedPollingEntity<AccountStorageItem>;
 };
 
 export const focusedStorageIdParamKey = "focusedStorageId";
 
 export function PublicPrivateStorageCard({
-  content,
+  storageItem,
   currentAccountAddress,
 }: StorageCardProps): ReactElement {
-  const targetPathIdentifier = content.data?.TargetPath?.Identifier ?? "-";
-  const borrowType = content.data?.BorrowType ?? "-";
+  const targetPathIdentifier = storageItem.data?.TargetPath?.Identifier ?? "-";
+  const borrowType = storageItem.data?.BorrowType ?? "-";
   const targetStorageCardUrl = getTargetStorageCardUrl({
     currentAccountAddress,
-    data: content.data,
+    data: storageItem.data,
   });
 
   return (
-    <div className={classes.root}>
+    <div
+      className={classNames(classes.root, {
+        [classes.introAnimation]: storageItem.isUpdated || storageItem.isNew,
+      })}
+    >
       <img className={classes.background} src={gradient} alt="" />
       <div className={classes.content}>
-        <StorageDomainBadge pathDomain={content.pathDomain} />
-        <div className={classes.identifier}>{content.pathIdentifier}</div>
+        <StorageDomainBadge pathDomain={storageItem.pathDomain} />
+        <div className={classes.identifier}>{storageItem.pathIdentifier}</div>
         <NavLink className={classes.link} to={targetStorageCardUrl}>
           <LinkIcon />
           <div className={classes.linkText}>{targetPathIdentifier}</div>
