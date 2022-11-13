@@ -20,12 +20,11 @@ import { useFlow } from "../../hooks/use-flow";
 import { SimpleButton } from "../simple-button/SimpleButton";
 
 const Navigation: FunctionComponent<{
-  className: string;
+  className?: string;
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
 }> = (props) => {
-  const { isShowBackButtonVisible, isNavigationDrawerVisible } =
-    useNavigation();
+  const { isShowBackButtonVisible, isBreadcrumbsVisible } = useNavigation();
   const { user, isLoggedIn } = useFlow();
   const history = useHistory();
   const tabCount = useTabCount();
@@ -112,8 +111,7 @@ const Navigation: FunctionComponent<{
           </Button>
         </div>
       </div>
-      {/* NAVIGATION DRAWER */}
-      {isNavigationDrawerVisible && (
+      {isBreadcrumbsVisible && (
         <div className={classes.navigationDrawerContainer}>
           {isShowBackButtonVisible && (
             <div className={classes.backButtonWrapper} onClick={onBack}>
