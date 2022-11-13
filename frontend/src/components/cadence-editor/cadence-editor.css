@@ -5,13 +5,12 @@
 
 .cadence-editor .cm-editor {
     background: none;
-    border: 1px solid transparent;
+    border: 2px solid #202a40;
     border-radius: 6px;
 }
 
 .cm-focused {
     outline: none !important;
-    border-color: #cfc5f8 !important;
 }
 
 /* Line number container */

@@ -138,7 +138,12 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
             Transaction error occurred, click to view!
           </button>
         )}
-        <CadenceEditor value={code} onChange={setCode} minHeight="200px" />
+        <CadenceEditor
+          value={code}
+          onChange={setCode}
+          minHeight="200px"
+          maxHeight="300px"
+        />
         <ScriptArguments className={classes.arguments} onChange={setArgs} />
       </>
     </ActionDialog>
