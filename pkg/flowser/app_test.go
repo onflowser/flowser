@@ -27,6 +27,6 @@ func TestInstallAndRun(t *testing.T) {
 
 	err = app.Remove("")
 	if err != nil {
-		t.Fatalf("Failed to remove installed app: %s", err)
+		t.Fatalf("Failed to remove installed App: %s", err)
 	}
 }
