@@ -221,7 +221,7 @@ export class ProjectsService {
     return this.projectRepository.delete({ id });
   }
 
-  async getDefaultProject() {
+  getDefaultProject() {
     const restServerPort = 8888;
     const grpcServerPort = 3569;
 

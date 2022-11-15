@@ -1,6 +1,7 @@
 @import "styles/spacings";
 @import "styles/colors";
 @import "styles/typography";
+@import "styles/animations";
 
 .root {
   display: flex;
@@ -10,6 +11,10 @@
   height: 196px;
   overflow: hidden;
   position: relative;
+
+  &.introAnimation {
+    @include addNewContentAnimation(.4s);
+  }
 
   .background {
     position: absolute;

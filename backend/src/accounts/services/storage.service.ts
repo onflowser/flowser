@@ -40,7 +40,7 @@ export class AccountStorageService {
   ) {
     const oldStorageItems = await this.findStorageByAccount(address);
     const entitiesDiff = computeEntitiesDiff<AccountStorageItemEntity>({
-      primaryKey: "pathIdentifier",
+      primaryKey: "id",
       newEntities: newStorageItems,
       oldEntities: oldStorageItems,
       deepCompare: true,

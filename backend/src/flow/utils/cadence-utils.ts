@@ -24,6 +24,7 @@ export class CadenceUtils {
     }
     switch (cadenceType) {
       case CadenceType.String:
+      case CadenceType.Address:
         return this.serializeStringLikeValue(cadenceObject);
       case CadenceType.Array:
         return this.serializeArrayValue(cadenceObject);

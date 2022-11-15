@@ -5,7 +5,6 @@ import { SentryMainService } from "./services/sentry-main.service";
 import { setupMenu } from "./menu";
 import { ServiceRegistry } from "./services/service-registry";
 import { FlowserBackend } from "./backend";
-import { ProjectEntity } from "@flowser/backend";
 
 fixPath();
 
@@ -125,11 +124,20 @@ async function handleBackendStart() {
     );
 
     if (shouldStartTemporaryProject) {
-      const project = new ProjectEntity();
+      const project = backend.getDefaultProject();
 
+      project.name = "Flow CLI project";
       project.filesystemPath = getSwitchValue(
         temporaryProjectFlags.projectPath
       );
+
+      // Do not run wallet/emulator, because Flow CLI will do it
+      if (project.emulator) {
+        project.emulator.run = false;
+      }
+      if (project.devWallet) {
+        project.devWallet.run = false;
+      }
 
       await backend.startTemporaryProject(project);
     }

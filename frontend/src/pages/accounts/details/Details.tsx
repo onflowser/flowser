@@ -225,14 +225,18 @@ const Details: FunctionComponent = () => {
         <DetailsTabItem label="STORAGE" value={storageItems?.length}>
           <div className={classes.grid}>
             {privateAndPublicStorageItems.map((item) => (
-              <PublicPrivateStorageCard key={item.id} content={item} />
+              <PublicPrivateStorageCard
+                key={item.id}
+                currentAccountAddress={account.address}
+                storageItem={item}
+              />
             ))}
           </div>
           <div className={classes.gridExtendable}>
             {baseStorageItems.map((item) => (
               <BaseStorageCard
                 key={item.id}
-                content={item}
+                storageItem={item}
                 onToggleExpand={() => toggleCardExpand(item.id)}
                 isExpanded={expandedCardIds.has(item.id)}
                 className={classNames({

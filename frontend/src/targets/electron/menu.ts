@@ -35,6 +35,31 @@ const template: MenuItemConstructorOptions[] = [
     ],
   },
   {
+    label: "Edit",
+    submenu: [
+      {
+        label: "Cut",
+        accelerator: "Command+X",
+        role: "cut",
+      },
+      {
+        label: "Copy",
+        accelerator: "Command+C",
+        role: "copy",
+      },
+      {
+        label: "Paste",
+        accelerator: "Command+V",
+        role: "paste",
+      },
+      {
+        label: "Select All",
+        accelerator: "Command+A",
+        role: "selectAll",
+      },
+    ],
+  },
+  {
     label: "View",
     submenu: [
       { role: "reload" },
