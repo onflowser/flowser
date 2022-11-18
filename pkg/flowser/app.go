@@ -116,7 +116,7 @@ func (a *App) unzip(source string, target string) error {
 
 // appDir returns the location of the executable application inside the installation dir.
 func (a *App) appDir(installDir string) (string, error) {
-	return path.Join(installDir, "Flowser.App"), nil
+	return path.Join(installDir, "Flowser.app"), nil
 }
 
 // executable returns the location of application executable.
