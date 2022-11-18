@@ -17,6 +17,10 @@ export class CommonUtils {
     );
   }
 
+  static isStandardError(error: unknown): error is Error {
+    return typeof error === "object" && error !== null && "message" in error;
+  }
+
   static isNotEmpty<Value>(value: Value | null | undefined): value is Value {
     return value !== null && value !== undefined;
   }

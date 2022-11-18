@@ -34,9 +34,9 @@ export const RouteWithLayout: FC<RouteProps> = (props) => (
 
 const Layout: FunctionComponent = ({ children }) => {
   const { logDrawerSize } = useLogDrawer();
-  const [isSidebarOpe, setIsSidebarOpe] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
-    setIsSidebarOpe((prevState) => !prevState);
+    setIsSidebarOpen((prevState) => !prevState);
   };
   const getLogDrawerLayoutClass = useCallback(() => {
     return logDrawerSize === "tiny"
@@ -47,15 +47,11 @@ const Layout: FunctionComponent = ({ children }) => {
   }, [logDrawerSize]);
 
   return (
-    <div className={`${classes.layoutContainer}`}>
-      <Navigation
-        className={classes.navigation}
-        isSidebarOpen={isSidebarOpe}
-        toggleSidebar={toggleSidebar}
-      />
-      <SideBar toggled={isSidebarOpe} toggleSidebar={toggleSidebar} />
+    <div className={classes.layoutContainer}>
+      <Navigation isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <SideBar toggled={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <Content className={classes.content}>{children} </Content>
-      <Logs className={`${classes.logs} ${getLogDrawerLayoutClass()}`} />
+      <Logs className={classNames(classes.logs, getLogDrawerLayoutClass())} />
     </div>
   );
 };

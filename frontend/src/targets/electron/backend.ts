@@ -52,9 +52,20 @@ export class FlowserBackend {
     await this.app?.close();
   }
 
+  public getDefaultProject(): ProjectEntity {
+    const projectService = this.app?.get(ProjectsService);
+    if (!projectService) {
+      throw new Error("App not initialized");
+    }
+    const defaultProjectProto = projectService?.getDefaultProject();
+    return ProjectEntity.create(defaultProjectProto);
+  }
+
   public async startTemporaryProject(project: ProjectEntity): Promise<void> {
     const projectService = this.app?.get(ProjectsService);
-
+    if (!projectService) {
+      throw new Error("App not initialized");
+    }
     await projectService?.useProject(project);
   }
 }
