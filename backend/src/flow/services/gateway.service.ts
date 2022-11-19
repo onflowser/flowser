@@ -1,4 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  PreconditionFailedException,
+} from "@nestjs/common";
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
@@ -113,13 +117,14 @@ export class FlowGatewayService implements ProjectContextLifecycle {
 
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
-    if (this.projectContext?.gateway) {
-      const accessNodeUrl = this.projectContext.gateway.restServerAddress;
-      FlowGatewayService.logger.debug(
-        `@onflow/fcl listening on ${accessNodeUrl}`
-      );
-      fcl.config().put("accessNode.api", accessNodeUrl);
+    const { restServerAddress } = this.projectContext.gateway ?? {};
+    if (!restServerAddress) {
+      throw new PreconditionFailedException("HTTP Access API address unset");
     }
+    FlowGatewayService.logger.debug(
+      `@onflow/fcl listening on ${restServerAddress}`
+    );
+    fcl.config().put("accessNode.api", restServerAddress);
   }
   onExitProjectContext(): void {
     this.projectContext = undefined;
