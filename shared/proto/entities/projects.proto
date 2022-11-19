@@ -33,16 +33,10 @@ message Project {
   string updated_at = 9;
 }
 
-enum GatewayStatus {
-  GATEWAY_STATUS_UNKNOWN = 0;
-  GATEWAY_STATUS_ONLINE = 1;
-  GATEWAY_STATUS_OFFLINE = 2;
-}
-
 message Gateway {
   string rest_server_address = 1;
   string grpc_server_address = 2;
-  GatewayStatus status = 3;
+  ServiceStatus status = 3;
 }
 
 message DevWallet {

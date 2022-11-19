@@ -73,8 +73,8 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   onExitProjectContext() {
-    this.detachListeners();
     this.projectContext = undefined;
+    this.detachListeners();
   }
 
   public async reload() {

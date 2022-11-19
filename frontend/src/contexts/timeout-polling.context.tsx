@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { PollingEntity, PollingResponse } from "@flowser/shared";
 import { useQuery } from "react-query";
-import { useIsInitialLoad } from "../hooks/use-api";
+import { useGatewayStatus } from "../hooks/use-api";
 
 export interface TimeoutPollingHook<Response extends PollingEntity> {
   stopPolling: () => void;
@@ -52,7 +52,7 @@ export function useProjectTimeoutPolling<
   Entity extends PollingEntity,
   Response extends PollingResponse<Entity[]>
 >(props: UseTimeoutPollingProps<Entity, Response>): TimeoutPollingHook<Entity> {
-  const { isInitialLoad, error: initialLoadError } = useIsInitialLoad();
+  const { isInitialLoad, error: initialLoadError } = useGatewayStatus();
 
   const timeoutPollingState = useTimeoutPolling<Entity, Response>({
     ...props,

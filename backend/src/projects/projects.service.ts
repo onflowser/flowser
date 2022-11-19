@@ -27,7 +27,7 @@ import {
   DevWallet,
   Emulator,
   Gateway,
-  GatewayStatus,
+  ServiceStatus,
   GetProjectStatusResponse,
   HashAlgorithm,
   Project,
@@ -98,7 +98,7 @@ export class ProjectsService {
       this.currentProject.gateway
     );
     const totalBlocksToProcess =
-      gatewayStatus === GatewayStatus.GATEWAY_STATUS_ONLINE
+      gatewayStatus === ServiceStatus.SERVICE_STATUS_ONLINE
         ? await this.flowAggregatorService.getTotalBlocksToProcess()
         : -1;
     return {

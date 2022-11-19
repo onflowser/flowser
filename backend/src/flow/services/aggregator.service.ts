@@ -30,7 +30,7 @@ import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import {
   FlowCoreEventType,
-  GatewayStatus,
+  ServiceStatus,
   ManagedProcessState,
 } from "@flowser/shared";
 import {
@@ -160,7 +160,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     const gatewayStatus = await FlowGatewayService.getGatewayStatus(
       this.projectContext.gateway
     );
-    if (gatewayStatus !== GatewayStatus.GATEWAY_STATUS_ONLINE) {
+    if (gatewayStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
       return;
     }
 

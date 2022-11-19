@@ -1,9 +1,14 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { hashAlgorithmToJSON, signatureAlgorithmToJSON } from "@flowser/shared";
+import {
+  ServiceStatus,
+  hashAlgorithmToJSON,
+  signatureAlgorithmToJSON,
+} from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
+import { FlowGatewayService } from "./gateway.service";
 
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
@@ -14,7 +19,10 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (this.projectContext.shouldRunEmulator()) {
+    const accessNodeStatus = await FlowGatewayService.getGatewayStatus(
+      this.projectContext.gateway
+    );
+    if (accessNodeStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
       await this.start();
     }
   }
