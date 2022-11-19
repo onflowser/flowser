@@ -12,9 +12,10 @@ import {
   RowData,
 } from "@tanstack/react-table";
 import { CommonUtils } from "../../utils/common-utils";
-import { NoResults } from "../no-results/NoResults";
+import { ErrorMessage } from "../errors/ErrorMessage";
 import FullScreenLoading from "../fullscreen-loading/FullScreenLoading";
 import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
+import { Message } from "../errors/Message";
 
 type CustomTableProps<TData> = {
   renderCustomHeader?: (header: HeaderGroup<TableData<TData>>) => ReactElement;
@@ -23,6 +24,7 @@ type CustomTableProps<TData> = {
   bodyRowClass?: string | ((row: Row<TableData<TData>>) => string);
   footerRowClass?: string;
   isInitialLoading?: boolean;
+  error?: Error | string | null | undefined;
 };
 
 export type TableProps<TData> = Pick<
@@ -53,6 +55,7 @@ function Table<TData>({
   bodyRowClass,
   footerRowClass,
   className,
+  error,
 }: TableProps<TData>): ReactElement {
   const table = useReactTable<TableData<TData>>({
     data,
@@ -60,8 +63,17 @@ function Table<TData>({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
+
   if (!isInitialLoading && data.length === 0) {
-    return <NoResults />;
+    return (
+      <Message
+        title="It looks like there is nothing here."
+        description="No results"
+      />
+    );
   }
 
   if (isInitialLoading) {

@@ -9,7 +9,7 @@ export type ErrorHandlerState = {
 export function useErrorHandler(componentName: string): ErrorHandlerState {
   const { monitoringService } = usePlatformAdapter();
   function handleError(error: unknown) {
-    if (CommonUtils.isStandardApiError(error)) {
+    if (CommonUtils.isFlowserError(error)) {
       toast.error(error.message);
     } else {
       toast.error("Unknown error");

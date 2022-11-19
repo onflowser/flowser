@@ -28,12 +28,12 @@ import {
   Emulator,
   Gateway,
   GatewayStatus,
+  GetProjectStatusResponse,
   HashAlgorithm,
   Project,
   ProjectRequirement,
   ProjectRequirementType,
   SignatureAlgorithm,
-  GetProjectStatusResponse,
 } from "@flowser/shared";
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
@@ -88,10 +88,22 @@ export class ProjectsService {
   }
 
   async getProjectStatus(): Promise<GetProjectStatusResponse> {
+    if (!this.currentProject) {
+      throw new NotFoundException("No current project");
+    }
+    if (!this.currentProject.gateway) {
+      throw new PreconditionFailedException("Gateway not configured");
+    }
+    const gatewayStatus = await FlowGatewayService.getGatewayStatus(
+      this.currentProject.gateway
+    );
     const totalBlocksToProcess =
-      await this.flowAggregatorService.getTotalBlocksToProcess();
+      gatewayStatus === GatewayStatus.GATEWAY_STATUS_ONLINE
+        ? await this.flowAggregatorService.getTotalBlocksToProcess()
+        : -1;
     return {
       totalBlocksToProcess,
+      gatewayStatus,
     };
   }
 
@@ -268,10 +280,9 @@ export class ProjectsService {
 
   private async setComputedFields(project: ProjectEntity) {
     if (project.hasGatewayConfiguration()) {
-      // Assume non-emulator networks are always online
-      project.gateway.status = project.shouldRunEmulator()
-        ? await FlowGatewayService.getGatewayStatus(project.gateway)
-        : GatewayStatus.GATEWAY_STATUS_ONLINE;
+      project.gateway.status = await FlowGatewayService.getGatewayStatus(
+        project.gateway
+      );
     }
     return project;
   }

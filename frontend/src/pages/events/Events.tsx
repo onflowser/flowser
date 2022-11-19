@@ -59,7 +59,7 @@ const subTableColumns = [
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
   const { searchTerm, setPlaceholder } = useSearch();
-  const { data, firstFetch } = useGetPollingEvents();
+  const { data, firstFetch, error } = useGetPollingEvents();
   const { filteredData } = useFilterData(data, searchTerm);
   const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
@@ -138,6 +138,7 @@ const Events: FunctionComponent = () => {
     <Table<DecoratedPollingEntity<Event>>
       isInitialLoading={firstFetch}
       data={filteredData}
+      error={error}
       columns={columns}
       renderCustomHeader={(headerGroup) => (
         <Card

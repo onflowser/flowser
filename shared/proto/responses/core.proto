@@ -1,12 +1,13 @@
 syntax = "proto3";
 
-message ErrorData {
+message FlowserError {
   string name = 1;
   string message = 2;
+  string description = 3;
 }
 
 message ErrorResponse {
-  ErrorData error = 1;
+  FlowserError error = 1;
 }
 
 message PollingMetaData {

@@ -1,6 +1,6 @@
 import { SendRequestOptions, TransportService } from "./transport.service";
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-import { ErrorData } from "@flowser/shared";
+import { FlowserError } from "@flowser/shared";
 
 export class HttpTransportService implements TransportService {
   private axios: AxiosInstance;
@@ -14,13 +14,13 @@ export class HttpTransportService implements TransportService {
         // status codes within the 2xx range trigger this function
         return response;
       },
-      function (error): ErrorData {
+      function (error): FlowserError {
         // status codes outside the 2xx range trigger this function
         console.error("HTTP transport error");
         console.error(error);
         throw (
           error.response.data.error ??
-          ErrorData.fromPartial({
+          FlowserError.fromPartial({
             message: "Unknown error",
           })
         );

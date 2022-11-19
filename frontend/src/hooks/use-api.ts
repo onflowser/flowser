@@ -31,6 +31,8 @@ import {
   GetProjectStatusResponse,
   Project,
   GetPollingProjectsResponse,
+  GatewayStatus,
+  FlowserError,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -249,21 +251,24 @@ export function useGetProjectRequirements() {
   );
 }
 
-export function useIsInitialLoad(): { isInitialLoad: boolean } {
-  const [enabled, setEnabled] = useState(true);
+export function useIsInitialLoad(): {
+  isInitialLoad: boolean;
+  error: FlowserError | undefined;
+} {
   const { data } = useGetProjectStatus({
     refetchInterval: 1000,
-    enabled,
   });
 
-  useEffect(() => {
-    const isInitialLoadComplete = data && data?.totalBlocksToProcess <= 0;
-    if (isInitialLoadComplete) {
-      setEnabled(false);
-    }
-  }, [data]);
-
   return {
+    error:
+      data?.gatewayStatus === GatewayStatus.GATEWAY_STATUS_OFFLINE
+        ? {
+            name: "Service Unreachable",
+            message: "Gateway offline",
+            description:
+              "Can't reach Flow access node. Make sure Flow emulator is running without errors.",
+          }
+        : undefined,
     isInitialLoad: !data || data.totalBlocksToProcess > 0,
   };
 }

@@ -165,18 +165,6 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     return { ...account, address };
   }
 
-  async isConnectedToGateway() {
-    if (!this.projectContext?.gateway) {
-      return false;
-    }
-
-    const gatewayStatus = await FlowGatewayService.getGatewayStatus(
-      this.projectContext.gateway
-    );
-
-    return gatewayStatus === GatewayStatus.GATEWAY_STATUS_ONLINE;
-  }
-
   static async getGatewayStatus(gateway: Gateway): Promise<GatewayStatus> {
     const { hostname, port } = new URL(gateway.restServerAddress);
     return new Promise((resolve) => {
@@ -187,13 +175,13 @@ export class FlowGatewayService implements ProjectContextLifecycle {
             path: "/live",
             port,
           },
-          (res) => {
+          () => {
             req.end();
-            return resolve(
-              res.statusCode === 200
-                ? GatewayStatus.GATEWAY_STATUS_ONLINE
-                : GatewayStatus.GATEWAY_STATUS_UNKNOWN
-            );
+            // Assume that if response is received, server is online
+            // Ideally we should send a ping request to access API
+            // but that endpoint isn't implemented on emulator side (afaik)
+            // https://github.com/onflow/flow/blob/master/protobuf/flow/access/access.proto#L20
+            return resolve(GatewayStatus.GATEWAY_STATUS_ONLINE);
           }
         )
         .on("error", (err) => {

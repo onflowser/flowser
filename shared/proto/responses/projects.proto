@@ -11,6 +11,7 @@ message GetProjectRequirementsResponse {
 message GetProjectStatusResponse {
   // Number of blocks that our backend needs to process.
   uint32 total_blocks_to_process = 1;
+  GatewayStatus gateway_status = 2;
 }
 
 message GetAllProjectsResponse {
@@ -27,17 +28,17 @@ message GetPollingProjectsResponse {
 }
 
 message CreateProjectResponse {
-  ErrorData error = 1;
+  FlowserError error = 1;
   Project project = 2;
 }
 
 message UpdateProjectResponse {
-  ErrorData error = 1;
+  FlowserError error = 1;
   Project project = 2;
 }
 
 message UseProjectResponse {
-  ErrorData error = 1;
+  FlowserError error = 1;
   Project project = 2;
 }
 
