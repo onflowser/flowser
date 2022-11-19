@@ -31,7 +31,7 @@ const Main: FunctionComponent = () => {
   const { showNavigationDrawer } = useNavigation();
   const { checkoutBlock } = useProjectActions();
 
-  const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { data: blocks, firstFetch, error } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
   const snapshotLookupByBlockId = useMemo(
@@ -127,6 +127,7 @@ const Main: FunctionComponent = () => {
   return (
     <Table<DecoratedPollingEntity<Block>>
       isInitialLoading={firstFetch}
+      error={error}
       data={filteredData}
       columns={columns}
       renderCustomHeader={(headerGroup) => (

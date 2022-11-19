@@ -85,7 +85,7 @@ const columns = [
 const Main: FunctionComponent = () => {
   const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
-  const { data, firstFetch } = useGetPollingTransactions();
+  const { data, firstFetch, error } = useGetPollingTransactions();
   const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
@@ -96,6 +96,7 @@ const Main: FunctionComponent = () => {
   return (
     <Table<DecoratedPollingEntity<Transaction>>
       isInitialLoading={firstFetch}
+      error={error}
       data={filteredData}
       columns={columns}
     />

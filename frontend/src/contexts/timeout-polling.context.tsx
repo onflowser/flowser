@@ -52,7 +52,7 @@ export function useProjectTimeoutPolling<
   Entity extends PollingEntity,
   Response extends PollingResponse<Entity[]>
 >(props: UseTimeoutPollingProps<Entity, Response>): TimeoutPollingHook<Entity> {
-  const { isInitialLoad } = useIsInitialLoad();
+  const { isInitialLoad, error: initialLoadError } = useIsInitialLoad();
 
   const timeoutPollingState = useTimeoutPolling<Entity, Response>({
     ...props,
@@ -61,6 +61,7 @@ export function useProjectTimeoutPolling<
 
   return {
     ...timeoutPollingState,
+    error: initialLoadError || timeoutPollingState.error,
     firstFetch: isInitialLoad || timeoutPollingState.firstFetch,
   };
 }

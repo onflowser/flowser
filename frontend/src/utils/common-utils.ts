@@ -1,4 +1,4 @@
-import { ErrorData } from "@flowser/shared";
+import { FlowserError } from "@flowser/shared";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 export class CommonUtils {
@@ -8,12 +8,13 @@ export class CommonUtils {
     return "isNew" in entity && "isUpdated" in entity;
   }
 
-  static isStandardApiError(error: unknown): error is ErrorData {
+  static isFlowserError(error: unknown): error is FlowserError {
     return (
       typeof error === "object" &&
       error !== null &&
+      "name" in error &&
       "message" in error &&
-      "name" in error
+      "description" in error
     );
   }
 

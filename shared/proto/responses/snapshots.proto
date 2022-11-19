@@ -19,7 +19,7 @@ message CreateEmulatorSnapshotRequest {
 }
 
 message CreateEmulatorSnapshotResponse {
-  ErrorData error = 1;
+  FlowserError error = 1;
   EmulatorSnapshot snapshot = 2;
 }
 
@@ -29,6 +29,6 @@ message RevertToEmulatorSnapshotRequest {
 }
 
 message RevertToEmulatorSnapshotResponse {
-  ErrorData error = 1;
+  FlowserError error = 1;
   EmulatorSnapshot snapshot = 2;
 }
