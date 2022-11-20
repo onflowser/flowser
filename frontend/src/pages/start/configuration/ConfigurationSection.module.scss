@@ -13,6 +13,10 @@
         color: $light-grey;
         font-size: $font-size-big;
       }
+      .description {
+        color: $color-grey;
+        margin-left: $spacing-base;
+      }
       .toggleWrapper {
         display: flex;
         margin-left: $spacing-base;
@@ -26,23 +30,30 @@
     .rightSection {
       display: flex;
       align-items: center;
-      span {
+      .title {
         color: $color-grey;
         margin-right: $spacing-base;
-      }
-      .openIcon, .closeIcon {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-      }
-      .openIcon {
-        path {
-          fill: $color-grey;
+        &:first-letter {
+          text-transform: uppercase;
         }
       }
-      .closeIcon {
-        path {
-          fill: $color-light-gray;
+      .toggleOpenButton {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        .openIcon, .closeIcon {
+          width: 20px;
+          height: 20px;
+        }
+        .openIcon {
+          path {
+            fill: $color-grey;
+          }
+        }
+        .closeIcon {
+          path {
+            fill: $color-light-gray;
+          }
         }
       }
     }

@@ -1,9 +1,14 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { hashAlgorithmToJSON, signatureAlgorithmToJSON } from "@flowser/shared";
+import {
+  ServiceStatus,
+  hashAlgorithmToJSON,
+  signatureAlgorithmToJSON,
+} from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
+import { FlowGatewayService } from "./gateway.service";
 
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
@@ -14,14 +19,17 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (this.projectContext.shouldRunEmulator()) {
+    const accessNodeStatus = await FlowGatewayService.getApiStatus(
+      this.projectContext.gateway
+    );
+    if (accessNodeStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
       await this.start();
     }
   }
 
   async onExitProjectContext() {
     this.projectContext = undefined;
-    await this.stop();
+    await this.processManagerService.remove(FlowEmulatorService.processId);
     this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
@@ -38,10 +46,6 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       },
     });
     await this.processManagerService.start(managedProcess);
-  }
-
-  async stop() {
-    await this.processManagerService.stop(FlowEmulatorService.processId);
   }
 
   private getFlags() {

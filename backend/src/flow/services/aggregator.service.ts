@@ -28,7 +28,11 @@ import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { FlowAccountStorageService } from "./storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
-import { FlowCoreEventType, ManagedProcessState } from "@flowser/shared";
+import {
+  FlowCoreEventType,
+  ServiceStatus,
+  ManagedProcessState,
+} from "@flowser/shared";
 import {
   ProcessManagerEvent,
   ProcessManagerService,
@@ -47,7 +51,12 @@ type BlockData = {
   events: ExtendedFlowEvent[];
 };
 
-export type FlowTransactionWithStatus = FlowTransaction & {
+type UnprocessedBlockInfo = {
+  nextBlockHeightToProcess: number;
+  latestUnprocessedBlockHeight: number;
+};
+
+type FlowTransactionWithStatus = FlowTransaction & {
   status: FlowTransactionStatus;
 };
 
@@ -136,8 +145,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   async getTotalBlocksToProcess() {
-    const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
-    return endBlockHeight - startBlockHeight;
+    const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
+      await this.getUnprocessedBlocksInfo();
+
+    return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
   }
 
   // TODO(milestone-x): Next interval shouldn't start before this function resolves
@@ -146,10 +157,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     if (!this.projectContext) {
       return;
     }
-    if (
-      this.projectContext.shouldRunEmulator() &&
-      !this.emulatorProcess?.isRunning()
-    ) {
+    const gatewayStatus = await FlowGatewayService.getApiStatus(
+      this.projectContext.gateway
+    );
+    if (gatewayStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
       return;
     }
 
@@ -158,55 +169,49 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       await this.processDefaultAccounts();
     }
 
-    const { startBlockHeight, endBlockHeight } = await this.getBlockRange();
-    const hasBlocksToProcess = startBlockHeight <= endBlockHeight;
+    const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
+      await this.getUnprocessedBlocksInfo();
+    const hasBlocksToProcess =
+      nextBlockHeightToProcess <= latestUnprocessedBlockHeight;
+
     if (!hasBlocksToProcess) {
       return;
     }
 
     try {
-      await this.processBlocksWithinHeightRange(
-        startBlockHeight,
-        endBlockHeight
-      );
+      for (
+        let height = nextBlockHeightToProcess;
+        height <= latestUnprocessedBlockHeight;
+        height++
+      ) {
+        this.logger.debug(`Processing block: ${height}`);
+        // Blocks must be processed in sequential order (not in parallel)
+        // because objects on subsequent blocks can reference objects from previous blocks
+        // (e.g. a transaction may reference an account from previous block)
+        await this.processBlockWithHeight(height);
+      }
     } catch (e) {
       return this.logger.debug(`failed to fetch block data: ${e}`);
     }
   }
 
-  async getBlockRange() {
+  private async getUnprocessedBlocksInfo(): Promise<UnprocessedBlockInfo> {
     const [lastStoredBlock, latestBlock] = await Promise.all([
       this.blockService.findLastBlock(),
       this.flowGatewayService.getLatestBlock(),
     ]);
-
-    // user can specify (on a project level) what is the starting block height
-    // if user provides no specification, the latest block height is used
-    const initialStartBlockHeight =
-      !this.projectContext.isStartBlockHeightDefined()
-        ? latestBlock.height
-        : this.projectContext.startBlockHeight;
-
-    // fetch from last stored block (if there are already blocks in the database)
-    const startBlockHeight = lastStoredBlock
+    const nextBlockHeightToProcess = lastStoredBlock
       ? lastStoredBlock.height + 1
-      : initialStartBlockHeight;
-    const endBlockHeight = latestBlock.height;
+      : this.projectContext.startBlockHeight;
+    const latestUnprocessedBlockHeight = latestBlock.height;
 
-    return { startBlockHeight, endBlockHeight };
+    return {
+      nextBlockHeightToProcess,
+      latestUnprocessedBlockHeight,
+    };
   }
 
-  public async processBlocksWithinHeightRange(
-    fromHeight: number,
-    toHeight: number
-  ) {
-    for (let height = fromHeight; height <= toHeight; height++) {
-      this.logger.debug(`fetching block: ${height}`);
-      await this.processBlockWithHeight(height);
-    }
-  }
-
-  async processBlockWithHeight(height: number) {
+  private async processBlockWithHeight(height: number) {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
 
@@ -233,13 +238,13 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     }
   }
 
-  subscribeTxStatusUpdates(transactions: FlowTransactionWithStatus[]) {
+  private subscribeTxStatusUpdates(transactions: FlowTransactionWithStatus[]) {
     transactions.forEach((transaction) => {
       this.flowSubscriptionService.addTransactionSubscription(transaction.id);
     });
   }
 
-  async storeBlockData(data: BlockData) {
+  private async storeBlockData(data: BlockData) {
     // TODO(milestone-3): Transaction references previous block in referenceBlockId field. Why? Previously we used this field to indicate which block contained some transaction.
     // Docs say: referenceBlockId = A reference to the block used to calculate the expiry of this transaction.
     // https://developers.flow.com/tools/fcl-js/reference/api#transactionobject
@@ -272,7 +277,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     return Promise.all([blockPromise, transactionPromises, eventPromises]);
   }
 
-  public async getBlockData(height: number): Promise<BlockData> {
+  private async getBlockData(height: number): Promise<BlockData> {
     const block = await this.flowGatewayService.getBlockByHeight(height);
     const collections = await Promise.all(
       block.collectionGuarantees.map(async (guarantee) =>
@@ -322,7 +327,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     };
   }
 
-  async processEvents(events: FlowEvent[]) {
+  private async processEvents(events: FlowEvent[]) {
     // Process new accounts first, so other events can reference them.
     const accountCreatedEvents = events.filter(
       (event) => event.type === FlowCoreEventType.ACCOUNT_CREATED
@@ -349,7 +354,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     );
   }
 
-  async handleEvent(event: FlowEvent) {
+  private async handleEvent(event: FlowEvent) {
     const { data, type } = event;
     this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
     const address = ensurePrefixedAddress(data.address);
@@ -369,7 +374,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     }
   }
 
-  async handleTransactionCreated(
+  private async handleTransactionCreated(
     block: FlowBlock,
     transaction: FlowTransaction,
     status: FlowTransactionStatus
@@ -384,7 +389,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  async storeNewAccountWithContractsAndKeys(address: string) {
+  private async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     const unSerializedAccount = AccountEntity.create(flowAccount);
     if (
@@ -412,7 +417,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  async updateStoredAccountKeys(address: string) {
+  private async updateStoredAccountKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     await Promise.all([
       this.accountService.markUpdated(address),
@@ -425,7 +430,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  async updateStoredAccountContracts(address: string) {
+  private async updateStoredAccountContracts(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     const account = AccountEntity.create(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
@@ -445,7 +450,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  async updateAccountsStorage() {
+  private async updateAccountsStorage() {
     const allAddresses = await this.accountService.findAllAddresses();
     this.logger.debug(
       `Processing storages for accounts: ${allAddresses.join(", ")}`
@@ -455,7 +460,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     );
   }
 
-  async processAccountStorage(address: string) {
+  private async processAccountStorage(address: string) {
     const { privateItems, publicItems, storageItems } =
       await this.flowStorageService.getAccountStorage(address);
     return this.accountStorageService.updateAccountStorage(address, [
@@ -465,14 +470,14 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
   }
 
-  async isServiceAccountProcessed() {
+  private async isServiceAccountProcessed() {
     const serviceAccountAddress = ensurePrefixedAddress(
       this.configService.getServiceAccountAddress()
     );
     return this.accountService.accountExists(serviceAccountAddress);
   }
 
-  async processDefaultAccounts() {
+  private async processDefaultAccounts() {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
 
@@ -491,7 +496,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     }
   }
 
-  getDefaultAccountsAddresses() {
+  private getDefaultAccountsAddresses() {
     const serviceAccountAddress = ensurePrefixedAddress(
       this.configService.getServiceAccountAddress()
     );

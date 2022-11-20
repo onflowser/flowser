@@ -39,12 +39,10 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
       onClose();
     } catch (e) {
       handleError(e);
-      if (!data?.project?.emulator?.run) {
-        toast(
-          "Make sure you are using the '--snapshot' flag when running emulator",
-          { duration: 4000 }
-        );
-      }
+      toast(
+        "Make sure you are using the '--snapshot' flag when running emulator",
+        { duration: 4000 }
+      );
     } finally {
       setLoading(false);
     }

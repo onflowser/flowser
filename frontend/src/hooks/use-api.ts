@@ -31,7 +31,7 @@ import {
   GetProjectStatusResponse,
   Project,
   GetPollingProjectsResponse,
-  GatewayStatus,
+  ServiceStatus,
   FlowserError,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
@@ -251,25 +251,36 @@ export function useGetProjectRequirements() {
   );
 }
 
-export function useIsInitialLoad(): {
+export function useGatewayStatus(): {
   isInitialLoad: boolean;
   error: FlowserError | undefined;
 } {
-  const { data } = useGetProjectStatus({
-    refetchInterval: 1000,
-  });
+  const [error, setError] = useState<FlowserError | undefined>();
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const { data } = useGetProjectStatus();
+
+  useEffect(() => {
+    if (isInitialLoad) {
+      setIsInitialLoad(data?.totalBlocksToProcess !== 0);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data?.flowApiStatus === ServiceStatus.SERVICE_STATUS_OFFLINE) {
+      setError({
+        name: "Service Unreachable",
+        message: "Flow API offline",
+        description:
+          "Can't reach Flow access node. Make sure Flow emulator is running without errors.",
+      });
+    } else {
+      setError(undefined);
+    }
+  }, [data]);
 
   return {
-    error:
-      data?.gatewayStatus === GatewayStatus.GATEWAY_STATUS_OFFLINE
-        ? {
-            name: "Service Unreachable",
-            message: "Gateway offline",
-            description:
-              "Can't reach Flow access node. Make sure Flow emulator is running without errors.",
-          }
-        : undefined,
-    isInitialLoad: !data || data.totalBlocksToProcess > 0,
+    error,
+    isInitialLoad,
   };
 }
 
@@ -277,10 +288,11 @@ export function useGetProjectStatus(options?: {
   refetchInterval?: number;
   enabled?: boolean;
 }) {
+  const { refetchInterval = 1000, enabled = true } = options ?? {};
   return useQuery<GetProjectStatusResponse>(
     `/projects/status`,
     () => projectsService.getStatus(),
-    options
+    { refetchInterval, enabled }
   );
 }
 

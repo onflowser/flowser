@@ -37,25 +37,13 @@ export class ProjectEntity extends PollingEntity {
   })
   emulator: Emulator | null;
 
-  // Blockchain data will be fetched from this block height
-  // Set this null to start fetching from the latest block
+  // User can specify (on a project level) the starting block height.
+  // Blockchain data will be fetched from this height value if set.
   @Column({ nullable: true })
   startBlockHeight: number | null = 0;
 
   hasGatewayConfiguration() {
     return this.gateway !== null;
-  }
-
-  isStartBlockHeightDefined() {
-    return this.startBlockHeight !== null;
-  }
-
-  shouldRunEmulator() {
-    return Boolean(this.emulator?.run);
-  }
-
-  shouldRunDevWallet() {
-    return Boolean(this.devWallet?.run);
   }
 
   toProto(): Project {

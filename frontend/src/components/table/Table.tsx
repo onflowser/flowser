@@ -70,8 +70,8 @@ function Table<TData>({
   if (!isInitialLoading && data.length === 0) {
     return (
       <Message
-        title="It looks like there is nothing here."
-        description="No results"
+        title="No results"
+        description="It looks like there is nothing here."
       />
     );
   }

@@ -3,6 +3,8 @@ import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
+import { DevWallet, ServiceStatus } from "@flowser/shared";
+import * as http from "http";
 
 @Injectable()
 export class FlowDevWalletService implements ProjectContextLifecycle {
@@ -13,18 +15,17 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    if (this.projectContext.shouldRunDevWallet()) {
+    const walletApiStatus = await FlowDevWalletService.getApiStatus(
+      this.projectContext.devWallet
+    );
+    if (walletApiStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
       await this.start();
     }
   }
 
   async onExitProjectContext() {
-    if (this.projectContext?.shouldRunDevWallet()) {
-      await this.processManagerService.stop(FlowDevWalletService.processId);
-      this.processManagerService
-        .get(FlowDevWalletService.processId)
-        ?.clearLogs();
-    }
+    await this.processManagerService.remove(FlowDevWalletService.processId);
+    this.processManagerService.get(FlowDevWalletService.processId)?.clearLogs();
   }
 
   async start() {
@@ -44,5 +45,26 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
       },
     });
     await this.processManagerService.start(devWalletProcess);
+  }
+
+  static async getApiStatus(devWallet: DevWallet): Promise<ServiceStatus> {
+    return new Promise((resolve) => {
+      const req = http
+        .get(
+          {
+            host: "localhost",
+            path: "/api/",
+            port: devWallet.port,
+          },
+          () => {
+            req.end();
+            return resolve(ServiceStatus.SERVICE_STATUS_ONLINE);
+          }
+        )
+        .on("error", (err) => {
+          req.end();
+          return resolve(ServiceStatus.SERVICE_STATUS_OFFLINE);
+        });
+    });
   }
 }

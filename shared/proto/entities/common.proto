@@ -18,3 +18,9 @@ enum HashAlgorithm {
   KMAC128_BLS_BLS12_381 = 5;
   KECCAK_256 = 6;
 }
+
+enum ServiceStatus {
+  SERVICE_STATUS_UNKNOWN = 0;
+  SERVICE_STATUS_ONLINE = 1;
+  SERVICE_STATUS_OFFLINE = 2;
+}

@@ -1,26 +1,22 @@
 import React, { FC, useState } from "react";
 import classes from "./ConfigurationSection.module.scss";
 import classNames from "classnames";
-import ToggleButton from "../../../components/toggle-button/ToggleButton";
 import { ReactComponent as OpenIcon } from "assets/icons/open.svg";
 import { ReactComponent as CloseIcon } from "assets/icons/close.svg";
 
 export type ConfigurationSectionProps = {
   title: string;
-  isToggleable?: boolean;
+  description?: string;
   className?: string;
   isEnabled?: boolean;
-  onToggleEnabled?: (isEnabled: boolean) => void;
   collapseChildren?: boolean;
 };
 
 export const ConfigurationSection: FC<ConfigurationSectionProps> = ({
   title,
-  isToggleable,
+  description,
   children,
   className,
-  isEnabled,
-  onToggleEnabled,
   collapseChildren = false,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(!collapseChildren);
@@ -29,31 +25,23 @@ export const ConfigurationSection: FC<ConfigurationSectionProps> = ({
       <div className={classes.header}>
         <div className={classes.leftSection}>
           <h3 className={classes.title}>{title}</h3>
-          {isToggleable && (
-            <div className={classes.toggleWrapper}>
-              <ToggleButton
-                value={isEnabled}
-                onChange={(value) => onToggleEnabled?.(value)}
-              />
-            </div>
-          )}
+          {description && <p className={classes.description}>{description}</p>}
         </div>
         <div className={classes.rightSection}>
           {collapseChildren && (
-            <>
-              <span>Advanced settings</span>
+            <div
+              className={classes.toggleOpenButton}
+              onClick={() => setShowAdvanced((show) => !show)}
+            >
+              <span className={classes.title}>
+                {title.toLowerCase()} settings
+              </span>
               {showAdvanced ? (
-                <CloseIcon
-                  className={classes.closeIcon}
-                  onClick={() => setShowAdvanced(false)}
-                />
+                <CloseIcon className={classes.closeIcon} />
               ) : (
-                <OpenIcon
-                  className={classes.openIcon}
-                  onClick={() => setShowAdvanced(true)}
-                />
+                <OpenIcon className={classes.openIcon} />
               )}
-            </>
+            </div>
           )}
         </div>
       </div>

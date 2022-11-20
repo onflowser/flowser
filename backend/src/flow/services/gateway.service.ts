@@ -1,8 +1,12 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  PreconditionFailedException,
+} from "@nestjs/common";
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { Gateway, GatewayStatus } from "@flowser/shared";
+import { Gateway, ServiceStatus } from "@flowser/shared";
 
 const fcl = require("@onflow/fcl");
 
@@ -113,13 +117,14 @@ export class FlowGatewayService implements ProjectContextLifecycle {
 
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
-    if (this.projectContext?.gateway) {
-      const accessNodeUrl = this.projectContext.gateway.restServerAddress;
-      FlowGatewayService.logger.debug(
-        `@onflow/fcl listening on ${accessNodeUrl}`
-      );
-      fcl.config().put("accessNode.api", accessNodeUrl);
+    const { restServerAddress } = this.projectContext.gateway ?? {};
+    if (!restServerAddress) {
+      throw new PreconditionFailedException("HTTP Access API address unset");
     }
+    FlowGatewayService.logger.debug(
+      `@onflow/fcl listening on ${restServerAddress}`
+    );
+    fcl.config().put("accessNode.api", restServerAddress);
   }
   onExitProjectContext(): void {
     this.projectContext = undefined;
@@ -165,7 +170,7 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     return { ...account, address };
   }
 
-  static async getGatewayStatus(gateway: Gateway): Promise<GatewayStatus> {
+  static async getApiStatus(gateway: Gateway): Promise<ServiceStatus> {
     const { hostname, port } = new URL(gateway.restServerAddress);
     return new Promise((resolve) => {
       const req = http
@@ -181,14 +186,13 @@ export class FlowGatewayService implements ProjectContextLifecycle {
             // Ideally we should send a ping request to access API
             // but that endpoint isn't implemented on emulator side (afaik)
             // https://github.com/onflow/flow/blob/master/protobuf/flow/access/access.proto#L20
-            return resolve(GatewayStatus.GATEWAY_STATUS_ONLINE);
+            return resolve(ServiceStatus.SERVICE_STATUS_ONLINE);
           }
         )
         .on("error", (err) => {
           req.end();
-          return resolve(GatewayStatus.GATEWAY_STATUS_OFFLINE);
+          return resolve(ServiceStatus.SERVICE_STATUS_OFFLINE);
         });
-      return true;
     });
   }
 }

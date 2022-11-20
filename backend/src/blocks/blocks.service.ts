@@ -26,7 +26,7 @@ export class BlocksService {
     });
   }
 
-  findLastBlock(): Promise<BlockEntity> {
+  findLastBlock(): Promise<BlockEntity | null> {
     return this.blockRepository
       .createQueryBuilder("block")
       .select()

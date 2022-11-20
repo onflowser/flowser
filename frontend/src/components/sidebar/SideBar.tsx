@@ -131,9 +131,15 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>PROCESSES</span>
           <div className={classes.processItemsWrapper}>
-            {processes.map((process) => (
-              <ManagedProcessItem key={process.id} process={process} />
-            ))}
+            {processes.length > 0 ? (
+              processes.map((process) => (
+                <ManagedProcessItem key={process.id} process={process} />
+              ))
+            ) : (
+              <span className={classes.description}>
+                No processes are running within Flowser
+              </span>
+            )}
           </div>
         </div>
         <div>

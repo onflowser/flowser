@@ -25,8 +25,6 @@ export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
   restServerPort: number;
   @ApiProperty()
-  run: boolean;
-  @ApiProperty()
   scriptGasLimit: number;
   @ApiProperty()
   serviceHashAlgorithm: number;
