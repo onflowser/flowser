@@ -40,12 +40,10 @@ message Gateway {
 }
 
 message DevWallet {
-  bool run = 1;
   int32 port = 2;
 }
 
 message Emulator {
-  bool run = 28;
   bool verbose_logging = 1;
   string log_format = 22;
   uint32 rest_server_port = 2;

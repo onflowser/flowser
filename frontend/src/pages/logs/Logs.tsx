@@ -16,12 +16,13 @@ import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
-import { useGetCurrentProject, useGetPollingLogs } from "../../hooks/use-api";
+import { useGetPollingLogs, useGetPollingProcesses } from "../../hooks/use-api";
 import { ManagedProcessLog, LogSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../../components/simple-button/SimpleButton";
 import { TextUtils } from "../../utils/text-utils";
+import { CommonUtils } from "../../utils/common-utils";
 
 type LogsProps = {
   className?: string;
@@ -60,8 +61,12 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     [logs]
   );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
-  const { data } = useGetCurrentProject();
-  const isCapturingEmulatorLogs = data?.project?.emulator?.run;
+  const { data: processes } = useGetPollingProcesses();
+  const isCapturingProcessLogs = processes.some(
+    (process) =>
+      CommonUtils.isEmulatorProcess(process) ||
+      CommonUtils.isDevWalletProcess(process)
+  );
   const { filteredData } = useFilterData(sortedLogs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
 
@@ -134,8 +139,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     setTrackMousePosition(false);
   }, []);
 
-  if (!isCapturingEmulatorLogs) {
-    // TODO(milestone-5): Should we show some kind of notice somewhere?
+  if (!isCapturingProcessLogs) {
     return null;
   }
 

@@ -246,11 +246,9 @@ export class ProjectsService {
         grpcServerAddress: `http://localhost:${grpcServerPort}`,
       }),
       devWallet: DevWallet.fromJSON({
-        run: true,
         port: 8701,
       }),
       emulator: Emulator.fromPartial({
-        run: true,
         verboseLogging: true,
         restServerPort,
         grpcServerPort,

@@ -97,12 +97,6 @@ export function useFlow() {
   async function login() {
     track(AnalyticEvent.CONNECT_WALLET);
 
-    if (!project?.devWallet?.run) {
-      // TODO(milestone-x): Check if wallet is online with GET {devWalletUrl}/api request
-      toast(
-        "Make sure you started the dev wallet with `flow dev-wallet` command"
-      );
-    }
     setLoggingIn(true);
     try {
       const result = await fcl.authenticate();

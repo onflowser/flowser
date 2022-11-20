@@ -196,11 +196,6 @@ export const Configuration: FunctionComponent = () => {
             title="Dev wallet"
             collapseChildren
             className={classes.section}
-            isEnabled={formik.values.devWallet?.run}
-            onToggleEnabled={(isEnabled) =>
-              formik.setFieldValue("devWallet.run", isEnabled)
-            }
-            isToggleable
           >
             <Card className={classes.card}>
               <DevWalletTextField
@@ -215,11 +210,6 @@ export const Configuration: FunctionComponent = () => {
             title="Emulator"
             collapseChildren
             className={classes.section}
-            isEnabled={formik.values.emulator?.run}
-            onToggleEnabled={(isEnabled) =>
-              formik.setFieldValue("emulator.run", isEnabled)
-            }
-            isToggleable
           >
             <Card className={classes.card}>
               <EmulatorTextField
