@@ -102,6 +102,15 @@ export class ProcessManagerService extends EventEmitter {
     await this.processLookupById.get(processId)?.stop();
   }
 
+  /**
+   * Stops the process and removes it from the process table.
+   * Process state won't be tracked anymore.
+   */
+  async remove(processId: string) {
+    await this.stop(processId);
+    this.processLookupById.delete(processId);
+  }
+
   async restart(processId: string) {
     const process = this.processLookupById.get(processId);
     if (!process) {

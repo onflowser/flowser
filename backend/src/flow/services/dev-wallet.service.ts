@@ -24,7 +24,7 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
   }
 
   async onExitProjectContext() {
-    await this.processManagerService.stop(FlowDevWalletService.processId);
+    await this.processManagerService.remove(FlowDevWalletService.processId);
     this.processManagerService.get(FlowDevWalletService.processId)?.clearLogs();
   }
 

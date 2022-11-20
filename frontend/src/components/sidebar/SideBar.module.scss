@@ -38,6 +38,11 @@
       -webkit-text-fill-color: transparent;
     }
 
+    .description {
+      color: $color-grey;
+      font-size: $font-size-small;
+    }
+
     .menuItem {
       display: flex;
       padding: $spacing-base * 0.6 0;

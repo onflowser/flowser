@@ -269,7 +269,7 @@ export function useGatewayStatus(): {
     if (data?.flowApiStatus === ServiceStatus.SERVICE_STATUS_OFFLINE) {
       setError({
         name: "Service Unreachable",
-        message: "Gateway offline",
+        message: "Flow API offline",
         description:
           "Can't reach Flow access node. Make sure Flow emulator is running without errors.",
       });

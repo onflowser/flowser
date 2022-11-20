@@ -29,7 +29,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async onExitProjectContext() {
     this.projectContext = undefined;
-    await this.stop();
+    await this.processManagerService.remove(FlowEmulatorService.processId);
     this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
@@ -46,10 +46,6 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       },
     });
     await this.processManagerService.start(managedProcess);
-  }
-
-  async stop() {
-    await this.processManagerService.stop(FlowEmulatorService.processId);
   }
 
   private getFlags() {
