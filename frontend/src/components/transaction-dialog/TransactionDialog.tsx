@@ -104,7 +104,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
   if (showLongError) {
     return (
       <Dialog className={classes.dialog} onClose={onClose}>
-        <div className={classes.root} style={{ padding: 0 }}>
+        <div className={classes.errorRoot} style={{ padding: 0 }}>
           <TransactionErrorMessage errorMessage={longError} />
           <div className={classes.actions}>
             <Button
