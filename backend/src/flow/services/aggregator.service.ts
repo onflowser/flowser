@@ -157,7 +157,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     if (!this.projectContext) {
       return;
     }
-    const gatewayStatus = await FlowGatewayService.getGatewayStatus(
+    const gatewayStatus = await FlowGatewayService.getApiStatus(
       this.projectContext.gateway
     );
     if (gatewayStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {

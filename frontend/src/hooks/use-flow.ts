@@ -4,10 +4,11 @@ import * as fcl from "@onflow/fcl";
 // @ts-ignore
 import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
-import { useGetCurrentProject } from "./use-api";
+import { useGetCurrentProject, useGetProjectStatus } from "./use-api";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "./use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
+import { ServiceStatus } from "@flowser/shared";
 
 export type FlowScriptArgumentValue = string | number;
 export type FlowScriptArgumentType = string;
@@ -35,6 +36,7 @@ export function setFclConfig(options: {
 export function useFlow() {
   const { track } = useAnalytics();
   const { data } = useGetCurrentProject();
+  const { data: projectStatus } = useGetProjectStatus();
   const { project } = data ?? {};
   const [user, setUser] = useState<{ loggedIn: null; addr?: string }>({
     loggedIn: null,
@@ -96,6 +98,15 @@ export function useFlow() {
 
   async function login() {
     track(AnalyticEvent.CONNECT_WALLET);
+
+    if (
+      projectStatus?.devWalletApiStatus !== ServiceStatus.SERVICE_STATUS_ONLINE
+    ) {
+      return toast.error(
+        `fcl-dev-wallet service doesn't appear to be running. 
+        Make sure to start it with \`flow dev-wallet\` command.`
+      );
+    }
 
     setLoggingIn(true);
     try {

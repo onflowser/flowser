@@ -94,16 +94,20 @@ export class ProjectsService {
     if (!this.currentProject.gateway) {
       throw new PreconditionFailedException("Gateway not configured");
     }
-    const gatewayStatus = await FlowGatewayService.getGatewayStatus(
+    const flowApiStatus = await FlowGatewayService.getApiStatus(
       this.currentProject.gateway
     );
+    const devWalletApiStatus = await FlowDevWalletService.getApiStatus(
+      this.currentProject.devWallet
+    );
     const totalBlocksToProcess =
-      gatewayStatus === ServiceStatus.SERVICE_STATUS_ONLINE
+      flowApiStatus === ServiceStatus.SERVICE_STATUS_ONLINE
         ? await this.flowAggregatorService.getTotalBlocksToProcess()
         : -1;
     return {
       totalBlocksToProcess,
-      gatewayStatus,
+      flowApiStatus,
+      devWalletApiStatus,
     };
   }
 
@@ -278,7 +282,7 @@ export class ProjectsService {
 
   private async setComputedFields(project: ProjectEntity) {
     if (project.hasGatewayConfiguration()) {
-      project.gateway.status = await FlowGatewayService.getGatewayStatus(
+      project.gateway.status = await FlowGatewayService.getApiStatus(
         project.gateway
       );
     }

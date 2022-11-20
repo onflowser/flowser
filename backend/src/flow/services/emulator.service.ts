@@ -19,7 +19,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
-    const accessNodeStatus = await FlowGatewayService.getGatewayStatus(
+    const accessNodeStatus = await FlowGatewayService.getApiStatus(
       this.projectContext.gateway
     );
     if (accessNodeStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {

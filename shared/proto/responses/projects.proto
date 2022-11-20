@@ -12,7 +12,8 @@ message GetProjectRequirementsResponse {
 message GetProjectStatusResponse {
   // Number of blocks that our backend needs to process.
   uint32 total_blocks_to_process = 1;
-  ServiceStatus gateway_status = 2;
+  ServiceStatus flow_api_status = 2;
+  ServiceStatus dev_wallet_api_status = 3;
 }
 
 message GetAllProjectsResponse {

@@ -170,7 +170,7 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     return { ...account, address };
   }
 
-  static async getGatewayStatus(gateway: Gateway): Promise<ServiceStatus> {
+  static async getApiStatus(gateway: Gateway): Promise<ServiceStatus> {
     const { hostname, port } = new URL(gateway.restServerAddress);
     return new Promise((resolve) => {
       const req = http

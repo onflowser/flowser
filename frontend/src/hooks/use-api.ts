@@ -257,9 +257,7 @@ export function useGatewayStatus(): {
 } {
   const [error, setError] = useState<FlowserError | undefined>();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const { data } = useGetProjectStatus({
-    refetchInterval: 1000,
-  });
+  const { data } = useGetProjectStatus();
 
   useEffect(() => {
     if (isInitialLoad) {
@@ -268,7 +266,7 @@ export function useGatewayStatus(): {
   }, [data]);
 
   useEffect(() => {
-    if (data?.gatewayStatus === ServiceStatus.SERVICE_STATUS_OFFLINE) {
+    if (data?.flowApiStatus === ServiceStatus.SERVICE_STATUS_OFFLINE) {
       setError({
         name: "Service Unreachable",
         message: "Gateway offline",
@@ -290,10 +288,11 @@ export function useGetProjectStatus(options?: {
   refetchInterval?: number;
   enabled?: boolean;
 }) {
+  const { refetchInterval = 1000, enabled = true } = options ?? {};
   return useQuery<GetProjectStatusResponse>(
     `/projects/status`,
     () => projectsService.getStatus(),
-    options
+    { refetchInterval, enabled }
   );
 }
 
