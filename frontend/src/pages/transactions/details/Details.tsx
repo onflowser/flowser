@@ -252,12 +252,8 @@ const Details: FunctionComponent = () => {
         value: <GrcpStatusBadge status={transaction.status} />,
       },
       {
-        label: "Timestamp",
+        label: "Created date",
         value: TextUtils.longDate(transaction.createdAt),
-      },
-      {
-        label: "Time",
-        value: <ReactTimeAgo date={transaction.createdAt} />,
       },
       {
         label: "Block ID",

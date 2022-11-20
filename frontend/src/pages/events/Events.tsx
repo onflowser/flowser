@@ -20,6 +20,7 @@ import ReactTimeago from "react-timeago";
 import classNames from "classnames";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { Ellipsis } from "../../components/ellipsis/Ellipsis";
+import { useNavigation } from "../../hooks/use-navigation";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -58,6 +59,7 @@ const subTableColumns = [
 
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
+  const { showNavigationDrawer } = useNavigation();
   const { searchTerm, setPlaceholder } = useSearch();
   const { data, firstFetch, error } = useGetPollingEvents();
   const { filteredData } = useFilterData(data, searchTerm);
@@ -101,7 +103,7 @@ const Events: FunctionComponent = () => {
         ),
       }),
       columnHelper.accessor("createdAt", {
-        header: () => <Label variant="medium">TIME</Label>,
+        header: () => <Label variant="medium">CREATED</Label>,
         cell: (info) => (
           <Value>
             <ReactTimeago date={info.getValue()} />
@@ -128,6 +130,7 @@ const Events: FunctionComponent = () => {
 
   useEffect(() => {
     setPlaceholder("Search events");
+    showNavigationDrawer(false);
   }, []);
 
   const openLog = (status: boolean, id: string) => {

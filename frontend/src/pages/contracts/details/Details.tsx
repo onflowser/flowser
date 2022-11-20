@@ -9,6 +9,7 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
+import { TextUtils } from "../../../utils/text-utils";
 
 type RouteParams = {
   contractId: string;
@@ -49,6 +50,10 @@ const Details: FunctionComponent = () => {
             {contract.accountAddress}
           </NavLink>
         ),
+      },
+      {
+        label: "Created date",
+        value: TextUtils.longDate(contract.createdAt),
       },
     ],
   ];

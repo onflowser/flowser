@@ -58,7 +58,11 @@ export class AccountsService {
   async update(address: string, updatedAccount: AccountEntity) {
     const account = await this.accountRepository.findOneByOrFail({ address });
     account.markUpdated();
-    return this.accountRepository.update({ address }, updatedAccount);
+    return this.accountRepository.update(
+      { address },
+      // Prevent overwriting existing created date
+      { ...account, createdAt: undefined }
+    );
   }
 
   async markUpdated(address: string) {

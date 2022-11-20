@@ -49,6 +49,7 @@ import { UserIcon } from "../../../components/user-icon/UserIcon";
 import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
+import { TextUtils } from "../../../utils/text-utils";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -211,6 +212,10 @@ const Details: FunctionComponent = () => {
             <span className={classes.currency}>FLOW</span>
           </>
         ),
+      },
+      {
+        label: "Created date",
+        value: TextUtils.longDate(account.createdAt),
       },
     ],
   ];
