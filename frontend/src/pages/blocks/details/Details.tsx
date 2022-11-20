@@ -136,12 +136,8 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
-        label: "Timestamp",
+        label: "Created date",
         value: TextUtils.longDate(block.createdAt),
-      },
-      {
-        label: "Time",
-        value: <ReactTimeAgo date={block.createdAt} />,
       },
     ],
   ];

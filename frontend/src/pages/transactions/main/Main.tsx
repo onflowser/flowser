@@ -73,7 +73,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("createdAt", {
-    header: () => <Label variant="medium">TIME</Label>,
+    header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
         <ReactTimeago date={info.getValue()} />

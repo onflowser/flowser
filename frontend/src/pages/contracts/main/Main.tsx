@@ -10,6 +10,7 @@ import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { AccountContract } from "@flowser/shared";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import ReactTimeago from "react-timeago";
 
 // CONTRACTS TABLE
 const columnHelper =
@@ -33,6 +34,14 @@ const columns = [
         <NavLink to={`/accounts/details/${info.getValue()}`}>
           {info.getValue()}
         </NavLink>
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">CREATED</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
       </Value>
     ),
   }),

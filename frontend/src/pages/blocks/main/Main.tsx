@@ -49,13 +49,6 @@ const Main: FunctionComponent = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor("height", {
-        header: () => <Label variant="medium">HEIGHT</Label>,
-        meta: {
-          className: classes.blockHeight,
-        },
-        cell: (info) => <Value>{info.getValue()}</Value>,
-      }),
       columnHelper.accessor("id", {
         header: () => <Label variant="medium">ID</Label>,
         meta: {
@@ -70,6 +63,13 @@ const Main: FunctionComponent = () => {
             </NavLink>
           </Value>
         ),
+      }),
+      columnHelper.accessor("height", {
+        header: () => <Label variant="medium">HEIGHT</Label>,
+        meta: {
+          className: classes.blockHeight,
+        },
+        cell: (info) => <Value>{info.getValue()}</Value>,
       }),
       columnHelper.accessor("blockSeals", {
         header: () => <Label variant="medium">SEALS COUNT</Label>,
@@ -86,7 +86,7 @@ const Main: FunctionComponent = () => {
         cell: (info) => <Value>{info.getValue()?.length}</Value>,
       }),
       columnHelper.accessor("timestamp", {
-        header: () => <Label variant="medium">TIME</Label>,
+        header: () => <Label variant="medium">CREATED</Label>,
         meta: {
           className: classes.time,
         },
