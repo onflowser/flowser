@@ -6,6 +6,7 @@ import { ReactComponent as CloseIcon } from "assets/icons/close.svg";
 
 export type ConfigurationSectionProps = {
   title: string;
+  description?: string;
   className?: string;
   isEnabled?: boolean;
   collapseChildren?: boolean;
@@ -13,6 +14,7 @@ export type ConfigurationSectionProps = {
 
 export const ConfigurationSection: FC<ConfigurationSectionProps> = ({
   title,
+  description,
   children,
   className,
   collapseChildren = false,
@@ -23,23 +25,23 @@ export const ConfigurationSection: FC<ConfigurationSectionProps> = ({
       <div className={classes.header}>
         <div className={classes.leftSection}>
           <h3 className={classes.title}>{title}</h3>
+          {description && <p className={classes.description}>{description}</p>}
         </div>
         <div className={classes.rightSection}>
           {collapseChildren && (
-            <>
-              <span>Advanced settings</span>
+            <div
+              className={classes.toggleOpenButton}
+              onClick={() => setShowAdvanced((show) => !show)}
+            >
+              <span className={classes.title}>
+                {title.toLowerCase()} settings
+              </span>
               {showAdvanced ? (
-                <CloseIcon
-                  className={classes.closeIcon}
-                  onClick={() => setShowAdvanced(false)}
-                />
+                <CloseIcon className={classes.closeIcon} />
               ) : (
-                <OpenIcon
-                  className={classes.openIcon}
-                  onClick={() => setShowAdvanced(true)}
-                />
+                <OpenIcon className={classes.openIcon} />
               )}
-            </>
+            </div>
           )}
         </div>
       </div>

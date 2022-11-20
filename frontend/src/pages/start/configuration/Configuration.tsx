@@ -194,6 +194,7 @@ export const Configuration: FunctionComponent = () => {
           </ConfigurationSection>
           <ConfigurationSection
             title="Dev wallet"
+            description="If fcl-dev-wallet is not running, Flowser will start it automatically."
             collapseChildren
             className={classes.section}
           >
@@ -208,6 +209,7 @@ export const Configuration: FunctionComponent = () => {
           </ConfigurationSection>
           <ConfigurationSection
             title="Emulator"
+            description="If flow-emulator is not running, Flowser will start it automatically."
             collapseChildren
             className={classes.section}
           >
@@ -385,7 +387,7 @@ export const Configuration: FunctionComponent = () => {
               href={`https://github.com/onflow/flow-cli/releases/tag/${flowCliInfo?.version}`}
               rel="noreferrer"
             >
-              Emulator version: {flowCliInfo?.version || "-"}
+              Flow CLI version {flowCliInfo?.version || "-"}
             </a>
           </div>
         </footer>
