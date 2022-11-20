@@ -245,9 +245,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   private async storeBlockData(data: BlockData) {
-    // TODO(milestone-3): Transaction references previous block in referenceBlockId field. Why? Previously we used this field to indicate which block contained some transaction.
-    // Docs say: referenceBlockId = A reference to the block used to calculate the expiry of this transaction.
-    // https://developers.flow.com/tools/fcl-js/reference/api#transactionobject
     const blockPromise = this.blockService
       .create(BlockEntity.create(data.block))
       .catch((e) =>
@@ -348,7 +345,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     await Promise.all(
       restEvents.map((event) =>
         this.handleEvent(event).catch((e) => {
-          this.logger.error(`event handling error: ${e.message}`, e.stack);
+          this.logger.error(
+            `${event.type} event handling error: ${e.message}`,
+            e.stack
+          );
         })
       )
     );
@@ -358,7 +358,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     const { data, type } = event;
     this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
     const address = ensurePrefixedAddress(data.address);
-    // TODO: should we use data.contract info to find the updated/created/deleted contract?
     switch (type) {
       case FlowCoreEventType.ACCOUNT_CREATED:
         return this.storeNewAccountWithContractsAndKeys(address);
@@ -368,6 +367,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
+        // TODO: Use event.data.address & event.data.contract to determine updated/created/removed contract
         return this.updateStoredAccountContracts(address);
       default:
         return null; // not a core event, ignore it

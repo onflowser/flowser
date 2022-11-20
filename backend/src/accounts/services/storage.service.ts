@@ -65,7 +65,8 @@ export class AccountStorageService {
         pathDomain: accountStorage.pathDomain,
         accountAddress: accountStorage.accountAddress,
       },
-      accountStorage
+      // Prevent overwriting existing created date
+      { ...accountStorage, createdAt: undefined }
     );
   }
 

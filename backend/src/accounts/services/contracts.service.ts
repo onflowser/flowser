@@ -60,9 +60,11 @@ export class ContractsService {
   }
 
   async update(contract: AccountContractEntity) {
+    contract.markUpdated();
     return this.contractRepository.update(
       { accountAddress: contract.accountAddress, name: contract.name },
-      contract
+      // Prevent overwriting existing created date
+      { ...contract, createdAt: undefined }
     );
   }
 
@@ -74,7 +76,7 @@ export class ContractsService {
       accountAddress
     );
     const contractsDiff = computeEntitiesDiff({
-      primaryKey: "name",
+      primaryKey: "id",
       oldEntities: oldContracts,
       newEntities: newContracts,
     });

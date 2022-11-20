@@ -226,7 +226,11 @@ export class ProjectsService {
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     const project = ProjectEntity.create(updateProjectDto);
     project.markUpdated();
-    await this.projectRepository.update({ id }, project);
+    await this.projectRepository.update(
+      { id },
+      // Prevent overwriting existing created date
+      { ...project, createdAt: undefined }
+    );
     return project;
   }
 

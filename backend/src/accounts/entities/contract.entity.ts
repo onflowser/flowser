@@ -1,5 +1,13 @@
 import { PollingEntity } from "../../core/entities/polling.entity";
-import { AfterLoad, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import {
+  AfterLoad,
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+} from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
 import { ensurePrefixedAddress } from "../../utils";
@@ -23,18 +31,15 @@ export class AccountContractEntity extends PollingEntity {
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
   account: AccountEntity;
 
-  public static parseId(id: string) {
-    const idParts = id.split(".");
-    if (idParts.length !== 2) {
-      throw new BadRequestException("Invalid contract id");
-    }
-    const [accountAddress, name] = idParts;
-    return { accountAddress, name };
+  @AfterLoad()
+  public updateId() {
+    this.id = `${this.accountAddress}.${this.name}`;
   }
 
-  @AfterLoad()
-  private computeId() {
-    this.id = `${this.accountAddress}.${this.name}`;
+  @BeforeInsert()
+  @BeforeUpdate()
+  public unsetId() {
+    delete this.id;
   }
 
   toProto(): AccountContract {
@@ -53,6 +58,16 @@ export class AccountContractEntity extends PollingEntity {
     contract.accountAddress = ensurePrefixedAddress(account.address);
     contract.name = name;
     contract.code = code;
+    contract.updateId();
     return contract;
+  }
+
+  public static parseId(id: string) {
+    const idParts = id.split(".");
+    if (idParts.length !== 2) {
+      throw new BadRequestException("Invalid contract id");
+    }
+    const [accountAddress, name] = idParts;
+    return { accountAddress, name };
   }
 }

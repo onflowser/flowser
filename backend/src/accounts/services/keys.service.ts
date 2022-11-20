@@ -63,7 +63,8 @@ export class KeysService {
         accountAddress: accountKey.accountAddress,
         index: accountKey.index,
       },
-      accountKey
+      // Prevent overwriting existing created date
+      { ...accountKey, createdAt: undefined }
     );
   }
 
