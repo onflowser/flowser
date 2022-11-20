@@ -12,7 +12,6 @@ import { Account } from "@flowser/shared";
 import { TextUtils } from "../../../utils/text-utils";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import classes from "./Main.module.scss";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -70,9 +69,6 @@ const Main: FunctionComponent = () => {
       error={error}
       columns={columns}
       data={filteredData}
-      bodyRowClass={(row) =>
-        row.original.isDefaultAccount ? classes.defaultAccountRow : ""
-      }
     />
   );
 };
