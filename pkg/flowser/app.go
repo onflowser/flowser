@@ -25,9 +25,7 @@ func New() *App {
 	return &App{}
 }
 
-type App struct {
-	installDir string
-}
+type App struct{}
 
 var errorPlatformNotSupported = errors.New("OS not supported, only supporting Windows and Mac OS")
 
@@ -77,8 +75,6 @@ func (a *App) Installed(installDir string) bool {
 //
 // Install directory is optional, if you don't provide a value default will be used.
 func (a *App) Remove(installDir string) error {
-	a.installDir = installDir
-
 	dir, err := a.appDir(installDir)
 	if err != nil {
 		return err
