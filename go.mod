@@ -1,4 +1,4 @@
-module github.com/onflowser/flowser
+module github.com/onflowser/flowser/v2
 
 go 1.19
 
