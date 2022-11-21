@@ -15,7 +15,10 @@ import newProject from "../../../assets/icons/new_project.svg";
 import openProject from "../../../assets/icons/open_project.svg";
 import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
-import { useGetAllProjects } from "../../../hooks/use-api";
+import {
+  useGetAllProjects,
+  useGetCurrentProject,
+} from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import Search from "../../../components/search/Search";
@@ -58,12 +61,21 @@ const enableOpenProjectAction = false;
 const Main: FunctionComponent<RouteChildrenProps> = (props) => {
   const { showDialog } = useConfirmDialog();
   const history = useHistory();
+  const { data: currentProject } = useGetCurrentProject();
 
   const providedTabId = props.location.hash?.replace("#", "");
   const providedTab = tabs.find((tab) => tab.id === providedTabId);
   const defaultTab = tabs.find((tab) => tab.isDefault);
   const fallbackTab = tabs[0];
   const activeTab = providedTab ?? defaultTab ?? fallbackTab;
+
+  useEffect(() => {
+    const isStartPage = history.location.pathname.startsWith("/start");
+    const isRunningProject = currentProject?.project;
+    if (isStartPage && isRunningProject) {
+      history.push(routes.firstRouteAfterStart);
+    }
+  }, [history.location, currentProject]);
 
   const onConfigure = useCallback(() => {
     history.push(routes.configure);

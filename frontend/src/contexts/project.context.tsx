@@ -63,14 +63,6 @@ export function ProjectProvider({
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
 
-  useEffect(() => {
-    const isStartPage = history.location.pathname.startsWith("/start");
-    const isRunningProject = currentProject?.project;
-    if (isStartPage && isRunningProject) {
-      history.push(routes.firstRouteAfterStart);
-    }
-  }, [history.location, currentProject]);
-
   const confirmProjectRemove = async (project: Project) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
 
