@@ -48,8 +48,6 @@ func (a *App) Run(installDir string, projectPath string) error {
 }
 
 // Install Flowser application in the provided install directory.
-//
-// Install directory is optional, if you want to default to your system location you can provide empty value.
 func (a *App) Install(installDir string) error {
 	downloadDir, err := downloadLatestReleaseAsset()
 	if err != nil {
