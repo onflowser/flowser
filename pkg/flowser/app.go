@@ -40,6 +40,10 @@ func (a *App) Run(installDir string, projectPath string) error {
 		return err
 	}
 
+	if projectPath != "" {
+		projectPath = fmt.Sprintf("--project-path=%s", projectPath)
+	}
+
 	cmd := exec.Command(exe, projectPath)
 
 	go func() {
@@ -49,10 +53,6 @@ func (a *App) Run(installDir string, projectPath string) error {
 		<-sig
 		_ = cmd.Process.Kill()
 	}()
-
-	if projectPath != "" {
-		projectPath = fmt.Sprintf("--project-path=%s", projectPath)
-	}
 
 	return cmd.Run()
 }
