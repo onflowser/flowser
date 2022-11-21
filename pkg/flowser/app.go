@@ -47,7 +47,6 @@ func (a *App) Run(installDir string, projectPath string) error {
 		signal.Notify(sig, os.Interrupt)
 		signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
 		<-sig
-
 		_ = cmd.Process.Kill()
 	}()
 
