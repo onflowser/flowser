@@ -8,9 +8,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/google/go-github/github"
 )
@@ -38,13 +40,22 @@ func (a *App) Run(installDir string, projectPath string) error {
 		return err
 	}
 
+	cmd := exec.Command(exe, projectPath)
+
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, os.Interrupt)
+		signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
+		<-sig
+
+		_ = cmd.Process.Kill()
+	}()
+
 	if projectPath != "" {
 		projectPath = fmt.Sprintf("--project-path=%s", projectPath)
 	}
 
-	return exec.
-		Command(exe, projectPath).
-		Run()
+	return cmd.Run()
 }
 
 // Install Flowser application in the provided install directory.
