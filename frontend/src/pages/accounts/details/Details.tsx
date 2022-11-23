@@ -18,12 +18,14 @@ import {
   useGetPollingContractsByAccount,
   useGetPollingKeysByAccount,
   useGetPollingStorageByAccount,
+  useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import {
   AccountContract,
   AccountKey,
   AccountStorageDomain,
+  Transaction,
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
@@ -50,6 +52,7 @@ import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { TextUtils } from "../../../utils/text-utils";
+import { transactionTableColumns } from "../../transactions/main/Main";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -124,7 +127,7 @@ const Details: FunctionComponent = () => {
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
-  // TODO(milestone-5): Should we show all transactions of account?
+  const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
@@ -250,6 +253,18 @@ const Details: FunctionComponent = () => {
               />
             ))}
           </div>
+        </DetailsTabItem>
+        <DetailsTabItem
+          label="TRANSACTIONS"
+          value={transactions.length}
+          onClick={() =>
+            updateSearchBar("search for transactions", !transactions.length)
+          }
+        >
+          <Table<DecoratedPollingEntity<Transaction>>
+            columns={transactionTableColumns}
+            data={transactions}
+          />
         </DetailsTabItem>
         <DetailsTabItem
           label="CONTRACTS"

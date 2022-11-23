@@ -19,7 +19,7 @@ import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
-const columns = [
+export const transactionTableColumns = [
   columnHelper.accessor("id", {
     header: () => <Label variant="medium">ID</Label>,
     cell: (info) => (
@@ -98,7 +98,7 @@ const Main: FunctionComponent = () => {
       isInitialLoading={firstFetch}
       error={error}
       data={filteredData}
-      columns={columns}
+      columns={transactionTableColumns}
     />
   );
 };
