@@ -3,6 +3,7 @@ import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
 import { ReactComponent as SettingsIcon } from "../../assets/icons/settings-circle.svg";
+import { ReactComponent as ShareFeedbackIcon } from "../../assets/icons/share-feedback.svg";
 import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle.svg";
 import { ReactComponent as LogoutIcon } from "../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
@@ -82,6 +83,13 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             onClick={openSettings}
             title="Settings"
             icon={<SettingsIcon />}
+          />
+          <ActionButton
+            onClick={() => {
+              window.open("mailto:info.flowser@gmail.com");
+            }}
+            title="Share Feedback"
+            icon={<ShareFeedbackIcon />}
           />
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>EMULATOR</span>
