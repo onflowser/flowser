@@ -127,7 +127,7 @@ func (a *App) appDir(installDir string) (string, error) {
 func (a *App) executable(installDir string) (string, error) {
 	files := map[string]string{
 		darwin:  "Contents/MacOS/Flowser",
-		windows: "Flowser.exe",
+		windows: "@flowserapp",
 	}
 	file, ok := files[runtime.GOOS]
 	if !ok {
