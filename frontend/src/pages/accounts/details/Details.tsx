@@ -18,12 +18,14 @@ import {
   useGetPollingContractsByAccount,
   useGetPollingKeysByAccount,
   useGetPollingStorageByAccount,
+  useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import {
   AccountContract,
   AccountKey,
   AccountStorageDomain,
+  Transaction,
 } from "@flowser/shared";
 import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
@@ -50,6 +52,8 @@ import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { TextUtils } from "../../../utils/text-utils";
+import { transactionTableColumns } from "../../transactions/main/Main";
+import { enableDetailsIntroAnimation } from "../../../config/common";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -124,7 +128,7 @@ const Details: FunctionComponent = () => {
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
-  // TODO(milestone-5): Should we show all transactions of account?
+  const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
@@ -232,6 +236,7 @@ const Details: FunctionComponent = () => {
             {privateAndPublicStorageItems.map((item) => (
               <PublicPrivateStorageCard
                 key={item.id}
+                enableIntroAnimation={enableDetailsIntroAnimation}
                 currentAccountAddress={account.address}
                 storageItem={item}
               />
@@ -242,6 +247,7 @@ const Details: FunctionComponent = () => {
               <BaseStorageCard
                 key={item.id}
                 storageItem={item}
+                enableIntroAnimation={enableDetailsIntroAnimation}
                 onToggleExpand={() => toggleCardExpand(item.id)}
                 isExpanded={expandedCardIds.has(item.id)}
                 className={classNames({
@@ -252,6 +258,19 @@ const Details: FunctionComponent = () => {
           </div>
         </DetailsTabItem>
         <DetailsTabItem
+          label="TRANSACTIONS"
+          value={transactions.length}
+          onClick={() =>
+            updateSearchBar("search for transactions", !transactions.length)
+          }
+        >
+          <Table<DecoratedPollingEntity<Transaction>>
+            enableIntroAnimations={enableDetailsIntroAnimation}
+            columns={transactionTableColumns}
+            data={transactions}
+          />
+        </DetailsTabItem>
+        <DetailsTabItem
           label="CONTRACTS"
           value={contracts.length}
           onClick={() =>
@@ -259,6 +278,7 @@ const Details: FunctionComponent = () => {
           }
         >
           <Table<DecoratedPollingEntity<AccountContract>>
+            enableIntroAnimations={enableDetailsIntroAnimation}
             columns={columnsContract}
             data={contracts}
           />
@@ -268,6 +288,7 @@ const Details: FunctionComponent = () => {
             onMount={() => updateSearchBar("search for keys", !keys.length)}
           >
             <Table<DecoratedPollingEntity<AccountKey>>
+              enableIntroAnimations={enableDetailsIntroAnimation}
               columns={columnsKeys}
               data={keys}
             />

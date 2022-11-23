@@ -40,11 +40,11 @@ export class EventsController {
   @ApiParam({ name: "id", type: String })
   @Post("/transactions/:id/events/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingEventsResponse))
-  async findAllNewByTransaction(@Body() data) {
+  async findAllNewByTransaction(@Param("id") transactionId, @Body() data) {
     const request = GetPollingEventsByTransactionRequest.fromJSON(data);
     const events =
       await this.eventsService.findAllByTransactionNewerThanTimestamp(
-        request.transactionId,
+        transactionId,
         new Date(request.timestamp)
       );
     return events.map((event) => event.toProto());

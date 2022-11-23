@@ -35,6 +35,7 @@ import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { enableDetailsIntroAnimation } from "../../../config/common";
 
 type RouteParams = {
   transactionId: string;
@@ -383,6 +384,7 @@ const Details: FunctionComponent = () => {
           <Table<DecoratedPollingEntity<Event>>
             data={events}
             columns={columnsEventsParent}
+            enableIntroAnimations={enableDetailsIntroAnimation}
             renderCustomHeader={(headerGroup) => (
               <Card
                 className={`${classes.tableRow}`}
@@ -404,7 +406,7 @@ const Details: FunctionComponent = () => {
                 <Card
                   className={classes.tableRow}
                   key={row.id}
-                  showIntroAnimation={true}
+                  showIntroAnimation={enableDetailsIntroAnimation}
                   variant="table-line"
                 >
                   {row.getVisibleCells().map((cell) => (

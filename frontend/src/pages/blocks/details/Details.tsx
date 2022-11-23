@@ -21,7 +21,6 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
-import ReactTimeAgo from "react-timeago";
 import {
   DetailsCard,
   DetailsCardColumn,
@@ -29,6 +28,7 @@ import {
 import { TextUtils } from "../../../utils/text-utils";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { enableDetailsIntroAnimation } from "../../../config/common";
 
 type RouteParams = {
   blockId: string;
@@ -146,7 +146,6 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
       <DetailsTabs>
-        <DetailsTabItem label="HEIGHT" value={block.height} />
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
           <Fragment
             onMount={() =>
@@ -157,11 +156,12 @@ const Details: FunctionComponent = () => {
               <Table<DecoratedPollingEntity<Transaction>>
                 data={transactions}
                 columns={txTableColumns}
+                enableIntroAnimations={enableDetailsIntroAnimation}
               />
             )}
           </Fragment>
         </DetailsTabItem>
-
+        <DetailsTabItem label="HEIGHT" value={block.height} />
         <DetailsTabItem
           label="COLLECTIONS"
           value={block.collectionGuarantees?.length ?? 0}

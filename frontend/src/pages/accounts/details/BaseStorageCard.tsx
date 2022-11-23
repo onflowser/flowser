@@ -12,6 +12,7 @@ type ExtendableStorageCardProps = {
   onToggleExpand: () => void;
   isExpanded: boolean;
   className?: string;
+  enableIntroAnimation?: boolean;
 };
 
 export function BaseStorageCard({
@@ -19,11 +20,13 @@ export function BaseStorageCard({
   onToggleExpand,
   isExpanded,
   className,
+  enableIntroAnimation = true,
 }: ExtendableStorageCardProps): ReactElement {
   const extendClass = classNames(className, {
     [classes.root]: true,
     [classes.gridItemExtended]: isExpanded,
-    [classes.introAnimation]: storageItem.isNew || storageItem.isUpdated,
+    [classes.introAnimation]:
+      enableIntroAnimation && (storageItem.isNew || storageItem.isUpdated),
   });
 
   const storageDataPaths = getDataTypeKeysInStorageData(storageItem.data);
