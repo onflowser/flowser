@@ -17,7 +17,7 @@ export function UpdateLoader({
       <div className={classes.root}>
         <Spinner className={classes.loader} size={60} />
         <span className={classes.title}>
-          Installing update ({loadingPercentage}%) {dots}
+          Installing update ({Math.round(loadingPercentage)}%) {dots}
         </span>
       </div>
     </>

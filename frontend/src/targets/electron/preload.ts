@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld("platformAdapter", {
   handleUpdateDownloadEnd: (callback: () => void) =>
     ipcRenderer.on("update-download-end", callback),
   handleUpdateDownloadProgress: (callback: (percentage: number) => void) =>
-    ipcRenderer.on("update-download-progress", (percentage) =>
-      callback(percentage as unknown as number)
+    ipcRenderer.on("update-download-progress", (event, value) =>
+      callback(value as unknown as number)
     ),
 });

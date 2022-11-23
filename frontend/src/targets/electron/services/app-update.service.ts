@@ -27,7 +27,7 @@ export class AppUpdateService {
       console.log(
         `Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`
       );
-      webContents?.emit("update-download-progress", progress.percent);
+      webContents?.send("update-download-progress", progress.percent);
     });
 
     autoUpdater.on("update-available", () => {
@@ -40,7 +40,7 @@ export class AppUpdateService {
         })
         .then((buttonIndex) => {
           if (buttonIndex.response === 0) {
-            webContents?.emit("update-download-start");
+            webContents?.send("update-download-start");
             autoUpdater.downloadUpdate();
           }
         });
@@ -56,7 +56,7 @@ export class AppUpdateService {
     });
 
     autoUpdater.once("update-downloaded", () => {
-      webContents?.emit("update-download-end");
+      webContents?.send("update-download-end");
       dialog
         .showMessageBox({
           title: "Install Updates",
