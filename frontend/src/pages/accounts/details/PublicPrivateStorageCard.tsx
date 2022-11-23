@@ -11,6 +11,7 @@ import classNames from "classnames";
 
 type StorageCardProps = {
   currentAccountAddress: string;
+  enableIntroAnimation?: boolean;
   storageItem: DecoratedPollingEntity<AccountStorageItem>;
 };
 
@@ -19,6 +20,7 @@ export const focusedStorageIdParamKey = "focusedStorageId";
 export function PublicPrivateStorageCard({
   storageItem,
   currentAccountAddress,
+  enableIntroAnimation = true,
 }: StorageCardProps): ReactElement {
   const targetPathIdentifier = storageItem.data?.TargetPath?.Identifier ?? "-";
   const borrowType = storageItem.data?.BorrowType ?? "-";
@@ -30,7 +32,8 @@ export function PublicPrivateStorageCard({
   return (
     <div
       className={classNames(classes.root, {
-        [classes.introAnimation]: storageItem.isUpdated || storageItem.isNew,
+        [classes.introAnimation]:
+          enableIntroAnimation && (storageItem.isUpdated || storageItem.isNew),
       })}
     >
       <img className={classes.background} src={gradient} alt="" />

@@ -33,6 +33,7 @@ export type TableProps<TData> = Pick<
 > &
   CustomTableProps<TData> & {
     className?: string;
+    enableIntroAnimations?: boolean;
   };
 
 export type TableData<TData> = DecoratedPollingEntity<TData> | TData;
@@ -56,6 +57,7 @@ function Table<TData>({
   footerRowClass,
   className,
   error,
+  enableIntroAnimations = true,
 }: TableProps<TData>): ReactElement {
   const table = useReactTable<TableData<TData>>({
     data,
@@ -121,7 +123,9 @@ function Table<TData>({
                 : bodyRowClass
             )}
             key={row.id}
-            showIntroAnimation={showIntroAnimation(row.original)}
+            showIntroAnimation={
+              showIntroAnimation(row.original) && enableIntroAnimations
+            }
             variant="table-line"
           >
             {row.getVisibleCells().map((cell) => (

@@ -53,6 +53,7 @@ import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { TextUtils } from "../../../utils/text-utils";
 import { transactionTableColumns } from "../../transactions/main/Main";
+import { enableDetailsIntroAnimation } from "../../../config/common";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -235,6 +236,7 @@ const Details: FunctionComponent = () => {
             {privateAndPublicStorageItems.map((item) => (
               <PublicPrivateStorageCard
                 key={item.id}
+                enableIntroAnimation={enableDetailsIntroAnimation}
                 currentAccountAddress={account.address}
                 storageItem={item}
               />
@@ -245,6 +247,7 @@ const Details: FunctionComponent = () => {
               <BaseStorageCard
                 key={item.id}
                 storageItem={item}
+                enableIntroAnimation={enableDetailsIntroAnimation}
                 onToggleExpand={() => toggleCardExpand(item.id)}
                 isExpanded={expandedCardIds.has(item.id)}
                 className={classNames({
@@ -262,6 +265,7 @@ const Details: FunctionComponent = () => {
           }
         >
           <Table<DecoratedPollingEntity<Transaction>>
+            enableIntroAnimations={enableDetailsIntroAnimation}
             columns={transactionTableColumns}
             data={transactions}
           />
@@ -274,6 +278,7 @@ const Details: FunctionComponent = () => {
           }
         >
           <Table<DecoratedPollingEntity<AccountContract>>
+            enableIntroAnimations={enableDetailsIntroAnimation}
             columns={columnsContract}
             data={contracts}
           />
@@ -283,6 +288,7 @@ const Details: FunctionComponent = () => {
             onMount={() => updateSearchBar("search for keys", !keys.length)}
           >
             <Table<DecoratedPollingEntity<AccountKey>>
+              enableIntroAnimations={enableDetailsIntroAnimation}
               columns={columnsKeys}
               data={keys}
             />

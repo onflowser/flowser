@@ -35,6 +35,7 @@ import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { enableDetailsIntroAnimation } from "../../../config/common";
 
 type RouteParams = {
   transactionId: string;
@@ -383,6 +384,7 @@ const Details: FunctionComponent = () => {
           <Table<DecoratedPollingEntity<Event>>
             data={events}
             columns={columnsEventsParent}
+            enableIntroAnimations={enableDetailsIntroAnimation}
             renderCustomHeader={(headerGroup) => (
               <Card
                 className={`${classes.tableRow}`}
@@ -404,12 +406,7 @@ const Details: FunctionComponent = () => {
                 <Card
                   className={classes.tableRow}
                   key={row.id}
-                  // Don't show intro animation,
-                  // because that gets shown every time you visit "Events" tab,
-                  // (table is rebuild everytime you visit tab)
-                  // which is disturbing
-                  // TODO: Rework unseen/new logic
-                  showIntroAnimation={false}
+                  showIntroAnimation={enableDetailsIntroAnimation}
                   variant="table-line"
                 >
                   {row.getVisibleCells().map((cell) => (
