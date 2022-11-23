@@ -30,13 +30,13 @@ export class AppUpdateService {
       webContents?.send("update-download-progress", progress.percent);
     });
 
-    autoUpdater.on("update-available", () => {
+    autoUpdater.once("update-available", () => {
       dialog
         .showMessageBox({
           type: "info",
           title: "Found Updates",
           message: "Found updates, do you want update now?",
-          buttons: ["Sure", "No"],
+          buttons: ["Yes", "No"],
         })
         .then((buttonIndex) => {
           if (buttonIndex.response === 0) {

@@ -28,26 +28,23 @@ sentryService.init();
 
 function Root() {
   const [isExiting, setIsExiting] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [appUpdateDownloadPercentage, setAppUpdateDownloadPercentage] =
     useState(0);
+  const isUpdating = ![0, 100].includes(appUpdateDownloadPercentage);
 
   window.platformAdapter.handleExit(() => {
     setIsExiting(true);
   });
 
   window.platformAdapter.handleUpdateDownloadProgress((percentage) => {
-    console.log("update progress", { percentage });
     setAppUpdateDownloadPercentage(percentage);
   });
 
   window.platformAdapter.handleUpdateDownloadStart(() => {
-    console.log("update started");
-    setIsUpdating(true);
+    setAppUpdateDownloadPercentage(0);
   });
   window.platformAdapter.handleUpdateDownloadEnd(() => {
-    console.log("update ended");
-    setIsUpdating(false);
+    setAppUpdateDownloadPercentage(100);
   });
 
   return (
