@@ -404,7 +404,12 @@ const Details: FunctionComponent = () => {
                 <Card
                   className={classes.tableRow}
                   key={row.id}
-                  showIntroAnimation={true}
+                  // Don't show intro animation,
+                  // because that gets shown every time you visit "Events" tab,
+                  // (table is rebuild everytime you visit tab)
+                  // which is disturbing
+                  // TODO: Rework unseen/new logic
+                  showIntroAnimation={false}
                   variant="table-line"
                 >
                   {row.getVisibleCells().map((cell) => (
