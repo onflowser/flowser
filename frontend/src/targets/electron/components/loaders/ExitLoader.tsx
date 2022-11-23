@@ -1,6 +1,6 @@
 import { Spinner } from "components/spinner/Spinner";
 import React, { ReactElement } from "react";
-import classes from "./ExitLoader.module.scss";
+import classes from "./Loader.module.scss";
 import { useProgressDots } from "../../../../hooks/use-progress-dots";
 
 export function ExitLoader(): ReactElement {

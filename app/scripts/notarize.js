@@ -15,6 +15,8 @@ exports.default = async function notarizing(context) {
     return;
   }
 
+  return;
+
   const appleId = process.env.APPLEID;
   const appleIdPassword = process.env.APPLEIDPASS;
   if (!appleId) {
