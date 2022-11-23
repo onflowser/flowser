@@ -47,9 +47,12 @@ async function createWindow() {
 }
 
 app.on("ready", () => {
-  setupMenu();
+  setupMenu(win);
   createWindow();
-  appUpdateService.checkForUpdatesAndNotify({ silent: true });
+  appUpdateService.checkForUpdatesAndNotify({
+    silent: true,
+    targetWindow: win,
+  });
 });
 
 // Quit when all windows are closed.

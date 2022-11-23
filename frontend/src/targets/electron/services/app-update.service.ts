@@ -1,8 +1,9 @@
 import { autoUpdater } from "electron-updater";
-import { dialog } from "electron";
+import { BrowserWindow, dialog } from "electron";
 
 export type RegisterListenersOptions = {
   silent?: boolean;
+  targetWindow: BrowserWindow;
 };
 
 export class AppUpdateService {
@@ -13,7 +14,8 @@ export class AppUpdateService {
     await autoUpdater.checkForUpdatesAndNotify();
   }
 
-  private registerListeners(options: RegisterListenersOptions) {
+  private registerListeners(options?: RegisterListenersOptions) {
+    const { webContents } = options?.targetWindow ?? {};
     autoUpdater.autoDownload = false;
 
     autoUpdater.on("checking-for-update", () => {
@@ -25,25 +27,27 @@ export class AppUpdateService {
       console.log(
         `Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`
       );
+      webContents?.send("update-download-progress", progress.percent);
     });
 
-    autoUpdater.on("update-available", () => {
+    autoUpdater.once("update-available", () => {
       dialog
         .showMessageBox({
           type: "info",
           title: "Found Updates",
           message: "Found updates, do you want update now?",
-          buttons: ["Sure", "No"],
+          buttons: ["Yes", "No"],
         })
         .then((buttonIndex) => {
           if (buttonIndex.response === 0) {
+            webContents?.send("update-download-start");
             autoUpdater.downloadUpdate();
           }
         });
     });
 
     autoUpdater.once("update-not-available", () => {
-      if (!options.silent) {
+      if (!options?.silent) {
         dialog.showMessageBox({
           title: "No Updates",
           message: "Current version is up-to-date.",
@@ -52,6 +56,7 @@ export class AppUpdateService {
     });
 
     autoUpdater.once("update-downloaded", () => {
+      webContents?.send("update-download-end");
       dialog
         .showMessageBox({
           title: "Install Updates",
@@ -64,7 +69,7 @@ export class AppUpdateService {
 
     autoUpdater.on("error", (error) => {
       console.log("Error in auto-updater:", error);
-      if (!options.silent) {
+      if (!options?.silent) {
         dialog.showErrorBox(
           "Update error",
           error == null ? "unknown" : (error.stack || error).toString()
