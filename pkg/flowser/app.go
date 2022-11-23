@@ -120,7 +120,16 @@ func (a *App) unzip(source string, target string) error {
 
 // appDir returns the location of the executable application inside the installation dir.
 func (a *App) appDir(installDir string) (string, error) {
-	return path.Join(installDir, "Flowser.app"), nil
+	files := map[string]string{
+		darwin:  "Flowser.app",
+		windows: "@flowserapp",
+	}
+	executable, ok := files[runtime.GOOS]
+	if !ok {
+		return "", errorPlatformNotSupported
+	}
+
+	return path.Join(installDir, executable), nil
 }
 
 // executable returns the location of application executable.
