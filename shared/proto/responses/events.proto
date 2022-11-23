@@ -18,7 +18,6 @@ message GetPollingEventsResponse {
 
 message GetPollingEventsByTransactionRequest {
   uint32 timestamp = 1;
-  string transaction_id = 2;
 }
 
 message GetPollingEventsByTransactionResponse {
