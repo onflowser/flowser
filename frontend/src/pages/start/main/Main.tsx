@@ -55,13 +55,13 @@ const tabs: ProjectTab[] = [
   },
 ];
 
-// TODO(milestone-x): Enable "open project" action?
 const enableOpenProjectAction = false;
 
 const Main: FunctionComponent<RouteChildrenProps> = (props) => {
   const { showDialog } = useConfirmDialog();
   const history = useHistory();
-  const { data: currentProject } = useGetCurrentProject();
+  const { data: currentProject, isFetching: isFetchingProject } =
+    useGetCurrentProject();
 
   const providedTabId = props.location.hash?.replace("#", "");
   const providedTab = tabs.find((tab) => tab.id === providedTabId);
@@ -71,8 +71,8 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
 
   useEffect(() => {
     const isStartPage = history.location.pathname.startsWith("/start");
-    const isRunningProject = currentProject?.project;
-    if (isStartPage && isRunningProject) {
+    const isRunningProject = Boolean(currentProject?.project);
+    if (isStartPage && isRunningProject && !isFetchingProject) {
       history.push(routes.firstRouteAfterStart);
     }
   }, [history.location, currentProject]);
