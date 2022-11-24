@@ -247,7 +247,17 @@ export function useGetCurrentProject() {
 export function useGetProjectRequirements() {
   return useQuery<GetProjectRequirementsResponse>(
     `/projects/requirements`,
-    () => projectsService.getRequirements()
+    () => projectsService.getRequirements(),
+    {
+      refetchInterval(data: GetProjectRequirementsResponse | undefined) {
+        // Refetch only if not all requirements are satisfied
+        // to verify if user fixed the required issues
+        if (!data || data.missingRequirements.length > 0) {
+          return 1000;
+        }
+        return false;
+      },
+    }
   );
 }
 
