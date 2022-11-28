@@ -5,11 +5,14 @@ import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { DevWallet, ServiceStatus } from "@flowser/shared";
 import * as http from "http";
+import { defaultRestServerPort } from "./emulator.service";
+
+export const defaultDevWalletPort = 8701;
 
 @Injectable()
 export class FlowDevWalletService implements ProjectContextLifecycle {
   static readonly processId = "dev-wallet";
-  private projectContext: ProjectEntity;
+  private projectContext: ProjectEntity | undefined;
 
   constructor(private readonly processManagerService: ProcessManagerService) {}
 
@@ -24,8 +27,10 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
   }
 
   async onExitProjectContext() {
-    await this.processManagerService.remove(FlowDevWalletService.processId);
-    this.processManagerService.get(FlowDevWalletService.processId)?.clearLogs();
+    await this.processManagerService.removeById(FlowDevWalletService.processId);
+    this.processManagerService
+      .getByIdOrFail(FlowDevWalletService.processId)
+      ?.clearLogs();
   }
 
   async start() {
@@ -36,11 +41,16 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
         name: "flow",
         args: [
           "dev-wallet",
-          `--emulator-host=http://localhost:${this.projectContext.emulator.restServerPort}`,
-          `--port=${this.projectContext.devWallet.port}`,
+          `--emulator-host=http://localhost:${
+            this.projectContext?.emulator?.restServerPort ??
+            defaultRestServerPort
+          }`,
+          `--port=${
+            this.projectContext?.devWallet.port ?? defaultDevWalletPort
+          }`,
         ],
         options: {
-          cwd: this.projectContext.filesystemPath,
+          cwd: this.projectContext?.filesystemPath,
         },
       },
     });

@@ -56,7 +56,7 @@ export class FlowController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingEmulatorSnapshotsResponse)
   )
-  async getSnapshotsWithPolling(@Body() data) {
+  async getSnapshotsWithPolling(@Body() data: unknown) {
     const request = GetPollingEmulatorSnapshotsRequest.fromJSON(data);
     const snapshots =
       await this.flowSnapshotService.findAllByProjectNewerThanTimestamp(
@@ -66,7 +66,7 @@ export class FlowController {
   }
 
   @Post("snapshots")
-  async createSnapshot(@Body() body) {
+  async createSnapshot(@Body() body: unknown) {
     const request = CreateEmulatorSnapshotRequest.fromJSON(body);
     const snapshot = await this.flowSnapshotService.create(request);
     return RevertToEmulatorSnapshotResponse.toJSON(
@@ -77,7 +77,7 @@ export class FlowController {
   }
 
   @Put("snapshots")
-  async checkoutSnapshot(@Body() body) {
+  async checkoutSnapshot(@Body() body: unknown) {
     const request = RevertToEmulatorSnapshotRequest.fromJSON(body);
     const snapshot = await this.flowSnapshotService.checkout(request);
     return RevertToEmulatorSnapshotResponse.toJSON(

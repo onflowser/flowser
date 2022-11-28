@@ -9,31 +9,31 @@ import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 @Entity({ name: "keys" })
 export class AccountKeyEntity extends PollingEntity {
   @PrimaryColumn()
-  index: number;
+  index!: number;
 
   @PrimaryColumn()
-  accountAddress: string;
+  accountAddress!: string;
 
   @Column()
-  publicKey: string;
+  publicKey!: string;
 
   @Column()
-  signAlgo: SignatureAlgorithm;
+  signAlgo!: SignatureAlgorithm;
 
   @Column()
-  hashAlgo: HashAlgorithm;
+  hashAlgo!: HashAlgorithm;
 
   @Column()
-  weight: number;
+  weight!: number;
 
   @Column()
-  sequenceNumber: number;
+  sequenceNumber!: number;
 
   @Column()
-  revoked: boolean;
+  revoked!: boolean;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
-  account: AccountEntity;
+  account!: AccountEntity;
 
   toProto(): AccountKey {
     return {

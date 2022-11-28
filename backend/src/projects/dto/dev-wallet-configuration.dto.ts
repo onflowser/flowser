@@ -5,5 +5,5 @@ import { DevWallet } from "@flowser/shared";
 export class DevWalletConfigurationDto implements DevWallet {
   @ApiProperty()
   @IsNotEmpty()
-  port: number;
+  port!: number;
 }

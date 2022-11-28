@@ -12,7 +12,11 @@ import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
 import { FlowAggregatorService } from "../flow/services/aggregator.service";
-import { FlowEmulatorService } from "../flow/services/emulator.service";
+import {
+  defaultGrpcServerPort,
+  defaultRestServerPort,
+  FlowEmulatorService,
+} from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { EventsService } from "../events/events.service";
@@ -37,14 +41,17 @@ import {
 } from "@flowser/shared";
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
-import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
+import {
+  defaultDevWalletPort,
+  FlowDevWalletService,
+} from "../flow/services/dev-wallet.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
 
 @Injectable()
 export class ProjectsService {
-  private currentProject: ProjectEntity;
+  private currentProject: ProjectEntity | undefined;
   private readonly logger = new Logger(ProjectsService.name);
 
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
@@ -259,24 +266,21 @@ export class ProjectsService {
   }
 
   getDefaultProject() {
-    const restServerPort = 8888;
-    const grpcServerPort = 3569;
-
     const isWindows = process.platform === "win32";
 
     return Project.fromPartial({
       name: "New Project",
       gateway: Gateway.fromPartial({
-        restServerAddress: `http://localhost:${restServerPort}`,
-        grpcServerAddress: `http://localhost:${grpcServerPort}`,
+        restServerAddress: `http://localhost:${defaultRestServerPort}`,
+        grpcServerAddress: `http://localhost:${defaultGrpcServerPort}`,
       }),
       devWallet: DevWallet.fromJSON({
-        port: 8701,
+        port: defaultDevWalletPort,
       }),
       emulator: Emulator.fromPartial({
         verboseLogging: true,
-        restServerPort,
-        grpcServerPort,
+        restServerPort: defaultRestServerPort,
+        grpcServerPort: defaultGrpcServerPort,
         adminServerPort: 8080,
         persist: false,
         // Snapshot should be temporarily disabled on Windows

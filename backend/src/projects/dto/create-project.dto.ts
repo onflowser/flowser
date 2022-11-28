@@ -6,32 +6,34 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Project } from "@flowser/shared";
 import { DevWalletConfigurationDto } from "./dev-wallet-configuration.dto";
 
-export class CreateProjectDto implements Partial<Project> {
+export class CreateProjectDto
+  implements Omit<Project, "id" | "createdAt" | "updatedAt">
+{
   @ApiProperty()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  filesystemPath: string;
+  filesystemPath!: string;
 
   @ApiProperty({
     description: "Data will be fetched from this block height forward.",
   })
-  startBlockHeight: number;
+  startBlockHeight!: number;
 
   @ApiProperty()
   @ValidateNested()
   @Type(() => GatewayConfigurationDto)
-  gateway: GatewayConfigurationDto | undefined;
+  gateway!: GatewayConfigurationDto | undefined;
 
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => EmulatorConfigurationDto)
-  emulator: EmulatorConfigurationDto;
+  emulator!: EmulatorConfigurationDto;
 
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => DevWalletConfigurationDto)
-  devWallet: DevWalletConfigurationDto;
+  devWallet!: DevWalletConfigurationDto;
 }

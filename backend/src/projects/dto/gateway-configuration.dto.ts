@@ -5,13 +5,13 @@ import { Gateway, ServiceStatus } from "@flowser/shared";
 export class GatewayConfigurationDto implements Gateway {
   @ApiProperty()
   @IsNotEmpty()
-  grpcServerAddress: string;
+  grpcServerAddress!: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  restServerAddress: string;
+  restServerAddress!: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  status: ServiceStatus;
+  status!: ServiceStatus;
 }

@@ -1,3 +1,4 @@
+import { BadRequestException } from "@nestjs/common";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { typeOrmProtobufTransformer } from "../../utils";
 import { CreateProjectDto } from "../dto/create-project.dto";
@@ -5,37 +6,41 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
 import { UpdateProjectDto } from "../dto/update-project.dto";
 import * as crypto from "crypto";
+import {
+  defaultGrpcServerPort,
+  defaultRestServerPort,
+} from "../../flow/services/emulator.service";
 
 @Entity({ name: "projects" })
 export class ProjectEntity extends PollingEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  filesystemPath: string;
+  filesystemPath!: string;
 
   @Column("simple-json", {
     nullable: true,
     transformer: typeOrmProtobufTransformer(DevWallet),
   })
-  devWallet: DevWallet;
+  devWallet!: DevWallet;
 
   // TODO(milestone-3): gateway should be synced with network settings in flow.json
   @Column("simple-json", {
     nullable: true,
     transformer: typeOrmProtobufTransformer(Gateway),
   })
-  gateway: Gateway;
+  gateway!: Gateway;
 
   // TODO(milestone-3): emulator should be synced with settings in flow.json
   @Column("simple-json", {
     nullable: true,
     transformer: typeOrmProtobufTransformer(Emulator),
   })
-  emulator: Emulator | null;
+  emulator?: Emulator | null;
 
   // User can specify (on a project level) the starting block height.
   // Blockchain data will be fetched from this height value if set.
@@ -51,10 +56,10 @@ export class ProjectEntity extends PollingEntity {
       id: this.id,
       name: this.name,
       filesystemPath: this.filesystemPath,
-      startBlockHeight: this.startBlockHeight,
+      startBlockHeight: this.startBlockHeight ?? 0,
       gateway: this.gateway,
       devWallet: this.devWallet,
-      emulator: this.emulator,
+      emulator: this.emulator ?? undefined,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
@@ -68,14 +73,21 @@ export class ProjectEntity extends PollingEntity {
     } else {
       project.id = crypto.randomUUID();
     }
-    project.name = projectDto.name;
-    project.startBlockHeight = projectDto.startBlockHeight;
+    project.name = projectDto.name ?? "";
+    project.startBlockHeight = projectDto.startBlockHeight ?? 0;
+    if (!projectDto.filesystemPath) {
+      throw new BadRequestException("Filesystem path not provided");
+    }
     project.filesystemPath = projectDto.filesystemPath;
     project.gateway = projectDto.gateway
       ? Gateway.fromJSON(projectDto.gateway)
       : Gateway.fromPartial({
-          restServerAddress: `http://localhost:${projectDto.emulator.restServerPort}`,
-          grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
+          restServerAddress: `http://localhost:${
+            projectDto.emulator?.restServerPort ?? defaultRestServerPort
+          }`,
+          grpcServerAddress: `http://localhost:${
+            projectDto.emulator?.grpcServerPort ?? defaultGrpcServerPort
+          }`,
         });
     project.devWallet = DevWallet.fromJSON(projectDto.devWallet);
     project.emulator = Emulator.fromJSON(projectDto.emulator);

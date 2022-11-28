@@ -51,8 +51,10 @@ export class ProcessManagerService extends EventEmitter {
     timestamp: Date
   ): ManagedProcessLog[] {
     const process = this.processLookupById.get(processId);
-    return process.logs?.filter(
-      (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
+    return (
+      process?.logs?.filter(
+        (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
+      ) ?? []
     );
   }
 
@@ -64,8 +66,12 @@ export class ProcessManagerService extends EventEmitter {
     );
   }
 
-  get(processId: string) {
-    return this.processLookupById.get(processId);
+  getByIdOrFail(processId: string) {
+    const process = this.processLookupById.get(processId);
+    if (!process) {
+      throw new NotFoundException("Process not found");
+    }
+    return process;
   }
 
   async start(process: ManagedProcessEntity) {
@@ -80,6 +86,10 @@ export class ProcessManagerService extends EventEmitter {
     }
 
     await process.start();
+  }
+
+  async startExistingById(processId: string) {
+    await this.start(this.getByIdOrFail(processId));
   }
 
   /**
@@ -98,7 +108,7 @@ export class ProcessManagerService extends EventEmitter {
     await Promise.all(this.getAll().map((process) => process.stop()));
   }
 
-  async stop(processId: string) {
+  async stopById(processId: string) {
     await this.processLookupById.get(processId)?.stop();
   }
 
@@ -106,8 +116,8 @@ export class ProcessManagerService extends EventEmitter {
    * Stops the process and removes it from the process table.
    * Process state won't be tracked anymore.
    */
-  async remove(processId: string) {
-    await this.stop(processId);
+  async removeById(processId: string) {
+    await this.stopById(processId);
     this.processLookupById.delete(processId);
   }
 

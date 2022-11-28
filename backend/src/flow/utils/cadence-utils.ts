@@ -9,14 +9,14 @@ import { isArray } from "../../utils";
 
 export class CadenceUtils {
   static isCadenceObject(value: unknown): value is FlowCadenceObject {
-    return typeof value === "object" && "type" in value;
+    return typeof value === "object" && value !== null && "type" in value;
   }
 
   static serializeCadenceObject(
     cadenceObject: FlowCadenceObject | unknown
   ): CadenceObject {
     if (!this.isCadenceObject(cadenceObject)) {
-      return;
+      return CadenceObject.fromPartial({});
     }
     const cadenceType = cadenceTypeFromJSON(cadenceObject.type);
     if (SharedCadenceUtils.isNumericType(cadenceType)) {

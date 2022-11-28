@@ -20,51 +20,51 @@ import { CadenceUtils } from "../../flow/utils/cadence-utils";
 @Entity({ name: "transactions" })
 export class TransactionEntity extends PollingEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column("text")
-  script: string;
+  script!: string;
 
   @Column()
-  blockId: string;
+  blockId!: string;
 
   @Column()
-  referenceBlockId: string;
+  referenceBlockId!: string;
 
   @Column()
-  gasLimit: number;
+  gasLimit!: number;
 
   @Column()
-  payerAddress: string; // payer account address
+  payerAddress!: string; // payer account address
 
   @ManyToOne(() => AccountEntity, (account) => account.transactions)
-  payer: AccountEntity; // payer account address
+  payer!: AccountEntity; // payer account address
 
   @Column("simple-array")
-  authorizers: string[]; // authorizers account addresses
+  authorizers!: string[]; // authorizers account addresses
 
   @Column("simple-json")
-  args: FlowCadenceObject[];
+  args!: FlowCadenceObject[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(TransactionProposalKey),
   })
-  proposalKey: TransactionProposalKey;
+  proposalKey!: TransactionProposalKey;
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(SignableObject),
   })
-  envelopeSignatures: SignableObject[];
+  envelopeSignatures!: SignableObject[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(SignableObject),
   })
-  payloadSignatures: SignableObject[];
+  payloadSignatures!: SignableObject[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(TransactionStatus),
   })
-  status: TransactionStatus;
+  status!: TransactionStatus;
 
   toProto(): Transaction {
     return {

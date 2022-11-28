@@ -89,7 +89,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
-    this.emulatorProcess = this.processManagerService.get(
+    this.emulatorProcess = this.processManagerService.getByIdOrFail(
       FlowEmulatorService.processId
     );
     this.processManagerService.on(
@@ -202,7 +202,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     ]);
     const nextBlockHeightToProcess = lastStoredBlock
       ? lastStoredBlock.height + 1
-      : this.projectContext.startBlockHeight;
+      : this.projectContext?.startBlockHeight ?? 0;
     const latestUnprocessedBlockHeight = latestBlock.height;
 
     return {

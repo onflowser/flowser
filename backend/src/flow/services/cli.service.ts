@@ -25,7 +25,9 @@ export class FlowCliService implements ProjectContextLifecycle {
   }
 
   async onExitProjectContext() {
-    this.processManagerService.get(FlowCliService.processId)?.clearLogs();
+    this.processManagerService
+      .getByIdOrFail(FlowCliService.processId)
+      ?.clearLogs();
     this.projectContext = undefined;
   }
 
@@ -37,7 +39,7 @@ export class FlowCliService implements ProjectContextLifecycle {
         name: "flow",
         args: ["init"],
         options: {
-          cwd: this.projectContext.filesystemPath,
+          cwd: this.projectContext?.filesystemPath,
         },
       },
     });
@@ -62,7 +64,7 @@ export class FlowCliService implements ProjectContextLifecycle {
     // This should only happen with a test build,
     // but let's handle it anyway just in case
     const unknownVersionMessage = "Version information unknown!";
-    if (versionLog.data === unknownVersionMessage) {
+    if (versionLog?.data === unknownVersionMessage) {
       throw new NotFoundException("Flow CLI version not found");
     }
     const [_, version] = versionLog?.data?.split(/: /) ?? [];

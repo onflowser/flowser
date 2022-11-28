@@ -17,19 +17,19 @@ import { AccountContract } from "@flowser/shared";
 @Entity({ name: "contracts" })
 export class AccountContractEntity extends PollingEntity {
   // Encodes both accountAddress and name into the id.
-  id: string;
+  id!: string;
 
   @PrimaryColumn()
-  accountAddress: string;
+  accountAddress!: string;
 
   @PrimaryColumn()
-  name: string;
+  name!: string;
 
   @Column("text")
-  code: string;
+  code!: string;
 
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
-  account: AccountEntity;
+  account!: AccountEntity;
 
   @AfterLoad()
   public updateId() {
@@ -39,6 +39,7 @@ export class AccountContractEntity extends PollingEntity {
   @BeforeInsert()
   @BeforeUpdate()
   public unsetId() {
+    // @ts-ignore
     delete this.id;
   }
 

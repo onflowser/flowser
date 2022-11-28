@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
@@ -6,7 +6,7 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../../utils";
+import { isDefined, isObject } from "../../utils";
 
 type FlowAddress = string;
 
@@ -115,9 +115,10 @@ export class FlowConfigService implements ProjectContextLifecycle {
     );
 
     const contractsSourceCode = await Promise.all(
-      contractNamesAndPaths.map(({ filePath }) =>
-        this.readProjectFile(filePath)
-      )
+      contractNamesAndPaths
+        .map(({ filePath }) => filePath)
+        .filter(isDefined)
+        .map((filePath) => this.readProjectFile(filePath))
     );
 
     return contractNamesAndPaths.map(({ name, filePath }, index) =>
@@ -130,7 +131,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   private getContractFilePath(contractNameKey: string) {
-    const contractConfig = this.config.contracts[contractNameKey];
+    const contractConfig = this.config.contracts?.[contractNameKey];
     const isSimpleFormat = typeof contractConfig === "string";
     return isSimpleFormat ? contractConfig : contractConfig?.source;
   }
@@ -162,7 +163,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   getAccountConfig(accountKey: string) {
-    return this.config.accounts[accountKey];
+    return this.config.accounts?.[accountKey];
   }
 
   // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
@@ -171,7 +172,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   getDatabasePath() {
-    return this.buildProjectPath(this.projectContext?.emulator.databasePath);
+    return this.buildProjectPath(this.projectContext?.emulator?.databasePath);
   }
 
   getConfigPath() {
@@ -179,23 +180,27 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   public hasConfigFile() {
-    return fs.existsSync(this.getConfigPath());
+    return fs.existsSync(this.getConfigPath() ?? "");
   }
 
   private async readProjectFile(pathPostfix: string) {
-    const data = await readFile(this.buildProjectPath(pathPostfix));
+    const data = await readFile(this.buildProjectPath(pathPostfix) ?? "");
     return data.toString();
   }
 
   private async writeProjectFile(pathPostfix: string, data: string) {
-    return writeFile(this.buildProjectPath(pathPostfix), data);
+    return writeFile(this.buildProjectPath(pathPostfix) ?? "", data);
   }
 
   private buildProjectPath(pathPostfix: string | undefined | null) {
     if (!pathPostfix) {
       return null;
     }
+    const { filesystemPath } = this.projectContext ?? {};
+    if (!filesystemPath) {
+      throw new NotFoundException("Filesystem path not set");
+    }
     // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
-    return path.join(this.projectContext.filesystemPath, pathPostfix);
+    return path.join(filesystemPath, pathPostfix);
   }
 }

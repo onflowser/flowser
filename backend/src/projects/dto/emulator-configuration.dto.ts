@@ -1,55 +1,81 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty } from "class-validator";
 import { Emulator } from "@flowser/shared";
 
 export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
-  adminServerPort: number;
+  @IsNotEmpty()
+  adminServerPort!: number;
   @ApiProperty()
-  blockTime: number;
+  @IsNotEmpty()
+  blockTime!: number;
   @ApiProperty()
-  databasePath: string;
+  @IsNotEmpty()
+  databasePath!: string;
   @ApiProperty()
-  enableGrpcDebug: boolean;
+  @IsNotEmpty()
+  enableGrpcDebug!: boolean;
   @ApiProperty()
-  enableRestDebug: boolean;
+  @IsNotEmpty()
+  enableRestDebug!: boolean;
   @ApiProperty()
-  grpcServerPort: number;
+  @IsNotEmpty()
+  grpcServerPort!: number;
   @ApiProperty()
-  logFormat: string;
+  @IsNotEmpty()
+  logFormat!: string;
   @ApiProperty()
-  minAccountBalance: number;
+  @IsNotEmpty()
+  minAccountBalance!: number;
   @ApiProperty()
-  persist: boolean;
+  @IsNotEmpty()
+  persist!: boolean;
   @ApiProperty()
-  snapshot: boolean;
+  @IsNotEmpty()
+  snapshot!: boolean;
   @ApiProperty()
-  restServerPort: number;
+  @IsNotEmpty()
+  restServerPort!: number;
   @ApiProperty()
-  scriptGasLimit: number;
+  @IsNotEmpty()
+  scriptGasLimit!: number;
   @ApiProperty()
-  serviceHashAlgorithm: number;
+  @IsNotEmpty()
+  serviceHashAlgorithm!: number;
   @ApiProperty()
-  servicePrivateKey: string;
+  @IsNotEmpty()
+  servicePrivateKey!: string;
   @ApiProperty()
-  serviceSignatureAlgorithm: number;
+  @IsNotEmpty()
+  serviceSignatureAlgorithm!: number;
   @ApiProperty()
-  simpleAddresses: boolean;
+  @IsNotEmpty()
+  simpleAddresses!: boolean;
   @ApiProperty()
-  storageLimit: boolean;
+  @IsNotEmpty()
+  storageLimit!: boolean;
   @ApiProperty()
-  storagePerFlow: number;
+  @IsNotEmpty()
+  storagePerFlow!: number;
   @ApiProperty()
-  tokenSupply: number;
+  @IsNotEmpty()
+  tokenSupply!: number;
   @ApiProperty()
-  transactionExpiry: number;
+  @IsNotEmpty()
+  transactionExpiry!: number;
   @ApiProperty()
-  transactionFees: boolean;
+  @IsNotEmpty()
+  transactionFees!: boolean;
   @ApiProperty()
-  transactionMaxGasLimit: number;
+  @IsNotEmpty()
+  transactionMaxGasLimit!: number;
   @ApiProperty()
-  useSimpleAddresses: boolean;
+  @IsNotEmpty()
+  useSimpleAddresses!: boolean;
   @ApiProperty()
-  verboseLogging: boolean;
+  @IsNotEmpty()
+  verboseLogging!: boolean;
   @ApiProperty()
-  withContracts: boolean;
+  @IsNotEmpty()
+  withContracts!: boolean;
 }

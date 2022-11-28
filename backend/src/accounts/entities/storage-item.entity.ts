@@ -12,28 +12,29 @@ import { ensurePrefixedAddress } from "../../utils";
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  pathIdentifier: string;
+  pathIdentifier!: string;
 
   @PrimaryColumn()
-  pathDomain: AccountStorageDomain;
+  pathDomain!: AccountStorageDomain;
 
   @PrimaryColumn()
-  accountAddress: string;
+  accountAddress!: string;
 
   @Column("simple-json")
-  data: unknown;
+  data!: unknown;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
-  account: AccountEntity;
+  account!: AccountEntity;
 
   toProto(): AccountStorageItem {
     return {
       id: this.id,
       pathIdentifier: this.pathIdentifier,
       pathDomain: this.pathDomain,
+      // @ts-ignore unknown not assignable to Record
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
@@ -61,7 +62,7 @@ export class AccountStorageItemEntity extends PollingEntity {
       // Otherwise it won't get properly encoded/decoded by protocol buffers.
       storageItem.data = { value: storageData };
     } else {
-      storageItem.data = storageData;
+      storageItem.data = storageData ?? {};
     }
     storageItem.accountAddress = ensurePrefixedAddress(
       flowAccountStorage.Address

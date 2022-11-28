@@ -7,28 +7,28 @@ import { typeOrmProtobufTransformer } from "../../utils";
 @Entity({ name: "blocks" })
 export class BlockEntity extends PollingEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  parentId: string;
+  parentId!: string;
 
   @Column()
-  height: number;
+  height!: number;
 
   @Column("datetime")
-  timestamp: Date;
+  timestamp!: Date;
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(CollectionGuarantee),
   })
-  collectionGuarantees: CollectionGuarantee[];
+  collectionGuarantees!: CollectionGuarantee[];
 
   // TODO(milestone-x): Define type (Note: we aren't showing blockSeals anywhere)
   @Column("simple-json")
-  blockSeals: any[];
+  blockSeals!: any[];
 
   @Column("simple-array")
-  signatures: string[];
+  signatures!: string[];
 
   static create(flowBlock: FlowBlock): BlockEntity {
     const block = new BlockEntity();

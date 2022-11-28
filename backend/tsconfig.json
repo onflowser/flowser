@@ -15,10 +15,10 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": false,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": true
   }
 }

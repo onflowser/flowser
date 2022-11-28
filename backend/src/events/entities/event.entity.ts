@@ -5,25 +5,25 @@ import { Event } from "@flowser/shared";
 
 @Entity({ name: "events" })
 export class EventEntity extends PollingEntity {
-  id: string;
+  id?: string;
 
   @PrimaryColumn()
-  transactionId: string;
+  transactionId!: string;
 
   @PrimaryColumn()
-  blockId: string;
+  blockId!: string;
 
   @PrimaryColumn()
-  eventIndex: number;
+  eventIndex!: number;
 
   @Column()
-  type: string;
+  type!: string;
 
   @Column()
-  transactionIndex: number;
+  transactionIndex!: number;
 
   @Column("simple-json")
-  data: object;
+  data!: object;
 
   @AfterLoad()
   private computeId() {
@@ -32,7 +32,7 @@ export class EventEntity extends PollingEntity {
 
   toProto(): Event {
     return {
-      id: this.id,
+      id: this.id ?? "",
       transactionId: this.transactionId,
       blockId: this.blockId,
       eventIndex: this.eventIndex,

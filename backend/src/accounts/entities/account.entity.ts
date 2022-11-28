@@ -11,36 +11,36 @@ import { AccountStorageItemEntity } from "./storage-item.entity";
 @Entity({ name: "accounts" })
 export class AccountEntity extends PollingEntity {
   @PrimaryColumn()
-  address: string;
+  address!: string;
 
   @Column({ type: "bigint" })
-  balance: number;
+  balance!: number;
 
   @Column()
-  code: string;
+  code!: string;
 
   @Column({ default: false })
-  isDefaultAccount: boolean;
+  isDefaultAccount!: boolean;
 
   @OneToMany(() => AccountKeyEntity, (key) => key.account, {
     eager: true,
   })
-  keys: AccountKeyEntity[];
+  keys?: AccountKeyEntity[];
 
   @OneToMany(() => AccountStorageItemEntity, (storage) => storage.account, {
     eager: true,
   })
-  storage: AccountStorageItemEntity[];
+  storage?: AccountStorageItemEntity[];
 
   @OneToMany(() => AccountContractEntity, (contract) => contract.account, {
     eager: true,
   })
-  contracts: AccountContractEntity[];
+  contracts?: AccountContractEntity[];
 
   @OneToMany(() => TransactionEntity, (key) => key.payer, {
     eager: true,
   })
-  transactions: TransactionEntity[];
+  transactions?: TransactionEntity[];
 
   static create(flowAccount: FlowAccount): AccountEntity {
     const account = new AccountEntity();
@@ -58,12 +58,11 @@ export class AccountEntity extends PollingEntity {
       address: this.address,
       balance: this.balance,
       code: this.code,
-      storage: this.storage.map((storage) => storage.toProto()),
-      keys: this.keys.map((key) => key.toProto()),
-      contracts: this.contracts.map((contract) => contract.toProto()),
-      transactions: this.transactions.map((transaction) =>
-        transaction.toProto()
-      ),
+      storage: this.storage?.map((storage) => storage.toProto()) ?? [],
+      keys: this.keys?.map((key) => key.toProto()) ?? [],
+      contracts: this.contracts?.map((contract) => contract.toProto()) ?? [],
+      transactions:
+        this.transactions?.map((transaction) => transaction.toProto()) ?? [],
       isDefaultAccount: this.isDefaultAccount,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),

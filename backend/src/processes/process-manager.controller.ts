@@ -21,17 +21,17 @@ export class ProcessManagerController {
   constructor(private processManagerService: ProcessManagerService) {}
 
   @Post(":id/start")
-  async startProcess(@Param("id") processId) {
-    return this.processManagerService.start(processId);
+  async startProcess(@Param("id") processId: string) {
+    return this.processManagerService.startExistingById(processId);
   }
 
   @Post(":id/stop")
-  async stopProcess(@Param("id") processId) {
-    return this.processManagerService.stop(processId);
+  async stopProcess(@Param("id") processId: string) {
+    return this.processManagerService.stopById(processId);
   }
 
   @Post(":id/restart")
-  async restartProcess(@Param("id") processId) {
+  async restartProcess(@Param("id") processId: string) {
     return this.processManagerService.restart(processId);
   }
 
@@ -44,7 +44,7 @@ export class ProcessManagerController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingManagedProcessesResponse)
   )
-  async getAllProcessesNewerThanTimestamp(@Body() body) {
+  async getAllProcessesNewerThanTimestamp(@Body() body: unknown) {
     const request = GetPollingManagedProcessesRequest.fromJSON(body);
     const processes =
       this.processManagerService.findAllProcessesNewerThanTimestamp(
@@ -63,7 +63,7 @@ export class ProcessManagerController {
 
   @Post(":logs/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingLogsResponse))
-  async getAllLogsNewerThanTimestamp(@Body() data) {
+  async getAllLogsNewerThanTimestamp(@Body() data: unknown) {
     const request = GetPollingLogsRequest.fromJSON(data);
     return this.processManagerService.findAllLogsNewerThanTimestamp(
       new Date(request.timestamp)
@@ -73,8 +73,8 @@ export class ProcessManagerController {
   @Post(":processId/logs/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingLogsResponse))
   async getAllLogsByProcessNewerThanTimestamp(
-    @Param("processId") processId,
-    @Body() data
+    @Param("processId") processId: string,
+    @Body() data: unknown
   ) {
     const request = GetPollingLogsRequest.fromJSON(data);
     return this.processManagerService.findAllLogsByProcessIdNewerThanTimestamp(

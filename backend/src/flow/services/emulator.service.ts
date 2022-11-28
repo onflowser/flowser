@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common";
 import {
   ServiceStatus,
   hashAlgorithmToJSON,
@@ -9,6 +13,10 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
+import { isDefined } from "../../utils";
+
+export const defaultRestServerPort = 8888;
+export const defaultGrpcServerPort = 3569;
 
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
@@ -29,8 +37,10 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   async onExitProjectContext() {
     this.projectContext = undefined;
-    await this.processManagerService.remove(FlowEmulatorService.processId);
-    this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
+    await this.processManagerService.removeById(FlowEmulatorService.processId);
+    this.processManagerService
+      .getByIdOrFail(FlowEmulatorService.processId)
+      ?.clearLogs();
   }
 
   async start() {
@@ -41,18 +51,26 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         name: "flow",
         args: ["emulator", ...this.getFlags()],
         options: {
-          cwd: this.projectContext.filesystemPath,
+          cwd: this.projectContext?.filesystemPath,
         },
       },
     });
     await this.processManagerService.start(managedProcess);
   }
 
-  private getFlags() {
+  private getFlags(): string[] {
     const { emulator } = this.projectContext ?? {};
 
+    if (!emulator) {
+      throw new NotFoundException("Emulator not set in project context");
+    }
+
     const formatTokenSupply = (tokenSupply: number) => tokenSupply.toFixed(1);
-    const flag = (name: string, userValue: any, defaultValue?: any) => {
+    const flag = (
+      name: string,
+      userValue: any,
+      defaultValue?: any
+    ): string | undefined => {
       const value = userValue || defaultValue;
       return value ? `--${name}=${value}` : undefined;
     };
@@ -99,6 +117,6 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       flag("transaction-fees", emulator.transactionFees),
       flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
       flag("script-gas-limit", emulator.scriptGasLimit),
-    ].filter(Boolean);
+    ].filter(isDefined);
   }
 }

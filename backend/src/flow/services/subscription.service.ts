@@ -15,7 +15,7 @@ export class FlowSubscriptionService {
   public async addTransactionSubscription(transactionId: string) {
     const unsubscribe = await this.flowGatewayService
       .getTxStatusSubscription(transactionId)
-      .subscribe((newStatus) =>
+      .subscribe((newStatus: FlowTransactionStatus) =>
         this.updateTransactionStatus(transactionId, newStatus)
       );
     try {

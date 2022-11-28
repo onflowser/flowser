@@ -6,5 +6,5 @@ import { ApiProperty } from "@nestjs/swagger";
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {
   @ApiProperty()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 }

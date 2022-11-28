@@ -19,5 +19,9 @@ export function hasProjectContextInterface(object: unknown) {
   if (typeof object !== "object") {
     return false;
   }
-  return "onEnterProjectContext" in object && "onExitProjectContext" in object;
+  return (
+    object !== null &&
+    "onEnterProjectContext" in object &&
+    "onExitProjectContext" in object
+  );
 }
