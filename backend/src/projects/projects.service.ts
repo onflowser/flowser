@@ -79,7 +79,11 @@ export class ProjectsService {
     private flowDevWalletService: FlowDevWalletService
   ) {}
 
-  getCurrentProject() {
+  getCurrentProject(): ProjectEntity | undefined {
+    return this.currentProject;
+  }
+
+  getCurrentProjectOrFail() {
     if (this.currentProject) {
       return this.currentProject;
     } else {
@@ -160,7 +164,7 @@ export class ProjectsService {
     );
   }
 
-  async usePersistedProject(id: string) {
+  async useProjectById(id: string) {
     const targetProject = await this.findOne(id);
     return this.useProject(targetProject);
   }
@@ -219,13 +223,26 @@ export class ProjectsService {
   }
 
   async findOne(id: string): Promise<ProjectEntity> {
+    const currentProject = this.getCurrentProject();
+    // Project can be persisted only in-memory
+    if (currentProject?.id === id) {
+      return currentProject;
+    }
     const project = await this.projectRepository.findOneByOrFail({ id });
     return this.setComputedFields(project);
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
+    const currentProject = this.getCurrentProject();
     const project = ProjectEntity.create(updateProjectDto);
     project.markUpdated();
+
+    // Project can be persisted only in-memory
+    if (currentProject?.id === id) {
+      this.currentProject = project;
+      return this.currentProject;
+    }
+
     await this.projectRepository.update(
       { id },
       // Prevent overwriting existing created date

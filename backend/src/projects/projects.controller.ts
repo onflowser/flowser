@@ -79,7 +79,7 @@ export class ProjectsController {
 
   @Get("current")
   async findCurrent() {
-    const project = await this.projectsService.getCurrentProject();
+    const project = await this.projectsService.getCurrentProjectOrFail();
     return GetSingleProjectResponse.toJSON(
       GetSingleProjectResponse.fromPartial({
         project: project.toProto(),
@@ -148,7 +148,7 @@ export class ProjectsController {
   @ApiParam({ name: "id", type: String })
   @Post("/use/:id")
   async useProject(@Param("id") id: string) {
-    const project = await this.projectsService.usePersistedProject(id);
+    const project = await this.projectsService.useProjectById(id);
     return UseProjectResponse.toJSON(
       UseProjectResponse.fromPartial({
         project: project.toProto(),
