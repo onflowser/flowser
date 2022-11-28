@@ -49,7 +49,10 @@ export class FlowserBackend {
     const processManagerService = this.app?.get(ProcessManagerService);
     // Make sure to stop all child processes, so that they don't become orphans
     await processManagerService?.stopAll();
-    await this.app?.close();
+    // Bellow promise is taking a really long time to resolve
+    // so just don't await it for the time being
+    // TODO: Investigate why is the Nest shutdown taking a long time
+    this.app?.close();
   }
 
   public getDefaultProject(): ProjectEntity {
