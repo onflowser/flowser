@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
@@ -59,6 +59,12 @@ export class FlowCliService implements ProjectContextLifecycle {
       (log) => log.source === LogSource.LOG_SOURCE_STDOUT
     );
     const versionLog = stdout.find((log) => log.data.startsWith("Version"));
+    // This should only happen with a test build,
+    // but let's handle it anyway just in case
+    const unknownVersionMessage = "Version information unknown!";
+    if (versionLog.data === unknownVersionMessage) {
+      throw new NotFoundException("Flow CLI version not found");
+    }
     const [_, version] = versionLog?.data?.split(/: /) ?? [];
     return {
       version,
