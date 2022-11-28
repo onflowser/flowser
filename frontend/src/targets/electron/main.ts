@@ -17,6 +17,8 @@ const { appUpdateService } = ServiceRegistry.getInstance();
 const sentryService = new SentryMainService();
 sentryService.init();
 
+ipcMain.handle("showDirectoryPicker", showDirectoryPicker);
+
 async function createWindow() {
   win = new BrowserWindow({
     width: minWidth,
@@ -28,8 +30,6 @@ async function createWindow() {
       preload: path.join(__dirname, "preload.js"),
     },
   });
-
-  ipcMain.handle("showDirectoryPicker", showDirectoryPicker);
 
   // Open urls in the user's browser
   win.webContents.setWindowOpenHandler((data) => {
@@ -48,6 +48,7 @@ async function createWindow() {
 
 app.on("ready", () => {
   setupMenu(win);
+  console.log("ready");
   createWindow();
   appUpdateService.checkForUpdatesAndNotify({
     silent: true,
@@ -65,6 +66,7 @@ app.on("window-all-closed", function () {
 });
 
 app.on("activate", function () {
+  console.log("activate", BrowserWindow.getAllWindows());
   // On OS X it's core to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
