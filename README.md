@@ -9,6 +9,13 @@
 
 Flowser is first-of-its-kind development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing blockchain emulator, inspecting the current state, interacting with the network and much more!
 
+## Get started
+
+You can install & run flowser with a simple [Flow CLI ](https://developers.flow.com/tools/flow-cli/install) command:
+```bash
+flow flowser
+```
+
 ## Key Features
 
 - **Easy to use**: Simplifies your development workflow
@@ -17,12 +24,6 @@ Flowser is first-of-its-kind development tool for [Flow blockchain](https://www.
 - **Development wallet**: Built in [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) integration for easy blockchain interactions
 - **Account storage inspection**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
 
-## Get started
-
-You can install & run flowser with a simple [Flow CLI ](https://developers.flow.com/tools/flow-cli/install) command:
-```bash
-flow flowser
-```
 
 If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2gx7ZsRUkD)!
 
