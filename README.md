@@ -18,14 +18,15 @@ flow flowser
 
 ## Key Features
 
-- **Easy to use**: Simplifies your development workflow
-- **Transparent development**: See the whole state of your local Flow blockchain in real-time
-- **Snapshot management**: Create and checkout [blockchain state snapshots](https://github.com/onflow/flow-emulator#managing-emulator-state) - similar to how Git works
+- **Blockchain state**: See the whole state of your local Flow blockchain in real-time
+- **State snapshots**: Create and jump to [blockchain state snapshots](https://github.com/onflow/flow-emulator#managing-emulator-state) - similar to how Git works
 - **Development wallet**: Built in [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) integration for easy blockchain interactions
 - **Account storage inspection**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
 
 
 If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2gx7ZsRUkD)!
+
+For more info, visit [docs.flowser.dev](https://docs.flowser.dev).
 
 ## License
 
