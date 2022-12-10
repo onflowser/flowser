@@ -167,7 +167,8 @@ export class FlowGatewayService implements ProjectContextLifecycle {
 
   public async getAccount(address: string): Promise<FlowAccount> {
     const account = await fcl.send([fcl.getAccount(address)]).then(fcl.decode);
-    return { ...account, address };
+    // https://developers.flow.com/tools/fcl-js/reference/api#accountobject
+    return { ...account, balance: account.balance / Math.pow(10, 8), address };
   }
 
   static async getApiStatus(gateway: Gateway): Promise<ServiceStatus> {
