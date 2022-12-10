@@ -8,10 +8,9 @@ import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle
 import { ReactComponent as LogoutIcon } from "../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
-import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
+import { ReactComponent as PlusIcon } from "../../assets/icons/plus-round.svg";
 import { ReactComponent as CreateSnapshotIcon } from "../../assets/icons/create-snapshot.svg";
 import { ReactComponent as RestartIcon } from "../../assets/icons/restart.svg";
-import IconButton from "components/icon-button/IconButton";
 import { SimpleButton } from "../simple-button/SimpleButton";
 import {
   useGetCurrentProject,
@@ -85,6 +84,11 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             icon={<SettingsIcon />}
           />
           <ActionButton
+            onClick={createProject}
+            title="New Project"
+            icon={<PlusIcon />}
+          />
+          <ActionButton
             onClick={() => {
               window.open("mailto:info.flowser@gmail.com");
             }}
@@ -148,18 +152,6 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
                 No processes are running within Flowser
               </span>
             )}
-          </div>
-        </div>
-        <div>
-          <div className={classNames(classes.menuItem, classes.footer)}>
-            <IconButton
-              onClick={createProject}
-              icon={<PlusIcon></PlusIcon>}
-              iconPosition="before"
-              className={classes.button}
-            >
-              NEW PROJECT
-            </IconButton>
           </div>
         </div>
       </div>
