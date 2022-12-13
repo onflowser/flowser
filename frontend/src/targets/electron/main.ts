@@ -83,13 +83,18 @@ app.on("before-quit", async function (e) {
   // Prevent app termination before cleanup is done
   e.preventDefault();
   try {
-    // Notify renderer process
-    win.webContents.send("exit");
+    // On macOS the user could first close the app by clicking on "X"
+    // (which would destroy the window) and later quit the app from app bar.
+    // If we trigger any method on destroyed window, electron throws an error.
+    if (!win.isDestroyed()) {
+      // Notify renderer process
+      win.webContents.send("exit");
+    }
 
     await backend.cleanupAndStop();
   } catch (e) {
     dialog.showMessageBox({
-      message: `Couldn't shutdown successfully. Some flow processes may be still running in the background.`,
+      message: `Couldn't shutdown successfully: ${String(e)}`,
       type: "error",
     });
   } finally {
