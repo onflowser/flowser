@@ -1,5 +1,4 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Interval } from "@nestjs/schedule";
 import {
   FlowBlock,
   FlowCollection,
@@ -43,6 +42,7 @@ import {
 } from "../../processes/managed-process.entity";
 import { CommonService } from "../../core/services/common.service";
 import { FlowEmulatorService } from "./emulator.service";
+import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
 
 type BlockData = {
   block: FlowBlock;
@@ -70,6 +70,8 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
+  private readonly processingIntervalMs = 500;
+  private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
     private blockService: BlocksService,
@@ -85,9 +87,16 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
     private commonService: CommonService
-  ) {}
+  ) {
+    this.processingScheduler = new AsyncIntervalScheduler({
+      name: "Blockchain processing",
+      intervalInMs: this.processingIntervalMs,
+      functionToExecute: this.processBlockchainData.bind(this),
+    });
+  }
 
   onEnterProjectContext(project: ProjectEntity): void {
+    this.processingScheduler?.start();
     this.projectContext = project;
     this.emulatorProcess = this.processManagerService.get(
       FlowEmulatorService.processId
@@ -103,6 +112,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   onExitProjectContext(): void {
+    this.processingScheduler?.stop();
     this.projectContext = undefined;
     this.processManagerService.removeListener(
       ProcessManagerEvent.PROCESS_ADDED,
@@ -151,9 +161,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
   }
 
-  // TODO(milestone-x): Next interval shouldn't start before this function resolves
-  @Interval(1000)
-  async fetchDataFromDataSource(): Promise<void> {
+  async processBlockchainData(): Promise<void> {
     if (!this.projectContext) {
       return;
     }
