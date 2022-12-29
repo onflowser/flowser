@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  OnApplicationBootstrap,
-  OnApplicationShutdown,
-} from "@nestjs/common";
-import { Interval } from "@nestjs/schedule";
+import { Injectable, Logger } from "@nestjs/common";
 import {
   FlowBlock,
   FlowCollection,
@@ -72,17 +66,12 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService
-  implements
-    ProjectContextLifecycle,
-    OnApplicationBootstrap,
-    OnApplicationShutdown
-{
+export class FlowAggregatorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
   private readonly processingIntervalMs = 500;
-  private processingScheduler: AsyncIntervalScheduler | undefined;
+  private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
     private blockService: BlocksService,
@@ -98,22 +87,12 @@ export class FlowAggregatorService
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
     private commonService: CommonService
-  ) {}
-
-  onApplicationShutdown(signal?: string) {
-    this.processingScheduler.stop();
-  }
-
-  onApplicationBootstrap() {
-    if (this.processingScheduler) {
-      this.processingScheduler.stop();
-    }
+  ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
       intervalInMs: this.processingIntervalMs,
-      functionToExecute: this.fetchDataFromDataSource.bind(this),
+      functionToExecute: this.processBlockchainData.bind(this),
     });
-    this.processingScheduler.start();
   }
 
   onEnterProjectContext(project: ProjectEntity): void {
@@ -182,7 +161,7 @@ export class FlowAggregatorService
     return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
   }
 
-  async fetchDataFromDataSource(): Promise<void> {
+  async processBlockchainData(): Promise<void> {
     if (!this.projectContext) {
       return;
     }
