@@ -1,4 +1,9 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  OnApplicationBootstrap,
+  OnApplicationShutdown,
+} from "@nestjs/common";
 import { Interval } from "@nestjs/schedule";
 import {
   FlowBlock,
@@ -43,6 +48,7 @@ import {
 } from "../../processes/managed-process.entity";
 import { CommonService } from "../../core/services/common.service";
 import { FlowEmulatorService } from "./emulator.service";
+import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
 
 type BlockData = {
   block: FlowBlock;
@@ -66,10 +72,17 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService implements ProjectContextLifecycle {
+export class FlowAggregatorService
+  implements
+    ProjectContextLifecycle,
+    OnApplicationBootstrap,
+    OnApplicationShutdown
+{
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
+  private readonly processingIntervalMs = 1000;
+  private processingScheduler: AsyncIntervalScheduler | undefined;
 
   constructor(
     private blockService: BlocksService,
@@ -87,7 +100,24 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private commonService: CommonService
   ) {}
 
+  onApplicationShutdown(signal?: string) {
+    this.processingScheduler.stop();
+  }
+
+  onApplicationBootstrap() {
+    if (this.processingScheduler) {
+      this.processingScheduler.stop();
+    }
+    this.processingScheduler = new AsyncIntervalScheduler({
+      name: "Blockchain processing",
+      intervalInMs: this.processingIntervalMs,
+      functionToExecute: this.fetchDataFromDataSource.bind(this),
+    });
+    this.processingScheduler.start();
+  }
+
   onEnterProjectContext(project: ProjectEntity): void {
+    this.processingScheduler?.start();
     this.projectContext = project;
     this.emulatorProcess = this.processManagerService.get(
       FlowEmulatorService.processId
@@ -103,6 +133,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
   }
 
   onExitProjectContext(): void {
+    this.processingScheduler?.stop();
     this.projectContext = undefined;
     this.processManagerService.removeListener(
       ProcessManagerEvent.PROCESS_ADDED,
@@ -151,8 +182,6 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
   }
 
-  // TODO(milestone-x): Next interval shouldn't start before this function resolves
-  @Interval(1000)
   async fetchDataFromDataSource(): Promise<void> {
     if (!this.projectContext) {
       return;
