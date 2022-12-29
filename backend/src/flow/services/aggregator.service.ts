@@ -81,7 +81,7 @@ export class FlowAggregatorService
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
   private readonly logger = new Logger(FlowAggregatorService.name);
-  private readonly processingIntervalMs = 1000;
+  private readonly processingIntervalMs = 500;
   private processingScheduler: AsyncIntervalScheduler | undefined;
 
   constructor(
