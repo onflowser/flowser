@@ -25,19 +25,30 @@ export class AsyncIntervalScheduler {
   }
 
   async start(): Promise<void> {
+    if (this.isRunning) {
+      return;
+    }
     this.isRunning = true;
-    await this.handler();
+    await this.pollIfRunning();
   }
 
   stop(): void {
+    clearTimeout(this.runningTimeoutId);
     this.isRunning = false;
   }
 
-  private async handler() {
-    const { functionToExecute, name, intervalInMs } = this.options;
-    if (!this.isRunning) {
-      return;
+  private async pollIfRunning() {
+    const { intervalInMs } = this.options;
+    while (this.isRunning) {
+      await this.executeCallback();
+      await new Promise((resolve) => {
+        this.runningTimeoutId = setTimeout(resolve, intervalInMs);
+      });
     }
+  }
+
+  private async executeCallback() {
+    const { functionToExecute, name, intervalInMs } = this.options;
     try {
       const startTime = new Date();
       await functionToExecute();
@@ -49,6 +60,5 @@ export class AsyncIntervalScheduler {
     } catch (e) {
       logger.error(`${name} failed`, e);
     }
-    this.runningTimeoutId = setTimeout(this.handler.bind(this), intervalInMs);
   }
 }
