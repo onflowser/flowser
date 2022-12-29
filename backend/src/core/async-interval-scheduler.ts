@@ -43,7 +43,9 @@ export class AsyncIntervalScheduler {
       await functionToExecute();
       const endTime = new Date();
       const runTimeInMs = endTime.getTime() - startTime.getTime();
-      logger.debug(`${name} took ${runTimeInMs}ms`);
+      if (runTimeInMs > intervalInMs) {
+        logger.debug(`${name} took ${runTimeInMs}ms`);
+      }
     } catch (e) {
       logger.error(`${name} failed`, e);
     }
