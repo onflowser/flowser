@@ -128,7 +128,7 @@ export class ProjectsService {
       return missingRequirements;
     }
 
-    const flowCliInfo = await this.flowCliService.getInfo();
+    const flowCliInfo = await this.flowCliService.getVersion();
     const foundVersion = semver.coerce(flowCliInfo.version).version;
     const minSupportedVersion = "0.41.1";
     const isSupportedFlowCliVersion = semver.lte(

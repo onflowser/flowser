@@ -6,6 +6,17 @@ import { LogSource } from "@flowser/shared";
 import { FlowConfigService } from "./config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 
+export type FlowCliKey = {
+  derivationPath: string;
+  mnemonic: string;
+  private: string;
+  public: string;
+};
+
+export type FlowCliVersion = {
+  version: string;
+};
+
 @Injectable()
 export class FlowCliService implements ProjectContextLifecycle {
   static readonly processId = "flow-init-config";
@@ -44,7 +55,28 @@ export class FlowCliService implements ProjectContextLifecycle {
     await this.processManagerService.runUntilTermination(childProcess);
   }
 
-  async getInfo() {
+  async generateKey(): Promise<FlowCliKey> {
+    const childProcess = new ManagedProcessEntity({
+      id: FlowCliService.processId,
+      name: "Flow generate key",
+      command: {
+        name: "flow",
+        args: ["keys", "generate"],
+        options: {
+          cwd: this.projectContext.filesystemPath,
+        },
+      },
+    });
+    const output = await this.processManagerService.runUntilTermination(
+      childProcess
+    );
+    const lineWithData = output.find(
+      (outputLine) => outputLine.data.length > 0
+    );
+    return JSON.parse(lineWithData.data);
+  }
+
+  async getVersion(): Promise<FlowCliVersion> {
     const childProcess = new ManagedProcessEntity({
       id: "flow-version",
       name: "Flow version",
@@ -53,9 +85,10 @@ export class FlowCliService implements ProjectContextLifecycle {
         args: ["version"],
       },
     });
-    await childProcess.start();
-    await childProcess.waitOnExit();
-    const stdout = childProcess.logs.filter(
+    const output = await this.processManagerService.runUntilTermination(
+      childProcess
+    );
+    const stdout = output.filter(
       (log) => log.source === LogSource.LOG_SOURCE_STDOUT
     );
     const versionLog = stdout.find((log) => log.data.startsWith("Version"));

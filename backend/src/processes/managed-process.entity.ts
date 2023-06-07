@@ -35,7 +35,8 @@ export class ManagedProcessEntity extends EventEmitter {
   public options: ManagedProcessOptions;
   public childProcess: ChildProcessWithoutNullStreams | undefined;
   public state: ManagedProcessState;
-  public logs: ManagedProcessLog[];
+  // List of output lines received from either stdout or stderr.
+  public output: ManagedProcessLog[];
   public createdAt: Date;
   public updatedAt: Date;
 
@@ -44,7 +45,7 @@ export class ManagedProcessEntity extends EventEmitter {
     this.id = options.id ?? randomUUID();
     this.name = options.name;
     this.options = options;
-    this.logs = [];
+    this.output = [];
     this.state = ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
     this.createdAt = new Date();
     this.updatedAt = new Date();
@@ -109,7 +110,7 @@ export class ManagedProcessEntity extends EventEmitter {
   }
 
   public clearLogs() {
-    this.logs = [];
+    this.output = [];
   }
 
   public toProto(): ManagedProcess {
@@ -119,7 +120,7 @@ export class ManagedProcessEntity extends EventEmitter {
       name: this.name,
       command: { name, args },
       state: this.state,
-      logs: this.logs,
+      logs: this.output,
       updatedAt: this.updatedAt.toISOString(),
       createdAt: this.createdAt.toISOString(),
     };
@@ -169,7 +170,7 @@ export class ManagedProcessEntity extends EventEmitter {
       })
     );
 
-    this.logs.push(...logs);
+    this.output.push(...logs);
   }
 
   private setState(state: ManagedProcessState) {

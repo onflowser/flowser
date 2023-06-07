@@ -22,9 +22,11 @@ enum ManagedProcessState {
   MANAGED_PROCESS_STATE_ERROR = 3;
 }
 
+// TODO(custom-wallet): Rename to `ManagedProcessOutput`
 message ManagedProcessLog {
   string id = 1;
   string data = 2;
+  // TODO(custom-wallet): Rename to `OutputSource`
   LogSource source = 3;
   string created_at = 4;
   string updated_at = 5;

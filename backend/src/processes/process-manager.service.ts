@@ -51,7 +51,7 @@ export class ProcessManagerService extends EventEmitter {
     timestamp: Date
   ): ManagedProcessLog[] {
     const process = this.processLookupById.get(processId);
-    return process.logs?.filter(
+    return process.output?.filter(
       (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
     );
   }
@@ -83,11 +83,16 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   /**
-   * Starts the process and waits until it terminates (exits).
+   * Starts the process,
+   * waits until it terminates (exits),
+   * and returns the output it produced.
    */
-  async runUntilTermination(process: ManagedProcessEntity) {
+  async runUntilTermination(
+    process: ManagedProcessEntity
+  ): Promise<ManagedProcessLog[]> {
     await this.start(process);
     await process.waitOnExit();
+    return process.output;
   }
 
   isStoppedAll() {

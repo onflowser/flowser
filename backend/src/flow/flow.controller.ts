@@ -34,7 +34,7 @@ export class FlowController {
 
   @Get("version")
   async getVersion() {
-    const info = await this.flowCliService.getInfo();
+    const info = await this.flowCliService.getVersion();
     return GetFlowCliInfoResponse.toJSON(info);
   }
 
