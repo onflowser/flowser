@@ -2,8 +2,6 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKeyEntity } from "./key.entity";
 import { AccountContractEntity } from "./contract.entity";
-import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/gateway.service";
 import { Account } from "@flowser/shared";
 import { TransactionEntity } from "../../transactions/entities/transaction.entity";
 import { AccountStorageItemEntity } from "./storage-item.entity";
@@ -41,17 +39,6 @@ export class AccountEntity extends PollingEntity {
     eager: true,
   })
   transactions: TransactionEntity[];
-
-  static create(flowAccount: FlowAccount): AccountEntity {
-    const account = new AccountEntity();
-    account.address = ensurePrefixedAddress(flowAccount.address);
-    account.balance = flowAccount.balance;
-    account.code = flowAccount.code;
-    account.keys = flowAccount.keys.map((key) =>
-      AccountKeyEntity.create(flowAccount, key)
-    );
-    return account;
-  }
 
   toProto(): Account {
     return {

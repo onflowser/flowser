@@ -35,10 +35,6 @@ function configureFcl(options: {
     .put("accessNode.api", `http://localhost:${options.accessNodePort}`)
     // Point FCL at dev-wallet (default port)
     .put("discovery.wallet", `${options.devWalletUrl}/fcl/authn`);
-  // .put(
-  //   "discovery.authn.endpoint",
-  //   "https://fcl-discovery.onflow.org/api/testnet/authn"
-  // );
 }
 
 export function useFlow() {
@@ -71,40 +67,7 @@ export function useFlow() {
     }
   }, [project]);
 
-  console.log({ user: loggedInUser });
-
   useEffect(() => fcl.currentUser().subscribe(setLoggedInUser), []);
-
-  async function customAuthorization(account: Record<string, unknown>) {
-    console.log({ account });
-
-    const targetAccountInfo = storedAccounts.find(
-      (storedAccount) => storedAccount.address === loggedInUser.addr
-    );
-
-    if (!targetAccountInfo) {
-      throw new Error(
-        `Couldn't find target stored account: ${loggedInUser.addr}`
-      );
-    }
-
-    const firstKey = targetAccountInfo.keys[0];
-
-    return {
-      ...account,
-      tempId: `${targetAccountInfo.address}-${firstKey.index}`,
-      addr: targetAccountInfo.address,
-      keyId: firstKey.index,
-      signingFunction: async (signable: unknown) => {
-        console.log({ signable });
-        return {
-          addr: targetAccountInfo.address,
-          keyId: firstKey.index,
-          signature: "",
-        };
-      },
-    };
-  }
 
   async function sendTransaction(code: string, args: FlowScriptArgument[]) {
     track(AnalyticEvent.SEND_TRANSACTION);
@@ -114,7 +77,7 @@ export function useFlow() {
       args: (arg: any, t: any) => args.map((e) => arg(e.value, t[e.type])),
       payer: fcl.authz,
       proposer: fcl.authz,
-      authorizations: [customAuthorization],
+      authorizations: [fcl.authz],
       limit: 50,
     });
 

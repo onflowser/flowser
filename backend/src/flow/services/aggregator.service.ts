@@ -1,9 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
 import {
+  FlowAccount,
   FlowBlock,
   FlowCollection,
   FlowEvent,
   FlowGatewayService,
+  FlowKey,
   FlowTransaction,
   FlowTransactionStatus,
 } from "./gateway.service";
@@ -399,7 +401,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   private async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const unSerializedAccount = AccountEntity.create(flowAccount);
+    const unSerializedAccount = this.createAccountEntity(flowAccount);
     if (
       this.getDefaultAccountsAddresses().includes(unSerializedAccount.address)
     ) {
@@ -413,7 +415,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       )
     );
     const newKeys = flowAccount.keys.map((flowKey) =>
-      AccountKeyEntity.create(flowAccount, flowKey)
+      this.createKeyEntity(flowAccount, flowKey)
     );
     await this.accountService.create(unSerializedAccount);
     await Promise.all([
@@ -432,7 +434,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       this.accountKeysService.updateAccountKeys(
         address,
         flowAccount.keys.map((flowKey) =>
-          AccountKeyEntity.create(flowAccount, flowKey)
+          this.createKeyEntity(flowAccount, flowKey)
         )
       ),
     ]);
@@ -440,7 +442,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   private async updateStoredAccountContracts(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = AccountEntity.create(flowAccount);
+    const account = this.createAccountEntity(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
       AccountContractEntity.create(
         flowAccount,
@@ -515,5 +517,29 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       "0xe5a8b7f23e8b548f",
       "0x0ae53cb6e3f42a79",
     ];
+  }
+
+  private createAccountEntity(flowAccount: FlowAccount): AccountEntity {
+    const account = new AccountEntity();
+    account.address = ensurePrefixedAddress(flowAccount.address);
+    account.balance = flowAccount.balance;
+    account.code = flowAccount.code;
+    account.keys = flowAccount.keys.map((key) =>
+      this.createKeyEntity(flowAccount, key)
+    );
+    return account;
+  }
+
+  private createKeyEntity(flowAccount: FlowAccount, flowKey: FlowKey) {
+    const key = new AccountKeyEntity();
+    key.index = flowKey.index;
+    key.accountAddress = ensurePrefixedAddress(flowAccount.address);
+    key.publicKey = flowKey.publicKey;
+    key.signAlgo = flowKey.signAlgo;
+    key.hashAlgo = flowKey.hashAlgo;
+    key.weight = flowKey.weight;
+    key.sequenceNumber = flowKey.sequenceNumber;
+    key.revoked = flowKey.revoked;
+    return key;
   }
 }
