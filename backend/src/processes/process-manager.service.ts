@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ManagedProcessEntity } from "./managed-process.entity";
-import { ManagedProcessLog } from "@flowser/shared";
+import { LogSource, ManagedProcessLog } from "@flowser/shared";
 import { EventEmitter } from "node:events";
 
 export enum ProcessManagerEvent {
@@ -83,15 +83,28 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   /**
-   * Starts the process,
-   * waits until it terminates (exits),
+   * Starts the process, waits until it terminates (exits),
    * and returns the output it produced.
+   *
+   * If process exists with non-zero exit code, an error is thrown.
    */
   async runUntilTermination(
     process: ManagedProcessEntity
   ): Promise<ManagedProcessLog[]> {
     await this.start(process);
     await process.waitOnExit();
+    if (process.childProcess.exitCode > 0) {
+      const errorOutput = process.output.filter(
+        (outputLine) => outputLine.source == LogSource.LOG_SOURCE_STDERR
+      );
+      const errorMessage = errorOutput
+        .map((errorLine) => errorLine.data)
+        .filter((lineData) => lineData.length > 0)
+        .join(" ... ");
+      throw new Error(
+        `Managed process exited with code: ${process.childProcess.exitCode} (${errorMessage})`
+      );
+    }
     return process.output;
   }
 
