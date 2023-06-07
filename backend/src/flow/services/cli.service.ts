@@ -61,7 +61,7 @@ export class FlowCliService implements ProjectContextLifecycle {
       name: "Flow generate key",
       command: {
         name: "flow",
-        args: ["keys", "generate"],
+        args: ["keys", "generate", "--output", "json"],
         options: {
           cwd: this.projectContext.filesystemPath,
         },

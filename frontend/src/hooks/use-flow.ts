@@ -4,7 +4,11 @@ import * as fcl from "@onflow/fcl";
 // @ts-ignore
 import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
-import { useGetCurrentProject, useGetProjectStatus } from "./use-api";
+import {
+  useGetCurrentProject,
+  useGetPollingAccounts,
+  useGetProjectStatus,
+} from "./use-api";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "./use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
@@ -18,7 +22,7 @@ export type FlowScriptArgument = {
   type: FlowScriptArgumentType;
 };
 
-export function setFclConfig(options: {
+function configureFcl(options: {
   devWalletUrl: string;
   accessNodePort: number;
 }): void {
@@ -31,14 +35,22 @@ export function setFclConfig(options: {
     .put("accessNode.api", `http://localhost:${options.accessNodePort}`)
     // Point FCL at dev-wallet (default port)
     .put("discovery.wallet", `${options.devWalletUrl}/fcl/authn`);
+  // .put(
+  //   "discovery.authn.endpoint",
+  //   "https://fcl-discovery.onflow.org/api/testnet/authn"
+  // );
 }
 
 export function useFlow() {
   const { track } = useAnalytics();
   const { data } = useGetCurrentProject();
+  const { data: storedAccounts } = useGetPollingAccounts();
   const { data: projectStatus } = useGetProjectStatus();
   const { project } = data ?? {};
-  const [user, setUser] = useState<{ loggedIn: null; addr?: string }>({
+  const [loggedInUser, setLoggedInUser] = useState<{
+    loggedIn: null;
+    addr?: string;
+  }>({
     loggedIn: null,
   });
   const [isLoggingIn, setLoggingIn] = useState(false);
@@ -52,14 +64,47 @@ export function useFlow() {
 
   useEffect(() => {
     if (project) {
-      setFclConfig({
+      configureFcl({
         devWalletUrl,
         accessNodePort,
       });
     }
   }, [project]);
 
-  useEffect(() => fcl.currentUser().subscribe(setUser), []);
+  console.log({ user: loggedInUser });
+
+  useEffect(() => fcl.currentUser().subscribe(setLoggedInUser), []);
+
+  async function customAuthorization(account: Record<string, unknown>) {
+    console.log({ account });
+
+    const targetAccountInfo = storedAccounts.find(
+      (storedAccount) => storedAccount.address === loggedInUser.addr
+    );
+
+    if (!targetAccountInfo) {
+      throw new Error(
+        `Couldn't find target stored account: ${loggedInUser.addr}`
+      );
+    }
+
+    const firstKey = targetAccountInfo.keys[0];
+
+    return {
+      ...account,
+      tempId: `${targetAccountInfo.address}-${firstKey.index}`,
+      addr: targetAccountInfo.address,
+      keyId: firstKey.index,
+      signingFunction: async (signable: unknown) => {
+        console.log({ signable });
+        return {
+          addr: targetAccountInfo.address,
+          keyId: firstKey.index,
+          signature: "",
+        };
+      },
+    };
+  }
 
   async function sendTransaction(code: string, args: FlowScriptArgument[]) {
     track(AnalyticEvent.SEND_TRANSACTION);
@@ -69,7 +114,7 @@ export function useFlow() {
       args: (arg: any, t: any) => args.map((e) => arg(e.value, t[e.type])),
       payer: fcl.authz,
       proposer: fcl.authz,
-      authorizations: [fcl.authz],
+      authorizations: [customAuthorization],
       limit: 50,
     });
 
@@ -124,10 +169,10 @@ export function useFlow() {
   return {
     login,
     logout,
-    user,
+    user: loggedInUser,
     isLoggingIn,
     isLoggingOut,
-    isLoggedIn: user.loggedIn,
+    isLoggedIn: loggedInUser.loggedIn,
     sendTransaction,
   };
 }

@@ -67,12 +67,12 @@ export class FlowConfigService implements ProjectContextLifecycle {
   private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
 
-  async onEnterProjectContext(project: ProjectEntity) {
+  public async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
     await this.reload();
   }
 
-  onExitProjectContext() {
+  public onExitProjectContext() {
     this.projectContext = undefined;
     this.detachListeners();
   }
@@ -82,6 +82,48 @@ export class FlowConfigService implements ProjectContextLifecycle {
     this.detachListeners();
     await this.load();
     this.attachListeners();
+  }
+
+  public async getContractTemplates(): Promise<ContractTemplate[]> {
+    const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
+      (nameKey) => ({
+        name: nameKey,
+        filePath: this.getContractFilePath(nameKey),
+      })
+    );
+
+    const contractsSourceCode = await Promise.all(
+      contractNamesAndPaths.map(({ filePath }) =>
+        this.readProjectFile(filePath)
+      )
+    );
+
+    return contractNamesAndPaths.map(({ name, filePath }, index) =>
+      ContractTemplate.fromPartial({
+        name,
+        filePath,
+        sourceCode: contractsSourceCode[index],
+      })
+    );
+  }
+
+  public async getTransactionTemplates(): Promise<TransactionTemplate[]> {
+    // TODO(milestone-x): Is there a way to retrieve all project transaction files?
+    // For now we can't reliably tell where are transactions source files located,
+    // because they are not defined in flow.json config file - but this may be doable in the future.
+    // For now we have 2 options:
+    // - try to find a /transactions folder and read all files (hopefully transactions) within it
+    // - provide a Flowser setting to specify a path to the transactions folder
+    return [];
+  }
+
+  // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
+  public getServiceAccountAddress(): string | undefined {
+    return this.getAccountConfig("emulator-account")?.address;
+  }
+
+  public hasConfigFile(): boolean {
+    return fs.existsSync(this.getConfigPath());
   }
 
   private async attachListeners() {
@@ -106,43 +148,10 @@ export class FlowConfigService implements ProjectContextLifecycle {
     this.fileListenerController?.abort();
   }
 
-  async getContractTemplates(): Promise<ContractTemplate[]> {
-    const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
-      (nameKey) => ({
-        name: nameKey,
-        filePath: this.getContractFilePath(nameKey),
-      })
-    );
-
-    const contractsSourceCode = await Promise.all(
-      contractNamesAndPaths.map(({ filePath }) =>
-        this.readProjectFile(filePath)
-      )
-    );
-
-    return contractNamesAndPaths.map(({ name, filePath }, index) =>
-      ContractTemplate.fromPartial({
-        name,
-        filePath,
-        sourceCode: contractsSourceCode[index],
-      })
-    );
-  }
-
   private getContractFilePath(contractNameKey: string) {
     const contractConfig = this.config.contracts[contractNameKey];
     const isSimpleFormat = typeof contractConfig === "string";
     return isSimpleFormat ? contractConfig : contractConfig?.source;
-  }
-
-  async getTransactionTemplates(): Promise<TransactionTemplate[]> {
-    // TODO(milestone-x): Is there a way to retrieve all project transaction files?
-    // For now we can't reliably tell where are transactions source files located,
-    // because they are not defined in flow.json config file - but this may be doable in the future.
-    // For now we have 2 options:
-    // - try to find a /transactions folder and read all files (hopefully transactions) within it
-    // - provide a Flowser setting to specify a path to the transactions folder
-    return [];
   }
 
   private async load() {
@@ -154,32 +163,23 @@ export class FlowConfigService implements ProjectContextLifecycle {
     }
   }
 
-  async save() {
+  private async save() {
     await this.writeProjectFile(
       this.configFileName,
       JSON.stringify(this.config, null, 4)
     );
   }
 
-  getAccountConfig(accountKey: string) {
+  private getAccountConfig(accountKey: string) {
     return this.config.accounts[accountKey];
   }
 
-  // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
-  getServiceAccountAddress() {
-    return this.getAccountConfig("emulator-account")?.address;
-  }
-
-  getDatabasePath() {
+  private getDatabasePath() {
     return this.buildProjectPath(this.projectContext?.emulator.databasePath);
   }
 
-  getConfigPath() {
+  private getConfigPath() {
     return this.buildProjectPath(this.configFileName);
-  }
-
-  public hasConfigFile() {
-    return fs.existsSync(this.getConfigPath());
   }
 
   private async readProjectFile(pathPostfix: string) {
