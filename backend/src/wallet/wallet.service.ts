@@ -21,14 +21,30 @@ export class WalletService {
     private accountsService: AccountsService
   ) {}
 
-  public async createAccount(): Promise<void> {
+  public async sendTransaction(address: string): Promise<void> {
+    const authn = this.withAuthorization(address);
+
+    const response = await fcl.mutate({
+      cadence: `transaction {}`,
+      args: (_arg, _t) => [],
+      proposer: [authn],
+      authorizations: [authn],
+      payer: [authn],
+      limit: 9999,
+    });
+
+    return await fcl.tx(response).onceSealed();
+  }
+
+  public async createAccount(): Promise<AccountEntity> {
     // A user could choose to generate multiple keys for account.
     const keyPairs = await Promise.all([this.cliService.generateKey()]);
     const account = await this.cliService.createAccount(keyPairs);
+    const accountEntity = this.createAccountEntity(account, keyPairs);
 
-    await this.accountsService.create(
-      this.createAccountEntity(account, keyPairs)
-    );
+    await this.accountsService.create(accountEntity);
+
+    return accountEntity;
   }
 
   private createAccountEntity(
@@ -65,13 +81,11 @@ export class WalletService {
     return key;
   }
 
-  // Implements fcl authorization function:
-  // https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
-  public async authorizeAccount(fclAccount: Record<string, unknown> = {}) {
-    const address = fclAccount.addr as string;
-
+  public async withAuthorization(address: string) {
     const storedAccount = await this.accountsService.findOneByAddress(address);
 
+    // TODO(custom-wallet): This won't have a private key on it,
+    //  because I believe it gets overwritten in aggregator service
     const keyToUse = storedAccount.keys[0];
 
     if (!keyToUse) {
@@ -82,7 +96,11 @@ export class WalletService {
       throw new Error(`Account ${address} has no private key`);
     }
 
-    return {
+    // Implements fcl authorization function:
+    // https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
+    const authorizationCallback = (
+      fclAccount: Record<string, unknown> = {}
+    ) => ({
       ...fclAccount,
       tempId: `${address}-${keyToUse.index}`,
       addr: fcl.sansPrefix(address),
@@ -97,7 +115,10 @@ export class WalletService {
           ),
         };
       },
-    };
+    });
+
+    // Called by fcl in the callers scope.
+    return authorizationCallback;
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {

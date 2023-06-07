@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  PreconditionFailedException,
+} from "@nestjs/common";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
@@ -30,6 +34,8 @@ type FlowCliVersion = {
 type RunCliCommandOptions = {
   // Every command should have a unique human-readable name.
   name: string;
+  // Should this command be run in the project folder.
+  useProjectAsCwd: boolean;
   flowFlags: string[];
 };
 
@@ -75,6 +81,7 @@ export class FlowCliService implements ProjectContextLifecycle {
     return this.runAndGetJsonOutput<GeneratedKey>({
       name: "Flow generate key",
       flowFlags: ["keys", "generate"],
+      useProjectAsCwd: true,
     });
   }
 
@@ -83,6 +90,7 @@ export class FlowCliService implements ProjectContextLifecycle {
     return this.runAndGetJsonOutput<GeneratedAccount>({
       name: "Flow create account",
       flowFlags: ["accounts", "create", ...keyArgs],
+      useProjectAsCwd: true,
     });
   }
 
@@ -90,6 +98,7 @@ export class FlowCliService implements ProjectContextLifecycle {
     const output = await this.runAndGetOutput({
       name: "Flow version",
       flowFlags: ["version"],
+      useProjectAsCwd: false,
     });
     const stdout = output.filter(
       (log) => log.source === LogSource.LOG_SOURCE_STDOUT
@@ -127,11 +136,23 @@ export class FlowCliService implements ProjectContextLifecycle {
       command: {
         name: "flow",
         args: options.flowFlags,
-        options: {
-          cwd: this.projectContext.filesystemPath,
-        },
+        options: options.useProjectAsCwd
+          ? {
+              cwd: this.getRequiredProjectCwd(),
+            }
+          : undefined,
       },
     });
     return this.processManagerService.runUntilTermination(childProcess);
+  }
+
+  private getRequiredProjectCwd() {
+    if (!this.projectContext) {
+      throw new PreconditionFailedException(
+        "Project context not set",
+        "Missing project context when retrieving project path"
+      );
+    }
+    return this.projectContext.filesystemPath;
   }
 }
