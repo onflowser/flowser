@@ -15,6 +15,9 @@ export class AccountKeyEntity extends PollingEntity {
   @Column()
   publicKey: string;
 
+  @Column({ nullable: true })
+  privateKey: string | null;
+
   @Column()
   signAlgo: SignatureAlgorithm;
 
@@ -38,6 +41,7 @@ export class AccountKeyEntity extends PollingEntity {
       index: this.index,
       accountAddress: this.accountAddress,
       publicKey: this.publicKey,
+      privateKey: this.privateKey ?? "",
       signAlgo: this.signAlgo,
       hashAlgo: this.hashAlgo,
       weight: this.weight,

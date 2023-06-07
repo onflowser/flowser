@@ -21,6 +21,9 @@ message AccountKey {
     int32 index = 1;
     string account_address = 2;
     string public_key = 3;
+    // Only present on accounts generated
+    // thought our custom wallet service.
+    string private_key = 11;
     SignatureAlgorithm sign_algo = 4;
     HashAlgorithm hash_algo = 5;
     int32 weight = 6;

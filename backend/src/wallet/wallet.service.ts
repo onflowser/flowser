@@ -1,6 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { FlowConfigService } from "../flow/services/config.service";
-import { ProcessManagerService } from "../processes/process-manager.service";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import {
@@ -10,7 +8,6 @@ import {
 } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
-import { FlowAccount, FlowKey } from "../flow/services/gateway.service";
 import { ensurePrefixedAddress } from "../utils";
 import { AccountKeyEntity } from "../accounts/entities/key.entity";
 const fcl = require("@onflow/fcl");
@@ -66,5 +63,55 @@ export class WalletService {
     // key.sequenceNumber = generatedKey.sequenceNumber;
     // key.revoked = false;
     return key;
+  }
+
+  // Implements fcl authorization function:
+  // https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
+  public async authorizeAccount(fclAccount: Record<string, unknown> = {}) {
+    const address = fclAccount.addr as string;
+
+    const storedAccount = await this.accountsService.findOneByAddress(address);
+
+    const keyToUse = storedAccount.keys[0];
+
+    if (!keyToUse) {
+      throw new Error(`Account ${address} has no keys`);
+    }
+
+    if (!keyToUse.privateKey) {
+      throw new Error(`Account ${address} has no private key`);
+    }
+
+    return {
+      ...fclAccount,
+      tempId: `${address}-${keyToUse.index}`,
+      addr: fcl.sansPrefix(address),
+      keyId: keyToUse.index,
+      signingFunction: (signable) => {
+        return {
+          addr: fcl.withPrefix(address),
+          keyId: keyToUse.index,
+          signature: this.signWithPrivateKey(
+            keyToUse.privateKey,
+            signable.message
+          ),
+        };
+      },
+    };
+  }
+
+  private signWithPrivateKey(privateKey: string, message: string) {
+    const key = ec.keyFromPrivate(Buffer.from(privateKey, "hex"));
+    const sig = key.sign(this.hashMessage(message));
+    const n = 32;
+    const r = sig.r.toArrayLike(Buffer, "be", n);
+    const s = sig.s.toArrayLike(Buffer, "be", n);
+    return Buffer.concat([r, s]).toString("hex");
+  }
+
+  private hashMessage(msg: string) {
+    const sha = new SHA3(256);
+    sha.update(Buffer.from(msg, "hex"));
+    return sha.digest();
   }
 }
