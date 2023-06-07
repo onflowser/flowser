@@ -6,15 +6,31 @@ import { LogSource } from "@flowser/shared";
 import { FlowConfigService } from "./config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 
-export type FlowCliKey = {
+export type GeneratedKey = {
   derivationPath: string;
   mnemonic: string;
   private: string;
   public: string;
 };
 
-export type FlowCliVersion = {
+export type GeneratedAccount = {
+  // Address, without '0x' prefix.
+  address: string;
+  balance: string;
+  contracts: [];
+  // Public keys that you provided as input.
+  keys: string[];
+};
+
+type FlowCliVersion = {
   version: string;
+};
+
+// Simplified options for basic usage.
+type RunCliCommandOptions = {
+  // Every command should have a unique human-readable name.
+  name: string;
+  flowFlags: string[];
 };
 
 @Injectable()
@@ -55,39 +71,26 @@ export class FlowCliService implements ProjectContextLifecycle {
     await this.processManagerService.runUntilTermination(childProcess);
   }
 
-  async generateKey(): Promise<FlowCliKey> {
-    const childProcess = new ManagedProcessEntity({
-      id: FlowCliService.processId,
+  async generateKey(): Promise<GeneratedKey> {
+    return this.runAndGetJsonOutput<GeneratedKey>({
       name: "Flow generate key",
-      command: {
-        name: "flow",
-        args: ["keys", "generate", "--output", "json"],
-        options: {
-          cwd: this.projectContext.filesystemPath,
-        },
-      },
+      flowFlags: ["keys", "generate"],
     });
-    const output = await this.processManagerService.runUntilTermination(
-      childProcess
-    );
-    const lineWithData = output.find(
-      (outputLine) => outputLine.data.length > 0
-    );
-    return JSON.parse(lineWithData.data);
+  }
+
+  async createAccount(keys: GeneratedKey[]): Promise<GeneratedAccount> {
+    const keyArgs = keys.map((key) => ["--key", key.public]).flat();
+    return this.runAndGetJsonOutput<GeneratedAccount>({
+      name: "Flow create account",
+      flowFlags: ["accounts", "create", ...keyArgs],
+    });
   }
 
   async getVersion(): Promise<FlowCliVersion> {
-    const childProcess = new ManagedProcessEntity({
-      id: "flow-version",
+    const output = await this.runAndGetOutput({
       name: "Flow version",
-      command: {
-        name: "flow",
-        args: ["version"],
-      },
+      flowFlags: ["version"],
     });
-    const output = await this.processManagerService.runUntilTermination(
-      childProcess
-    );
     const stdout = output.filter(
       (log) => log.source === LogSource.LOG_SOURCE_STDOUT
     );
@@ -102,5 +105,33 @@ export class FlowCliService implements ProjectContextLifecycle {
     return {
       version,
     };
+  }
+
+  private async runAndGetJsonOutput<Output>(
+    options: RunCliCommandOptions
+  ): Promise<Output> {
+    const output = await this.runAndGetOutput({
+      ...options,
+      flowFlags: [...options.flowFlags, "--output", "json"],
+    });
+    const lineWithData = output.find(
+      (outputLine) => outputLine.data.length > 0
+    );
+    return JSON.parse(lineWithData.data) as Output;
+  }
+
+  private async runAndGetOutput(options: RunCliCommandOptions) {
+    const childProcess = new ManagedProcessEntity({
+      id: options.name.toLowerCase().replace(/ /g, "-"),
+      name: options.name,
+      command: {
+        name: "flow",
+        args: options.flowFlags,
+        options: {
+          cwd: this.projectContext.filesystemPath,
+        },
+      },
+    });
+    return this.processManagerService.runUntilTermination(childProcess);
   }
 }
