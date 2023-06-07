@@ -10,6 +10,8 @@ import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
 import { ensurePrefixedAddress } from "../utils";
 import { AccountKeyEntity } from "../accounts/entities/key.entity";
+import { KeysService } from "../accounts/services/keys.service";
+import { FlowEmulatorService } from "../flow/services/emulator.service";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");
@@ -17,8 +19,9 @@ const ec: EC = new EC("p256");
 @Injectable()
 export class WalletService {
   constructor(
-    private cliService: FlowCliService,
-    private accountsService: AccountsService
+    private readonly cliService: FlowCliService,
+    private readonly accountsService: AccountsService,
+    private readonly keysService: KeysService
   ) {}
 
   public async sendTransaction(address: string): Promise<void> {
@@ -43,6 +46,10 @@ export class WalletService {
     const accountEntity = this.createAccountEntity(account, keyPairs);
 
     await this.accountsService.create(accountEntity);
+    await this.keysService.updateAccountKeys(
+      accountEntity.address,
+      accountEntity.keys
+    );
 
     return accountEntity;
   }
@@ -65,19 +72,21 @@ export class WalletService {
     generatedAccount: GeneratedAccount,
     generatedKey: GeneratedKey
   ) {
+    const defaultSettings = FlowEmulatorService.getDefaultFlags();
+
     const key = new AccountKeyEntity();
     key.index = generatedAccount.keys.findIndex(
       (key) => key === generatedKey.public
     );
     key.accountAddress = ensurePrefixedAddress(generatedAccount.address);
-    // TODO(custom-wallet): Add `privateKey` field
     key.publicKey = generatedKey.public;
-    // TODO(custom-wallet): Set default values for these below (or add KeySetting struct)
-    // key.signAlgo = generatedKey.signAlgo;
-    // key.hashAlgo = generatedKey.hashAlgo;
-    // key.weight = generatedKey.weight;
-    // key.sequenceNumber = generatedKey.sequenceNumber;
-    // key.revoked = false;
+    key.privateKey = generatedKey.private;
+    // TODO(custom-wallet): For now use default settings, but maybe we should have a "GenerateKeyOptions" struct
+    key.signAlgo = defaultSettings.serviceSignatureAlgorithm;
+    key.hashAlgo = defaultSettings.serviceHashAlgorithm;
+    key.weight = 1;
+    key.sequenceNumber = 0;
+    key.revoked = false;
     return key;
   }
 

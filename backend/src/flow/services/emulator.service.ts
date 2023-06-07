@@ -3,6 +3,9 @@ import {
   ServiceStatus,
   hashAlgorithmToJSON,
   signatureAlgorithmToJSON,
+  Emulator,
+  SignatureAlgorithm,
+  HashAlgorithm,
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
@@ -39,7 +42,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       name: "Flow emulator",
       command: {
         name: "flow",
-        args: ["emulator", ...this.getFlags()],
+        args: ["emulator", ...this.getAppliedFlags()],
         options: {
           cwd: this.projectContext.filesystemPath,
         },
@@ -48,7 +51,33 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
     await this.processManagerService.start(managedProcess);
   }
 
-  private getFlags() {
+  public static getDefaultFlags(): Emulator {
+    return Emulator.fromPartial({
+      verboseLogging: true,
+      restServerPort: 8888,
+      grpcServerPort: 3569,
+      adminServerPort: 8080,
+      persist: false,
+      snapshot: true,
+      withContracts: false,
+      blockTime: 0,
+      servicePrivateKey: undefined,
+      databasePath: "./flowdb",
+      tokenSupply: 1000000000,
+      transactionExpiry: 10,
+      storagePerFlow: undefined,
+      minAccountBalance: undefined,
+      transactionMaxGasLimit: 9999,
+      scriptGasLimit: 100000,
+      serviceSignatureAlgorithm: SignatureAlgorithm.ECDSA_P256,
+      serviceHashAlgorithm: HashAlgorithm.SHA3_256,
+      storageLimit: true,
+      transactionFees: false,
+      simpleAddresses: false,
+    });
+  }
+
+  private getAppliedFlags(): string[] {
     const { emulator } = this.projectContext ?? {};
 
     const formatTokenSupply = (tokenSupply: number) => tokenSupply.toFixed(1);
