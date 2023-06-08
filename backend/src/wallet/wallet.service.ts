@@ -12,6 +12,10 @@ import { ensurePrefixedAddress } from "../utils";
 import { AccountKeyEntity } from "../accounts/entities/key.entity";
 import { KeysService } from "../accounts/services/keys.service";
 import { FlowEmulatorService } from "../flow/services/emulator.service";
+import {
+  FlowAuthorizationFunction,
+  FlowGatewayService,
+} from "../flow/services/gateway.service";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");
@@ -20,23 +24,52 @@ const ec: EC = new EC("p256");
 export class WalletService {
   constructor(
     private readonly cliService: FlowCliService,
+    private readonly flowGateway: FlowGatewayService,
     private readonly accountsService: AccountsService,
     private readonly keysService: KeysService
   ) {}
 
   public async sendTransaction(address: string): Promise<void> {
-    const authn = this.withAuthorization(address);
+    const storedAccount = await this.accountsService.findOneByAddress(address);
 
-    const response = await fcl.mutate({
-      cadence: `transaction {}`,
-      args: (_arg, _t) => [],
+    // TODO(custom-wallet): This won't have a private key on it,
+    //  because I believe it gets overwritten in aggregator service
+    const keyToUse = storedAccount.keys[0];
+
+    if (!keyToUse) {
+      throw new Error(`Account ${address} has no keys`);
+    }
+
+    if (!keyToUse.privateKey) {
+      throw new Error(`Account ${address} has no private key`);
+    }
+
+    const authn: FlowAuthorizationFunction = (
+      fclAccount: Record<string, unknown> = {}
+    ) => ({
+      ...fclAccount,
+      tempId: `${address}-${keyToUse.index}`,
+      addr: fcl.sansPrefix(address),
+      keyId: keyToUse.index,
+      signingFunction: (signable) => {
+        return {
+          addr: fcl.withPrefix(address),
+          keyId: keyToUse.index,
+          signature: this.signWithPrivateKey(
+            keyToUse.privateKey,
+            signable.message
+          ),
+        };
+      },
+    });
+
+    // TODO(custom-wallet): This throws: invalid address (for url: /v1/accounts/null?block_height=sealed&expand=contracts,keys)
+    return this.flowGateway.sendTransaction({
+      cadence: "transaction {}",
       proposer: [authn],
       authorizations: [authn],
       payer: [authn],
-      limit: 9999,
     });
-
-    return await fcl.tx(response).onceSealed();
   }
 
   public async createAccount(): Promise<AccountEntity> {
@@ -88,46 +121,6 @@ export class WalletService {
     key.sequenceNumber = 0;
     key.revoked = false;
     return key;
-  }
-
-  public async withAuthorization(address: string) {
-    const storedAccount = await this.accountsService.findOneByAddress(address);
-
-    // TODO(custom-wallet): This won't have a private key on it,
-    //  because I believe it gets overwritten in aggregator service
-    const keyToUse = storedAccount.keys[0];
-
-    if (!keyToUse) {
-      throw new Error(`Account ${address} has no keys`);
-    }
-
-    if (!keyToUse.privateKey) {
-      throw new Error(`Account ${address} has no private key`);
-    }
-
-    // Implements fcl authorization function:
-    // https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
-    const authorizationCallback = (
-      fclAccount: Record<string, unknown> = {}
-    ) => ({
-      ...fclAccount,
-      tempId: `${address}-${keyToUse.index}`,
-      addr: fcl.sansPrefix(address),
-      keyId: keyToUse.index,
-      signingFunction: (signable) => {
-        return {
-          addr: fcl.withPrefix(address),
-          keyId: keyToUse.index,
-          signature: this.signWithPrivateKey(
-            keyToUse.privateKey,
-            signable.message
-          ),
-        };
-      },
-    });
-
-    // Called by fcl in the callers scope.
-    return authorizationCallback;
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {
