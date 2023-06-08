@@ -17,7 +17,11 @@ import {
   FlowAuthorizationFunction,
   FlowGatewayService,
 } from "../flow/services/gateway.service";
-import { SignatureAlgorithm } from "@flowser/shared/dist/src/generated/entities/common";
+import {
+  SignatureAlgorithm,
+  SendTransactionRequest,
+  SendTransactionResponse,
+} from "@flowser/shared";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");
@@ -36,7 +40,28 @@ export class WalletService {
     private readonly keysService: KeysService
   ) {}
 
-  public async sendTransaction(address: string): Promise<void> {
+  public async sendTransaction(
+    request: SendTransactionRequest
+  ): Promise<SendTransactionResponse> {
+    const [proposer, payer, authorizations] = await Promise.all([
+      this.withAuthorization(request.proposerAddress),
+      this.withAuthorization(request.payerAddress),
+      Promise.all(
+        request.authorizerAddresses.map((authorizerAddress) =>
+          this.withAuthorization(authorizerAddress)
+        )
+      ),
+    ]);
+
+    return this.flowGateway.sendTransaction({
+      cadence: request.cadence,
+      proposer,
+      payer,
+      authorizations,
+    });
+  }
+
+  private async withAuthorization(address: string) {
     const storedAccount = await this.accountsService.findOneByAddress(address);
 
     const credentialsWithPrivateKeys = storedAccount.keys.filter((key) =>
@@ -46,7 +71,7 @@ export class WalletService {
 
     if (!isManagedAccount) {
       throw new PreconditionFailedException(
-        `Account ${address} isn't managed by Flowser.`,
+        `Authorizer account ${address} isn't managed by Flowser.`,
         "Flowser doesn't store private keys of the provided account."
       );
     }
@@ -72,16 +97,7 @@ export class WalletService {
       },
     });
 
-    return this.flowGateway.sendTransaction({
-      cadence: `transaction {
-        prepare(signer: AuthAccount) {
-          
-        }
-      }`,
-      proposer: authn,
-      payer: authn,
-      authorizations: [authn],
-    });
+    return authn;
   }
 
   public async createAccount(): Promise<AccountEntity> {

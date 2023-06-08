@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "entities/accounts.proto";
+
+message CreateAccountRequest {}
+
+message CreateAccountResponse {
+    Account account = 1;
+}
+
+message SendTransactionRequest {
+  string cadence = 1;
+  string proposer_address = 2;
+  string payer_address = 3;
+  repeated string authorizer_addresses = 4;
+}
+
+message SendTransactionResponse {
+  string transaction_id = 1;
+}

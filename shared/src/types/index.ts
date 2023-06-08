@@ -18,6 +18,7 @@ export * from "../generated/api/projects";
 export * from "../generated/api/transactions";
 export * from "../generated/api/flow";
 export * from "../generated/api/snapshots";
+export * from "../generated/api/wallet";
 
 // Entities
 export * from "../generated/entities/config";

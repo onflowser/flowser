@@ -6,8 +6,17 @@ export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   @Post("accounts/:address/transaction")
-  async sendTransaction(@Param("address") address) {
-    return this.walletService.sendTransaction(address);
+  async sendTransaction(@Param("address") address: string) {
+    return this.walletService.sendTransaction({
+      cadence: `transaction {
+        prepare(signer: AuthAccount) {
+          log(signer.address);
+        }
+      }`,
+      payerAddress: address,
+      proposerAddress: address,
+      authorizerAddresses: [address],
+    });
   }
 
   @Post("accounts")

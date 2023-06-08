@@ -140,10 +140,13 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     this.projectContext = undefined;
   }
 
+  /**
+   * Sends the transaction and returns the transaction ID.
+   */
   public async sendTransaction(
     options: SendFlowTransactionOptions
-  ): Promise<void> {
-    const txId = await fcl.mutate({
+  ): Promise<{ transactionId: string }> {
+    const transactionId = await fcl.mutate({
       cadence: options.cadence,
       args: (_arg, _t) => [],
       proposer: options.proposer,
@@ -152,7 +155,7 @@ export class FlowGatewayService implements ProjectContextLifecycle {
       limit: 9999,
     });
 
-    return await fcl.tx(txId).onceSealed();
+    return { transactionId };
   }
 
   public getTxStatusSubscription(transactionId: string) {
