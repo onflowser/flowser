@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, PreconditionFailedException } from "@nestjs/common";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import {
@@ -32,31 +32,33 @@ export class WalletService {
   public async sendTransaction(address: string): Promise<void> {
     const storedAccount = await this.accountsService.findOneByAddress(address);
 
-    // TODO(custom-wallet): This won't have a private key on it,
-    //  because I believe it gets overwritten in aggregator service
-    const keyToUse = storedAccount.keys[0];
+    const credentialsWithPrivateKeys = storedAccount.keys.filter((key) =>
+      Boolean(key.privateKey)
+    );
+    const isManagedAccount = credentialsWithPrivateKeys.length > 0;
 
-    if (!keyToUse) {
-      throw new Error(`Account ${address} has no keys`);
+    if (!isManagedAccount) {
+      throw new PreconditionFailedException(
+        `Account ${address} isn't managed by Flowser.`,
+        "Flowser doesn't store private keys of the provided account."
+      );
     }
 
-    if (!keyToUse.privateKey) {
-      throw new Error(`Account ${address} has no private key`);
-    }
+    const credentialToUse = credentialsWithPrivateKeys[0];
 
     const authn: FlowAuthorizationFunction = (
       fclAccount: Record<string, unknown> = {}
     ) => ({
       ...fclAccount,
-      tempId: `${address}-${keyToUse.index}`,
+      tempId: `${address}-${credentialToUse.index}`,
       addr: fcl.sansPrefix(address),
-      keyId: keyToUse.index,
+      keyId: credentialToUse.index,
       signingFunction: (signable) => {
         return {
           addr: fcl.withPrefix(address),
-          keyId: keyToUse.index,
+          keyId: credentialToUse.index,
           signature: this.signWithPrivateKey(
-            keyToUse.privateKey,
+            credentialToUse.privateKey,
             signable.message
           ),
         };
