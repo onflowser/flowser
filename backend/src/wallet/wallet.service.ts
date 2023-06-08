@@ -63,12 +63,11 @@ export class WalletService {
       },
     });
 
-    // TODO(custom-wallet): This throws: invalid address (for url: /v1/accounts/null?block_height=sealed&expand=contracts,keys)
     return this.flowGateway.sendTransaction({
       cadence: "transaction {}",
-      proposer: [authn],
+      proposer: authn,
+      payer: authn,
       authorizations: [authn],
-      payer: [authn],
     });
   }
 

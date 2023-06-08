@@ -115,9 +115,9 @@ export type FlowAuthorizationFunction = () => unknown;
 
 type SendFlowTransactionOptions = {
   cadence: string;
-  proposer: FlowAuthorizationFunction[];
+  proposer: FlowAuthorizationFunction;
+  payer: FlowAuthorizationFunction;
   authorizations: FlowAuthorizationFunction[];
-  payer: FlowAuthorizationFunction[];
 };
 
 @Injectable()
@@ -143,16 +143,21 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   public async sendTransaction(
     options: SendFlowTransactionOptions
   ): Promise<void> {
-    const response = await fcl.mutate({
-      cadence: options.cadence,
-      args: (_arg, _t) => [],
-      proposer: options.proposer,
-      authorizations: options.authorizations,
-      payer: options.payer,
-      limit: 9999,
-    });
+    try {
+      const response = await fcl.mutate({
+        cadence: options.cadence,
+        args: (_arg, _t) => [],
+        proposer: options.proposer,
+        authorizations: options.authorizations,
+        payer: options.payer,
+        limit: 9999,
+      });
 
-    return await fcl.tx(response).onceSealed();
+      return response;
+    } catch (e) {
+      console.log("fc.mutate failed", e);
+    }
+    // return await fcl.tx(response).onceSealed();
   }
 
   public getTxStatusSubscription(transactionId: string) {
