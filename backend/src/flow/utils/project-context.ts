@@ -5,17 +5,22 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
  */
 export interface ProjectContextLifecycle {
   /**
-   * Perform setup logic.
+   * Called when project is started (e.g. user chooses a project in the UI).
+   * Should be used to perform setup logic.
    */
   onEnterProjectContext(project: ProjectEntity): Promise<void> | void;
 
   /**
-   * Perform teardown logic.
+   * Called when project is exited.
+   * Should be used to perform teardown logic.
    */
   onExitProjectContext(): Promise<void> | void;
 }
 
-export function hasProjectContextInterface(object: unknown) {
+// TODO: Use this to retrieve all services that implement the above interface automatically
+export function implementsProjectContextLifecycle(
+  object: unknown
+): object is ProjectContextLifecycle {
   if (typeof object !== "object") {
     return false;
   }
