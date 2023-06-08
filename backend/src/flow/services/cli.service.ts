@@ -9,6 +9,18 @@ import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { LogSource } from "@flowser/shared";
 import { FlowConfigService } from "./config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
+import {
+  HashAlgorithm,
+  hashAlgorithmToJSON,
+  SignatureAlgorithm,
+  signatureAlgorithmToJSON,
+} from "@flowser/shared/dist/src/generated/entities/common";
+
+export type GenerateKeyOptions = {
+  derivationPath?: string;
+  mnemonicSeed?: string;
+  signatureAlgorithm?: SignatureAlgorithm;
+};
 
 export type GeneratedKey = {
   derivationPath: string;
@@ -17,7 +29,20 @@ export type GeneratedKey = {
   public: string;
 };
 
-export type GeneratedAccount = {
+export type KeyWithWeight = {
+  weight: number;
+  publicKey: string;
+};
+
+type CreateAccountOptions = {
+  keys: KeyWithWeight[];
+  // Account name from configuration used to sign the transaction (default "emulator-account")
+  signer?: string;
+  hashAlgorithm?: HashAlgorithm;
+  signatureAlgorithm?: SignatureAlgorithm;
+};
+
+export type CreatedAccount = {
   // Address, without '0x' prefix.
   address: string;
   balance: string;
@@ -30,13 +55,21 @@ type FlowCliVersion = {
   version: string;
 };
 
+type SimpleFlowCliFlag = string;
+type KeyValueFlowCliFlag = {
+  key: string;
+  // Flags with undefined value will be excluded.
+  value: string | number | undefined;
+};
+type FlowCliFlag = SimpleFlowCliFlag | KeyValueFlowCliFlag;
+
 // Simplified options for basic usage.
 type RunCliCommandOptions = {
   // Every command should have a unique human-readable name.
   name: string;
   // Should this command be run in the project folder.
   useProjectAsCwd: boolean;
-  flowFlags: string[];
+  flowFlags: FlowCliFlag[];
 };
 
 @Injectable()
@@ -77,19 +110,60 @@ export class FlowCliService implements ProjectContextLifecycle {
     await this.processManagerService.runUntilTermination(childProcess);
   }
 
-  async generateKey(): Promise<GeneratedKey> {
+  async generateKey(options?: GenerateKeyOptions): Promise<GeneratedKey> {
     return this.runAndGetJsonOutput<GeneratedKey>({
       name: "Flow generate key",
-      flowFlags: ["keys", "generate"],
+      flowFlags: [
+        "keys",
+        "generate",
+        {
+          key: "--derivationPath",
+          value: options?.derivationPath,
+        },
+        {
+          key: "--mnemonic",
+          value: options?.mnemonicSeed,
+        },
+        {
+          key: "--sig-algo",
+          value: options?.signatureAlgorithm
+            ? signatureAlgorithmToJSON(options?.signatureAlgorithm)
+            : undefined,
+        },
+      ],
       useProjectAsCwd: true,
     });
   }
 
-  async createAccount(keys: GeneratedKey[]): Promise<GeneratedAccount> {
-    const keyArgs = keys.map((key) => ["--key", key.public]).flat();
-    return this.runAndGetJsonOutput<GeneratedAccount>({
+  async createAccount(options: CreateAccountOptions): Promise<CreatedAccount> {
+    return this.runAndGetJsonOutput<CreatedAccount>({
       name: "Flow create account",
-      flowFlags: ["accounts", "create", ...keyArgs],
+      flowFlags: [
+        "accounts",
+        "create",
+        {
+          key: "--signer",
+          value: options.signer,
+        },
+        {
+          key: "--hash-algo",
+          value: options.hashAlgorithm
+            ? hashAlgorithmToJSON(options.hashAlgorithm)
+            : undefined,
+        },
+        {
+          key: "--sig-algo",
+          value: options?.signatureAlgorithm
+            ? signatureAlgorithmToJSON(options?.signatureAlgorithm)
+            : undefined,
+        },
+        ...options.keys
+          .map((key): FlowCliFlag[] => [
+            { key: "--key", value: key.publicKey },
+            { key: "--key-weight", value: key.weight },
+          ])
+          .flat(),
+      ],
       useProjectAsCwd: true,
     });
   }
@@ -135,7 +209,7 @@ export class FlowCliService implements ProjectContextLifecycle {
       name: options.name,
       command: {
         name: "flow",
-        args: options.flowFlags,
+        args: options.flowFlags.map((flag) => this.buildFlag(flag)).flat(),
         options: options.useProjectAsCwd
           ? {
               cwd: this.getRequiredProjectCwd(),
@@ -144,6 +218,22 @@ export class FlowCliService implements ProjectContextLifecycle {
       },
     });
     return this.processManagerService.runUntilTermination(childProcess);
+  }
+
+  private buildFlag(flag: FlowCliFlag): string[] {
+    if (typeof flag === "string") {
+      return [flag];
+    }
+
+    if (flag.value !== undefined) {
+      const shouldBeWrappedInQuotes = typeof flag.value !== "number";
+      return [
+        flag.key,
+        shouldBeWrappedInQuotes ? `"${flag.value}"` : String(flag.value),
+      ];
+    }
+
+    return [];
   }
 
   private getRequiredProjectCwd() {

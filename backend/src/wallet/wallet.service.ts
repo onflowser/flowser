@@ -3,8 +3,9 @@ import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import {
   FlowCliService,
-  GeneratedAccount,
+  CreatedAccount,
   GeneratedKey,
+  KeyWithWeight,
 } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
@@ -16,9 +17,15 @@ import {
   FlowAuthorizationFunction,
   FlowGatewayService,
 } from "../flow/services/gateway.service";
+import { SignatureAlgorithm } from "@flowser/shared/dist/src/generated/entities/common";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");
+
+// https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
+const defaultKeyWeight = 1000;
+// https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#public-key-signature-algorithm
+const defaultSignatureAlgorithm = SignatureAlgorithm.ECDSA_P256;
 
 @Injectable()
 export class WalletService {
@@ -78,9 +85,18 @@ export class WalletService {
   }
 
   public async createAccount(): Promise<AccountEntity> {
-    // A user could choose to generate multiple keys for account.
+    // For now, we only support a single key per account,
+    // but we could as well add support for attaching
+    // multiple keys with (possibly) different weights.
     const keyPairs = await Promise.all([this.cliService.generateKey()]);
-    const account = await this.cliService.createAccount(keyPairs);
+    const account = await this.cliService.createAccount({
+      keys: keyPairs.map(
+        (key): KeyWithWeight => ({
+          weight: defaultKeyWeight,
+          publicKey: key.public,
+        })
+      ),
+    });
     const accountEntity = this.createAccountEntity(account, keyPairs);
 
     await this.accountsService.create(accountEntity);
@@ -93,7 +109,7 @@ export class WalletService {
   }
 
   private createAccountEntity(
-    generatedAccount: GeneratedAccount,
+    generatedAccount: CreatedAccount,
     generatedKeys: GeneratedKey[]
   ): AccountEntity {
     const account = new AccountEntity();
@@ -107,7 +123,7 @@ export class WalletService {
   }
 
   private createKeyEntity(
-    generatedAccount: GeneratedAccount,
+    generatedAccount: CreatedAccount,
     generatedKey: GeneratedKey
   ) {
     const defaultSettings = FlowEmulatorService.getDefaultFlags();
@@ -119,10 +135,12 @@ export class WalletService {
     key.accountAddress = ensurePrefixedAddress(generatedAccount.address);
     key.publicKey = generatedKey.public;
     key.privateKey = generatedKey.private;
-    // TODO(custom-wallet): For now use default settings, but maybe we should have a "GenerateKeyOptions" struct
-    key.signAlgo = defaultSettings.serviceSignatureAlgorithm;
+    key.signAlgo = defaultSignatureAlgorithm;
+    // Which has algorithm is actually used here by default?
+    // Flow CLI doesn't support the option to specify it as an argument,
+    // nor does it return this info when generating the key.
     key.hashAlgo = defaultSettings.serviceHashAlgorithm;
-    key.weight = 1;
+    key.weight = defaultKeyWeight;
     key.sequenceNumber = 0;
     key.revoked = false;
     return key;
