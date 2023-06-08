@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/blocks.proto";
-import "responses/core.proto";
+import "api/core.proto";
 
 message GetAllBlocksResponse {
   repeated Block blocks = 1;
