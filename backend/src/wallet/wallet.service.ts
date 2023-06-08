@@ -64,7 +64,11 @@ export class WalletService {
     });
 
     return this.flowGateway.sendTransaction({
-      cadence: "transaction {}",
+      cadence: `transaction {
+        prepare(signer: AuthAccount) {
+          
+        }
+      }`,
       proposer: authn,
       payer: authn,
       authorizations: [authn],

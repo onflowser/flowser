@@ -143,21 +143,16 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   public async sendTransaction(
     options: SendFlowTransactionOptions
   ): Promise<void> {
-    try {
-      const response = await fcl.mutate({
-        cadence: options.cadence,
-        args: (_arg, _t) => [],
-        proposer: options.proposer,
-        authorizations: options.authorizations,
-        payer: options.payer,
-        limit: 9999,
-      });
+    const txId = await fcl.mutate({
+      cadence: options.cadence,
+      args: (_arg, _t) => [],
+      proposer: options.proposer,
+      authorizations: options.authorizations,
+      payer: options.payer,
+      limit: 9999,
+    });
 
-      return response;
-    } catch (e) {
-      console.log("fc.mutate failed", e);
-    }
-    // return await fcl.tx(response).onceSealed();
+    return await fcl.tx(txId).onceSealed();
   }
 
   public getTxStatusSubscription(transactionId: string) {
