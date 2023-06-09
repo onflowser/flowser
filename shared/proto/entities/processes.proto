@@ -24,10 +24,11 @@ enum ManagedProcessState {
 
 message ManagedProcessOutput {
   string id = 1;
-  string data = 2;
-  ProcessOutputSource source = 3;
-  string created_at = 4;
-  string updated_at = 5;
+  string process_id = 2;
+  string data = 3;
+  ProcessOutputSource source = 4;
+  string created_at = 5;
+  string updated_at = 6;
 }
 
 enum ProcessOutputSource {

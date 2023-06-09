@@ -163,6 +163,7 @@ export class ManagedProcessEntity extends EventEmitter {
     const logs = lines.map(
       (line): ManagedProcessOutput => ({
         id: randomUUID(),
+        processId: this.id,
         source,
         data: line,
         createdAt,
