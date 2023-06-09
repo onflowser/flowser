@@ -1,6 +1,6 @@
 import dateFormat from "dateformat";
 import { isToday, isThisMonth, isThisYear } from "date-fns";
-import { ManagedProcessLog } from "@flowser/shared";
+import { ManagedProcessOutput } from "@flowser/shared";
 import AnsiHtmlConvert from "ansi-to-html";
 
 export class TextUtils {
@@ -63,7 +63,7 @@ export class TextUtils {
     return logLine;
   }
 
-  static formatProcessLog(log: ManagedProcessLog): string {
+  static formatProcessOutput(log: ManagedProcessOutput): string {
     const convert = new AnsiHtmlConvert();
     // The msg field in logs can contain escaped ansi codes
     // We need to unescape them so that they can be parsed by ansi-to-html lib

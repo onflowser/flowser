@@ -1,6 +1,6 @@
 import {
-  GetPollingLogsRequest,
-  GetPollingLogsResponse,
+  GetPollingOutputsRequest,
+  GetPollingOutputsResponse,
   GetPollingManagedProcessesRequest,
   GetPollingManagedProcessesResponse,
 } from "@flowser/shared";
@@ -16,31 +16,31 @@ export class ProcessesService {
     });
   }
 
-  getAllLogsByProcessWithPolling({
+  getAllOutputsByProcessWithPolling({
     processId,
     ...data
   }: {
     timestamp: number;
     processId: string;
-  }): Promise<GetPollingLogsResponse> {
+  }): Promise<GetPollingOutputsResponse> {
     return this.transport.send({
       requestMethod: "POST",
       resourceIdentifier: `/api/processes/${processId}/logs/polling`,
       requestData: data,
-      requestProtobuf: GetPollingLogsRequest,
-      responseProtobuf: GetPollingLogsResponse,
+      requestProtobuf: GetPollingOutputsRequest,
+      responseProtobuf: GetPollingOutputsResponse,
     });
   }
 
-  getAllLogsWithPolling(data: {
+  getAllOutputsWithPolling(data: {
     timestamp: number;
-  }): Promise<GetPollingLogsResponse> {
+  }): Promise<GetPollingOutputsResponse> {
     return this.transport.send({
       requestMethod: "POST",
       resourceIdentifier: `/api/processes/logs/polling`,
       requestData: data,
-      requestProtobuf: GetPollingLogsRequest,
-      responseProtobuf: GetPollingLogsResponse,
+      requestProtobuf: GetPollingOutputsRequest,
+      responseProtobuf: GetPollingOutputsResponse,
     });
   }
 

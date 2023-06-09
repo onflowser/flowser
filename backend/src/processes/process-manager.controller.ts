@@ -8,11 +8,11 @@ import {
 } from "@nestjs/common";
 import { ProcessManagerService } from "./process-manager.service";
 import {
-  GetPollingLogsResponse,
+  GetPollingOutputsResponse,
   GetAllManagedProcessesResponse,
   GetPollingManagedProcessesResponse,
   GetPollingManagedProcessesRequest,
-  GetPollingLogsRequest,
+  GetPollingOutputsRequest,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 
@@ -61,22 +61,22 @@ export class ProcessManagerController {
     });
   }
 
-  @Post(":logs/polling")
-  @UseInterceptors(new PollingResponseInterceptor(GetPollingLogsResponse))
-  async getAllLogsNewerThanTimestamp(@Body() data) {
-    const request = GetPollingLogsRequest.fromJSON(data);
+  @Post(":outputs/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingOutputsResponse))
+  async getAllOutputsNewerThanTimestamp(@Body() data) {
+    const request = GetPollingOutputsRequest.fromJSON(data);
     return this.processManagerService.findAllLogsNewerThanTimestamp(
       new Date(request.timestamp)
     );
   }
 
-  @Post(":processId/logs/polling")
-  @UseInterceptors(new PollingResponseInterceptor(GetPollingLogsResponse))
-  async getAllLogsByProcessNewerThanTimestamp(
+  @Post(":processId/outputs/polling")
+  @UseInterceptors(new PollingResponseInterceptor(GetPollingOutputsResponse))
+  async getAllOutputsByProcessNewerThanTimestamp(
     @Param("processId") processId,
     @Body() data
   ) {
-    const request = GetPollingLogsRequest.fromJSON(data);
+    const request = GetPollingOutputsRequest.fromJSON(data);
     return this.processManagerService.findAllLogsByProcessIdNewerThanTimestamp(
       processId,
       new Date(request.timestamp)

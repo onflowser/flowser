@@ -6,7 +6,7 @@ import {
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
-import { LogSource } from "@flowser/shared";
+import { ProcessOutputSource } from "@flowser/shared";
 import { FlowConfigService } from "./config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import {
@@ -175,7 +175,7 @@ export class FlowCliService implements ProjectContextLifecycle {
       useProjectAsCwd: false,
     });
     const stdout = output.filter(
-      (log) => log.source === LogSource.LOG_SOURCE_STDOUT
+      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT
     );
     const versionLog = stdout.find((log) => log.data.startsWith("Version"));
     // This should only happen with a test build,

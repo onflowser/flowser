@@ -16,8 +16,11 @@ import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
-import { useGetPollingLogs, useGetPollingProcesses } from "../../hooks/use-api";
-import { ManagedProcessLog, LogSource } from "@flowser/shared";
+import {
+  useGetPollingOutputs,
+  useGetPollingProcesses,
+} from "../../hooks/use-api";
+import { ManagedProcessOutput, ProcessOutputSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../../components/simple-button/SimpleButton";
@@ -35,7 +38,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const { logDrawerSize, setSize } = useLogDrawer();
   const tinyLogRef = useRef<HTMLDivElement>(null);
   const nonTinyLogRef = useRef<HTMLDivElement>(null);
-  const { data: logs } = useGetPollingLogs();
+  const { data: logs } = useGetPollingOutputs();
   const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
   const logWrapperElement = logWrapperRef.current;
   const scrollBottom =
@@ -94,7 +97,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   useEffect(() => {
     const hasErrorLogs = logs
       .filter((log) => log.isNew)
-      .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
+      .some((log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR);
     if (hasErrorLogs) {
       toast.error("Some process encountered errors", {
         duration: 4000,
@@ -224,16 +227,18 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   );
 };
 
-function LogLine({ log }: { log: ManagedProcessLog }) {
+function LogLine({ log }: { log: ManagedProcessOutput }) {
   return (
     <pre
       className={classes.line}
       style={
         // TODO(ui): use color from color pallet
-        log.source === LogSource.LOG_SOURCE_STDERR ? { color: "#D02525" } : {}
+        log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR
+          ? { color: "#D02525" }
+          : {}
       }
       dangerouslySetInnerHTML={{
-        __html: TextUtils.formatProcessLog(log),
+        __html: TextUtils.formatProcessOutput(log),
       }}
     />
   );

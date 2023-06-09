@@ -17,15 +17,15 @@ message GetPollingManagedProcessesResponse {
   PollingMetaData meta = 2;
 }
 
-message GetAllLogsResponse {
-  repeated ManagedProcessLog logs = 1;
+message GetAllOutputsResponse {
+  repeated ManagedProcessOutput outputs = 1;
 }
 
-message GetPollingLogsRequest {
+message GetPollingOutputsRequest {
   uint32 timestamp = 1;
 }
 
-message GetPollingLogsResponse {
-  repeated ManagedProcessLog data = 1;
+message GetPollingOutputsResponse {
+  repeated ManagedProcessOutput data = 1;
   PollingMetaData meta = 2;
 }
