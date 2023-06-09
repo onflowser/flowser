@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ManagedProcessEntity } from "./managed-process.entity";
-import { ManagedProcessLog } from "@flowser/shared";
+import { ProcessOutputSource, ManagedProcessOutput } from "@flowser/shared";
 import { EventEmitter } from "node:events";
 
 export enum ProcessManagerEvent {
@@ -34,7 +34,7 @@ export class ProcessManagerService extends EventEmitter {
     });
   }
 
-  findAllLogsNewerThanTimestamp(timestamp: Date): ManagedProcessLog[] {
+  findAllLogsNewerThanTimestamp(timestamp: Date): ManagedProcessOutput[] {
     const processes = this.getAll();
     const logsByProcesses = processes.map((process) =>
       this.findAllLogsByProcessIdNewerThanTimestamp(process.id, timestamp)
@@ -49,9 +49,9 @@ export class ProcessManagerService extends EventEmitter {
   findAllLogsByProcessIdNewerThanTimestamp(
     processId: string,
     timestamp: Date
-  ): ManagedProcessLog[] {
+  ): ManagedProcessOutput[] {
     const process = this.processLookupById.get(processId);
-    return process.logs?.filter(
+    return process.output?.filter(
       (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
     );
   }
@@ -83,11 +83,30 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   /**
-   * Starts the process and waits until it terminates (exits).
+   * Starts the process, waits until it terminates (exits),
+   * and returns the output it produced.
+   *
+   * If process exists with non-zero exit code, an error is thrown.
    */
-  async runUntilTermination(process: ManagedProcessEntity) {
+  async runUntilTermination(
+    process: ManagedProcessEntity
+  ): Promise<ManagedProcessOutput[]> {
     await this.start(process);
     await process.waitOnExit();
+    if (process.childProcess.exitCode > 0) {
+      const errorOutput = process.output.filter(
+        (outputLine) =>
+          outputLine.source == ProcessOutputSource.OUTPUT_SOURCE_STDERR
+      );
+      const errorMessage = errorOutput
+        .map((errorLine) => errorLine.data)
+        .filter((lineData) => lineData.length > 0)
+        .join(" ... ");
+      throw new Error(
+        `Managed process exited with code: ${process.childProcess.exitCode} (${errorMessage})`
+      );
+    }
+    return process.output;
   }
 
   isStoppedAll() {

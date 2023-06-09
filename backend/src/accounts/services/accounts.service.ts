@@ -39,11 +39,6 @@ export class AccountsService {
     });
   }
 
-  async accountExists(address: string) {
-    const existingAccount = await this.accountRepository.findOneBy({ address });
-    return existingAccount !== null;
-  }
-
   async findOneByAddress(address: string) {
     return this.accountRepository.findOneOrFail({
       where: { address },
@@ -51,17 +46,13 @@ export class AccountsService {
     });
   }
 
-  async create(account: AccountEntity) {
-    return this.accountRepository.insert(account);
-  }
-
-  async update(address: string, updatedAccount: AccountEntity) {
-    const account = await this.accountRepository.findOneByOrFail({ address });
-    account.markUpdated();
-    return this.accountRepository.update(
-      { address },
-      // Prevent overwriting existing created date
-      { ...account, createdAt: undefined }
+  async upsert(accountToUpsert: AccountEntity) {
+    const existingAccount = await this.accountRepository.findOneBy({
+      address: accountToUpsert.address,
+    });
+    return this.accountRepository.upsert(
+      { ...(existingAccount ?? {}), ...accountToUpsert },
+      ["address"]
     );
   }
 

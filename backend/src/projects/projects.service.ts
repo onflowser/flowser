@@ -11,7 +11,7 @@ import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
-import { FlowAggregatorService } from "../flow/services/aggregator.service";
+import { ProcessorService } from "../data-processing/services/processor.service";
 import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
@@ -25,19 +25,17 @@ import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   DevWallet,
-  Emulator,
   Gateway,
   ServiceStatus,
   GetProjectStatusResponse,
-  HashAlgorithm,
   Project,
   ProjectRequirement,
   ProjectRequirementType,
-  SignatureAlgorithm,
 } from "@flowser/shared";
 import * as fs from "fs";
-import { CommonService } from "../core/services/common.service";
+import { DataRemovalService } from "../core/services/data-removal.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
+import { WalletService } from "../wallet/wallet.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -51,9 +49,12 @@ export class ProjectsService {
   // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
     [
-      // Config service must be defined before cli service!
       this.flowConfigService,
+      // Below services depend on flow config service,
+      // so they must be configured after the above one.
       this.flowCliService,
+      this.walletService,
+
       this.flowGatewayService,
       this.flowAggregatorService,
       this.flowEmulatorService,
@@ -64,7 +65,7 @@ export class ProjectsService {
     @InjectRepository(ProjectEntity)
     private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
-    private flowAggregatorService: FlowAggregatorService,
+    private flowAggregatorService: ProcessorService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
@@ -75,8 +76,9 @@ export class ProjectsService {
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private transactionsService: TransactionsService,
-    private commonService: CommonService,
-    private flowDevWalletService: FlowDevWalletService
+    private commonService: DataRemovalService,
+    private flowDevWalletService: FlowDevWalletService,
+    private walletService: WalletService
   ) {}
 
   getCurrentProject(): ProjectEntity | undefined {
@@ -128,7 +130,7 @@ export class ProjectsService {
       return missingRequirements;
     }
 
-    const flowCliInfo = await this.flowCliService.getInfo();
+    const flowCliInfo = await this.flowCliService.getVersion();
     const foundVersion = semver.coerce(flowCliInfo.version).version;
     const minSupportedVersion = "0.41.1";
     const isSupportedFlowCliVersion = semver.lte(
@@ -259,45 +261,18 @@ export class ProjectsService {
   }
 
   getDefaultProject() {
-    const restServerPort = 8888;
-    const grpcServerPort = 3569;
-
-    const isWindows = process.platform === "win32";
+    const defaultEmulator = FlowEmulatorService.getDefaultFlags();
 
     return Project.fromPartial({
       name: "New Project",
       gateway: Gateway.fromPartial({
-        restServerAddress: `http://localhost:${restServerPort}`,
-        grpcServerAddress: `http://localhost:${grpcServerPort}`,
+        restServerAddress: `http://localhost:${defaultEmulator.restServerPort}`,
+        grpcServerAddress: `http://localhost:${defaultEmulator.grpcServerPort}`,
       }),
       devWallet: DevWallet.fromJSON({
         port: 8701,
       }),
-      emulator: Emulator.fromPartial({
-        verboseLogging: true,
-        restServerPort,
-        grpcServerPort,
-        adminServerPort: 8080,
-        persist: false,
-        // Snapshot should be temporarily disabled on Windows
-        // See https://github.com/onflow/flow-emulator/issues/208
-        snapshot: !isWindows,
-        withContracts: false,
-        blockTime: 0,
-        servicePrivateKey: undefined,
-        databasePath: "./flowdb",
-        tokenSupply: 1000000000,
-        transactionExpiry: 10,
-        storagePerFlow: undefined,
-        minAccountBalance: undefined,
-        transactionMaxGasLimit: 9999,
-        scriptGasLimit: 100000,
-        serviceSignatureAlgorithm: SignatureAlgorithm.ECDSA_P256,
-        serviceHashAlgorithm: HashAlgorithm.SHA3_256,
-        storageLimit: true,
-        transactionFees: false,
-        simpleAddresses: false,
-      }),
+      emulator: defaultEmulator,
     });
   }
 

@@ -4,7 +4,11 @@ import * as fcl from "@onflow/fcl";
 // @ts-ignore
 import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
-import { useGetCurrentProject, useGetProjectStatus } from "./use-api";
+import {
+  useGetCurrentProject,
+  useGetPollingAccounts,
+  useGetProjectStatus,
+} from "./use-api";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "./use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
@@ -18,7 +22,7 @@ export type FlowScriptArgument = {
   type: FlowScriptArgumentType;
 };
 
-export function setFclConfig(options: {
+function configureFcl(options: {
   devWalletUrl: string;
   accessNodePort: number;
 }): void {
@@ -36,9 +40,13 @@ export function setFclConfig(options: {
 export function useFlow() {
   const { track } = useAnalytics();
   const { data } = useGetCurrentProject();
+  const { data: storedAccounts } = useGetPollingAccounts();
   const { data: projectStatus } = useGetProjectStatus();
   const { project } = data ?? {};
-  const [user, setUser] = useState<{ loggedIn: null; addr?: string }>({
+  const [loggedInUser, setLoggedInUser] = useState<{
+    loggedIn: null;
+    addr?: string;
+  }>({
     loggedIn: null,
   });
   const [isLoggingIn, setLoggingIn] = useState(false);
@@ -52,14 +60,14 @@ export function useFlow() {
 
   useEffect(() => {
     if (project) {
-      setFclConfig({
+      configureFcl({
         devWalletUrl,
         accessNodePort,
       });
     }
   }, [project]);
 
-  useEffect(() => fcl.currentUser().subscribe(setUser), []);
+  useEffect(() => fcl.currentUser().subscribe(setLoggedInUser), []);
 
   async function sendTransaction(code: string, args: FlowScriptArgument[]) {
     track(AnalyticEvent.SEND_TRANSACTION);
@@ -124,10 +132,10 @@ export function useFlow() {
   return {
     login,
     logout,
-    user,
+    user: loggedInUser,
     isLoggingIn,
     isLoggingOut,
-    isLoggedIn: user.loggedIn,
+    isLoggedIn: loggedInUser.loggedIn,
     sendTransaction,
   };
 }

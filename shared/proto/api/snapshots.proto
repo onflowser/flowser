@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/snapshots.proto";
-import "responses/core.proto";
+import "api/core.proto";
 
 message GetPollingEmulatorSnapshotsRequest {
   uint32 timestamp = 1;

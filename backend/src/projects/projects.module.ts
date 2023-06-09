@@ -9,6 +9,8 @@ import { BlocksModule } from "../blocks/blocks.module";
 import { EventsModule } from "../events/events.module";
 import { TransactionsModule } from "../transactions/transactions.module";
 import { CoreModule } from "../core/core.module";
+import { WalletModule } from "../wallet/wallet.module";
+import { DataProcessingModule } from "../data-processing/data-processing.module";
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { CoreModule } from "../core/core.module";
     EventsModule,
     TransactionsModule,
     CoreModule,
+    WalletModule,
+    DataProcessingModule,
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService],

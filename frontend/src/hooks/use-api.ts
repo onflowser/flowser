@@ -6,7 +6,7 @@ import {
   Transaction,
   Block,
   Event,
-  ManagedProcessLog,
+  ManagedProcessOutput,
   ManagedProcess,
   GetFlowserVersionResponse,
   GetSingleProjectResponse,
@@ -22,7 +22,7 @@ import {
   GetSingleAccountResponse,
   GetFlowCliInfoResponse,
   GetPollingEventsResponse,
-  GetPollingLogsResponse,
+  GetPollingOutputsResponse,
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
   GetProjectObjectsResponse,
@@ -176,21 +176,24 @@ export function useGetPollingEventsByTransaction(
   });
 }
 
-export function useGetPollingLogs(): TimeoutPollingHook<ManagedProcessLog> {
-  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
-    resourceKey: "/processes/logs/polling",
+export function useGetPollingOutputs(): TimeoutPollingHook<ManagedProcessOutput> {
+  return useTimeoutPolling<ManagedProcessOutput, GetPollingOutputsResponse>({
+    resourceKey: "/processes/outputs/polling",
     fetcher: ({ timestamp }) =>
-      processesService.getAllLogsWithPolling({ timestamp }),
+      processesService.getAllOutputsWithPolling({ timestamp }),
   });
 }
 
 export function useGetPollingLogsByProcess(
   processId: string
-): TimeoutPollingHook<ManagedProcessLog> {
-  return useTimeoutPolling<ManagedProcessLog, GetPollingLogsResponse>({
-    resourceKey: `/processes/${processId}/logs/polling`,
+): TimeoutPollingHook<ManagedProcessOutput> {
+  return useTimeoutPolling<ManagedProcessOutput, GetPollingOutputsResponse>({
+    resourceKey: `/processes/${processId}/outputs/polling`,
     fetcher: ({ timestamp }) =>
-      processesService.getAllLogsByProcessWithPolling({ timestamp, processId }),
+      processesService.getAllOutputsByProcessWithPolling({
+        timestamp,
+        processId,
+      }),
   });
 }
 

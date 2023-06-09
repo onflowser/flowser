@@ -8,4 +8,4 @@ protoc -I=./proto \
   --ts_proto_opt=outputServices=grpc-js \
   --ts_proto_out=./src/generated \
   ./proto/entities/* \
-  ./proto/responses/*
+  ./proto/api/*

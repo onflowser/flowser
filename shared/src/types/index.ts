@@ -7,17 +7,18 @@ export * from "./polling";
 export * from "./flow";
 export * from "./common";
 
-// Responses
-export * from "../generated/responses/events";
-export * from "../generated/responses/accounts";
-export * from "../generated/responses/blocks";
-export * from "../generated/responses/core";
-export * from "../generated/responses/contracts";
-export * from "../generated/responses/processes";
-export * from "../generated/responses/projects";
-export * from "../generated/responses/transactions";
-export * from "../generated/responses/flow";
-export * from "../generated/responses/snapshots";
+// API definitions (requests/responses)
+export * from "../generated/api/events";
+export * from "../generated/api/accounts";
+export * from "../generated/api/blocks";
+export * from "../generated/api/core";
+export * from "../generated/api/contracts";
+export * from "../generated/api/processes";
+export * from "../generated/api/projects";
+export * from "../generated/api/transactions";
+export * from "../generated/api/flow";
+export * from "../generated/api/snapshots";
+export * from "../generated/api/wallet";
 
 // Entities
 export * from "../generated/entities/config";

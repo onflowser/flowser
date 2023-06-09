@@ -4,9 +4,9 @@ import {
   SpawnOptionsWithoutStdio,
 } from "child_process";
 import {
-  LogSource,
+  ProcessOutputSource,
   ManagedProcess,
-  ManagedProcessLog,
+  ManagedProcessOutput,
   ManagedProcessState,
   managedProcessStateToJSON,
 } from "@flowser/shared";
@@ -35,7 +35,8 @@ export class ManagedProcessEntity extends EventEmitter {
   public options: ManagedProcessOptions;
   public childProcess: ChildProcessWithoutNullStreams | undefined;
   public state: ManagedProcessState;
-  public logs: ManagedProcessLog[];
+  // List of output lines received from either stdout or stderr.
+  public output: ManagedProcessOutput[];
   public createdAt: Date;
   public updatedAt: Date;
 
@@ -44,7 +45,7 @@ export class ManagedProcessEntity extends EventEmitter {
     this.id = options.id ?? randomUUID();
     this.name = options.name;
     this.options = options;
-    this.logs = [];
+    this.output = [];
     this.state = ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
     this.createdAt = new Date();
     this.updatedAt = new Date();
@@ -109,7 +110,7 @@ export class ManagedProcessEntity extends EventEmitter {
   }
 
   public clearLogs() {
-    this.logs = [];
+    this.output = [];
   }
 
   public toProto(): ManagedProcess {
@@ -119,7 +120,7 @@ export class ManagedProcessEntity extends EventEmitter {
       name: this.name,
       command: { name, args },
       state: this.state,
-      logs: this.logs,
+      output: this.output,
       updatedAt: this.updatedAt.toISOString(),
       createdAt: this.createdAt.toISOString(),
     };
@@ -143,10 +144,10 @@ export class ManagedProcessEntity extends EventEmitter {
     });
 
     this.childProcess.stdout.on("data", (data) =>
-      this.handleData(LogSource.LOG_SOURCE_STDOUT, data)
+      this.handleData(ProcessOutputSource.OUTPUT_SOURCE_STDOUT, data)
     );
     this.childProcess.stderr.on("data", (data) =>
-      this.handleData(LogSource.LOG_SOURCE_STDERR, data)
+      this.handleData(ProcessOutputSource.OUTPUT_SOURCE_STDERR, data)
     );
   }
 
@@ -156,12 +157,13 @@ export class ManagedProcessEntity extends EventEmitter {
     this.childProcess.stderr.removeAllListeners("data");
   }
 
-  private handleData(source: LogSource, data: any) {
+  private handleData(source: ProcessOutputSource, data: any) {
     const lines: string[] = data.toString().split("\n");
     const createdAt = new Date().toString();
     const logs = lines.map(
-      (line): ManagedProcessLog => ({
+      (line): ManagedProcessOutput => ({
         id: randomUUID(),
+        processId: this.id,
         source,
         data: line,
         createdAt,
@@ -169,7 +171,7 @@ export class ManagedProcessEntity extends EventEmitter {
       })
     );
 
-    this.logs.push(...logs);
+    this.output.push(...logs);
   }
 
   private setState(state: ManagedProcessState) {

@@ -1,12 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
 import {
+  FlowAccount,
   FlowBlock,
   FlowCollection,
   FlowEvent,
   FlowGatewayService,
+  FlowKey,
   FlowTransaction,
   FlowTransactionStatus,
-} from "./gateway.service";
+} from "../../flow/services/gateway.service";
 import { BlocksService } from "../../blocks/blocks.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { AccountsService } from "../../accounts/services/accounts.service";
@@ -21,16 +23,16 @@ import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
-import { FlowSubscriptionService } from "./subscription.service";
-import { FlowConfigService } from "./config.service";
-import { ProjectContextLifecycle } from "../utils/project-context";
+import { SubscriptionService } from "./subscription.service";
+import { FlowConfigService } from "../../flow/services/config.service";
+import { ProjectContextLifecycle } from "../../flow/utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { FlowAccountStorageService } from "./storage.service";
+import { FlowAccountStorageService } from "../../flow/services/storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import {
   FlowCoreEventType,
-  ServiceStatus,
   ManagedProcessState,
+  ServiceStatus,
 } from "@flowser/shared";
 import {
   ProcessManagerEvent,
@@ -40,9 +42,10 @@ import {
   ManagedProcessEntity,
   ManagedProcessEvent,
 } from "../../processes/managed-process.entity";
-import { CommonService } from "../../core/services/common.service";
-import { FlowEmulatorService } from "./emulator.service";
+import { DataRemovalService } from "../../core/services/data-removal.service";
+import { FlowEmulatorService } from "../../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
+import { WalletService } from "../../wallet/wallet.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -66,10 +69,10 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService implements ProjectContextLifecycle {
+export class ProcessorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
-  private readonly logger = new Logger(FlowAggregatorService.name);
+  private readonly logger = new Logger(ProcessorService.name);
   private readonly processingIntervalMs = 500;
   private processingScheduler: AsyncIntervalScheduler;
 
@@ -83,10 +86,11 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private eventService: EventsService,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private flowSubscriptionService: FlowSubscriptionService,
+    private flowSubscriptionService: SubscriptionService,
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
-    private commonService: CommonService
+    private commonService: DataRemovalService,
+    private walletService: WalletService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -151,6 +155,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       this.logger.debug("Emulator process was started, reindexing");
       // Reindex all blockchain data when the emulator is started (restarted)
       await this.commonService.removeBlockchainData();
+      await this.walletService.importAccountsFromConfig();
     }
   }
 
@@ -399,7 +404,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   private async storeNewAccountWithContractsAndKeys(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const unSerializedAccount = AccountEntity.create(flowAccount);
+    const unSerializedAccount = this.createAccountEntity(flowAccount);
     if (
       this.getDefaultAccountsAddresses().includes(unSerializedAccount.address)
     ) {
@@ -413,9 +418,9 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       )
     );
     const newKeys = flowAccount.keys.map((flowKey) =>
-      AccountKeyEntity.create(flowAccount, flowKey)
+      this.createKeyEntity(flowAccount, flowKey)
     );
-    await this.accountService.create(unSerializedAccount);
+    await this.accountService.upsert(unSerializedAccount);
     await Promise.all([
       this.accountKeysService.updateAccountKeys(address, newKeys),
       this.contractService.updateAccountContracts(
@@ -432,7 +437,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       this.accountKeysService.updateAccountKeys(
         address,
         flowAccount.keys.map((flowKey) =>
-          AccountKeyEntity.create(flowAccount, flowKey)
+          this.createKeyEntity(flowAccount, flowKey)
         )
       ),
     ]);
@@ -440,7 +445,7 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
 
   private async updateStoredAccountContracts(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = AccountEntity.create(flowAccount);
+    const account = this.createAccountEntity(flowAccount);
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
       AccountContractEntity.create(
         flowAccount,
@@ -482,7 +487,15 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     const serviceAccountAddress = ensurePrefixedAddress(
       this.configService.getServiceAccountAddress()
     );
-    return this.accountService.accountExists(serviceAccountAddress);
+    const serviceAccount = await this.accountService.findOneByAddress(
+      serviceAccountAddress
+    );
+
+    // Service account is already created by the wallet service,
+    // but that service doesn't set the public key.
+    // So if public key isn't present,
+    // we know that we haven't processed this account yet.
+    return Boolean(serviceAccount.keys[0]?.publicKey);
   }
 
   private async processDefaultAccounts() {
@@ -515,5 +528,29 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
       "0xe5a8b7f23e8b548f",
       "0x0ae53cb6e3f42a79",
     ];
+  }
+
+  private createAccountEntity(flowAccount: FlowAccount): AccountEntity {
+    const account = AccountEntity.createDefault();
+    account.address = ensurePrefixedAddress(flowAccount.address);
+    account.balance = flowAccount.balance;
+    account.code = flowAccount.code;
+    account.keys = flowAccount.keys.map((key) =>
+      this.createKeyEntity(flowAccount, key)
+    );
+    return account;
+  }
+
+  private createKeyEntity(flowAccount: FlowAccount, flowKey: FlowKey) {
+    const key = new AccountKeyEntity();
+    key.index = flowKey.index;
+    key.accountAddress = ensurePrefixedAddress(flowAccount.address);
+    key.publicKey = flowKey.publicKey;
+    key.signAlgo = flowKey.signAlgo;
+    key.hashAlgo = flowKey.hashAlgo;
+    key.weight = flowKey.weight;
+    key.sequenceNumber = flowKey.sequenceNumber;
+    key.revoked = flowKey.revoked;
+    return key;
   }
 }

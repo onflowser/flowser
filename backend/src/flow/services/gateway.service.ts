@@ -110,6 +110,16 @@ export type FlowEvent = {
   data: Record<string, any>;
 };
 
+// https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
+export type FlowAuthorizationFunction = () => unknown;
+
+type SendFlowTransactionOptions = {
+  cadence: string;
+  proposer: FlowAuthorizationFunction;
+  payer: FlowAuthorizationFunction;
+  authorizations: FlowAuthorizationFunction[];
+};
+
 @Injectable()
 export class FlowGatewayService implements ProjectContextLifecycle {
   private static readonly logger = new Logger(FlowGatewayService.name);
@@ -128,6 +138,24 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   }
   onExitProjectContext(): void {
     this.projectContext = undefined;
+  }
+
+  /**
+   * Sends the transaction and returns the transaction ID.
+   */
+  public async sendTransaction(
+    options: SendFlowTransactionOptions
+  ): Promise<{ transactionId: string }> {
+    const transactionId = await fcl.mutate({
+      cadence: options.cadence,
+      args: (_arg, _t) => [],
+      proposer: options.proposer,
+      authorizations: options.authorizations,
+      payer: options.payer,
+      limit: 9999,
+    });
+
+    return { transactionId };
   }
 
   public getTxStatusSubscription(transactionId: string) {

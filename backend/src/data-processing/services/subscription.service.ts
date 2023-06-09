@@ -1,15 +1,18 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { FlowGatewayService, FlowTransactionStatus } from "./gateway.service";
+import {
+  FlowGatewayService,
+  FlowTransactionStatus,
+} from "../../flow/services/gateway.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { TransactionStatus } from "@flowser/shared";
 
 @Injectable()
-export class FlowSubscriptionService {
-  private logger = new Logger(FlowSubscriptionService.name);
+export class SubscriptionService {
+  private logger = new Logger(SubscriptionService.name);
 
   constructor(
     private readonly flowGatewayService: FlowGatewayService,
-    private transactionService: TransactionsService
+    private readonly transactionService: TransactionsService
   ) {}
 
   public async addTransactionSubscription(transactionId: string) {

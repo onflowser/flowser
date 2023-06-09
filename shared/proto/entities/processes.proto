@@ -5,7 +5,7 @@ message ManagedProcess {
   string name = 7;
   CommandOption command = 2;
   ManagedProcessState state = 3;
-  repeated ManagedProcessLog logs = 4;
+  repeated ManagedProcessOutput output = 4;
   string created_at = 5;
   string updated_at = 6;
 
@@ -22,16 +22,17 @@ enum ManagedProcessState {
   MANAGED_PROCESS_STATE_ERROR = 3;
 }
 
-message ManagedProcessLog {
+message ManagedProcessOutput {
   string id = 1;
-  string data = 2;
-  LogSource source = 3;
-  string created_at = 4;
-  string updated_at = 5;
+  string process_id = 2;
+  string data = 3;
+  ProcessOutputSource source = 4;
+  string created_at = 5;
+  string updated_at = 6;
 }
 
-enum LogSource {
-  LOG_SOURCE_UNSPECIFIED = 0;
-  LOG_SOURCE_STDOUT = 1;
-  LOG_SOURCE_STDERR = 2;
+enum ProcessOutputSource {
+  OUTPUT_SOURCE_UNSPECIFIED = 0;
+  OUTPUT_SOURCE_STDOUT = 1;
+  OUTPUT_SOURCE_STDERR = 2;
 }

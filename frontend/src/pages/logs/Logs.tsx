@@ -16,8 +16,11 @@ import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
-import { useGetPollingLogs, useGetPollingProcesses } from "../../hooks/use-api";
-import { ManagedProcessLog, LogSource } from "@flowser/shared";
+import {
+  useGetPollingOutputs,
+  useGetPollingProcesses,
+} from "../../hooks/use-api";
+import { ManagedProcessOutput, ProcessOutputSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../../components/simple-button/SimpleButton";
@@ -29,13 +32,22 @@ type LogsProps = {
 };
 
 const SEARCH_CONTEXT_NAME = "logs";
+const EMULATOR_PROCESS_ID = "emulator";
+const DEV_WALLET_PROCESS_ID = "dev-wallet";
 
 const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
   const tinyLogRef = useRef<HTMLDivElement>(null);
   const nonTinyLogRef = useRef<HTMLDivElement>(null);
-  const { data: logs } = useGetPollingLogs();
+  const { data: unfilteredLogs } = useGetPollingOutputs();
+  const filteredLogs = useMemo(
+    () =>
+      unfilteredLogs.filter((log) =>
+        [EMULATOR_PROCESS_ID, DEV_WALLET_PROCESS_ID].includes(log.processId)
+      ),
+    [unfilteredLogs]
+  );
   const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
   const logWrapperElement = logWrapperRef.current;
   const scrollBottom =
@@ -47,7 +59,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   const sortedLogs = useMemo(
     () =>
-      logs
+      filteredLogs
         // Exclude logs that indicate which our backend called the emulator
         // To reduce unnecessary clutter
         .filter((log) => {
@@ -58,7 +70,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         ),
-    [logs]
+    [filteredLogs]
   );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
   const { data: processes } = useGetPollingProcesses();
@@ -92,9 +104,9 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   }, [logDrawerSize, shouldScrollToBottom]);
 
   useEffect(() => {
-    const hasErrorLogs = logs
+    const hasErrorLogs = filteredLogs
       .filter((log) => log.isNew)
-      .some((log) => log.source === LogSource.LOG_SOURCE_STDERR);
+      .some((log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR);
     if (hasErrorLogs) {
       toast.error("Some process encountered errors", {
         duration: 4000,
@@ -102,7 +114,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     }
 
     scrollToBottom();
-  }, [logs]);
+  }, [filteredLogs]);
 
   const onCaretChange = useCallback((state) => {
     if (state === false) {
@@ -224,16 +236,18 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   );
 };
 
-function LogLine({ log }: { log: ManagedProcessLog }) {
+function LogLine({ log }: { log: ManagedProcessOutput }) {
   return (
     <pre
       className={classes.line}
       style={
         // TODO(ui): use color from color pallet
-        log.source === LogSource.LOG_SOURCE_STDERR ? { color: "#D02525" } : {}
+        log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR
+          ? { color: "#D02525" }
+          : {}
       }
       dangerouslySetInnerHTML={{
-        __html: TextUtils.formatProcessLog(log),
+        __html: TextUtils.formatProcessOutput(log),
       }}
     />
   );

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/events.proto";
-import "responses/core.proto";
+import "api/core.proto";
 
 message GetAllEventsResponse {
   repeated Event events = 1;
