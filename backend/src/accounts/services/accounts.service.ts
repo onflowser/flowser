@@ -55,6 +55,18 @@ export class AccountsService {
     return this.accountRepository.insert(account);
   }
 
+  // TODO(custom-wallet): Should we replace update/create calls with upsert?
+  async upsert(accountToUpsert: AccountEntity) {
+    const account = await this.accountRepository.findOneBy({
+      address: accountToUpsert.address,
+    });
+    return this.accountRepository.upsert(
+      { ...(account ?? {}), ...accountToUpsert },
+      ["address"]
+    );
+  }
+
+  // TODO(custom-wallet): Why do we not use the `updatedAccount` here?
   async update(address: string, updatedAccount: AccountEntity) {
     const account = await this.accountRepository.findOneByOrFail({ address });
     account.markUpdated();

@@ -7,9 +7,16 @@ import { EventsService } from "../../events/events.service";
 import { KeysService } from "../../accounts/services/keys.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 
+/**
+ * Our Sqlite database acts as a cache for blockchain related data,
+ * which is project-based and should be revalidated (repopulated) in some cases.
+ *
+ * In the future we could avoid this pattern, by implementing multi-tenancy:
+ * https://www.notion.so/flowser/Multitenant-architecture-9bbc3053cade47f2bf1867626a54e074?pvs=4
+ */
 @Injectable()
-export class CommonService {
-  private readonly logger = new Logger(CommonService.name);
+export class DataRemovalService {
+  private readonly logger = new Logger(DataRemovalService.name);
   constructor(
     private contractsService: ContractsService,
     private accountsService: AccountsService,

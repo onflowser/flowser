@@ -8,7 +8,7 @@ import {
   FlowKey,
   FlowTransaction,
   FlowTransactionStatus,
-} from "./gateway.service";
+} from "../../flow/services/gateway.service";
 import { BlocksService } from "../../blocks/blocks.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { AccountsService } from "../../accounts/services/accounts.service";
@@ -23,11 +23,11 @@ import { KeysService } from "../../accounts/services/keys.service";
 import { AccountKeyEntity } from "../../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../../utils";
 import { getDataSourceInstance } from "../../database";
-import { FlowSubscriptionService } from "./subscription.service";
-import { FlowConfigService } from "./config.service";
-import { ProjectContextLifecycle } from "../utils/project-context";
+import { SubscriptionService } from "./subscription.service";
+import { FlowConfigService } from "../../flow/services/config.service";
+import { ProjectContextLifecycle } from "../../flow/utils/project-context";
 import { ProjectEntity } from "../../projects/entities/project.entity";
-import { FlowAccountStorageService } from "./storage.service";
+import { FlowAccountStorageService } from "../../flow/services/storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import {
   FlowCoreEventType,
@@ -42,8 +42,8 @@ import {
   ManagedProcessEntity,
   ManagedProcessEvent,
 } from "../../processes/managed-process.entity";
-import { CommonService } from "../../core/services/common.service";
-import { FlowEmulatorService } from "./emulator.service";
+import { DataRemovalService } from "../../core/services/data-removal.service";
+import { FlowEmulatorService } from "../../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
 
 type BlockData = {
@@ -68,10 +68,10 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class FlowAggregatorService implements ProjectContextLifecycle {
+export class ProcessorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
-  private readonly logger = new Logger(FlowAggregatorService.name);
+  private readonly logger = new Logger(ProcessorService.name);
   private readonly processingIntervalMs = 500;
   private processingScheduler: AsyncIntervalScheduler;
 
@@ -85,10 +85,10 @@ export class FlowAggregatorService implements ProjectContextLifecycle {
     private eventService: EventsService,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private flowSubscriptionService: FlowSubscriptionService,
+    private flowSubscriptionService: SubscriptionService,
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
-    private commonService: CommonService
+    private commonService: DataRemovalService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",

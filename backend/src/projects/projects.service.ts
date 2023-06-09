@@ -11,7 +11,7 @@ import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./entities/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
-import { FlowAggregatorService } from "../flow/services/aggregator.service";
+import { ProcessorService } from "../data-processing/services/processor.service";
 import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
@@ -33,7 +33,7 @@ import {
   ProjectRequirementType,
 } from "@flowser/shared";
 import * as fs from "fs";
-import { CommonService } from "../core/services/common.service";
+import { DataRemovalService } from "../core/services/data-removal.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
 import { WalletService } from "../wallet/wallet.service";
 
@@ -65,7 +65,7 @@ export class ProjectsService {
     @InjectRepository(ProjectEntity)
     private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
-    private flowAggregatorService: FlowAggregatorService,
+    private flowAggregatorService: ProcessorService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
@@ -76,7 +76,7 @@ export class ProjectsService {
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private transactionsService: TransactionsService,
-    private commonService: CommonService,
+    private commonService: DataRemovalService,
     private flowDevWalletService: FlowDevWalletService,
     private walletService: WalletService
   ) {}

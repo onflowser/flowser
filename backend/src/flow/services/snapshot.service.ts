@@ -10,7 +10,7 @@ import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios from "axios";
 import { randomUUID } from "crypto";
-import { CommonService } from "../../core/services/common.service";
+import { DataRemovalService } from "../../core/services/data-removal.service";
 import {
   CreateEmulatorSnapshotRequest,
   GetPollingEmulatorSnapshotsRequest,
@@ -30,7 +30,7 @@ export class FlowSnapshotService {
   constructor(
     @InjectRepository(SnapshotEntity)
     private readonly snapshotRepository: Repository<SnapshotEntity>,
-    private readonly commonService: CommonService
+    private readonly commonService: DataRemovalService
   ) {}
 
   async create(request: CreateEmulatorSnapshotRequest) {

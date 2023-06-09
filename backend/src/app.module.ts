@@ -17,6 +17,7 @@ import { ProcessesModule } from "./processes/processes.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { WalletModule } from "./wallet/wallet.module";
+import { DataProcessingModule } from './data-processing/data-processing.module';
 
 @Global()
 @Module({
@@ -37,6 +38,7 @@ import { WalletModule } from "./wallet/wallet.module";
     CoreModule,
     ProcessesModule,
     WalletModule,
+    DataProcessingModule,
   ],
   controllers: [AppController],
 })
