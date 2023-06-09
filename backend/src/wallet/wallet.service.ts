@@ -10,35 +10,44 @@ import {
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
 import { ensurePrefixedAddress } from "../utils";
-import { AccountKeyEntity } from "../accounts/entities/key.entity";
+import {
+  AccountKeyEntity,
+  defaultKeyWeight,
+} from "../accounts/entities/key.entity";
 import { KeysService } from "../accounts/services/keys.service";
-import { FlowEmulatorService } from "../flow/services/emulator.service";
 import {
   FlowAuthorizationFunction,
   FlowGatewayService,
 } from "../flow/services/gateway.service";
 import {
-  SignatureAlgorithm,
   SendTransactionRequest,
   SendTransactionResponse,
 } from "@flowser/shared";
+import { FlowConfigService } from "../flow/services/config.service";
+import { ProjectContextLifecycle } from "../flow/utils/project-context";
+import { ProjectEntity } from "src/projects/entities/project.entity";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");
 
-// https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
-const defaultKeyWeight = 1000;
-// https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#public-key-signature-algorithm
-const defaultSignatureAlgorithm = SignatureAlgorithm.ECDSA_P256;
-
 @Injectable()
-export class WalletService {
+export class WalletService implements ProjectContextLifecycle {
   constructor(
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
+    private readonly flowConfig: FlowConfigService,
     private readonly accountsService: AccountsService,
     private readonly keysService: KeysService
   ) {}
+
+  async onEnterProjectContext(project: ProjectEntity): Promise<void> {
+    // TODO(custom-wallet): Fix imported accounts deleted when emulator starts
+    await this.importAccountsFromConfig();
+  }
+
+  async onExitProjectContext(): Promise<void> {
+    // Nothing to do here
+  }
 
   public async sendTransaction(
     request: SendTransactionRequest
@@ -100,20 +109,61 @@ export class WalletService {
     return authn;
   }
 
+  public async importAccountsFromConfig() {
+    const accountsConfig = this.flowConfig.getAccounts();
+    await Promise.all(
+      accountsConfig.map(async (accountConfig) => {
+        const accountAddress = ensurePrefixedAddress(accountConfig.address);
+
+        const keyEntity = AccountKeyEntity.createDefault();
+        keyEntity.index = 0;
+        keyEntity.accountAddress = accountAddress;
+        // Public key is not stored in flow.json,
+        // so just use empty value for now.
+        // This should be updated by the aggregator service once it's picked up.
+        keyEntity.publicKey = "";
+        keyEntity.privateKey = accountConfig.privateKey;
+
+        const accountEntity = AccountEntity.createDefault();
+        accountEntity.address = accountAddress;
+        accountEntity.keys = [keyEntity];
+
+        await this.accountsService.create(accountEntity);
+        await this.keysService.updateAccountKeys(
+          accountEntity.address,
+          accountEntity.keys
+        );
+      })
+    );
+  }
+
   public async createAccount(): Promise<AccountEntity> {
     // For now, we only support a single key per account,
     // but we could as well add support for attaching
     // multiple keys with (possibly) different weights.
-    const keyPairs = await Promise.all([this.cliService.generateKey()]);
-    const account = await this.cliService.createAccount({
-      keys: keyPairs.map(
+    const generatedKeyPairs = await Promise.all([
+      this.cliService.generateKey(),
+    ]);
+    const generatedAccount = await this.cliService.createAccount({
+      keys: generatedKeyPairs.map(
         (key): KeyWithWeight => ({
           weight: defaultKeyWeight,
           publicKey: key.public,
         })
       ),
     });
-    const accountEntity = this.createAccountEntity(account, keyPairs);
+    const accountEntity = AccountEntity.createDefault();
+    accountEntity.address = ensurePrefixedAddress(generatedAccount.address);
+    accountEntity.keys = generatedKeyPairs.map((generatedKey) => {
+      const key = AccountKeyEntity.createDefault();
+      key.accountAddress = accountEntity.address;
+      key.index = generatedAccount.keys.findIndex(
+        (key) => key === generatedKey.public
+      );
+      key.publicKey = generatedKey.public;
+      key.privateKey = generatedKey.private;
+      return key;
+    });
 
     await this.accountsService.create(accountEntity);
     await this.keysService.updateAccountKeys(
@@ -122,44 +172,6 @@ export class WalletService {
     );
 
     return accountEntity;
-  }
-
-  private createAccountEntity(
-    generatedAccount: CreatedAccount,
-    generatedKeys: GeneratedKey[]
-  ): AccountEntity {
-    const account = new AccountEntity();
-    account.address = ensurePrefixedAddress(generatedAccount.address);
-    account.balance = 0;
-    account.code = "";
-    account.keys = generatedKeys.map((generatedKey) =>
-      this.createKeyEntity(generatedAccount, generatedKey)
-    );
-    return account;
-  }
-
-  private createKeyEntity(
-    generatedAccount: CreatedAccount,
-    generatedKey: GeneratedKey
-  ) {
-    const defaultSettings = FlowEmulatorService.getDefaultFlags();
-
-    const key = new AccountKeyEntity();
-    key.index = generatedAccount.keys.findIndex(
-      (key) => key === generatedKey.public
-    );
-    key.accountAddress = ensurePrefixedAddress(generatedAccount.address);
-    key.publicKey = generatedKey.public;
-    key.privateKey = generatedKey.private;
-    key.signAlgo = defaultSignatureAlgorithm;
-    // Which has algorithm is actually used here by default?
-    // Flow CLI doesn't support the option to specify it as an argument,
-    // nor does it return this info when generating the key.
-    key.hashAlgo = defaultSettings.serviceHashAlgorithm;
-    key.weight = defaultKeyWeight;
-    key.sequenceNumber = 0;
-    key.revoked = false;
-    return key;
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {

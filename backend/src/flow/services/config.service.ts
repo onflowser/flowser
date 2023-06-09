@@ -10,7 +10,7 @@ import { isObject } from "../../utils";
 
 type FlowAddress = string;
 
-export type FlowContractsConfig = Record<FlowContractName, FlowContractConfig>;
+type FlowContractsConfig = Record<FlowContractName, FlowContractConfig>;
 
 type FlowContractName = string;
 
@@ -23,25 +23,32 @@ type FlowContractConfig =
       aliases: Record<FlowNetworkName, FlowAddress>;
     };
 
-export type FlowDeploymentsConfig = Record<
-  FlowNetworkName,
-  FlowDeploymentConfig
->;
+type FlowDeploymentsConfig = Record<FlowNetworkName, FlowDeploymentConfig>;
 
 type FlowDeploymentConfig = Record<FlowAccountName, FlowContractName[]>;
 
-export type FlowAccountsConfig = Record<FlowAccountName, FlowAccountConfig>;
+type FlowAccountsConfig = Record<FlowAccountName, FlowAccountConfig>;
 
 type FlowAccountName = "emulator-account" | string;
 
-// TODO(milestone-3): add support for advanced account format
-// https://developers.flow.com/tools/flow-cli/configuration#advanced-format
 type FlowAccountConfig = {
   address: string;
-  key: string;
+  key: FlowAccountKeyConfig;
 };
 
-export type FlowNetworksConfig = Record<FlowNetworkName, FlowNetworkConfig>;
+type FlowAccountKeySimpleConfig = string;
+type FlowAccountKeyAdvancedConfig = {
+  type?: string;
+  index?: number;
+  signatureAlgorithm?: string;
+  hashAlgorithm?: string;
+  privateKey?: string;
+};
+type FlowAccountKeyConfig =
+  | FlowAccountKeySimpleConfig
+  | FlowAccountKeyAdvancedConfig;
+
+type FlowNetworksConfig = Record<FlowNetworkName, FlowNetworkConfig>;
 
 type FlowNetworkName = "testnet" | "emulator" | "mainnet" | string;
 type FlowNetworkAddress = string;
@@ -52,11 +59,21 @@ type FlowNetworkConfig =
       NetworkKey: string;
     };
 
-export type FlowCliConfig = {
+type FlowCliConfig = {
   contracts?: FlowContractsConfig;
   deployments?: FlowDeploymentsConfig;
   accounts?: FlowAccountsConfig;
   networks?: FlowNetworksConfig;
+};
+
+// Exposes the account configuration in a single standard format.
+// This is a "boundary" type to hide the implementation detail
+// of multiple configuration formats.
+export type FlowAbstractAccountConfig = {
+  name: string;
+  // Possibly without the '0x' prefix.
+  address: string;
+  privateKey: string;
 };
 
 @Injectable()
@@ -82,6 +99,26 @@ export class FlowConfigService implements ProjectContextLifecycle {
     this.detachListeners();
     await this.load();
     this.attachListeners();
+  }
+
+  public getAccounts(): FlowAbstractAccountConfig[] {
+    const accountEntries = Object.entries(this.config.accounts);
+
+    return accountEntries.map(
+      ([name, config]): FlowAbstractAccountConfig => ({
+        name,
+        address: config.address,
+        privateKey: this.getPrivateKey(config.key),
+      })
+    );
+  }
+
+  private getPrivateKey(keyConfig: FlowAccountKeyConfig) {
+    if (typeof keyConfig === "string") {
+      return keyConfig;
+    } else {
+      return keyConfig.privateKey;
+    }
   }
 
   public async getContractTemplates(): Promise<ContractTemplate[]> {

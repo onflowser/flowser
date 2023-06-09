@@ -40,6 +40,21 @@ export class AccountEntity extends PollingEntity {
   })
   transactions: TransactionEntity[];
 
+  /**
+   * Creates an account with default values (where applicable).
+   * It doesn't pre-set the values that should be provided.
+   */
+  static createDefault(): AccountEntity {
+    const account = new AccountEntity();
+    account.balance = 0;
+    account.code = "";
+    account.keys = [];
+    account.transactions = [];
+    account.contracts = [];
+    account.storage = [];
+    return account;
+  }
+
   toProto(): Account {
     return {
       address: this.address,

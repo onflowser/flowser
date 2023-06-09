@@ -35,6 +35,7 @@ import {
 import * as fs from "fs";
 import { CommonService } from "../core/services/common.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
+import { WalletService } from "../wallet/wallet.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -48,9 +49,12 @@ export class ProjectsService {
   // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
     [
-      // Config service must be defined before cli service!
       this.flowConfigService,
+      // Below services depend on flow config service,
+      // so they must be configured after the above one.
       this.flowCliService,
+      this.walletService,
+
       this.flowGatewayService,
       this.flowAggregatorService,
       this.flowEmulatorService,
@@ -73,7 +77,8 @@ export class ProjectsService {
     private eventsService: EventsService,
     private transactionsService: TransactionsService,
     private commonService: CommonService,
-    private flowDevWalletService: FlowDevWalletService
+    private flowDevWalletService: FlowDevWalletService,
+    private walletService: WalletService
   ) {}
 
   getCurrentProject(): ProjectEntity | undefined {
