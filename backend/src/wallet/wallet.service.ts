@@ -41,7 +41,6 @@ export class WalletService implements ProjectContextLifecycle {
   ) {}
 
   async onEnterProjectContext(project: ProjectEntity): Promise<void> {
-    // TODO(custom-wallet): Fix imported accounts deleted when emulator starts
     await this.importAccountsFromConfig();
   }
 

@@ -19,7 +19,7 @@ export class WalletController {
   @Post("accounts")
   async createAccount() {
     return this.walletService.createAccount();
-    // TODO(custom-wallet): Got Unimplemented cadence type: {"value":[],"type":"Dictionary"} error here
+    // FIXME: Got Unimplemented cadence type: {"value":[],"type":"Dictionary"} error here
     // account.toProto();
   }
 }
