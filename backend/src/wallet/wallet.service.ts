@@ -128,7 +128,7 @@ export class WalletService implements ProjectContextLifecycle {
         accountEntity.address = accountAddress;
         accountEntity.keys = [keyEntity];
 
-        await this.accountsService.create(accountEntity);
+        await this.accountsService.upsert(accountEntity);
         await this.keysService.updateAccountKeys(
           accountEntity.address,
           accountEntity.keys
@@ -165,7 +165,7 @@ export class WalletService implements ProjectContextLifecycle {
       return key;
     });
 
-    await this.accountsService.create(accountEntity);
+    await this.accountsService.upsert(accountEntity);
     await this.keysService.updateAccountKeys(
       accountEntity.address,
       accountEntity.keys

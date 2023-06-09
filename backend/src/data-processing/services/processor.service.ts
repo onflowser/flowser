@@ -31,8 +31,8 @@ import { FlowAccountStorageService } from "../../flow/services/storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import {
   FlowCoreEventType,
-  ServiceStatus,
   ManagedProcessState,
+  ServiceStatus,
 } from "@flowser/shared";
 import {
   ProcessManagerEvent,
@@ -45,6 +45,7 @@ import {
 import { DataRemovalService } from "../../core/services/data-removal.service";
 import { FlowEmulatorService } from "../../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
+import { WalletService } from "../../wallet/wallet.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -88,7 +89,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     private flowSubscriptionService: SubscriptionService,
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
-    private commonService: DataRemovalService
+    private commonService: DataRemovalService,
+    private walletService: WalletService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -153,6 +155,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       this.logger.debug("Emulator process was started, reindexing");
       // Reindex all blockchain data when the emulator is started (restarted)
       await this.commonService.removeBlockchainData();
+      await this.walletService.importAccountsFromConfig();
     }
   }
 
@@ -417,7 +420,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     const newKeys = flowAccount.keys.map((flowKey) =>
       this.createKeyEntity(flowAccount, flowKey)
     );
-    await this.accountService.create(unSerializedAccount);
+    await this.accountService.upsert(unSerializedAccount);
     await Promise.all([
       this.accountKeysService.updateAccountKeys(address, newKeys),
       this.contractService.updateAccountContracts(
@@ -484,7 +487,15 @@ export class ProcessorService implements ProjectContextLifecycle {
     const serviceAccountAddress = ensurePrefixedAddress(
       this.configService.getServiceAccountAddress()
     );
-    return this.accountService.accountExists(serviceAccountAddress);
+    const serviceAccount = await this.accountService.findOneByAddress(
+      serviceAccountAddress
+    );
+
+    // Service account is already created by the wallet service,
+    // but that service doesn't set the public key.
+    // So if public key isn't present,
+    // we know that we haven't processed this account yet.
+    return Boolean(serviceAccount.keys[0]?.publicKey);
   }
 
   private async processDefaultAccounts() {
@@ -520,7 +531,7 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private createAccountEntity(flowAccount: FlowAccount): AccountEntity {
-    const account = new AccountEntity();
+    const account = AccountEntity.createDefault();
     account.address = ensurePrefixedAddress(flowAccount.address);
     account.balance = flowAccount.balance;
     account.code = flowAccount.code;

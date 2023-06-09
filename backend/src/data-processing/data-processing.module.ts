@@ -8,6 +8,7 @@ import { ProcessorService } from "./services/processor.service";
 import { FlowModule } from "../flow/flow.module";
 import { SubscriptionService } from "./services/subscription.service";
 import { ProcessesModule } from "../processes/processes.module";
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ProcessesModule } from "../processes/processes.module";
     TransactionsModule,
     CoreModule,
     ProcessesModule,
+    WalletModule
   ],
   providers: [ProcessorService, SubscriptionService],
   exports: [ProcessorService],

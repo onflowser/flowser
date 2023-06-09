@@ -17,6 +17,8 @@ export class AccountEntity extends PollingEntity {
   @Column()
   code: string;
 
+  // If this account is one of the default accounts
+  // already created by the emulator itself.
   @Column({ default: false })
   isDefaultAccount: boolean;
 
