@@ -4,6 +4,7 @@ import { EmulatorSnapshot } from "@flowser/shared";
 
 @Entity()
 export class SnapshotEntity extends PollingEntity {
+  // aka. "snapshot name"
   @PrimaryColumn()
   id: string;
 

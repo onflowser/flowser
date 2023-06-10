@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
-import axios from "axios";
+import axios, { Method } from "axios";
 import { randomUUID } from "crypto";
 import { DataRemovalService } from "../../core/services/data-removal.service";
 import {
@@ -17,12 +17,25 @@ import {
   RevertToEmulatorSnapshotRequest,
 } from "@flowser/shared";
 
-type SnapshotResponse = {
-  blockId: string;
+type CreateSnapshotRequest = {
+  name: string;
+};
+
+type JumpToSnapshotRequest = {
+  name: string;
+};
+
+type ListSnapshotsResponse = {
+  names: string[];
+};
+
+type SnapshotInfoResponse = {
   context: string;
+  blockId: string;
   height: number;
 };
 
+// TODO(snapshots-revamp): Implement ProjectContextLifecycle interface and sync snapshots on project startup
 @Injectable()
 export class FlowSnapshotService {
   private logger = new Logger(FlowSnapshotService.name);
@@ -34,23 +47,12 @@ export class FlowSnapshotService {
   ) {}
 
   async create(request: CreateEmulatorSnapshotRequest) {
-    // TODO(milestone-3): use value from emulator config object
-    const snapshotId = randomUUID();
-    const response = await this.createOrRevertSnapshotRequest(snapshotId);
-
-    if (response.status !== 200) {
-      this.logger.error(
-        `Got ${response.status} response from emulator`,
-        response.data
-      );
-      // Most likely reason for failure is that emulator wasn't started with "--snapshot" flag
-      throw new InternalServerErrorException("Failed to create snapshot");
-    }
-
-    const snapshotData = response.data as SnapshotResponse;
+    const createdSnapshot = await this.createSnapshot({
+      name: randomUUID(),
+    });
 
     const existingSnapshot = await this.snapshotRepository.findOneBy({
-      blockId: snapshotData.blockId,
+      blockId: createdSnapshot.blockId,
       projectId: request.projectId,
     });
 
@@ -61,8 +63,8 @@ export class FlowSnapshotService {
     }
 
     const snapshot = new SnapshotEntity();
-    snapshot.id = snapshotId;
-    snapshot.blockId = snapshotData.blockId;
+    snapshot.id = createdSnapshot.context;
+    snapshot.blockId = createdSnapshot.blockId;
     snapshot.projectId = request.projectId;
     snapshot.description = request.description;
 
@@ -79,23 +81,12 @@ export class FlowSnapshotService {
       throw new NotFoundException("Snapshot not found");
     }
 
-    const response = await this.createOrRevertSnapshotRequest(
-      existingSnapshot.id
-    );
+    await this.jumpToSnapshot({
+      name: existingSnapshot.id,
+    });
 
-    // TODO(milestone-x): Handle snapshot data deleted by user
-    // What happens if the user removes snapshot data (in ./flowdb)
-    // and tries to revert to the stored snapshot?
-    // We could check whether the returned snapshot blockId
-    // matches the blockId in our stored snapshot entity
-    if (response.status !== 200) {
-      this.logger.error(
-        `Got ${response.status} response from emulator`,
-        response.data
-      );
-      throw new InternalServerErrorException("Failed to move to snapshot");
-    }
-
+    // TODO(snapshots-revamp): How to handle cached managed accounts?
+    // Reprocess all cached data
     await this.commonService.removeBlockchainData();
 
     return existingSnapshot;
@@ -113,13 +104,63 @@ export class FlowSnapshotService {
     });
   }
 
-  private async createOrRevertSnapshotRequest(snapshotId: string) {
-    // Docs: https://github.com/onflow/flow-emulator#managing-emulator-state
-    return axios.get<SnapshotResponse>(
-      `http://localhost:8080/emulator/snapshot/${snapshotId}`,
+  private async createSnapshot(
+    request: CreateSnapshotRequest
+  ): Promise<SnapshotInfoResponse> {
+    const response = await this.emulatorRequest<SnapshotInfoResponse>({
+      method: "post",
+      endpoint: `/snapshots?name=${request.name}`,
+    });
+
+    if (response.status !== 200) {
+      throw new InternalServerErrorException("Failed creating snapshot");
+    }
+
+    return response.data;
+  }
+
+  private async jumpToSnapshot(
+    request: JumpToSnapshotRequest
+  ): Promise<SnapshotInfoResponse> {
+    const response = await this.emulatorRequest<SnapshotInfoResponse>({
+      method: "put",
+      endpoint: `/snapshots/${request.name}`,
+    });
+
+    if (response.status === 404) {
+      throw new NotFoundException("Snapshot not found");
+    }
+
+    if (response.status !== 200) {
+      throw new InternalServerErrorException("Failed to jump to snapshot");
+    }
+
+    return response.data;
+  }
+
+  private async listSnapshots(): Promise<ListSnapshotsResponse> {
+    const response = await this.emulatorRequest<ListSnapshotsResponse>({
+      method: "get",
+      endpoint: "/snapshots",
+    });
+
+    if (response.status !== 200) {
+      throw new InternalServerErrorException("Failed to list snapshots");
+    }
+
+    return response.data;
+  }
+
+  private emulatorRequest<ResponseData>(options: {
+    method: Method;
+    endpoint: string;
+  }) {
+    return axios.request<ResponseData>({
+      method: options.method,
+      url: `http://localhost:8080/emulator${options.endpoint}`,
       // Prevent axios from throwing on certain http response codes
       // https://github.com/axios/axios/issues/41
-      { validateStatus: () => true }
-    );
+      validateStatus: () => true,
+    });
   }
 }
