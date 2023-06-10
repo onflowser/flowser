@@ -1,6 +1,10 @@
 import { rm } from "fs/promises";
 import { ProtobufLikeObject } from "@flowser/shared";
 
+export function waitForMs(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
 }

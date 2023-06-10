@@ -12,11 +12,13 @@ import { ProjectEntity } from "../../projects/entities/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
+import { waitForMs } from "../../utils";
 
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
   public static readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
+  private process: ManagedProcessEntity | undefined;
 
   constructor(private processManagerService: ProcessManagerService) {}
 
@@ -37,7 +39,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   }
 
   async start() {
-    const managedProcess = new ManagedProcessEntity({
+    this.process = new ManagedProcessEntity({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
       command: {
@@ -48,7 +50,8 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         },
       },
     });
-    await this.processManagerService.start(managedProcess);
+    await this.processManagerService.start(this.process);
+    await this.waitUntilApisStarted();
   }
 
   public static getDefaultFlags(): Emulator {
@@ -75,6 +78,15 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       transactionFees: false,
       simpleAddresses: false,
     });
+  }
+
+  private async waitUntilApisStarted() {
+    // Wait until emulator process emits "Started <API-name>" logs.
+    const hasStarted = () =>
+      this.process.output.some((output) => output.data.includes("Started"));
+    while (!hasStarted()) {
+      await waitForMs(100);
+    }
   }
 
   private getAppliedFlags(): string[] {

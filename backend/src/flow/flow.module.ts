@@ -38,6 +38,7 @@ import { CoreModule } from "../core/core.module";
     FlowConfigService,
     FlowDevWalletService,
     FlowAccountStorageService,
+    FlowSnapshotService
   ],
 })
 export class FlowModule {}

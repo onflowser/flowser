@@ -16,6 +16,9 @@ import {
   GetPollingEmulatorSnapshotsRequest,
   RevertToEmulatorSnapshotRequest,
 } from "@flowser/shared";
+import { ProjectContextLifecycle } from "../utils/project-context";
+import { ProjectEntity } from "src/projects/entities/project.entity";
+import { computeEntitiesDiff } from "../../utils";
 
 type CreateSnapshotRequest = {
   name: string;
@@ -35,9 +38,8 @@ type SnapshotInfoResponse = {
   height: number;
 };
 
-// TODO(snapshots-revamp): Implement ProjectContextLifecycle interface and sync snapshots on project startup
 @Injectable()
-export class FlowSnapshotService {
+export class FlowSnapshotService implements ProjectContextLifecycle {
   private logger = new Logger(FlowSnapshotService.name);
 
   constructor(
@@ -45,6 +47,14 @@ export class FlowSnapshotService {
     private readonly snapshotRepository: Repository<SnapshotEntity>,
     private readonly commonService: DataRemovalService
   ) {}
+
+  async onEnterProjectContext(project: ProjectEntity): Promise<void> {
+    await this.syncSnapshotsCache(project);
+  }
+
+  async onExitProjectContext(): Promise<void> {
+    // Do nothing
+  }
 
   async create(request: CreateEmulatorSnapshotRequest) {
     const createdSnapshot = await this.createSnapshot({
@@ -92,6 +102,15 @@ export class FlowSnapshotService {
     return existingSnapshot;
   }
 
+  findAll(request: { projectId: string }): Promise<SnapshotEntity[]> {
+    return this.snapshotRepository.find({
+      where: {
+        projectId: request.projectId,
+      },
+      order: { createdAt: "DESC" },
+    });
+  }
+
   findAllByProjectNewerThanTimestamp(
     request: GetPollingEmulatorSnapshotsRequest
   ): Promise<SnapshotEntity[]> {
@@ -102,6 +121,41 @@ export class FlowSnapshotService {
       },
       order: { createdAt: "DESC" },
     });
+  }
+
+  private async syncSnapshotsCache(project: ProjectEntity) {
+    const [emulatorSnapshots, cachedSnapshots] = await Promise.all([
+      this.listSnapshots(),
+      this.findAll({ projectId: project.id }),
+    ]);
+
+    const emulatorSnapshotIds = emulatorSnapshots.names.map((name) => ({
+      id: name,
+    }));
+    const cachedSnapshotIds = cachedSnapshots.map((snapshot) => ({
+      id: snapshot.id,
+    }));
+
+    const diff = computeEntitiesDiff<{ id: string }>({
+      newEntities: emulatorSnapshotIds,
+      oldEntities: cachedSnapshotIds,
+      primaryKey: "id",
+    });
+
+    if (diff.created.length > 0) {
+      this.logger.debug(
+        `Found unseen snapshots on project startup: ${diff.created
+          .map((e) => e.id)
+          .join(", ")}`
+      );
+    }
+
+    if (diff.deleted.length > 0) {
+      this.logger.debug(
+        `Removing ${diff.deleted.length} removed snapshots on startup`
+      );
+      await this.snapshotRepository.delete(diff.deleted.map((e) => e.id));
+    }
   }
 
   private async createSnapshot(
@@ -148,7 +202,12 @@ export class FlowSnapshotService {
       throw new InternalServerErrorException("Failed to list snapshots");
     }
 
-    return response.data;
+    const emptyResponse: ListSnapshotsResponse = {
+      names: [],
+    };
+
+    // Emulator returns `null` when no snapshots exist.
+    return response.data ?? emptyResponse;
   }
 
   private emulatorRequest<ResponseData>(options: {

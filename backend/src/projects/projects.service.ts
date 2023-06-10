@@ -36,6 +36,7 @@ import * as fs from "fs";
 import { DataRemovalService } from "../core/services/data-removal.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
 import { WalletService } from "../wallet/wallet.service";
+import { FlowSnapshotService } from "../flow/services/snapshot.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -59,6 +60,9 @@ export class ProjectsService {
       this.flowAggregatorService,
       this.flowEmulatorService,
       this.flowDevWalletService,
+      // Snapshot service must be started after emulator service,
+      // as it depends on REST APIs that emulator process exposes.
+      this.flowSnapshotsService,
     ];
 
   constructor(
@@ -78,7 +82,8 @@ export class ProjectsService {
     private transactionsService: TransactionsService,
     private commonService: DataRemovalService,
     private flowDevWalletService: FlowDevWalletService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private flowSnapshotsService: FlowSnapshotService
   ) {}
 
   getCurrentProject(): ProjectEntity | undefined {
