@@ -24,6 +24,10 @@ type CreateSnapshotRequest = {
   name: string;
 };
 
+type JumpToBlockHeightRequest = {
+  height: number;
+};
+
 type JumpToSnapshotRequest = {
   name: string;
 };
@@ -161,6 +165,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
   private async createSnapshot(
     request: CreateSnapshotRequest
   ): Promise<SnapshotInfoResponse> {
+    // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L208-L233
     const response = await this.emulatorRequest<SnapshotInfoResponse>({
       method: "post",
       endpoint: `/snapshots?name=${request.name}`,
@@ -173,9 +178,22 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     return response.data;
   }
 
+  public async jumpToHeight(request: JumpToBlockHeightRequest): Promise<void> {
+    // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L118-L136
+    const response = await this.emulatorRequest({
+      method: "post",
+      endpoint: `/rollback?height=${request.height}`,
+    });
+
+    if (response.status !== 200) {
+      throw new InternalServerErrorException("Failed to jump to height");
+    }
+  }
+
   private async jumpToSnapshot(
     request: JumpToSnapshotRequest
   ): Promise<SnapshotInfoResponse> {
+    // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L183-L206
     const response = await this.emulatorRequest<SnapshotInfoResponse>({
       method: "put",
       endpoint: `/snapshots/${request.name}`,
@@ -193,6 +211,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
   }
 
   private async listSnapshots(): Promise<ListSnapshotsResponse> {
+    // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L138-L156
     const response = await this.emulatorRequest<ListSnapshotsResponse>({
       method: "get",
       endpoint: "/snapshots",
