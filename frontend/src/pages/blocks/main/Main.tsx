@@ -104,22 +104,26 @@ const Main: FunctionComponent = () => {
         },
         cell: (info) => {
           const block = info.row.original;
+          const latestBlock = blocks[0];
+          const isLatestBlock = latestBlock.height === block.height;
           const snapshot = snapshotLookupByBlockId.get(block.id);
           return (
             <Value>
-              <SimpleButton
-                style={{ marginRight: 10 }}
-                onClick={() => checkoutBlock(block.id)}
-              >
-                <SnapshotIcon />
-              </SimpleButton>
+              {!isLatestBlock && (
+                <SimpleButton
+                  style={{ marginRight: 10 }}
+                  onClick={() => checkoutBlock(block.id)}
+                >
+                  <SnapshotIcon />
+                </SimpleButton>
+              )}
               {snapshot?.description}
             </Value>
           );
         },
       }),
     ],
-    [snapshotLookupByBlockId, checkoutBlock]
+    [snapshotLookupByBlockId, blocks, checkoutBlock]
   );
 
   return (
