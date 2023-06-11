@@ -107,21 +107,19 @@ const Main: FunctionComponent = () => {
           const snapshot = snapshotLookupByBlockId.get(block.id);
           return (
             <Value>
-              {snapshot && (
-                <SimpleButton
-                  style={{ marginRight: 10 }}
-                  onClick={() => checkoutBlock(block.id)}
-                >
-                  <SnapshotIcon />
-                </SimpleButton>
-              )}
-              {snapshot?.description ?? "-"}
+              <SimpleButton
+                style={{ marginRight: 10 }}
+                onClick={() => checkoutBlock(block.id)}
+              >
+                <SnapshotIcon />
+              </SimpleButton>
+              {snapshot?.description}
             </Value>
           );
         },
       }),
     ],
-    [snapshotLookupByBlockId]
+    [snapshotLookupByBlockId, checkoutBlock]
   );
 
   return (

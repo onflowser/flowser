@@ -15,6 +15,7 @@ import {
   CreateEmulatorSnapshotRequest,
   GetPollingEmulatorSnapshotsRequest,
   RevertToEmulatorSnapshotRequest,
+  RollbackToHeightRequest,
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "src/projects/entities/project.entity";
@@ -60,6 +61,14 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     // Do nothing
   }
 
+  async rollback(request: RollbackToHeightRequest) {
+    await this.jumpToHeight({
+      height: request.blockHeight,
+    });
+
+    await this.reprocessBlockchainData();
+  }
+
   async create(request: CreateEmulatorSnapshotRequest) {
     const createdSnapshot = await this.createSnapshot({
       name: randomUUID(),
@@ -99,9 +108,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       name: existingSnapshot.id,
     });
 
-    // TODO(snapshots-revamp): How to handle cached managed accounts?
-    // Reprocess all cached data
-    await this.commonService.removeBlockchainData();
+    await this.reprocessBlockchainData();
 
     return existingSnapshot;
   }
@@ -125,6 +132,11 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       },
       order: { createdAt: "DESC" },
     });
+  }
+
+  private async reprocessBlockchainData() {
+    // TODO(snapshots-revamp): How to handle cached managed accounts?
+    await this.commonService.removeBlockchainData();
   }
 
   private async syncSnapshotsCache(project: ProjectEntity) {
@@ -178,7 +190,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     return response.data;
   }
 
-  public async jumpToHeight(request: JumpToBlockHeightRequest): Promise<void> {
+  private async jumpToHeight(request: JumpToBlockHeightRequest): Promise<void> {
     // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L118-L136
     const response = await this.emulatorRequest({
       method: "post",

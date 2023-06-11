@@ -1,6 +1,7 @@
 import React, {
   createContext,
   ReactElement,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -54,11 +55,10 @@ export function ProjectProvider({
   const history = useHistory();
   const { handleError } = useErrorHandler(ProjectProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
-  const projectId = useCurrentProjectId();
   const { data: currentProject, refetch: refetchCurrentProject } =
     useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
-  const { data: blocks, fetchAll } = useGetPollingBlocks();
+  const { data: blocks, refetchBlocks } = useGetPollingBlocks();
 
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
@@ -140,48 +140,55 @@ export function ProjectProvider({
     }
   }
 
-  async function checkoutBlock(blockId: string) {
-    track(AnalyticEvent.CLICK_CHECKOUT_SNAPSHOT);
+  const checkoutBlock = useCallback(
+    (blockId: string) => {
+      track(AnalyticEvent.CLICK_CHECKOUT_SNAPSHOT);
 
-    if (!projectId) {
-      return;
-    }
-    const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
-    if (!isSnapshotEnabled) {
-      toast.error(
-        "Can't revert, because 'snapshot' option is not enabled in settings"
-      );
-      return;
-    }
-    const block = blocks.find((block) => block.id === blockId);
-    showDialog({
-      title: "Jump to snapshot",
-      body: (
-        <span style={{ textAlign: "center" }}>
-          Do you want to move to the emulator blockchain state to the block with
-          height <code>{block?.height}</code>?
-        </span>
-      ),
-      confirmBtnLabel: "REVERT",
-      cancelBtnLabel: "CANCEL",
-      onConfirm: async () => {
-        track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+      const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
+      if (!isSnapshotEnabled) {
+        toast.error(
+          "Can't jump to block, because 'snapshot' option is not enabled in settings"
+        );
+        return;
+      }
+      const block = blocks.find((block) => block.id === blockId);
 
-        try {
-          const snapshot = await snapshotService.checkoutBlock({
-            blockId,
-            projectId,
-          });
-          fetchAll();
-          toast.success(
-            `Moved to snapshot "${snapshot.snapshot?.description}"`
-          );
-        } catch (e) {
-          handleError(e);
-        }
-      },
-    });
-  }
+      if (!block) {
+        throw new Error(`Expected to find block with ID: ${blockId}`);
+      }
+
+      showDialog({
+        title: "Jump to snapshot",
+        body: (
+          <span style={{ textAlign: "center" }}>
+            Do you want to move to the emulator blockchain state to the block
+            with height <code>{block.height}</code>?
+          </span>
+        ),
+        confirmBtnLabel: "JUMP",
+        cancelBtnLabel: "CANCEL",
+        onConfirm: async () => {
+          track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+
+          try {
+            // TODO(snapshots-revamp): Should we remove the old createSnapshot/jumpToSnapshot functionality entirely?
+            await snapshotService.rollback({
+              blockHeight: block.height,
+            });
+            refetchBlocks();
+            toast.success(`Moved to block height: ${block.height}`);
+          } catch (e) {
+            handleError(e);
+          }
+        },
+      });
+    },
+    [currentProject, blocks]
+  );
+
+  useEffect(() => {
+    console.log("checkoutBlock rebuild");
+  }, [checkoutBlock]);
 
   return (
     <ProjectContext.Provider

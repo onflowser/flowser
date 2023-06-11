@@ -18,6 +18,8 @@ import {
   RevertToEmulatorSnapshotResponse,
   GetPollingEmulatorSnapshotsRequest,
   GetProjectObjectsResponse,
+  RollbackToHeightRequest,
+  RollbackToHeightResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowConfigService } from "./services/config.service";
@@ -84,6 +86,15 @@ export class FlowController {
       RevertToEmulatorSnapshotResponse.fromPartial({
         snapshot: snapshot.toProto(),
       })
+    );
+  }
+
+  @Post("rollback")
+  async rollbackEmulator(@Body() body) {
+    const request = RollbackToHeightRequest.fromJSON(body);
+    await this.flowSnapshotService.rollback(request);
+    return RollbackToHeightResponse.toJSON(
+      RollbackToHeightResponse.fromPartial({})
     );
   }
 }

@@ -5,6 +5,8 @@ import {
   RevertToEmulatorSnapshotResponse,
   CreateEmulatorSnapshotResponse,
   GetPollingEmulatorSnapshotsRequest,
+  RollbackToHeightRequest,
+  RollbackToHeightResponse,
 } from "@flowser/shared";
 import { TransportService } from "./transports/transport.service";
 
@@ -32,6 +34,16 @@ export class SnapshotService {
       requestData: data,
       requestProtobuf: RevertToEmulatorSnapshotRequest,
       responseProtobuf: RevertToEmulatorSnapshotResponse,
+    });
+  }
+
+  rollback(data: RollbackToHeightRequest): Promise<RollbackToHeightResponse> {
+    return this.transport.send({
+      requestMethod: "POST",
+      resourceIdentifier: "/api/flow/rollback",
+      requestData: data,
+      requestProtobuf: RollbackToHeightRequest,
+      responseProtobuf: RollbackToHeightResponse,
     });
   }
 
