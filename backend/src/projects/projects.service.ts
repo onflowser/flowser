@@ -184,15 +184,19 @@ export class ProjectsService {
     // TODO(milestone-3): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
-    try {
-      for (const service of this.servicesWithProjectLifecycleContext) {
+    for (let i = 0; i < this.servicesWithProjectLifecycleContext.length; i++) {
+      const service = this.servicesWithProjectLifecycleContext[i];
+      try {
         await service.onEnterProjectContext(this.currentProject);
+      } catch (e: unknown) {
+        this.logger.debug(
+          `Project context initialization failed for service with index: ${i}`,
+          e
+        );
+        throw new InternalServerErrorException(
+          e ?? "Project context initialization failed"
+        );
       }
-    } catch (e: unknown) {
-      this.logger.debug("Project context initialization failed", e);
-      throw new InternalServerErrorException(
-        e ?? "Project context initialization failed"
-      );
     }
 
     this.logger.debug(`using project: ${project.id}`);

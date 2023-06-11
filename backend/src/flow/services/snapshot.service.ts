@@ -212,7 +212,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
 
   private async listSnapshots(): Promise<ListSnapshotsResponse> {
     // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L138-L156
-    const response = await this.emulatorRequest<ListSnapshotsResponse>({
+    const response = await this.emulatorRequest<string[]>({
       method: "get",
       endpoint: "/snapshots",
     });
@@ -226,7 +226,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     };
 
     // Emulator returns `null` when no snapshots exist.
-    return response.data ?? emptyResponse;
+    return response.data ? { names: response.data } : emptyResponse;
   }
 
   private emulatorRequest<ResponseData>(options: {
