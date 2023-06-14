@@ -18,7 +18,7 @@ import {
   RollbackToHeightRequest,
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "src/projects/entities/project.entity";
+import { ProjectEntity } from "src/projects/project.entity";
 import { computeEntitiesDiff } from "../../utils";
 
 type CreateSnapshotRequest = {

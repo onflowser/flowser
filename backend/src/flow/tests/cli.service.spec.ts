@@ -1,7 +1,7 @@
 import { FlowCliService } from "../services/cli.service";
 import { FlowConfigService } from "../services/config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 
 describe("FlowCliService", function () {
   let cliService: FlowCliService;
@@ -23,7 +23,6 @@ describe("FlowCliService", function () {
     expect(generatedKey.derivationPath).toBeDefined();
     expect(generatedKey.mnemonic).toBeDefined();
   });
-
 });
 
 class FlowConfigMockService extends FlowConfigService {

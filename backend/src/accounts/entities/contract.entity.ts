@@ -10,12 +10,14 @@ import {
 } from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
-import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/gateway.service";
 import { AccountContract } from "@flowser/shared";
+import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 
 @Entity({ name: "contracts" })
-export class AccountContractEntity extends PollingEntity {
+export class AccountContractEntity
+  extends PollingEntity
+  implements BlockContextEntity
+{
   // Encodes both accountAddress and name into the id.
   id: string;
 
@@ -24,6 +26,10 @@ export class AccountContractEntity extends PollingEntity {
 
   @PrimaryColumn()
   name: string;
+
+  // Nullable for backward compatability - to not cause not null constraint failure on migration.
+  @Column({ nullable: true })
+  blockId: string;
 
   @Column("text")
   code: string;
@@ -51,15 +57,6 @@ export class AccountContractEntity extends PollingEntity {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
-  }
-
-  static create(account: FlowAccount, name: string, code: string) {
-    const contract = new AccountContractEntity();
-    contract.accountAddress = ensurePrefixedAddress(account.address);
-    contract.name = name;
-    contract.code = code;
-    contract.updateId();
-    return contract;
   }
 
   public static parseId(id: string) {

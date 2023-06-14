@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountEntity } from "../entities/account.entity";
 import { MoreThan, Repository } from "typeorm";
-import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { TransactionEntity } from "../../transactions/transaction.entity";
 
 @Injectable()
 export class AccountsService {

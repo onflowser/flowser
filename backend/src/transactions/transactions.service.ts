@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { TransactionEntity } from "./entities/transaction.entity";
+import { TransactionEntity } from "./transaction.entity";
 import { MoreThan, Repository } from "typeorm";
 import { TransactionStatus } from "@flowser/shared";
 

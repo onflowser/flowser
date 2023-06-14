@@ -3,13 +3,18 @@ import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKeyEntity } from "./key.entity";
 import { AccountContractEntity } from "./contract.entity";
 import { Account } from "@flowser/shared";
-import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { TransactionEntity } from "../../transactions/transaction.entity";
 import { AccountStorageItemEntity } from "./storage-item.entity";
+import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 
 @Entity({ name: "accounts" })
-export class AccountEntity extends PollingEntity {
+export class AccountEntity extends PollingEntity implements BlockContextEntity {
   @PrimaryColumn()
   address: string;
+
+  // Nullable for backward compatability - to not cause not null constraint failure on migration.
+  @Column({ nullable: true })
+  blockId: string;
 
   @Column({ type: "bigint" })
   balance: number;

@@ -15,8 +15,8 @@ import { AccountsService } from "../../accounts/services/accounts.service";
 import { ContractsService } from "../../accounts/services/contracts.service";
 import { EventsService } from "../../events/events.service";
 import { AccountEntity } from "../../accounts/entities/account.entity";
-import { EventEntity } from "../../events/entities/event.entity";
-import { TransactionEntity } from "../../transactions/entities/transaction.entity";
+import { EventEntity } from "../../events/event.entity";
+import { TransactionEntity } from "../../transactions/transaction.entity";
 import { BlockEntity } from "../../blocks/entities/block.entity";
 import { AccountContractEntity } from "../../accounts/entities/contract.entity";
 import { KeysService } from "../../accounts/services/keys.service";
@@ -26,7 +26,7 @@ import { getDataSourceInstance } from "../../database";
 import { SubscriptionService } from "./subscription.service";
 import { FlowConfigService } from "../../flow/services/config.service";
 import { ProjectContextLifecycle } from "../../flow/utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { FlowAccountStorageService } from "../../flow/services/storage.service";
 import { AccountStorageService } from "../../accounts/services/storage.service";
 import {
@@ -177,10 +177,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       return;
     }
 
-    // Service account is present only on emulator chain
-    if (!(await this.isServiceAccountProcessed())) {
-      await this.processDefaultAccounts();
-    }
+    await this.processDefaultAccounts();
 
     const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
       await this.getUnprocessedBlocksInfo();
@@ -214,7 +211,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       this.flowGatewayService.getLatestBlock(),
     ]);
     const nextBlockHeightToProcess = lastStoredBlock
-      ? lastStoredBlock.height + 1
+      ? lastStoredBlock.blockHeight + 1
       : this.projectContext.startBlockHeight;
     const latestUnprocessedBlockHeight = latestBlock.height;
 
@@ -231,7 +228,10 @@ export class ProcessorService implements ProjectContextLifecycle {
     const blockData = await this.getBlockData(height);
 
     // Process events first, so that transactions can reference created users.
-    await this.processEvents(blockData.events);
+    await this.processNewEventBatch({
+      flowEvents: blockData.events,
+      flowBlock: blockData.block,
+    });
 
     this.subscribeTxStatusUpdates(blockData.transactions);
 
@@ -239,7 +239,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       await queryRunner.startTransaction();
 
       await this.storeBlockData(blockData);
-      await this.updateAccountsStorage();
+      await this.reProcessStorageForAllAccounts();
 
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -259,25 +259,30 @@ export class ProcessorService implements ProjectContextLifecycle {
 
   private async storeBlockData(data: BlockData) {
     const blockPromise = this.blockService
-      .create(BlockEntity.create(data.block))
+      .create(this.createBlockEntity({ flowBlock: data.block }))
       .catch((e) =>
         this.logger.error(`block save error: ${e.message}`, e.stack)
       );
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
-        this.handleTransactionCreated(
-          data.block,
+        this.processNewTransaction({
+          block: data.block,
           transaction,
-          transaction.status
-        ).catch((e) =>
+          transactionStatus: transaction.status,
+        }).catch((e) =>
           this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
     const eventPromises = Promise.all(
-      data.events.map((event) =>
+      data.events.map((flowEvent) =>
         this.eventService
-          .create(EventEntity.create(event))
+          .create(
+            this.createEventEntity({
+              flowEvent,
+              flowBlock: data.block,
+            })
+          )
           .catch((e) =>
             this.logger.error(`event save error: ${e.message}`, e.stack)
           )
@@ -337,17 +342,21 @@ export class ProcessorService implements ProjectContextLifecycle {
     };
   }
 
-  private async processEvents(events: FlowEvent[]) {
+  private async processNewEventBatch(options: {
+    flowEvents: FlowEvent[];
+    flowBlock: FlowBlock;
+  }) {
+    const { flowEvents, flowBlock } = options;
     // Process new accounts first, so other events can reference them.
-    const accountCreatedEvents = events.filter(
+    const accountCreatedEvents = flowEvents.filter(
       (event) => event.type === FlowCoreEventType.ACCOUNT_CREATED
     );
-    const restEvents = events.filter(
+    const restEvents = flowEvents.filter(
       (event) => event.type !== FlowCoreEventType.ACCOUNT_CREATED
     );
     await Promise.all(
-      accountCreatedEvents.map((event) =>
-        this.handleEvent(event).catch((e) => {
+      accountCreatedEvents.map((flowEvent) =>
+        this.processNewEvent({ flowEvent, flowBlock }).catch((e) => {
           this.logger.error(
             `flow.AccountCreated event handling error: ${e.message}`,
             e.stack
@@ -356,10 +365,10 @@ export class ProcessorService implements ProjectContextLifecycle {
       )
     );
     await Promise.all(
-      restEvents.map((event) =>
-        this.handleEvent(event).catch((e) => {
+      restEvents.map((flowEvent) =>
+        this.processNewEvent({ flowEvent, flowBlock }).catch((e) => {
           this.logger.error(
-            `${event.type} event handling error: ${e.message}`,
+            `${flowEvent.type} event handling error: ${e.message}`,
             e.stack
           );
         })
@@ -367,62 +376,80 @@ export class ProcessorService implements ProjectContextLifecycle {
     );
   }
 
-  private async handleEvent(event: FlowEvent) {
-    const { data, type } = event;
-    this.logger.debug(`handling event: ${type} ${JSON.stringify(data)}`);
-    const address = ensurePrefixedAddress(data.address);
-    switch (type) {
+  private async processNewEvent(options: {
+    flowEvent: FlowEvent;
+    flowBlock: FlowBlock;
+  }) {
+    const { flowEvent, flowBlock } = options;
+    this.logger.debug(
+      `handling event: ${flowEvent.type} ${JSON.stringify(flowEvent.data)}`
+    );
+    const address = ensurePrefixedAddress(flowEvent.data.address);
+    switch (flowEvent.type) {
       case FlowCoreEventType.ACCOUNT_CREATED:
-        return this.storeNewAccountWithContractsAndKeys(address);
+        return this.storeNewAccountWithContractsAndKeys({ address, flowBlock });
       case FlowCoreEventType.ACCOUNT_KEY_ADDED:
       case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
-        return this.updateStoredAccountKeys(address);
+        return this.updateStoredAccountKeys({ address, flowBlock });
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         // TODO: Use event.data.address & event.data.contract to determine updated/created/removed contract
-        return this.updateStoredAccountContracts(address);
+        return this.updateStoredAccountContracts({ address, flowBlock });
       default:
         return null; // not a core event, ignore it
     }
   }
 
-  private async handleTransactionCreated(
-    block: FlowBlock,
-    transaction: FlowTransaction,
-    status: FlowTransactionStatus
-  ) {
+  private async processNewTransaction(options: {
+    block: FlowBlock;
+    transaction: FlowTransaction;
+    transactionStatus: FlowTransactionStatus;
+  }) {
     // TODO: Should we also mark all tx.authorizers as updated?
-    const payerAddress = ensurePrefixedAddress(transaction.payer);
+    const payerAddress = ensurePrefixedAddress(options.transaction.payer);
     return Promise.all([
       this.transactionService.createOrUpdate(
-        TransactionEntity.create(block, transaction, status)
+        TransactionEntity.create(
+          options.block,
+          options.transaction,
+          options.transactionStatus
+        )
       ),
       this.accountService.markUpdated(payerAddress),
     ]);
   }
 
-  private async storeNewAccountWithContractsAndKeys(address: string) {
+  private async storeNewAccountWithContractsAndKeys(options: {
+    address: string;
+    flowBlock: FlowBlock | undefined;
+  }) {
+    const { address, flowBlock } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const unSerializedAccount = this.createAccountEntity(flowAccount);
+    const unSerializedAccount = this.createAccountEntity({
+      flowAccount,
+      flowBlock,
+    });
     if (
       this.getDefaultAccountsAddresses().includes(unSerializedAccount.address)
     ) {
       unSerializedAccount.isDefaultAccount = true;
     }
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      AccountContractEntity.create(
+      this.createContractEntity({
         flowAccount,
+        flowBlock,
         name,
-        flowAccount.contracts[name]
-      )
+        code: flowAccount.contracts[name],
+      })
     );
-    const newKeys = flowAccount.keys.map((flowKey) =>
-      this.createKeyEntity(flowAccount, flowKey)
-    );
+
     await this.accountService.upsert(unSerializedAccount);
     await Promise.all([
-      this.accountKeysService.updateAccountKeys(address, newKeys),
+      this.accountKeysService.updateAccountKeys(
+        address,
+        unSerializedAccount.keys
+      ),
       this.contractService.updateAccountContracts(
         unSerializedAccount.address,
         newContracts
@@ -430,28 +457,37 @@ export class ProcessorService implements ProjectContextLifecycle {
     ]);
   }
 
-  private async updateStoredAccountKeys(address: string) {
+  private async updateStoredAccountKeys(options: {
+    address: string;
+    flowBlock: FlowBlock;
+  }) {
+    const { address, flowBlock } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
     await Promise.all([
       this.accountService.markUpdated(address),
       this.accountKeysService.updateAccountKeys(
         address,
         flowAccount.keys.map((flowKey) =>
-          this.createKeyEntity(flowAccount, flowKey)
+          this.createKeyEntity({ flowAccount, flowKey, flowBlock })
         )
       ),
     ]);
   }
 
-  private async updateStoredAccountContracts(address: string) {
+  private async updateStoredAccountContracts(options: {
+    address: string;
+    flowBlock: FlowBlock;
+  }) {
+    const { address, flowBlock } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = this.createAccountEntity(flowAccount);
+    const account = this.createAccountEntity({ flowAccount, flowBlock });
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      AccountContractEntity.create(
+      this.createContractEntity({
         flowAccount,
+        flowBlock,
         name,
-        flowAccount.contracts[name]
-      )
+        code: flowAccount.contracts[name],
+      })
     );
 
     await Promise.all([
@@ -463,7 +499,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     ]);
   }
 
-  private async updateAccountsStorage() {
+  private async reProcessStorageForAllAccounts() {
     const allAddresses = await this.accountService.findAllAddresses();
     this.logger.debug(
       `Processing storages for accounts: ${allAddresses.join(", ")}`
@@ -504,6 +540,12 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private async processDefaultAccounts() {
+    const isAlreadyProcessed = await this.isServiceAccountProcessed();
+
+    if (isAlreadyProcessed) {
+      return;
+    }
+
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
 
@@ -511,11 +553,19 @@ export class ProcessorService implements ProjectContextLifecycle {
     try {
       await Promise.all(
         this.getDefaultAccountsAddresses().map((address) =>
-          this.storeNewAccountWithContractsAndKeys(address)
+          this.storeNewAccountWithContractsAndKeys({
+            address,
+            // TODO(snapshots-revamp): Default accounts seem to be created before outside of any block, investigate this further.
+            // @ts-ignore This is the only field that needs to be consumed.
+            flowBlock: {
+              id: "NULL",
+            },
+          })
         )
       );
       await queryRunner.commitTransaction();
     } catch (error) {
+      this.logger.error("Default account processing failed", error);
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
@@ -535,19 +585,31 @@ export class ProcessorService implements ProjectContextLifecycle {
     ];
   }
 
-  private createAccountEntity(flowAccount: FlowAccount): AccountEntity {
+  private createAccountEntity(options: {
+    flowAccount: FlowAccount;
+    // Undefined in case we don't want to update block ID.
+    flowBlock: FlowBlock;
+  }): AccountEntity {
+    const { flowAccount, flowBlock } = options;
     const account = AccountEntity.createDefault();
+    account.blockId = flowBlock.id;
     account.address = ensurePrefixedAddress(flowAccount.address);
     account.balance = flowAccount.balance;
     account.code = flowAccount.code;
-    account.keys = flowAccount.keys.map((key) =>
-      this.createKeyEntity(flowAccount, key)
+    account.keys = flowAccount.keys.map((flowKey) =>
+      this.createKeyEntity({ flowAccount, flowKey, flowBlock })
     );
     return account;
   }
 
-  private createKeyEntity(flowAccount: FlowAccount, flowKey: FlowKey) {
+  private createKeyEntity(options: {
+    flowAccount: FlowAccount;
+    flowKey: FlowKey;
+    flowBlock: FlowBlock;
+  }) {
+    const { flowAccount, flowKey, flowBlock } = options;
     const key = new AccountKeyEntity();
+    key.blockId = flowBlock.id;
     key.index = flowKey.index;
     key.accountAddress = ensurePrefixedAddress(flowAccount.address);
     key.publicKey = flowKey.publicKey;
@@ -557,5 +619,52 @@ export class ProcessorService implements ProjectContextLifecycle {
     key.sequenceNumber = flowKey.sequenceNumber;
     key.revoked = flowKey.revoked;
     return key;
+  }
+
+  private createEventEntity(options: {
+    flowEvent: ExtendedFlowEvent;
+    flowBlock: FlowBlock;
+  }): EventEntity {
+    const { flowEvent, flowBlock } = options;
+    const event = new EventEntity();
+    event.blockId = flowBlock.id;
+    event.type = flowEvent.type;
+    event.transactionIndex = flowEvent.transactionIndex;
+    event.transactionId = flowEvent.transactionId;
+    event.blockId = flowEvent.blockId;
+    event.eventIndex = flowEvent.eventIndex;
+    event.data = flowEvent.data;
+    return event;
+  }
+
+  private createBlockEntity(options: { flowBlock: FlowBlock }): BlockEntity {
+    const { flowBlock } = options;
+    const block = new BlockEntity();
+    block.blockId = flowBlock.id;
+    block.collectionGuarantees = flowBlock.collectionGuarantees;
+    block.blockSeals = flowBlock.blockSeals;
+    // TODO(milestone-x): "signatures" field is not present in block response
+    // https://github.com/onflow/fcl-js/issues/1355
+    block.signatures = flowBlock.signatures ?? [];
+    block.timestamp = new Date(flowBlock.timestamp);
+    block.blockHeight = flowBlock.height;
+    block.parentId = flowBlock.parentId;
+    return block;
+  }
+
+  private createContractEntity(options: {
+    flowBlock: FlowBlock | undefined;
+    flowAccount: FlowAccount;
+    name: string;
+    code: string;
+  }) {
+    const { flowAccount, flowBlock, name, code } = options;
+    const contract = new AccountContractEntity();
+    contract.blockId = flowBlock.id;
+    contract.accountAddress = ensurePrefixedAddress(flowAccount.address);
+    contract.name = name;
+    contract.code = code;
+    contract.updateId();
+    return contract;
   }
 }

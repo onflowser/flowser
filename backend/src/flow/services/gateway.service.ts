@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { Gateway, ServiceStatus } from "@flowser/shared";
 
 const fcl = require("@onflow/fcl");

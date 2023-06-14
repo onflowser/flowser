@@ -4,7 +4,7 @@ import {
   PreconditionFailedException,
 } from "@nestjs/common";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { ProcessOutputSource } from "@flowser/shared";
 import { FlowConfigService } from "./config.service";

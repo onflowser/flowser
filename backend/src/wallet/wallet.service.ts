@@ -25,7 +25,7 @@ import {
 } from "@flowser/shared";
 import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
-import { ProjectEntity } from "src/projects/entities/project.entity";
+import { ProjectEntity } from "src/projects/project.entity";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");

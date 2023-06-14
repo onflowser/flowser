@@ -1,4 +1,4 @@
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 
 /**
  * Services must implement this interface to get info on the current project.

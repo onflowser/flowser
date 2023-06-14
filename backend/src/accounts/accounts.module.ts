@@ -5,7 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AccountEntity } from "./entities/account.entity";
 import { ContractsController } from "./controllers/contracts.controller";
 import { ContractsService } from "./services/contracts.service";
-import { TransactionEntity } from "../transactions/entities/transaction.entity";
+import { TransactionEntity } from "../transactions/transaction.entity";
 import { AccountContractEntity } from "./entities/contract.entity";
 import { AccountKeyEntity } from "./entities/key.entity";
 import { AccountStorageItemEntity } from "./entities/storage-item.entity";

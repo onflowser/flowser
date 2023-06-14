@@ -8,7 +8,7 @@ import {
   HashAlgorithm,
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";

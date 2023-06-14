@@ -8,7 +8,7 @@ import {
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { MoreThan, Repository } from "typeorm";
-import { ProjectEntity } from "./entities/project.entity";
+import { ProjectEntity } from "./project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
 import { ProcessorService } from "../data-processing/services/processor.service";

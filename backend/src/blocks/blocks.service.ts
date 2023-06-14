@@ -22,7 +22,7 @@ export class BlocksService {
         { createdAt: MoreThan(timestamp) },
         { updatedAt: MoreThan(timestamp) },
       ],
-      order: { height: "DESC" },
+      order: { blockHeight: "DESC" },
     });
   }
 
@@ -30,13 +30,13 @@ export class BlocksService {
     return this.blockRepository
       .createQueryBuilder("block")
       .select()
-      .orderBy("block.height", "DESC")
+      .orderBy("block.blockHeight", "DESC")
       .limit(1)
       .getOne();
   }
 
-  async findOne(id: string) {
-    return this.blockRepository.findOneByOrFail({ id });
+  async findOne(blockId: string) {
+    return this.blockRepository.findOneByOrFail({ blockId });
   }
 
   removeAll() {
