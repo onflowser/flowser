@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountEntity } from "../entities/account.entity";
-import { MoreThan, Repository } from "typeorm";
+import { MoreThan, Repository, Any } from "typeorm";
 import { TransactionEntity } from "../../transactions/transaction.entity";
+import { removeByBlockIds } from '../../blocks/entities/block-context.entity';
 
 @Injectable()
 export class AccountsService {
@@ -65,5 +66,12 @@ export class AccountsService {
 
   removeAll() {
     return this.accountRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.accountRepository
+    })
   }
 }

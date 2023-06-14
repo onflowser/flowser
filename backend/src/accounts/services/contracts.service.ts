@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
 import { AccountContractEntity } from "../entities/contract.entity";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
+import { removeByBlockIds } from "../../blocks/entities/block-context.entity";
 
 @Injectable()
 export class ContractsService {
@@ -101,5 +102,12 @@ export class ContractsService {
 
   removeAll() {
     return this.contractRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.contractRepository,
+    });
   }
 }

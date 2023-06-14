@@ -33,7 +33,7 @@ import {
   ProjectRequirementType,
 } from "@flowser/shared";
 import * as fs from "fs";
-import { DataRemovalService } from "../core/services/data-removal.service";
+import { CacheRemovalService } from "../core/services/cache-removal.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
 import { WalletService } from "../wallet/wallet.service";
 import { FlowSnapshotService } from "../flow/services/snapshot.service";
@@ -80,7 +80,7 @@ export class ProjectsService {
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private transactionsService: TransactionsService,
-    private commonService: DataRemovalService,
+    private commonService: CacheRemovalService,
     private flowDevWalletService: FlowDevWalletService,
     private walletService: WalletService,
     private flowSnapshotsService: FlowSnapshotService
@@ -158,7 +158,7 @@ export class ProjectsService {
   async cleanupProject() {
     try {
       // Remove all cached data of previously used project
-      await this.commonService.removeBlockchainData();
+      await this.commonService.removeAll();
     } catch (e) {
       throw new InternalServerErrorException("Database cleanup failed");
     }

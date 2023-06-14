@@ -42,7 +42,7 @@ import {
   ManagedProcessEntity,
   ManagedProcessEvent,
 } from "../../processes/managed-process.entity";
-import { DataRemovalService } from "../../core/services/data-removal.service";
+import { CacheRemovalService } from "../../core/services/cache-removal.service";
 import { FlowEmulatorService } from "../../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
 import { WalletService } from "../../wallet/wallet.service";
@@ -89,7 +89,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     private flowSubscriptionService: SubscriptionService,
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
-    private commonService: DataRemovalService,
+    private commonService: CacheRemovalService,
     private walletService: WalletService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
@@ -154,7 +154,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     if (state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING) {
       this.logger.debug("Emulator process was started, reindexing");
       // Reindex all blockchain data when the emulator is started (restarted)
-      await this.commonService.removeBlockchainData();
+      await this.commonService.removeAll();
       await this.walletService.importAccountsFromConfig();
     }
   }

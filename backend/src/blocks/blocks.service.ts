@@ -1,6 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThan, Repository } from "typeorm";
+import { MoreThan, Repository, Any } from "typeorm";
 import { BlockEntity } from "./entities/block.entity";
+import { removeByBlockIds } from "./entities/block-context.entity";
 
 export class BlocksService {
   constructor(
@@ -41,5 +42,12 @@ export class BlocksService {
 
   removeAll() {
     return this.blockRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.blockRepository,
+    });
   }
 }

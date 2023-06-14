@@ -11,11 +11,14 @@ import { FlowSnapshotService } from "./services/snapshot.service";
 import { FlowDevWalletService } from "./services/dev-wallet.service";
 import { ProcessesModule } from "../processes/processes.module";
 import { CoreModule } from "../core/core.module";
+import { BlocksModule } from '../blocks/blocks.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SnapshotEntity]),
     ProcessesModule,
+    // We need this to perform blockchain cache removal in snapshot service.
+    BlocksModule,
     // We only need to import core module,
     // to access data removal service from snapshots service.
     // Otherwise, this module shouldn't depend on many other modules.

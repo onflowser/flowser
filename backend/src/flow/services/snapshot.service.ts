@@ -10,7 +10,7 @@ import { MoreThan, Repository } from "typeorm";
 import { SnapshotEntity } from "../entities/snapshot.entity";
 import axios, { Method } from "axios";
 import { randomUUID } from "crypto";
-import { DataRemovalService } from "../../core/services/data-removal.service";
+import { CacheRemovalService } from "../../core/services/cache-removal.service";
 import {
   CreateEmulatorSnapshotRequest,
   GetPollingEmulatorSnapshotsRequest,
@@ -20,6 +20,7 @@ import {
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "src/projects/project.entity";
 import { computeEntitiesDiff } from "../../utils";
+import { BlocksService } from "../../blocks/blocks.service";
 
 type CreateSnapshotRequest = {
   name: string;
@@ -50,7 +51,8 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
   constructor(
     @InjectRepository(SnapshotEntity)
     private readonly snapshotRepository: Repository<SnapshotEntity>,
-    private readonly commonService: DataRemovalService
+    private readonly cacheRemovalService: CacheRemovalService,
+    private readonly blocksService: BlocksService
   ) {}
 
   async onEnterProjectContext(project: ProjectEntity): Promise<void> {
@@ -66,7 +68,17 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       height: request.blockHeight,
     });
 
-    await this.reprocessBlockchainData();
+    // TODO(snapshots-revamp): Optimise if this turns out too slow,
+    //  since it's probably gonna be used often.
+    const allBlocks = await this.blocksService.findAll();
+
+    const blockIdsUntilTargetHeight = allBlocks
+      .filter((block) => block.blockHeight > request.blockHeight)
+      .map((block) => block.blockId);
+
+    console.log("removing data for block IDs", blockIdsUntilTargetHeight);
+
+    await this.cacheRemovalService.removeByBlockIds(blockIdsUntilTargetHeight);
   }
 
   async create(request: CreateEmulatorSnapshotRequest) {
@@ -108,7 +120,17 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       name: existingSnapshot.id,
     });
 
-    await this.reprocessBlockchainData();
+    // TODO(snapshots-revamp): Optimise if this turns out too slow.
+    const allBlocks = await this.blocksService.findAll();
+
+    const targetBlock = allBlocks.find(
+      (block) => block.blockId === request.blockId
+    );
+    const blockIdsUntilTargetHeight = allBlocks
+      .filter((block) => block.blockHeight > targetBlock.blockHeight)
+      .map((block) => block.blockId);
+
+    await this.cacheRemovalService.removeByBlockIds(blockIdsUntilTargetHeight);
 
     return existingSnapshot;
   }
@@ -134,9 +156,13 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     });
   }
 
-  private async reprocessBlockchainData() {
+  private async reprocessBlockchainData(options: {
+    // Block ID of the block that user jumped to.
+    // We need to re-index all blockchain data until this block.
+    toBlockId: string;
+  }) {
     // TODO(snapshots-revamp): How to handle cached managed accounts?
-    await this.commonService.removeBlockchainData();
+    await this.cacheRemovalService.removeAll();
   }
 
   private async syncSnapshotsCache(project: ProjectEntity) {
