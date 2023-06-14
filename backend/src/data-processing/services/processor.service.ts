@@ -487,15 +487,20 @@ export class ProcessorService implements ProjectContextLifecycle {
     const serviceAccountAddress = ensurePrefixedAddress(
       this.configService.getServiceAccountAddress()
     );
-    const serviceAccount = await this.accountService.findOneByAddress(
-      serviceAccountAddress
-    );
+    try {
+      const serviceAccount = await this.accountService.findOneByAddress(
+        serviceAccountAddress
+      );
 
-    // Service account is already created by the wallet service,
-    // but that service doesn't set the public key.
-    // So if public key isn't present,
-    // we know that we haven't processed this account yet.
-    return Boolean(serviceAccount.keys[0]?.publicKey);
+      // Service account is already created by the wallet service,
+      // but that service doesn't set the public key.
+      // So if public key isn't present,
+      // we know that we haven't processed this account yet.
+      return Boolean(serviceAccount.keys[0]?.publicKey);
+    } catch (e) {
+      // Service account not found
+      return false;
+    }
   }
 
   private async processDefaultAccounts() {
