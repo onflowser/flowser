@@ -3,7 +3,6 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { AccountKey } from "@flowser/shared";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
-import { ensurePrefixedAddress } from "../../utils";
 
 // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
 export const defaultKeyWeight = 1000;

@@ -151,9 +151,10 @@ export function ProjectProvider({
         );
         return;
       }
-      const block = blocks.find((block) => block.id === blockId);
+      const latestBlock = blocks[0];
+      const targetBlock = blocks.find((block) => block.id === blockId);
 
-      if (!block) {
+      if (!targetBlock) {
         throw new Error(`Expected to find block with ID: ${blockId}`);
       }
 
@@ -162,7 +163,7 @@ export function ProjectProvider({
         body: (
           <span style={{ textAlign: "center" }}>
             Do you want to move to the emulator blockchain state to the block
-            with height <code>{block.height}</code>?
+            with height <code>{targetBlock.height}</code>?
           </span>
         ),
         confirmBtnLabel: "JUMP",
@@ -170,13 +171,18 @@ export function ProjectProvider({
         onConfirm: async () => {
           track(AnalyticEvent.CHECKOUT_SNAPSHOT);
 
+          if (targetBlock.id === latestBlock.id) {
+            toast("Blockchain is already at this block height");
+            return;
+          }
+
           try {
             // TODO(snapshots-revamp): Should we remove the old createSnapshot/jumpToSnapshot functionality entirely?
             await snapshotService.rollback({
-              blockHeight: block.height,
+              blockHeight: targetBlock.height,
             });
             refetchBlocks();
-            toast.success(`Moved to block height: ${block.height}`);
+            toast.success(`Moved to block height: ${targetBlock.height}`);
           } catch (e) {
             handleError(e);
           }
