@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
 import { routes } from "../constants/routes";
 import { useHistory } from "react-router-dom";
@@ -14,9 +15,9 @@ import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
 import {
-  useCurrentProjectId,
   useGetCurrentProject,
   useGetPollingBlocks,
+  useGetPollingEmulatorSnapshots,
 } from "../hooks/use-api";
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
@@ -59,6 +60,14 @@ export function ProjectProvider({
     useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
   const { data: blocks, refetchBlocks } = useGetPollingBlocks();
+  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
+  const snapshotLookupByBlockId = useMemo(
+    () =>
+      new Map(
+        emulatorSnapshots.map((snapshot) => [snapshot.blockId, snapshot])
+      ),
+    [emulatorSnapshots]
+  );
 
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
@@ -158,12 +167,19 @@ export function ProjectProvider({
         throw new Error(`Expected to find block with ID: ${blockId}`);
       }
 
+      const snapshot = snapshotLookupByBlockId.get(targetBlock.id);
+
       showDialog({
-        title: "Jump to snapshot",
-        body: (
+        title: snapshot ? "Jump to snapshot" : "Rollback to block",
+        body: snapshot ? (
           <span style={{ textAlign: "center" }}>
-            Do you want to move to the emulator blockchain state to the block
-            with height <code>{targetBlock.height}</code>?
+            Do you want to move the emulator blockchain state to the snapshot{" "}
+            <code>{snapshot.description}</code>?
+          </span>
+        ) : (
+          <span style={{ textAlign: "center" }}>
+            Do you want to move the emulator blockchain state to the block with
+            height <code>{targetBlock.height}</code>?
           </span>
         ),
         confirmBtnLabel: "JUMP",
@@ -172,24 +188,33 @@ export function ProjectProvider({
           track(AnalyticEvent.CHECKOUT_SNAPSHOT);
 
           if (targetBlock.id === latestBlock.id) {
-            toast("Blockchain is already at this block height");
+            toast("Blockchain state is already at this block, doing nothing.");
             return;
+          }
+          if (!currentProject.project) {
+            throw new Error("Expected project to be defined");
           }
 
           try {
-            // TODO(snapshots-revamp): Should we remove the old createSnapshot/jumpToSnapshot functionality entirely?
-            await snapshotService.rollback({
-              blockHeight: targetBlock.height,
-            });
+            if (snapshot) {
+              await snapshotService.checkoutBlock({
+                blockId: targetBlock.id,
+                projectId: currentProject.project.id,
+              });
+            } else {
+              await snapshotService.rollback({
+                blockHeight: targetBlock.height,
+              });
+            }
             refetchBlocks();
-            toast.success(`Moved to block height: ${targetBlock.height}`);
+            toast.success(`Moved to block: ${targetBlock.id}`);
           } catch (e) {
             handleError(e);
           }
         },
       });
     },
-    [currentProject, blocks]
+    [currentProject, blocks, snapshotLookupByBlockId]
   );
 
   useEffect(() => {

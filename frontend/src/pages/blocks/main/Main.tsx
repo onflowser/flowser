@@ -32,8 +32,8 @@ const Main: FunctionComponent = () => {
   const { checkoutBlock } = useProjectActions();
 
   const { data: blocks, firstFetch, error } = useGetPollingBlocks();
-  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
+  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
       new Map(
