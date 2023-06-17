@@ -12,8 +12,8 @@ export type ConfirmDialogContextState = {
 };
 
 export type OpenConfirmDialogProps = {
-  confirmBtnLabel: string;
-  cancelBtnLabel: string;
+  confirmButtonLabel: string;
+  cancelButtonLabel: string;
   title: string;
   body: ReactElement;
   onConfirm?: () => void | Promise<void>;
@@ -57,8 +57,8 @@ export function ConfirmDialogProvider({
           onClose={hideDialog}
           title={dialogProps.title}
           onConfirm={dialogProps.onConfirm ?? defaultOnConfirm}
-          confirmBtnLabel={dialogProps.confirmBtnLabel}
-          cancelBtnLabel={dialogProps.cancelBtnLabel}
+          confirmButtonLabel={dialogProps.confirmButtonLabel}
+          cancelButtonLabel={dialogProps.cancelButtonLabel}
         >
           {dialogProps.body}
         </ConfirmDialog>

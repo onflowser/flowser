@@ -4,6 +4,7 @@ import {
   HashAlgorithm,
   SignatureAlgorithm,
   ExecutionStatusCode,
+  Block,
 } from "@flowser/shared";
 import React from "react";
 import { ReactComponent as ExpiredIcon } from "../assets/icons/expired-tx-icon.svg";
@@ -81,6 +82,15 @@ export class FlowUtils {
       default:
         return "-";
     }
+  }
+
+  static getShortedBlockId(block: Block): string {
+    const { id } = block;
+    const charsToTake = 5;
+    return `${id.slice(0, charsToTake)}...${id.slice(
+      id.length - charsToTake,
+      id.length
+    )}`;
   }
 
   static getGrcpStatusIcon(

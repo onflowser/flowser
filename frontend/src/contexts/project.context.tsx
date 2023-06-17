@@ -25,6 +25,7 @@ import { useErrorHandler } from "../hooks/use-error-handler";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
+import { FlowUtils } from "../utils/flow-utils";
 
 export type ProjectActionsContextState = {
   switchProject: () => Promise<void>;
@@ -94,8 +95,8 @@ export function ProjectProvider({
       title: "Delete project",
       body: <span>Are you sure you want to delete this project?</span>,
       onConfirm: () => confirmProjectRemove(project),
-      confirmBtnLabel: "DELETE",
-      cancelBtnLabel: "BACK",
+      confirmButtonLabel: "DELETE",
+      cancelButtonLabel: "BACK",
     });
   }
 
@@ -169,6 +170,37 @@ export function ProjectProvider({
 
       const snapshot = snapshotLookupByBlockId.get(targetBlock.id);
 
+      const onConfirm = async () => {
+        track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+
+        if (targetBlock.id === latestBlock.id) {
+          toast("Blockchain state is already at this block, doing nothing.");
+          return;
+        }
+        if (!currentProject.project) {
+          throw new Error("Expected project to be defined");
+        }
+
+        try {
+          if (snapshot) {
+            await snapshotService.checkoutBlock({
+              blockId: targetBlock.id,
+              projectId: currentProject.project.id,
+            });
+          } else {
+            await snapshotService.rollback({
+              blockHeight: targetBlock.height,
+            });
+          }
+          refetchBlocks();
+          toast.success(
+            `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock)}`
+          );
+        } catch (e) {
+          handleError(e);
+        }
+      };
+
       showDialog({
         title: snapshot ? "Jump to snapshot" : "Rollback to block",
         body: snapshot ? (
@@ -182,44 +214,13 @@ export function ProjectProvider({
             height <code>{targetBlock.height}</code>?
           </span>
         ),
-        confirmBtnLabel: "JUMP",
-        cancelBtnLabel: "CANCEL",
-        onConfirm: async () => {
-          track(AnalyticEvent.CHECKOUT_SNAPSHOT);
-
-          if (targetBlock.id === latestBlock.id) {
-            toast("Blockchain state is already at this block, doing nothing.");
-            return;
-          }
-          if (!currentProject.project) {
-            throw new Error("Expected project to be defined");
-          }
-
-          try {
-            if (snapshot) {
-              await snapshotService.checkoutBlock({
-                blockId: targetBlock.id,
-                projectId: currentProject.project.id,
-              });
-            } else {
-              await snapshotService.rollback({
-                blockHeight: targetBlock.height,
-              });
-            }
-            refetchBlocks();
-            toast.success(`Moved to block: ${targetBlock.id}`);
-          } catch (e) {
-            handleError(e);
-          }
-        },
+        confirmButtonLabel: "JUMP",
+        cancelButtonLabel: "CANCEL",
+        onConfirm,
       });
     },
     [currentProject, blocks, snapshotLookupByBlockId]
   );
-
-  useEffect(() => {
-    console.log("checkoutBlock rebuild");
-  }, [checkoutBlock]);
 
   return (
     <ProjectContext.Provider
