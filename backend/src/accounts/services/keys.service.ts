@@ -15,13 +15,13 @@ export class KeysService {
   async updateAccountKeys(address: string, newKeys: AccountKeyEntity[]) {
     const oldKeys = await this.findKeysByAccount(address);
     const entitiesDiff = computeEntitiesDiff<AccountKeyEntity>({
-      primaryKey: "index",
+      primaryKey: ["accountAddress", "index"],
       newEntities: newKeys,
       oldEntities: oldKeys,
     });
     return processEntitiesDiff<AccountKeyEntity>({
-      create: (e) => this.upsert(e),
-      update: (e) => this.upsert(e),
+      create: (e) => this.create(e),
+      update: (e) => this.update(e),
       delete: (e) => this.delete(e.accountAddress, e.index),
       diff: entitiesDiff,
     });
@@ -53,24 +53,29 @@ export class KeysService {
     });
   }
 
-  async upsert(createdOrUpdatedKey: AccountKeyEntity) {
+  async create(createdKey: AccountKeyEntity) {
+    return this.keyRepository.insert(createdKey);
+  }
+
+  async update(updatedKey: AccountKeyEntity) {
     const existingKey = await this.keyRepository.findOneBy({
-      accountAddress: createdOrUpdatedKey.accountAddress,
-      index: createdOrUpdatedKey.index,
+      accountAddress: updatedKey.accountAddress,
+      index: updatedKey.index,
     });
-    createdOrUpdatedKey.markUpdated();
-    return this.keyRepository.upsert(
+    updatedKey.markUpdated();
+    return this.keyRepository.update(
       {
-        ...createdOrUpdatedKey,
-        // Don't override the exiting private key with an empty one.
-        privateKey: createdOrUpdatedKey.privateKey
-          ? createdOrUpdatedKey.privateKey
-          : existingKey?.privateKey,
-        // Make sure to keep the original created date.
-        createdAt: existingKey?.createdAt ?? createdOrUpdatedKey.createdAt,
+        accountAddress: updatedKey.accountAddress,
+        index: updatedKey.index,
       },
       {
-        conflictPaths: ["index", "accountAddress"],
+        ...updatedKey,
+        // Don't override the exiting private key with an empty one.
+        privateKey: updatedKey.privateKey
+          ? updatedKey.privateKey
+          : existingKey?.privateKey,
+        // Make sure to keep the original created date.
+        createdAt: existingKey?.createdAt ?? updatedKey.createdAt,
       }
     );
   }
