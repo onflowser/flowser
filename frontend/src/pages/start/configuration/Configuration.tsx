@@ -97,7 +97,7 @@ export const Configuration: FunctionComponent = () => {
 
     const { project } = response;
     if (!project) {
-      return;
+      throw new Error("Expected project in response");
     }
     try {
       await projectService.useProject(project.id);
@@ -335,7 +335,7 @@ export const Configuration: FunctionComponent = () => {
               />
               <EmulatorToggleField
                 label="Simple Addresses"
-                path="simpleAddresses"
+                path="useSimpleAddresses"
                 description="Use sequential addresses starting with 0x1"
                 formik={formik}
               />

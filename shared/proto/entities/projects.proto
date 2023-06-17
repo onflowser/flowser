@@ -62,8 +62,7 @@ message Emulator {
   HashAlgorithm service_hash_algorithm = 15;
   bool storage_limit = 16;
   bool transaction_fees = 17;
-  bool simple_addresses = 19;
-  bool persist = 20;
+  bool persist = 19;
   bool with_contracts = 23;
   bool enable_grpc_debug = 25;
   bool enable_rest_debug = 26;

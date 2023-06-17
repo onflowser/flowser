@@ -92,14 +92,17 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   }
 
   public static getDefaultFlags(): Emulator {
-    return Emulator.fromPartial({
+    // Some default values vary from the ones used in Flow CLI.
+    return {
       verboseLogging: true,
+      enableRestDebug: true,
       restServerPort: 8888,
+      enableGrpcDebug: true,
       grpcServerPort: 3569,
       adminServerPort: 8080,
       persist: false,
       snapshot: true,
-      withContracts: false,
+      withContracts: true,
       blockTime: 0,
       servicePrivateKey: undefined,
       databasePath: "./flowdb",
@@ -113,8 +116,9 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       serviceHashAlgorithm: HashAlgorithm.SHA3_256,
       storageLimit: true,
       transactionFees: false,
-      simpleAddresses: false,
-    });
+      useSimpleAddresses: false,
+      logFormat: "text",
+    };
   }
 
   private async waitUntilApisStarted() {
