@@ -178,7 +178,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       return;
     }
 
-    await this.processDefaultAccounts();
+    await this.processWellKnownAccounts();
 
     const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
       await this.getUnprocessedBlocksInfo();
@@ -537,10 +537,11 @@ export class ProcessorService implements ProjectContextLifecycle {
     }
   }
 
-  private async processDefaultAccounts() {
+  private async processWellKnownAccounts() {
     const isAlreadyProcessed = await this.isServiceAccountProcessed();
 
     if (isAlreadyProcessed) {
+      // Assume all other accounts are also processed (we batch process them together).
       return;
     }
 
@@ -571,6 +572,8 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private getAllWellKnownAddresses() {
+    // TODO(snapshots-revamp): Try processing monotonic and normal addresses
+    //  as we don't know which setting is used if non-managed emulator is used.
     const wellKnownAddresses = this.flowEmulatorService.getWellKnownAddresses();
     return [
       wellKnownAddresses.serviceAccountAddress,
