@@ -79,12 +79,11 @@ export class FlowUtils {
     }
   }
 
-  static getShortedBlockId(block: Block): string {
-    const { id } = block;
+  static getShortedBlockId(blockId: string): string {
     const charsToTake = 5;
-    return `${id.slice(0, charsToTake)}...${id.slice(
-      id.length - charsToTake,
-      id.length
+    return `${blockId.slice(0, charsToTake)}...${blockId.slice(
+      blockId.length - charsToTake,
+      blockId.length
     )}`;
   }
 

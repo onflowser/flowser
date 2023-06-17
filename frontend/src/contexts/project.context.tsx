@@ -11,7 +11,7 @@ import { routes } from "../constants/routes";
 import { useHistory } from "react-router-dom";
 import { useFlow } from "../hooks/use-flow";
 import toast from "react-hot-toast";
-import { Project } from "@flowser/shared";
+import { Block, EmulatorSnapshot, Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
 import {
@@ -150,74 +150,115 @@ export function ProjectProvider({
     }
   }
 
-  const checkoutBlock = useCallback(
-    (blockId: string) => {
-      track(AnalyticEvent.CLICK_CHECKOUT_SNAPSHOT);
+  function checkoutSnapshot(snapshot: EmulatorSnapshot) {
+    const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
+    if (!isSnapshotEnabled) {
+      toast.error(
+        "Can't jump to block, because 'snapshot' option is not enabled in project settings"
+      );
+      return;
+    }
 
-      const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
-      if (!isSnapshotEnabled) {
-        toast.error(
-          "Can't jump to block, because 'snapshot' option is not enabled in settings"
+    const latestBlock = blocks[0];
+
+    if (snapshot.blockId === latestBlock.id) {
+      toast("Blockchain state is already at this block, doing nothing.");
+      return;
+    }
+
+    const onConfirm = async () => {
+      track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+
+      if (!currentProject?.project) {
+        throw new Error("Expected project to be defined");
+      }
+
+      try {
+        await snapshotService.checkoutBlock({
+          blockId: snapshot.blockId,
+          projectId: currentProject.project.id,
+        });
+        refetchBlocks();
+        toast.success(
+          `Moved to block: ${FlowUtils.getShortedBlockId(snapshot.blockId)}`
         );
+      } catch (e) {
+        handleError(e);
+      }
+    };
+
+    showDialog({
+      title: "Jump to snapshot",
+      body: (
+        <span style={{ textAlign: "center" }}>
+          Do you want to move the emulator blockchain state to the snapshot{" "}
+          <code>{snapshot.description}</code>?
+        </span>
+      ),
+      confirmButtonLabel: "JUMP",
+      cancelButtonLabel: "CANCEL",
+      onConfirm,
+    });
+  }
+
+  function rollbackToBlock(targetBlock: Block) {
+    const onConfirm = async () => {
+      track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+
+      const latestBlock = blocks[0];
+
+      if (targetBlock.id === latestBlock.id) {
+        toast("Blockchain state is already at this block, doing nothing.");
         return;
       }
-      const latestBlock = blocks[0];
-      const targetBlock = blocks.find((block) => block.id === blockId);
-
-      if (!targetBlock) {
-        throw new Error(`Expected to find block with ID: ${blockId}`);
+      if (!currentProject?.project) {
+        throw new Error("Expected project to be defined");
       }
 
-      const snapshot = snapshotLookupByBlockId.get(targetBlock.id);
+      try {
+        await snapshotService.rollback({
+          blockHeight: targetBlock.height,
+        });
+        refetchBlocks();
+        toast.success(
+          `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock.id)}`
+        );
+      } catch (e) {
+        handleError(e);
+      }
+    };
 
-      const onConfirm = async () => {
-        track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+    showDialog({
+      title: "Rollback to block",
+      body: (
+        <span style={{ textAlign: "center" }}>
+          Do you want to move the emulator blockchain state to the block with
+          height <code>{targetBlock.height}</code>?
+        </span>
+      ),
+      confirmButtonLabel: "JUMP",
+      cancelButtonLabel: "CANCEL",
+      onConfirm,
+    });
+  }
 
-        if (targetBlock.id === latestBlock.id) {
-          toast("Blockchain state is already at this block, doing nothing.");
-          return;
-        }
-        if (!currentProject.project) {
-          throw new Error("Expected project to be defined");
-        }
+  const checkoutBlock = useCallback(
+    (targetBlockId: string) => {
+      track(AnalyticEvent.CLICK_CHECKOUT_SNAPSHOT);
 
-        try {
-          if (snapshot) {
-            await snapshotService.checkoutBlock({
-              blockId: targetBlock.id,
-              projectId: currentProject.project.id,
-            });
-          } else {
-            await snapshotService.rollback({
-              blockHeight: targetBlock.height,
-            });
-          }
-          refetchBlocks();
-          toast.success(
-            `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock)}`
-          );
-        } catch (e) {
-          handleError(e);
-        }
-      };
+      const snapshot = snapshotLookupByBlockId.get(targetBlockId);
 
-      showDialog({
-        title: snapshot ? "Jump to snapshot" : "Rollback to block",
-        body: snapshot ? (
-          <span style={{ textAlign: "center" }}>
-            Do you want to move the emulator blockchain state to the snapshot{" "}
-            <code>{snapshot.description}</code>?
-          </span>
-        ) : (
-          <span style={{ textAlign: "center" }}>
-            Do you want to move the emulator blockchain state to the block with
-            height <code>{targetBlock.height}</code>?
-          </span>
-        ),
-        confirmButtonLabel: "JUMP",
-        cancelButtonLabel: "CANCEL",
-        onConfirm,
-      });
+      if (snapshot) {
+        return checkoutSnapshot(snapshot);
+      }
+
+      const targetBlock = blocks.find((block) => block.id === targetBlockId);
+
+      if (!targetBlock) {
+        throw new Error(`Expected to find block with ID: ${targetBlockId}`);
+      }
+
+      rollbackToBlock(targetBlock);
     },
     [currentProject, blocks, snapshotLookupByBlockId]
   );

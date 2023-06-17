@@ -123,6 +123,7 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     // TODO(snapshots-revamp): Optimise if this turns out too slow.
     const allBlocks = await this.blocksService.findAll();
 
+    // TODO(snapshots-revamp): In case we jump to the future, this will be undefined
     const targetBlock = allBlocks.find(
       (block) => block.blockId === request.blockId
     );
