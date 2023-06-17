@@ -156,15 +156,6 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     });
   }
 
-  private async reprocessBlockchainData(options: {
-    // Block ID of the block that user jumped to.
-    // We need to re-index all blockchain data until this block.
-    toBlockId: string;
-  }) {
-    // TODO(snapshots-revamp): How to handle cached managed accounts?
-    await this.cacheRemovalService.removeAll();
-  }
-
   private async syncSnapshotsCache(project: ProjectEntity) {
     const [emulatorSnapshots, cachedSnapshots] = await Promise.all([
       this.listSnapshots(),

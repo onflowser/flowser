@@ -154,11 +154,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return [];
   }
 
-  // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
-  public getServiceAccountAddress(): string | undefined {
-    return this.getAccountConfig("emulator-account")?.address;
-  }
-
   public hasConfigFile(): boolean {
     return fs.existsSync(this.getConfigPath());
   }

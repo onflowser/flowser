@@ -90,7 +90,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private flowEmulatorService: FlowEmulatorService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -430,9 +431,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       flowAccount,
       flowBlock,
     });
-    if (
-      this.getDefaultAccountsAddresses().includes(unSerializedAccount.address)
-    ) {
+    if (this.getAllWellKnownAddresses().includes(unSerializedAccount.address)) {
       unSerializedAccount.isDefaultAccount = true;
     }
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
@@ -520,9 +519,8 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private async isServiceAccountProcessed() {
-    const serviceAccountAddress = ensurePrefixedAddress(
-      this.configService.getServiceAccountAddress()
-    );
+    const { serviceAccountAddress } =
+      this.flowEmulatorService.getWellKnownAddresses();
     try {
       const serviceAccount = await this.accountService.findOneByAddress(
         serviceAccountAddress
@@ -552,7 +550,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     await queryRunner.startTransaction();
     try {
       await Promise.all(
-        this.getDefaultAccountsAddresses().map((address) =>
+        this.getAllWellKnownAddresses().map((address) =>
           this.storeNewAccountWithContractsAndKeys({
             address,
             // TODO(snapshots-revamp): Default accounts seem to be created before outside of any block, investigate this further.
@@ -572,16 +570,13 @@ export class ProcessorService implements ProjectContextLifecycle {
     }
   }
 
-  private getDefaultAccountsAddresses() {
-    const serviceAccountAddress = ensurePrefixedAddress(
-      this.configService.getServiceAccountAddress()
-    );
+  private getAllWellKnownAddresses() {
+    const wellKnownAddresses = this.flowEmulatorService.getWellKnownAddresses();
     return [
-      serviceAccountAddress,
-      // See: https://github.com/onflow/flow-emulator/blob/cdd177ea264f67b0e79d63f681888fd47bba90fa/server/server.go#L137-L143
-      "0xee82856bf20e2aa6",
-      "0xe5a8b7f23e8b548f",
-      "0x0ae53cb6e3f42a79",
+      wellKnownAddresses.serviceAccountAddress,
+      wellKnownAddresses.fungibleTokenAddress,
+      wellKnownAddresses.flowFeesAddress,
+      wellKnownAddresses.flowTokenAddress,
     ];
   }
 
