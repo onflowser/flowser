@@ -9,8 +9,10 @@ import {
 
 export class FlowUtils {
   static getUserAvatarUrl(address: string): string {
-    // TODO(milestone-x): Read this from fcl-js config
-    const isServiceAccount = address === "0xf8d6e0586b0a20c7";
+    const isServiceAccount = [
+      "0xf8d6e0586b0a20c7",
+      "0x0000000000000001", // When using monotonic addresses setting
+    ].includes(address);
     if (isServiceAccount) {
       return "http://localhost:8701/settings.svg";
     }
