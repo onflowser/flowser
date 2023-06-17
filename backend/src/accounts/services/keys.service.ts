@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountKeyEntity } from "../entities/key.entity";
-import { MoreThan, Repository, Any } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
-import { removeByBlockIds } from '../../blocks/entities/block-context.entity';
+import { removeByBlockIds } from "../../blocks/entities/block-context.entity";
 
 @Injectable()
 export class KeysService {
@@ -20,8 +20,8 @@ export class KeysService {
       oldEntities: oldKeys,
     });
     return processEntitiesDiff<AccountKeyEntity>({
-      create: (e) => this.create(e),
-      update: (e) => this.update(e),
+      create: (e) => this.upsert(e),
+      update: (e) => this.upsert(e),
       delete: (e) => this.delete(e.accountAddress, e.index),
       diff: entitiesDiff,
     });
@@ -53,19 +53,25 @@ export class KeysService {
     });
   }
 
-  async create(accountKey: AccountKeyEntity) {
-    return this.keyRepository.insert(accountKey);
-  }
-
-  async update(accountKey: AccountKeyEntity) {
-    accountKey.markUpdated();
-    return this.keyRepository.update(
+  async upsert(createdOrUpdatedKey: AccountKeyEntity) {
+    const existingKey = await this.keyRepository.findOneBy({
+      accountAddress: createdOrUpdatedKey.accountAddress,
+      index: createdOrUpdatedKey.index,
+    });
+    createdOrUpdatedKey.markUpdated();
+    return this.keyRepository.upsert(
       {
-        accountAddress: accountKey.accountAddress,
-        index: accountKey.index,
+        ...createdOrUpdatedKey,
+        // Don't override the exiting private key with an empty one.
+        privateKey: createdOrUpdatedKey.privateKey
+          ? createdOrUpdatedKey.privateKey
+          : existingKey?.privateKey,
+        // Make sure to keep the original created date.
+        createdAt: existingKey?.createdAt ?? createdOrUpdatedKey.createdAt,
       },
-      // Prevent overwriting existing created date
-      { ...accountKey, createdAt: undefined }
+      {
+        conflictPaths: ["index", "accountAddress"],
+      }
     );
   }
 
@@ -76,7 +82,7 @@ export class KeysService {
   removeByBlockIds(blockIds: string[]) {
     return removeByBlockIds({
       blockIds,
-      repository: this.keyRepository
-    })
+      repository: this.keyRepository,
+    });
   }
 }
