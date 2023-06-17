@@ -48,17 +48,25 @@ export type EntitiesDiff<T> = {
   deleted: T[];
 };
 
-export function computeEntitiesDiff<T>(props: {
-  primaryKey: keyof T;
-  oldEntities: T[];
-  newEntities: T[];
+type PrimaryKey<Entity> = keyof Entity | (keyof Entity)[];
+
+export function computeEntitiesDiff<Entity>(props: {
+  primaryKey: PrimaryKey<Entity>;
+  oldEntities: Entity[];
+  newEntities: Entity[];
   deepCompare?: boolean;
-}): EntitiesDiff<T> {
+}): EntitiesDiff<Entity> {
   const newEntitiesLookup = new Map(
-    props.newEntities.map((entity) => [entity[props.primaryKey], entity])
+    props.newEntities.map((entity) => [
+      stringifyPrimaryKey(props.primaryKey, entity),
+      entity,
+    ])
   );
   const oldEntitiesLookup = new Map(
-    props.oldEntities.map((entity) => [entity[props.primaryKey], entity])
+    props.oldEntities.map((entity) => [
+      stringifyPrimaryKey(props.primaryKey, entity),
+      entity,
+    ])
   );
 
   const created = [];
@@ -85,6 +93,23 @@ export function computeEntitiesDiff<T>(props: {
   }
 
   return { created, updated, deleted };
+}
+
+function stringifyPrimaryKey<Entity>(
+  primaryKey: PrimaryKey<Entity>,
+  entity: Entity
+): string {
+  // Single primary key.
+  if (typeof primaryKey === "string") {
+    return String(entity[primaryKey]);
+  }
+
+  // Composed primary key
+  if (primaryKey instanceof Array) {
+    return primaryKey.map((key) => String(entity[key])).join(",");
+  }
+
+  throw new Error("Invalid primary key: " + JSON.stringify(primaryKey));
 }
 
 type ProcessEntitiesDiffOptions<T> = {

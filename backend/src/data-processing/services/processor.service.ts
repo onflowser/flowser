@@ -359,7 +359,9 @@ export class ProcessorService implements ProjectContextLifecycle {
       accountCreatedEvents.map((flowEvent) =>
         this.processNewEvent({ flowEvent, flowBlock }).catch((e) => {
           this.logger.error(
-            `flow.AccountCreated event handling error: ${e.message}`,
+            `flow.AccountCreated event handling error: ${
+              e.message
+            } (${JSON.stringify(flowEvent)})`,
             e.stack
           );
         })
@@ -369,7 +371,9 @@ export class ProcessorService implements ProjectContextLifecycle {
       restEvents.map((flowEvent) =>
         this.processNewEvent({ flowEvent, flowBlock }).catch((e) => {
           this.logger.error(
-            `${flowEvent.type} event handling error: ${e.message}`,
+            `${flowEvent.type} event handling error: ${
+              e.message
+            } (${JSON.stringify(flowEvent)})`,
             e.stack
           );
         })
@@ -479,7 +483,6 @@ export class ProcessorService implements ProjectContextLifecycle {
   }) {
     const { address, flowBlock } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const account = this.createAccountEntity({ flowAccount, flowBlock });
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
       this.createContractEntity({
         flowAccount,
@@ -491,10 +494,7 @@ export class ProcessorService implements ProjectContextLifecycle {
 
     await Promise.all([
       this.accountService.markUpdated(address),
-      this.contractService.updateAccountContracts(
-        account.address,
-        newContracts
-      ),
+      this.contractService.updateAccountContracts(address, newContracts),
     ]);
   }
 
@@ -662,7 +662,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     contract.accountAddress = ensurePrefixedAddress(flowAccount.address);
     contract.name = name;
     contract.code = code;
-    contract.updateId();
+    // contract.updateId();
     return contract;
   }
 }

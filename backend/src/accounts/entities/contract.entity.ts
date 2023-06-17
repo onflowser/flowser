@@ -1,8 +1,5 @@
 import { PollingEntity } from "../../core/entities/polling.entity";
 import {
-  AfterLoad,
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
@@ -18,9 +15,6 @@ export class AccountContractEntity
   extends PollingEntity
   implements BlockContextEntity
 {
-  // Encodes both accountAddress and name into the id.
-  id: string;
-
   @PrimaryColumn()
   accountAddress: string;
 
@@ -37,17 +31,6 @@ export class AccountContractEntity
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
   account: AccountEntity;
 
-  @AfterLoad()
-  public updateId() {
-    this.id = `${this.accountAddress}.${this.name}`;
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  public unsetId() {
-    delete this.id;
-  }
-
   toProto(): AccountContract {
     return {
       id: this.id,
@@ -59,7 +42,11 @@ export class AccountContractEntity
     };
   }
 
-  public static parseId(id: string) {
+  get id() {
+    return `${this.accountAddress}.${this.name}`
+  }
+
+  public static decodeId(id: string) {
     const idParts = id.split(".");
     if (idParts.length !== 2) {
       throw new BadRequestException("Invalid contract id");

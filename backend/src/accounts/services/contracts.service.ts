@@ -53,7 +53,7 @@ export class ContractsService {
   }
 
   async findOne(id: string) {
-    const { accountAddress, name } = AccountContractEntity.parseId(id);
+    const { accountAddress, name } = AccountContractEntity.decodeId(id);
     return this.contractRepository.findOneByOrFail({
       accountAddress,
       name,
@@ -77,7 +77,7 @@ export class ContractsService {
       accountAddress
     );
     const contractsDiff = computeEntitiesDiff({
-      primaryKey: "id",
+      primaryKey: ["accountAddress", "name"],
       oldEntities: oldContracts,
       newEntities: newContracts,
     });
