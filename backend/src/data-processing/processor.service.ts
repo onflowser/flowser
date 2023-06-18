@@ -42,9 +42,11 @@ import {
   ManagedProcessEvent,
 } from "../processes/managed-process.entity";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
-import { FlowEmulatorService } from "../flow/services/emulator.service";
+import {
+  FlowEmulatorService,
+  WellKnownAddressesOptions,
+} from "../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
-import { WalletService } from "../wallet/wallet.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -87,7 +89,6 @@ export class ProcessorService implements ProjectContextLifecycle {
     private flowGatewayService: FlowGatewayService,
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
-    private walletService: WalletService,
     private flowEmulatorService: FlowEmulatorService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
@@ -153,7 +154,6 @@ export class ProcessorService implements ProjectContextLifecycle {
       this.logger.debug("Emulator process was started, reindexing");
       // Reindex all blockchain data when the emulator is started (restarted)
       await this.commonService.removeAll();
-      await this.walletService.importAccountsFromConfig();
     }
   }
 
@@ -175,7 +175,21 @@ export class ProcessorService implements ProjectContextLifecycle {
       return;
     }
 
-    await this.processWellKnownAccounts();
+    // When using non-managed emulator,
+    // we don't know if the blockchain uses monotonic or non-monotonic addresses,
+    // so we need to try processing well-known accounts with both options.
+    const isManagedEmulator = this.emulatorProcess?.isRunning();
+    if (!isManagedEmulator) {
+      await this.processWellKnownAccounts({
+        overrideUseMonotonicAddresses: true,
+      });
+      await this.processWellKnownAccounts({
+        overrideUseMonotonicAddresses: false,
+      });
+    } else {
+      // Process with whatever address schema is currently used.
+      await this.processWellKnownAccounts();
+    }
 
     const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
       await this.getUnprocessedBlocksInfo();
@@ -459,7 +473,11 @@ export class ProcessorService implements ProjectContextLifecycle {
       flowAccount,
       flowBlock,
     });
-    if (this.getAllWellKnownAddresses().includes(unSerializedAccount.address)) {
+    const allPossibleWellKnownAddresses = [
+      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: true }),
+      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: false }),
+    ].flat();
+    if (allPossibleWellKnownAddresses.includes(unSerializedAccount.address)) {
       unSerializedAccount.isDefaultAccount = true;
     }
     const newContracts = Object.keys(flowAccount.contracts).map((name) =>
@@ -542,9 +560,9 @@ export class ProcessorService implements ProjectContextLifecycle {
     ]);
   }
 
-  private async isServiceAccountProcessed() {
+  private async isServiceAccountProcessed(options?: WellKnownAddressesOptions) {
     const { serviceAccountAddress } =
-      this.flowEmulatorService.getWellKnownAddresses();
+      this.flowEmulatorService.getWellKnownAddresses(options);
     try {
       const serviceAccount = await this.accountService.findOneByAddress(
         serviceAccountAddress
@@ -561,8 +579,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     }
   }
 
-  private async processWellKnownAccounts() {
-    const isAlreadyProcessed = await this.isServiceAccountProcessed();
+  private async processWellKnownAccounts(options?: WellKnownAddressesOptions) {
+    const isAlreadyProcessed = await this.isServiceAccountProcessed(options);
 
     if (isAlreadyProcessed) {
       // Assume all other accounts are also processed (we batch process them together).
@@ -589,7 +607,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     await queryRunner.startTransaction();
     try {
       await Promise.all(
-        this.getAllWellKnownAddresses().map((address) =>
+        this.getAllWellKnownAddresses(options).map((address) =>
           this.storeNewAccountWithContractsAndKeys({
             address,
             flowBlock: nonExistingBlock,
@@ -605,10 +623,11 @@ export class ProcessorService implements ProjectContextLifecycle {
     }
   }
 
-  private getAllWellKnownAddresses() {
+  private getAllWellKnownAddresses(options?: WellKnownAddressesOptions) {
     // TODO(snapshots-revamp): Try processing monotonic and normal addresses
     //  as we don't know which setting is used if non-managed emulator is used.
-    const wellKnownAddresses = this.flowEmulatorService.getWellKnownAddresses();
+    const wellKnownAddresses =
+      this.flowEmulatorService.getWellKnownAddresses(options);
     return [
       wellKnownAddresses.serviceAccountAddress,
       wellKnownAddresses.fungibleTokenAddress,

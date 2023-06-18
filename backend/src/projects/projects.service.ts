@@ -46,6 +46,7 @@ export class ProjectsService {
   private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
+  // TODO: This should be refactored sooner or later. It's a weird system of bootstrapping services.
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
   // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
@@ -54,15 +55,16 @@ export class ProjectsService {
       // Below services depend on flow config service,
       // so they must be configured after the above one.
       this.flowCliService,
-      this.walletService,
 
       this.flowGatewayService,
       this.flowAggregatorService,
       this.flowEmulatorService,
       this.flowDevWalletService,
-      // Snapshot service must be started after emulator service,
+      // Snapshot and wallet services must be started after emulator service,
       // as it depends on REST APIs that emulator process exposes.
       this.flowSnapshotsService,
+      // Wallet service also depends on the gateway service (needs to initialize fcl).
+      this.walletService,
     ];
 
   constructor(

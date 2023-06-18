@@ -21,6 +21,11 @@ type FlowWellKnownAddresses = {
   flowFeesAddress: string;
 };
 
+export type WellKnownAddressesOptions = {
+  // If not specifies, uses the setting from current emulator settings.
+  overrideUseMonotonicAddresses?: boolean;
+};
+
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
   public static readonly processId = "emulator";
@@ -53,11 +58,14 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
    * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/server/server.go#L163-L169
    * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/contracts.go#L17-L60
    */
-  public getWellKnownAddresses(): FlowWellKnownAddresses {
+  public getWellKnownAddresses(
+    options?: WellKnownAddressesOptions
+  ): FlowWellKnownAddresses {
     // When "simple-addresses" flag is provided,
     // a monotonic address generation mechanism is used:
     // https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/blockchain.go#L336-L342
     const useMonotonicAddresses =
+      options?.overrideUseMonotonicAddresses ??
       this.projectContext.emulator.useSimpleAddresses;
     return {
       serviceAccountAddress: useMonotonicAddresses

@@ -1,10 +1,11 @@
-import { Injectable, PreconditionFailedException } from "@nestjs/common";
+import {
+  Injectable,
+  PreconditionFailedException,
+  Logger,
+} from "@nestjs/common";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
-import {
-  FlowCliService,
-  KeyWithWeight,
-} from "../flow/services/cli.service";
+import { FlowCliService, KeyWithWeight } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
 import { ensurePrefixedAddress } from "../utils";
@@ -30,6 +31,8 @@ const ec: EC = new EC("p256");
 
 @Injectable()
 export class WalletService implements ProjectContextLifecycle {
+  private readonly logger = new Logger(WalletService.name);
+
   constructor(
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
@@ -39,6 +42,7 @@ export class WalletService implements ProjectContextLifecycle {
   ) {}
 
   async onEnterProjectContext(project: ProjectEntity): Promise<void> {
+    // TODO(snapshots-revamp): Re-import accounts when emulator state changes?
     await this.importAccountsFromConfig();
   }
 
@@ -106,7 +110,7 @@ export class WalletService implements ProjectContextLifecycle {
     return authn;
   }
 
-  public async importAccountsFromConfig() {
+  private async importAccountsFromConfig() {
     const accountsConfig = this.flowConfig.getAccounts();
     await Promise.all(
       accountsConfig.map(async (accountConfig) => {
@@ -125,15 +129,26 @@ export class WalletService implements ProjectContextLifecycle {
         accountEntity.address = accountAddress;
         accountEntity.keys = [keyEntity];
 
-        await this.accountsService.upsert(accountEntity);
-        await this.keysService.updateAccountKeys(
-          accountEntity.address,
-          accountEntity.keys
-        );
+        try {
+          // Check if account is found on the blockchain.
+          // Will throw if not found.
+          await this.flowGateway.getAccount(accountAddress);
+
+          await this.accountsService.upsert(accountEntity);
+          await this.keysService.updateAccountKeys(
+            accountEntity.address,
+            accountEntity.keys
+          );
+        } catch (e) {
+          // Ignore
+          this.logger.debug("Managed account import failed", e);
+        }
       })
     );
   }
 
+  // TODO(snapshots-revamp): I think that persisting all managed accounts to flow.json
+  //  would solve most of our issues with necessary managed account deletion when jumping to snapshots.
   public async createAccount(): Promise<AccountEntity> {
     // For now, we only support a single key per account,
     // but we could as well add support for attaching
