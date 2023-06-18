@@ -11,7 +11,7 @@ import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
-import { ProcessorService } from "../data-processing/services/processor.service";
+import { ProcessorService } from "../data-processing/processor.service";
 import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";

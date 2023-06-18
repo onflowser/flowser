@@ -8,44 +8,44 @@ import {
   FlowKey,
   FlowTransaction,
   FlowTransactionStatus,
-} from "../../flow/services/gateway.service";
-import { BlocksService } from "../../blocks/blocks.service";
-import { TransactionsService } from "../../transactions/transactions.service";
-import { AccountsService } from "../../accounts/services/accounts.service";
-import { ContractsService } from "../../accounts/services/contracts.service";
-import { EventsService } from "../../events/events.service";
-import { AccountEntity } from "../../accounts/entities/account.entity";
-import { EventEntity } from "../../events/event.entity";
-import { TransactionEntity } from "../../transactions/transaction.entity";
-import { BlockEntity } from "../../blocks/entities/block.entity";
-import { AccountContractEntity } from "../../accounts/entities/contract.entity";
-import { KeysService } from "../../accounts/services/keys.service";
-import { AccountKeyEntity } from "../../accounts/entities/key.entity";
-import { ensurePrefixedAddress } from "../../utils";
-import { getDataSourceInstance } from "../../database";
-import { SubscriptionService } from "./subscription.service";
-import { FlowConfigService } from "../../flow/services/config.service";
-import { ProjectContextLifecycle } from "../../flow/utils/project-context";
-import { ProjectEntity } from "../../projects/project.entity";
-import { FlowAccountStorageService } from "../../flow/services/storage.service";
-import { AccountStorageService } from "../../accounts/services/storage.service";
+} from "../flow/services/gateway.service";
+import { BlocksService } from "../blocks/blocks.service";
+import { TransactionsService } from "../transactions/transactions.service";
+import { AccountsService } from "../accounts/services/accounts.service";
+import { ContractsService } from "../accounts/services/contracts.service";
+import { EventsService } from "../events/events.service";
+import { AccountEntity } from "../accounts/entities/account.entity";
+import { EventEntity } from "../events/event.entity";
+import { TransactionEntity } from "../transactions/transaction.entity";
+import { BlockEntity } from "../blocks/entities/block.entity";
+import { AccountContractEntity } from "../accounts/entities/contract.entity";
+import { KeysService } from "../accounts/services/keys.service";
+import { AccountKeyEntity } from "../accounts/entities/key.entity";
+import { ensurePrefixedAddress } from "../utils";
+import { getDataSourceInstance } from "../database";
+import { FlowConfigService } from "../flow/services/config.service";
+import { ProjectContextLifecycle } from "../flow/utils/project-context";
+import { ProjectEntity } from "../projects/project.entity";
+import { FlowAccountStorageService } from "../flow/services/storage.service";
+import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   FlowCoreEventType,
   ManagedProcessState,
   ServiceStatus,
+  TransactionStatus,
 } from "@flowser/shared";
 import {
   ProcessManagerEvent,
   ProcessManagerService,
-} from "../../processes/process-manager.service";
+} from "../processes/process-manager.service";
 import {
   ManagedProcessEntity,
   ManagedProcessEvent,
-} from "../../processes/managed-process.entity";
-import { CacheRemovalService } from "../../core/services/cache-removal.service";
-import { FlowEmulatorService } from "../../flow/services/emulator.service";
-import { AsyncIntervalScheduler } from "../../core/async-interval-scheduler";
-import { WalletService } from "../../wallet/wallet.service";
+} from "../processes/managed-process.entity";
+import { CacheRemovalService } from "../core/services/cache-removal.service";
+import { FlowEmulatorService } from "../flow/services/emulator.service";
+import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
+import { WalletService } from "../wallet/wallet.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -86,7 +86,6 @@ export class ProcessorService implements ProjectContextLifecycle {
     private eventService: EventsService,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private flowSubscriptionService: SubscriptionService,
     private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
@@ -234,7 +233,9 @@ export class ProcessorService implements ProjectContextLifecycle {
       flowBlock: blockData.block,
     });
 
-    this.subscribeTxStatusUpdates(blockData.transactions);
+    blockData.transactions.map((transaction) =>
+      this.subscribeToTransactionStatusUpdates(transaction.id)
+    );
 
     try {
       await queryRunner.startTransaction();
@@ -252,10 +253,31 @@ export class ProcessorService implements ProjectContextLifecycle {
     }
   }
 
-  private subscribeTxStatusUpdates(transactions: FlowTransactionWithStatus[]) {
-    transactions.forEach((transaction) => {
-      this.flowSubscriptionService.addTransactionSubscription(transaction.id);
-    });
+  private async subscribeToTransactionStatusUpdates(
+    transactionId: string
+  ): Promise<void> {
+    const unsubscribe = await this.flowGatewayService
+      .getTxStatusSubscription(transactionId)
+      .subscribe((newStatus) =>
+        this.transactionService.updateStatus(
+          transactionId,
+          TransactionStatus.fromJSON({
+            errorMessage: newStatus.errorMessage,
+            grcpStatus: newStatus.statusCode,
+            executionStatus: newStatus.status,
+          })
+        )
+      );
+    try {
+      await this.flowGatewayService
+        .getTxStatusSubscription(transactionId)
+        .onceSealed();
+    } catch (e) {
+      this.logger.debug(`Failed to wait on sealed transaction:`, e);
+    } finally {
+      // Once transaction is sealed, status won't change anymore.
+      unsubscribe();
+    }
   }
 
   private async storeBlockData(data: BlockData) {
