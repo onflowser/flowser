@@ -68,8 +68,6 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       height: request.blockHeight,
     });
 
-    // TODO(snapshots-revamp): Optimise if this turns out too slow,
-    //  since it's probably gonna be used often.
     const allBlocks = await this.blocksService.findAll();
 
     const blockIdsUntilTargetHeight = allBlocks
@@ -118,7 +116,6 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       name: existingSnapshot.id,
     });
 
-    // TODO(snapshots-revamp): Optimise if this turns out too slow.
     const historicBlocks = await this.blocksService.findAll();
 
     const targetHistoricBlock = historicBlocks.find(
@@ -140,6 +137,8 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       // - a block on another chain branch (we would have to remove data until a common block where history diverges)
       // For now just remove all data,
       // since we don't know where the common branching block is.
+      // Note that this will also remove all managed accounts,
+      // which is not ideal and may require a better solution.
       // TODO(snapshots-revamp): Would it make sense to persist all blocks ever recorded to fix this issue?
       await this.cacheRemovalService.removeAll();
     }
