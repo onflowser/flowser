@@ -76,8 +76,6 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       .filter((block) => block.blockHeight > request.blockHeight)
       .map((block) => block.blockId);
 
-    console.log("removing data for block IDs", blockIdsUntilTargetHeight);
-
     await this.cacheRemovalService.removeByBlockIds(blockIdsUntilTargetHeight);
   }
 
@@ -121,17 +119,30 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
     });
 
     // TODO(snapshots-revamp): Optimise if this turns out too slow.
-    const allBlocks = await this.blocksService.findAll();
+    const historicBlocks = await this.blocksService.findAll();
 
-    // TODO(snapshots-revamp): In case we jump to the future, this will be undefined
-    const targetBlock = allBlocks.find(
+    const targetHistoricBlock = historicBlocks.find(
       (block) => block.blockId === request.blockId
     );
-    const blockIdsUntilTargetHeight = allBlocks
-      .filter((block) => block.blockHeight > targetBlock.blockHeight)
-      .map((block) => block.blockId);
 
-    await this.cacheRemovalService.removeByBlockIds(blockIdsUntilTargetHeight);
+    if (targetHistoricBlock) {
+      // Target block is in the past, selectively remove blockchain data until the target.
+      const blockIdsUntilTargetHeight = historicBlocks
+        .filter((block) => block.blockHeight > targetHistoricBlock.blockHeight)
+        .map((block) => block.blockId);
+
+      await this.cacheRemovalService.removeByBlockIds(
+        blockIdsUntilTargetHeight
+      );
+    } else {
+      // Target block could either be:
+      // - a block in the future (we won't have to do anything)
+      // - a block on another chain branch (we would have to remove data until a common block where history diverges)
+      // For now just remove all data,
+      // since we don't know where the common branching block is.
+      // TODO(snapshots-revamp): Would it make sense to persist all blocks ever recorded to fix this issue?
+      await this.cacheRemovalService.removeAll();
+    }
 
     return existingSnapshot;
   }

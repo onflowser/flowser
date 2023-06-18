@@ -23,7 +23,6 @@ import { KeysService } from "../accounts/services/keys.service";
 import { AccountKeyEntity } from "../accounts/entities/key.entity";
 import { ensurePrefixedAddress } from "../utils";
 import { getDataSourceInstance } from "../database";
-import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
 import { FlowAccountStorageService } from "../flow/services/storage.service";
@@ -86,7 +85,6 @@ export class ProcessorService implements ProjectContextLifecycle {
     private eventService: EventsService,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private configService: FlowConfigService,
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
     private walletService: WalletService,
@@ -210,6 +208,10 @@ export class ProcessorService implements ProjectContextLifecycle {
       this.blockService.findLastBlock(),
       this.flowGatewayService.getLatestBlock(),
     ]);
+    console.log({
+      lastStoredBlock: lastStoredBlock?.blockHeight,
+      latestBlock: latestBlock?.height,
+    });
     const nextBlockHeightToProcess = lastStoredBlock
       ? lastStoredBlock.blockHeight + 1
       : this.projectContext.startBlockHeight;
@@ -233,10 +235,6 @@ export class ProcessorService implements ProjectContextLifecycle {
       flowBlock: blockData.block,
     });
 
-    blockData.transactions.map((transaction) =>
-      this.subscribeToTransactionStatusUpdates(transaction.id)
-    );
-
     try {
       await queryRunner.startTransaction();
 
@@ -247,9 +245,17 @@ export class ProcessorService implements ProjectContextLifecycle {
     } catch (e) {
       await queryRunner.rollbackTransaction();
 
-      await this.logger.error(`Failed to store latest data`, e);
+      this.logger.error(`Failed to store latest data`, e);
     } finally {
       await queryRunner.release();
+    }
+
+    try {
+      blockData.transactions.map((transaction) =>
+        this.subscribeToTransactionStatusUpdates(transaction.id)
+      );
+    } catch (e) {
+      this.logger.error("Transaction status update failed", e);
     }
   }
 

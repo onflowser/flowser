@@ -3,8 +3,6 @@ import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import {
   FlowCliService,
-  CreatedAccount,
-  GeneratedKey,
   KeyWithWeight,
 } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
