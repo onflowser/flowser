@@ -208,10 +208,6 @@ export class ProcessorService implements ProjectContextLifecycle {
       this.blockService.findLastBlock(),
       this.flowGatewayService.getLatestBlock(),
     ]);
-    console.log({
-      lastStoredBlock: lastStoredBlock?.blockHeight,
-      latestBlock: latestBlock?.height,
-    });
     const nextBlockHeightToProcess = lastStoredBlock
       ? lastStoredBlock.blockHeight + 1
       : this.projectContext.startBlockHeight;
@@ -576,17 +572,27 @@ export class ProcessorService implements ProjectContextLifecycle {
     const dataSource = await getDataSourceInstance();
     const queryRunner = dataSource.createQueryRunner();
 
+    // Afaik these well-known default accounts are
+    // bootstrapped in a "meta-transaction",
+    // which is hidden from the public blockchain.
+    // See: https://github.com/onflow/flow-go/blob/master/fvm/bootstrap.go
+    const nonExistingBlock: FlowBlock = {
+      id: "NULL",
+      blockSeals: [],
+      collectionGuarantees: [],
+      height: 0,
+      parentId: "",
+      signatures: [],
+      timestamp: 0,
+    };
+
     await queryRunner.startTransaction();
     try {
       await Promise.all(
         this.getAllWellKnownAddresses().map((address) =>
           this.storeNewAccountWithContractsAndKeys({
             address,
-            // TODO(snapshots-revamp): Default accounts seem to be created before outside of any block, investigate this further.
-            // @ts-ignore This is the only field that needs to be consumed.
-            flowBlock: {
-              id: "NULL",
-            },
+            flowBlock: nonExistingBlock,
           })
         )
       );

@@ -53,8 +53,7 @@ export class CacheRemovalService {
       await Promise.all([
         this.contractsService.removeByBlockIds(blockIds),
         this.accountKeysService.removeByBlockIds(blockIds),
-        // TODO(snapshots-revamp): Should we remove storage too?
-        // this.accountStorageService.removeAll(),
+        this.accountStorageService.removeAll(),
         this.transactionsService.removeByBlockIds(blockIds),
         this.eventsService.removeByBlockIds(blockIds),
       ]);
