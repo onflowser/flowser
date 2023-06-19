@@ -130,9 +130,19 @@ export class WalletService implements ProjectContextLifecycle {
         accountEntity.keys = [keyEntity];
 
         try {
-          // Check if account is found on the blockchain.
-          // Will throw if not found.
-          await this.flowGateway.getAccount(accountAddress);
+          const isOnNetwork = await this.isAccountCreatedOnNetwork(
+            accountAddress
+          );
+
+          if (!isOnNetwork) {
+            // Ideally we could create this account on the blockchain, but:
+            // - we would need to retrieve the public key from the private key we store in flow.json
+            // - seems like flow team doesn't recommend doing this: https://github.com/onflow/flow-emulator/issues/405
+            this.logger.debug(
+              `Account ${accountAddress} is not created on the network, skipping import.`
+            );
+            return;
+          }
 
           await this.accountsService.upsert(accountEntity);
           await this.keysService.updateAccountKeys(
@@ -147,8 +157,6 @@ export class WalletService implements ProjectContextLifecycle {
     );
   }
 
-  // TODO(snapshots-revamp): I think that persisting all managed accounts to flow.json
-  //  would solve most of our issues with necessary managed account deletion when jumping to snapshots.
   public async createAccount(): Promise<AccountEntity> {
     // For now, we only support a single key per account,
     // but we could as well add support for attaching
@@ -183,8 +191,12 @@ export class WalletService implements ProjectContextLifecycle {
       accountEntity.keys
     );
 
+    // For now, we just write new accounts to flow.json,
+    // but they don't get recreated on the next emulator run.
+    // See: https://github.com/onflow/flow-emulator/issues/405
     await this.flowConfig.updateAccounts([
       {
+        // TODO(custom-wallet): Come up with a human-readable name generation
         name: accountEntity.address,
         address: accountEntity.address,
         // Assume only a single key per account for now
@@ -193,6 +205,25 @@ export class WalletService implements ProjectContextLifecycle {
     ]);
 
     return accountEntity;
+  }
+
+  // Returns whether the account exists on the current blockchain.
+  private async isAccountCreatedOnNetwork(address: string): Promise<boolean> {
+    try {
+      // Check if account is found on the blockchain.
+      // Will throw if not found.
+      await this.flowGateway.getAccount(address);
+      return true;
+    } catch (error: unknown) {
+      const isNotFoundError = String(error).includes(
+        "could not find account with address"
+      );
+      if (isNotFoundError) {
+        return false;
+      }
+
+      throw error;
+    }
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {
