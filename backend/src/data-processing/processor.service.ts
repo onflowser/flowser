@@ -21,7 +21,7 @@ import { BlockEntity } from "../blocks/entities/block.entity";
 import { AccountContractEntity } from "../accounts/entities/contract.entity";
 import { KeysService } from "../accounts/services/keys.service";
 import { AccountKeyEntity } from "../accounts/entities/key.entity";
-import { ensurePrefixedAddress } from "../utils";
+import { ensureNonPrefixedAddress, ensurePrefixedAddress } from "../utils";
 import { getDataSourceInstance } from "../database";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
@@ -240,7 +240,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     const blockData = await this.getBlockData(height);
 
     // Process events first, so that transactions can reference created users.
-    await this.processNewEventBatch({
+    await this.processNewEvents({
       flowEvents: blockData.events,
       flowBlock: blockData.block,
     });
@@ -381,7 +381,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     };
   }
 
-  private async processNewEventBatch(options: {
+  private async processNewEvents(options: {
     flowEvents: FlowEvent[];
     flowBlock: FlowBlock;
   }) {
@@ -395,7 +395,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     );
     await Promise.all(
       accountCreatedEvents.map((flowEvent) =>
-        this.processNewEvent({ flowEvent, flowBlock }).catch((e) => {
+        this.processStandardEvents({ flowEvent, flowBlock }).catch((e) => {
           this.logger.error(
             `flow.AccountCreated event handling error: ${
               e.message
@@ -407,7 +407,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     );
     await Promise.all(
       restEvents.map((flowEvent) =>
-        this.processNewEvent({ flowEvent, flowBlock }).catch((e) => {
+        this.processStandardEvents({ flowEvent, flowBlock }).catch((e) => {
           this.logger.error(
             `${flowEvent.type} event handling error: ${
               e.message
@@ -419,7 +419,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     );
   }
 
-  private async processNewEvent(options: {
+  private async processStandardEvents(options: {
     flowEvent: FlowEvent;
     flowBlock: FlowBlock;
   }) {
@@ -427,6 +427,20 @@ export class ProcessorService implements ProjectContextLifecycle {
     this.logger.debug(
       `handling event: ${flowEvent.type} ${JSON.stringify(flowEvent.data)}`
     );
+
+    const monotonicAddresses = this.flowEmulatorService.getWellKnownAddresses({
+      overrideUseMonotonicAddresses: true,
+    });
+    const nonMonotonicAddresses =
+      this.flowEmulatorService.getWellKnownAddresses({
+        overrideUseMonotonicAddresses: false,
+      });
+
+    const buildFlowTokensWithdrawnEvent = (address: string) =>
+      `A.${ensureNonPrefixedAddress(address)}.FlowToken.TokensWithdrawn`;
+    const buildFlowTokensDepositedEvent = (address: string) =>
+      `A.${ensureNonPrefixedAddress(address)}.FlowToken.TokensDeposited`;
+
     const address = ensurePrefixedAddress(flowEvent.data.address);
     switch (flowEvent.type) {
       case FlowCoreEventType.ACCOUNT_CREATED:
@@ -439,9 +453,30 @@ export class ProcessorService implements ProjectContextLifecycle {
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         // TODO: Use event.data.address & event.data.contract to determine updated/created/removed contract
         return this.updateStoredAccountContracts({ address, flowBlock });
+      // For now keep listening for monotonic and non-monotonic addresses,
+      // although I think only non-monotonic ones are used for contract deployment.
+      // See: https://github.com/onflow/flow-emulator/issues/421#issuecomment-1596844610
+      case buildFlowTokensWithdrawnEvent(monotonicAddresses.flowTokenAddress):
+      case buildFlowTokensWithdrawnEvent(
+        nonMonotonicAddresses.flowTokenAddress
+      ):
+        return this.reprocessAccountFlowBalance(flowEvent.data.from);
+      case buildFlowTokensDepositedEvent(monotonicAddresses.flowTokenAddress):
+      case buildFlowTokensDepositedEvent(
+        nonMonotonicAddresses.flowTokenAddress
+      ):
+        return this.reprocessAccountFlowBalance(flowEvent.data.to);
       default:
-        return null; // not a core event, ignore it
+        return null; // not a standard event, ignore it
     }
+  }
+
+  private async reprocessAccountFlowBalance(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    await this.accountService.upsert({
+      address: flowAccount.address,
+      balance: flowAccount.balance,
+    });
   }
 
   private async processNewTransaction(options: {
