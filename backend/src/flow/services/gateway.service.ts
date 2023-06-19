@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { Gateway, ServiceStatus } from "@flowser/shared";
 
 const fcl = require("@onflow/fcl");
@@ -120,6 +120,17 @@ type SendFlowTransactionOptions = {
   authorizations: FlowAuthorizationFunction[];
 };
 
+type FlowTxUnsubscribe = () => void;
+
+type FlowTxStatusCallback = (status: FlowTransactionStatus) => void;
+
+type FlowTxSubscribe = (callback: FlowTxStatusCallback) => FlowTxUnsubscribe;
+
+type FlowTxStatusSubscription = {
+  subscribe: FlowTxSubscribe;
+  onceSealed: () => void;
+};
+
 @Injectable()
 export class FlowGatewayService implements ProjectContextLifecycle {
   private static readonly logger = new Logger(FlowGatewayService.name);
@@ -158,7 +169,9 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     return { transactionId };
   }
 
-  public getTxStatusSubscription(transactionId: string) {
+  public getTxStatusSubscription(
+    transactionId: string
+  ): FlowTxStatusSubscription {
     return fcl.tx(transactionId);
   }
 

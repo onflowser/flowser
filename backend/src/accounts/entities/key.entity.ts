@@ -3,18 +3,25 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { AccountEntity } from "./account.entity";
 import { AccountKey } from "@flowser/shared";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
-import { ensurePrefixedAddress } from "../../utils";
+import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 
 // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
 export const defaultKeyWeight = 1000;
 
 @Entity({ name: "keys" })
-export class AccountKeyEntity extends PollingEntity {
+export class AccountKeyEntity
+  extends PollingEntity
+  implements BlockContextEntity
+{
   @PrimaryColumn()
   index: number;
 
   @PrimaryColumn()
   accountAddress: string;
+
+  // Nullable for backward compatability - to not cause not null constraint failure on migration.
+  @Column({ nullable: true })
+  blockId: string;
 
   @Column()
   publicKey: string;

@@ -8,10 +8,10 @@ import {
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { MoreThan, Repository } from "typeorm";
-import { ProjectEntity } from "./entities/project.entity";
+import { ProjectEntity } from "./project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
-import { ProcessorService } from "../data-processing/services/processor.service";
+import { ProcessorService } from "../data-processing/processor.service";
 import { FlowEmulatorService } from "../flow/services/emulator.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { BlocksService } from "../blocks/blocks.service";
@@ -33,9 +33,10 @@ import {
   ProjectRequirementType,
 } from "@flowser/shared";
 import * as fs from "fs";
-import { DataRemovalService } from "../core/services/data-removal.service";
+import { CacheRemovalService } from "../core/services/cache-removal.service";
 import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
 import { WalletService } from "../wallet/wallet.service";
+import { FlowSnapshotService } from "../flow/services/snapshot.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -45,6 +46,7 @@ export class ProjectsService {
   private currentProject: ProjectEntity;
   private readonly logger = new Logger(ProjectsService.name);
 
+  // TODO: This should be refactored sooner or later. It's a weird system of bootstrapping services.
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
   // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
@@ -53,12 +55,16 @@ export class ProjectsService {
       // Below services depend on flow config service,
       // so they must be configured after the above one.
       this.flowCliService,
-      this.walletService,
 
       this.flowGatewayService,
       this.flowAggregatorService,
       this.flowEmulatorService,
       this.flowDevWalletService,
+      // Snapshot and wallet services must be started after emulator service,
+      // as it depends on REST APIs that emulator process exposes.
+      this.flowSnapshotsService,
+      // Wallet service also depends on the gateway service (needs to initialize fcl).
+      this.walletService,
     ];
 
   constructor(
@@ -76,9 +82,10 @@ export class ProjectsService {
     private blocksService: BlocksService,
     private eventsService: EventsService,
     private transactionsService: TransactionsService,
-    private commonService: DataRemovalService,
+    private commonService: CacheRemovalService,
     private flowDevWalletService: FlowDevWalletService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private flowSnapshotsService: FlowSnapshotService
   ) {}
 
   getCurrentProject(): ProjectEntity | undefined {
@@ -153,7 +160,7 @@ export class ProjectsService {
   async cleanupProject() {
     try {
       // Remove all cached data of previously used project
-      await this.commonService.removeBlockchainData();
+      await this.commonService.removeAll();
     } catch (e) {
       throw new InternalServerErrorException("Database cleanup failed");
     }
@@ -179,15 +186,19 @@ export class ProjectsService {
     // TODO(milestone-3): validate that project has a valid flow.json config
 
     // Provide project context to services that need it
-    try {
-      for (const service of this.servicesWithProjectLifecycleContext) {
+    for (let i = 0; i < this.servicesWithProjectLifecycleContext.length; i++) {
+      const service = this.servicesWithProjectLifecycleContext[i];
+      try {
         await service.onEnterProjectContext(this.currentProject);
+      } catch (e: unknown) {
+        this.logger.debug(
+          `Project context initialization failed for service with index: ${i}`,
+          e
+        );
+        throw new InternalServerErrorException(
+          e ?? "Project context initialization failed"
+        );
       }
-    } catch (e: unknown) {
-      this.logger.debug("Project context initialization failed", e);
-      throw new InternalServerErrorException(
-        e ?? "Project context initialization failed"
-      );
     }
 
     this.logger.debug(`using project: ${project.id}`);

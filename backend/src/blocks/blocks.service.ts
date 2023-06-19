@@ -1,6 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThan, Repository } from "typeorm";
+import { MoreThan, Repository, Any } from "typeorm";
 import { BlockEntity } from "./entities/block.entity";
+import { removeByBlockIds } from "./entities/block-context.entity";
 
 export class BlocksService {
   constructor(
@@ -22,7 +23,7 @@ export class BlocksService {
         { createdAt: MoreThan(timestamp) },
         { updatedAt: MoreThan(timestamp) },
       ],
-      order: { height: "DESC" },
+      order: { blockHeight: "DESC" },
     });
   }
 
@@ -30,16 +31,23 @@ export class BlocksService {
     return this.blockRepository
       .createQueryBuilder("block")
       .select()
-      .orderBy("block.height", "DESC")
+      .orderBy("block.blockHeight", "DESC")
       .limit(1)
       .getOne();
   }
 
-  async findOne(id: string) {
-    return this.blockRepository.findOneByOrFail({ id });
+  async findOne(blockId: string) {
+    return this.blockRepository.findOneByOrFail({ blockId });
   }
 
   removeAll() {
     return this.blockRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.blockRepository,
+    });
   }
 }

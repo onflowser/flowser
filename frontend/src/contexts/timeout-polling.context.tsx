@@ -13,7 +13,7 @@ import { useGatewayStatus } from "../hooks/use-api";
 export interface TimeoutPollingHook<Response extends PollingEntity> {
   stopPolling: () => void;
   startPolling: () => void;
-  fetchAll: () => void;
+  refetchBlocks: () => void;
   isFetching: boolean;
   firstFetch: boolean;
   error: Error | null;
@@ -106,7 +106,7 @@ export function useTimeoutPolling<
     firstFetch: !response && isFetching,
     startPolling: () => null,
     stopPolling: () => null,
-    fetchAll: () => null,
+    refetchBlocks: () => null,
     isFetching,
     error,
   };

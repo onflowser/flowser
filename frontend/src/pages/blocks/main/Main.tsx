@@ -32,8 +32,8 @@ const Main: FunctionComponent = () => {
   const { checkoutBlock } = useProjectActions();
 
   const { data: blocks, firstFetch, error } = useGetPollingBlocks();
-  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const { filteredData } = useFilterData(blocks, searchTerm);
+  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
       new Map(
@@ -104,10 +104,12 @@ const Main: FunctionComponent = () => {
         },
         cell: (info) => {
           const block = info.row.original;
+          const latestBlock = blocks[0];
+          const isLatestBlock = latestBlock.height === block.height;
           const snapshot = snapshotLookupByBlockId.get(block.id);
           return (
             <Value>
-              {snapshot && (
+              {!isLatestBlock && (
                 <SimpleButton
                   style={{ marginRight: 10 }}
                   onClick={() => checkoutBlock(block.id)}
@@ -115,13 +117,13 @@ const Main: FunctionComponent = () => {
                   <SnapshotIcon />
                 </SimpleButton>
               )}
-              {snapshot?.description ?? "-"}
+              {snapshot?.description}
             </Value>
           );
         },
       }),
     ],
-    [snapshotLookupByBlockId]
+    [snapshotLookupByBlockId, blocks, checkoutBlock]
   );
 
   return (

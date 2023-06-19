@@ -8,15 +8,29 @@ import {
   HashAlgorithm,
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
+import { waitForMs } from "../../utils";
+
+type FlowWellKnownAddresses = {
+  serviceAccountAddress: string;
+  flowTokenAddress: string;
+  fungibleTokenAddress: string;
+  flowFeesAddress: string;
+};
+
+export type WellKnownAddressesOptions = {
+  // If not specifies, uses the setting from current emulator settings.
+  overrideUseMonotonicAddresses?: boolean;
+};
 
 @Injectable()
 export class FlowEmulatorService implements ProjectContextLifecycle {
   public static readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
+  private process: ManagedProcessEntity | undefined;
 
   constructor(private processManagerService: ProcessManagerService) {}
 
@@ -36,8 +50,41 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
     this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
+  /**
+   * Well known addresses have predefined roles
+   * and are used to deploy common/core flow contracts.
+   *
+   * For more info, see source code:
+   * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/server/server.go#L163-L169
+   * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/contracts.go#L17-L60
+   */
+  public getWellKnownAddresses(
+    options?: WellKnownAddressesOptions
+  ): FlowWellKnownAddresses {
+    // When "simple-addresses" flag is provided,
+    // a monotonic address generation mechanism is used:
+    // https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/blockchain.go#L336-L342
+    const useMonotonicAddresses =
+      options?.overrideUseMonotonicAddresses ??
+      this.projectContext.emulator.useSimpleAddresses;
+    return {
+      serviceAccountAddress: useMonotonicAddresses
+        ? "0x0000000000000001"
+        : "0xf8d6e0586b0a20c7",
+      fungibleTokenAddress: useMonotonicAddresses
+        ? "0x0000000000000002"
+        : "0xee82856bf20e2aa6",
+      flowTokenAddress: useMonotonicAddresses
+        ? "0x0000000000000003"
+        : "0x0ae53cb6e3f42a79",
+      flowFeesAddress: useMonotonicAddresses
+        ? "0x0000000000000004"
+        : "0xe5a8b7f23e8b548f",
+    };
+  }
+
   async start() {
-    const managedProcess = new ManagedProcessEntity({
+    this.process = new ManagedProcessEntity({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
       command: {
@@ -48,18 +95,22 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
         },
       },
     });
-    await this.processManagerService.start(managedProcess);
+    await this.processManagerService.start(this.process);
+    await this.waitUntilApisStarted();
   }
 
   public static getDefaultFlags(): Emulator {
-    return Emulator.fromPartial({
+    // Some default values vary from the ones used in Flow CLI.
+    return {
       verboseLogging: true,
+      enableRestDebug: true,
       restServerPort: 8888,
+      enableGrpcDebug: true,
       grpcServerPort: 3569,
       adminServerPort: 8080,
       persist: false,
       snapshot: true,
-      withContracts: false,
+      withContracts: true,
       blockTime: 0,
       servicePrivateKey: undefined,
       databasePath: "./flowdb",
@@ -73,8 +124,18 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       serviceHashAlgorithm: HashAlgorithm.SHA3_256,
       storageLimit: true,
       transactionFees: false,
-      simpleAddresses: false,
-    });
+      useSimpleAddresses: false,
+      logFormat: "text",
+    };
+  }
+
+  private async waitUntilApisStarted() {
+    // Wait until emulator process emits "Started <API-name>" logs.
+    const hasStarted = () =>
+      this.process.output.some((output) => output.data.includes("Started"));
+    while (!hasStarted()) {
+      await waitForMs(100);
+    }
   }
 
   private getAppliedFlags(): string[] {

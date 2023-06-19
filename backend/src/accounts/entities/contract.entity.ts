@@ -1,8 +1,5 @@
 import { PollingEntity } from "../../core/entities/polling.entity";
 import {
-  AfterLoad,
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
@@ -10,37 +7,29 @@ import {
 } from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
-import { ensurePrefixedAddress } from "../../utils";
-import { FlowAccount } from "../../flow/services/gateway.service";
 import { AccountContract } from "@flowser/shared";
+import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 
 @Entity({ name: "contracts" })
-export class AccountContractEntity extends PollingEntity {
-  // Encodes both accountAddress and name into the id.
-  id: string;
-
+export class AccountContractEntity
+  extends PollingEntity
+  implements BlockContextEntity
+{
   @PrimaryColumn()
   accountAddress: string;
 
   @PrimaryColumn()
   name: string;
 
+  // Nullable for backward compatability - to not cause not null constraint failure on migration.
+  @Column({ nullable: true })
+  blockId: string;
+
   @Column("text")
   code: string;
 
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
   account: AccountEntity;
-
-  @AfterLoad()
-  public updateId() {
-    this.id = `${this.accountAddress}.${this.name}`;
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  public unsetId() {
-    delete this.id;
-  }
 
   toProto(): AccountContract {
     return {
@@ -53,16 +42,11 @@ export class AccountContractEntity extends PollingEntity {
     };
   }
 
-  static create(account: FlowAccount, name: string, code: string) {
-    const contract = new AccountContractEntity();
-    contract.accountAddress = ensurePrefixedAddress(account.address);
-    contract.name = name;
-    contract.code = code;
-    contract.updateId();
-    return contract;
+  get id() {
+    return `${this.accountAddress}.${this.name}`
   }
 
-  public static parseId(id: string) {
+  public static decodeId(id: string) {
     const idParts = id.split(".");
     if (idParts.length !== 2) {
       throw new BadRequestException("Invalid contract id");

@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AccountKeyEntity } from "../entities/key.entity";
 import { MoreThan, Repository } from "typeorm";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
+import { removeByBlockIds } from "../../blocks/entities/block-context.entity";
 
 @Injectable()
 export class KeysService {
@@ -14,7 +15,7 @@ export class KeysService {
   async updateAccountKeys(address: string, newKeys: AccountKeyEntity[]) {
     const oldKeys = await this.findKeysByAccount(address);
     const entitiesDiff = computeEntitiesDiff<AccountKeyEntity>({
-      primaryKey: "index",
+      primaryKey: ["accountAddress", "index"],
       newEntities: newKeys,
       oldEntities: oldKeys,
     });
@@ -52,23 +53,41 @@ export class KeysService {
     });
   }
 
-  async create(accountKey: AccountKeyEntity) {
-    return this.keyRepository.insert(accountKey);
+  async create(createdKey: AccountKeyEntity) {
+    return this.keyRepository.insert(createdKey);
   }
 
-  async update(accountKey: AccountKeyEntity) {
-    accountKey.markUpdated();
+  async update(updatedKey: AccountKeyEntity) {
+    const existingKey = await this.keyRepository.findOneBy({
+      accountAddress: updatedKey.accountAddress,
+      index: updatedKey.index,
+    });
+    updatedKey.markUpdated();
     return this.keyRepository.update(
       {
-        accountAddress: accountKey.accountAddress,
-        index: accountKey.index,
+        accountAddress: updatedKey.accountAddress,
+        index: updatedKey.index,
       },
-      // Prevent overwriting existing created date
-      { ...accountKey, createdAt: undefined }
+      {
+        ...updatedKey,
+        // Don't override the exiting private key with an empty one.
+        privateKey: updatedKey.privateKey
+          ? updatedKey.privateKey
+          : existingKey?.privateKey,
+        // Make sure to keep the original created date.
+        createdAt: existingKey?.createdAt ?? updatedKey.createdAt,
+      }
     );
   }
 
   removeAll() {
     return this.keyRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.keyRepository,
+    });
   }
 }

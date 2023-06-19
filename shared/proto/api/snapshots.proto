@@ -32,3 +32,9 @@ message RevertToEmulatorSnapshotResponse {
   FlowserError error = 1;
   EmulatorSnapshot snapshot = 2;
 }
+
+message RollbackToHeightRequest {
+  uint32 block_height = 1;
+}
+
+message RollbackToHeightResponse {}

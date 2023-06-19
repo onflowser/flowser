@@ -15,8 +15,8 @@ import { AccountStorageService } from "../../accounts/services/storage.service";
  * https://www.notion.so/flowser/Multitenant-architecture-9bbc3053cade47f2bf1867626a54e074?pvs=4
  */
 @Injectable()
-export class DataRemovalService {
-  private readonly logger = new Logger(DataRemovalService.name);
+export class CacheRemovalService {
+  private readonly logger = new Logger(CacheRemovalService.name);
   constructor(
     private contractsService: ContractsService,
     private accountsService: AccountsService,
@@ -27,7 +27,7 @@ export class DataRemovalService {
     private accountStorageService: AccountStorageService
   ) {}
 
-  async removeBlockchainData() {
+  async removeAll() {
     try {
       // Remove contracts before removing accounts, because of the foreign key constraint.
       await Promise.all([
@@ -40,6 +40,26 @@ export class DataRemovalService {
       await Promise.all([
         this.accountsService.removeAll(),
         this.blocksService.removeAll(),
+      ]);
+    } catch (e) {
+      this.logger.error("Failed to remove other data", e);
+      throw e;
+    }
+  }
+
+  async removeByBlockIds(blockIds: string[]) {
+    try {
+      // Remove contracts before removing accounts, because of the foreign key constraint.
+      await Promise.all([
+        this.contractsService.removeByBlockIds(blockIds),
+        this.accountKeysService.removeByBlockIds(blockIds),
+        this.accountStorageService.removeAll(),
+        this.transactionsService.removeByBlockIds(blockIds),
+        this.eventsService.removeByBlockIds(blockIds),
+      ]);
+      await Promise.all([
+        this.accountsService.removeByBlockIds(blockIds),
+        this.blocksService.removeByBlockIds(blockIds),
       ]);
     } catch (e) {
       this.logger.error("Failed to remove other data", e);

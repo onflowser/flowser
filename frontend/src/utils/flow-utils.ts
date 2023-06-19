@@ -4,19 +4,15 @@ import {
   HashAlgorithm,
   SignatureAlgorithm,
   ExecutionStatusCode,
+  Block,
 } from "@flowser/shared";
-import React from "react";
-import { ReactComponent as ExpiredIcon } from "../assets/icons/expired-tx-icon.svg";
-import { ReactComponent as SealedIcon } from "../assets/icons/sealed-tx-icon.svg";
-import { ReactComponent as UnknownIcon } from "../assets/icons/unknown-tx-icon.svg";
-import { ReactComponent as PendingIcon } from "../assets/icons/pending-tx-icon.svg";
-import { ReactComponent as FinalizedIcon } from "../assets/icons/finalised-tx-icon.svg";
-import { ReactComponent as ExecutedIcon } from "../assets/icons/executed-tx-icon.svg";
 
 export class FlowUtils {
   static getUserAvatarUrl(address: string): string {
-    // TODO(milestone-x): Read this from fcl-js config
-    const isServiceAccount = address === "0xf8d6e0586b0a20c7";
+    const isServiceAccount = [
+      "0xf8d6e0586b0a20c7",
+      "0x0000000000000001", // When using monotonic addresses setting
+    ].includes(address);
     if (isServiceAccount) {
       return "http://localhost:8701/settings.svg";
     }
@@ -24,9 +20,9 @@ export class FlowUtils {
     return `https://avatars.onflow.org/avatar/avatar/${address}-${appName}.svg`;
   }
 
-  static isInitialBlockId(value: number | string): boolean {
+  static isInitialBlockId(blockId: number | string): boolean {
     // initial parent id contains only zeros
-    return `${value}`.replaceAll("0", "").length === 0;
+    return `${blockId}`.replaceAll("0", "").length === 0;
   }
 
   static getLowerCasedPathDomain(pathDomain: AccountStorageDomain): string {
@@ -83,53 +79,12 @@ export class FlowUtils {
     }
   }
 
-  static getGrcpStatusIcon(
-    statusCode: GrcpStatusCode | undefined
-  ): JSX.Element {
-    switch (statusCode) {
-      case GrcpStatusCode.GRCP_STATUS_OK:
-        return <SealedIcon />;
-      case GrcpStatusCode.GRCP_STATUS_CANCELLED:
-      case GrcpStatusCode.GRCP_STATUS_INVALID_ARGUMENT:
-      case GrcpStatusCode.GRCP_STATUS_DEADLINE_EXCEEDED:
-      case GrcpStatusCode.GRCP_STATUS_NOT_FOUND:
-      case GrcpStatusCode.GRCP_STATUS_ALREADY_EXISTS:
-      case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
-      case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
-      case GrcpStatusCode.GRCP_STATUS_FAILED_PRECONDITION:
-      case GrcpStatusCode.GRCP_STATUS_ABORTED:
-      case GrcpStatusCode.GRCP_STATUS_OUT_OF_RANGE:
-      case GrcpStatusCode.GRCP_STATUS_UNIMPLEMENTED:
-      case GrcpStatusCode.GRCP_STATUS_INTERNAL:
-      case GrcpStatusCode.GRCP_STATUS_UNAVAILABLE:
-      case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
-      case GrcpStatusCode.GRCP_STATUS_UNAUTHENTICATED:
-        return <ExpiredIcon />;
-      case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
-      default:
-        return <UnknownIcon />;
-    }
-  }
-
-  static getExecutionStatusIcon(
-    statusCode: ExecutionStatusCode | undefined
-  ): JSX.Element {
-    switch (statusCode) {
-      case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:
-        return <ExecutedIcon />;
-      case ExecutionStatusCode.EXECUTION_STATUS_EXPIRED:
-        return <ExpiredIcon />;
-      case ExecutionStatusCode.EXECUTION_STATUS_FINALIZED:
-        return <FinalizedIcon />;
-      case ExecutionStatusCode.EXECUTION_STATUS_SEALED:
-        return <SealedIcon />;
-      case ExecutionStatusCode.EXECUTION_STATUS_PENDING:
-        return <PendingIcon />;
-      case ExecutionStatusCode.EXECUTION_STATUS_UNKNOWN:
-        return <UnknownIcon />;
-      default:
-        return <></>;
-    }
+  static getShortedBlockId(blockId: string): string {
+    const charsToTake = 5;
+    return `${blockId.slice(0, charsToTake)}...${blockId.slice(
+      blockId.length - charsToTake,
+      blockId.length
+    )}`;
   }
 
   static getExecutionStatusName(

@@ -1,4 +1,4 @@
-import { PollingEntity } from "../../core/entities/polling.entity";
+import { PollingEntity } from "../core/entities/polling.entity";
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import {
   Transaction,
@@ -12,13 +12,17 @@ import {
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
-} from "../../flow/services/gateway.service";
-import { ensurePrefixedAddress, typeOrmProtobufTransformer } from "../../utils";
-import { AccountEntity } from "../../accounts/entities/account.entity";
-import { CadenceUtils } from "../../flow/utils/cadence-utils";
+} from "../flow/services/gateway.service";
+import { ensurePrefixedAddress, typeOrmProtobufTransformer } from "../utils";
+import { AccountEntity } from "../accounts/entities/account.entity";
+import { CadenceUtils } from "../flow/utils/cadence-utils";
+import { BlockContextEntity } from "../blocks/entities/block-context.entity";
 
 @Entity({ name: "transactions" })
-export class TransactionEntity extends PollingEntity {
+export class TransactionEntity
+  extends PollingEntity
+  implements BlockContextEntity
+{
   @PrimaryColumn()
   id: string;
 

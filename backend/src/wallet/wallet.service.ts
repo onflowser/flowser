@@ -1,12 +1,11 @@
-import { Injectable, PreconditionFailedException } from "@nestjs/common";
+import {
+  Injectable,
+  PreconditionFailedException,
+  Logger,
+} from "@nestjs/common";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
-import {
-  FlowCliService,
-  CreatedAccount,
-  GeneratedKey,
-  KeyWithWeight,
-} from "../flow/services/cli.service";
+import { FlowCliService, KeyWithWeight } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
 import { ensurePrefixedAddress } from "../utils";
@@ -25,13 +24,15 @@ import {
 } from "@flowser/shared";
 import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
-import { ProjectEntity } from "src/projects/entities/project.entity";
+import { ProjectEntity } from "src/projects/project.entity";
 const fcl = require("@onflow/fcl");
 
 const ec: EC = new EC("p256");
 
 @Injectable()
 export class WalletService implements ProjectContextLifecycle {
+  private readonly logger = new Logger(WalletService.name);
+
   constructor(
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
@@ -41,6 +42,7 @@ export class WalletService implements ProjectContextLifecycle {
   ) {}
 
   async onEnterProjectContext(project: ProjectEntity): Promise<void> {
+    // TODO(snapshots-revamp): Re-import accounts when emulator state changes?
     await this.importAccountsFromConfig();
   }
 
@@ -108,7 +110,7 @@ export class WalletService implements ProjectContextLifecycle {
     return authn;
   }
 
-  public async importAccountsFromConfig() {
+  private async importAccountsFromConfig() {
     const accountsConfig = this.flowConfig.getAccounts();
     await Promise.all(
       accountsConfig.map(async (accountConfig) => {
@@ -127,11 +129,30 @@ export class WalletService implements ProjectContextLifecycle {
         accountEntity.address = accountAddress;
         accountEntity.keys = [keyEntity];
 
-        await this.accountsService.upsert(accountEntity);
-        await this.keysService.updateAccountKeys(
-          accountEntity.address,
-          accountEntity.keys
-        );
+        try {
+          const isOnNetwork = await this.isAccountCreatedOnNetwork(
+            accountAddress
+          );
+
+          if (!isOnNetwork) {
+            // Ideally we could create this account on the blockchain, but:
+            // - we would need to retrieve the public key from the private key we store in flow.json
+            // - seems like flow team doesn't recommend doing this: https://github.com/onflow/flow-emulator/issues/405
+            this.logger.debug(
+              `Account ${accountAddress} is not created on the network, skipping import.`
+            );
+            return;
+          }
+
+          await this.accountsService.upsert(accountEntity);
+          await this.keysService.updateAccountKeys(
+            accountEntity.address,
+            accountEntity.keys
+          );
+        } catch (e) {
+          // Ignore
+          this.logger.debug("Managed account import failed", e);
+        }
       })
     );
   }
@@ -170,7 +191,39 @@ export class WalletService implements ProjectContextLifecycle {
       accountEntity.keys
     );
 
+    // For now, we just write new accounts to flow.json,
+    // but they don't get recreated on the next emulator run.
+    // See: https://github.com/onflow/flow-emulator/issues/405
+    await this.flowConfig.updateAccounts([
+      {
+        // TODO(custom-wallet): Come up with a human-readable name generation
+        name: accountEntity.address,
+        address: accountEntity.address,
+        // Assume only a single key per account for now
+        privateKey: accountEntity.keys[0].privateKey,
+      },
+    ]);
+
     return accountEntity;
+  }
+
+  // Returns whether the account exists on the current blockchain.
+  private async isAccountCreatedOnNetwork(address: string): Promise<boolean> {
+    try {
+      // Check if account is found on the blockchain.
+      // Will throw if not found.
+      await this.flowGateway.getAccount(address);
+      return true;
+    } catch (error: unknown) {
+      const isNotFoundError = String(error).includes(
+        "could not find account with address"
+      );
+      if (isNotFoundError) {
+        return false;
+      }
+
+      throw error;
+    }
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {

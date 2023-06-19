@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
 import { AccountContractEntity } from "../entities/contract.entity";
 import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
+import { removeByBlockIds } from "../../blocks/entities/block-context.entity";
 
 @Injectable()
 export class ContractsService {
@@ -52,7 +53,7 @@ export class ContractsService {
   }
 
   async findOne(id: string) {
-    const { accountAddress, name } = AccountContractEntity.parseId(id);
+    const { accountAddress, name } = AccountContractEntity.decodeId(id);
     return this.contractRepository.findOneByOrFail({
       accountAddress,
       name,
@@ -76,7 +77,7 @@ export class ContractsService {
       accountAddress
     );
     const contractsDiff = computeEntitiesDiff({
-      primaryKey: "id",
+      primaryKey: ["accountAddress", "name"],
       oldEntities: oldContracts,
       newEntities: newContracts,
     });
@@ -101,5 +102,12 @@ export class ContractsService {
 
   removeAll() {
     return this.contractRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.contractRepository,
+    });
   }
 }

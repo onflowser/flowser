@@ -1,19 +1,20 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../core/entities/polling.entity";
-import { FlowBlock } from "../../flow/services/gateway.service";
 import { Block, CollectionGuarantee } from "@flowser/shared";
 import { typeOrmProtobufTransformer } from "../../utils";
+import { BlockContextEntity } from "./block-context.entity";
 
 @Entity({ name: "blocks" })
-export class BlockEntity extends PollingEntity {
-  @PrimaryColumn()
-  id: string;
+export class BlockEntity extends PollingEntity implements BlockContextEntity {
+  // Use the old name for database column for backward compatability.
+  @PrimaryColumn({ name: "id" })
+  blockId: string;
 
   @Column()
   parentId: string;
 
   @Column()
-  height: number;
+  blockHeight: number;
 
   @Column("datetime")
   timestamp: Date;
@@ -30,25 +31,11 @@ export class BlockEntity extends PollingEntity {
   @Column("simple-array")
   signatures: string[];
 
-  static create(flowBlock: FlowBlock): BlockEntity {
-    const block = new BlockEntity();
-    block.id = flowBlock.id;
-    block.collectionGuarantees = flowBlock.collectionGuarantees;
-    block.blockSeals = flowBlock.blockSeals;
-    // TODO(milestone-x): "signatures" field is not present in block response
-    // https://github.com/onflow/fcl-js/issues/1355
-    block.signatures = flowBlock.signatures ?? [];
-    block.timestamp = new Date(flowBlock.timestamp);
-    block.height = flowBlock.height;
-    block.parentId = flowBlock.parentId;
-    return block;
-  }
-
   toProto(): Block {
     return {
-      id: this.id,
+      id: this.blockId,
       parentId: this.parentId,
-      height: this.height,
+      height: this.blockHeight,
       timestamp: this.timestamp.toISOString(),
       blockSeals: this.blockSeals,
       signatures: this.signatures,

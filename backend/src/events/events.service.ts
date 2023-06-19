@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EventEntity } from "./entities/event.entity";
-import { MoreThan, Repository } from "typeorm";
+import { EventEntity } from "./event.entity";
+import { MoreThan, Repository, Any } from "typeorm";
+import { removeByBlockIds } from '../blocks/entities/block-context.entity';
 
 @Injectable()
 export class EventsService {
@@ -49,5 +50,12 @@ export class EventsService {
 
   removeAll() {
     return this.eventRepository.delete({});
+  }
+
+  removeByBlockIds(blockIds: string[]) {
+    return removeByBlockIds({
+      blockIds,
+      repository: this.eventRepository
+    })
   }
 }

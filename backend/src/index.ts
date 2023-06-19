@@ -10,7 +10,7 @@ import { Config, ConfigService } from "./core/services/config.service";
 
 export { ProcessManagerService } from "./processes/process-manager.service";
 export { ProjectsService } from "./projects/projects.service";
-export { ProjectEntity } from "./projects/entities/project.entity";
+export { ProjectEntity } from "./projects/project.entity";
 
 export type CreateAppOptions = {
   config: Config;

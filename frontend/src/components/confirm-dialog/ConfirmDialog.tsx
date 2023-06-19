@@ -5,8 +5,8 @@ import { ActionDialog, ActionDialogProps } from "../action-dialog/ActionDialog";
 export type ConfirmDialogProps = ActionDialogProps & {
   onClose: () => void | Promise<void>;
   onConfirm: () => void | Promise<void>;
-  confirmBtnLabel?: string;
-  cancelBtnLabel?: string;
+  confirmButtonLabel?: string;
+  cancelButtonLabel?: string;
   className?: string;
   title: string;
 };
@@ -15,8 +15,8 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
   onConfirm,
   onClose,
   title,
-  confirmBtnLabel = "OK",
-  cancelBtnLabel = "CANCEL",
+  confirmButtonLabel = "OK",
+  cancelButtonLabel = "CANCEL",
   children,
   className = "",
 }) => {
@@ -40,10 +40,10 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
       footer={
         <>
           <Button outlined={true} variant="middle" onClick={onClose}>
-            {cancelBtnLabel}
+            {cancelButtonLabel}
           </Button>
           <Button loading={isLoading} variant="middle" onClick={handleConfirm}>
-            {confirmBtnLabel}
+            {confirmButtonLabel}
           </Button>
         </>
       }

@@ -2,11 +2,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/entities/project.entity";
+import { ProjectEntity } from "../../projects/project.entity";
 import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../../utils";
+import { computeEntitiesDiff, isObject } from "../../utils";
 
 type FlowAddress = string;
 
@@ -113,6 +113,18 @@ export class FlowConfigService implements ProjectContextLifecycle {
     );
   }
 
+  public async updateAccounts(
+    newOrUpdatedAccounts: FlowAbstractAccountConfig[]
+  ): Promise<void> {
+    for (const newOrUpdatedAccount of newOrUpdatedAccounts) {
+      this.config.accounts[newOrUpdatedAccount.name] = {
+        address: newOrUpdatedAccount.address,
+        key: newOrUpdatedAccount.privateKey,
+      };
+    }
+    await this.save();
+  }
+
   private getPrivateKey(keyConfig: FlowAccountKeyConfig) {
     if (typeof keyConfig === "string") {
       return keyConfig;
@@ -152,11 +164,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
     // - try to find a /transactions folder and read all files (hopefully transactions) within it
     // - provide a Flowser setting to specify a path to the transactions folder
     return [];
-  }
-
-  // TODO(milestone-3): is account under "emulator-account" key considered as "service account"?
-  public getServiceAccountAddress(): string | undefined {
-    return this.getAccountConfig("emulator-account")?.address;
   }
 
   public hasConfigFile(): boolean {

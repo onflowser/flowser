@@ -33,8 +33,6 @@ export class EmulatorConfigurationDto implements Emulator {
   @ApiProperty()
   serviceSignatureAlgorithm: number;
   @ApiProperty()
-  simpleAddresses: boolean;
-  @ApiProperty()
   storageLimit: boolean;
   @ApiProperty()
   storagePerFlow: number;

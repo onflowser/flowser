@@ -1,10 +1,10 @@
-import { PollingEntity } from "../../core/entities/polling.entity";
+import { PollingEntity } from "../core/entities/polling.entity";
 import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
-import { ExtendedFlowEvent } from "../../data-processing/services/processor.service";
 import { Event } from "@flowser/shared";
+import { BlockContextEntity } from "../blocks/entities/block-context.entity";
 
 @Entity({ name: "events" })
-export class EventEntity extends PollingEntity {
+export class EventEntity extends PollingEntity implements BlockContextEntity {
   id: string;
 
   @PrimaryColumn()
@@ -42,16 +42,5 @@ export class EventEntity extends PollingEntity {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
-  }
-
-  static create(flowEvent: ExtendedFlowEvent): EventEntity {
-    const event = new EventEntity();
-    event.type = flowEvent.type;
-    event.transactionIndex = flowEvent.transactionIndex;
-    event.transactionId = flowEvent.transactionId;
-    event.blockId = flowEvent.blockId;
-    event.eventIndex = flowEvent.eventIndex;
-    event.data = flowEvent.data;
-    return event;
   }
 }
