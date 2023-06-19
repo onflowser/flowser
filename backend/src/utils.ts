@@ -42,6 +42,10 @@ export function ensurePrefixedAddress(address: string | null | undefined) {
   return address?.startsWith("0x") ? address : `0x${address}`;
 }
 
+export function ensureNonPrefixedAddress(address: string | null | undefined) {
+  return address?.startsWith("0x") ? address.slice(2, address.length) : address;
+}
+
 export type EntitiesDiff<T> = {
   created: T[];
   updated: T[];
