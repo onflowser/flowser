@@ -6,7 +6,7 @@ import { ProjectEntity } from "../../projects/project.entity";
 import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../../utils";
+import { computeEntitiesDiff, isObject } from "../../utils";
 
 type FlowAddress = string;
 
@@ -111,6 +111,18 @@ export class FlowConfigService implements ProjectContextLifecycle {
         privateKey: this.getPrivateKey(config.key),
       })
     );
+  }
+
+  public async updateAccounts(
+    newOrUpdatedAccounts: FlowAbstractAccountConfig[]
+  ): Promise<void> {
+    for (const newOrUpdatedAccount of newOrUpdatedAccounts) {
+      this.config.accounts[newOrUpdatedAccount.name] = {
+        address: newOrUpdatedAccount.address,
+        key: newOrUpdatedAccount.privateKey,
+      };
+    }
+    await this.save();
   }
 
   private getPrivateKey(keyConfig: FlowAccountKeyConfig) {

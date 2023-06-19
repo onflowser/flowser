@@ -183,6 +183,15 @@ export class WalletService implements ProjectContextLifecycle {
       accountEntity.keys
     );
 
+    await this.flowConfig.updateAccounts([
+      {
+        name: accountEntity.address,
+        address: accountEntity.address,
+        // Assume only a single key per account for now
+        privateKey: accountEntity.keys[0].privateKey,
+      },
+    ]);
+
     return accountEntity;
   }
 
