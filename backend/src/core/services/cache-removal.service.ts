@@ -42,7 +42,7 @@ export class CacheRemovalService {
         this.blocksService.removeAll(),
       ]);
     } catch (e) {
-      this.logger.error("Failed to remove other data", e);
+      this.logger.error("Failed to remove cached data", e);
       throw e;
     }
   }
@@ -62,7 +62,7 @@ export class CacheRemovalService {
         this.blocksService.removeByBlockIds(blockIds),
       ]);
     } catch (e) {
-      this.logger.error("Failed to remove other data", e);
+      this.logger.error("Failed to remove cached data", e);
       throw e;
     }
   }

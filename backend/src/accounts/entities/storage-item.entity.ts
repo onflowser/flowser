@@ -11,10 +11,12 @@ import { ensurePrefixedAddress } from "../../utils";
 
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {
-  @PrimaryColumn()
-  id: string;
+  // This is a deprecated column, but removing it would cause a database migration error.
+  // To completely remove this we would need to write a manual migration script.
+  @PrimaryColumn({ name: "id" })
+  _id: string = "";
 
-  @Column()
+  @PrimaryColumn()
   pathIdentifier: string;
 
   @PrimaryColumn()
@@ -29,6 +31,12 @@ export class AccountStorageItemEntity extends PollingEntity {
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
 
+  get id() {
+    return `${this.accountAddress}/${this.getLowerCasedPathDomain()}/${
+      this.pathIdentifier
+    }`;
+  }
+
   toProto(): AccountStorageItem {
     return {
       id: this.id,
@@ -38,53 +46,6 @@ export class AccountStorageItemEntity extends PollingEntity {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
-  }
-
-  static create(
-    flowStorageDomain: FlowAccountStorageDomain,
-    flowStorageIdentifier: FlowStorageIdentifier,
-    flowAccountStorage: FlowAccountStorage
-  ) {
-    const storageData =
-      flowAccountStorage[flowStorageDomain][flowStorageIdentifier];
-
-    const storageItem = new AccountStorageItemEntity();
-    storageItem.pathIdentifier = flowStorageIdentifier;
-    storageItem.pathDomain = this.convertFlowStorageDomain(flowStorageDomain);
-
-    // TODO(milestone-x): For now we will just show plain (unparsed) storage data
-    // But in the future we will want to parse it so that we can extract info
-    // This will be possible after storage API implements proper deserialization of storage data
-    if (typeof storageData !== "object") {
-      // In case the data is a simple value (string, number, boolean,...)
-      // we need to store it in object form (e.g. under "value" key).
-      // Otherwise it won't get properly encoded/decoded by protocol buffers.
-      storageItem.data = { value: storageData };
-    } else {
-      storageItem.data = storageData;
-    }
-    storageItem.accountAddress = ensurePrefixedAddress(
-      flowAccountStorage.Address
-    );
-    storageItem.id = `${
-      storageItem.accountAddress
-    }/${storageItem.getLowerCasedPathDomain()}/${storageItem.pathIdentifier}`;
-    return storageItem;
-  }
-
-  private static convertFlowStorageDomain(
-    flowStorageDomain: FlowAccountStorageDomain
-  ): AccountStorageDomain {
-    switch (flowStorageDomain) {
-      case "Public":
-        return AccountStorageDomain.STORAGE_DOMAIN_PUBLIC;
-      case "Private":
-        return AccountStorageDomain.STORAGE_DOMAIN_PRIVATE;
-      case "Storage":
-        return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
-      default:
-        return AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
-    }
   }
 
   getLowerCasedPathDomain() {

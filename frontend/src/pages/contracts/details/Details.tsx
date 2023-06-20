@@ -52,6 +52,10 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
+        label: "Updated date",
+        value: TextUtils.longDate(contract.updatedAt),
+      },
+      {
         label: "Created date",
         value: TextUtils.longDate(contract.createdAt),
       },

@@ -2,6 +2,8 @@ import { Injectable, HttpException } from "@nestjs/common";
 import axios from "axios";
 import { FlowAccount } from "./gateway.service";
 import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
+import { ensurePrefixedAddress } from "../../utils";
+import { AccountStorageDomain } from "@flowser/shared";
 
 /**
  * For more info on the account storage model and API, see:
@@ -47,14 +49,27 @@ export class FlowAccountStorageService {
     );
     const storageIdentifiers = Object.keys(flowAccountStorage.Storage ?? {});
 
-    const privateItems = privateStorageIdentifiers.map((identifier) =>
-      AccountStorageItemEntity.create("Private", identifier, flowAccountStorage)
+    const privateItems = privateStorageIdentifiers.map(
+      (flowStorageIdentifier) =>
+        this.createStorageEntity({
+          flowStorageDomain: "Private",
+          flowStorageIdentifier,
+          flowAccountStorage,
+        })
     );
-    const publicItems = publicStorageIdentifiers.map((identifier) =>
-      AccountStorageItemEntity.create("Public", identifier, flowAccountStorage)
+    const publicItems = publicStorageIdentifiers.map((flowStorageIdentifier) =>
+      this.createStorageEntity({
+        flowStorageDomain: "Public",
+        flowStorageIdentifier,
+        flowAccountStorage,
+      })
     );
-    const storageItems = storageIdentifiers.map((identifier) =>
-      AccountStorageItemEntity.create("Storage", identifier, flowAccountStorage)
+    const storageItems = storageIdentifiers.map((flowStorageIdentifier) =>
+      this.createStorageEntity({
+        flowStorageDomain: "Storage",
+        flowStorageIdentifier,
+        flowAccountStorage,
+      })
     );
 
     return { privateItems, publicItems, storageItems };
@@ -71,5 +86,51 @@ export class FlowAccountStorageService {
     }
 
     return response.data as FlowAccountStorage;
+  }
+
+  private createStorageEntity(options: {
+    flowStorageDomain: FlowAccountStorageDomain;
+    flowStorageIdentifier: FlowStorageIdentifier;
+    flowAccountStorage: FlowAccountStorage;
+  }) {
+    const { flowAccountStorage, flowStorageIdentifier, flowStorageDomain } =
+      options;
+    const storageData =
+      flowAccountStorage[flowStorageDomain][flowStorageIdentifier];
+
+    const storageItem = new AccountStorageItemEntity();
+    storageItem.pathIdentifier = flowStorageIdentifier;
+    storageItem.pathDomain = this.flowStorageDomainToEnum(flowStorageDomain);
+
+    // TODO(milestone-x): For now we will just show plain (unparsed) storage data
+    // But in the future we will want to parse it so that we can extract info
+    // This will be possible after storage API implements proper deserialization of storage data
+    if (typeof storageData !== "object") {
+      // In case the data is a simple value (string, number, boolean,...)
+      // we need to store it in object form (e.g. under "value" key).
+      // Otherwise, it won't get properly encoded/decoded by protocol buffers.
+      storageItem.data = { value: storageData };
+    } else {
+      storageItem.data = storageData;
+    }
+    storageItem.accountAddress = ensurePrefixedAddress(
+      flowAccountStorage.Address
+    );
+    return storageItem;
+  }
+
+  private flowStorageDomainToEnum(
+    flowStorageDomain: FlowAccountStorageDomain
+  ): AccountStorageDomain {
+    switch (flowStorageDomain) {
+      case "Public":
+        return AccountStorageDomain.STORAGE_DOMAIN_PUBLIC;
+      case "Private":
+        return AccountStorageDomain.STORAGE_DOMAIN_PRIVATE;
+      case "Storage":
+        return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
+      default:
+        return AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
+    }
   }
 }

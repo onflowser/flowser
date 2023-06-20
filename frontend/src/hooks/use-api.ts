@@ -130,8 +130,12 @@ export function useGetPollingContracts(): TimeoutPollingHook<AccountContract> {
 }
 
 export function useGetContract(contractId: string) {
-  return useQuery<GetSingleContractResponse>(`/contract/${contractId}`, () =>
-    contractsService.getSingle(contractId)
+  return useQuery<GetSingleContractResponse>(
+    `/contract/${contractId}`,
+    () => contractsService.getSingle(contractId),
+    {
+      refetchInterval: 2000,
+    }
   );
 }
 

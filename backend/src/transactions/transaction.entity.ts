@@ -88,47 +88,4 @@ export class TransactionEntity
       updatedAt: this.updatedAt.toISOString(),
     };
   }
-
-  static create(
-    flowBlock: FlowBlock,
-    flowTransaction: FlowTransaction,
-    flowTransactionStatus: FlowTransactionStatus
-  ): TransactionEntity {
-    const transaction = new TransactionEntity();
-    transaction.id = flowTransaction.id;
-    transaction.script = flowTransaction.script;
-    transaction.payerAddress = ensurePrefixedAddress(flowTransaction.payer);
-    transaction.blockId = flowBlock.id;
-    transaction.referenceBlockId = flowTransaction.referenceBlockId;
-    transaction.gasLimit = flowTransaction.gasLimit;
-    transaction.authorizers = flowTransaction.authorizers.map((address) =>
-      ensurePrefixedAddress(address)
-    );
-    transaction.args = flowTransaction.args;
-    transaction.proposalKey = {
-      ...flowTransaction.proposalKey,
-      address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
-    };
-    transaction.envelopeSignatures = deserializeSignableObjects(
-      flowTransaction.envelopeSignatures
-    );
-    transaction.payloadSignatures = deserializeSignableObjects(
-      flowTransaction.payloadSignatures
-    );
-    transaction.status = TransactionStatus.fromJSON({
-      errorMessage: flowTransactionStatus.errorMessage,
-      grcpStatus: flowTransactionStatus.statusCode,
-      executionStatus: flowTransactionStatus.status,
-    });
-    return transaction;
-  }
-}
-
-function deserializeSignableObjects(signableObjects: FlowSignableObject[]) {
-  return signableObjects.map((signable) =>
-    SignableObject.fromJSON({
-      ...signable,
-      address: ensurePrefixedAddress(signable.address),
-    })
-  );
 }
