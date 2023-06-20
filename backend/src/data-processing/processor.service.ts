@@ -453,7 +453,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
-        // TODO: Use event.data.address & event.data.contract to determine updated/created/removed contract
+        // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
         return this.updateStoredAccountContracts({ address, flowBlock });
       // For now keep listening for monotonic and non-monotonic addresses,
       // although I think only non-monotonic ones are used for contract deployment.
@@ -743,7 +743,6 @@ export class ProcessorService implements ProjectContextLifecycle {
     contract.accountAddress = ensurePrefixedAddress(flowAccount.address);
     contract.name = name;
     contract.code = code;
-    // contract.updateId();
     return contract;
   }
 
