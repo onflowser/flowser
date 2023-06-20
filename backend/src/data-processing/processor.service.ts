@@ -486,14 +486,9 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
   }) {
-    // TODO: Should we also mark all tx.authorizers as updated?
-    const payerAddress = ensurePrefixedAddress(options.flowTransaction.payer);
-    return Promise.all([
-      this.transactionService.createOrUpdate(
-        this.createTransactionEntity(options)
-      ),
-      this.accountService.markUpdated(payerAddress),
-    ]);
+    this.transactionService.createOrUpdate(
+      this.createTransactionEntity(options)
+    );
   }
 
   private async storeNewAccountWithContractsAndKeys(options: {
