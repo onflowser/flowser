@@ -6,6 +6,7 @@ import {
   FlowEvent,
   FlowGatewayService,
   FlowKey,
+  FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
 } from "../flow/services/gateway.service";
@@ -31,6 +32,7 @@ import {
   FlowCoreEventType,
   ManagedProcessState,
   ServiceStatus,
+  SignableObject,
   TransactionStatus,
 } from "@flowser/shared";
 import {
@@ -305,9 +307,9 @@ export class ProcessorService implements ProjectContextLifecycle {
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
         this.processNewTransaction({
-          block: data.block,
-          transaction,
-          transactionStatus: transaction.status,
+          flowBlock: data.block,
+          flowTransaction: transaction,
+          flowTransactionStatus: transaction.status,
         }).catch((e) =>
           this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
@@ -480,19 +482,15 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private async processNewTransaction(options: {
-    block: FlowBlock;
-    transaction: FlowTransaction;
-    transactionStatus: FlowTransactionStatus;
+    flowBlock: FlowBlock;
+    flowTransaction: FlowTransaction;
+    flowTransactionStatus: FlowTransactionStatus;
   }) {
     // TODO: Should we also mark all tx.authorizers as updated?
-    const payerAddress = ensurePrefixedAddress(options.transaction.payer);
+    const payerAddress = ensurePrefixedAddress(options.flowTransaction.payer);
     return Promise.all([
       this.transactionService.createOrUpdate(
-        TransactionEntity.create(
-          options.block,
-          options.transaction,
-          options.transactionStatus
-        )
+        this.createTransactionEntity(options)
       ),
       this.accountService.markUpdated(payerAddress),
     ]);
@@ -752,5 +750,49 @@ export class ProcessorService implements ProjectContextLifecycle {
     contract.code = code;
     // contract.updateId();
     return contract;
+  }
+
+  private createTransactionEntity(options: {
+    flowBlock: FlowBlock;
+    flowTransaction: FlowTransaction;
+    flowTransactionStatus: FlowTransactionStatus;
+  }): TransactionEntity {
+    const { flowBlock, flowTransaction, flowTransactionStatus } = options;
+    const transaction = new TransactionEntity();
+    transaction.id = flowTransaction.id;
+    transaction.script = flowTransaction.script;
+    transaction.payerAddress = ensurePrefixedAddress(flowTransaction.payer);
+    transaction.blockId = flowBlock.id;
+    transaction.referenceBlockId = flowTransaction.referenceBlockId;
+    transaction.gasLimit = flowTransaction.gasLimit;
+    transaction.authorizers = flowTransaction.authorizers.map((address) =>
+      ensurePrefixedAddress(address)
+    );
+    transaction.args = flowTransaction.args;
+    transaction.proposalKey = {
+      ...flowTransaction.proposalKey,
+      address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
+    };
+    transaction.envelopeSignatures = this.deserializeSignableObjects(
+      flowTransaction.envelopeSignatures
+    );
+    transaction.payloadSignatures = this.deserializeSignableObjects(
+      flowTransaction.payloadSignatures
+    );
+    transaction.status = TransactionStatus.fromJSON({
+      errorMessage: flowTransactionStatus.errorMessage,
+      grcpStatus: flowTransactionStatus.statusCode,
+      executionStatus: flowTransactionStatus.status,
+    });
+    return transaction;
+  }
+
+  private deserializeSignableObjects(signableObjects: FlowSignableObject[]) {
+    return signableObjects.map((signable) =>
+      SignableObject.fromJSON({
+        ...signable,
+        address: ensurePrefixedAddress(signable.address),
+      })
+    );
   }
 }
