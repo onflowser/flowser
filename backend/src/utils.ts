@@ -86,7 +86,7 @@ export function computeEntitiesDiff<Entity>(props: {
       updated.push(entity);
     }
 
-    if (areDeepEqualEntities(oldEntitiesLookup.get(primaryKey), entity)) {
+    if (!areDeepEqualEntities(oldEntitiesLookup.get(primaryKey), entity)) {
       updated.push(entity);
     }
   }
