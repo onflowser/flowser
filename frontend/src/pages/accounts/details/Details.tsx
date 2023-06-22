@@ -32,7 +32,7 @@ import Table from "../../../components/table/Table";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import Badge from "../../../components/badge/Badge";
 import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
-import { BaseStorageCard } from "./BaseStorageCard";
+import { InternalStorageCard } from "./InternalStorageCard";
 import classNames from "classnames";
 import { useUrlQuery } from "../../../hooks/use-url-query";
 import {
@@ -179,7 +179,7 @@ const Details: FunctionComponent = () => {
   const publicStorageItems = storageItems.filter(
     (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
   );
-  const baseStorageItems = storageItems.filter(
+  const internalStorageItems = storageItems.filter(
     (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
   );
 
@@ -243,8 +243,8 @@ const Details: FunctionComponent = () => {
             ))}
           </div>
           <div className={classes.gridExtendable}>
-            {baseStorageItems.map((item) => (
-              <BaseStorageCard
+            {internalStorageItems.map((item) => (
+              <InternalStorageCard
                 key={item.id}
                 storageItem={item}
                 enableIntroAnimation={enableDetailsIntroAnimation}
