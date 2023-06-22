@@ -66,10 +66,10 @@ function getTargetStorageCardUrl(options: {
   // Example: &String
 
   const borrowTypePathParts = options.data?.BorrowType?.split(".");
-  const targetAccountAddress =
-    borrowTypePathParts && borrowTypePathParts.length > 1
-      ? `0x${borrowTypePathParts?.[1]}`
-      : options.currentAccountAddress;
+  // Public or private storage paths can only
+  // point to "internal" storage paths of the same account.
+  // https://developers.flow.com/cadence/language/capability-based-access-control
+  const targetAccountAddress = options.currentAccountAddress;
 
   const targetPathIdentifier = options.data?.TargetPath?.Identifier;
 
