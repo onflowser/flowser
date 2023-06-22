@@ -12,7 +12,7 @@ import { ProjectEntity } from "../../projects/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
-import { waitForMs } from "../../utils";
+import { waitForMs } from "../../utils/common-utils";
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;

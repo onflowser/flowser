@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { typeOrmProtobufTransformer } from "../utils";
+import { typeOrmProtobufTransformer } from "../utils/common-utils";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { PollingEntity } from "../core/entities/polling.entity";
 import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";

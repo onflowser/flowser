@@ -10,7 +10,7 @@ import { ProjectEntity } from "../../projects/project.entity";
 import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../../utils";
+import { isObject } from "../../utils/common-utils";
 
 type FlowAddress = string;
 

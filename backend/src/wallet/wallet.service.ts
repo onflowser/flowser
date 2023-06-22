@@ -8,7 +8,7 @@ import { SHA3 } from "sha3";
 import { FlowCliService, KeyWithWeight } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
-import { ensurePrefixedAddress } from "../utils";
+import { ensurePrefixedAddress } from "../utils/common-utils";
 import {
   AccountKeyEntity,
   defaultKeyWeight,

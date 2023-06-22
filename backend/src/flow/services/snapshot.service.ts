@@ -19,7 +19,7 @@ import {
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "src/projects/project.entity";
-import { computeEntitiesDiff } from "../../utils";
+import { computeEntitiesDiff } from "../../utils/common-utils";
 import { BlocksService } from "../../blocks/blocks.service";
 
 type CreateSnapshotRequest = {

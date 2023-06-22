@@ -7,7 +7,7 @@ import {
   FlowAccountStorageDomain,
   FlowStorageIdentifier,
 } from "../../flow/services/storage.service";
-import { ensurePrefixedAddress } from "../../utils";
+import { ensurePrefixedAddress } from "../../utils/common-utils";
 
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {

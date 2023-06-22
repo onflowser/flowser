@@ -22,7 +22,10 @@ import { BlockEntity } from "../blocks/entities/block.entity";
 import { AccountContractEntity } from "../accounts/entities/contract.entity";
 import { KeysService } from "../accounts/services/keys.service";
 import { AccountKeyEntity } from "../accounts/entities/key.entity";
-import { ensureNonPrefixedAddress, ensurePrefixedAddress } from "../utils";
+import {
+  ensureNonPrefixedAddress,
+  ensurePrefixedAddress,
+} from "../utils/common-utils";
 import { getDataSourceInstance } from "../database";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
@@ -752,33 +755,34 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowTransactionStatus: FlowTransactionStatus;
   }): TransactionEntity {
     const { flowBlock, flowTransaction, flowTransactionStatus } = options;
-    const transaction = new TransactionEntity();
-    transaction.id = flowTransaction.id;
-    transaction.script = flowTransaction.script;
-    transaction.payerAddress = ensurePrefixedAddress(flowTransaction.payer);
-    transaction.blockId = flowBlock.id;
-    transaction.referenceBlockId = flowTransaction.referenceBlockId;
-    transaction.gasLimit = flowTransaction.gasLimit;
-    transaction.authorizers = flowTransaction.authorizers.map((address) =>
-      ensurePrefixedAddress(address)
-    );
-    transaction.args = flowTransaction.args;
-    transaction.proposalKey = {
-      ...flowTransaction.proposalKey,
-      address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
-    };
-    transaction.envelopeSignatures = this.deserializeSignableObjects(
-      flowTransaction.envelopeSignatures
-    );
-    transaction.payloadSignatures = this.deserializeSignableObjects(
-      flowTransaction.payloadSignatures
-    );
-    transaction.status = TransactionStatus.fromJSON({
-      errorMessage: flowTransactionStatus.errorMessage,
-      grcpStatus: flowTransactionStatus.statusCode,
-      executionStatus: flowTransactionStatus.status,
+    return new TransactionEntity({
+      id: flowTransaction.id,
+      script: flowTransaction.script,
+      payerAddress: ensurePrefixedAddress(flowTransaction.payer),
+      blockId: flowBlock.id,
+      referenceBlockId: flowTransaction.referenceBlockId,
+      gasLimit: flowTransaction.gasLimit,
+      authorizers: flowTransaction.authorizers.map((address) =>
+        ensurePrefixedAddress(address)
+      ),
+      args: flowTransaction.args,
+      proposalKey: {
+        ...flowTransaction.proposalKey,
+        address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
+      },
+      envelopeSignatures: this.deserializeSignableObjects(
+        flowTransaction.envelopeSignatures
+      ),
+      payloadSignatures: this.deserializeSignableObjects(
+        flowTransaction.payloadSignatures
+      ),
+      status: TransactionStatus.fromJSON({
+        errorMessage: flowTransactionStatus.errorMessage,
+        grcpStatus: flowTransactionStatus.statusCode,
+        executionStatus: flowTransactionStatus.status,
+      }),
+      payer: undefined,
     });
-    return transaction;
   }
 
   private deserializeSignableObjects(signableObjects: FlowSignableObject[]) {

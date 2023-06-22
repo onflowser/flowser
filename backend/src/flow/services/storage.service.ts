@@ -2,7 +2,7 @@ import { Injectable, HttpException } from "@nestjs/common";
 import axios from "axios";
 import { FlowAccount } from "./gateway.service";
 import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
-import { ensurePrefixedAddress } from "../../utils";
+import { ensurePrefixedAddress } from "../../utils/common-utils";
 import { AccountStorageDomain } from "@flowser/shared";
 
 /**

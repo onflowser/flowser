@@ -13,10 +13,16 @@ import {
   FlowTransaction,
   FlowTransactionStatus,
 } from "../flow/services/gateway.service";
-import { ensurePrefixedAddress, typeOrmProtobufTransformer } from "../utils";
+import {
+  ensurePrefixedAddress,
+  typeOrmProtobufTransformer,
+} from "../utils/common-utils";
 import { AccountEntity } from "../accounts/entities/account.entity";
 import { CadenceUtils } from "../flow/utils/cadence-utils";
 import { BlockContextEntity } from "../blocks/entities/block-context.entity";
+import { PollingEntityInitArguments } from "../utils/type-utils";
+
+type TransactionEntityInitArgs = PollingEntityInitArguments<TransactionEntity>;
 
 @Entity({ name: "transactions" })
 export class TransactionEntity
@@ -42,7 +48,7 @@ export class TransactionEntity
   payerAddress: string; // payer account address
 
   @ManyToOne(() => AccountEntity, (account) => account.transactions)
-  payer: AccountEntity; // payer account address
+  payer: AccountEntity | undefined; // payer account address
 
   @Column("simple-array")
   authorizers: string[]; // authorizers account addresses
@@ -69,6 +75,23 @@ export class TransactionEntity
     transformer: typeOrmProtobufTransformer(TransactionStatus),
   })
   status: TransactionStatus;
+
+  constructor(entity: TransactionEntityInitArgs) {
+    super();
+    this.id = entity.id;
+    this.script = entity.script;
+    this.blockId = entity.blockId;
+    this.referenceBlockId = entity.referenceBlockId;
+    this.gasLimit = entity.gasLimit;
+    this.payerAddress = entity.payerAddress;
+    this.payer = entity.payer;
+    this.authorizers = entity.authorizers;
+    this.args = entity.args;
+    this.proposalKey = entity.proposalKey;
+    this.envelopeSignatures = entity.envelopeSignatures;
+    this.payloadSignatures = entity.payloadSignatures;
+    this.status = entity.status;
+  }
 
   toProto(): Transaction {
     return {

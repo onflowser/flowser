@@ -6,7 +6,7 @@ import {
   computeEntitiesDiff,
   ensurePrefixedAddress,
   processEntitiesDiff,
-} from "../../utils";
+} from "../../utils/common-utils";
 
 @Injectable()
 export class AccountStorageService {

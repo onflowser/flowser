@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { PollingEntity } from "../../core/entities/polling.entity";
 import { Block, CollectionGuarantee } from "@flowser/shared";
-import { typeOrmProtobufTransformer } from "../../utils";
+import { typeOrmProtobufTransformer } from "../../utils/common-utils";
 import { BlockContextEntity } from "./block-context.entity";
 
 @Entity({ name: "blocks" })
