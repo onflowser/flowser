@@ -141,7 +141,7 @@ const Details: FunctionComponent = () => {
     if (focusedStorageId) {
       expandCardById(focusedStorageId);
       // We need to wait for the virtual nodes to be added to the browser DOM.
-      // This is achieved with setTimeout call - wait for the next window pain.
+      // This is achieved with setTimeout call - wait for the next window paint.
       // There might be a better React way to do this.
       setTimeout(() => {
         const targetDomNode = document.getElementById(focusedStorageId);
