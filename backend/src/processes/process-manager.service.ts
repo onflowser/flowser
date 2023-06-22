@@ -51,6 +51,9 @@ export class ProcessManagerService extends EventEmitter {
     timestamp: Date
   ): ManagedProcessOutput[] {
     const process = this.processLookupById.get(processId);
+    if (!process) {
+      return [];
+    }
     return process.output?.filter(
       (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
     );
@@ -93,7 +96,11 @@ export class ProcessManagerService extends EventEmitter {
   ): Promise<ManagedProcessOutput[]> {
     await this.start(process);
     await process.waitOnExit();
-    if (process.childProcess.exitCode > 0) {
+    if (
+      process.childProcess &&
+      process.childProcess.exitCode !== null &&
+      process.childProcess.exitCode > 0
+    ) {
       const errorOutput = process.output.filter(
         (outputLine) =>
           outputLine.source == ProcessOutputSource.OUTPUT_SOURCE_STDERR

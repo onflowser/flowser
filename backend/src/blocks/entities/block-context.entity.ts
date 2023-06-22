@@ -21,8 +21,5 @@ export async function removeByBlockIds(options: {
 export function implementsBlockContext(
   object: unknown
 ): object is BlockContextEntity {
-  if (typeof object !== "object") {
-    return false;
-  }
-  return "blockId" in object;
+  return typeof object === "object" && object !== null && "blockId" in object;
 }

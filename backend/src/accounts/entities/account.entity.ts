@@ -6,6 +6,9 @@ import { Account } from "@flowser/shared";
 import { TransactionEntity } from "../../transactions/transaction.entity";
 import { AccountStorageItemEntity } from "./storage-item.entity";
 import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
+import { PollingEntityInitArguments } from "../../utils/type-utils";
+
+type AccountEntityInitArgs = PollingEntityInitArguments<AccountEntity>;
 
 @Entity({ name: "accounts" })
 export class AccountEntity extends PollingEntity implements BlockContextEntity {
@@ -47,19 +50,35 @@ export class AccountEntity extends PollingEntity implements BlockContextEntity {
   })
   transactions: TransactionEntity[];
 
+  constructor(args: AccountEntityInitArgs) {
+    super();
+    this.address = args.address;
+    this.blockId = args.blockId;
+    this.balance = args.balance;
+    this.code = args.code;
+    this.isDefaultAccount = args.isDefaultAccount;
+    this.keys = args.keys;
+    this.storage = args.storage;
+    this.contracts = args.contracts;
+    this.transactions = args.transactions;
+  }
+
   /**
    * Creates an account with default values (where applicable).
    * It doesn't pre-set the values that should be provided.
    */
   static createDefault(): AccountEntity {
-    const account = new AccountEntity();
-    account.balance = 0;
-    account.code = "";
-    account.keys = [];
-    account.transactions = [];
-    account.contracts = [];
-    account.storage = [];
-    return account;
+    return new AccountEntity({
+      balance: 0,
+      address: "",
+      blockId: "",
+      isDefaultAccount: false,
+      code: "",
+      keys: [],
+      transactions: [],
+      contracts: [],
+      storage: [],
+    });
   }
 
   toProto(): Account {

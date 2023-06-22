@@ -2,12 +2,12 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { AccountStorageDomain, AccountStorageItem } from "@flowser/shared";
 import { PollingEntity } from "../../core/entities/polling.entity";
-import {
-  FlowAccountStorage,
-  FlowAccountStorageDomain,
-  FlowStorageIdentifier,
-} from "../../flow/services/storage.service";
-import { ensurePrefixedAddress } from "../../utils/common-utils";
+import { PollingEntityInitArguments } from "../../utils/type-utils";
+
+type AccountStorageItemEntityInitArgs = Omit<
+  PollingEntityInitArguments<AccountStorageItemEntity>,
+  "_id"
+>;
 
 @Entity({ name: "storage" })
 export class AccountStorageItemEntity extends PollingEntity {
@@ -26,10 +26,18 @@ export class AccountStorageItemEntity extends PollingEntity {
   accountAddress: string;
 
   @Column("simple-json")
-  data: unknown;
+  data: any;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
   account: AccountEntity;
+
+  constructor(args: AccountStorageItemEntityInitArgs) {
+    super();
+    this.pathIdentifier = args.pathIdentifier;
+    this.pathDomain = args.pathDomain;
+    this.accountAddress = args.accountAddress;
+    this.account = args.account;
+  }
 
   get id() {
     return `${this.accountAddress}/${this.getLowerCasedPathDomain()}/${

@@ -1,14 +1,13 @@
 import { PollingEntity } from "../../core/entities/polling.entity";
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryColumn,
-} from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
 import { AccountContract } from "@flowser/shared";
 import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
+import { PollingEntityInitArguments } from "../../utils/type-utils";
+
+type AccountContractEntityInitArgs =
+  PollingEntityInitArguments<AccountContractEntity>;
 
 @Entity({ name: "contracts" })
 export class AccountContractEntity
@@ -31,6 +30,15 @@ export class AccountContractEntity
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
   account: AccountEntity;
 
+  constructor(args: AccountContractEntityInitArgs) {
+    super();
+    this.accountAddress = args.accountAddress;
+    this.name = args.name;
+    this.blockId = args.blockId;
+    this.code = args.code;
+    this.account = args.account;
+  }
+
   toProto(): AccountContract {
     return {
       id: this.id,
@@ -43,7 +51,7 @@ export class AccountContractEntity
   }
 
   get id() {
-    return `${this.accountAddress}.${this.name}`
+    return `${this.accountAddress}.${this.name}`;
   }
 
   public static decodeId(id: string) {

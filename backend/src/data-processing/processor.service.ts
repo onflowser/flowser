@@ -781,7 +781,7 @@ export class ProcessorService implements ProjectContextLifecycle {
         grcpStatus: flowTransactionStatus.statusCode,
         executionStatus: flowTransactionStatus.status,
       }),
-      payer: undefined,
+      payer: null,
     });
   }
 

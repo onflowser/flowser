@@ -1,12 +1,13 @@
 import { PollingEntity } from "../core/entities/polling.entity";
-import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { Event } from "@flowser/shared";
 import { BlockContextEntity } from "../blocks/entities/block-context.entity";
+import { PollingEntityInitArguments } from "../utils/type-utils";
+
+type EventEntityInitArgs = PollingEntityInitArguments<EventEntity>;
 
 @Entity({ name: "events" })
 export class EventEntity extends PollingEntity implements BlockContextEntity {
-  id: string;
-
   @PrimaryColumn()
   transactionId: string;
 
@@ -25,9 +26,18 @@ export class EventEntity extends PollingEntity implements BlockContextEntity {
   @Column("simple-json")
   data: object;
 
-  @AfterLoad()
-  private computeId() {
-    this.id = `${this.transactionId}.${this.eventIndex}`;
+  constructor(args: EventEntityInitArgs) {
+    super();
+    this.transactionId = args.transactionId;
+    this.blockId = args.blockId;
+    this.eventIndex = args.eventIndex;
+    this.type = args.type;
+    this.transactionIndex = args.transactionIndex;
+    this.data = args.data;
+  }
+
+  get id() {
+    return `${this.transactionId}.${this.eventIndex}`;
   }
 
   toProto(): Event {

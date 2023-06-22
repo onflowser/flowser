@@ -1,10 +1,14 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
+import { BadRequestException } from "@nestjs/common";
 import { typeOrmProtobufTransformer } from "../utils/common-utils";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { PollingEntity } from "../core/entities/polling.entity";
 import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import * as crypto from "crypto";
+import { PollingEntityInitArguments } from "../utils/type-utils";
+
+type ProjectEntityInitArgs = PollingEntityInitArguments<ProjectEntity>;
 
 @Entity({ name: "projects" })
 export class ProjectEntity extends PollingEntity {
@@ -42,6 +46,17 @@ export class ProjectEntity extends PollingEntity {
   @Column({ nullable: true })
   startBlockHeight: number | null = 0;
 
+  constructor(args: ProjectEntityInitArgs) {
+    super();
+    this.id = args.id;
+    this.name = args.name;
+    this.filesystemPath = args.filesystemPath;
+    this.devWallet = args.devWallet;
+    this.gateway = args.gateway;
+    this.emulator = args.emulator;
+    this.startBlockHeight = args.startBlockHeight;
+  }
+
   hasGatewayConfiguration() {
     return this.gateway !== null;
   }
@@ -51,34 +66,44 @@ export class ProjectEntity extends PollingEntity {
       id: this.id,
       name: this.name,
       filesystemPath: this.filesystemPath,
-      startBlockHeight: this.startBlockHeight,
+      startBlockHeight: this.startBlockHeight ?? -1,
       gateway: this.gateway,
       devWallet: this.devWallet,
-      emulator: this.emulator,
+      emulator: this.emulator ?? undefined,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
   }
 
   static create(projectDto: CreateProjectDto | UpdateProjectDto) {
-    const project = new ProjectEntity();
     const isUpdateDto = "id" in projectDto && Boolean(projectDto.id);
-    if (isUpdateDto) {
-      project.id = projectDto.id;
-    } else {
-      project.id = crypto.randomUUID();
+
+    if (!projectDto.filesystemPath) {
+      throw new BadRequestException("Missing project filesystem path");
     }
-    project.name = projectDto.name;
-    project.startBlockHeight = projectDto.startBlockHeight;
-    project.filesystemPath = projectDto.filesystemPath;
-    project.gateway = projectDto.gateway
-      ? Gateway.fromJSON(projectDto.gateway)
-      : Gateway.fromPartial({
-          restServerAddress: `http://localhost:${projectDto.emulator.restServerPort}`,
-          grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
-        });
-    project.devWallet = DevWallet.fromJSON(projectDto.devWallet);
-    project.emulator = Emulator.fromJSON(projectDto.emulator);
-    return project;
+    if (!projectDto.name) {
+      throw new BadRequestException("Missing project name");
+    }
+    if (
+      projectDto.startBlockHeight === null ||
+      projectDto.startBlockHeight === undefined
+    ) {
+      throw new BadRequestException("Missing project start block height");
+    }
+
+    return new ProjectEntity({
+      id: isUpdateDto ? projectDto.id : crypto.randomUUID(),
+      name: projectDto.name,
+      startBlockHeight: projectDto.startBlockHeight,
+      filesystemPath: projectDto.filesystemPath,
+      gateway: projectDto.emulator
+        ? Gateway.fromPartial({
+            restServerAddress: `http://localhost:${projectDto.emulator.restServerPort}`,
+            grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
+          })
+        : Gateway.fromJSON(projectDto.gateway),
+      devWallet: DevWallet.fromJSON(projectDto.devWallet),
+      emulator: Emulator.fromJSON(projectDto.emulator),
+    });
   }
 }

@@ -3,6 +3,9 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { Block, CollectionGuarantee } from "@flowser/shared";
 import { typeOrmProtobufTransformer } from "../../utils/common-utils";
 import { BlockContextEntity } from "./block-context.entity";
+import { PollingEntityInitArguments } from "../../utils/type-utils";
+
+type BlockEntityInitArgs = PollingEntityInitArguments<BlockEntity>;
 
 @Entity({ name: "blocks" })
 export class BlockEntity extends PollingEntity implements BlockContextEntity {
@@ -30,6 +33,17 @@ export class BlockEntity extends PollingEntity implements BlockContextEntity {
 
   @Column("simple-array")
   signatures: string[];
+
+  constructor(args: BlockEntityInitArgs) {
+    super();
+    this.blockId = args.blockId;
+    this.parentId = args.parentId;
+    this.blockHeight = args.blockHeight;
+    this.timestamp = args.timestamp;
+    this.collectionGuarantees = args.collectionGuarantees;
+    this.blockSeals = args.blockSeals;
+    this.signatures = args.signatures;
+  }
 
   toProto(): Block {
     return {

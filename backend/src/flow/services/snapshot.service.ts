@@ -93,13 +93,14 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       );
     }
 
-    const snapshot = new SnapshotEntity();
-    snapshot.id = createdSnapshot.context;
-    snapshot.blockId = createdSnapshot.blockId;
-    snapshot.projectId = request.projectId;
-    snapshot.description = request.description;
+    const snapshotEntity = new SnapshotEntity({
+      id: createdSnapshot.context,
+      blockId: createdSnapshot.blockId,
+      projectId: request.projectId,
+      description: request.description,
+    });
 
-    return this.snapshotRepository.save(snapshot);
+    return this.snapshotRepository.save(snapshotEntity);
   }
 
   async checkout(request: RevertToEmulatorSnapshotRequest) {

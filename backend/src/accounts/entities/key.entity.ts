@@ -4,6 +4,9 @@ import { AccountEntity } from "./account.entity";
 import { AccountKey } from "@flowser/shared";
 import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
+import { PollingEntityInitArguments } from "../../utils/type-utils";
+
+type AccountKeyEntityInitArgs = PollingEntityInitArguments<AccountKeyEntity>;
 
 // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
 export const defaultKeyWeight = 1000;
@@ -45,24 +48,45 @@ export class AccountKeyEntity
   revoked: boolean;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
-  account: AccountEntity;
+  account: AccountEntity | null;
+
+  constructor(args: AccountKeyEntityInitArgs) {
+    super();
+    this.index = args.index;
+    this.accountAddress = args.accountAddress;
+    this.blockId = args.blockId;
+    this.publicKey = args.publicKey;
+    this.privateKey = args.privateKey;
+    this.signAlgo = args.signAlgo;
+    this.hashAlgo = args.hashAlgo;
+    this.weight = args.weight;
+    this.sequenceNumber = args.sequenceNumber;
+    this.revoked = args.revoked;
+    this.account = args.account;
+  }
 
   /**
    * Creates a key with default values (where applicable).
    * It doesn't pre-set the values that should be provided.
    */
   static createDefault(): AccountKeyEntity {
-    const key = new AccountKeyEntity();
-    // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#public-key-signature-algorithm
-    key.signAlgo = SignatureAlgorithm.ECDSA_P256;
-    // Which has algorithm is actually used here by default?
-    // Flow CLI doesn't support the option to specify it as an argument,
-    // nor does it return this info when generating the key.
-    key.hashAlgo = HashAlgorithm.SHA3_256;
-    key.weight = defaultKeyWeight;
-    key.sequenceNumber = 0;
-    key.revoked = false;
-    return key;
+    return new AccountKeyEntity({
+      // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#public-key-signature-algorithm
+      signAlgo: SignatureAlgorithm.ECDSA_P256,
+      // Which has algorithm is actually used here by default?
+      // Flow CLI doesn't support the option to specify it as an argument,
+      // nor does it return this info when generating the key.
+      hashAlgo: HashAlgorithm.SHA3_256,
+      weight: defaultKeyWeight,
+      sequenceNumber: 0,
+      revoked: false,
+      account: null,
+      accountAddress: '',
+      blockId: '',
+      index: 0,
+      privateKey: null,
+      publicKey: '',
+    });
   }
 
   toProto(): AccountKey {

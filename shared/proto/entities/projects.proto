@@ -22,7 +22,7 @@ message Project {
   string name = 2;
   string filesystem_path = 10;
   // Blockchain data will be fetched from this block height
-  // Set this null to start fetching from the latest block
+  // Set this -1 to start fetching from the latest block
   int32 start_block_height = 5;
 
   Gateway gateway = 6;
