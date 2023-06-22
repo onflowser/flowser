@@ -1,4 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
@@ -6,7 +10,7 @@ import { ProjectEntity } from "../../projects/project.entity";
 import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { computeEntitiesDiff, isObject } from "../../utils";
+import { isObject } from "../../utils";
 
 type FlowAddress = string;
 
@@ -235,9 +239,9 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return writeFile(this.buildProjectPath(pathPostfix), data);
   }
 
-  private buildProjectPath(pathPostfix: string | undefined | null) {
+  private buildProjectPath(pathPostfix: string) {
     if (!pathPostfix) {
-      return null;
+      throw new InternalServerErrorException("Postfix path not provided");
     }
     // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);

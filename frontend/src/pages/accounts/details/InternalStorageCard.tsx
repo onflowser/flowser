@@ -15,7 +15,7 @@ type ExtendableStorageCardProps = {
   enableIntroAnimation?: boolean;
 };
 
-export function BaseStorageCard({
+export function InternalStorageCard({
   storageItem,
   onToggleExpand,
   isExpanded,
