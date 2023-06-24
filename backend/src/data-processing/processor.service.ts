@@ -467,7 +467,11 @@ export class ProcessorService implements ProjectContextLifecycle {
       case buildFlowTokensWithdrawnEvent(
         nonMonotonicAddresses.flowTokenAddress
       ):
-        return this.reprocessAccountFlowBalance(flowEvent.data.from);
+        // New emulator accounts are initialized
+        // with a default Flow balance coming from null address.
+        return flowEvent.data.from
+          ? this.reprocessAccountFlowBalance(flowEvent.data.from)
+          : undefined;
       case buildFlowTokensDepositedEvent(monotonicAddresses.flowTokenAddress):
       case buildFlowTokensDepositedEvent(
         nonMonotonicAddresses.flowTokenAddress
