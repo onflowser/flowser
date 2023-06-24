@@ -42,7 +42,8 @@ export class WalletService implements ProjectContextLifecycle {
   ) {}
 
   async onEnterProjectContext(project: ProjectEntity): Promise<void> {
-    // TODO(snapshots-revamp): Re-import accounts when emulator state changes?
+    // TODO(snapshots-revamp): Re-import accounts when flow.json is updated
+    //  (it could be the case that user is manually adding new managed accounts with `flow accounts create` command).
     await this.importAccountsFromConfig();
   }
 
@@ -75,7 +76,7 @@ export class WalletService implements ProjectContextLifecycle {
     const storedAccount = await this.accountsService.findOneByAddress(address);
 
     if (!storedAccount.keys) {
-      throw new Error("Keys not loaded for account")
+      throw new Error("Keys not loaded for account");
     }
 
     const credentialsWithPrivateKeys = storedAccount.keys.filter((key) =>
