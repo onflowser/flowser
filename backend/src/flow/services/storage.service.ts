@@ -113,7 +113,7 @@ export class FlowAccountStorageService {
     }
 
     return new AccountStorageItemEntity({
-      account: null,
+      account: undefined,
       accountAddress: ensurePrefixedAddress(flowAccountStorage.Address),
       data: getStorageData(),
       pathDomain: this.flowStorageDomainToEnum(flowStorageDomain),

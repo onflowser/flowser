@@ -25,12 +25,14 @@ export class SnapshotEntity
   @Column({ nullable: true })
   projectId: string;
 
-  constructor(args: SnapshotEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: SnapshotEntityInitArgs | undefined) {
     super();
-    this.id = args.id;
-    this.description = args.description;
-    this.blockId = args.blockId;
-    this.projectId = args.projectId;
+    this.id = args?.id ?? "";
+    this.description = args?.description ?? "";
+    this.blockId = args?.blockId ?? "";
+    this.projectId = args?.projectId ?? "";
   }
 
   toProto(): EmulatorSnapshot {

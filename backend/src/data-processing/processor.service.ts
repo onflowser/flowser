@@ -526,7 +526,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     await Promise.all([
       this.accountKeysService.updateAccountKeys(
         address,
-        unSerializedAccount.keys
+        unSerializedAccount.keys ?? []
       ),
       this.contractService.updateAccountContracts(
         unSerializedAccount.address,
@@ -605,7 +605,7 @@ export class ProcessorService implements ProjectContextLifecycle {
       // but that service doesn't set the public key.
       // So if public key isn't present,
       // we know that we haven't processed this account yet.
-      return Boolean(serviceAccount.keys[0]?.publicKey);
+      return Boolean(serviceAccount.keys?.[0]?.publicKey);
     } catch (e) {
       // Service account not found
       return false;
@@ -701,8 +701,8 @@ export class ProcessorService implements ProjectContextLifecycle {
       sequenceNumber: flowKey.sequenceNumber,
       revoked: flowKey.revoked,
       blockId: flowBlock.id,
-      privateKey: null,
-      account: null,
+      privateKey: "",
+      account: undefined,
     });
   }
 
@@ -783,7 +783,7 @@ export class ProcessorService implements ProjectContextLifecycle {
         grcpStatus: flowTransactionStatus.statusCode,
         executionStatus: flowTransactionStatus.status,
       }),
-      payer: null,
+      payer: undefined,
     });
   }
 

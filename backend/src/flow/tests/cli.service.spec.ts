@@ -19,7 +19,7 @@ describe("FlowCliService", function () {
       gateway: Gateway.fromPartial({}),
       id: "",
       name: "",
-      startBlockHeight: null,
+      startBlockHeight: 0,
     });
     await cliService.onEnterProjectContext(mockProject);
   });

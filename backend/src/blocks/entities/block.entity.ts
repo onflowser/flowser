@@ -34,15 +34,17 @@ export class BlockEntity extends PollingEntity implements BlockContextEntity {
   @Column("simple-array")
   signatures: string[];
 
-  constructor(args: BlockEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: BlockEntityInitArgs | undefined) {
     super();
-    this.blockId = args.blockId;
-    this.parentId = args.parentId;
-    this.blockHeight = args.blockHeight;
-    this.timestamp = args.timestamp;
-    this.collectionGuarantees = args.collectionGuarantees;
-    this.blockSeals = args.blockSeals;
-    this.signatures = args.signatures;
+    this.blockId = args?.blockId ?? "";
+    this.parentId = args?.parentId ?? "";
+    this.blockHeight = args?.blockHeight ?? -1;
+    this.timestamp = args?.timestamp ?? new Date();
+    this.collectionGuarantees = args?.collectionGuarantees ?? [];
+    this.blockSeals = args?.blockSeals ?? [];
+    this.signatures = args?.signatures ?? [];
   }
 
   toProto(): Block {

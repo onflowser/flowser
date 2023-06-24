@@ -33,34 +33,44 @@ export class AccountEntity extends PollingEntity implements BlockContextEntity {
   @OneToMany(() => AccountKeyEntity, (key) => key.account, {
     eager: true,
   })
-  keys: AccountKeyEntity[];
+  keys?: AccountKeyEntity[];
 
   @OneToMany(() => AccountStorageItemEntity, (storage) => storage.account, {
     eager: true,
   })
-  storage: AccountStorageItemEntity[];
+  storage?: AccountStorageItemEntity[];
 
   @OneToMany(() => AccountContractEntity, (contract) => contract.account, {
     eager: true,
   })
-  contracts: AccountContractEntity[];
+  contracts?: AccountContractEntity[];
 
   @OneToMany(() => TransactionEntity, (key) => key.payer, {
     eager: true,
   })
-  transactions: TransactionEntity[];
+  transactions?: TransactionEntity[];
 
-  constructor(args: AccountEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: AccountEntityInitArgs | undefined) {
     super();
-    this.address = args.address;
-    this.blockId = args.blockId;
-    this.balance = args.balance;
-    this.code = args.code;
-    this.isDefaultAccount = args.isDefaultAccount;
-    this.keys = args.keys;
-    this.storage = args.storage;
-    this.contracts = args.contracts;
-    this.transactions = args.transactions;
+    this.address = args?.address ?? "";
+    this.blockId = args?.blockId ?? "";
+    this.balance = args?.balance ?? 0;
+    this.code = args?.code ?? "";
+    this.isDefaultAccount = args?.isDefaultAccount ?? false;
+    if (args?.keys) {
+      this.keys = args.keys;
+    }
+    if (args?.storage) {
+      this.storage = args.storage;
+    }
+    if (args?.contracts) {
+      this.contracts = args.contracts;
+    }
+    if (args?.transactions) {
+      this.transactions = args.transactions;
+    }
   }
 
   /**
@@ -86,12 +96,11 @@ export class AccountEntity extends PollingEntity implements BlockContextEntity {
       address: this.address,
       balance: this.balance,
       code: this.code,
-      storage: this.storage.map((storage) => storage.toProto()),
-      keys: this.keys.map((key) => key.toProto()),
-      contracts: this.contracts.map((contract) => contract.toProto()),
-      transactions: this.transactions.map((transaction) =>
-        transaction.toProto()
-      ),
+      storage: this.storage?.map((storage) => storage.toProto()) ?? [],
+      keys: this.keys?.map((key) => key.toProto()) ?? [],
+      contracts: this.contracts?.map((contract) => contract.toProto()) ?? [],
+      transactions:
+        this.transactions?.map((transaction) => transaction.toProto()) ?? [],
       isDefaultAccount: this.isDefaultAccount,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),

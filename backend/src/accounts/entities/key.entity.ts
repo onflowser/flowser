@@ -30,7 +30,7 @@ export class AccountKeyEntity
   publicKey: string;
 
   @Column({ nullable: true })
-  privateKey: string | null;
+  privateKey: string;
 
   @Column()
   signAlgo: SignatureAlgorithm;
@@ -48,21 +48,26 @@ export class AccountKeyEntity
   revoked: boolean;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
-  account: AccountEntity | null;
+  account?: AccountEntity;
 
-  constructor(args: AccountKeyEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: AccountKeyEntityInitArgs | undefined) {
     super();
-    this.index = args.index;
-    this.accountAddress = args.accountAddress;
-    this.blockId = args.blockId;
-    this.publicKey = args.publicKey;
-    this.privateKey = args.privateKey;
-    this.signAlgo = args.signAlgo;
-    this.hashAlgo = args.hashAlgo;
-    this.weight = args.weight;
-    this.sequenceNumber = args.sequenceNumber;
-    this.revoked = args.revoked;
-    this.account = args.account;
+    this.index = args?.index ?? -1;
+    this.accountAddress = args?.accountAddress ?? "";
+    this.blockId = args?.blockId ?? "";
+    this.publicKey = args?.publicKey ?? "";
+    this.privateKey = args?.privateKey ?? "";
+    this.signAlgo =
+      args?.signAlgo ?? SignatureAlgorithm.SIGNATURE_ALGORITHM_UNSPECIFIED;
+    this.hashAlgo = args?.hashAlgo ?? HashAlgorithm.HASH_ALGORITHM_UNSPECIFIED;
+    this.weight = args?.weight ?? -1;
+    this.sequenceNumber = args?.sequenceNumber ?? -1;
+    this.revoked = args?.revoked ?? false;
+    if (args?.account) {
+      this.account = args.account;
+    }
   }
 
   /**
@@ -80,12 +85,12 @@ export class AccountKeyEntity
       weight: defaultKeyWeight,
       sequenceNumber: 0,
       revoked: false,
-      account: null,
-      accountAddress: '',
-      blockId: '',
+      account: undefined,
+      accountAddress: "",
+      blockId: "",
       index: 0,
-      privateKey: null,
-      publicKey: '',
+      privateKey: "",
+      publicKey: "",
     });
   }
 

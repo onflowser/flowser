@@ -44,17 +44,19 @@ export class ProjectEntity extends PollingEntity {
   // User can specify (on a project level) the starting block height.
   // Blockchain data will be fetched from this height value if set.
   @Column({ nullable: true })
-  startBlockHeight: number | null = 0;
+  startBlockHeight: number = 0;
 
-  constructor(args: ProjectEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: ProjectEntityInitArgs | undefined) {
     super();
-    this.id = args.id;
-    this.name = args.name;
-    this.filesystemPath = args.filesystemPath;
-    this.devWallet = args.devWallet;
-    this.gateway = args.gateway;
-    this.emulator = args.emulator;
-    this.startBlockHeight = args.startBlockHeight;
+    this.id = args?.id ?? "";
+    this.name = args?.name ?? "";
+    this.filesystemPath = args?.filesystemPath ?? "";
+    this.devWallet = args?.devWallet ?? DevWallet.fromPartial({});
+    this.gateway = args?.gateway ?? Gateway.fromPartial({});
+    this.emulator = args?.emulator ?? Emulator.fromPartial({});
+    this.startBlockHeight = args?.startBlockHeight ?? 0;
   }
 
   hasGatewayConfiguration() {

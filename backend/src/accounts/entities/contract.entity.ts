@@ -6,8 +6,10 @@ import { AccountContract } from "@flowser/shared";
 import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 import { PollingEntityInitArguments } from "../../utils/type-utils";
 
-type AccountContractEntityInitArgs =
-  Omit<PollingEntityInitArguments<AccountContractEntity>, "id">;
+type AccountContractEntityInitArgs = Omit<
+  PollingEntityInitArguments<AccountContractEntity>,
+  "id"
+>;
 
 @Entity({ name: "contracts" })
 export class AccountContractEntity
@@ -30,13 +32,15 @@ export class AccountContractEntity
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
   account: AccountEntity | null;
 
-  constructor(args: AccountContractEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: AccountContractEntityInitArgs | undefined) {
     super();
-    this.accountAddress = args.accountAddress;
-    this.name = args.name;
-    this.blockId = args.blockId;
-    this.code = args.code;
-    this.account = args.account;
+    this.accountAddress = args?.accountAddress ?? "";
+    this.name = args?.name ?? "";
+    this.blockId = args?.blockId ?? "";
+    this.code = args?.code ?? "";
+    this.account = args?.account ?? null;
   }
 
   toProto(): AccountContract {

@@ -26,14 +26,16 @@ export class EventEntity extends PollingEntity implements BlockContextEntity {
   @Column("simple-json")
   data: object;
 
-  constructor(args: EventEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: EventEntityInitArgs | undefined) {
     super();
-    this.transactionId = args.transactionId;
-    this.blockId = args.blockId;
-    this.eventIndex = args.eventIndex;
-    this.type = args.type;
-    this.transactionIndex = args.transactionIndex;
-    this.data = args.data;
+    this.transactionId = args?.transactionId ?? "";
+    this.blockId = args?.blockId ?? "";
+    this.eventIndex = args?.eventIndex ?? -1;
+    this.type = args?.type ?? "";
+    this.transactionIndex = args?.transactionIndex ?? -1;
+    this.data = args?.data ?? {};
   }
 
   get id() {

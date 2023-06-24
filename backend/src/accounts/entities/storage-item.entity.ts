@@ -29,14 +29,20 @@ export class AccountStorageItemEntity extends PollingEntity {
   data: any;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
-  account: AccountEntity | null;
+  account?: AccountEntity;
 
-  constructor(args: AccountStorageItemEntityInitArgs) {
+  // Entities are also automatically initialized by TypeORM.
+  // In those cases no constructor arguments are provided.
+  constructor(args: AccountStorageItemEntityInitArgs | undefined) {
     super();
-    this.pathIdentifier = args.pathIdentifier;
-    this.pathDomain = args.pathDomain;
-    this.accountAddress = args.accountAddress;
-    this.account = args.account;
+    this.pathIdentifier = args?.pathIdentifier ?? "";
+    this.pathDomain =
+      args?.pathDomain ?? AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
+    this.accountAddress = args?.accountAddress ?? "";
+    this.data = args?.data ?? {};
+    if (args?.account) {
+      this.account = args.account;
+    }
   }
 
   get id() {
