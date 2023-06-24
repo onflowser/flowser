@@ -43,7 +43,7 @@ const semver = require("semver");
 
 @Injectable()
 export class ProjectsService {
-  private currentProject: ProjectEntity;
+  private currentProject: ProjectEntity | undefined;
   private readonly logger = new Logger(ProjectsService.name);
 
   // TODO: This should be refactored sooner or later. It's a weird system of bootstrapping services.

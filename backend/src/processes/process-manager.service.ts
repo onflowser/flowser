@@ -72,17 +72,28 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   async start(process: ManagedProcessEntity) {
-    const existingProcess = this.processLookupById.get(process.id);
-    if (existingProcess) {
-      await existingProcess.stop();
-      this.processLookupById.set(process.id, process);
-      this.emit(ProcessManagerEvent.PROCESS_UPDATED, process);
+    const isExisting = this.processLookupById.has(process.id);
+    if (isExisting) {
+      await this.startExisting(process.id);
     } else {
-      this.processLookupById.set(process.id, process);
-      this.emit(ProcessManagerEvent.PROCESS_ADDED, process);
+      await this.startNew(process);
     }
+  }
 
+  async startNew(process: ManagedProcessEntity) {
+    this.processLookupById.set(process.id, process);
+    this.emit(ProcessManagerEvent.PROCESS_ADDED, process);
     await process.start();
+  }
+
+  async startExisting(processId: string) {
+    const existingProcess = this.processLookupById.get(processId);
+    if (!existingProcess) {
+      throw new NotFoundException(`Existing process not found: ${processId}`);
+    }
+    await existingProcess.stop();
+    this.emit(ProcessManagerEvent.PROCESS_UPDATED, process);
+    await existingProcess.start();
   }
 
   /**

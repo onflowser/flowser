@@ -12,7 +12,7 @@ import { ProjectEntity } from "../../projects/project.entity";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
-import { waitForMs } from "../../utils/common-utils";
+import { isDefined, waitForMs } from "../../utils/common-utils";
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;
@@ -61,6 +61,9 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   public getWellKnownAddresses(
     options?: WellKnownAddressesOptions
   ): FlowWellKnownAddresses {
+    if (!this.projectContext?.emulator) {
+      throw new Error("Emulator settings not found on project context");
+    }
     // When "simple-addresses" flag is provided,
     // a monotonic address generation mechanism is used:
     // https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/blockchain.go#L336-L342
@@ -84,6 +87,9 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   }
 
   async start() {
+    if (!this.projectContext) {
+      throw new Error("Project context not found");
+    }
     this.process = new ManagedProcessEntity({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
@@ -112,12 +118,12 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       snapshot: true,
       withContracts: true,
       blockTime: 0,
-      servicePrivateKey: undefined,
+      servicePrivateKey: "",
       databasePath: "./flowdb",
       tokenSupply: 1000000000,
       transactionExpiry: 10,
-      storagePerFlow: undefined,
-      minAccountBalance: undefined,
+      storagePerFlow: 100,
+      minAccountBalance: 0,
       transactionMaxGasLimit: 9999,
       scriptGasLimit: 100000,
       serviceSignatureAlgorithm: SignatureAlgorithm.ECDSA_P256,
@@ -131,8 +137,14 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
 
   private async waitUntilApisStarted() {
     // Wait until emulator process emits "Started <API-name>" logs.
-    const hasStarted = () =>
-      this.process.output.some((output) => output.data.includes("Started"));
+    const hasStarted = () => {
+      if (!this.process) {
+        throw new Error("Process not found");
+      }
+      return this.process.output.some((output) =>
+        output.data.includes("Started")
+      );
+    };
     while (!hasStarted()) {
       await waitForMs(100);
     }
@@ -141,12 +153,17 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
   private getAppliedFlags(): string[] {
     const { emulator } = this.projectContext ?? {};
 
+    if (!emulator) {
+      throw new Error("Emulator not found in project context");
+    }
+
     const formatTokenSupply = (tokenSupply: number) => tokenSupply.toFixed(1);
     const flag = (name: string, userValue: any, defaultValue?: any) => {
       const value = userValue || defaultValue;
       return value ? `--${name}=${value}` : undefined;
     };
 
+    // TODO: I think windows support for snapshots was fixed, so we can remove this check
     const isWindows = process.platform === "win32";
     const isSnapshotFeatureDisabled = emulator.snapshot && isWindows;
     if (isSnapshotFeatureDisabled) {
@@ -189,6 +206,6 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
       flag("transaction-fees", emulator.transactionFees),
       flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
       flag("script-gas-limit", emulator.scriptGasLimit),
-    ].filter(Boolean);
+    ].filter(isDefined);
   }
 }

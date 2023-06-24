@@ -1,6 +1,12 @@
 import { rm } from "fs/promises";
 import { ProtobufLikeObject } from "@flowser/shared";
 
+export function isDefined<Value>(
+  value: Value | null | undefined
+): value is Value {
+  return value !== null && value !== undefined;
+}
+
 export function waitForMs(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -4,7 +4,7 @@ import { Event } from "@flowser/shared";
 import { BlockContextEntity } from "../blocks/entities/block-context.entity";
 import { PollingEntityInitArguments } from "../utils/type-utils";
 
-type EventEntityInitArgs = PollingEntityInitArguments<EventEntity>;
+type EventEntityInitArgs = Omit<PollingEntityInitArguments<EventEntity>, "id">;
 
 @Entity({ name: "events" })
 export class EventEntity extends PollingEntity implements BlockContextEntity {

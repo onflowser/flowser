@@ -31,7 +31,7 @@ export class ContractsController {
 
   @Post("contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
-  async findAllNew(@Body() data) {
+  async findAllNew(@Body() data: unknown) {
     const request = GetPollingContractsRequest.fromJSON(data);
     const contracts = await this.contractsService.findAllNewerThanTimestamp(
       new Date(request.timestamp)
@@ -42,7 +42,10 @@ export class ContractsController {
   @ApiParam({ name: "id", type: String })
   @Post("/accounts/:address/contracts/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingContractsResponse))
-  async findAllNewByAccount(@Param("address") accountAddress, @Body() data) {
+  async findAllNewByAccount(
+    @Param("address") accountAddress: string,
+    @Body() data: unknown
+  ) {
     const request = GetPollingContractsByAccountRequest.fromJSON(data);
     const contracts =
       await this.contractsService.findAllNewerThanTimestampByAccount(

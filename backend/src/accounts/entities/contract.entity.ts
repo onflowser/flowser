@@ -7,7 +7,7 @@ import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 import { PollingEntityInitArguments } from "../../utils/type-utils";
 
 type AccountContractEntityInitArgs =
-  PollingEntityInitArguments<AccountContractEntity>;
+  Omit<PollingEntityInitArguments<AccountContractEntity>, "id">;
 
 @Entity({ name: "contracts" })
 export class AccountContractEntity
@@ -28,7 +28,7 @@ export class AccountContractEntity
   code: string;
 
   @ManyToOne(() => AccountEntity, (account) => account.contracts)
-  account: AccountEntity;
+  account: AccountEntity | null;
 
   constructor(args: AccountContractEntityInitArgs) {
     super();

@@ -30,7 +30,7 @@ export class BlocksController {
 
   @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingBlocksResponse))
-  async findAllNew(@Body() data) {
+  async findAllNew(@Body() data: unknown) {
     const request = GetPollingBlocksRequest.fromJSON(data);
     const blocks = await this.blocksService.findAllNewerThanTimestamp(
       new Date(request.timestamp)

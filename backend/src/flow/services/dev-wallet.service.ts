@@ -9,7 +9,7 @@ import * as http from "http";
 @Injectable()
 export class FlowDevWalletService implements ProjectContextLifecycle {
   static readonly processId = "dev-wallet";
-  private projectContext: ProjectEntity;
+  private projectContext: ProjectEntity | undefined;
 
   constructor(private readonly processManagerService: ProcessManagerService) {}
 
@@ -29,6 +29,12 @@ export class FlowDevWalletService implements ProjectContextLifecycle {
   }
 
   async start() {
+    if (!this.projectContext) {
+      throw new Error("Project context not found")
+    }
+    if (!this.projectContext?.emulator) {
+      throw new Error("Emulator settings not found in project context")
+    }
     const devWalletProcess = new ManagedProcessEntity({
       id: FlowDevWalletService.processId,
       name: "Dev wallet",

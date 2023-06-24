@@ -24,7 +24,7 @@ export class AccountKeyEntity
 
   // Nullable for backward compatability - to not cause not null constraint failure on migration.
   @Column({ nullable: true })
-  blockId: string;
+  blockId: string = "NULL";
 
   @Column()
   publicKey: string;

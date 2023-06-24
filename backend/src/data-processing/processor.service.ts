@@ -223,13 +223,16 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private async getUnprocessedBlocksInfo(): Promise<UnprocessedBlockInfo> {
+    if (!this.projectContext) {
+      throw new Error("Project context not found");
+    }
     const [lastStoredBlock, latestBlock] = await Promise.all([
       this.blockService.findLastBlock(),
       this.flowGatewayService.getLatestBlock(),
     ]);
     const nextBlockHeightToProcess = lastStoredBlock
       ? lastStoredBlock.blockHeight + 1
-      : this.projectContext.startBlockHeight;
+      : this.projectContext.startBlockHeight ?? latestBlock.height;
     const latestUnprocessedBlockHeight = latestBlock.height;
 
     return {
@@ -324,7 +327,6 @@ export class ProcessorService implements ProjectContextLifecycle {
           .create(
             this.createEventEntity({
               flowEvent,
-              flowBlock: data.block,
             })
           )
           .catch((e) =>
@@ -496,7 +498,7 @@ export class ProcessorService implements ProjectContextLifecycle {
 
   private async storeNewAccountWithContractsAndKeys(options: {
     address: string;
-    flowBlock: FlowBlock | undefined;
+    flowBlock: FlowBlock;
   }) {
     const { address, flowBlock } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
@@ -669,7 +671,6 @@ export class ProcessorService implements ProjectContextLifecycle {
 
   private createAccountEntity(options: {
     flowAccount: FlowAccount;
-    // Undefined in case we don't want to update block ID.
     flowBlock: FlowBlock;
   }): AccountEntity {
     const { flowAccount, flowBlock } = options;
@@ -690,63 +691,64 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowBlock: FlowBlock;
   }) {
     const { flowAccount, flowKey, flowBlock } = options;
-    const key = new AccountKeyEntity();
-    key.blockId = flowBlock.id;
-    key.index = flowKey.index;
-    key.accountAddress = ensurePrefixedAddress(flowAccount.address);
-    key.publicKey = flowKey.publicKey;
-    key.signAlgo = flowKey.signAlgo;
-    key.hashAlgo = flowKey.hashAlgo;
-    key.weight = flowKey.weight;
-    key.sequenceNumber = flowKey.sequenceNumber;
-    key.revoked = flowKey.revoked;
-    return key;
+    return new AccountKeyEntity({
+      index: flowKey.index,
+      accountAddress: ensurePrefixedAddress(flowAccount.address),
+      publicKey: flowKey.publicKey,
+      signAlgo: flowKey.signAlgo,
+      hashAlgo: flowKey.hashAlgo,
+      weight: flowKey.weight,
+      sequenceNumber: flowKey.sequenceNumber,
+      revoked: flowKey.revoked,
+      blockId: flowBlock.id,
+      privateKey: null,
+      account: null,
+    });
   }
 
   private createEventEntity(options: {
     flowEvent: ExtendedFlowEvent;
-    flowBlock: FlowBlock;
   }): EventEntity {
-    const { flowEvent, flowBlock } = options;
-    const event = new EventEntity();
-    event.blockId = flowBlock.id;
-    event.type = flowEvent.type;
-    event.transactionIndex = flowEvent.transactionIndex;
-    event.transactionId = flowEvent.transactionId;
-    event.blockId = flowEvent.blockId;
-    event.eventIndex = flowEvent.eventIndex;
-    event.data = flowEvent.data;
-    return event;
+    const { flowEvent } = options;
+    return new EventEntity({
+      type: flowEvent.type,
+      transactionIndex: flowEvent.transactionIndex,
+      transactionId: flowEvent.transactionId,
+      blockId: flowEvent.blockId,
+      eventIndex: flowEvent.eventIndex,
+      data: flowEvent.data,
+    });
   }
 
   private createBlockEntity(options: { flowBlock: FlowBlock }): BlockEntity {
     const { flowBlock } = options;
-    const block = new BlockEntity();
-    block.blockId = flowBlock.id;
-    block.collectionGuarantees = flowBlock.collectionGuarantees;
-    block.blockSeals = flowBlock.blockSeals;
-    // TODO(milestone-x): "signatures" field is not present in block response
-    // https://github.com/onflow/fcl-js/issues/1355
-    block.signatures = flowBlock.signatures ?? [];
-    block.timestamp = new Date(flowBlock.timestamp);
-    block.blockHeight = flowBlock.height;
-    block.parentId = flowBlock.parentId;
-    return block;
+    return new BlockEntity({
+      blockId: flowBlock.id,
+      collectionGuarantees: flowBlock.collectionGuarantees,
+      blockSeals: flowBlock.blockSeals,
+      // TODO(milestone-x): "signatures" field is not present in block response
+      // https://github.com/onflow/fcl-js/issues/1355
+      signatures: flowBlock.signatures ?? [],
+      timestamp: new Date(flowBlock.timestamp),
+      blockHeight: flowBlock.height,
+      parentId: flowBlock.parentId,
+    });
   }
 
   private createContractEntity(options: {
-    flowBlock: FlowBlock | undefined;
+    flowBlock: FlowBlock;
     flowAccount: FlowAccount;
     name: string;
     code: string;
   }) {
     const { flowAccount, flowBlock, name, code } = options;
-    const contract = new AccountContractEntity();
-    contract.blockId = flowBlock.id;
-    contract.accountAddress = ensurePrefixedAddress(flowAccount.address);
-    contract.name = name;
-    contract.code = code;
-    return contract;
+    return new AccountContractEntity({
+      blockId: flowBlock.id,
+      accountAddress: ensurePrefixedAddress(flowAccount.address),
+      name: name,
+      code: code,
+      account: null,
+    });
   }
 
   private createTransactionEntity(options: {

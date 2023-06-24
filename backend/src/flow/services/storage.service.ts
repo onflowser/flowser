@@ -98,25 +98,27 @@ export class FlowAccountStorageService {
     const storageData =
       flowAccountStorage[flowStorageDomain][flowStorageIdentifier];
 
-    const storageItem = new AccountStorageItemEntity();
-    storageItem.pathIdentifier = flowStorageIdentifier;
-    storageItem.pathDomain = this.flowStorageDomainToEnum(flowStorageDomain);
-
-    // TODO(milestone-x): For now we will just show plain (unparsed) storage data
-    // But in the future we will want to parse it so that we can extract info
-    // This will be possible after storage API implements proper deserialization of storage data
-    if (typeof storageData !== "object") {
-      // In case the data is a simple value (string, number, boolean,...)
-      // we need to store it in object form (e.g. under "value" key).
-      // Otherwise, it won't get properly encoded/decoded by protocol buffers.
-      storageItem.data = { value: storageData };
-    } else {
-      storageItem.data = storageData;
+    function getStorageData() {
+      // TODO(milestone-x): For now we will just show plain (unparsed) storage data
+      // But in the future we will want to parse it so that we can extract info
+      // This will be possible after storage API implements proper deserialization of storage data
+      if (typeof storageData !== "object") {
+        // In case the data is a simple value (string, number, boolean,...)
+        // we need to store it in object form (e.g. under "value" key).
+        // Otherwise, it won't get properly encoded/decoded by protocol buffers.
+        return { value: storageData };
+      } else {
+        return storageData;
+      }
     }
-    storageItem.accountAddress = ensurePrefixedAddress(
-      flowAccountStorage.Address
-    );
-    return storageItem;
+
+    return new AccountStorageItemEntity({
+      account: null,
+      accountAddress: ensurePrefixedAddress(flowAccountStorage.Address),
+      data: getStorageData(),
+      pathDomain: this.flowStorageDomainToEnum(flowStorageDomain),
+      pathIdentifier: flowStorageIdentifier,
+    });
   }
 
   private flowStorageDomainToEnum(

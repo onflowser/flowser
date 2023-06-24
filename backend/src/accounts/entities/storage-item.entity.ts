@@ -6,7 +6,7 @@ import { PollingEntityInitArguments } from "../../utils/type-utils";
 
 type AccountStorageItemEntityInitArgs = Omit<
   PollingEntityInitArguments<AccountStorageItemEntity>,
-  "_id"
+  "_id" | "id"
 >;
 
 @Entity({ name: "storage" })
@@ -29,7 +29,7 @@ export class AccountStorageItemEntity extends PollingEntity {
   data: any;
 
   @ManyToOne(() => AccountEntity, (account) => account.storage)
-  account: AccountEntity;
+  account: AccountEntity | null;
 
   constructor(args: AccountStorageItemEntityInitArgs) {
     super();

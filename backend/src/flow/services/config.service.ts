@@ -106,6 +106,9 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   public getAccounts(): FlowAbstractAccountConfig[] {
+    if (!this.config.accounts) {
+      throw new Error("Accounts config not loaded");
+    }
     const accountEntries = Object.entries(this.config.accounts);
 
     return accountEntries.map(
@@ -120,6 +123,9 @@ export class FlowConfigService implements ProjectContextLifecycle {
   public async updateAccounts(
     newOrUpdatedAccounts: FlowAbstractAccountConfig[]
   ): Promise<void> {
+    if (!this.config.accounts) {
+      throw new Error("Accounts config not loaded")
+    }
     for (const newOrUpdatedAccount of newOrUpdatedAccounts) {
       this.config.accounts[newOrUpdatedAccount.name] = {
         address: newOrUpdatedAccount.address,
@@ -129,12 +135,13 @@ export class FlowConfigService implements ProjectContextLifecycle {
     await this.save();
   }
 
-  private getPrivateKey(keyConfig: FlowAccountKeyConfig) {
-    if (typeof keyConfig === "string") {
-      return keyConfig;
-    } else {
-      return keyConfig.privateKey;
+  private getPrivateKey(keyConfig: FlowAccountKeyConfig): string {
+    const privateKey =
+      typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
+    if (!privateKey) {
+      throw new Error("Private key not found in config");
     }
+    return privateKey;
   }
 
   public async getContractTemplates(): Promise<ContractTemplate[]> {
@@ -197,6 +204,9 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   private getContractFilePath(contractNameKey: string) {
+    if (!this.config.contracts) {
+      throw new Error("Contracts config not loaded")
+    }
     const contractConfig = this.config.contracts[contractNameKey];
     const isSimpleFormat = typeof contractConfig === "string";
     return isSimpleFormat ? contractConfig : contractConfig?.source;
@@ -218,14 +228,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
     );
   }
 
-  private getAccountConfig(accountKey: string) {
-    return this.config.accounts[accountKey];
-  }
-
-  private getDatabasePath() {
-    return this.buildProjectPath(this.projectContext?.emulator.databasePath);
-  }
-
   private getConfigPath() {
     return this.buildProjectPath(this.configFileName);
   }
@@ -242,6 +244,9 @@ export class FlowConfigService implements ProjectContextLifecycle {
   private buildProjectPath(pathPostfix: string) {
     if (!pathPostfix) {
       throw new InternalServerErrorException("Postfix path not provided");
+    }
+    if (!this.projectContext) {
+      throw new Error("Project context not found")
     }
     // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);

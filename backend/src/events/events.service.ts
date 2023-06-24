@@ -21,7 +21,7 @@ export class EventsService {
     });
   }
 
-  findAllNewerThanTimestamp(timestamp): Promise<EventEntity[]> {
+  findAllNewerThanTimestamp(timestamp: Date): Promise<EventEntity[]> {
     return this.eventRepository.find({
       where: [
         { createdAt: MoreThan(timestamp) },
@@ -38,7 +38,7 @@ export class EventsService {
     });
   }
 
-  findAllByTransactionNewerThanTimestamp(transactionId: string, timestamp) {
+  findAllByTransactionNewerThanTimestamp(transactionId: string, timestamp: Date) {
     return this.eventRepository.find({
       where: {
         createdAt: MoreThan(timestamp),

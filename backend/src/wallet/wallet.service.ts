@@ -95,7 +95,10 @@ export class WalletService implements ProjectContextLifecycle {
       tempId: `${address}-${credentialToUse.index}`,
       addr: fcl.sansPrefix(address),
       keyId: credentialToUse.index,
-      signingFunction: (signable) => {
+      signingFunction: (signable: any) => {
+        if (!credentialToUse.privateKey) {
+          throw new Error("Private key not found");
+        }
         return {
           addr: fcl.withPrefix(address),
           keyId: credentialToUse.index,
@@ -191,6 +194,12 @@ export class WalletService implements ProjectContextLifecycle {
       accountEntity.keys
     );
 
+    // Assume only a single key per account for now
+    const singlePrivateKey = accountEntity.keys[0].privateKey;
+    if (!singlePrivateKey) {
+      throw new Error("Private key not found");
+    }
+
     // For now, we just write new accounts to flow.json,
     // but they don't get recreated on the next emulator run.
     // See: https://github.com/onflow/flow-emulator/issues/405
@@ -199,8 +208,7 @@ export class WalletService implements ProjectContextLifecycle {
         // TODO(custom-wallet): Come up with a human-readable name generation
         name: accountEntity.address,
         address: accountEntity.address,
-        // Assume only a single key per account for now
-        privateKey: accountEntity.keys[0].privateKey,
+        privateKey: singlePrivateKey,
       },
     ]);
 
