@@ -5,19 +5,16 @@ import {
   cadenceTypeFromJSON,
 } from "@flowser/shared";
 import { CadenceUtils as SharedCadenceUtils } from "@flowser/shared";
-import { isArray } from "../../utils";
+import { isArray } from "../../utils/common-utils";
 
 export class CadenceUtils {
   static isCadenceObject(value: unknown): value is FlowCadenceObject {
-    return typeof value === "object" && "type" in value;
+    return typeof value === "object" && value !== null && "type" in value;
   }
 
   static serializeCadenceObject(
-    cadenceObject: FlowCadenceObject | unknown
+    cadenceObject: FlowCadenceObject
   ): CadenceObject {
-    if (!this.isCadenceObject(cadenceObject)) {
-      return;
-    }
     const cadenceType = cadenceTypeFromJSON(cadenceObject.type);
     if (SharedCadenceUtils.isNumericType(cadenceType)) {
       return this.serializeNumericValue(cadenceObject);

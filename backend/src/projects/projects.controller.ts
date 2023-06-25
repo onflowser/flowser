@@ -69,7 +69,7 @@ export class ProjectsController {
 
   @Post("polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingProjectsResponse))
-  async findAllNew(@Body() data) {
+  async findAllNew(@Body() data: unknown) {
     const request = GetPollingProjectsRequest.fromJSON(data);
     const projects = await this.projectsService.findAllNewerThanTimestamp(
       new Date(request.timestamp)

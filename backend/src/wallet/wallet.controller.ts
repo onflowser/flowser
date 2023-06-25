@@ -10,7 +10,7 @@ export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   @Post("accounts/transaction")
-  async sendTransaction(@Body() body) {
+  async sendTransaction(@Body() body: unknown) {
     const request = SendTransactionRequest.fromJSON(body);
     const response = await this.walletService.sendTransaction(request);
     return SendTransactionResponse.toJSON(response);

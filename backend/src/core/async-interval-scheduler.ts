@@ -16,7 +16,7 @@ export type AsyncIntervalOptions = {
  */
 export class AsyncIntervalScheduler {
   private isRunning: boolean;
-  private runningTimeoutId: NodeJS.Timeout;
+  private runningTimeoutId: NodeJS.Timeout | undefined;
   private readonly options: AsyncIntervalOptions;
 
   constructor(options: AsyncIntervalOptions) {

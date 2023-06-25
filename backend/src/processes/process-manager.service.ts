@@ -51,6 +51,9 @@ export class ProcessManagerService extends EventEmitter {
     timestamp: Date
   ): ManagedProcessOutput[] {
     const process = this.processLookupById.get(processId);
+    if (!process) {
+      return [];
+    }
     return process.output?.filter(
       (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
     );
@@ -69,17 +72,28 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   async start(process: ManagedProcessEntity) {
-    const existingProcess = this.processLookupById.get(process.id);
-    if (existingProcess) {
-      await existingProcess.stop();
-      this.processLookupById.set(process.id, process);
-      this.emit(ProcessManagerEvent.PROCESS_UPDATED, process);
+    const isExisting = this.processLookupById.has(process.id);
+    if (isExisting) {
+      await this.startExisting(process.id);
     } else {
-      this.processLookupById.set(process.id, process);
-      this.emit(ProcessManagerEvent.PROCESS_ADDED, process);
+      await this.startNew(process);
     }
+  }
 
+  async startNew(process: ManagedProcessEntity) {
+    this.processLookupById.set(process.id, process);
+    this.emit(ProcessManagerEvent.PROCESS_ADDED, process);
     await process.start();
+  }
+
+  async startExisting(processId: string) {
+    const existingProcess = this.processLookupById.get(processId);
+    if (!existingProcess) {
+      throw new NotFoundException(`Existing process not found: ${processId}`);
+    }
+    await existingProcess.stop();
+    this.emit(ProcessManagerEvent.PROCESS_UPDATED, process);
+    await existingProcess.start();
   }
 
   /**
@@ -93,7 +107,11 @@ export class ProcessManagerService extends EventEmitter {
   ): Promise<ManagedProcessOutput[]> {
     await this.start(process);
     await process.waitOnExit();
-    if (process.childProcess.exitCode > 0) {
+    if (
+      process.childProcess &&
+      process.childProcess.exitCode !== null &&
+      process.childProcess.exitCode > 0
+    ) {
       const errorOutput = process.output.filter(
         (outputLine) =>
           outputLine.source == ProcessOutputSource.OUTPUT_SOURCE_STDERR

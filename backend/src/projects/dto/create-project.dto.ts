@@ -9,15 +9,18 @@ import { DevWalletConfigurationDto } from "./dev-wallet-configuration.dto";
 export class CreateProjectDto implements Partial<Project> {
   @ApiProperty()
   @IsNotEmpty()
+  // @ts-ignore As this is always set automatically by the framework.
   name: string;
 
   @ApiProperty()
   @IsNotEmpty()
+    // @ts-ignore As this is always set automatically by the framework.
   filesystemPath: string;
 
   @ApiProperty({
     description: "Data will be fetched from this block height forward.",
   })
+    // @ts-ignore As this is always set automatically by the framework.
   startBlockHeight: number;
 
   @ApiProperty()
@@ -28,10 +31,12 @@ export class CreateProjectDto implements Partial<Project> {
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => EmulatorConfigurationDto)
+    // @ts-ignore As this is always set automatically by the framework.
   emulator: EmulatorConfigurationDto;
 
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => DevWalletConfigurationDto)
+    // @ts-ignore As this is always set automatically by the framework.
   devWallet: DevWalletConfigurationDto;
 }

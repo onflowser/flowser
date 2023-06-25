@@ -159,7 +159,7 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   ): Promise<{ transactionId: string }> {
     const transactionId = await fcl.mutate({
       cadence: options.cadence,
-      args: (_arg, _t) => [],
+      args: (_arg: unknown, _t: unknown) => [],
       proposer: options.proposer,
       authorizations: options.authorizations,
       payer: options.payer,

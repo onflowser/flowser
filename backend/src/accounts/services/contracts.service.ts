@@ -2,7 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
 import { AccountContractEntity } from "../entities/contract.entity";
-import { computeEntitiesDiff, processEntitiesDiff } from "../../utils";
+import {
+  computeEntitiesDiff,
+  processEntitiesDiff,
+} from "../../utils/common-utils";
 import { removeByBlockIds } from "../../blocks/entities/block-context.entity";
 
 @Injectable()

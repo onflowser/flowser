@@ -41,7 +41,7 @@ export class AccountsController {
   @ApiQuery({ name: "timestamp", type: Number })
   @Post("/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingAccountsResponse))
-  async findAllNew(@Body() data) {
+  async findAllNew(@Body() data: unknown) {
     const request = GetPollingAccountsRequest.fromJSON(data);
     const accounts = await this.accountsService.findAllNewerThanTimestamp(
       new Date(request.timestamp)
@@ -53,8 +53,8 @@ export class AccountsController {
   @Post(":address/keys/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingKeysResponse))
   async findAllNewKeysByAccount(
-    @Param("address") accountAddress,
-    @Body() data
+    @Param("address") accountAddress: string,
+    @Body() data: unknown
   ) {
     const request = GetPollingKeysRequest.fromJSON(data);
     const keys = await this.keysService.findAllNewerThanTimestampByAccount(
@@ -68,8 +68,8 @@ export class AccountsController {
   @Post(":address/storage/polling")
   @UseInterceptors(new PollingResponseInterceptor(GetPollingStorageResponse))
   async findAllNewStorageByAccount(
-    @Param("address") accountAddress,
-    @Body() data
+    @Param("address") accountAddress: string,
+    @Body() data: unknown
   ) {
     const request = GetPollingStorageRequest.fromJSON(data);
     const storageItems =

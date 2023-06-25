@@ -96,6 +96,9 @@ export class FlowCliService implements ProjectContextLifecycle {
   }
 
   async initConfig() {
+    if (!this.projectContext) {
+      throw new Error("Project context not found")
+    }
     const childProcess = new ManagedProcessEntity({
       id: FlowCliService.processId,
       name: "Flow init",
@@ -181,7 +184,7 @@ export class FlowCliService implements ProjectContextLifecycle {
     // This should only happen with a test build,
     // but let's handle it anyway just in case
     const unknownVersionMessage = "Version information unknown!";
-    if (versionLog.data === unknownVersionMessage) {
+    if (!versionLog || versionLog.data === unknownVersionMessage) {
       throw new NotFoundException("Flow CLI version not found");
     }
     const [_, version] = versionLog?.data?.split(/: /) ?? [];
@@ -200,6 +203,9 @@ export class FlowCliService implements ProjectContextLifecycle {
     const lineWithData = output.find(
       (outputLine) => outputLine.data.length > 0
     );
+    if (!lineWithData) {
+      throw new Error("Output line with JSON data not found")
+    }
     return JSON.parse(lineWithData.data) as Output;
   }
 

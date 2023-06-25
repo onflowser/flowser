@@ -19,10 +19,12 @@ export interface ProjectContextLifecycle {
 
 // TODO: Use this to retrieve all services that implement the above interface automatically
 export function implementsProjectContextLifecycle(
-  object: unknown
-): object is ProjectContextLifecycle {
-  if (typeof object !== "object") {
-    return false;
-  }
-  return "onEnterProjectContext" in object && "onExitProjectContext" in object;
+  value: unknown
+): value is ProjectContextLifecycle {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "onEnterProjectContext" in value &&
+    "onExitProjectContext" in value
+  );
 }

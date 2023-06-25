@@ -19,7 +19,7 @@ import {
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "src/projects/project.entity";
-import { computeEntitiesDiff } from "../../utils";
+import { computeEntitiesDiff } from "../../utils/common-utils";
 import { BlocksService } from "../../blocks/blocks.service";
 
 type CreateSnapshotRequest = {
@@ -93,13 +93,14 @@ export class FlowSnapshotService implements ProjectContextLifecycle {
       );
     }
 
-    const snapshot = new SnapshotEntity();
-    snapshot.id = createdSnapshot.context;
-    snapshot.blockId = createdSnapshot.blockId;
-    snapshot.projectId = request.projectId;
-    snapshot.description = request.description;
+    const snapshotEntity = new SnapshotEntity({
+      id: createdSnapshot.context,
+      blockId: createdSnapshot.blockId,
+      projectId: request.projectId,
+      description: request.description,
+    });
 
-    return this.snapshotRepository.save(snapshot);
+    return this.snapshotRepository.save(snapshotEntity);
   }
 
   async checkout(request: RevertToEmulatorSnapshotRequest) {

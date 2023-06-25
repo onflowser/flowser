@@ -8,7 +8,7 @@ import { SHA3 } from "sha3";
 import { FlowCliService, KeyWithWeight } from "../flow/services/cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
-import { ensurePrefixedAddress } from "../utils";
+import { ensurePrefixedAddress } from "../utils/common-utils";
 import {
   AccountKeyEntity,
   defaultKeyWeight,
@@ -42,7 +42,8 @@ export class WalletService implements ProjectContextLifecycle {
   ) {}
 
   async onEnterProjectContext(project: ProjectEntity): Promise<void> {
-    // TODO(snapshots-revamp): Re-import accounts when emulator state changes?
+    // TODO(snapshots-revamp): Re-import accounts when flow.json is updated
+    //  (it could be the case that user is manually adding new managed accounts with `flow accounts create` command).
     await this.importAccountsFromConfig();
   }
 
@@ -74,6 +75,10 @@ export class WalletService implements ProjectContextLifecycle {
   private async withAuthorization(address: string) {
     const storedAccount = await this.accountsService.findOneByAddress(address);
 
+    if (!storedAccount.keys) {
+      throw new Error("Keys not loaded for account");
+    }
+
     const credentialsWithPrivateKeys = storedAccount.keys.filter((key) =>
       Boolean(key.privateKey)
     );
@@ -95,7 +100,10 @@ export class WalletService implements ProjectContextLifecycle {
       tempId: `${address}-${credentialToUse.index}`,
       addr: fcl.sansPrefix(address),
       keyId: credentialToUse.index,
-      signingFunction: (signable) => {
+      signingFunction: (signable: any) => {
+        if (!credentialToUse.privateKey) {
+          throw new Error("Private key not found");
+        }
         return {
           addr: fcl.withPrefix(address),
           keyId: credentialToUse.index,
@@ -191,6 +199,12 @@ export class WalletService implements ProjectContextLifecycle {
       accountEntity.keys
     );
 
+    // Assume only a single key per account for now
+    const singlePrivateKey = accountEntity.keys[0].privateKey;
+    if (!singlePrivateKey) {
+      throw new Error("Private key not found");
+    }
+
     // For now, we just write new accounts to flow.json,
     // but they don't get recreated on the next emulator run.
     // See: https://github.com/onflow/flow-emulator/issues/405
@@ -199,8 +213,7 @@ export class WalletService implements ProjectContextLifecycle {
         // TODO(custom-wallet): Come up with a human-readable name generation
         name: accountEntity.address,
         address: accountEntity.address,
-        // Assume only a single key per account for now
-        privateKey: accountEntity.keys[0].privateKey,
+        privateKey: singlePrivateKey,
       },
     ]);
 

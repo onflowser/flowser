@@ -1,6 +1,12 @@
 import { rm } from "fs/promises";
 import { ProtobufLikeObject } from "@flowser/shared";
 
+export function isDefined<Value>(
+  value: Value | null | undefined
+): value is Value {
+  return value !== null && value !== undefined;
+}
+
 export function waitForMs(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -10,7 +16,7 @@ export function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function isArray(value: unknown): value is unknown[] {
-  return typeof value === "object" && "map" in value;
+  return typeof value === "object" && value !== null && "map" in value;
 }
 
 export async function rmdir(path: string) {

@@ -35,7 +35,7 @@ export class TransactionsController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
-  async findAllNew(@Body() data) {
+  async findAllNew(@Body() data: unknown) {
     const request = GetPollingTransactionsRequest.fromJSON(data);
     const transactions =
       await this.transactionsService.findAllNewerThanTimestamp(
@@ -46,7 +46,7 @@ export class TransactionsController {
 
   @ApiParam({ name: "id", type: String })
   @Get("/blocks/:id/transactions")
-  async findAllByBlock(@Param("id") blockId) {
+  async findAllByBlock(@Param("id") blockId: string) {
     const transactions = await this.transactionsService.findAllByBlock(blockId);
     return GetAllTransactionsResponse.fromPartial({
       transactions: transactions.map((transaction) => transaction.toProto()),
@@ -58,7 +58,7 @@ export class TransactionsController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
-  async findAllNewByBlock(@Param("id") blockId, @Body() data) {
+  async findAllNewByBlock(@Param("id") blockId: string, @Body() data: unknown) {
     const request = GetPollingTransactionsByBlockRequest.fromJSON(data);
     const transactions =
       await this.transactionsService.findAllNewerThanTimestampByBlock(
@@ -74,7 +74,10 @@ export class TransactionsController {
   @UseInterceptors(
     new PollingResponseInterceptor(GetPollingTransactionsResponse)
   )
-  async findAllNewByAccount(@Param("address") accountAddress, @Body() data) {
+  async findAllNewByAccount(
+    @Param("address") accountAddress: string,
+    @Body() data: unknown
+  ) {
     const request = GetPollingTransactionsByAccountRequest.fromJSON(data);
     const transactions =
       await this.transactionsService.findAllNewerThanTimestampByAccount(
