@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import {
   FlowInteraction,
-  useSingleInteractionCRUD,
+  useSingleInteraction,
 } from "../../../contexts/interactions.context";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
@@ -14,36 +14,26 @@ type InteractionContentProps = {
 export function InteractionContent(
   props: InteractionContentProps
 ): ReactElement {
-  const { value, update } = useSingleInteractionCRUD(props.interaction.id);
+  const { interaction, update, execute } = useSingleInteraction(
+    props.interaction.id
+  );
 
   return (
     <div className={classes.root}>
       <div className={classes.content}>
         <div className={classes.code}>
           <CadenceEditor
-            value={value.code}
+            value={interaction.code}
             onChange={(code) => update({ code })}
           />
         </div>
         <div className={classes.details}>
-          <DetailsSection />
+          <div>Details...</div>
         </div>
       </div>
       <div className={classes.sidebar}>
-        <ArgumentsSidebar />
+        <SimpleButton onClick={execute}>Execute</SimpleButton>
       </div>
-    </div>
-  );
-}
-
-function DetailsSection() {
-  return <div>Details</div>;
-}
-
-function ArgumentsSidebar() {
-  return (
-    <div>
-      <SimpleButton>Execute</SimpleButton>
     </div>
   );
 }

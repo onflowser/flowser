@@ -1,3 +1,4 @@
+import { SendTransactionResponse } from "@flowser/shared";
 import React, {
   createContext,
   Dispatch,
@@ -6,6 +7,7 @@ import React, {
   useContext,
   useState,
 } from "react";
+import { ServiceRegistry } from "../services/service-registry";
 
 enum FlowInteractionType {
   SCRIPT,
@@ -67,14 +69,16 @@ export function useInteractions(): InteractionsContext {
   return context;
 }
 
-type SingleInteractionCRUD = {
-  value: FlowInteraction;
+type SingleInteractionContext = {
+  interaction: FlowInteraction;
   update: (interaction: Partial<FlowInteraction>) => void;
+  execute: () => Promise<SendTransactionResponse>;
 };
 
-export function useSingleInteractionCRUD(
+export function useSingleInteraction(
   targetInteractionId: string
-): SingleInteractionCRUD {
+): SingleInteractionContext {
+  const { walletService } = ServiceRegistry.getInstance();
   const { openInteractions, setOpenInteractions } = useInteractions();
 
   function update(partialUpdated: Partial<FlowInteraction>) {
@@ -87,13 +91,26 @@ export function useSingleInteractionCRUD(
     );
   }
 
-  const value = openInteractions.find(
+  const interaction = openInteractions.find(
     (interaction) => interaction.id === targetInteractionId
   );
 
-  if (!value) {
+  if (!interaction) {
     throw new Error("Assertion error: Expected interaction value");
   }
 
-  return { update, value };
+  async function execute() {
+    if (!interaction) {
+      throw new Error("Assertion error: Expected interaction value");
+    }
+    const accountAddress = "0xf8d6e0586b0a20c7";
+    return walletService.sendTransaction({
+      cadence: interaction.code,
+      authorizerAddresses: [],
+      proposerAddress: accountAddress,
+      payerAddress: accountAddress,
+    });
+  }
+
+  return { update, execute, interaction };
 }
