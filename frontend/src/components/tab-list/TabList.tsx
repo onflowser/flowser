@@ -1,21 +1,21 @@
 import classNames from "classnames";
 import React, { ReactElement } from "react";
-import classes from "./SideMenu.module.scss";
+import classes from "./TabList.module.scss";
 
-export type SideMenuTab = {
+export type TabItem = {
   id: string;
   label: string;
   content: React.ReactNode;
 };
 
-type SideMenuProps = {
+type TabListProps = {
   className?: string;
-  currentTab: SideMenuTab;
-  onChangeTab: (tab: SideMenuTab) => void;
-  tabs: SideMenuTab[];
+  currentTab: TabItem;
+  onChangeTab: (tab: TabItem) => void;
+  tabs: TabItem[];
 };
 
-export function SideMenu(props: SideMenuProps): ReactElement {
+export function TabList(props: TabListProps): ReactElement {
   const { className, tabs, currentTab, onChangeTab } = props;
   return (
     <div className={classNames(classes.sideMenu, className)}>

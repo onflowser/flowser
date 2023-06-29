@@ -3,7 +3,7 @@
 .pageRoot {
   display: flex;
   flex: 1;
-  .sideMenuContainer {
+  .leftSideMenu {
     flex: 1;
   }
   .mainContent {
@@ -17,5 +17,8 @@
     .detailsSection {
       flex: 1;
     }
+  }
+  .rightSideBar {
+    flex: 1;
   }
 }
