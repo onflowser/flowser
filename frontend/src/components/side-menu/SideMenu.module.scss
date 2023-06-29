@@ -1,0 +1,26 @@
+@import 'styles/spacings';
+@import 'styles/typography';
+@import 'styles/colors';
+
+.sideMenu {
+  .navigation {
+    display: flex;
+    .tabButton {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: $spacing-base;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: $font-size-large;
+      color: $color-light-gray;
+      opacity: 0.5;
+    }
+    .tabButtonSelected {
+      opacity: 1;
+    }
+  }
+  .body {
+
+  }
+}

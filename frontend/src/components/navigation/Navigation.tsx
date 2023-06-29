@@ -71,6 +71,9 @@ const Navigation: FunctionComponent<{
             <NavigationItem to={routes.events} totalCounter={tabCount.events}>
               Events
             </NavigationItem>
+            <NavigationItem to={routes.interactions}>
+              Interactions
+            </NavigationItem>
             <NavigationItem to={routes.project} totalCounter={tabCount.project}>
               Project
             </NavigationItem>
