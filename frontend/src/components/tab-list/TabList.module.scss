@@ -2,7 +2,9 @@
 @import 'styles/typography';
 @import 'styles/colors';
 
-.sideMenu {
+.root {
+  display: flex;
+  flex-direction: column;
   .navigation {
     display: flex;
     .tabButton {
@@ -21,6 +23,6 @@
     }
   }
   .body {
-
+    height: 100%;
   }
 }

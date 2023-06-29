@@ -18,7 +18,7 @@ type TabListProps = {
 export function TabList(props: TabListProps): ReactElement {
   const { className, tabs, currentTab, onChangeTab } = props;
   return (
-    <div className={classNames(classes.sideMenu, className)}>
+    <div className={classNames(classes.root, className)}>
       <div className={classes.navigation}>
         {tabs.map((tab) => (
           <button

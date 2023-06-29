@@ -8,17 +8,5 @@
   }
   .mainContent {
     flex: 3;
-    display: flex;
-    flex-direction: column;
-
-    .editorSection {
-      flex: 3;
-    }
-    .detailsSection {
-      flex: 1;
-    }
-  }
-  .rightSideBar {
-    flex: 1;
   }
 }
