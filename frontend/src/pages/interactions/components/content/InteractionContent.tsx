@@ -1,8 +1,9 @@
 import React, { ReactElement } from "react";
-import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
-import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { CadenceEditor } from "../../../../components/cadence-editor/CadenceEditor";
+import { SimpleButton } from "../../../../components/simple-button/SimpleButton";
 import classes from "./InteractionContent.module.scss";
-import { useInteractionOutcomeManager } from "../contexts/outcome.context";
+import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
+import { InteractionOutcome } from "../outcome/InteractionOutcome";
 
 export function InteractionContent(): ReactElement {
   const { definition, update, execute } = useInteractionOutcomeManager();
@@ -17,7 +18,7 @@ export function InteractionContent(): ReactElement {
           />
         </div>
         <div className={classes.details}>
-          <div>Details...</div>
+          <InteractionOutcome />
         </div>
       </div>
       <div className={classes.sidebar}>

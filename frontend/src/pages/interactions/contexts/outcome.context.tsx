@@ -39,7 +39,7 @@ export function InteractionOutcomeManagerProvider(props: {
     () => ({
       transaction: transactionData?.transaction,
     }),
-    []
+    [transactionData]
   );
 
   function update(partialUpdated: Partial<FlowInteractionDefinition>) {

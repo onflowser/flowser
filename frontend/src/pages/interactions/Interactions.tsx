@@ -5,7 +5,7 @@ import {
   InteractionDefinitionsManagerProvider,
   useInteractionDefinitionsManager,
 } from "./contexts/definition.context";
-import { InteractionContent } from "./components/InteractionContent";
+import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 
 export function Interactions(): ReactElement {
