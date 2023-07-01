@@ -1,0 +1,50 @@
+.root {
+  list-style: none;
+
+  li {
+    position: relative;
+    color: #d2d1f6;
+    display: flex;
+    margin-top: 30px;
+  }
+
+  li:before {
+    content: "\25CF";
+    margin-right: 15px;
+    font-size: 30px;
+  }
+
+  li:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: "";
+    border-left: 3px solid #d2d1f6;
+    margin-left: 8px;
+    min-height: 10vh;
+    max-height: 13vh;
+  }
+  @media screen and (max-width: 1700px) {
+    li:after {
+      min-height: 15vh;
+    }
+  }
+  @media screen and (max-width: 1200px) {
+    li:after {
+      min-height: 16vh;
+    }
+  }
+  @media screen and (max-width: 900px) {
+    li:after {
+      min-height: 30vh;
+    }
+  }
+
+  li:first-of-type:after {
+    top: 20%;
+  }
+
+  li:last-of-type:after {
+    top: -50%;
+  }
+}

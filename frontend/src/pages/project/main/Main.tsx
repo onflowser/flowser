@@ -1,5 +1,5 @@
 import Card from "components/card/Card";
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useMemo } from "react";
 import classes from "./Main.module.scss";
 import { ProjectItem } from "./ProjectItem";
 import { ReactComponent as IconContracts } from "../../../assets/icons/contracts.svg";
@@ -18,6 +18,7 @@ import ReactTimeago from "react-timeago";
 import { ExternalLink } from "../../../components/link/ExternalLink";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { spacings } from "../../../styles/spacings";
+import { Timeline, TimelineItem } from "../../../components/timeline/Timeline";
 
 export const Main: FunctionComponent = () => {
   const { checkoutBlock } = useProjectActions();
@@ -26,6 +27,25 @@ export const Main: FunctionComponent = () => {
   const { contracts } = projectObjects ?? { contracts: [] };
   const limitedContracts = useLimitedArray(contracts);
   const limitedSnapshots = useLimitedArray(snapshots);
+
+  const snapshotsTimeline = useMemo<TimelineItem[]>(
+    () =>
+      limitedSnapshots.data.map((snapshot) => ({
+        id: snapshot.id,
+        label: (
+          <ProjectItem
+            title={snapshot.description}
+            footer={<ReactTimeago date={snapshot.createdAt} />}
+            rightSection={
+              <ProjectItemBadge onClick={() => checkoutBlock(snapshot.blockId)}>
+                Jump to
+              </ProjectItemBadge>
+            }
+          />
+        ),
+      })),
+    [limitedSnapshots]
+  );
 
   return (
     <div className={classes.root}>
@@ -36,33 +56,8 @@ export const Main: FunctionComponent = () => {
             <div className={classes.counter}>{snapshots.length}</div>
           </div>
           <div className={classes.itemsWrapper}>
-            <ul className={classes.snapshotsList}>
-              {snapshots.length === 0 && (
-                <>
-                  <p>You haven{`'`}t created any snapshots yet</p>
-                  <SizedBox height={spacings.base} />
-                  <p>
-                    Snapshots provide a way to store your local blockchain at
-                    different points in time (aka. blocks).
-                  </p>
-                </>
-              )}
-              {limitedSnapshots.data.map((snapshot) => (
-                <li key={snapshot.id}>
-                  <ProjectItem
-                    title={snapshot.description}
-                    footer={<ReactTimeago date={snapshot.createdAt} />}
-                    rightSection={
-                      <ProjectItemBadge
-                        onClick={() => checkoutBlock(snapshot.blockId)}
-                      >
-                        Jump to
-                      </ProjectItemBadge>
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
+            {snapshots.length === 0 && <NoSnapshotsCallToAction />}
+            <Timeline items={snapshotsTimeline} />
           </div>
           <ToggleLimitedButton
             title="Snapshots"
@@ -77,26 +72,9 @@ export const Main: FunctionComponent = () => {
             <div className={classes.counter}>{contracts.length}</div>
           </div>
           <div className={classes.itemsWrapper}>
-            {contracts.length === 0 && (
-              <>
-                <p>No contracts defined in flow.json</p>
-                <SizedBox height={spacings.base} />
-                <p>
-                  Get started with Cadence smart contract development on{" "}
-                  <ExternalLink href="https://developers.flow.com/cadence/language/contracts">
-                    flow developer portal
-                  </ExternalLink>
-                  .
-                </p>
-                <p>
-                  ... or see how to define your Cadence files in flow
-                  configuration{" "}
-                  <ExternalLink href="https://developers.flow.com/tools/flow-cli/configuration#contracts" />
-                </p>
-              </>
-            )}
+            {contracts.length === 0 && <NoContractsCallToAction />}
             {limitedContracts.data.map((contract) => (
-              <div key={contract.filePath} className={classes.item}>
+              <div key={contract.filePath} className={classes.projectItem}>
                 <IconContracts />
                 <ProjectItem title={contract.name} footer={contract.filePath} />
               </div>
@@ -111,6 +89,39 @@ export const Main: FunctionComponent = () => {
     </div>
   );
 };
+
+function NoSnapshotsCallToAction() {
+  return (
+    <div>
+      <p>You haven{`'`}t created any snapshots yet</p>
+      <SizedBox height={spacings.base} />
+      <p>
+        Snapshots provide a way to store your local blockchain at different
+        points in time (aka. blocks).
+      </p>
+    </div>
+  );
+}
+
+function NoContractsCallToAction() {
+  return (
+    <div>
+      <p>No contracts defined in flow.json</p>
+      <SizedBox height={spacings.base} />
+      <p>
+        Get started with Cadence smart contract development on{" "}
+        <ExternalLink href="https://developers.flow.com/cadence/language/contracts">
+          flow developer portal
+        </ExternalLink>
+        .
+      </p>
+      <p>
+        ... or see how to define your Cadence files in flow configuration{" "}
+        <ExternalLink href="https://developers.flow.com/tools/flow-cli/configuration#contracts" />
+      </p>
+    </div>
+  );
+}
 
 function ToggleLimitedButton<DataItem>({
   title,
