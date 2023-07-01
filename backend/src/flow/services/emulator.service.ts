@@ -109,9 +109,9 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
     // Some default values vary from the ones used in Flow CLI.
     return {
       verboseLogging: true,
-      enableRestDebug: true,
+      enableRestDebug: false,
       restServerPort: 8888,
-      enableGrpcDebug: true,
+      enableGrpcDebug: false,
       grpcServerPort: 3569,
       adminServerPort: 8080,
       persist: false,

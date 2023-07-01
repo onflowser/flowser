@@ -40,14 +40,6 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const { logDrawerSize, setSize } = useLogDrawer();
   const tinyLogRef = useRef<HTMLDivElement>(null);
   const nonTinyLogRef = useRef<HTMLDivElement>(null);
-  const { data: unfilteredLogs } = useGetPollingOutputs();
-  const filteredLogs = useMemo(
-    () =>
-      unfilteredLogs.filter((log) =>
-        [EMULATOR_PROCESS_ID, DEV_WALLET_PROCESS_ID].includes(log.processId)
-      ),
-    [unfilteredLogs]
-  );
   const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
   const logWrapperElement = logWrapperRef.current;
   const scrollBottom =
@@ -56,30 +48,17 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   const scrollHeight = logWrapperElement?.scrollHeight ?? 0;
   const scrollDistanceToBottom = Math.abs(scrollBottom - scrollHeight);
   const shouldScrollToBottom = scrollDistanceToBottom < 10;
-
-  const sortedLogs = useMemo(
-    () =>
-      filteredLogs
-        // Exclude logs that indicate which our backend called the emulator
-        // To reduce unnecessary clutter
-        .filter((log) => {
-          const isBackendCallLog = /[A-Za-z]+ called/.test(log.data);
-          return !isBackendCallLog;
-        })
-        .sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        ),
-    [filteredLogs]
-  );
   const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
+  const { logs, tailLogs } = useRelevantLogs({
+    searchTerm,
+    tailSize: 5,
+  });
   const { data: processes } = useGetPollingProcesses();
   const isCapturingProcessLogs = processes.some(
     (process) =>
       CommonUtils.isEmulatorProcess(process) ||
       CommonUtils.isDevWalletProcess(process)
   );
-  const { filteredData } = useFilterData(sortedLogs, searchTerm);
   const mouseEvent = useMouseMove(trackMousePosition);
 
   const scrollToBottom = (smooth = true) => {
@@ -104,7 +83,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
   }, [logDrawerSize, shouldScrollToBottom]);
 
   useEffect(() => {
-    const hasErrorLogs = filteredLogs
+    const hasErrorLogs = logs
       .filter((log) => log.isNew)
       .some((log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR);
     if (hasErrorLogs) {
@@ -114,7 +93,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
     }
 
     scrollToBottom();
-  }, [filteredLogs]);
+  }, [logs]);
 
   const onCaretChange = useCallback((state) => {
     if (state === false) {
@@ -187,7 +166,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
         {logDrawerSize === "tiny" && (
           <div className={classes.midContainer} ref={tinyLogRef}>
-            {filteredData.map((log) => (
+            {tailLogs.map((log) => (
               <LogLine key={log.id} log={log} />
             ))}
           </div>
@@ -227,7 +206,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
       {logDrawerSize !== "tiny" && (
         <div className={classes.bigLogsContainer} ref={nonTinyLogRef}>
-          {filteredData.map((log) => (
+          {logs.map((log) => (
             <LogLine key={log.id} log={log} />
           ))}
         </div>
@@ -251,6 +230,33 @@ function LogLine({ log }: { log: ManagedProcessOutput }) {
       }}
     />
   );
+}
+
+function useRelevantLogs(options: {
+  searchTerm: string | undefined;
+  tailSize: number;
+}) {
+  const { data: allLogs } = useGetPollingOutputs();
+  const emulatorOrWalletLogs = useMemo(
+    () =>
+      allLogs.filter((log) =>
+        [EMULATOR_PROCESS_ID, DEV_WALLET_PROCESS_ID].includes(log.processId)
+      ),
+    [allLogs]
+  );
+  const { filteredData: logs } = useFilterData(
+    emulatorOrWalletLogs,
+    options.searchTerm
+  );
+  const tailLogs = useMemo(
+    () => logs.slice(logs.length - options.tailSize, logs.length),
+    [logs]
+  );
+
+  return {
+    logs,
+    tailLogs,
+  };
 }
 
 type VerticalDragLineProps = {
