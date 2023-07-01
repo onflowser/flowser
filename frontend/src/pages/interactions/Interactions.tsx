@@ -7,6 +7,7 @@ import {
 } from "./contexts/definition.context";
 import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
+import { InteractionHistory } from "./components/history/InteractionHistory";
 
 export function Interactions(): ReactElement {
   return (
@@ -21,12 +22,12 @@ function ContentWithProvider() {
     {
       id: "action-history",
       label: "Action History",
-      content: <ActionHistoryTab />,
+      content: <InteractionHistory />,
     },
     {
       id: "templates",
       label: "Templates",
-      content: <TemplatesTab />,
+      content: <div>TODO</div>,
     },
   ];
   const [currentSideMenuTab, setCurrentSideMenuTab] = useState(sideMenuTabs[0]);
@@ -62,18 +63,4 @@ function ContentWithProvider() {
       />
     </div>
   );
-}
-
-function ActionHistoryTab() {
-  return (
-    <ul>
-      <li>Action 1</li>
-      <li>Action 2</li>
-      <li>Action 3</li>
-    </ul>
-  );
-}
-
-function TemplatesTab() {
-  return <div>Templates</div>;
 }

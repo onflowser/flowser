@@ -12,10 +12,13 @@ type TimelineProps = {
 
 export function Timeline(props: TimelineProps): ReactElement {
   return (
-    <ul className={classes.root}>
-      {props.items.map((item) => (
-        <li key={item.id}>{item.label}</li>
-      ))}
-    </ul>
+    <div className={classes.root}>
+      <div className={classes.line} />
+      <ul>
+        {props.items.map((item) => (
+          <li key={item.id}>{item.label}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
