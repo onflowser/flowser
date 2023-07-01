@@ -1,29 +1,18 @@
 import React, { ReactElement } from "react";
-import {
-  FlowInteraction,
-  useSingleInteraction,
-} from "../../../contexts/interactions.context";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import { SimpleButton } from "../../../components/simple-button/SimpleButton";
 import classes from "./InteractionContent.module.scss";
+import { useInteractionOutcomeManager } from "../contexts/outcome.context";
 
-type InteractionContentProps = {
-  interaction: FlowInteraction;
-};
-
-export function InteractionContent(
-  props: InteractionContentProps
-): ReactElement {
-  const { interaction, update, execute } = useSingleInteraction(
-    props.interaction.id
-  );
+export function InteractionContent(): ReactElement {
+  const { definition, update, execute } = useInteractionOutcomeManager();
 
   return (
     <div className={classes.root}>
       <div className={classes.content}>
         <div className={classes.code}>
           <CadenceEditor
-            value={interaction.code}
+            value={definition.code}
             onChange={(code) => update({ code })}
           />
         </div>

@@ -2,16 +2,17 @@ import React, { ReactElement, useState } from "react";
 import classes from "./Interactions.module.scss";
 import { TabList, TabItem } from "../../components/tab-list/TabList";
 import {
-  InteractionsProvider,
-  useInteractions,
-} from "../../contexts/interactions.context";
+  InteractionDefinitionsManagerProvider,
+  useInteractionDefinitionsManager,
+} from "./contexts/definition.context";
 import { InteractionContent } from "./components/InteractionContent";
+import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 
 export function Interactions(): ReactElement {
   return (
-    <InteractionsProvider>
+    <InteractionDefinitionsManagerProvider>
       <ContentWithProvider />
-    </InteractionsProvider>
+    </InteractionDefinitionsManagerProvider>
   );
 }
 
@@ -31,11 +32,15 @@ function ContentWithProvider() {
   const [currentSideMenuTab, setCurrentSideMenuTab] = useState(sideMenuTabs[0]);
 
   // TODO(feature-interact-screen): Add ability to add new tabs and switch between them
-  const { openInteractions } = useInteractions();
-  const openEditorTabs: TabItem[] = openInteractions.map((openInteraction) => ({
-    id: openInteraction.id,
-    label: openInteraction.name,
-    content: <InteractionContent interaction={openInteraction} />,
+  const { definitions } = useInteractionDefinitionsManager();
+  const openEditorTabs: TabItem[] = definitions.map((definition) => ({
+    id: definition.id,
+    label: definition.name,
+    content: (
+      <InteractionOutcomeManagerProvider interactionId={definition.id}>
+        <InteractionContent />
+      </InteractionOutcomeManagerProvider>
+    ),
   }));
   const [currentEditorTab, setCurrentEditorTab] = useState<TabItem>(
     openEditorTabs[0]

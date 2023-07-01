@@ -222,11 +222,18 @@ export function useGetPollingTransactionsByBlock(
   });
 }
 
-export function useGetTransaction(transactionId: string) {
+export function useGetTransaction(transactionId: string | undefined) {
   return useQuery<GetSingleTransactionResponse>(
     `/transactions/${transactionId}`,
-    () => transactionsService.getSingle(transactionId),
-    { refetchInterval: 1000 }
+    () =>
+      transactionId
+        ? transactionsService.getSingle(transactionId)
+        : GetSingleTransactionResponse.fromPartial({}),
+    {
+      // Poll until the transaction is found
+      refetchInterval: (data) => (data?.transaction ? false : 1000),
+      enabled: Boolean(transactionId),
+    }
   );
 }
 
