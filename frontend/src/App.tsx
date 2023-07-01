@@ -22,7 +22,6 @@ import Blocks from "./pages/blocks/Blocks";
 import Transactions from "./pages/transactions/Transactions";
 import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
-import Logs from "./pages/logs/Logs";
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
@@ -111,7 +110,6 @@ export const FlowserRoutes = (): ReactElement => {
         <RouteWithLayout path={routes.contracts} component={Contracts} />
         <RouteWithLayout path={routes.events} component={Events} />
         <RouteWithLayout path={routes.interactions} component={Interactions} />
-        <RouteWithLayout path={routes.logs} component={Logs} />
         <RouteWithLayout path={routes.project} component={Project} />
         <Redirect from="*" to={routes.start} />
       </Switch>
