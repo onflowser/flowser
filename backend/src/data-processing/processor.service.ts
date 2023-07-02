@@ -48,6 +48,7 @@ import {
 } from "../processes/managed-process.entity";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
 import {
+  FlowEmulatorEvent,
   FlowEmulatorService,
   WellKnownAddressesOptions,
 } from "../flow/services/emulator.service";
@@ -79,7 +80,7 @@ export class ProcessorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
   private emulatorProcess: ManagedProcessEntity | undefined;
   private readonly logger = new Logger(ProcessorService.name);
-  private readonly processingIntervalMs = 500;
+  private readonly pollingDelay = 500;
   private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
@@ -98,7 +99,7 @@ export class ProcessorService implements ProjectContextLifecycle {
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
-      intervalInMs: this.processingIntervalMs,
+      pollingIntervalInMs: this.pollingDelay,
       functionToExecute: this.processBlockchainData.bind(this),
     });
   }
@@ -116,6 +117,10 @@ export class ProcessorService implements ProjectContextLifecycle {
     this.processManagerService.on(
       ProcessManagerEvent.PROCESS_UPDATED,
       this.onProcessAddedOrUpdated.bind(this)
+    );
+    this.flowEmulatorService.on(
+      FlowEmulatorEvent.APIS_STARTED,
+      this.processWellKnownAccounts.bind(this)
     );
   }
 
@@ -177,27 +182,17 @@ export class ProcessorService implements ProjectContextLifecycle {
       this.projectContext.gateway
     );
     if (gatewayStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
+      this.logger.debug("Gateway offline, pausing processing.");
       return;
     }
 
-    // When using non-managed emulator,
-    // we don't know if the blockchain uses monotonic or non-monotonic addresses,
-    // so we need to try processing well-known accounts with both options.
-    const isManagedEmulator = this.emulatorProcess?.isRunning();
-    if (!isManagedEmulator) {
-      await this.processWellKnownAccounts({
-        overrideUseMonotonicAddresses: true,
-      });
-      await this.processWellKnownAccounts({
-        overrideUseMonotonicAddresses: false,
-      });
-    } else {
-      // Process with whatever address schema is currently used.
-      await this.processWellKnownAccounts();
-    }
+    const [unprocessedBlockInfo] = await Promise.all([
+      this.getUnprocessedBlocksInfo(),
+      this.processWellKnownAccountsForNonManagedEmulator(),
+    ]);
 
     const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
-      await this.getUnprocessedBlocksInfo();
+      unprocessedBlockInfo;
     const hasBlocksToProcess =
       nextBlockHeightToProcess <= latestUnprocessedBlockHeight;
 
@@ -613,6 +608,21 @@ export class ProcessorService implements ProjectContextLifecycle {
     } catch (e) {
       // Service account not found
       return false;
+    }
+  }
+
+  private async processWellKnownAccountsForNonManagedEmulator() {
+    // When using non-managed emulator,
+    // we don't know if the blockchain uses monotonic or non-monotonic addresses,
+    // so we need to try processing well-known accounts with both options.
+    const isManagedEmulator = this.emulatorProcess?.isRunning();
+    if (!isManagedEmulator) {
+      await this.processWellKnownAccounts({
+        overrideUseMonotonicAddresses: true,
+      });
+      await this.processWellKnownAccounts({
+        overrideUseMonotonicAddresses: false,
+      });
     }
   }
 

@@ -46,7 +46,7 @@ export class ProjectsService {
   private currentProject: ProjectEntity | undefined;
   private readonly logger = new Logger(ProjectsService.name);
 
-  // TODO: This should be refactored sooner or later. It's a weird system of bootstrapping services.
+  // TODO: This should be refactored sooner or later. It's a weird and bug prone system of bootstrapping services.
   // For now let's not forget to manually add services with ProjectContextLifecycle interface
   // Order is important, because some actions have dependencies
   private readonly servicesWithProjectLifecycleContext: ProjectContextLifecycle[] =
@@ -57,7 +57,9 @@ export class ProjectsService {
       this.flowCliService,
 
       this.flowGatewayService,
-      this.flowAggregatorService,
+      // Must be before emulator service,
+      // since it's listening for events emitted by that service.
+      this.processorService,
       this.flowEmulatorService,
       this.flowDevWalletService,
       // Snapshot and wallet services must be started after emulator service,
@@ -71,7 +73,7 @@ export class ProjectsService {
     @InjectRepository(ProjectEntity)
     private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
-    private flowAggregatorService: ProcessorService,
+    private processorService: ProcessorService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
@@ -115,7 +117,7 @@ export class ProjectsService {
     );
     const totalBlocksToProcess =
       flowApiStatus === ServiceStatus.SERVICE_STATUS_ONLINE
-        ? await this.flowAggregatorService.getTotalBlocksToProcess()
+        ? await this.processorService.getTotalBlocksToProcess()
         : -1;
     return {
       totalBlocksToProcess,
