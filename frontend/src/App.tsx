@@ -70,7 +70,7 @@ const BrowserRouterEvents = withRouter(
 );
 
 export type FlowserClientAppProps = {
-  platformAdapter?: PlatformAdapterState;
+  platformAdapter: PlatformAdapterState;
   enableTimeoutPolling?: boolean;
 };
 
@@ -83,13 +83,13 @@ export const FlowserClientApp = ({
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <BrowserRouter>
           <ConfirmDialogProvider>
-            <ProjectProvider>
-              <UiStateContextProvider>
-                <PlatformAdapterProvider {...platformAdapter}>
+            <UiStateContextProvider>
+              <PlatformAdapterProvider {...platformAdapter}>
+                <ProjectProvider>
                   <FlowserRoutes />
-                </PlatformAdapterProvider>
-              </UiStateContextProvider>
-            </ProjectProvider>
+                </ProjectProvider>
+              </PlatformAdapterProvider>
+            </UiStateContextProvider>
           </ConfirmDialogProvider>
         </BrowserRouter>
       </TimeoutPollingProvider>

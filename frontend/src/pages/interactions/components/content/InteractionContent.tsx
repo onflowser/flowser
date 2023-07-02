@@ -6,15 +6,16 @@ import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
 
 export function InteractionContent(): ReactElement {
-  const { definition, update, execute } = useInteractionOutcomeManager();
+  const { definition, updateCadenceSource, execute } =
+    useInteractionOutcomeManager();
 
   return (
     <div className={classes.root}>
       <div className={classes.content}>
         <div className={classes.code}>
           <CadenceEditor
-            value={definition.code}
-            onChange={(code) => update({ code })}
+            value={definition.sourceCode}
+            onChange={(sourceCode) => updateCadenceSource(sourceCode)}
           />
         </div>
         <div className={classes.details}>

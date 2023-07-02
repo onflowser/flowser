@@ -6,19 +6,8 @@ import React, {
   useContext,
   useState,
 } from "react";
-
-enum FlowInteractionType {
-  SCRIPT,
-  TRANSACTION,
-}
-
-export type FlowInteractionDefinition = {
-  id: string;
-  name: string;
-  type: FlowInteractionType;
-  code: string;
-  // TODO(feature-interact-screen): Add and formalize `arguments` field
-};
+import { FlowInteractionDefinition } from "../../../utils/flow-interaction-definition";
+import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 
 type InteractionsDefinitionsManager = {
   definitions: FlowInteractionDefinition[];
@@ -30,13 +19,13 @@ const Context = createContext<InteractionsDefinitionsManager>(undefined as any);
 export function InteractionDefinitionsManagerProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
+  const { cadenceParser } = usePlatformAdapter();
   const [definitions, setDefinitions] = useState<FlowInteractionDefinition[]>([
-    {
+    new FlowInteractionDefinition({
       id: "demo",
-      name: "First transaction",
-      type: FlowInteractionType.TRANSACTION,
-      code: "transaction {}",
-    },
+      sourceCode: "transaction {}",
+      cadenceParser,
+    }),
   ]);
 
   return (

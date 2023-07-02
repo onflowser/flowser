@@ -1,10 +1,7 @@
 import { Transaction } from "@flowser/shared";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useGetTransaction } from "../../../hooks/use-api";
-import {
-  FlowInteractionDefinition,
-  useInteractionDefinitionsManager,
-} from "./definition.context";
+import { useInteractionDefinitionsManager } from "./definition.context";
 import React, {
   createContext,
   ReactElement,
@@ -14,6 +11,7 @@ import React, {
   useState,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
+import { FlowInteractionDefinition } from "../../../utils/flow-interaction-definition";
 
 type FlowTransactionOutcome = {
   success: Transaction | undefined;
@@ -27,7 +25,7 @@ type FlowInteractionOutcome = {
 type InteractionOutcomeManager = {
   definition: FlowInteractionDefinition;
   outcome: FlowInteractionOutcome;
-  update: (interaction: Partial<FlowInteractionDefinition>) => void;
+  updateCadenceSource: (sourceCode: string) => void;
   execute: () => Promise<void>;
 };
 
@@ -53,13 +51,14 @@ export function InteractionOutcomeManagerProvider(props: {
     [transactionData, transactionError]
   );
 
-  function update(partialUpdated: Partial<FlowInteractionDefinition>) {
+  function updateCadenceSource(sourceCode: string) {
     setDefinitions((openInteractions) =>
-      openInteractions.map((existing) =>
-        existing.id === props.interactionId
-          ? { ...existing, ...partialUpdated }
-          : existing
-      )
+      openInteractions.map((existing) => {
+        if (existing.id === props.interactionId) {
+          existing.setSourceCode(sourceCode);
+        }
+        return existing;
+      })
     );
   }
 
@@ -80,7 +79,7 @@ export function InteractionOutcomeManagerProvider(props: {
       setTransactionError(undefined);
       setTransactionId(undefined);
       const transactionResult = await walletService.sendTransaction({
-        cadence: definition.code,
+        cadence: definition.sourceCode,
         authorizerAddresses: [],
         proposerAddress: accountAddress,
         payerAddress: accountAddress,
@@ -95,7 +94,9 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   return (
-    <Context.Provider value={{ update, execute, definition, outcome }}>
+    <Context.Provider
+      value={{ updateCadenceSource, execute, definition, outcome }}
+    >
       {props.children}
     </Context.Provider>
   );
