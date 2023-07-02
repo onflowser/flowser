@@ -231,7 +231,7 @@ export function useGetTransaction(transactionId: string | undefined) {
         : GetSingleTransactionResponse.fromPartial({}),
     {
       // Poll until the transaction is found
-      refetchInterval: (data) => (data?.transaction ? false : 1000),
+      refetchInterval: (data) => (data?.transaction ? false : 500),
       enabled: Boolean(transactionId),
     }
   );

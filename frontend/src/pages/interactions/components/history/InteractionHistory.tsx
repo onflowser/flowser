@@ -6,15 +6,19 @@ import {
   TimelineItem,
 } from "../../../../components/timeline/Timeline";
 import { Block } from "@flowser/shared";
+import { useProjectActions } from "../../../../contexts/project.context";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks } = useGetPollingBlocks();
+  const { checkoutBlock } = useProjectActions();
 
   const blocksTimeline = useMemo<TimelineItem[]>(
     () =>
       blocks.map((block) => ({
         id: block.id,
-        label: <BlockItem block={block} />,
+        label: (
+          <BlockItem block={block} onCheckout={() => checkoutBlock(block.id)} />
+        ),
       })),
     [blocks]
   );
@@ -26,10 +30,15 @@ export function InteractionHistory(): ReactElement {
   );
 }
 
-function BlockItem(props: { block: Block }) {
+type BlockItemProps = {
+  block: Block;
+  onCheckout: () => void;
+};
+
+function BlockItem(props: BlockItemProps) {
   const { block } = props;
   return (
-    <div>
+    <div onClick={props.onCheckout}>
       <code>#{block.height}</code>
     </div>
   );
