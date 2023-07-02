@@ -7,7 +7,7 @@ export type ExecutableCallback = () => Promise<void>;
 export type AsyncIntervalOptions = {
   functionToExecute: ExecutableCallback;
   name: string;
-  intervalInMs: number;
+  pollingIntervalInMs: number;
 };
 
 /**
@@ -38,27 +38,30 @@ export class AsyncIntervalScheduler {
   }
 
   private async pollIfRunning() {
-    const { intervalInMs } = this.options;
+    const { functionToExecute, name, pollingIntervalInMs } = this.options;
     while (this.isRunning) {
-      await this.executeCallback();
-      await new Promise((resolve) => {
-        this.runningTimeoutId = setTimeout(resolve, intervalInMs);
-      });
-    }
-  }
-
-  private async executeCallback() {
-    const { functionToExecute, name, intervalInMs } = this.options;
-    try {
       const startTime = new Date();
-      await functionToExecute();
+      try {
+        await functionToExecute();
+      } catch (e) {
+        logger.error(`${name} failed`, e);
+      }
       const endTime = new Date();
       const runTimeInMs = endTime.getTime() - startTime.getTime();
-      if (runTimeInMs > intervalInMs) {
+      const remainingTimeInMs = pollingIntervalInMs - runTimeInMs;
+
+      if (remainingTimeInMs > 0) {
+        await new Promise((resolve) => {
+          this.runningTimeoutId = setTimeout(
+            resolve,
+            pollingIntervalInMs - runTimeInMs
+          );
+        });
+      } else {
+        // Runtime exceeded polling time.
+        // Processing could be taking longer than expected.
         logger.debug(`${name} took ${runTimeInMs}ms`);
       }
-    } catch (e) {
-      logger.error(`${name} failed`, e);
     }
   }
 }
