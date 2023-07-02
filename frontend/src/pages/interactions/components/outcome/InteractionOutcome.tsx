@@ -44,9 +44,5 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
     return <TransactionErrorMessage errorMessage={error} />;
   }
 
-  if (result) {
-    return <JsonView data={{ result: result }} />;
-  }
-
-  return null;
+  return <JsonView data={{ result: result }} />;
 }
