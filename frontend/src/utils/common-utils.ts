@@ -49,4 +49,8 @@ export class CommonUtils {
   static isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
   }
+
+  static isDefined<Value>(value: Value | null | undefined): value is Value {
+    return value !== null && value !== undefined;
+  }
 }
