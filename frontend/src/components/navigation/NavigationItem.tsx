@@ -9,10 +9,11 @@ type NavigationItemProps = {
   activeClassName?: string;
 };
 
+// TODO: Refactor & remove counters
 const NavigationItem: FunctionComponent<NavigationItemProps> = ({
   to,
   children,
-  totalCounter = 0,
+  totalCounter = "-",
   unreadCounter = null,
 }) => {
   return (

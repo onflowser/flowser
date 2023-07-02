@@ -73,7 +73,8 @@ export class WalletService implements ProjectContextLifecycle {
   }
 
   private async withAuthorization(address: string) {
-    const storedAccount = await this.accountsService.findOneByAddress(address);
+    const storedAccount =
+      await this.accountsService.findOneWithRelationsByAddress(address);
 
     if (!storedAccount.keys) {
       throw new Error("Keys not loaded for account");

@@ -83,7 +83,9 @@ export class AccountsController {
   @ApiParam({ name: "address", type: String })
   @Get(":address")
   async findOne(@Param("address") address: string) {
-    const account = await this.accountsService.findOneByAddress(address);
+    const account = await this.accountsService.findOneWithRelationsByAddress(
+      address
+    );
     return GetSingleAccountResponse.toJSON({
       account: account.toProto(),
     });

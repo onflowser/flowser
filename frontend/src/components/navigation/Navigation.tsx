@@ -6,8 +6,6 @@ import Button from "../button/Button";
 import { useNavigation } from "../../hooks/use-navigation";
 import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
-import { useTabCount } from "../../hooks/use-tab-count";
-
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import sideMenuOpen from "../../assets/icons/side-menu-open.svg";
 import sideMenuClosed from "../../assets/icons/side-menu-closed.svg";
@@ -32,7 +30,6 @@ const Navigation: FunctionComponent<{
     (isBreadcrumbsVisible ? breadCrumbsBarHeight : 0) + navigationBarHeight;
   const { user, isLoggedIn } = useFlow();
   const history = useHistory();
-  const tabCount = useTabCount();
 
   const isEmulatorWorking = true;
   const isSidebarOpen = props.isSidebarOpen;
@@ -47,34 +44,25 @@ const Navigation: FunctionComponent<{
       <div className={classNames(classes.navigationContainer, props.className)}>
         <div className={classes.mainContainer}>
           <div className={classes.navLinksContainer}>
-            <NavigationItem
-              to={routes.accounts}
-              totalCounter={tabCount.accounts}
-            >
-              Accounts
-            </NavigationItem>
-            <NavigationItem to={routes.blocks} totalCounter={tabCount.blocks}>
-              Blocks
-            </NavigationItem>
+            <NavigationItem to={routes.accounts}>Accounts</NavigationItem>
+            <NavigationItem to={routes.blocks}>Blocks</NavigationItem>
             <NavigationItem
               to={routes.transactions}
-              totalCounter={tabCount.transactions}
             >
               Transactions
             </NavigationItem>
             <NavigationItem
               to={routes.contracts}
-              totalCounter={tabCount.contracts}
             >
               Contracts
             </NavigationItem>
-            <NavigationItem to={routes.events} totalCounter={tabCount.events}>
+            <NavigationItem to={routes.events}>
               Events
             </NavigationItem>
             <NavigationItem to={routes.interactions}>
               Interactions
             </NavigationItem>
-            <NavigationItem to={routes.project} totalCounter={tabCount.project}>
+            <NavigationItem to={routes.project}>
               Project
             </NavigationItem>
           </div>

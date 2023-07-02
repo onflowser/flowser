@@ -13,6 +13,7 @@ import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
 import { isDefined, waitForMs } from "../../utils/common-utils";
+import { EventEmitter } from 'node:events';
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;
@@ -26,13 +27,19 @@ export type WellKnownAddressesOptions = {
   overrideUseMonotonicAddresses?: boolean;
 };
 
+export enum FlowEmulatorEvent {
+  APIS_STARTED = "APIS_STARTED"
+}
+
 @Injectable()
-export class FlowEmulatorService implements ProjectContextLifecycle {
+export class FlowEmulatorService extends EventEmitter implements ProjectContextLifecycle {
   public static readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
   private process: ManagedProcessEntity | undefined;
 
-  constructor(private processManagerService: ProcessManagerService) {}
+  constructor(private processManagerService: ProcessManagerService) {
+    super();
+  }
 
   async onEnterProjectContext(project: ProjectEntity) {
     this.projectContext = project;
@@ -103,6 +110,7 @@ export class FlowEmulatorService implements ProjectContextLifecycle {
     });
     await this.processManagerService.start(this.process);
     await this.waitUntilApisStarted();
+    this.emit(FlowEmulatorEvent.APIS_STARTED)
   }
 
   public static getDefaultFlags(): Emulator {
