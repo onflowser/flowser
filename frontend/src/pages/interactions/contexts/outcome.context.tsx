@@ -1,13 +1,10 @@
-import { Transaction } from "@flowser/shared";
 import { ServiceRegistry } from "../../../services/service-registry";
-import { useGetTransaction } from "../../../hooks/use-api";
 import { useInteractionDefinitionsManager } from "./definition.context";
 import React, {
   createContext,
   ReactElement,
   ReactNode,
   useContext,
-  useMemo,
   useState,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
@@ -19,23 +16,23 @@ import {
 import * as fcl from "@onflow/fcl";
 
 export type FlowTransactionOutcome = {
-  success: Transaction | undefined;
-  error: string | undefined;
+  transactionId?: string;
+  error?: string;
 };
 
 export type FlowScriptOutcome = {
-  success: unknown; // Script result
-  error: string | undefined;
+  result?: unknown;
+  error?: string;
 };
 
 type FlowInteractionOutcome = {
-  transaction: FlowTransactionOutcome;
-  script: FlowScriptOutcome;
+  transaction?: FlowTransactionOutcome;
+  script?: FlowScriptOutcome;
 };
 
 type InteractionOutcomeManager = {
   definition: FlowInteractionDefinition;
-  outcome: FlowInteractionOutcome;
+  outcome: FlowInteractionOutcome | undefined;
   updateCadenceSource: (sourceCode: string) => void;
   execute: () => Promise<void>;
 };
@@ -48,24 +45,7 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const { walletService } = ServiceRegistry.getInstance();
   const { definitions, setDefinitions } = useInteractionDefinitionsManager();
-
-  const [transactionId, setTransactionId] = useState<string>();
-  const [scriptResult, setScriptResult] = useState<unknown>();
-  const [executionError, setExecutionError] = useState<string>();
-  const { data: transactionData } = useGetTransaction(transactionId);
-  const outcome = useMemo<FlowInteractionOutcome>(
-    () => ({
-      transaction: {
-        success: transactionData?.transaction,
-        error: executionError,
-      },
-      script: {
-        success: scriptResult,
-        error: executionError,
-      },
-    }),
-    [transactionData, executionError, scriptResult]
-  );
+  const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
 
   function updateCadenceSource(sourceCode: string) {
     setDefinitions((openInteractions) =>
@@ -104,35 +84,49 @@ export function InteractionOutcomeManagerProvider(props: {
   async function executeTransaction(definition: FlowInteractionDefinition) {
     const accountAddress = "0xf8d6e0586b0a20c7";
     try {
-      setExecutionError(undefined);
-      setTransactionId(undefined);
-      const transactionResult = await walletService.sendTransaction({
+      setOutcome({});
+      const result = await walletService.sendTransaction({
         cadence: definition.sourceCode,
         authorizerAddresses: [],
         proposerAddress: accountAddress,
         payerAddress: accountAddress,
       });
-      setTransactionId(transactionResult.transactionId);
+      setOutcome({
+        transaction: {
+          transactionId: result.transactionId,
+        },
+      });
     } catch (error: unknown) {
       console.log(error);
       if (CommonUtils.isStandardError(error)) {
-        setExecutionError(error.message);
+        setOutcome({
+          transaction: {
+            error: error.message,
+          },
+        });
       }
     }
   }
 
   async function executeScript(definition: FlowInteractionDefinition) {
     try {
-      setExecutionError(undefined);
-      setScriptResult(undefined);
-      const response = await fcl.query({
+      setOutcome({});
+      const result = await fcl.query({
         cadence: definition.sourceCode,
       });
-      setScriptResult(response);
+      setOutcome({
+        script: {
+          result,
+        },
+      });
     } catch (error: unknown) {
       console.error(error);
       if (CommonUtils.isStandardError(error)) {
-        setExecutionError(error.message);
+        setOutcome({
+          script: {
+            error: error.message,
+          },
+        });
       }
     }
   }

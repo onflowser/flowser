@@ -1,5 +1,4 @@
 import React, { ReactElement } from "react";
-import classes from "./InteractionOutcome.module.scss";
 import {
   FlowScriptOutcome,
   FlowTransactionOutcome,
@@ -8,40 +7,45 @@ import {
 import { TransactionOverview } from "../../../transactions/details/components/overview/TransactionOverview";
 import { TransactionErrorMessage } from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
+import { useGetTransaction } from "../../../../hooks/use-api";
+import { Spinner } from "../../../../components/spinner/Spinner";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
   return (
-    <div className={classes.root}>
-      <TransactionOutcome outcome={outcome.transaction} />
-      <ScriptOutcome outcome={outcome.script} />
+    <div>
+      {outcome?.script && <ScriptOutcome outcome={outcome.script} />}
+      {outcome?.transaction && (
+        <TransactionOutcome outcome={outcome.transaction} />
+      )}
     </div>
   );
 }
 
 function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
-  const { success, error } = props.outcome;
+  const { transactionId, error } = props.outcome;
+  const { data } = useGetTransaction(transactionId);
 
   if (error) {
     return <TransactionErrorMessage errorMessage={error} />;
   }
 
-  if (success) {
-    return <TransactionOverview transaction={success} />;
+  if (data?.transaction) {
+    return <TransactionOverview transaction={data.transaction} />;
+  } else {
+    return <Spinner size={50} />;
   }
-
-  return null;
 }
 
 function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
-  const { success, error } = props.outcome;
+  const { result, error } = props.outcome;
 
   if (error) {
     return <TransactionErrorMessage errorMessage={error} />;
   }
 
-  if (success) {
-    return <JsonView data={{ result: success }} />;
+  if (result) {
+    return <JsonView data={{ result: result }} />;
   }
 
   return null;
