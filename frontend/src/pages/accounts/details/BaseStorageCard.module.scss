@@ -86,26 +86,6 @@
         transition: 0.3s;
       }
     }
-
-    .json {
-      margin-top: 20px;
-      margin-bottom: 10px;
-      display: inline-block;
-      max-height: 500px;
-      min-width: 60vw;
-      font-size: 14px;
-      overflow: scroll;
-      height: 100%;
-      width: 100%;
-    }
-
-    .json::-webkit-scrollbar-track {
-      background-color: $code-background;
-    }
-
-    .json::-webkit-scrollbar-corner {
-      background-color: $code-background;
-    }
   }
 }
 

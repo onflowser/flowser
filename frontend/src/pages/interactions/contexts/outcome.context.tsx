@@ -13,9 +13,15 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { CommonUtils } from "../../../utils/common-utils";
+
+type FlowTransactionOutcome = {
+  success: Transaction | undefined;
+  error: string | undefined;
+};
 
 type FlowInteractionOutcome = {
-  transaction: Transaction | undefined;
+  transaction: FlowTransactionOutcome;
 };
 
 type InteractionOutcomeManager = {
@@ -33,13 +39,18 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const { walletService } = ServiceRegistry.getInstance();
   const { definitions, setDefinitions } = useInteractionDefinitionsManager();
+
   const [transactionId, setTransactionId] = useState<string>();
+  const [transactionError, setTransactionError] = useState<string>();
   const { data: transactionData } = useGetTransaction(transactionId);
   const outcome = useMemo<FlowInteractionOutcome>(
     () => ({
-      transaction: transactionData?.transaction,
+      transaction: {
+        success: transactionData?.transaction,
+        error: transactionError,
+      },
     }),
-    [transactionData]
+    [transactionData, transactionError]
   );
 
   function update(partialUpdated: Partial<FlowInteractionDefinition>) {
@@ -65,13 +76,22 @@ export function InteractionOutcomeManagerProvider(props: {
       throw new Error("Assertion error: Expected interaction value");
     }
     const accountAddress = "0xf8d6e0586b0a20c7";
-    const transactionResult = await walletService.sendTransaction({
-      cadence: definition.code,
-      authorizerAddresses: [],
-      proposerAddress: accountAddress,
-      payerAddress: accountAddress,
-    });
-    setTransactionId(transactionResult.transactionId);
+    try {
+      setTransactionError(undefined);
+      setTransactionId(undefined);
+      const transactionResult = await walletService.sendTransaction({
+        cadence: definition.code,
+        authorizerAddresses: [],
+        proposerAddress: accountAddress,
+        payerAddress: accountAddress,
+      });
+      setTransactionId(transactionResult.transactionId);
+    } catch (error: unknown) {
+      console.log(error);
+      if (CommonUtils.isStandardError(error)) {
+        setTransactionError(error.message);
+      }
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
 import React, { ReactElement } from "react";
-import { CadenceEditor } from "../cadence-editor/CadenceEditor";
+import { CadenceUtils } from "utils/cadence-utils";
+import { JsonView } from "../json-view/JsonView";
 
 export type TransactionErrorMessageProps = {
   errorMessage: string;
@@ -8,5 +9,6 @@ export type TransactionErrorMessageProps = {
 export function TransactionErrorMessage({
   errorMessage,
 }: TransactionErrorMessageProps): ReactElement {
-  return <CadenceEditor value={errorMessage} editable={false} />;
+  const parsedMessage = CadenceUtils.parseCadenceError(errorMessage);
+  return <JsonView data={parsedMessage} />;
 }

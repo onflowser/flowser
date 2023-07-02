@@ -26,9 +26,11 @@ export function TransactionOverview(
         label: "Transaction",
         value: (
           <>
-            <MiddleEllipsis className={classes.elipsis}>
-              {transaction.id}
-            </MiddleEllipsis>
+            <NavLink to={`/transactions/details/${transaction.id}`}>
+              <MiddleEllipsis className={classes.elipsis}>
+                {transaction.id}
+              </MiddleEllipsis>
+            </NavLink>
             <ExecutionStatusBadge
               className={classes.txStatusBadge}
               status={transaction.status}
