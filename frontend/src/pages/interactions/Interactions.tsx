@@ -36,7 +36,7 @@ function ContentWithProvider() {
   const { definitions } = useInteractionDefinitionsManager();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
-    label: definition.name,
+    label: `${definition.name} (${definition.type})`,
     content: (
       <InteractionOutcomeManagerProvider interactionId={definition.id}>
         <InteractionContent />

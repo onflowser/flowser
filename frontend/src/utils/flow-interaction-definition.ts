@@ -1,8 +1,9 @@
 import { CadenceParser } from "@onflow/cadence-parser";
 
 export enum FlowInteractionType {
-  SCRIPT,
-  TRANSACTION,
+  UNKNOWN = "unknown",
+  SCRIPT = "script",
+  TRANSACTION = "transaction",
 }
 
 export class FlowInteractionDefinition {
@@ -20,6 +21,7 @@ export class FlowInteractionDefinition {
     this.id = options.id;
     this.sourceCodeInternal = options.sourceCode;
     this.cadenceParser = options.cadenceParser;
+    this.updateAst();
   }
 
   get sourceCode(): string {
@@ -31,11 +33,23 @@ export class FlowInteractionDefinition {
   }
 
   get type(): FlowInteractionType {
-    return FlowInteractionType.TRANSACTION;
+    const declarations = this.cadenceAst?.program?.Declarations;
+    if (!declarations) {
+      return FlowInteractionType.UNKNOWN;
+    }
+    if (declarations?.[0]?.Type === "TransactionDeclaration") {
+      return FlowInteractionType.TRANSACTION;
+    } else {
+      return FlowInteractionType.SCRIPT;
+    }
   }
 
   setSourceCode(value: string): void {
-    this.cadenceAst = this.cadenceParser.parse(value);
     this.sourceCodeInternal = value;
+    this.updateAst();
+  }
+
+  private updateAst() {
+    this.cadenceAst = this.cadenceParser.parse(this.sourceCodeInternal);
   }
 }
