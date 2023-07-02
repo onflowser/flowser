@@ -43,10 +43,16 @@ export class AccountsService {
     });
   }
 
-  async findOneByAddress(address: string) {
+  async findOneWithRelationsByAddress(address: string) {
     return this.accountRepository.findOneOrFail({
       where: { address },
       relations: ["keys", "storage", "contracts", "transactions"],
+    });
+  }
+
+  async findOneByAddress(address: string) {
+    return this.accountRepository.findOneOrFail({
+      where: { address },
     });
   }
 
