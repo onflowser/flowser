@@ -11,15 +11,26 @@ import React, {
   useState,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
-import { FlowInteractionDefinition } from "../../../utils/flow-interaction-definition";
+import {
+  FlowInteractionDefinition,
+  FlowInteractionType,
+} from "../../../utils/flow-interaction-definition";
+// @ts-ignore
+import * as fcl from "@onflow/fcl";
 
-type FlowTransactionOutcome = {
+export type FlowTransactionOutcome = {
   success: Transaction | undefined;
+  error: string | undefined;
+};
+
+export type FlowScriptOutcome = {
+  success: unknown; // Script result
   error: string | undefined;
 };
 
 type FlowInteractionOutcome = {
   transaction: FlowTransactionOutcome;
+  script: FlowScriptOutcome;
 };
 
 type InteractionOutcomeManager = {
@@ -39,16 +50,21 @@ export function InteractionOutcomeManagerProvider(props: {
   const { definitions, setDefinitions } = useInteractionDefinitionsManager();
 
   const [transactionId, setTransactionId] = useState<string>();
-  const [transactionError, setTransactionError] = useState<string>();
+  const [scriptResult, setScriptResult] = useState<unknown>();
+  const [executionError, setExecutionError] = useState<string>();
   const { data: transactionData } = useGetTransaction(transactionId);
   const outcome = useMemo<FlowInteractionOutcome>(
     () => ({
       transaction: {
         success: transactionData?.transaction,
-        error: transactionError,
+        error: executionError,
+      },
+      script: {
+        success: scriptResult,
+        error: executionError,
       },
     }),
-    [transactionData, transactionError]
+    [transactionData, executionError, scriptResult]
   );
 
   function updateCadenceSource(sourceCode: string) {
@@ -74,9 +90,21 @@ export function InteractionOutcomeManagerProvider(props: {
     if (!definition) {
       throw new Error("Assertion error: Expected interaction value");
     }
+    switch (definition.type) {
+      case FlowInteractionType.SCRIPT:
+        return executeScript(definition);
+      case FlowInteractionType.TRANSACTION:
+        return executeTransaction(definition);
+      default:
+        // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
+        throw new Error(`Can't execute interaction: ${definition.type}`);
+    }
+  }
+
+  async function executeTransaction(definition: FlowInteractionDefinition) {
     const accountAddress = "0xf8d6e0586b0a20c7";
     try {
-      setTransactionError(undefined);
+      setExecutionError(undefined);
       setTransactionId(undefined);
       const transactionResult = await walletService.sendTransaction({
         cadence: definition.sourceCode,
@@ -88,7 +116,23 @@ export function InteractionOutcomeManagerProvider(props: {
     } catch (error: unknown) {
       console.log(error);
       if (CommonUtils.isStandardError(error)) {
-        setTransactionError(error.message);
+        setExecutionError(error.message);
+      }
+    }
+  }
+
+  async function executeScript(definition: FlowInteractionDefinition) {
+    try {
+      setExecutionError(undefined);
+      setScriptResult(undefined);
+      const response = await fcl.query({
+        cadence: definition.sourceCode,
+      });
+      setScriptResult(response);
+    } catch (error: unknown) {
+      console.error(error);
+      if (CommonUtils.isStandardError(error)) {
+        setExecutionError(error.message);
       }
     }
   }
