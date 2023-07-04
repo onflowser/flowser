@@ -1,0 +1,96 @@
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
+@import "styles/rules";
+
+.root {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: $dark-violet;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .logoContainer {
+    img {
+      width: 60px;
+      height: 60px;
+    }
+
+    margin-right: $spacing-base * 3;
+  }
+
+  .navLinksContainer {
+    display: flex;
+    margin-right: $spacing-base * 3;
+  }
+
+  .rightContainer {
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+
+    padding: 11px $spacing-l 14px 0;
+
+    > * {
+      box-sizing: border-box;
+      height: calc(100% - 25px);
+    }
+
+    .searchBox {
+      width: min-content;
+    }
+
+    .userButton {
+      width: 35px;
+      height: 35px;
+      & > * {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .sidebarButton {
+      background: none;
+      border: none;
+      padding: 0 0 0 15px;
+
+      .emulatorWorking {
+        padding-right: 4px;
+      }
+
+      .sidebarOpen {
+        padding-left: 6px;
+      }
+    }
+  }
+}
+
+.settingsIcon {
+  fill: $background;
+  width: 18px;
+  height: 18px;
+}
+
+.txButton {
+  background: $blue !important;
+  border-color: $blue !important;
+}
+
+.flowIcon {
+  height: 26px;
+  width: 26px;
+  margin-right: $spacing-s * 0.5 !important;
+  [class="flowPrimary"],
+  .flowPrimary {
+    fill: transparent;
+  }
+}
+
+.searchBar {
+  align-self: center;
+  margin-left: auto;
+  width: 531px;
+}
