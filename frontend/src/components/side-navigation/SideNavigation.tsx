@@ -20,8 +20,8 @@ function Link(props: { to: string }) {
   return (
     <NavLink
       to={props.to}
-      className={classes.navLink}
-      activeClassName={classes.active}
+      className={classes.inactivePage}
+      activeClassName={classes.activePage}
     >
       TODO
     </NavLink>

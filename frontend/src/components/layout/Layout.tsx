@@ -34,18 +34,10 @@ export const RouteWithLayout: FC<RouteProps> = (props) => (
 );
 
 const Layout: FunctionComponent = ({ children }) => {
-  const { logDrawerSize } = useLogDrawer();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
-  const getLogDrawerLayoutClass = useCallback(() => {
-    return logDrawerSize === "tiny"
-      ? ""
-      : logDrawerSize === "small"
-      ? classes.opened
-      : classes.expanded;
-  }, [logDrawerSize]);
 
   return (
     <div className={classes.root}>
@@ -55,7 +47,7 @@ const Layout: FunctionComponent = ({ children }) => {
         <Breadcrumbs />
         <SideBar toggled={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <div className={classes.body}>{children} </div>
-        <Logs className={classNames(classes.logs, getLogDrawerLayoutClass())} />
+        <Logs />
       </div>
     </div>
   );

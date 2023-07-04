@@ -1,4 +1,24 @@
+@import "styles/colors";
+
 .root {
   display: flex;
   flex-direction: column;
+  background: $new-color-1;
+  padding: 15px;
+
+  .inactivePage {
+    background: $new-color-2;
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
+  }
+
+  .activePage {
+    border-color: #9bdefa;
+  }
 }
