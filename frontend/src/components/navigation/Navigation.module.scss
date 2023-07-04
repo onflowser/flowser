@@ -12,7 +12,6 @@
   display: flex;
   flex-direction: column;
   margin: 0 $spacing-l;
-  background: $background;
   padding-bottom: $spacing-s;
 
   .mainContainer {
@@ -82,16 +81,6 @@
       }
     }
   }
-
-  .breadcrumbsContainer {
-    display: flex;
-    height: 50px;
-    margin-top: 8px;
-    padding: 0 $spacing-base - 2px;
-    border-radius: $border-radius-card;
-    align-items: center;
-    background: $medium-violet;
-  }
 }
 
 .settingsIcon {
@@ -112,32 +101,6 @@
   [class="flowPrimary"],
   .flowPrimary {
     fill: transparent;
-  }
-}
-
-.breadcrumbs {
-  margin-left: $spacing-base - 2px;
-}
-
-.backButtonWrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0);
-  cursor: pointer;
-
-  .backButton {
-    width: 20px;
-    height: 16px;
-  }
-
-  transition: background 0.1s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.12);
   }
 }
 

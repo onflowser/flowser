@@ -8,6 +8,7 @@ import { SideBar } from "components/sidebar/SideBar";
 import { Route, RouteProps, useHistory } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
+import { Breadcrumbs } from "../navigation/Breadcrumbs";
 
 export const RouteWithBackButton: FC<RouteProps> = (props) => {
   const history = useHistory();
@@ -49,6 +50,7 @@ const Layout: FunctionComponent = ({ children }) => {
   return (
     <div className={classes.layoutContainer}>
       <Navigation isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <Breadcrumbs />
       <SideBar toggled={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <Content className={classes.content}>{children} </Content>
       <Logs className={classNames(classes.logs, getLogDrawerLayoutClass())} />

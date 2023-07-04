@@ -1,12 +1,9 @@
-import React, { FunctionComponent, useCallback } from "react";
+import React, { FunctionComponent } from "react";
 import { routes } from "../../constants/routes";
 import classes from "./Navigation.module.scss";
 import NavigationItem from "./NavigationItem";
 import Button from "../button/Button";
-import { useNavigation } from "../../hooks/use-navigation";
-import Breadcrumbs from "./Breadcrumbs";
 import Search from "../search/Search";
-import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import sideMenuOpen from "../../assets/icons/side-menu-open.svg";
 import sideMenuClosed from "../../assets/icons/side-menu-closed.svg";
 import sideMenuClosedEmuNoWork from "../../assets/icons/side-menu-closed-emulator-not-working.svg";
@@ -23,20 +20,12 @@ const Navigation: FunctionComponent<{
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
 }> = (props) => {
-  const { isShowBackButtonVisible, isBreadcrumbsVisible } = useNavigation();
-  const breadCrumbsBarHeight = 50;
-  const navigationBarHeight = 65;
-  const navigationHeight =
-    (isBreadcrumbsVisible ? breadCrumbsBarHeight : 0) + navigationBarHeight;
+  const navigationHeight = 80;
   const { user, isLoggedIn } = useFlow();
   const history = useHistory();
 
   const isEmulatorWorking = true;
   const isSidebarOpen = props.isSidebarOpen;
-
-  const onBack = useCallback(() => {
-    history.goBack();
-  }, []);
 
   return (
     <>
@@ -46,22 +35,12 @@ const Navigation: FunctionComponent<{
           <div className={classes.navLinksContainer}>
             <NavigationItem to={routes.accounts}>Accounts</NavigationItem>
             <NavigationItem to={routes.blocks}>Blocks</NavigationItem>
-            <NavigationItem
-              to={routes.transactions}
-            >
+            <NavigationItem to={routes.transactions}>
               Transactions
             </NavigationItem>
-            <NavigationItem
-              to={routes.contracts}
-            >
-              Contracts
-            </NavigationItem>
-            <NavigationItem to={routes.events}>
-              Events
-            </NavigationItem>
-            <NavigationItem to={routes.project}>
-              Project
-            </NavigationItem>
+            <NavigationItem to={routes.contracts}>Contracts</NavigationItem>
+            <NavigationItem to={routes.events}>Events</NavigationItem>
+            <NavigationItem to={routes.project}>Project</NavigationItem>
           </div>
 
           <div className={classes.rightContainer}>
@@ -97,16 +76,6 @@ const Navigation: FunctionComponent<{
             </Button>
           </div>
         </div>
-        {isBreadcrumbsVisible && (
-          <div className={classes.breadcrumbsContainer}>
-            {isShowBackButtonVisible && (
-              <div className={classes.backButtonWrapper} onClick={onBack}>
-                <IconBackButton className={classes.backButton} />
-              </div>
-            )}
-            <Breadcrumbs className={classes.breadcrumbs} />
-          </div>
-        )}
       </div>
     </>
   );
