@@ -1,3 +1,29 @@
-.root {
+@import "styles/spacings";
 
+.loadingRoot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: $spacing-xl;
+}
+
+.root {
+  margin: $spacing-base;
+}
+
+.blockItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: $spacing-base;
+  .info {
+    display: flex;
+    align-items: center;
+  }
+  .actions {
+    .checkout {
+      cursor: pointer;
+    }
+  }
 }

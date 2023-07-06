@@ -1,10 +1,19 @@
 @import 'styles/spacings';
+@import 'styles/colors';
 
 .pageRoot {
   display: flex;
   flex: 1;
   .leftSideMenu {
+    background: #272B32;
     flex: 1;
+    .activeTab {
+
+    }
+    .inactiveTab {
+      background: #33383e !important;
+      color: rgba(229, 229, 229, 0.56) !important;
+    }
   }
   .mainContent {
     flex: 3;

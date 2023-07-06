@@ -51,6 +51,8 @@ function ContentWithProvider() {
     <div className={classes.pageRoot}>
       <TabList
         className={classes.leftSideMenu}
+        activeTabClassName={classes.activeTab}
+        inactiveTabClassName={classes.inactiveTab}
         currentTab={currentSideMenuTab}
         onChangeTab={setCurrentSideMenuTab}
         tabs={sideMenuTabs}

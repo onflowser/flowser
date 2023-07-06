@@ -6,6 +6,7 @@ import { ReactComponent as LogoRound } from "../../assets/icons/logo_round.svg";
 import { ReactComponent as Star } from "../../assets/icons/star.svg";
 import { ReactComponent as Transaction } from "../../assets/icons/transaction.svg";
 import { ReactComponent as ArtistPalette } from "../../assets/icons/artist_palette.svg";
+import { ReactComponent as CircleArrowLeft } from "../../assets/icons/circle_arrow_left.svg";
 
 export const FlowserIcon = {
   Account,
@@ -16,4 +17,5 @@ export const FlowserIcon = {
   Star,
   Transaction,
   ArtistPalette,
+  CircleArrowLeft,
 };
