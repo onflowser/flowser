@@ -27,15 +27,11 @@ import { SimpleButton } from "../../components/simple-button/SimpleButton";
 import { TextUtils } from "../../utils/text-utils";
 import { CommonUtils } from "../../utils/common-utils";
 
-type LogsProps = {
-  className?: string;
-};
-
 const SEARCH_CONTEXT_NAME = "logs";
 const EMULATOR_PROCESS_ID = "emulator";
 const DEV_WALLET_PROCESS_ID = "dev-wallet";
 
-const Logs: FunctionComponent<LogsProps> = ({ className }) => {
+const Logs: FunctionComponent = () => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
   const tinyLogRef = useRef<HTMLDivElement>(null);
@@ -60,6 +56,14 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
       CommonUtils.isDevWalletProcess(process)
   );
   const mouseEvent = useMouseMove(trackMousePosition);
+
+  const getDrawerSizeClass = useCallback(() => {
+    return logDrawerSize === "tiny"
+      ? ""
+      : logDrawerSize === "small"
+      ? classes.opened
+      : classes.expanded;
+  }, [logDrawerSize]);
 
   const scrollToBottom = (smooth = true) => {
     if (!shouldScrollToBottom) {
@@ -136,7 +140,7 @@ const Logs: FunctionComponent<LogsProps> = ({ className }) => {
 
   return (
     <div
-      className={classNames(classes.root, className)}
+      className={classNames(classes.root, getDrawerSizeClass())}
       style={logDrawerSize === "custom" ? { top: mouseEvent?.clientY } : {}}
     >
       <VerticalDragLine
