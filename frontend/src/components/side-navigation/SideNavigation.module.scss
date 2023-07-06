@@ -3,11 +3,13 @@
 .root {
   display: flex;
   flex-direction: column;
+  align-items: center;
   background: $new-color-1;
   padding: 15px;
 
-  .inactivePage {
+  .inactiveLink {
     background: $new-color-2;
+    opacity: 0.5;
     width: 50px;
     height: 50px;
     border-radius: 15px;
@@ -16,9 +18,12 @@
     justify-content: center;
     align-items: center;
     border: 1px solid transparent;
+    transition: 0.1s ease-in-out all;
   }
 
-  .activePage {
+  .activeLink {
     border-color: #9bdefa;
+    opacity: 1;
+    transform: scale(1.05);
   }
 }
