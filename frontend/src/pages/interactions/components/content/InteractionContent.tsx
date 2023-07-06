@@ -4,6 +4,7 @@ import { SimpleButton } from "../../../../components/simple-button/SimpleButton"
 import classes from "./InteractionContent.module.scss";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
+import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
 
 export function InteractionContent(): ReactElement {
   const { definition, updateCadenceSource, execute } =
@@ -18,10 +19,12 @@ export function InteractionContent(): ReactElement {
             onChange={(sourceCode) => updateCadenceSource(sourceCode)}
           />
         </div>
+        <LineSeparator horizontal />
         <div className={classes.details}>
           <InteractionOutcome />
         </div>
       </div>
+      <LineSeparator vertical />
       <div className={classes.sidebar}>
         <SimpleButton onClick={execute}>Execute</SimpleButton>
       </div>

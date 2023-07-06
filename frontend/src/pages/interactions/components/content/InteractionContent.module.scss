@@ -7,6 +7,7 @@
     flex: 2;
     display: flex;
     flex-direction: column;
+    padding: $spacing-l * 2;
     .code {
       flex: 3;
     }
