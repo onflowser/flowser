@@ -4,11 +4,24 @@
 
 .root {
   z-index: 99;
-  position: relative;
   padding: 0 $spacing-l * 2;
   padding-bottom: $spacing-l;
   border-top: 1px solid $color-logs-border;
   background-color: $background;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  &.opened {
+    top: 50%;
+  }
+
+  &.expanded {
+    top: 0;
+  }
 
   pre {
     white-space: nowrap;

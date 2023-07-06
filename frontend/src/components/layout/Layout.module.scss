@@ -29,34 +29,47 @@ $grid-gap: 30px;
   }
 }
 
-.layoutContainer {
+.root {
   display: flex;
-  position: relative;
-  flex-direction: column;
-  min-height: 100vh;
 
-  .content {
-    margin: $grid-gap $spacing-l 0;
-    /* Visual effect: log component will overlap bottom part of content */
-    padding-bottom: 100px;
-    color: $light-grey;
-    align-items: stretch;
+  .sideNavigation {
+
   }
 
-  .logs {
-    position: fixed;
+  .mainContent {
+    flex: 1;
     display: flex;
+    position: relative;
     flex-direction: column;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    min-height: 100vh;
 
-    &.opened {
-      top: 50%;
+    .body {
+      margin: $grid-gap $spacing-l 0;
+      /* Visual effect: log component will overlap bottom part of content */
+      padding-bottom: 100px;
+      color: $light-grey;
+      align-items: stretch;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
-    &.expanded {
-      top: 118px;
+    .logs {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      &.opened {
+        top: 50%;
+      }
+
+      &.expanded {
+        top: 118px;
+      }
     }
   }
+
 }

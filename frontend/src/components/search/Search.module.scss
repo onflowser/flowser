@@ -11,14 +11,15 @@
   border: #4f5768 1px solid;
   background: transparent;
   border-radius: 9px;
-  padding: 0 $spacing-base + 5px 0 $spacing-s + 1px;
+  padding-left: $spacing-l;
+  padding-right: $spacing-l;
 
   &:hover {
     cursor: text;
   }
 
   .searchIcon {
-    margin-right: $spacing-s;
+    margin-right: $spacing-base;
     width: 17px;
     height: 17px;
 
