@@ -15,6 +15,7 @@ export function SideNavigation(): ReactElement {
       <ProjectLink to={routes.transactions} icon={FlowserIcon.Transaction} />
       <ProjectLink to={routes.contracts} icon={FlowserIcon.Contract} />
       <ProjectLink to={routes.events} icon={FlowserIcon.Star} />
+      <ProjectLink to={routes.interactions} icon={FlowserIcon.CursorClick} />
       <ProjectLink to={routes.project} icon={FlowserIcon.ArtistPalette} />
     </div>
   );
