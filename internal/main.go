@@ -9,13 +9,10 @@ import (
 	"github.com/onflow/cadence/runtime/parser"
 )
 
-type Request struct {
-	Code string `json:"code"`
-}
-
 type Response struct {
-	Program *ast.Program `json:"program"`
-	Error   string       `json:"error"`
+	Interaction *Interaction `json:"interaction"`
+	Program     *ast.Program `json:"program"`
+	Error       string       `json:"error"`
 }
 
 func main() {
@@ -34,9 +31,10 @@ func main() {
 		response.Error = err.Error()
 	} else {
 		response.Program = program
+		response.Interaction = interaction
 	}
 
-	err = json.NewEncoder(os.Stdout).Encode(interaction)
+	err = json.NewEncoder(os.Stdout).Encode(response)
 	if err != nil {
 		panic(err)
 	}
