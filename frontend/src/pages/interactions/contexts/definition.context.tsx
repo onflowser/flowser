@@ -6,12 +6,12 @@ import React, {
   useContext,
   useState,
 } from "react";
-import { FlowInteractionDefinition } from "../../../utils/flow-interaction-definition";
+import { InteractionDefinition } from "../interaction-definition";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 
 type InteractionsDefinitionsManager = {
-  definitions: FlowInteractionDefinition[];
-  setDefinitions: Dispatch<SetStateAction<FlowInteractionDefinition[]>>;
+  definitions: InteractionDefinition[];
+  setDefinitions: Dispatch<SetStateAction<InteractionDefinition[]>>;
 };
 
 const Context = createContext<InteractionsDefinitionsManager>(undefined as any);
@@ -20,8 +20,8 @@ export function InteractionDefinitionsManagerProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const { cadenceParser } = usePlatformAdapter();
-  const [definitions, setDefinitions] = useState<FlowInteractionDefinition[]>([
-    new FlowInteractionDefinition({
+  const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
+    new InteractionDefinition({
       id: "demo",
       sourceCode: "transaction {}",
       cadenceParser,

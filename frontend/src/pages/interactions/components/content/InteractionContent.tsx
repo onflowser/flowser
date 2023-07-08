@@ -5,6 +5,7 @@ import classes from "./InteractionContent.module.scss";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
+import { ArgumentListBuilder } from "../arguments/ArgumentListBuilder";
 
 export function InteractionContent(): ReactElement {
   const { definition, updateCadenceSource, execute } =

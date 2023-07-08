@@ -9,9 +9,9 @@ import React, {
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
 import {
-  FlowInteractionDefinition,
-  FlowInteractionType,
-} from "../../../utils/flow-interaction-definition";
+  InteractionDefinition,
+  InteractionType,
+} from "../interaction-definition";
 // @ts-ignore
 import * as fcl from "@onflow/fcl";
 
@@ -31,7 +31,7 @@ type FlowInteractionOutcome = {
 };
 
 type InteractionOutcomeManager = {
-  definition: FlowInteractionDefinition;
+  definition: InteractionDefinition;
   outcome: FlowInteractionOutcome | undefined;
   updateCadenceSource: (sourceCode: string) => void;
   execute: () => Promise<void>;
@@ -71,9 +71,9 @@ export function InteractionOutcomeManagerProvider(props: {
       throw new Error("Assertion error: Expected interaction value");
     }
     switch (definition.type) {
-      case FlowInteractionType.SCRIPT:
+      case InteractionType.SCRIPT:
         return executeScript(definition);
-      case FlowInteractionType.TRANSACTION:
+      case InteractionType.TRANSACTION:
         return executeTransaction(definition);
       default:
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
@@ -81,7 +81,7 @@ export function InteractionOutcomeManagerProvider(props: {
     }
   }
 
-  async function executeTransaction(definition: FlowInteractionDefinition) {
+  async function executeTransaction(definition: InteractionDefinition) {
     const accountAddress = "0xf8d6e0586b0a20c7";
     try {
       setOutcome({});
@@ -108,7 +108,7 @@ export function InteractionOutcomeManagerProvider(props: {
     }
   }
 
-  async function executeScript(definition: FlowInteractionDefinition) {
+  async function executeScript(definition: InteractionDefinition) {
     try {
       setOutcome({});
       const result = await fcl.query({

@@ -1,12 +1,12 @@
 import { CadenceParser } from "@onflow/cadence-parser";
 
-export enum FlowInteractionType {
+export enum InteractionType {
   UNKNOWN = "unknown",
   SCRIPT = "script",
   TRANSACTION = "transaction",
 }
 
-export class FlowInteractionDefinition {
+export class InteractionDefinition {
   public id: string;
   private sourceCodeInternal: string;
   private cadenceParser: CadenceParser;
@@ -32,15 +32,15 @@ export class FlowInteractionDefinition {
     return "Test";
   }
 
-  get type(): FlowInteractionType {
+  get type(): InteractionType {
     const declarations = this.cadenceAst?.program?.Declarations;
     if (!declarations) {
-      return FlowInteractionType.UNKNOWN;
+      return InteractionType.UNKNOWN;
     }
     if (declarations?.[0]?.Type === "TransactionDeclaration") {
-      return FlowInteractionType.TRANSACTION;
+      return InteractionType.TRANSACTION;
     } else {
-      return FlowInteractionType.SCRIPT;
+      return InteractionType.SCRIPT;
     }
   }
 
