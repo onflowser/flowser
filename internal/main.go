@@ -49,40 +49,109 @@ const (
 )
 
 type Interaction struct {
-	Kind InteractionKind
+	Kind       InteractionKind
+	Parameters []InteractionParameter
 }
 
-type ArgumentKind uint
+type ParameterKind uint
 
 const (
-	ArgumentKindUnknown ArgumentKind = iota
-	ArgumentKindNumeric
-	ArgumentKindTextual
-	ArgumentKindBoolean
+	ParameterKindUnknown ParameterKind = iota
+	ParameterKindNumeric
+	ParameterKindTextual
+	ParameterKindBoolean
+	ParameterKindAddress
 )
 
-type InteractionArgument struct {
-	Kind        ArgumentKind
+type InteractionParameter struct {
+	Kind        ParameterKind
 	CadenceType string
+	// TODO: Add support for optional types (e.g. `optional` flag)
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
-	kind := InteractionKindUnknown
-
 	transactionDeclaration := getTransactionDeclaration(program.Declarations())
 
 	if transactionDeclaration != nil {
-		kind = InteractionKindTransaction
+		return &Interaction{
+			Kind:       InteractionKindTransaction,
+			Parameters: buildInteractionParameterList(transactionDeclaration.ParameterList),
+		}
 	}
 
 	mainFunctionDeclaration := getMainFunctionDeclaration(program.Declarations())
 
 	if mainFunctionDeclaration != nil {
-		kind = InteractionKindScript
+		return &Interaction{
+			Kind:       InteractionKindScript,
+			Parameters: buildInteractionParameterList(mainFunctionDeclaration.ParameterList),
+		}
 	}
 
 	return &Interaction{
-		Kind: kind,
+		Kind: InteractionKindUnknown,
+	}
+}
+
+func buildInteractionParameterList(parameterList *ast.ParameterList) []InteractionParameter {
+	var parameters []InteractionParameter
+
+	for _, parameter := range parameterList.Parameters {
+		parameters = append(parameters, buildInteractionParameter(parameter))
+	}
+
+	return parameters
+}
+
+func buildInteractionParameter(parameter *ast.Parameter) InteractionParameter {
+	cadenceType := parameter.TypeAnnotation.Type.String()
+
+	return InteractionParameter{
+		Kind:        getInteractionParameterKind(parameter.TypeAnnotation),
+		CadenceType: cadenceType,
+	}
+}
+
+func getInteractionParameterKind(typeAnnotation *ast.TypeAnnotation) ParameterKind {
+	switch typeAnnotation.Type.String() {
+	case "Address":
+		return ParameterKindAddress
+	case "Bool":
+		return ParameterKindBoolean
+	case "String",
+		"Character",
+		"Bytes",
+		"Path",
+		"CapabilityPath",
+		"StoragePath",
+		"PublicPath",
+		"PrivatePath":
+		return ParameterKindTextual
+	case "Number",
+		"SignedNumber",
+		"Integer",
+		"SignedInteger",
+		"FixedPoint",
+		"SignedFixedPoint",
+		"Int",
+		"Int8",
+		"Int16",
+		"Int32",
+		"Int64",
+		"Int128",
+		"Int256",
+		"UInt",
+		"UInt8",
+		"UInt16",
+		"UInt32",
+		"UInt64",
+		"UInt128",
+		"UInt256",
+		"Fix64",
+		"UFIx64":
+		return ParameterKindNumeric
+	default:
+		return ParameterKindUnknown
 	}
 }
 
