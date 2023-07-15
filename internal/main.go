@@ -66,7 +66,7 @@ const (
 type InteractionParameter struct {
 	Kind        ParameterKind
 	CadenceType string
-	// TODO: Add support for optional types (e.g. `optional` flag)
+	Optional    bool
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
@@ -106,14 +106,25 @@ func buildInteractionParameterList(parameterList *ast.ParameterList) []Interacti
 func buildInteractionParameter(parameter *ast.Parameter) InteractionParameter {
 	cadenceType := parameter.TypeAnnotation.Type.String()
 
-	return InteractionParameter{
-		Kind:        getInteractionParameterKind(parameter.TypeAnnotation),
-		CadenceType: cadenceType,
+	optionalParameter, ok := parameter.TypeAnnotation.Type.(*ast.OptionalType)
+
+	if ok {
+		return InteractionParameter{
+			Kind:        getInteractionParameterKind(optionalParameter.Type),
+			CadenceType: cadenceType,
+			Optional:    true,
+		}
+	} else {
+		return InteractionParameter{
+			Kind:        getInteractionParameterKind(parameter.TypeAnnotation.Type),
+			CadenceType: cadenceType,
+			Optional:    false,
+		}
 	}
 }
 
-func getInteractionParameterKind(typeAnnotation *ast.TypeAnnotation) ParameterKind {
-	switch typeAnnotation.Type.String() {
+func getInteractionParameterKind(t ast.Type) ParameterKind {
+	switch t.String() {
 	case "Address":
 		return ParameterKindAddress
 	case "Bool":

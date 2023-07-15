@@ -6,7 +6,7 @@ import (
 	"github.com/onflow/cadence/runtime/parser"
 )
 
-func TestBuildInteraction(t *testing.T) {
+func TestSimpleInteraction(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addr: Address) {}")
 
 	if interaction.Kind != InteractionKindTransaction {
@@ -19,6 +19,22 @@ func TestBuildInteraction(t *testing.T) {
 
 	if interaction.Parameters[0].Kind != ParameterKindAddress {
 		t.Error("Expected Address parameter kind")
+	}
+
+	if interaction.Parameters[0].Optional {
+		t.Error("Expected required")
+	}
+}
+
+func TestSimpleInteractionWithOptionalParameter(t *testing.T) {
+	interaction := parseAndBuildInteraction("transaction (addr: Address?) {}")
+
+	if interaction.Parameters[0].Kind != ParameterKindAddress {
+		t.Error("Expected Address parameter kind")
+	}
+
+	if !interaction.Parameters[0].Optional {
+		t.Error("Expected optional")
 	}
 }
 
