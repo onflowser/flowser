@@ -38,6 +38,22 @@ func TestSimpleInteractionWithOptionalParameter(t *testing.T) {
 	}
 }
 
+func TestComplexParameter(t *testing.T) {
+	interaction := parseAndBuildInteraction("transaction (addresses: [Address]) {}")
+
+	if interaction.Parameters[0].Kind != ParameterKindArray {
+		t.Error("Expected Array parameter kind")
+	}
+
+	if interaction.Parameters[0].ArrayParameter == nil {
+		t.Error("Expected array element")
+	}
+
+	if interaction.Parameters[0].ArrayParameter.Kind != ParameterKindAddress {
+		t.Error("Expected Address parameter kind")
+	}
+}
+
 func parseAndBuildInteraction(code string) *Interaction {
 	program, err := parser.ParseProgram(nil, []byte(code), parser.Config{})
 

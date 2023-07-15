@@ -50,7 +50,7 @@ const (
 
 type Interaction struct {
 	Kind       InteractionKind
-	Parameters []InteractionParameter
+	Parameters []*InteractionParameter
 }
 
 type ParameterKind uint
@@ -61,12 +61,15 @@ const (
 	ParameterKindTextual
 	ParameterKindBoolean
 	ParameterKindAddress
+	ParameterKindArray
 )
 
 type InteractionParameter struct {
 	Kind        ParameterKind
 	CadenceType string
 	Optional    bool
+
+	ArrayParameter *InteractionParameter
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
@@ -93,30 +96,36 @@ func buildInteraction(program *ast.Program) *Interaction {
 	}
 }
 
-func buildInteractionParameterList(parameterList *ast.ParameterList) []InteractionParameter {
-	var parameters []InteractionParameter
+func buildInteractionParameterList(parameterList *ast.ParameterList) []*InteractionParameter {
+	var parameters []*InteractionParameter
 
 	for _, parameter := range parameterList.Parameters {
-		parameters = append(parameters, buildInteractionParameter(parameter))
+		parameters = append(parameters, buildInteractionParameter(parameter.TypeAnnotation.Type))
 	}
 
 	return parameters
 }
 
-func buildInteractionParameter(parameter *ast.Parameter) InteractionParameter {
-	cadenceType := parameter.TypeAnnotation.Type.String()
+func buildInteractionParameter(uncastedType ast.Type) *InteractionParameter {
+	cadenceType := uncastedType.String()
 
-	optionalParameter, ok := parameter.TypeAnnotation.Type.(*ast.OptionalType)
-
-	if ok {
-		return InteractionParameter{
-			Kind:        getInteractionParameterKind(optionalParameter.Type),
+	switch castedType := uncastedType.(type) {
+	case *ast.OptionalType:
+		return &InteractionParameter{
+			Kind:        getInteractionParameterKind(castedType.Type),
 			CadenceType: cadenceType,
 			Optional:    true,
 		}
-	} else {
-		return InteractionParameter{
-			Kind:        getInteractionParameterKind(parameter.TypeAnnotation.Type),
+	case *ast.VariableSizedType:
+		return &InteractionParameter{
+			Kind:           ParameterKindArray,
+			CadenceType:    cadenceType,
+			Optional:       false,
+			ArrayParameter: buildInteractionParameter(castedType.Type),
+		}
+	default:
+		return &InteractionParameter{
+			Kind:        getInteractionParameterKind(uncastedType),
 			CadenceType: cadenceType,
 			Optional:    false,
 		}
