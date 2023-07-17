@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-// TODO(milestone-x): This is not a complete list of types
-// Refer to: https://github.com/onflow/cadence/blob/master/values.go
-enum CadenceType {
+// TODO(feature-interact-screen): Migrate to use messages from interactions.proto
+
+enum LegacyCadenceType {
   TX_ARG_UNSPECIFIED = 0;
   UInt = 1;
   UInt8 = 2;
@@ -36,7 +36,7 @@ enum CadenceType {
 }
 
 message CadenceObject {
-  CadenceType type = 1;
+  LegacyCadenceType type = 1;
 
   // TODO(milestone-x): Some of these type-specific properties are not tested
   CadenceNumericObject numeric_attributes = 2;

@@ -1,7 +1,7 @@
-import { CadenceType } from "../generated/entities/cadence";
+import { LegacyCadenceType } from "../generated/entities/cadence";
 
 export class CadenceUtils {
-  static isPrimitiveType(cadenceType: CadenceType): boolean {
+  static isPrimitiveType(cadenceType: LegacyCadenceType): boolean {
     if (this.isNumericType(cadenceType)) {
       return true;
     }
@@ -11,107 +11,107 @@ export class CadenceUtils {
     return this.isBoolType(cadenceType);
   }
 
-  static isBoolType(cadenceType: CadenceType): boolean {
-    return cadenceType === CadenceType.Bool;
+  static isBoolType(cadenceType: LegacyCadenceType): boolean {
+    return cadenceType === LegacyCadenceType.Bool;
   }
 
-  static isNumericType(cadenceType: CadenceType): boolean {
+  static isNumericType(cadenceType: LegacyCadenceType): boolean {
     switch (cadenceType) {
-      case CadenceType.UInt:
-      case CadenceType.UInt8:
-      case CadenceType.UInt16:
-      case CadenceType.UInt32:
-      case CadenceType.UInt64:
-      case CadenceType.UInt128:
-      case CadenceType.UInt256:
-      case CadenceType.Int:
-      case CadenceType.Int8:
-      case CadenceType.Int16:
-      case CadenceType.Int32:
-      case CadenceType.Int64:
-      case CadenceType.Int128:
-      case CadenceType.Int256:
-      case CadenceType.UFix64:
-      case CadenceType.Fix64:
+      case LegacyCadenceType.UInt:
+      case LegacyCadenceType.UInt8:
+      case LegacyCadenceType.UInt16:
+      case LegacyCadenceType.UInt32:
+      case LegacyCadenceType.UInt64:
+      case LegacyCadenceType.UInt128:
+      case LegacyCadenceType.UInt256:
+      case LegacyCadenceType.Int:
+      case LegacyCadenceType.Int8:
+      case LegacyCadenceType.Int16:
+      case LegacyCadenceType.Int32:
+      case LegacyCadenceType.Int64:
+      case LegacyCadenceType.Int128:
+      case LegacyCadenceType.Int256:
+      case LegacyCadenceType.UFix64:
+      case LegacyCadenceType.Fix64:
         return true;
       default:
         return false;
     }
   }
 
-  static isStringLikeType(cadenceType: CadenceType): boolean {
+  static isStringLikeType(cadenceType: LegacyCadenceType): boolean {
     switch (cadenceType) {
-      case CadenceType.Word8:
-      case CadenceType.Word16:
-      case CadenceType.Word32:
-      case CadenceType.Word64:
-      case CadenceType.String:
-      case CadenceType.Character:
-      case CadenceType.Address:
-      case CadenceType.Path:
+      case LegacyCadenceType.Word8:
+      case LegacyCadenceType.Word16:
+      case LegacyCadenceType.Word32:
+      case LegacyCadenceType.Word64:
+      case LegacyCadenceType.String:
+      case LegacyCadenceType.Character:
+      case LegacyCadenceType.Address:
+      case LegacyCadenceType.Path:
         return true;
       default:
         return false;
     }
   }
 
-  static getTypeName(cadenceType: CadenceType): string {
+  static getTypeName(cadenceType: LegacyCadenceType): string {
     switch (cadenceType) {
-      case CadenceType.UInt:
+      case LegacyCadenceType.UInt:
         return "Uint";
-      case CadenceType.UInt8:
+      case LegacyCadenceType.UInt8:
         return "Uint8";
-      case CadenceType.UInt16:
+      case LegacyCadenceType.UInt16:
         return "Uint16";
-      case CadenceType.UInt32:
+      case LegacyCadenceType.UInt32:
         return "UInt32";
-      case CadenceType.UInt64:
+      case LegacyCadenceType.UInt64:
         return "UInt64";
-      case CadenceType.UInt128:
+      case LegacyCadenceType.UInt128:
         return "UInt128";
-      case CadenceType.UInt256:
+      case LegacyCadenceType.UInt256:
         return "UInt256";
-      case CadenceType.Int:
+      case LegacyCadenceType.Int:
         return "Int";
-      case CadenceType.Int8:
+      case LegacyCadenceType.Int8:
         return "Int8";
-      case CadenceType.Int16:
+      case LegacyCadenceType.Int16:
         return "Int16";
-      case CadenceType.Int32:
+      case LegacyCadenceType.Int32:
         return "Int32";
-      case CadenceType.Int64:
+      case LegacyCadenceType.Int64:
         return "Int64";
-      case CadenceType.Int128:
+      case LegacyCadenceType.Int128:
         return "Int128";
-      case CadenceType.Int256:
+      case LegacyCadenceType.Int256:
         return "Int256";
-      case CadenceType.Word8:
+      case LegacyCadenceType.Word8:
         return "Word8";
-      case CadenceType.Word16:
+      case LegacyCadenceType.Word16:
         return "Word16";
-      case CadenceType.Word32:
+      case LegacyCadenceType.Word32:
         return "Word32";
-      case CadenceType.Word64:
+      case LegacyCadenceType.Word64:
         return "Word64";
-      case CadenceType.UFix64:
+      case LegacyCadenceType.UFix64:
         return "UFix64";
-      case CadenceType.Fix64:
+      case LegacyCadenceType.Fix64:
         return "Fix64";
-      case CadenceType.String:
+      case LegacyCadenceType.String:
         return "String";
-      case CadenceType.Character:
+      case LegacyCadenceType.Character:
         return "Character";
-      case CadenceType.Bool:
+      case LegacyCadenceType.Bool:
         return "Bool";
-      case CadenceType.Address:
+      case LegacyCadenceType.Address:
         return "Address";
-      case CadenceType.Path:
+      case LegacyCadenceType.Path:
         return "Path";
-      case CadenceType.Array:
+      case LegacyCadenceType.Array:
         return "Array";
-      case CadenceType.Dictionary:
+      case LegacyCadenceType.Dictionary:
         return "Dictionary";
-      case CadenceType.Optional:
+      case LegacyCadenceType.Optional:
         return "Optional";
       default:
         return "-";

@@ -1,8 +1,8 @@
 import { FlowCadenceObject } from "../services/gateway.service";
 import {
   CadenceObject,
-  CadenceType,
-  cadenceTypeFromJSON,
+  LegacyCadenceType,
+  legacyCadenceTypeFromJSON,
 } from "@flowser/shared";
 import { CadenceUtils as SharedCadenceUtils } from "@flowser/shared";
 import { isArray } from "../../utils/common-utils";
@@ -15,19 +15,19 @@ export class CadenceUtils {
   static serializeCadenceObject(
     cadenceObject: FlowCadenceObject
   ): CadenceObject {
-    const cadenceType = cadenceTypeFromJSON(cadenceObject.type);
+    const cadenceType = legacyCadenceTypeFromJSON(cadenceObject.type);
     if (SharedCadenceUtils.isNumericType(cadenceType)) {
       return this.serializeNumericValue(cadenceObject);
     }
     switch (cadenceType) {
-      case CadenceType.String:
-      case CadenceType.Address:
+      case LegacyCadenceType.String:
+      case LegacyCadenceType.Address:
         return this.serializeStringLikeValue(cadenceObject);
-      case CadenceType.Array:
+      case LegacyCadenceType.Array:
         return this.serializeArrayValue(cadenceObject);
-      case CadenceType.Struct:
+      case LegacyCadenceType.Struct:
         return this.serializeStructValue(cadenceObject);
-      case CadenceType.Bool:
+      case LegacyCadenceType.Bool:
         return this.serializeBoolValue(cadenceObject);
       default: {
         console.error(
@@ -42,7 +42,7 @@ export class CadenceUtils {
 
   private static serializeNumericValue(cadenceObject: FlowCadenceObject) {
     return CadenceObject.fromPartial({
-      type: cadenceTypeFromJSON(cadenceObject.type),
+      type: legacyCadenceTypeFromJSON(cadenceObject.type),
       numericAttributes: {
         value: Number(String(cadenceObject.value)),
       },
@@ -51,7 +51,7 @@ export class CadenceUtils {
 
   private static serializeStringLikeValue(cadenceObject: FlowCadenceObject) {
     return CadenceObject.fromPartial({
-      type: cadenceTypeFromJSON(cadenceObject.type),
+      type: legacyCadenceTypeFromJSON(cadenceObject.type),
       stringAttributes: {
         value: String(cadenceObject.value),
       },
@@ -60,7 +60,7 @@ export class CadenceUtils {
 
   private static serializeArrayValue(cadenceObject: FlowCadenceObject) {
     return CadenceObject.fromPartial({
-      type: cadenceTypeFromJSON(cadenceObject.type),
+      type: legacyCadenceTypeFromJSON(cadenceObject.type),
       arrayAttributes: {
         value: isArray(cadenceObject.value)
           ? cadenceObject.value.map((value) =>
@@ -73,7 +73,7 @@ export class CadenceUtils {
 
   private static serializeStructValue(cadenceObject: FlowCadenceObject) {
     return CadenceObject.fromPartial({
-      type: cadenceTypeFromJSON(cadenceObject.type),
+      type: legacyCadenceTypeFromJSON(cadenceObject.type),
       structAttributes: {
         // TODO(milestone-x): Not sure how to parse structs
         // See https://www.notion.so/flowser/Improve-cadence-object-parsing-827aa42fba6a434b9b7d999c999f4d30
@@ -84,7 +84,7 @@ export class CadenceUtils {
 
   private static serializeBoolValue(cadenceObject: FlowCadenceObject) {
     return CadenceObject.fromPartial({
-      type: cadenceTypeFromJSON(cadenceObject.type),
+      type: legacyCadenceTypeFromJSON(cadenceObject.type),
       boolAttributes: {
         value: Boolean(cadenceObject.value),
       },

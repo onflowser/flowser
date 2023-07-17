@@ -1382,6 +1382,7 @@
     "@fingerprintjs/fingerprintjs" "^3.3.6"
     "@flowser/backend" "0.0.1"
     "@flowser/shared" "0.0.1"
+    "@onflow/cadence-parser" "^0.26.0"
     "@onflow/fcl" "^1.2.0"
     "@onflow/types" "^1.0.3"
     "@sentry/electron" "^4.0.2"

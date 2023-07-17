@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+enum InteractionKind {
+  INTERACTION_UNKNOWN = 0;
+  INTERACTION_SCRIPT = 1;
+  INTERACTION_TRANSACTION = 2;
+}
+
+message Interaction {
+  InteractionKind kind = 1;
+  repeated CadenceType parameters = 2;
+}
+
+enum CadenceTypeKind {
+  CADENCE_TYPE_UNKNOWN = 0;
+  CADENCE_TYPE_NUMERIC = 1;
+  CADENCE_TYPE_TEXTUAL = 2;
+  CADENCE_TYPE_BOOLEAN = 3;
+  CADENCE_TYPE_ADDRESS = 4;
+  CADENCE_TYPE_ARRAY = 5;
+  CADENCE_TYPE_DICTIONARY = 6;
+}
+
+message CadenceType {
+  CadenceTypeKind kind = 1;
+  string raw_type = 2;
+  bool optional = 3;
+
+  message Array {
+    CadenceType element = 1;
+    int32 size = 2;
+  }
+
+  message Dictionary {
+    CadenceType key = 1;
+    CadenceType value = 2;
+  }
+}
