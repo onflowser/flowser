@@ -8,6 +8,7 @@ import {
 import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
+import { InteractionKind } from "@flowser/shared";
 
 export function Interactions(): ReactElement {
   return (
@@ -36,7 +37,7 @@ function ContentWithProvider() {
   const { definitions } = useInteractionDefinitionsManager();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
-    label: `${definition.name} (${definition.type})`,
+    label: `${definition.name} (${getInteractionKindLabel(definition.type)})`,
     content: (
       <InteractionOutcomeManagerProvider interactionId={definition.id}>
         <InteractionContent />
@@ -65,4 +66,15 @@ function ContentWithProvider() {
       />
     </div>
   );
+}
+
+function getInteractionKindLabel(kind: InteractionKind) {
+  switch (kind) {
+    case InteractionKind.INTERACTION_TRANSACTION:
+      return "Transaction";
+    case InteractionKind.INTERACTION_SCRIPT:
+      return "Script";
+    default:
+      return "Unknown";
+  }
 }

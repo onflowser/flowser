@@ -26,6 +26,7 @@ export class InteractionsService {
       });
 
       childProcess.stdin.write(sourceCode);
+      // Write delimiter char to signal the end of input.
       childProcess.stdin.write("\n");
 
       childProcess.on("close", (code) => {

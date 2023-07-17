@@ -3,16 +3,11 @@ import ReactDOM from "react-dom";
 import "App.scss";
 import { FlowserClientApp } from "App";
 import reportWebVitals from "reportWebVitals";
-import { CadenceParser } from "@onflow/cadence-parser";
 
 async function renderApp() {
-  // For now just make sure to put the cadence-parser.wasm
-  // from @onflow/cadence-parser build folder to /public folder manually.
-  const cadenceParser = await CadenceParser.create("/cadence-parser.wasm");
-
   ReactDOM.render(
     <React.StrictMode>
-      <FlowserClientApp platformAdapter={{ cadenceParser }} />
+      <FlowserClientApp platformAdapter={{}} />
     </React.StrictMode>,
     document.getElementById("root")
   );

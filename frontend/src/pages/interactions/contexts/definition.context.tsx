@@ -7,7 +7,6 @@ import React, {
   useState,
 } from "react";
 import { InteractionDefinition } from "../interaction-definition";
-import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 
 type InteractionsDefinitionsManager = {
   definitions: InteractionDefinition[];
@@ -19,12 +18,10 @@ const Context = createContext<InteractionsDefinitionsManager>(undefined as any);
 export function InteractionDefinitionsManagerProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const { cadenceParser } = usePlatformAdapter();
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     new InteractionDefinition({
       id: "demo",
       sourceCode: "transaction {}",
-      cadenceParser,
     }),
   ]);
 

@@ -1,26 +1,20 @@
-import { CadenceParser } from "@onflow/cadence-parser";
-
-export enum InteractionType {
-  UNKNOWN = "unknown",
-  SCRIPT = "script",
-  TRANSACTION = "transaction",
-}
+import { GetParsedInteractionResponse, InteractionKind } from "@flowser/shared";
+import { ServiceRegistry } from "../../services/service-registry";
 
 export class InteractionDefinition {
   public id: string;
   private sourceCodeInternal: string;
-  private cadenceParser: CadenceParser;
-  private cadenceAst: any;
-  // TODO(feature-interact-screen): Add and formalize `arguments` field
+  private parsedInteractionResponse: GetParsedInteractionResponse;
 
   constructor(options: {
     id: string;
     sourceCode: string;
-    cadenceParser: CadenceParser;
   }) {
     this.id = options.id;
     this.sourceCodeInternal = options.sourceCode;
-    this.cadenceParser = options.cadenceParser;
+    this.parsedInteractionResponse = GetParsedInteractionResponse.fromPartial(
+      {}
+    );
     this.updateAst();
   }
 
@@ -32,16 +26,11 @@ export class InteractionDefinition {
     return "Test";
   }
 
-  get type(): InteractionType {
-    const declarations = this.cadenceAst?.program?.Declarations;
-    if (!declarations) {
-      return InteractionType.UNKNOWN;
-    }
-    if (declarations?.[0]?.Type === "TransactionDeclaration") {
-      return InteractionType.TRANSACTION;
-    } else {
-      return InteractionType.SCRIPT;
-    }
+  get type(): InteractionKind {
+    return (
+      this.parsedInteractionResponse.interaction?.kind ??
+      InteractionKind.INTERACTION_UNKNOWN
+    );
   }
 
   setSourceCode(value: string): void {
@@ -49,7 +38,10 @@ export class InteractionDefinition {
     this.updateAst();
   }
 
-  private updateAst() {
-    this.cadenceAst = this.cadenceParser.parse(this.sourceCodeInternal);
+  private async updateAst() {
+    this.parsedInteractionResponse =
+      await ServiceRegistry.getInstance().interactionsService.parseInteraction({
+        sourceCode: this.sourceCodeInternal,
+      });
   }
 }

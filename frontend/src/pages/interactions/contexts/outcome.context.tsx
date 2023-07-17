@@ -8,12 +8,10 @@ import React, {
   useState,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
-import {
-  InteractionDefinition,
-  InteractionType,
-} from "../interaction-definition";
+import { InteractionDefinition } from "../interaction-definition";
 // @ts-ignore
 import * as fcl from "@onflow/fcl";
+import { InteractionKind } from "@flowser/shared";
 
 export type FlowTransactionOutcome = {
   transactionId?: string;
@@ -71,9 +69,9 @@ export function InteractionOutcomeManagerProvider(props: {
       throw new Error("Assertion error: Expected interaction value");
     }
     switch (definition.type) {
-      case InteractionType.SCRIPT:
+      case InteractionKind.INTERACTION_SCRIPT:
         return executeScript(definition);
-      case InteractionType.TRANSACTION:
+      case InteractionKind.INTERACTION_TRANSACTION:
         return executeTransaction(definition);
       default:
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
