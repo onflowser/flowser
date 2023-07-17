@@ -51,38 +51,39 @@ const (
 
 type Interaction struct {
 	Kind       InteractionKind
-	Parameters []*InteractionParameter
+	Parameters []*CadenceType
 }
 
-type ParameterKind uint
+type CadenceTypeKind uint
 
 const (
-	ParameterKindUnknown ParameterKind = iota
-	ParameterKindNumeric
-	ParameterKindTextual
-	ParameterKindBoolean
-	ParameterKindAddress
-	ParameterKindArray
-	ParameterKindDictionary
+	CadenceTypeUnknown CadenceTypeKind = iota
+	CadenceTypeNumeric
+	CadenceTypeTextual
+	CadenceTypeBoolean
+	CadenceTypeAddress
+	CadenceTypeArray
+	CadenceTypeDictionary
 )
 
-type InteractionParameter struct {
-	Kind        ParameterKind
-	CadenceType string
-	Optional    bool
+type CadenceType struct {
+	Kind     CadenceTypeKind
+	RawType  string
+	Optional bool
 
-	ArrayParameter      *ArrayParameter
-	DictionaryParameter *DictionaryParameter
+	// sub-type specific fields
+	ArrayType      *ArrayType
+	DictionaryType *DictionaryType
 }
 
-type ArrayParameter struct {
-	Element *InteractionParameter
+type ArrayType struct {
+	Element *CadenceType
 	Size    *big.Int
 }
 
-type DictionaryParameter struct {
-	Key   *InteractionParameter
-	Value *InteractionParameter
+type DictionaryType struct {
+	Key   *CadenceType
+	Value *CadenceType
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
@@ -109,70 +110,70 @@ func buildInteraction(program *ast.Program) *Interaction {
 	}
 }
 
-func buildInteractionParameterList(parameterList *ast.ParameterList) []*InteractionParameter {
-	var parameters []*InteractionParameter
+func buildInteractionParameterList(parameterList *ast.ParameterList) []*CadenceType {
+	var parameters []*CadenceType
 
 	for _, parameter := range parameterList.Parameters {
-		parameters = append(parameters, buildInteractionParameter(parameter.TypeAnnotation.Type))
+		parameters = append(parameters, buildCadenceType(parameter.TypeAnnotation.Type))
 	}
 
 	return parameters
 }
 
-func buildInteractionParameter(uncastedType ast.Type) *InteractionParameter {
+func buildCadenceType(uncastedType ast.Type) *CadenceType {
 	cadenceType := uncastedType.String()
 
 	switch castedType := uncastedType.(type) {
 	case *ast.OptionalType:
-		nestedInteraction := buildInteractionParameter(castedType.Type)
+		nestedInteraction := buildCadenceType(castedType.Type)
 		nestedInteraction.Optional = true
 		return nestedInteraction
 	case *ast.VariableSizedType:
-		return &InteractionParameter{
-			Kind:        ParameterKindArray,
-			CadenceType: cadenceType,
-			Optional:    false,
-			ArrayParameter: &ArrayParameter{
-				Element: buildInteractionParameter(castedType.Type),
+		return &CadenceType{
+			Kind:     CadenceTypeArray,
+			RawType:  cadenceType,
+			Optional: false,
+			ArrayType: &ArrayType{
+				Element: buildCadenceType(castedType.Type),
 				Size:    big.NewInt(-1),
 			},
 		}
 	case *ast.ConstantSizedType:
-		return &InteractionParameter{
-			Kind:        ParameterKindArray,
-			CadenceType: cadenceType,
-			Optional:    false,
-			ArrayParameter: &ArrayParameter{
-				Element: buildInteractionParameter(castedType.Type),
+		return &CadenceType{
+			Kind:     CadenceTypeArray,
+			RawType:  cadenceType,
+			Optional: false,
+			ArrayType: &ArrayType{
+				Element: buildCadenceType(castedType.Type),
 				Size:    castedType.Size.Value,
 			},
 		}
 	case *ast.DictionaryType:
-		return &InteractionParameter{
-			Kind:        ParameterKindDictionary,
-			CadenceType: cadenceType,
-			Optional:    false,
-			DictionaryParameter: &DictionaryParameter{
-				Key:   buildInteractionParameter(castedType.KeyType),
-				Value: buildInteractionParameter(castedType.ValueType),
+		return &CadenceType{
+			Kind:     CadenceTypeDictionary,
+			RawType:  cadenceType,
+			Optional: false,
+			DictionaryType: &DictionaryType{
+				Key:   buildCadenceType(castedType.KeyType),
+				Value: buildCadenceType(castedType.ValueType),
 			},
 		}
 	default:
-		return &InteractionParameter{
-			Kind:        getDefaultParameterKind(uncastedType),
-			CadenceType: cadenceType,
-			Optional:    false,
+		return &CadenceType{
+			Kind:     getDefaultCadenceTypeKind(uncastedType),
+			RawType:  cadenceType,
+			Optional: false,
 		}
 	}
 }
 
 // TODO: Remove the need for this helper util and use type assertions instead
-func getDefaultParameterKind(t ast.Type) ParameterKind {
+func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 	switch t.String() {
 	case "Address":
-		return ParameterKindAddress
+		return CadenceTypeAddress
 	case "Bool":
-		return ParameterKindBoolean
+		return CadenceTypeBoolean
 	case "String",
 		"Character",
 		"Bytes",
@@ -181,7 +182,7 @@ func getDefaultParameterKind(t ast.Type) ParameterKind {
 		"StoragePath",
 		"PublicPath",
 		"PrivatePath":
-		return ParameterKindTextual
+		return CadenceTypeTextual
 	case "Number",
 		"SignedNumber",
 		"Integer",
@@ -204,9 +205,9 @@ func getDefaultParameterKind(t ast.Type) ParameterKind {
 		"UInt256",
 		"Fix64",
 		"UFIx64":
-		return ParameterKindNumeric
+		return CadenceTypeNumeric
 	default:
-		return ParameterKindUnknown
+		return CadenceTypeUnknown
 	}
 }
 

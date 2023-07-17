@@ -18,7 +18,7 @@ func TestSimpleInteraction(t *testing.T) {
 		t.Error("Expected a single parameter")
 	}
 
-	if interaction.Parameters[0].Kind != ParameterKindAddress {
+	if interaction.Parameters[0].Kind != CadenceTypeAddress {
 		t.Error("Expected Address parameter kind")
 	}
 
@@ -30,7 +30,7 @@ func TestSimpleInteraction(t *testing.T) {
 func TestInteractionWithOptionalParameter(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addr: [Address?]?) {}")
 
-	if interaction.Parameters[0].Kind != ParameterKindArray {
+	if interaction.Parameters[0].Kind != CadenceTypeArray {
 		t.Error("Expected Array parameter kind")
 	}
 
@@ -38,11 +38,11 @@ func TestInteractionWithOptionalParameter(t *testing.T) {
 		t.Error("Expected optional")
 	}
 
-	if interaction.Parameters[0].ArrayParameter.Element.Kind != ParameterKindAddress {
+	if interaction.Parameters[0].ArrayType.Element.Kind != CadenceTypeAddress {
 		t.Error("Expected Address element kind")
 	}
 
-	if !interaction.Parameters[0].ArrayParameter.Element.Optional {
+	if !interaction.Parameters[0].ArrayType.Element.Optional {
 		t.Error("Expected optional array element")
 	}
 }
@@ -50,19 +50,19 @@ func TestInteractionWithOptionalParameter(t *testing.T) {
 func TestVariableArrayParameter(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addresses: [Address]) {}")
 
-	if interaction.Parameters[0].Kind != ParameterKindArray {
+	if interaction.Parameters[0].Kind != CadenceTypeArray {
 		t.Error("Expected Array parameter kind")
 	}
 
-	if interaction.Parameters[0].ArrayParameter == nil {
+	if interaction.Parameters[0].ArrayType == nil {
 		t.Error("Expected array sub-field to be set")
 	}
 
-	if interaction.Parameters[0].ArrayParameter.Element.Kind != ParameterKindAddress {
+	if interaction.Parameters[0].ArrayType.Element.Kind != CadenceTypeAddress {
 		t.Error("Expected Address parameter kind")
 	}
 
-	if interaction.Parameters[0].ArrayParameter.Size.Cmp(big.NewInt(-1)) != 0 {
+	if interaction.Parameters[0].ArrayType.Size.Cmp(big.NewInt(-1)) != 0 {
 		t.Error("Expected size -1")
 	}
 }
@@ -70,19 +70,19 @@ func TestVariableArrayParameter(t *testing.T) {
 func TestConstantArrayParameter(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addresses: [Address; 3]) {}")
 
-	if interaction.Parameters[0].Kind != ParameterKindArray {
+	if interaction.Parameters[0].Kind != CadenceTypeArray {
 		t.Error("Expected Array parameter kind")
 	}
 
-	if interaction.Parameters[0].ArrayParameter == nil {
+	if interaction.Parameters[0].ArrayType == nil {
 		t.Error("Expected array sub-field to be set")
 	}
 
-	if interaction.Parameters[0].ArrayParameter.Element.Kind != ParameterKindAddress {
+	if interaction.Parameters[0].ArrayType.Element.Kind != CadenceTypeAddress {
 		t.Error("Expected Address element kind")
 	}
 
-	if interaction.Parameters[0].ArrayParameter.Size.Cmp(big.NewInt(3)) != 0 {
+	if interaction.Parameters[0].ArrayType.Size.Cmp(big.NewInt(3)) != 0 {
 		t.Error("Expected size 3")
 	}
 }
@@ -90,19 +90,19 @@ func TestConstantArrayParameter(t *testing.T) {
 func TestDictionaryParameter(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addressLookupById: {String: Address}) {}")
 
-	if interaction.Parameters[0].Kind != ParameterKindDictionary {
+	if interaction.Parameters[0].Kind != CadenceTypeDictionary {
 		t.Error("Expected Dictionary parameter kind")
 	}
 
-	if interaction.Parameters[0].DictionaryParameter == nil {
+	if interaction.Parameters[0].DictionaryType == nil {
 		t.Error("Expected dictionary sub-field to be set")
 	}
 
-	if interaction.Parameters[0].DictionaryParameter.Key.Kind != ParameterKindTextual {
+	if interaction.Parameters[0].DictionaryType.Key.Kind != CadenceTypeTextual {
 		t.Error("Expected String key kind")
 	}
 
-	if interaction.Parameters[0].DictionaryParameter.Value.Kind != ParameterKindAddress {
+	if interaction.Parameters[0].DictionaryType.Value.Kind != CadenceTypeAddress {
 		t.Error("Expected Address value kind")
 	}
 }
