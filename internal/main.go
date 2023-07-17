@@ -124,12 +124,9 @@ func buildInteractionParameter(uncastedType ast.Type) *InteractionParameter {
 
 	switch castedType := uncastedType.(type) {
 	case *ast.OptionalType:
-		// TODO: Fix this
-		return &InteractionParameter{
-			Kind:        getDefaultParameterKind(castedType.Type),
-			CadenceType: cadenceType,
-			Optional:    true,
-		}
+		nestedInteraction := buildInteractionParameter(castedType.Type)
+		nestedInteraction.Optional = true
+		return nestedInteraction
 	case *ast.VariableSizedType:
 		return &InteractionParameter{
 			Kind:        ParameterKindArray,

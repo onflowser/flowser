@@ -27,15 +27,23 @@ func TestSimpleInteraction(t *testing.T) {
 	}
 }
 
-func TestSimpleInteractionWithOptionalParameter(t *testing.T) {
-	interaction := parseAndBuildInteraction("transaction (addr: Address?) {}")
+func TestInteractionWithOptionalParameter(t *testing.T) {
+	interaction := parseAndBuildInteraction("transaction (addr: [Address?]?) {}")
 
-	if interaction.Parameters[0].Kind != ParameterKindAddress {
-		t.Error("Expected Address parameter kind")
+	if interaction.Parameters[0].Kind != ParameterKindArray {
+		t.Error("Expected Array parameter kind")
 	}
 
 	if !interaction.Parameters[0].Optional {
 		t.Error("Expected optional")
+	}
+
+	if interaction.Parameters[0].ArrayParameter.Element.Kind != ParameterKindAddress {
+		t.Error("Expected Address element kind")
+	}
+
+	if !interaction.Parameters[0].ArrayParameter.Element.Optional {
+		t.Error("Expected optional array element")
 	}
 }
 
