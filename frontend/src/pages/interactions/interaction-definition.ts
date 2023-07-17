@@ -1,4 +1,4 @@
-import { GetParsedInteractionResponse, InteractionKind } from "@flowser/shared";
+import { CadenceType, GetParsedInteractionResponse, InteractionKind } from "@flowser/shared";
 import { ServiceRegistry } from "../../services/service-registry";
 
 export class InteractionDefinition {
@@ -6,16 +6,17 @@ export class InteractionDefinition {
   private sourceCodeInternal: string;
   private parsedInteractionResponse: GetParsedInteractionResponse;
 
-  constructor(options: {
-    id: string;
-    sourceCode: string;
-  }) {
+  constructor(options: { id: string; sourceCode: string }) {
     this.id = options.id;
     this.sourceCodeInternal = options.sourceCode;
     this.parsedInteractionResponse = GetParsedInteractionResponse.fromPartial(
       {}
     );
     this.updateAst();
+  }
+
+  get parameterTypes(): CadenceType[] {
+    return this.parsedInteractionResponse.interaction?.parameters ?? []
   }
 
   get sourceCode(): string {

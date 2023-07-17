@@ -5,7 +5,7 @@ import classes from "./InteractionContent.module.scss";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
-import { ArgumentListBuilder } from "../arguments/ArgumentListBuilder";
+import { ParamListBuilder } from "../parameters/ParamListBuilder";
 
 export function InteractionContent(): ReactElement {
   const { definition, updateCadenceSource, execute } =
@@ -28,6 +28,7 @@ export function InteractionContent(): ReactElement {
       <LineSeparator vertical />
       <div className={classes.sidebar}>
         <SimpleButton onClick={execute}>Execute</SimpleButton>
+        <ParamListBuilder parameterTypes={definition.parameterTypes} />
       </div>
     </div>
   );
