@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/onflow/cadence/runtime/parser"
@@ -38,7 +39,7 @@ func TestSimpleInteractionWithOptionalParameter(t *testing.T) {
 	}
 }
 
-func TestComplexParameter(t *testing.T) {
+func TestVariableArrayParameter(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addresses: [Address]) {}")
 
 	if interaction.Parameters[0].Kind != ParameterKindArray {
@@ -46,11 +47,55 @@ func TestComplexParameter(t *testing.T) {
 	}
 
 	if interaction.Parameters[0].ArrayParameter == nil {
-		t.Error("Expected array element")
+		t.Error("Expected array sub-field to be set")
 	}
 
-	if interaction.Parameters[0].ArrayParameter.Kind != ParameterKindAddress {
+	if interaction.Parameters[0].ArrayParameter.Element.Kind != ParameterKindAddress {
 		t.Error("Expected Address parameter kind")
+	}
+
+	if interaction.Parameters[0].ArrayParameter.Size.Cmp(big.NewInt(-1)) != 0 {
+		t.Error("Expected size -1")
+	}
+}
+
+func TestConstantArrayParameter(t *testing.T) {
+	interaction := parseAndBuildInteraction("transaction (addresses: [Address; 3]) {}")
+
+	if interaction.Parameters[0].Kind != ParameterKindArray {
+		t.Error("Expected Array parameter kind")
+	}
+
+	if interaction.Parameters[0].ArrayParameter == nil {
+		t.Error("Expected array sub-field to be set")
+	}
+
+	if interaction.Parameters[0].ArrayParameter.Element.Kind != ParameterKindAddress {
+		t.Error("Expected Address element kind")
+	}
+
+	if interaction.Parameters[0].ArrayParameter.Size.Cmp(big.NewInt(3)) != 0 {
+		t.Error("Expected size 3")
+	}
+}
+
+func TestDictionaryParameter(t *testing.T) {
+	interaction := parseAndBuildInteraction("transaction (addressLookupById: {String: Address}) {}")
+
+	if interaction.Parameters[0].Kind != ParameterKindDictionary {
+		t.Error("Expected Dictionary parameter kind")
+	}
+
+	if interaction.Parameters[0].DictionaryParameter == nil {
+		t.Error("Expected dictionary sub-field to be set")
+	}
+
+	if interaction.Parameters[0].DictionaryParameter.Key.Kind != ParameterKindTextual {
+		t.Error("Expected String key kind")
+	}
+
+	if interaction.Parameters[0].DictionaryParameter.Value.Kind != ParameterKindAddress {
+		t.Error("Expected Address value kind")
 	}
 }
 

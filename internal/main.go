@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"math/big"
 	"os"
 
 	"github.com/onflow/cadence/runtime/ast"
@@ -62,6 +63,7 @@ const (
 	ParameterKindBoolean
 	ParameterKindAddress
 	ParameterKindArray
+	ParameterKindDictionary
 )
 
 type InteractionParameter struct {
@@ -69,7 +71,18 @@ type InteractionParameter struct {
 	CadenceType string
 	Optional    bool
 
-	ArrayParameter *InteractionParameter
+	ArrayParameter      *ArrayParameter
+	DictionaryParameter *DictionaryParameter
+}
+
+type ArrayParameter struct {
+	Element *InteractionParameter
+	Size    *big.Int
+}
+
+type DictionaryParameter struct {
+	Key   *InteractionParameter
+	Value *InteractionParameter
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
@@ -111,28 +124,53 @@ func buildInteractionParameter(uncastedType ast.Type) *InteractionParameter {
 
 	switch castedType := uncastedType.(type) {
 	case *ast.OptionalType:
+		// TODO: Fix this
 		return &InteractionParameter{
-			Kind:        getInteractionParameterKind(castedType.Type),
+			Kind:        getDefaultParameterKind(castedType.Type),
 			CadenceType: cadenceType,
 			Optional:    true,
 		}
 	case *ast.VariableSizedType:
 		return &InteractionParameter{
-			Kind:           ParameterKindArray,
-			CadenceType:    cadenceType,
-			Optional:       false,
-			ArrayParameter: buildInteractionParameter(castedType.Type),
+			Kind:        ParameterKindArray,
+			CadenceType: cadenceType,
+			Optional:    false,
+			ArrayParameter: &ArrayParameter{
+				Element: buildInteractionParameter(castedType.Type),
+				Size:    big.NewInt(-1),
+			},
+		}
+	case *ast.ConstantSizedType:
+		return &InteractionParameter{
+			Kind:        ParameterKindArray,
+			CadenceType: cadenceType,
+			Optional:    false,
+			ArrayParameter: &ArrayParameter{
+				Element: buildInteractionParameter(castedType.Type),
+				Size:    castedType.Size.Value,
+			},
+		}
+	case *ast.DictionaryType:
+		return &InteractionParameter{
+			Kind:        ParameterKindDictionary,
+			CadenceType: cadenceType,
+			Optional:    false,
+			DictionaryParameter: &DictionaryParameter{
+				Key:   buildInteractionParameter(castedType.KeyType),
+				Value: buildInteractionParameter(castedType.ValueType),
+			},
 		}
 	default:
 		return &InteractionParameter{
-			Kind:        getInteractionParameterKind(uncastedType),
+			Kind:        getDefaultParameterKind(uncastedType),
 			CadenceType: cadenceType,
 			Optional:    false,
 		}
 	}
 }
 
-func getInteractionParameterKind(t ast.Type) ParameterKind {
+// TODO: Remove the need for this helper util and use type assertions instead
+func getDefaultParameterKind(t ast.Type) ParameterKind {
 	switch t.String() {
 	case "Address":
 		return ParameterKindAddress
