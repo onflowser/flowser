@@ -13,8 +13,6 @@ export class InteractionsService {
   ): Promise<GetParsedInteractionResponse> {
     const rawResponse = await this.execute(request.sourceCode);
 
-    console.log(rawResponse);
-
     return GetParsedInteractionResponse.fromJSON(JSON.parse(rawResponse));
   }
 

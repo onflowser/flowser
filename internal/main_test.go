@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math/big"
 	"testing"
 
 	"github.com/onflow/cadence/runtime/parser"
@@ -62,7 +61,7 @@ func TestVariableArrayParameter(t *testing.T) {
 		t.Error("Expected Address parameter kind")
 	}
 
-	if interaction.Parameters[0].ArrayType.Size.Cmp(big.NewInt(-1)) != 0 {
+	if interaction.Parameters[0].ArrayType.Size != -1 {
 		t.Error("Expected size -1")
 	}
 }
@@ -82,7 +81,7 @@ func TestConstantArrayParameter(t *testing.T) {
 		t.Error("Expected Address element kind")
 	}
 
-	if interaction.Parameters[0].ArrayType.Size.Cmp(big.NewInt(3)) != 0 {
+	if interaction.Parameters[0].ArrayType.Size != 3 {
 		t.Error("Expected size 3")
 	}
 }

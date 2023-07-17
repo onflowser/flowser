@@ -26,6 +26,9 @@ message CadenceType {
   string raw_type = 2;
   bool optional = 3;
 
+  Array array = 4;
+  Dictionary dictionary = 5;
+
   message Array {
     CadenceType element = 1;
     int32 size = 2;

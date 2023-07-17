@@ -3,13 +3,13 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"math/big"
 	"os"
 
 	"github.com/onflow/cadence/runtime/ast"
 	"github.com/onflow/cadence/runtime/parser"
 )
 
+// Response must match the messages specified in `shared/proto/api/interactions.proto`
 type Response struct {
 	Interaction *Interaction `json:"interaction"`
 	Program     *ast.Program `json:"program"`
@@ -50,8 +50,8 @@ const (
 )
 
 type Interaction struct {
-	Kind       InteractionKind
-	Parameters []*CadenceType
+	Kind       InteractionKind `json:"kind"`
+	Parameters []*CadenceType  `json:"parameters"`
 }
 
 type CadenceTypeKind uint
@@ -67,23 +67,23 @@ const (
 )
 
 type CadenceType struct {
-	Kind     CadenceTypeKind
-	RawType  string
-	Optional bool
+	Kind     CadenceTypeKind `json:"kind"`
+	RawType  string          `json:"rawType"`
+	Optional bool            `json:"optional"`
 
 	// sub-type specific fields
-	ArrayType      *ArrayType
-	DictionaryType *DictionaryType
+	ArrayType      *Array      `json:"array"`
+	DictionaryType *Dictionary `json:"dictionary"`
 }
 
-type ArrayType struct {
-	Element *CadenceType
-	Size    *big.Int
+type Array struct {
+	Element *CadenceType `json:"element"`
+	Size    int64        `json:"size"`
 }
 
-type DictionaryType struct {
-	Key   *CadenceType
-	Value *CadenceType
+type Dictionary struct {
+	Key   *CadenceType `key:"key"`
+	Value *CadenceType `value:"value"`
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
@@ -133,9 +133,9 @@ func buildCadenceType(uncastedType ast.Type) *CadenceType {
 			Kind:     CadenceTypeArray,
 			RawType:  cadenceType,
 			Optional: false,
-			ArrayType: &ArrayType{
+			ArrayType: &Array{
 				Element: buildCadenceType(castedType.Type),
-				Size:    big.NewInt(-1),
+				Size:    -1,
 			},
 		}
 	case *ast.ConstantSizedType:
@@ -143,9 +143,9 @@ func buildCadenceType(uncastedType ast.Type) *CadenceType {
 			Kind:     CadenceTypeArray,
 			RawType:  cadenceType,
 			Optional: false,
-			ArrayType: &ArrayType{
+			ArrayType: &Array{
 				Element: buildCadenceType(castedType.Type),
-				Size:    castedType.Size.Value,
+				Size:    castedType.Size.Value.Int64(),
 			},
 		}
 	case *ast.DictionaryType:
@@ -153,7 +153,7 @@ func buildCadenceType(uncastedType ast.Type) *CadenceType {
 			Kind:     CadenceTypeDictionary,
 			RawType:  cadenceType,
 			Optional: false,
-			DictionaryType: &DictionaryType{
+			DictionaryType: &Dictionary{
 				Key:   buildCadenceType(castedType.KeyType),
 				Value: buildCadenceType(castedType.ValueType),
 			},
