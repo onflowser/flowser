@@ -113,6 +113,10 @@ func buildInteraction(program *ast.Program) *Interaction {
 func buildInteractionParameterList(parameterList *ast.ParameterList) []*CadenceType {
 	var parameters []*CadenceType
 
+	if parameterList == nil {
+		return parameters
+	}
+
 	for _, parameter := range parameterList.Parameters {
 		parameters = append(parameters, buildCadenceType(parameter.TypeAnnotation.Type))
 	}
