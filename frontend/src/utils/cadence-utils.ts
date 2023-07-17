@@ -1,7 +1,7 @@
 import {
   CadenceObject,
-  CadenceType,
-  cadenceTypeToJSON,
+  LegacyCadenceType,
+  legacyCadenceTypeToJSON,
   CadenceUtils as SharedCadenceUtils,
 } from "@flowser/shared";
 import { CommonUtils } from "./common-utils";
@@ -11,14 +11,14 @@ export class CadenceUtils {
     if (SharedCadenceUtils.isPrimitiveType(cadenceObject.type)) {
       return SharedCadenceUtils.getTypeName(cadenceObject.type) ?? "-";
     }
-    if (cadenceObject.type === CadenceType.Array) {
+    if (cadenceObject.type === LegacyCadenceType.Array) {
       const nestedTypes =
         cadenceObject.arrayAttributes?.value.map((nestedObject) =>
           this.getDisplayType(nestedObject)
         ) ?? [];
       return `Array<${nestedTypes.join(",")}>`;
     }
-    return cadenceTypeToJSON(cadenceObject.type);
+    return legacyCadenceTypeToJSON(cadenceObject.type);
   }
 
   static getDisplayValue(cadenceObject: CadenceObject): string {
@@ -33,14 +33,14 @@ export class CadenceUtils {
     if (SharedCadenceUtils.isBoolType(cadenceObject.type)) {
       return String(cadenceObject.boolAttributes?.value) ?? "-";
     }
-    if (cadenceObject.type === CadenceType.Array) {
+    if (cadenceObject.type === LegacyCadenceType.Array) {
       const nestedTypes =
         cadenceObject.arrayAttributes?.value.map((nestedObject) =>
           this.getDisplayValue(nestedObject)
         ) ?? [];
       return `[${nestedTypes.join(",")}]`;
     }
-    if (cadenceObject.type === CadenceType.Dictionary) {
+    if (cadenceObject.type === LegacyCadenceType.Dictionary) {
       // TODO(milestone-3): add support for complex shared (e.g. dictionaries)
       return "-";
     }
