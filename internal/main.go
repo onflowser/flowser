@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/onflow/cadence/runtime/ast"
 	"github.com/onflow/cadence/runtime/parser"
@@ -18,10 +19,12 @@ type Response struct {
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	code, err := reader.ReadString('\n')
+	nullTerminatedCode, err := reader.ReadString(byte(0))
 	if err != nil {
 		panic(err)
 	}
+
+	code := strings.TrimSuffix(nullTerminatedCode, "\x00")
 
 	var response Response
 	program, err := parser.ParseProgram(nil, []byte(code), parser.Config{})
