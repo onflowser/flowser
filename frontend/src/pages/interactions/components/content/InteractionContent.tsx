@@ -11,8 +11,13 @@ import { Spinner } from "../../../../components/spinner/Spinner";
 
 export function InteractionContent(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
-  const { parameterTypes, definition, setSourceCode } =
-    useInteractionDefinitionManager();
+  const {
+    setParameterValueByIndex,
+    parameterValuesByIndex,
+    parameterTypes,
+    definition,
+    setSourceCode,
+  } = useInteractionDefinitionManager();
 
   return (
     <div className={classes.root}>
@@ -31,7 +36,11 @@ export function InteractionContent(): ReactElement {
       <LineSeparator vertical />
       <div className={classes.sidebar}>
         <SimpleButton onClick={execute}>Execute</SimpleButton>
-        <ParamListBuilder parameterTypes={parameterTypes} />
+        <ParamListBuilder
+          parameterTypes={parameterTypes}
+          setParameterValueByIndex={setParameterValueByIndex}
+          parameterValuesByIndex={parameterValuesByIndex}
+        />
       </div>
     </div>
   );

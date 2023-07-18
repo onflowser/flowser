@@ -38,10 +38,18 @@ type InteractionOutcomeManager = {
 
 const Context = createContext<InteractionOutcomeManager>(undefined as any);
 
+type FlowArgBuilder = (value: unknown, type: unknown) => void;
+type FlowArgTypeLookup = Record<string, unknown>;
+
 export function InteractionOutcomeManagerProvider(props: {
   children: ReactNode;
 }): ReactElement {
-  const { definition, interactionKind } = useInteractionDefinitionManager();
+  const {
+    definition,
+    parameterValuesByIndex,
+    parameterTypes,
+    interactionKind,
+  } = useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
   const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
 
@@ -58,6 +66,12 @@ export function InteractionOutcomeManagerProvider(props: {
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
         throw new Error(`Can't execute interaction: ${interactionKind}`);
     }
+  }
+
+  function buildArguments(arg: FlowArgBuilder, t: FlowArgTypeLookup) {
+    return parameterTypes.map((type, index) =>
+      arg(parameterValuesByIndex.get(index), t[type.rawType])
+    );
   }
 
   async function executeTransaction(definition: InteractionDefinition) {
@@ -92,6 +106,8 @@ export function InteractionOutcomeManagerProvider(props: {
       setOutcome({});
       const result = await fcl.query({
         cadence: definition.sourceCode,
+        args: (arg: FlowArgBuilder, t: FlowArgTypeLookup) =>
+          buildArguments(arg, t),
       });
       setOutcome({
         script: {

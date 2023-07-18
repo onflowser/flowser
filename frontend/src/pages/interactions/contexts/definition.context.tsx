@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
+  useState,
 } from "react";
 import {
   InteractionDefinition,
@@ -11,13 +12,18 @@ import {
 import { useGetParsedInteraction } from "../../../hooks/use-api";
 import { CadenceType, InteractionKind } from "@flowser/shared";
 
-type InteractionDefinitionManager = {
+type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
   parseError: string | undefined;
   interactionKind: InteractionKind;
   parameterTypes: CadenceType[];
   definition: InteractionDefinition;
   setSourceCode: (code: string) => void;
+};
+
+export type InteractionParameterBuilder = {
+  parameterValuesByIndex: Map<number, unknown>;
+  setParameterValueByIndex: (index: number, value: unknown) => void;
 };
 
 const Context = createContext<InteractionDefinitionManager>(undefined as any);
@@ -31,9 +37,18 @@ export function InteractionDefinitionManagerProvider(props: {
   const { data, isLoading } = useGetParsedInteraction({
     sourceCode: definition.sourceCode,
   });
+  const [parameterValuesByIndex, setParameterValues] = useState(new Map());
 
   function setSourceCode(sourceCode: string) {
     update({ ...definition, sourceCode });
+  }
+
+  function setParameterValueByIndex(index: number, value: unknown) {
+    setParameterValues((oldMapping) => {
+      const newMapping = new Map(oldMapping);
+      newMapping.set(index, value);
+      return newMapping;
+    });
   }
 
   return (
@@ -41,6 +56,8 @@ export function InteractionDefinitionManagerProvider(props: {
       value={{
         definition,
         setSourceCode,
+        setParameterValueByIndex,
+        parameterValuesByIndex,
         interactionKind:
           data?.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN,
         parameterTypes: data?.interaction?.parameters ?? [],
