@@ -6,10 +6,13 @@ import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
 import { ParamListBuilder } from "../parameters/ParamListBuilder";
+import { useInteractionDefinitionManager } from "../../contexts/definition.context";
+import { Spinner } from "../../../../components/spinner/Spinner";
 
 export function InteractionContent(): ReactElement {
-  const { definition, updateCadenceSource, execute } =
-    useInteractionOutcomeManager();
+  const { execute } = useInteractionOutcomeManager();
+  const { parameterTypes, definition, setSourceCode } =
+    useInteractionDefinitionManager();
 
   return (
     <div className={classes.root}>
@@ -17,19 +20,33 @@ export function InteractionContent(): ReactElement {
         <div className={classes.code}>
           <CadenceEditor
             value={definition.sourceCode}
-            onChange={(sourceCode) => updateCadenceSource(sourceCode)}
+            onChange={(sourceCode) => setSourceCode(sourceCode)}
           />
         </div>
         <LineSeparator horizontal />
         <div className={classes.details}>
-          <InteractionOutcome />
+          <InteractionDetails />
         </div>
       </div>
       <LineSeparator vertical />
       <div className={classes.sidebar}>
         <SimpleButton onClick={execute}>Execute</SimpleButton>
-        <ParamListBuilder parameterTypes={definition.parameterTypes} />
+        <ParamListBuilder parameterTypes={parameterTypes} />
       </div>
     </div>
   );
+}
+
+function InteractionDetails() {
+  const { parseError, isParsing } = useInteractionDefinitionManager();
+
+  if (isParsing) {
+    return <Spinner size={20} />;
+  }
+
+  if (parseError) {
+    return <pre>{parseError}</pre>;
+  }
+
+  return <InteractionOutcome />;
 }

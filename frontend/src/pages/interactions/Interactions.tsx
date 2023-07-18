@@ -2,19 +2,19 @@ import React, { ReactElement, useState } from "react";
 import classes from "./Interactions.module.scss";
 import { TabList, TabItem } from "../../components/tab-list/TabList";
 import {
-  InteractionDefinitionsManagerProvider,
-  useInteractionDefinitionsManager,
-} from "./contexts/definition.context";
+  InteractionDefinitionsRegistryProvider,
+  useInteractionDefinitionsRegistry,
+} from "./contexts/definitions-registry.context";
 import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
-import { InteractionKind } from "@flowser/shared";
+import { InteractionDefinitionManagerProvider } from "./contexts/definition.context";
 
 export function Interactions(): ReactElement {
   return (
-    <InteractionDefinitionsManagerProvider>
+    <InteractionDefinitionsRegistryProvider>
       <ContentWithProvider />
-    </InteractionDefinitionsManagerProvider>
+    </InteractionDefinitionsRegistryProvider>
   );
 }
 
@@ -34,14 +34,16 @@ function ContentWithProvider() {
   const [currentSideMenuTab, setCurrentSideMenuTab] = useState(sideMenuTabs[0]);
 
   // TODO(feature-interact-screen): Add ability to add new tabs and switch between them
-  const { definitions } = useInteractionDefinitionsManager();
+  const { definitions } = useInteractionDefinitionsRegistry();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
-    label: `${definition.name} (${getInteractionKindLabel(definition.type)})`,
+    label: definition.name,
     content: (
-      <InteractionOutcomeManagerProvider interactionId={definition.id}>
-        <InteractionContent />
-      </InteractionOutcomeManagerProvider>
+      <InteractionDefinitionManagerProvider interactionId={definition.id}>
+        <InteractionOutcomeManagerProvider>
+          <InteractionContent />
+        </InteractionOutcomeManagerProvider>
+      </InteractionDefinitionManagerProvider>
     ),
   }));
   const [currentEditorTab, setCurrentEditorTab] = useState<TabItem>(
@@ -66,15 +68,4 @@ function ContentWithProvider() {
       />
     </div>
   );
-}
-
-function getInteractionKindLabel(kind: InteractionKind) {
-  switch (kind) {
-    case InteractionKind.INTERACTION_TRANSACTION:
-      return "Transaction";
-    case InteractionKind.INTERACTION_SCRIPT:
-      return "Script";
-    default:
-      return "Unknown";
-  }
 }

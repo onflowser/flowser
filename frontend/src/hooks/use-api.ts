@@ -33,6 +33,8 @@ import {
   GetPollingProjectsResponse,
   ServiceStatus,
   FlowserError,
+  GetParsedInteractionRequest,
+  GetParsedInteractionResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -55,6 +57,7 @@ const {
   processesService,
   accountsService,
   snapshotService,
+  interactionsService
 } = ServiceRegistry.getInstance();
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
@@ -343,6 +346,12 @@ export function useGetAllProjects() {
 export function useGetFlowserVersion() {
   return useQuery<GetFlowserVersionResponse>("/version", () =>
     commonService.getFlowserVersion()
+  );
+}
+
+export function useGetParsedInteraction(request: GetParsedInteractionRequest) {
+  return useQuery<GetParsedInteractionResponse>(request.sourceCode, () =>
+    interactionsService.parseInteraction(request)
   );
 }
 

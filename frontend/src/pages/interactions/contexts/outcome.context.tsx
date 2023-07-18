@@ -1,5 +1,8 @@
 import { ServiceRegistry } from "../../../services/service-registry";
-import { useInteractionDefinitionsManager } from "./definition.context";
+import {
+  InteractionDefinition,
+  useInteractionDefinitionsRegistry,
+} from "./definitions-registry.context";
 import React, {
   createContext,
   ReactElement,
@@ -8,10 +11,10 @@ import React, {
   useState,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
-import { InteractionDefinition } from "../interaction-definition";
-// @ts-ignore
+// @ts-ignore FCL types
 import * as fcl from "@onflow/fcl";
 import { InteractionKind } from "@flowser/shared";
+import { useInteractionDefinitionManager } from "./definition.context";
 
 export type FlowTransactionOutcome = {
   transactionId?: string;
@@ -29,53 +32,31 @@ type FlowInteractionOutcome = {
 };
 
 type InteractionOutcomeManager = {
-  definition: InteractionDefinition;
   outcome: FlowInteractionOutcome | undefined;
-  updateCadenceSource: (sourceCode: string) => void;
   execute: () => Promise<void>;
 };
 
 const Context = createContext<InteractionOutcomeManager>(undefined as any);
 
 export function InteractionOutcomeManagerProvider(props: {
-  interactionId: string;
   children: ReactNode;
 }): ReactElement {
+  const { definition, interactionKind } = useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
-  const { definitions, setDefinitions } = useInteractionDefinitionsManager();
   const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
-
-  function updateCadenceSource(sourceCode: string) {
-    setDefinitions((openInteractions) =>
-      openInteractions.map((existing) => {
-        if (existing.id === props.interactionId) {
-          existing.setSourceCode(sourceCode);
-        }
-        return existing;
-      })
-    );
-  }
-
-  const definition = definitions.find(
-    (interaction) => interaction.id === props.interactionId
-  );
-
-  if (!definition) {
-    throw new Error("Assertion error: Expected interaction value");
-  }
 
   async function execute() {
     if (!definition) {
       throw new Error("Assertion error: Expected interaction value");
     }
-    switch (definition.type) {
+    switch (interactionKind) {
       case InteractionKind.INTERACTION_SCRIPT:
         return executeScript(definition);
       case InteractionKind.INTERACTION_TRANSACTION:
         return executeTransaction(definition);
       default:
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
-        throw new Error(`Can't execute interaction: ${definition.type}`);
+        throw new Error(`Can't execute interaction: ${interactionKind}`);
     }
   }
 
@@ -130,9 +111,7 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   return (
-    <Context.Provider
-      value={{ updateCadenceSource, execute, definition, outcome }}
-    >
+    <Context.Provider value={{ execute, outcome }}>
       {props.children}
     </Context.Provider>
   );

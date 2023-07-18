@@ -1,35 +1,51 @@
 import React, {
   createContext,
-  Dispatch,
   ReactElement,
-  SetStateAction,
+  ReactNode,
   useContext,
-  useState,
 } from "react";
-import { InteractionDefinition } from "../interaction-definition";
+import {
+  InteractionDefinition,
+  useInteractionDefinitionsRegistry,
+} from "./definitions-registry.context";
+import { useGetParsedInteraction } from "../../../hooks/use-api";
+import { CadenceType, InteractionKind } from "@flowser/shared";
 
-type InteractionsDefinitionsManager = {
-  definitions: InteractionDefinition[];
-  setDefinitions: Dispatch<SetStateAction<InteractionDefinition[]>>;
+type InteractionDefinitionManager = {
+  isParsing: boolean;
+  parseError: string | undefined;
+  interactionKind: InteractionKind;
+  parameterTypes: CadenceType[];
+  definition: InteractionDefinition;
+  setSourceCode: (code: string) => void;
 };
 
-const Context = createContext<InteractionsDefinitionsManager>(undefined as any);
+const Context = createContext<InteractionDefinitionManager>(undefined as any);
 
-export function InteractionDefinitionsManagerProvider(props: {
-  children: React.ReactNode;
+export function InteractionDefinitionManagerProvider(props: {
+  interactionId: string;
+  children: ReactNode;
 }): ReactElement {
-  const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
-    new InteractionDefinition({
-      id: "demo",
-      sourceCode: "transaction {}",
-    }),
-  ]);
+  const { getById, update } = useInteractionDefinitionsRegistry();
+  const definition = getById(props.interactionId);
+  const { data, isLoading } = useGetParsedInteraction({
+    sourceCode: definition.sourceCode,
+  });
+
+  function setSourceCode(sourceCode: string) {
+    update({ ...definition, sourceCode });
+  }
 
   return (
     <Context.Provider
       value={{
-        definitions,
-        setDefinitions,
+        definition,
+        setSourceCode,
+        interactionKind:
+          data?.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN,
+        parameterTypes: data?.interaction?.parameters ?? [],
+        parseError: data?.error,
+        isParsing: isLoading,
       }}
     >
       {props.children}
@@ -37,11 +53,11 @@ export function InteractionDefinitionsManagerProvider(props: {
   );
 }
 
-export function useInteractionDefinitionsManager(): InteractionsDefinitionsManager {
+export function useInteractionDefinitionManager(): InteractionDefinitionManager {
   const context = useContext(Context);
 
   if (context === undefined) {
-    throw new Error("Interaction definitions manager provider not found");
+    throw new Error("Interaction definition registry context not found");
   }
 
   return context;
