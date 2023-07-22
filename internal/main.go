@@ -90,8 +90,8 @@ type Array struct {
 }
 
 type Dictionary struct {
-	Key   *CadenceType `key:"key"`
-	Value *CadenceType `value:"value"`
+	Key   *CadenceType `json:"key"`
+	Value *CadenceType `json:"value"`
 }
 
 func buildInteraction(program *ast.Program) *Interaction {
