@@ -6,6 +6,7 @@ import { TextualBuilder } from "./TextualBuilder/TextualBuilder";
 import { NumericBuilder } from "./NumericBuilder/NumericBuilder";
 import { ArrayBuilder } from "./ArrayBuilder/ArrayBuilder";
 import { AddressBuilder } from "./AddressBuilder/AddressBuilder";
+import { DictionaryBuilder } from "./DictionaryBuilder/DictionaryBuilder";
 
 export function ParamBuilder(props: ParameterBuilder): ReactElement {
   const { parameterType } = props;
@@ -18,6 +19,8 @@ export function ParamBuilder(props: ParameterBuilder): ReactElement {
       return <NumericBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_ARRAY:
       return <ArrayBuilder {...props} />;
+    case CadenceTypeKind.CADENCE_TYPE_DICTIONARY:
+      return <DictionaryBuilder {...props} />;
     default:
       return <div>Unknown type</div>;
   }
