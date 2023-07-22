@@ -23,12 +23,12 @@ $grid-gap: 30px;
       display: flex;
       flex-direction: column;
       flex: 1;
+      // Bottom margin fixes the log drawer hiding some of the page content.
+      padding-bottom: 80px;
     }
 
     .bodyWithMargin {
       margin: $grid-gap $spacing-l 0;
-      // Bottom margin fixes the log drawer hiding some of the page content.
-      padding-bottom: 100px;
     }
 
     .logs {

@@ -29,6 +29,7 @@ import { TextUtils } from "../../../utils/text-utils";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
 
 type RouteParams = {
   blockId: string;
@@ -145,6 +146,7 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
+      <SizedBox height={30} />
       <DetailsTabs>
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
           <Fragment

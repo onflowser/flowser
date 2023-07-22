@@ -24,10 +24,9 @@ export function ParamListBuilder(
         }
 
         return (
-          <div>
-            <code>{parameter.identifier}</code>
+          <div key={parameter.identifier}>
+            <b>{parameter.identifier}</b> <code>{parameter.type.rawType}</code>
             <ParamBuilder
-              key={parameter.identifier}
               parameterType={parameter.type}
               parameterValue={parameterValuesByIdentifier.get(
                 parameter.identifier

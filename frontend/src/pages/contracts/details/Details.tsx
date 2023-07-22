@@ -10,6 +10,7 @@ import {
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
 
 type RouteParams = {
   contractId: string;
@@ -65,6 +66,7 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
+      <SizedBox height={30} />
       <ContentDetailsScript script={contract.code} />
     </div>
   );

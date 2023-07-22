@@ -30,6 +30,7 @@ import { TransactionErrorMessage } from "../../../components/status/ErrorMessage
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
 import { TransactionOverview } from "./components/overview/TransactionOverview";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
 
 type RouteParams = {
   transactionId: string;
@@ -229,6 +230,7 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <TransactionOverview transaction={transaction} />
+      <SizedBox height={30} />
       <DetailsTabs>
         {transaction?.status?.errorMessage && (
           <DetailsTabItem

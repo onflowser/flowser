@@ -8,6 +8,7 @@ import { LineSeparator } from "../../../../components/line-separator/LineSeparat
 import { ParamListBuilder } from "../parameters/ParamListBuilder";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Spinner } from "../../../../components/spinner/Spinner";
+import { SizedBox } from "../../../../components/sized-box/SizedBox";
 
 export function InteractionContent(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
@@ -35,12 +36,20 @@ export function InteractionContent(): ReactElement {
       </div>
       <LineSeparator vertical />
       <div className={classes.sidebar}>
-        <SimpleButton onClick={execute}>Execute</SimpleButton>
-        <ParamListBuilder
-          parameters={parameters}
-          setParameterValueByIdentifier={setParameterValueByIdentifier}
-          parameterValuesByIdentifier={parameterValuesByIdentifier}
-        />
+        <div>
+          <h3>Arguments</h3>
+          <ParamListBuilder
+            parameters={parameters}
+            setParameterValueByIdentifier={setParameterValueByIdentifier}
+            parameterValuesByIdentifier={parameterValuesByIdentifier}
+          />
+        </div>
+        <div>
+          <SimpleButton className={classes.button} onClick={execute}>
+            Execute
+          </SimpleButton>
+          <SizedBox height={20} />
+        </div>
       </div>
     </div>
   );

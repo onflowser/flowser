@@ -1,4 +1,6 @@
 @import 'styles/spacings';
+@import 'styles/colors';
+@import 'styles/typography';
 
 .root {
   height: 100%;
@@ -17,5 +19,18 @@
   }
   .sidebar {
     flex: 1;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100%;
+    .button {
+      width: 100%;
+      padding: $spacing-base;
+      background: $blue;
+      color: $new-color-1;
+      font-weight: bold;
+      font-size: $font-size-large;
+      border-radius: 5px;
+    }
   }
 }

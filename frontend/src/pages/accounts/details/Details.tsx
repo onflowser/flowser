@@ -54,6 +54,7 @@ import { AnalyticEvent } from "../../../services/analytics.service";
 import { TextUtils } from "../../../utils/text-utils";
 import { transactionTableColumns } from "../../transactions/main/Main";
 import { enableDetailsIntroAnimation } from "../../../config/common";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -230,6 +231,7 @@ const Details: FunctionComponent = () => {
         <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
         <ProfileActionsCard currentAddress={accountId} />
       </div>
+      <SizedBox height={30} />
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={storageItems?.length}>
           <div className={classes.grid}>

@@ -1,8 +1,7 @@
-import React, { FC, FunctionComponent, useCallback, useState } from "react";
+import React, { FC, FunctionComponent, useState } from "react";
 import classes from "./Layout.module.scss";
 import { TopRow } from "../top-row/TopRow";
 import Logs from "../../pages/logs/Logs";
-import { useLogDrawer } from "../../hooks/use-log-drawer";
 import { SideBar } from "components/sidebar/SideBar";
 import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
@@ -54,7 +53,7 @@ const Layout: FunctionComponent = ({ children }) => {
             [classes.bodyWithMargin]: showMargin,
           })}
         >
-          {children}{" "}
+          {children}
         </div>
         <Logs />
       </div>
