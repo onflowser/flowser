@@ -10,7 +10,7 @@ import React, {
 import { CommonUtils } from "../../../utils/common-utils";
 // @ts-ignore FCL types
 import * as fcl from "@onflow/fcl";
-import { InteractionKind } from "@flowser/shared";
+import { CadenceType, CadenceTypeKind, InteractionKind } from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
 
 export type FlowTransactionOutcome = {
@@ -36,7 +36,7 @@ type InteractionOutcomeManager = {
 const Context = createContext<InteractionOutcomeManager>(undefined as any);
 
 type FlowArgBuilder = (value: unknown, type: unknown) => void;
-type FlowArgTypeLookup = Record<string, unknown>;
+type FlowArgTypeLookup = Record<string, (nestedType?: unknown) => unknown>;
 
 export function InteractionOutcomeManagerProvider(props: {
   children: ReactNode;
@@ -67,8 +67,30 @@ export function InteractionOutcomeManagerProvider(props: {
 
   function buildArguments(arg: FlowArgBuilder, t: FlowArgTypeLookup) {
     return parameterTypes.map((type, index) =>
-      arg(parameterValuesByIndex.get(index), t[type.rawType])
+      arg(parameterValuesByIndex.get(index), getFlowType(t, type))
     );
+  }
+
+  // https://developers.flow.com/tooling/fcl-js/api#ftype
+  function getFlowType(
+    t: FlowArgTypeLookup,
+    cadenceType: CadenceType
+  ): unknown {
+    switch (cadenceType.kind) {
+      case CadenceTypeKind.CADENCE_TYPE_NUMERIC:
+      case CadenceTypeKind.CADENCE_TYPE_TEXTUAL:
+      case CadenceTypeKind.CADENCE_TYPE_BOOLEAN:
+        return t[cadenceType.rawType];
+      case CadenceTypeKind.CADENCE_TYPE_ARRAY:
+        if (!cadenceType.array?.element) {
+          throw new Error("Expected array.element to be set");
+        }
+        return t.Array(getFlowType(t, cadenceType.array.element));
+      case CadenceTypeKind.CADENCE_TYPE_DICTIONARY:
+      case CadenceTypeKind.CADENCE_TYPE_UNKNOWN:
+      default:
+        throw new Error("Unknown Cadence type: " + cadenceType.rawType);
+    }
   }
 
   async function executeTransaction(definition: InteractionDefinition) {
