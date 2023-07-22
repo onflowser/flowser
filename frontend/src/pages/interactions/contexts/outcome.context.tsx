@@ -43,8 +43,8 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const {
     definition,
-    parameterValuesByIndex,
-    parameterTypes,
+    parameterValuesByIdentifier,
+    parameters,
     interactionKind,
   } = useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
@@ -66,9 +66,15 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   function buildArguments(arg: FlowArgBuilder, t: FlowArgTypeLookup) {
-    return parameterTypes.map((type, index) =>
-      arg(parameterValuesByIndex.get(index), getFlowType(t, type))
-    );
+    return parameters.map((parameter) => {
+      if (!parameter.type) {
+        throw new Error("Expected parameter.type");
+      }
+      return arg(
+        parameterValuesByIdentifier.get(parameter.identifier),
+        getFlowType(t, parameter.type)
+      );
+    });
   }
 
   // https://developers.flow.com/tooling/fcl-js/api#ftype

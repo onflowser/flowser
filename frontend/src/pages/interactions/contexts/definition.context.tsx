@@ -10,20 +10,20 @@ import {
   useInteractionDefinitionsRegistry,
 } from "./definitions-registry.context";
 import { useGetParsedInteraction } from "../../../hooks/use-api";
-import { CadenceType, InteractionKind } from "@flowser/shared";
+import { InteractionKind, Parameter } from "@flowser/shared";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
   parseError: string | undefined;
   interactionKind: InteractionKind;
-  parameterTypes: CadenceType[];
+  parameters: Parameter[];
   definition: InteractionDefinition;
   setSourceCode: (code: string) => void;
 };
 
 export type InteractionParameterBuilder = {
-  parameterValuesByIndex: Map<number, unknown>;
-  setParameterValueByIndex: (index: number, value: unknown) => void;
+  parameterValuesByIdentifier: Map<string, unknown>;
+  setParameterValueByIdentifier: (identifier: string, value: unknown) => void;
 };
 
 const Context = createContext<InteractionDefinitionManager>(undefined as any);
@@ -37,16 +37,17 @@ export function InteractionDefinitionManagerProvider(props: {
   const { data, isLoading } = useGetParsedInteraction({
     sourceCode: definition.sourceCode,
   });
-  const [parameterValuesByIndex, setParameterValues] = useState(new Map());
+  const [parameterValuesByIdentifier, setParameterValuesByIdentifier] =
+    useState(new Map<string, unknown>());
 
   function setSourceCode(sourceCode: string) {
     update({ ...definition, sourceCode });
   }
 
-  function setParameterValueByIndex(index: number, value: unknown) {
-    setParameterValues((oldMapping) => {
+  function setParameterValueByIdentifier(identifier: string, value: unknown) {
+    setParameterValuesByIdentifier((oldMapping) => {
       const newMapping = new Map(oldMapping);
-      newMapping.set(index, value);
+      newMapping.set(identifier, value);
       return newMapping;
     });
   }
@@ -56,11 +57,11 @@ export function InteractionDefinitionManagerProvider(props: {
       value={{
         definition,
         setSourceCode,
-        setParameterValueByIndex,
-        parameterValuesByIndex,
+        setParameterValueByIdentifier,
+        parameterValuesByIdentifier,
         interactionKind:
           data?.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN,
-        parameterTypes: data?.interaction?.parameters ?? [],
+        parameters: data?.interaction?.parameters ?? [],
         parseError: data?.error,
         isParsing: isLoading,
       }}
