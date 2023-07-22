@@ -5,10 +5,13 @@ import { ParameterBuilder } from "./interface";
 import { TextualParamBuilder } from "./TextualParamBuilder/TextualParamBuilder";
 import { NumericParamBuilder } from "./NumericParamBuilder/NumericParamBuilder";
 import { ArrayParamBuilder } from "./ArrayParamBuilder/ArrayParamBuilder";
+import { AddressParamBuilder } from "./AddressParamBuilder/AddressParamBuilder";
 
 export function ParamBuilder(props: ParameterBuilder): ReactElement {
   const { parameterType } = props;
   switch (parameterType.kind) {
+    case CadenceTypeKind.CADENCE_TYPE_ADDRESS:
+      return <AddressParamBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_TEXTUAL:
       return <TextualParamBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_NUMERIC:

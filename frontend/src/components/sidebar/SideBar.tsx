@@ -21,7 +21,7 @@ import { useProjectActions } from "../../contexts/project.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
-import { UserIcon } from "../user-icon/UserIcon";
+import { LoggedInAccountAvatar } from "../account/avatar/AccountAvatar";
 import { useGetAccountBalance } from "../../hooks/use-account-balance";
 import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
 import { ServiceRegistry } from "../../services/service-registry";
@@ -113,7 +113,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
               onClick={onClickUserProfile}
               title={user?.addr ?? "-"}
               footer={flowBalance}
-              icon={<UserIcon />}
+              icon={<LoggedInAccountAvatar />}
             />
           )}
           {isLoggedIn && (

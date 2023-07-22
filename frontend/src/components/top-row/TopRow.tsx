@@ -8,7 +8,7 @@ import sideMenuClosedEmuNoWork from "../../assets/icons/side-menu-closed-emulato
 import sideMenuOpenEmuNoWork from "../../assets/icons/side-menu-open-emulator-not-working.svg";
 import classNames from "classnames";
 import { useHistory } from "react-router-dom";
-import { UserIcon } from "../user-icon/UserIcon";
+import { LoggedInAccountAvatar } from "../account/avatar/AccountAvatar";
 import { useFlow } from "../../hooks/use-flow";
 import { SimpleButton } from "../simple-button/SimpleButton";
 
@@ -31,7 +31,7 @@ export const TopRow: FunctionComponent<{
             className={classes.userButton}
             onClick={() => history.push(`/accounts/details/${user?.addr}`)}
           >
-            <UserIcon />
+            <LoggedInAccountAvatar />
           </SimpleButton>
         )}
         <Button className={classes.sidebarButton} onClick={props.toggleSidebar}>

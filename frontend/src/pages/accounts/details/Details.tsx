@@ -46,7 +46,7 @@ import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
 import { useFlow } from "../../../hooks/use-flow";
 import { useProjectActions } from "../../../contexts/project.context";
-import { UserIcon } from "../../../components/user-icon/UserIcon";
+import { LoggedInAccountAvatar } from "../../../components/account/avatar/AccountAvatar";
 // @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
@@ -321,7 +321,7 @@ function ProfileActionsCard({ currentAddress }: { currentAddress: string }) {
     <Card className={classes.actionCard}>
       <img className={classes.background} src={gradient} alt="" />
       <div className={classes.avatarWrapper}>
-        <UserIcon size={50} />
+        <LoggedInAccountAvatar size={50} />
       </div>
       <div className={classes.actionsWrapper}>
         <ActionButton

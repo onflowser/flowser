@@ -1,0 +1,44 @@
+@import "styles/spacings";
+@import "styles/colors";
+
+.root {
+  display: flex;
+  column-gap: $spacing-base;
+  .accountItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: $spacing-s;
+    cursor: pointer;
+    .selectedAccount {
+      border-color: $blue !important;
+    }
+    .avatarWrapper {
+      height: 40px;
+      width: 40px;
+      padding: $spacing-s * 1.5;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      &:hover {
+        border-color: $blue;
+      }
+      .plusIconWrapper {
+        background: white;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        svg {
+          width: 50%;
+          height: 50%;
+          * {
+            fill: $blue;
+          }
+        }
+      }
+    }
+  }
+}
