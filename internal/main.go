@@ -54,7 +54,12 @@ const (
 
 type Interaction struct {
 	Kind       InteractionKind `json:"kind"`
-	Parameters []*CadenceType  `json:"parameters"`
+	Parameters []*Parameter    `json:"parameters"`
+}
+
+type Parameter struct {
+	Identifier string       `json:"identifier"`
+	Type       *CadenceType `json:"type"`
 }
 
 type CadenceTypeKind uint
@@ -113,15 +118,18 @@ func buildInteraction(program *ast.Program) *Interaction {
 	}
 }
 
-func buildInteractionParameterList(parameterList *ast.ParameterList) []*CadenceType {
-	var parameters []*CadenceType
+func buildInteractionParameterList(parameterList *ast.ParameterList) []*Parameter {
+	var parameters []*Parameter
 
 	if parameterList == nil {
 		return parameters
 	}
 
 	for _, parameter := range parameterList.Parameters {
-		parameters = append(parameters, buildCadenceType(parameter.TypeAnnotation.Type))
+		parameters = append(parameters, &Parameter{
+			Identifier: parameter.Identifier.Identifier,
+			Type:       buildCadenceType(parameter.TypeAnnotation.Type),
+		})
 	}
 
 	return parameters

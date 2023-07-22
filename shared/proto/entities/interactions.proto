@@ -8,7 +8,12 @@ enum InteractionKind {
 
 message Interaction {
   InteractionKind kind = 1;
-  repeated CadenceType parameters = 2;
+  repeated Parameter parameters = 2;
+}
+
+message Parameter {
+  string identifier = 1;
+  CadenceType type = 2;
 }
 
 enum CadenceTypeKind {
