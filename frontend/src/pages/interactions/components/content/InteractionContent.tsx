@@ -44,11 +44,10 @@ export function InteractionContent(): ReactElement {
             parameterValuesByIdentifier={parameterValuesByIdentifier}
           />
         </div>
-        <div>
+        <div className={classes.bottom}>
           <SimpleButton className={classes.button} onClick={execute}>
             Execute
           </SimpleButton>
-          <SizedBox height={20} />
         </div>
       </div>
     </div>

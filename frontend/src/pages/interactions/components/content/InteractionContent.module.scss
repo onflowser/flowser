@@ -22,15 +22,22 @@
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    padding: $spacing-base;
     height: 100%;
-    .button {
-      width: 100%;
-      padding: $spacing-base;
-      background: $blue;
-      color: $new-color-1;
-      font-weight: bold;
-      font-size: $font-size-large;
-      border-radius: 5px;
+
+    .bottom {
+      display: flex;
+      .button {
+        flex: 1;
+        width: 100%;
+        padding: $spacing-base;
+        background: $blue;
+        color: $new-color-1;
+        font-weight: bold;
+        font-size: $font-size-large;
+        border-radius: 5px;
+        margin-bottom: 30px;
+      }
     }
   }
 }
