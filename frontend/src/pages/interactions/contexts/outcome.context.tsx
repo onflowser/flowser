@@ -1,8 +1,5 @@
 import { ServiceRegistry } from "../../../services/service-registry";
-import {
-  InteractionDefinition,
-  useInteractionDefinitionsRegistry,
-} from "./definitions-registry.context";
+import { InteractionDefinition } from "./definitions-registry.context";
 import React, {
   createContext,
   ReactElement,
