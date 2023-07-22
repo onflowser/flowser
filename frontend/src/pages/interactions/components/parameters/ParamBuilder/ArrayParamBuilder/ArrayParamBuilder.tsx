@@ -1,6 +1,8 @@
 import React, { ReactElement, useEffect, useMemo } from "react";
-import { ParameterBuilder } from "./parameter-builder";
-import { ParamBuilder } from "./ParamBuilder";
+import { ParameterBuilder } from "../interface";
+import { ParamBuilder } from "../ParamBuilder";
+import classes from "./ArrayParamBuilder.module.scss";
+import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
 
 export function ArrayParamBuilder(props: ParameterBuilder): ReactElement {
   const { parameterType, parameterValue, setParameterValue } = props;
@@ -56,19 +58,21 @@ export function ArrayParamBuilder(props: ParameterBuilder): ReactElement {
   }
 
   return (
-    <div>
+    <div className={classes.root}>
       {isValueArray &&
         parameterValue.map((value, index) => {
           if (array.element === undefined) {
             throw new Error("Expected array element field");
           }
           return (
-            <ParamBuilder
-              key={index}
-              parameterType={array.element}
-              parameterValue={value}
-              setParameterValue={(value) => setValueByIndex(value, index)}
-            />
+            <div key={index} className={classes.arrayElement}>
+              <code className={classes.indexDisplay}>{index}:</code>
+              <ParamBuilder
+                parameterType={array.element}
+                parameterValue={value}
+                setParameterValue={(value) => setValueByIndex(value, index)}
+              />
+            </div>
           );
         })}
       {!isConstantArray && (

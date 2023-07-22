@@ -1,0 +1,12 @@
+@import "styles/spacings";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-base;
+  .parameter {
+    .label {
+      margin-bottom: $spacing-s;
+    }
+  }
+}

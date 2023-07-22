@@ -1,10 +1,10 @@
 import React from "react";
 import { CadenceTypeKind } from "@flowser/shared";
 import { ReactElement } from "react";
-import { ParameterBuilder } from "./parameter-builder";
-import { TextualParamBuilder } from "./TextualParamBuilder";
-import { NumericParamBuilder } from "./NumericParamBuilder";
-import { ArrayParamBuilder } from "./ArrayParamBuilder";
+import { ParameterBuilder } from "./interface";
+import { TextualParamBuilder } from "./TextualParamBuilder/TextualParamBuilder";
+import { NumericParamBuilder } from "./NumericParamBuilder/NumericParamBuilder";
+import { ArrayParamBuilder } from "./ArrayParamBuilder/ArrayParamBuilder";
 
 export function ParamBuilder(props: ParameterBuilder): ReactElement {
   const { parameterType } = props;

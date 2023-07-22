@@ -5,7 +5,7 @@ import classes from "./InteractionContent.module.scss";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
-import { ParamListBuilder } from "../parameters/ParamListBuilder";
+import { ParamListBuilder } from "../parameters/ParamListBuilder/ParamListBuilder";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
@@ -38,6 +38,7 @@ export function InteractionContent(): ReactElement {
       <div className={classes.sidebar}>
         <div>
           <h3>Arguments</h3>
+          <SizedBox height={20} />
           <ParamListBuilder
             parameters={parameters}
             setParameterValueByIdentifier={setParameterValueByIdentifier}
