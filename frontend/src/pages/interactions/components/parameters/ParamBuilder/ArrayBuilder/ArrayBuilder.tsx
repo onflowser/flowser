@@ -1,10 +1,9 @@
 import React, { ReactElement, useEffect, useMemo } from "react";
 import { ParameterBuilder } from "../interface";
 import { ParamBuilder } from "../ParamBuilder";
-import classes from "./ArrayParamBuilder.module.scss";
-import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
+import classes from "./ArrayBuilder.module.scss";
 
-export function ArrayParamBuilder(props: ParameterBuilder): ReactElement {
+export function ArrayBuilder(props: ParameterBuilder): ReactElement {
   const { parameterType, parameterValue, setParameterValue } = props;
 
   const { array } = parameterType;

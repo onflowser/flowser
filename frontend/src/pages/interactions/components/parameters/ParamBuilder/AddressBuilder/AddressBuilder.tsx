@@ -1,5 +1,5 @@
 import React, { ReactElement, useMemo } from "react";
-import classes from "./AddressParamBuilder.module.scss";
+import classes from "./AddressBuilder.module.scss";
 import { ParameterBuilder } from "../interface";
 import { useGetPollingAccounts } from "../../../../../../hooks/use-api";
 import { AccountAvatar } from "../../../../../../components/account/avatar/AccountAvatar";
@@ -8,7 +8,7 @@ import { FlowserIcon } from "../../../../../../components/icons/Icons";
 import classNames from "classnames";
 import { ServiceRegistry } from "../../../../../../services/service-registry";
 
-export function AddressParamBuilder(props: ParameterBuilder): ReactElement {
+export function AddressBuilder(props: ParameterBuilder): ReactElement {
   const { parameterValue, setParameterValue } = props;
   const { data, refresh } = useGetPollingAccounts();
   const managedAccounts = useMemo(
