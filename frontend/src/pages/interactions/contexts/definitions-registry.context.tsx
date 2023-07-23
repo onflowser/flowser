@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
 } from "react";
+import { FclValueLookupByIdentifier } from "./definition.context";
 
 type InteractionsDefinitionsRegistry = {
   definitions: InteractionDefinition[];
@@ -18,10 +19,11 @@ export type InteractionDefinition = {
   id: string;
   name: string;
   sourceCode: string;
+  initialFclValuesByIdentifier: FclValueLookupByIdentifier;
 };
 
 const Context = createContext<InteractionsDefinitionsRegistry>(
-  undefined as any
+  undefined as never
 );
 
 export function InteractionDefinitionsRegistryProvider(props: {
@@ -31,6 +33,7 @@ export function InteractionDefinitionsRegistryProvider(props: {
     name: "Demo",
     id: "demo",
     sourceCode: "transaction {}",
+    initialFclValuesByIdentifier: new Map(),
   };
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     initialInteractionDefinition,

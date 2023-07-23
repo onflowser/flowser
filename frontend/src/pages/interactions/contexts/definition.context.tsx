@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import {
@@ -21,8 +22,10 @@ type InteractionDefinitionManager = InteractionParameterBuilder & {
   setSourceCode: (code: string) => void;
 };
 
+export type FclValueLookupByIdentifier = Map<string, FclValue>;
+
 export type InteractionParameterBuilder = {
-  fclValuesByIdentifier: Map<string, FclValue>;
+  fclValuesByIdentifier: FclValueLookupByIdentifier;
   setFclValue: (identifier: string, value: FclValue) => void;
 };
 
@@ -38,8 +41,12 @@ export function InteractionDefinitionManagerProvider(props: {
     sourceCode: definition.sourceCode,
   });
   const [fclValuesByIdentifier, setFclValuesByIdentifier] = useState(
-    new Map<string, FclValue>()
+    new Map<string, FclValue>(definition.initialFclValuesByIdentifier)
   );
+
+  useEffect(() => {
+    setFclValuesByIdentifier(definition.initialFclValuesByIdentifier);
+  }, [definition.initialFclValuesByIdentifier]);
 
   function setSourceCode(sourceCode: string) {
     update({ ...definition, sourceCode });

@@ -63,10 +63,17 @@ function BlockItem(props: BlockItemProps) {
   });
 
   function onForkAsTemplate() {
+    const transaction = data[0];
     create({
       id: block.id,
       name: `Tx #${block.height}`,
-      sourceCode: data[0].script,
+      sourceCode: transaction.script,
+      initialFclValuesByIdentifier: new Map(
+        transaction.arguments.map((arg) => [
+          arg.identifier,
+          JSON.parse(arg.valueAsJson),
+        ])
+      ),
     });
     setFocused(block.id);
   }
