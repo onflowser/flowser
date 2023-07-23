@@ -1,6 +1,9 @@
 import React, { ReactElement, useMemo } from "react";
 import classes from "./InteractionHistory.module.scss";
-import { useGetPollingBlocks } from "../../../../hooks/use-api";
+import {
+  useGetPollingBlocks,
+  useGetTransactionsByBlock,
+} from "../../../../hooks/use-api";
 import {
   Timeline,
   TimelineItem,
@@ -10,6 +13,7 @@ import { useProjectActions } from "../../../../contexts/project.context";
 import { FlowserIcon } from "../../../../components/icons/Icons";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { Spinner } from "../../../../components/spinner/Spinner";
+import { useInteractionDefinitionsRegistry } from "../../contexts/definitions-registry.context";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
@@ -50,9 +54,26 @@ function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const blockIconSize = 20;
   const checkoutIconSize = blockIconSize * 0.8;
+
+  const { create, setFocused } = useInteractionDefinitionsRegistry();
+  const { data } = useGetTransactionsByBlock(block.id, {
+    // Assume that every transaction is packaged into a separate block.
+    // So once a block exists, no transactions can be appended to it.
+    pollingInterval: 0,
+  });
+
+  function onForkAsTemplate() {
+    create({
+      id: block.id,
+      name: `Tx #${block.height}`,
+      sourceCode: data[0].script,
+    });
+    setFocused(block.id);
+  }
+
   return (
     <div className={classes.blockItem}>
-      <div className={classes.info}>
+      <div className={classes.info} onClick={onForkAsTemplate}>
         <FlowserIcon.Block width={blockIconSize} height={blockIconSize} />
         <SizedBox width={10} />
         <span>#{String(block.height).padStart(3, "0")}</span>

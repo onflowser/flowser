@@ -7,8 +7,11 @@ import React, {
 
 type InteractionsDefinitionsRegistry = {
   definitions: InteractionDefinition[];
+  focusedDefinition: InteractionDefinition;
   getById: (id: string) => InteractionDefinition;
   update: (interaction: InteractionDefinition) => void;
+  create: (interaction: InteractionDefinition) => void;
+  setFocused: (interactionId: string) => void;
 };
 
 export type InteractionDefinition = {
@@ -32,6 +35,9 @@ export function InteractionDefinitionsRegistryProvider(props: {
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     initialInteractionDefinition,
   ]);
+  const [focusedInteractionId, setFocusedInteractionId] = useState<string>(
+    definitions[0].id
+  );
 
   function update(updatedInteraction: InteractionDefinition) {
     setDefinitions((interactions) =>
@@ -42,6 +48,15 @@ export function InteractionDefinitionsRegistryProvider(props: {
         return existingInteraction;
       })
     );
+  }
+
+  function create(newInteraction: InteractionDefinition) {
+    const isExisting = definitions.some(
+      (definition) => definition.id === newInteraction.id
+    );
+    if (!isExisting) {
+      setDefinitions([...definitions, newInteraction]);
+    }
   }
 
   function getById(id: string) {
@@ -56,6 +71,9 @@ export function InteractionDefinitionsRegistryProvider(props: {
     <Context.Provider
       value={{
         definitions,
+        focusedDefinition: getById(focusedInteractionId),
+        setFocused: setFocusedInteractionId,
+        create,
         update,
         getById,
       }}

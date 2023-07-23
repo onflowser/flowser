@@ -57,7 +57,7 @@ const {
   processesService,
   accountsService,
   snapshotService,
-  interactionsService
+  interactionsService,
 } = ServiceRegistry.getInstance();
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
@@ -212,8 +212,11 @@ export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
   });
 }
 
-export function useGetPollingTransactionsByBlock(
-  blockId: string
+export function useGetTransactionsByBlock(
+  blockId: string,
+  options?: {
+    pollingInterval?: number;
+  }
 ): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
     resourceKey: "/block/transactions/polling",
@@ -222,6 +225,7 @@ export function useGetPollingTransactionsByBlock(
         blockId,
         timestamp,
       }),
+    interval: options?.pollingInterval,
   });
 }
 

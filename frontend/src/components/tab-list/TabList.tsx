@@ -12,18 +12,19 @@ type TabListProps = {
   className?: string;
   activeTabClassName?: string;
   inactiveTabClassName?: string;
-  currentTab: TabItem;
+  currentTabId: string;
   onChangeTab: (tab: TabItem) => void;
   tabs: TabItem[];
 };
 
 export function TabList(props: TabListProps): ReactElement {
-  const { className, tabs, currentTab, onChangeTab } = props;
+  const { className, tabs, currentTabId, onChangeTab } = props;
+  const currentTab = tabs.find((tab) => tab.id === currentTabId);
   return (
     <div className={classNames(classes.root, className)}>
       <div className={classes.navigation}>
         {tabs.map((tab) => {
-          const isActive = currentTab.id === tab.id;
+          const isActive = currentTabId === tab.id;
           return (
             <button
               key={tab.id}
@@ -38,7 +39,7 @@ export function TabList(props: TabListProps): ReactElement {
           );
         })}
       </div>
-      <div className={classes.body}>{currentTab.content}</div>
+      <div className={classes.body}>{currentTab?.content}</div>
     </div>
   );
 }

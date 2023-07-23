@@ -11,10 +11,7 @@ import {
 } from "../../../components/details-tabs/DetailsTabs";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import Fragment from "../../../components/fragment/Fragment";
-import {
-  useGetBlock,
-  useGetPollingTransactionsByBlock,
-} from "../../../hooks/use-api";
+import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Transaction } from "@flowser/shared";
@@ -109,7 +106,7 @@ const Details: FunctionComponent = () => {
 
   const { isLoading, data } = useGetBlock(blockId);
   const { block } = data ?? {};
-  const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
+  const { data: transactions } = useGetTransactionsByBlock(blockId);
 
   useEffect(() => {
     showNavigationDrawer(true);

@@ -31,10 +31,13 @@ function ContentWithProvider() {
       content: <div>TODO</div>,
     },
   ];
-  const [currentSideMenuTab, setCurrentSideMenuTab] = useState(sideMenuTabs[0]);
+  const [currentSideMenuTabId, setCurrentSideMenuTabId] = useState(
+    sideMenuTabs[0].id
+  );
 
   // TODO(feature-interact-screen): Add ability to add new tabs and switch between them
-  const { definitions } = useInteractionDefinitionsRegistry();
+  const { definitions, focusedDefinition, setFocused } =
+    useInteractionDefinitionsRegistry();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
     label: definition.name,
@@ -46,9 +49,6 @@ function ContentWithProvider() {
       </InteractionDefinitionManagerProvider>
     ),
   }));
-  const [currentEditorTab, setCurrentEditorTab] = useState<TabItem>(
-    openEditorTabs[0]
-  );
 
   return (
     <div className={classes.pageRoot}>
@@ -56,14 +56,14 @@ function ContentWithProvider() {
         className={classes.leftSideMenu}
         activeTabClassName={classes.activeTab}
         inactiveTabClassName={classes.inactiveTab}
-        currentTab={currentSideMenuTab}
-        onChangeTab={setCurrentSideMenuTab}
+        currentTabId={currentSideMenuTabId}
+        onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
       />
       <TabList
         className={classes.mainContent}
-        currentTab={currentEditorTab}
-        onChangeTab={setCurrentEditorTab}
+        currentTabId={focusedDefinition.id}
+        onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
       />
     </div>
