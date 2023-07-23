@@ -33,9 +33,11 @@ import { FlowAccountStorageService } from "../flow/services/storage.service";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   FlowCoreEventType,
+  GetParsedInteractionResponse,
   ManagedProcessState,
   ServiceStatus,
   SignableObject,
+  TransactionArgument,
   TransactionStatus,
 } from "@flowser/shared";
 import {
@@ -53,6 +55,7 @@ import {
   WellKnownAddressesOptions,
 } from "../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
+import { InteractionsService } from "../interactions/interactions.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -95,7 +98,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     private flowGatewayService: FlowGatewayService,
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
-    private flowEmulatorService: FlowEmulatorService
+    private flowEmulatorService: FlowEmulatorService,
+    private interactionService: InteractionsService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -490,8 +494,16 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
   }) {
+    const parsedInteraction = await this.interactionService.parse({
+      sourceCode: options.flowTransaction.script,
+    });
+    if (parsedInteraction.error) {
+      this.logger.error(
+        `Unexpected interaction parsing error: ${parsedInteraction.error}`
+      );
+    }
     this.transactionService.createOrUpdate(
-      this.createTransactionEntity(options)
+      this.createTransactionEntity({ ...options, parsedInteraction })
     );
   }
 
@@ -769,8 +781,14 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowBlock: FlowBlock;
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
+    parsedInteraction: GetParsedInteractionResponse;
   }): TransactionEntity {
-    const { flowBlock, flowTransaction, flowTransactionStatus } = options;
+    const {
+      flowBlock,
+      flowTransaction,
+      flowTransactionStatus,
+      parsedInteraction,
+    } = options;
     return new TransactionEntity({
       id: flowTransaction.id,
       script: flowTransaction.script,
@@ -781,7 +799,15 @@ export class ProcessorService implements ProjectContextLifecycle {
       authorizers: flowTransaction.authorizers.map((address) =>
         ensurePrefixedAddress(address)
       ),
-      args: flowTransaction.args,
+      args:
+        parsedInteraction.interaction?.parameters.map(
+          (parameter, index): TransactionArgument => ({
+            identifier: parameter.identifier,
+            type: parameter.type,
+            // TODO: Convert fcl encoded values to plain js ones
+            valueAsJson: JSON.stringify(flowTransaction.args[index]),
+          })
+        ) ?? [],
       proposalKey: {
         ...flowTransaction.proposalKey,
         address: ensurePrefixedAddress(flowTransaction.proposalKey.address),

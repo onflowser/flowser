@@ -245,7 +245,7 @@ const Details: FunctionComponent = () => {
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript
             script={transaction.script}
-            args={transaction.args}
+            arguments={transaction.arguments}
           />
         </DetailsTabItem>
         <DetailsTabItem

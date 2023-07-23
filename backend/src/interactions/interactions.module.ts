@@ -4,6 +4,7 @@ import { InteractionsController } from './interactions.controller';
 
 @Module({
   providers: [InteractionsService],
-  controllers: [InteractionsController]
+  controllers: [InteractionsController],
+  exports: [InteractionsService]
 })
 export class InteractionsModule {}

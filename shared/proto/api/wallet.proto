@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "entities/accounts.proto";
 import "entities/interactions.proto";
+import "entities/transactions.proto";
 
 message CreateAccountRequest {}
 
@@ -19,10 +20,4 @@ message SendTransactionRequest {
 
 message SendTransactionResponse {
   string transaction_id = 1;
-}
-
-message TransactionArgument {
-  string identifier = 1;
-  CadenceType type = 2;
-  string value_as_json = 3;
 }
