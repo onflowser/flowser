@@ -1,79 +1,69 @@
-import React, { ReactElement, useEffect, useMemo } from "react";
-import { ParameterBuilder } from "../interface";
+import React, { ReactElement, useEffect } from "react";
+import { CadenceValueBuilder } from "../interface";
 import { ParamBuilder } from "../ParamBuilder";
 import classes from "./ArrayBuilder.module.scss";
+import { FclArrayValue, FclValue, FclValues } from "@flowser/shared";
 
-export function ArrayBuilder(props: ParameterBuilder): ReactElement {
-  const { parameterType, parameterValue, setParameterValue } = props;
+export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
+  const { type, value, setValue } = props;
 
-  const { array } = parameterType;
+  const { array } = type;
   if (array === undefined) {
     throw new Error("Expected array field");
   }
 
-  const isValueArray = parameterValue instanceof Array;
   const isConstantArray = array.size !== -1;
-  const isInitialized = useMemo(() => {
-    if (!isValueArray) {
-      return false;
-    }
-    const isUninitializedConstantArray =
-      isConstantArray && parameterValue.length !== array.size;
-    return !isUninitializedConstantArray;
-  }, [parameterValue, isValueArray]);
+  const isFclArray = FclValues.isFclArrayValue(value);
+  const isUninitializedConstantArray =
+    isConstantArray && isFclArray && value.length !== array.size;
+  const isInitialized = isFclArray && !isUninitializedConstantArray;
 
   useEffect(() => {
-    if (isInitialized) {
-      return;
-    }
-    if (isConstantArray) {
-      setParameterValue(makeEmptyArrayOfSize(array.size));
-    } else {
-      setParameterValue([]);
+    if (!isInitialized) {
+      setValue(initFclArrayOfSize(isConstantArray ? array.size : 0));
     }
   }, [isConstantArray, isInitialized]);
 
-  function setValueByIndex(value: unknown, index: number) {
-    if (parameterValue instanceof Array) {
-      parameterValue[index] = value;
-      setParameterValue(parameterValue);
+  function setElement(index: number, element: FclValue) {
+    if (isInitialized) {
+      value[index] = element;
+      setValue(value);
     }
   }
 
   function increaseSize() {
-    if (parameterValue instanceof Array) {
-      setParameterValue([...parameterValue, undefined]);
+    if (isInitialized) {
+      setValue([...value, undefined]);
     }
   }
 
   function decreaseSize() {
-    if (parameterValue instanceof Array) {
-      setParameterValue(parameterValue.slice(0, parameterValue.length - 1));
+    if (isInitialized) {
+      setValue(value.slice(0, value.length - 1));
     }
   }
 
-  if (!isInitialized) {
+  if (!isFclArray) {
     return <></>;
   }
 
   return (
     <div className={classes.root}>
-      {isValueArray &&
-        parameterValue.map((value, index) => {
-          if (array.element === undefined) {
-            throw new Error("Expected array element field");
-          }
-          return (
-            <div key={index} className={classes.arrayElement}>
-              <code className={classes.indexDisplay}>{index}:</code>
-              <ParamBuilder
-                parameterType={array.element}
-                parameterValue={value}
-                setParameterValue={(value) => setValueByIndex(value, index)}
-              />
-            </div>
-          );
-        })}
+      {value.map((value, index) => {
+        if (array.element === undefined) {
+          throw new Error("Expected array element field");
+        }
+        return (
+          <div key={index} className={classes.arrayElement}>
+            <code className={classes.indexDisplay}>{index}:</code>
+            <ParamBuilder
+              type={array.element}
+              value={value}
+              setValue={(value) => setElement(index, value)}
+            />
+          </div>
+        );
+      })}
       {!isConstantArray && (
         <div>
           <button onClick={() => decreaseSize()}>-</button>
@@ -84,6 +74,6 @@ export function ArrayBuilder(props: ParameterBuilder): ReactElement {
   );
 }
 
-function makeEmptyArrayOfSize(size: number) {
-  return Array.from({ length: size });
+function initFclArrayOfSize(size: number): FclArrayValue {
+  return Array.from({ length: size }).map(() => undefined);
 }

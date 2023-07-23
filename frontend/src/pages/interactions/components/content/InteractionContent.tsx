@@ -13,8 +13,8 @@ import { SizedBox } from "../../../../components/sized-box/SizedBox";
 export function InteractionContent(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
   const {
-    setParameterValueByIdentifier,
-    parameterValuesByIdentifier,
+    setFclValue,
+    fclValuesByIdentifier,
     parameters,
     definition,
     setSourceCode,
@@ -41,8 +41,8 @@ export function InteractionContent(): ReactElement {
           <SizedBox height={20} />
           <ParamListBuilder
             parameters={parameters}
-            setParameterValueByIdentifier={setParameterValueByIdentifier}
-            parameterValuesByIdentifier={parameterValuesByIdentifier}
+            setFclValue={setFclValue}
+            fclValuesByIdentifier={fclValuesByIdentifier}
           />
         </div>
         <div className={classes.bottom}>

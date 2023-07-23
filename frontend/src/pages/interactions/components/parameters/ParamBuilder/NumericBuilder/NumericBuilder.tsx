@@ -1,15 +1,16 @@
 import React, { ReactElement, useEffect } from "react";
-import { ParameterBuilder } from "../interface";
+import { CadenceValueBuilder } from "../interface";
 import Input from "../../../../../../components/input/Input";
+import { FclValues } from "@flowser/shared";
 
-export function NumericBuilder(props: ParameterBuilder): ReactElement {
-  const { parameterValue, setParameterValue } = props;
+export function NumericBuilder(props: CadenceValueBuilder): ReactElement {
+  const { value, setValue } = props;
 
-  const isInitialised = typeof parameterValue === "number";
+  const isInitialised = FclValues.isFclNumericValue(value);
 
   useEffect(() => {
     if (!isInitialised) {
-      setParameterValue(0);
+      setValue(0);
     }
   }, [isInitialised]);
 
@@ -20,8 +21,8 @@ export function NumericBuilder(props: ParameterBuilder): ReactElement {
   return (
     <Input
       type="number"
-      value={parameterValue}
-      onChange={(e) => setParameterValue(e.target.valueAsNumber)}
+      value={value}
+      onChange={(e) => setValue(e.target.valueAsNumber)}
     />
   );
 }

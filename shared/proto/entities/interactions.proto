@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/any.proto";
+
 // This must match the structure of go structs in `internal/main.go`.
 
 enum InteractionKind {
@@ -16,6 +18,11 @@ message Interaction {
 message Parameter {
   string identifier = 1;
   CadenceType type = 2;
+}
+
+message Argument {
+  string identifier = 1;
+  google.protobuf.Any value = 2;
 }
 
 enum CadenceTypeKind {

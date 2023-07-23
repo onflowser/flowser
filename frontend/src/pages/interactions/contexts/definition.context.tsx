@@ -10,7 +10,7 @@ import {
   useInteractionDefinitionsRegistry,
 } from "./definitions-registry.context";
 import { useGetParsedInteraction } from "../../../hooks/use-api";
-import { InteractionKind, Parameter } from "@flowser/shared";
+import { FclValue, InteractionKind, Parameter } from "@flowser/shared";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
@@ -22,11 +22,11 @@ type InteractionDefinitionManager = InteractionParameterBuilder & {
 };
 
 export type InteractionParameterBuilder = {
-  parameterValuesByIdentifier: Map<string, unknown>;
-  setParameterValueByIdentifier: (identifier: string, value: unknown) => void;
+  fclValuesByIdentifier: Map<string, FclValue>;
+  setFclValue: (identifier: string, value: FclValue) => void;
 };
 
-const Context = createContext<InteractionDefinitionManager>(undefined as any);
+const Context = createContext<InteractionDefinitionManager>(undefined as never);
 
 export function InteractionDefinitionManagerProvider(props: {
   interactionId: string;
@@ -37,15 +37,16 @@ export function InteractionDefinitionManagerProvider(props: {
   const { data, isLoading } = useGetParsedInteraction({
     sourceCode: definition.sourceCode,
   });
-  const [parameterValuesByIdentifier, setParameterValuesByIdentifier] =
-    useState(new Map<string, unknown>());
+  const [fclValuesByIdentifier, setFclValuesByIdentifier] = useState(
+    new Map<string, FclValue>()
+  );
 
   function setSourceCode(sourceCode: string) {
     update({ ...definition, sourceCode });
   }
 
-  function setParameterValueByIdentifier(identifier: string, value: unknown) {
-    setParameterValuesByIdentifier((oldMapping) => {
+  function setFclValue(identifier: string, value: FclValue) {
+    setFclValuesByIdentifier((oldMapping) => {
       const newMapping = new Map(oldMapping);
       newMapping.set(identifier, value);
       return newMapping;
@@ -57,8 +58,8 @@ export function InteractionDefinitionManagerProvider(props: {
       value={{
         definition,
         setSourceCode,
-        setParameterValueByIdentifier,
-        parameterValuesByIdentifier,
+        setFclValue,
+        fclValuesByIdentifier,
         interactionKind:
           data?.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN,
         parameters: data?.interaction?.parameters ?? [],

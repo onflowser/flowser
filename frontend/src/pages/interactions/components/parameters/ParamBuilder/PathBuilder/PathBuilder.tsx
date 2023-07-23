@@ -1,29 +1,22 @@
 import React from "react";
-import { CadenceType } from "@flowser/shared";
+import { CadenceType, FclPathDomain, FclValues } from "@flowser/shared";
 import { ReactElement, useEffect } from "react";
-import { ParameterBuilder } from "../interface";
+import { CadenceValueBuilder } from "../interface";
 import SelectInput, {
   SelectInputOption,
 } from "../../../../../../components/select-input/SelectInput";
 import Input from "../../../../../../components/input/Input";
 
-type FclPathDomain = "public" | "private" | "storage";
+export function PathBuilder(props: CadenceValueBuilder): ReactElement {
+  const { type, value, setValue } = props;
 
-export function PathBuilder(props: ParameterBuilder): ReactElement {
-  const { parameterType, parameterValue, setParameterValue } = props;
-
-  const isInitialized =
-    typeof parameterValue === "object" &&
-    parameterValue instanceof Object &&
-    "domain" in parameterValue &&
-    "identifier" in parameterValue;
-
-  const specifiedDomain = getPredefinedDomain(parameterType);
+  const isInitialized = FclValues.isFclPathValue(value);
+  const specifiedDomain = getPredefinedDomain(type);
 
   useEffect(() => {
     if (!isInitialized) {
-      setParameterValue({
-        domain: specifiedDomain,
+      setValue({
+        domain: specifiedDomain ?? "public",
         identifier: "",
       });
     }
@@ -33,10 +26,10 @@ export function PathBuilder(props: ParameterBuilder): ReactElement {
     return <></>;
   }
 
-  function setDomain(domain: string) {
+  function setDomain(domain: FclPathDomain) {
     if (isInitialized) {
-      setParameterValue({
-        ...parameterValue,
+      setValue({
+        ...value,
         domain,
       });
     }
@@ -44,14 +37,14 @@ export function PathBuilder(props: ParameterBuilder): ReactElement {
 
   function setIdentifier(identifier: string) {
     if (isInitialized) {
-      setParameterValue({
-        ...parameterValue,
+      setValue({
+        ...value,
         identifier,
       });
     }
   }
 
-  const options = getAvailableDomains(parameterType).map(
+  const options = getAvailableDomains(type).map(
     (domain): SelectInputOption => ({
       label: domain,
       value: domain,
@@ -63,15 +56,13 @@ export function PathBuilder(props: ParameterBuilder): ReactElement {
       Domain:{" "}
       <SelectInput
         disabled={specifiedDomain !== undefined}
-        // @ts-ignore
-        value={parameterValue.domain}
+        value={value.domain}
         options={options}
-        onChange={(e) => setDomain(e.target.value)}
+        onChange={(e) => setDomain(e.target.value as FclPathDomain)}
       />
       Identifier:{" "}
       <Input
-        // @ts-ignore
-        value={parameterValue.identifier}
+        value={value.identifier}
         onChange={(e) => setIdentifier(e.target.value)}
       />
     </div>

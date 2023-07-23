@@ -1,15 +1,15 @@
 import React, { ReactElement, useEffect } from "react";
-import { ParameterBuilder } from "../interface";
+import { CadenceValueBuilder } from "../interface";
 import Input from "../../../../../../components/input/Input";
 
-export function TextualBuilder(props: ParameterBuilder): ReactElement {
-  const { parameterValue, setParameterValue } = props;
+export function TextualBuilder(props: CadenceValueBuilder): ReactElement {
+  const { value, setValue } = props;
 
-  const isInitialised = typeof parameterValue === "string";
+  const isInitialised = typeof value === "string";
 
   useEffect(() => {
     if (!isInitialised) {
-      setParameterValue("");
+      setValue("");
     }
   }, [isInitialised]);
 
@@ -20,8 +20,8 @@ export function TextualBuilder(props: ParameterBuilder): ReactElement {
   return (
     <Input
       type="text"
-      value={parameterValue}
-      onChange={(e) => setParameterValue(e.target.value)}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
     />
   );
 }

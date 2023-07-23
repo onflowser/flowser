@@ -1,77 +1,85 @@
 import React, { ReactElement, useEffect } from "react";
-import { ParameterBuilder } from "../interface";
+import { CadenceValueBuilder } from "../interface";
 import { ParamBuilder } from "../ParamBuilder";
+import { FclDictionaryEntry, FclValue, FclValues } from "@flowser/shared";
 
-export function DictionaryBuilder(props: ParameterBuilder): ReactElement {
-  const { parameterType, parameterValue, setParameterValue } = props;
-  const { dictionary } = parameterType;
+export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
+  const { type, value, setValue } = props;
+  const { dictionary } = type;
 
   if (!dictionary) {
     throw new Error("Expected dictionary field");
   }
 
-  const isInitialized = parameterValue instanceof Object;
+  const isInitialized = FclValues.isFclDictionaryValue(value);
 
   useEffect(() => {
-    setParameterValue({});
+    if (!isInitialized) {
+      setValue([
+        {
+          key: undefined,
+          value: undefined,
+        },
+      ]);
+    }
   }, [isInitialized]);
 
   if (!isInitialized) {
     return <></>;
   }
 
-  const entries = Object.entries(parameterValue);
-
-  function setValue(key: unknown, value: unknown) {
+  function updateEntry(
+    key: FclValue,
+    partialEntry: Partial<FclDictionaryEntry>
+  ) {
     if (isInitialized) {
-      setParameterValue({
-        ...parameterValue,
-        ...{ [key as never]: value },
-      });
-    }
-  }
-
-  function renameKey(oldKey: unknown, newKey: unknown) {
-    if (isInitialized) {
-      const value = parameterValue[oldKey as never];
-      delete parameterValue[oldKey as never];
-      parameterValue[newKey as never] = value;
-      setParameterValue(parameterValue);
+      const entryIndex = value.findIndex(
+        (entry: FclDictionaryEntry) => entry.key === key
+      );
+      value[entryIndex] = { ...value[entryIndex], ...partialEntry };
+      setValue(value);
     }
   }
 
   function addEntry() {
-    // Undefined can't be used as a key.
-    // It's converted to a string automatically.
-    setValue("", undefined);
+    if (isInitialized) {
+      setValue([
+        ...value,
+        {
+          key: undefined,
+          value: undefined,
+        },
+      ]);
+    }
   }
 
   return (
     <div>
-      {entries.map((entry, index) => {
+      {value.map((entry: FclDictionaryEntry, index: number) => {
         if (!dictionary.key) {
           throw new Error("Expected dictionary.key field");
         }
         if (!dictionary.value) {
           throw new Error("Expected dictionary.value field");
         }
-        const [key, value] = entry;
         return (
           <div key={index}>
             <div>
               Key:{" "}
               <ParamBuilder
-                parameterType={dictionary.key}
-                parameterValue={key}
-                setParameterValue={(newKey) => renameKey(key, newKey)}
+                type={dictionary.key}
+                value={entry.key}
+                setValue={(newKey) => updateEntry(entry.key, { key: newKey })}
               />
             </div>
             <div>
               Value:{" "}
               <ParamBuilder
-                parameterType={dictionary.value}
-                parameterValue={value}
-                setParameterValue={(value) => setValue(key, value)}
+                type={dictionary.value}
+                value={entry.value}
+                setValue={(newValue) =>
+                  updateEntry(entry.key, { value: newValue })
+                }
               />
             </div>
           </div>

@@ -1,7 +1,7 @@
-import { CadenceType } from "@flowser/shared";
+import { CadenceType, FclValue } from "@flowser/shared";
 
-export type ParameterBuilder = {
-  parameterType: CadenceType;
-  parameterValue: unknown;
-  setParameterValue: (value: unknown) => void;
+export type CadenceValueBuilder = {
+  type: CadenceType;
+  value: FclValue;
+  setValue: (value: FclValue) => void;
 };

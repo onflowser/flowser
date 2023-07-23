@@ -10,7 +10,12 @@ import React, {
 import { CommonUtils } from "../../../utils/common-utils";
 // @ts-ignore FCL types
 import * as fcl from "@onflow/fcl";
-import { CadenceType, CadenceTypeKind, InteractionKind } from "@flowser/shared";
+import {
+  InteractionKind,
+  FclValues,
+  FclArgBuilder,
+  FclTypeLookup,
+} from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
 
 export type FlowTransactionOutcome = {
@@ -33,20 +38,13 @@ type InteractionOutcomeManager = {
   execute: () => Promise<void>;
 };
 
-const Context = createContext<InteractionOutcomeManager>(undefined as any);
-
-type FlowArgBuilder = (value: unknown, type: unknown) => void;
-type FlowArgTypeLookup = Record<string, (nestedType?: unknown) => unknown>;
+const Context = createContext<InteractionOutcomeManager>(undefined as never);
 
 export function InteractionOutcomeManagerProvider(props: {
   children: ReactNode;
 }): ReactElement {
-  const {
-    definition,
-    parameterValuesByIdentifier,
-    parameters,
-    interactionKind,
-  } = useInteractionDefinitionManager();
+  const { definition, fclValuesByIdentifier, parameters, interactionKind } =
+    useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
   const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
 
@@ -62,40 +60,6 @@ export function InteractionOutcomeManagerProvider(props: {
       default:
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
         throw new Error(`Can't execute interaction: ${interactionKind}`);
-    }
-  }
-
-  function buildArguments(arg: FlowArgBuilder, t: FlowArgTypeLookup) {
-    return parameters.map((parameter) => {
-      if (!parameter.type) {
-        throw new Error("Expected parameter.type");
-      }
-      return arg(
-        parameterValuesByIdentifier.get(parameter.identifier),
-        getFlowType(t, parameter.type)
-      );
-    });
-  }
-
-  // https://developers.flow.com/tooling/fcl-js/api#ftype
-  function getFlowType(
-    t: FlowArgTypeLookup,
-    cadenceType: CadenceType
-  ): unknown {
-    switch (cadenceType.kind) {
-      case CadenceTypeKind.CADENCE_TYPE_NUMERIC:
-      case CadenceTypeKind.CADENCE_TYPE_TEXTUAL:
-      case CadenceTypeKind.CADENCE_TYPE_BOOLEAN:
-        return t[cadenceType.rawType];
-      case CadenceTypeKind.CADENCE_TYPE_ARRAY:
-        if (!cadenceType.array?.element) {
-          throw new Error("Expected array.element to be set");
-        }
-        return t.Array(getFlowType(t, cadenceType.array.element));
-      case CadenceTypeKind.CADENCE_TYPE_DICTIONARY:
-      case CadenceTypeKind.CADENCE_TYPE_UNKNOWN:
-      default:
-        throw new Error("Unknown Cadence type: " + cadenceType.rawType);
     }
   }
 
@@ -131,8 +95,18 @@ export function InteractionOutcomeManagerProvider(props: {
       setOutcome({});
       const result = await fcl.query({
         cadence: definition.sourceCode,
-        args: (arg: FlowArgBuilder, t: FlowArgTypeLookup) =>
-          buildArguments(arg, t),
+        args: (arg: FclArgBuilder, t: FclTypeLookup) => {
+          const argumentFunction = FclValues.getArgumentFunction({
+            parameters,
+            arguments: Array.from(fclValuesByIdentifier.entries()).map(
+              (entry) => ({
+                identifier: entry[0],
+                value: entry[1],
+              })
+            ),
+          });
+          return argumentFunction(arg, t);
+        },
       });
       setOutcome({
         script: {

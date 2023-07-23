@@ -12,11 +12,7 @@ export type ParameterListBuilderProps = InteractionParameterBuilder & {
 export function ParamListBuilder(
   props: ParameterListBuilderProps
 ): ReactElement {
-  const {
-    parameters,
-    parameterValuesByIdentifier,
-    setParameterValueByIdentifier,
-  } = props;
+  const { parameters, fclValuesByIdentifier, setFclValue } = props;
   return (
     <div className={classes.root}>
       {parameters.map((parameter) => {
@@ -31,13 +27,9 @@ export function ParamListBuilder(
               <code>{parameter.type.rawType}</code>
             </div>
             <ParamBuilder
-              parameterType={parameter.type}
-              parameterValue={parameterValuesByIdentifier.get(
-                parameter.identifier
-              )}
-              setParameterValue={(value) =>
-                setParameterValueByIdentifier(parameter.identifier, value)
-              }
+              type={parameter.type}
+              value={fclValuesByIdentifier.get(parameter.identifier)}
+              setValue={(value) => setFclValue(parameter.identifier, value)}
             />
           </div>
         );

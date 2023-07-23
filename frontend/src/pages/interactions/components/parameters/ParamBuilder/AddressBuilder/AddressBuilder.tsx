@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from "react";
 import classes from "./AddressBuilder.module.scss";
-import { ParameterBuilder } from "../interface";
+import { CadenceValueBuilder } from "../interface";
 import { useGetPollingAccounts } from "../../../../../../hooks/use-api";
 import { AccountAvatar } from "../../../../../../components/account/avatar/AccountAvatar";
 import { AccountName } from "../../../../../../components/account/name/AccountName";
@@ -8,8 +8,8 @@ import { FlowserIcon } from "../../../../../../components/icons/Icons";
 import classNames from "classnames";
 import { ServiceRegistry } from "../../../../../../services/service-registry";
 
-export function AddressBuilder(props: ParameterBuilder): ReactElement {
-  const { parameterValue, setParameterValue } = props;
+export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
+  const { value, setValue } = props;
   const { data, refresh } = useGetPollingAccounts();
   const managedAccounts = useMemo(
     () =>
@@ -31,11 +31,11 @@ export function AddressBuilder(props: ParameterBuilder): ReactElement {
         <div
           key={account.address}
           className={classes.accountItem}
-          onClick={() => setParameterValue(account.address)}
+          onClick={() => setValue(account.address)}
         >
           <div
             className={classNames(classes.avatarWrapper, {
-              [classes.selectedAccount]: account.address === parameterValue,
+              [classes.selectedAccount]: account.address === value,
             })}
           >
             <AccountAvatar address={account.address} />
