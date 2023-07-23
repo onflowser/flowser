@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import {
   FlowAccount,
   FlowBlock,
+  FlowTypeAnnotatedValue,
   FlowCollection,
   FlowEvent,
   FlowGatewayService,
@@ -29,7 +30,10 @@ import {
 import { getDataSourceInstance } from "../database";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
-import { FlowAccountStorageService } from "../flow/services/storage.service";
+import {
+  FlowAccountStorageService,
+  FlowCadenceValue,
+} from "../flow/services/storage.service";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   FlowCoreEventType,
@@ -789,6 +793,36 @@ export class ProcessorService implements ProjectContextLifecycle {
       flowTransactionStatus,
       parsedInteraction,
     } = options;
+
+    // FCL-JS returns type-annotated argument values.
+    // But we don't need the type info since we already have
+    // our own system of representing types with `CadenceType` message.
+    function fromTypeAnnotatedFclArguments(
+      object: FlowTypeAnnotatedValue
+    ): FlowCadenceValue {
+      const { type, value } = object;
+      // Available type values are listed here:
+      // https://developers.flow.com/tooling/fcl-js/api#ftype
+      switch (type) {
+        case "Dictionary":
+          return value.map((entry: any) => ({
+            key: fromTypeAnnotatedFclArguments(entry.key),
+            value: fromTypeAnnotatedFclArguments(entry.value),
+          }));
+        case "Array":
+          return value.map((element: any) =>
+            fromTypeAnnotatedFclArguments(element)
+          );
+        case "Path":
+        case "PublicPath":
+        case "PrivatePath":
+        case "StoragePath":
+        case "CapabilityPath":
+        default:
+          return value;
+      }
+    }
+
     return new TransactionEntity({
       id: flowTransaction.id,
       script: flowTransaction.script,
@@ -804,8 +838,9 @@ export class ProcessorService implements ProjectContextLifecycle {
           (parameter, index): TransactionArgument => ({
             identifier: parameter.identifier,
             type: parameter.type,
-            // TODO: Convert fcl encoded values to plain js ones
-            valueAsJson: JSON.stringify(flowTransaction.args[index]),
+            valueAsJson: JSON.stringify(
+              fromTypeAnnotatedFclArguments(flowTransaction.args[index])
+            ),
           })
         ) ?? [],
       proposalKey: {

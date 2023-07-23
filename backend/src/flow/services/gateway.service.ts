@@ -62,12 +62,10 @@ export type FlowCollection = {
   transactionIds: string[];
 };
 
-export type FlowCadenceObject = {
-  type: string; // See CadenceType
-  value: string | FlowCadenceObject | FlowCadenceObject[];
-  // Each object can contain other type-specific attributes
-  // Refer to: https://github.com/onflow/cadence/blob/master/values.go
-  [key: string]: unknown;
+export type FlowTypeAnnotatedValue = {
+  // https://developers.flow.com/tooling/fcl-js/api#ftype
+  type: string;
+  value: Record<string, any>;
 };
 
 // https://docs.onflow.org/fcl/reference/api/#proposalkeyobject
@@ -96,7 +94,7 @@ export type FlowTransactionStatus = {
 export type FlowTransaction = {
   id: string;
   script: string;
-  args: FlowCadenceObject[];
+  args: FlowTypeAnnotatedValue[];
   referenceBlockId: string;
   gasLimit: number;
   proposalKey: FlowProposalKey;
