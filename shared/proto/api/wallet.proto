@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "entities/accounts.proto";
+import "entities/interactions.proto";
 
 message CreateAccountRequest {}
 
@@ -13,8 +14,15 @@ message SendTransactionRequest {
   string proposer_address = 2;
   string payer_address = 3;
   repeated string authorizer_addresses = 4;
+  repeated TransactionArgument arguments = 5;
 }
 
 message SendTransactionResponse {
   string transaction_id = 1;
+}
+
+message TransactionArgument {
+  string identifier = 1;
+  CadenceType type = 2;
+  string value_as_json = 3;
 }

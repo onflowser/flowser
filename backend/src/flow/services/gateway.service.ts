@@ -6,7 +6,14 @@ import {
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/project.entity";
-import { Gateway, ServiceStatus } from "@flowser/shared";
+import {
+  FclArgBuilder,
+  FclArgumentWithMetadata,
+  FclTypeLookup,
+  FclValues,
+  Gateway,
+  ServiceStatus,
+} from "@flowser/shared";
 
 const fcl = require("@onflow/fcl");
 
@@ -118,6 +125,7 @@ type SendFlowTransactionOptions = {
   proposer: FlowAuthorizationFunction;
   payer: FlowAuthorizationFunction;
   authorizations: FlowAuthorizationFunction[];
+  arguments: FclArgumentWithMetadata[];
 };
 
 type FlowTxUnsubscribe = () => void;
@@ -159,7 +167,12 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   ): Promise<{ transactionId: string }> {
     const transactionId = await fcl.mutate({
       cadence: options.cadence,
-      args: (_arg: unknown, _t: unknown) => [],
+      args: (arg: FclArgBuilder, t: FclTypeLookup) => {
+        const argumentFunction = FclValues.getArgumentFunction(
+          options.arguments
+        );
+        return argumentFunction(arg, t);
+      },
       proposer: options.proposer,
       authorizations: options.authorizations,
       payer: options.payer,

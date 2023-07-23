@@ -19,6 +19,8 @@ import {
   FlowGatewayService,
 } from "../flow/services/gateway.service";
 import {
+  FclArgumentWithMetadata,
+  FclValues,
   SendTransactionRequest,
   SendTransactionResponse,
 } from "@flowser/shared";
@@ -64,11 +66,36 @@ export class WalletService implements ProjectContextLifecycle {
       ),
     ]);
 
+    const fclArguments = request.arguments.map(
+      (arg): FclArgumentWithMetadata => {
+        const { identifier, type, valueAsJson } = arg;
+
+        if (!type) {
+          throw new Error("Expecting argument type");
+        }
+
+        const parsedValue = JSON.parse(valueAsJson);
+        const value =
+          parsedValue === "" && type.optional ? undefined : parsedValue;
+
+        if (!FclValues.isFclValue(value)) {
+          throw new Error("Value not a fcl value");
+        }
+
+        return {
+          identifier,
+          type,
+          value,
+        };
+      }
+    );
+
     return this.flowGateway.sendTransaction({
       cadence: request.cadence,
       proposer,
       payer,
       authorizations,
+      arguments: fclArguments,
     });
   }
 

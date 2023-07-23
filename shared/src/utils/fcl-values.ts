@@ -1,7 +1,6 @@
 import {
   CadenceType,
   CadenceTypeKind,
-  Parameter,
 } from "../generated/entities/interactions";
 
 // https://developers.flow.com/tooling/fcl-js/api#argumentfunction
@@ -30,25 +29,19 @@ export type FclTextualValue = string;
 export type FclAddressValue = `0x${string}`;
 export type FclOptionalValue = FclRequiredValue | undefined;
 
-export type FclArgumentWithIdentifier = {
+export type FclArgumentWithMetadata = {
   identifier: string;
   value: FclValue;
+  type: CadenceType;
 };
 
 export class FclValues {
   // Builds a list of fcl encoded parameters.
   // See: https://developers.flow.com/tooling/fcl-js/api#argumentfunction
-  static getArgumentFunction(options: {
-    parameters: Parameter[];
-    arguments: FclArgumentWithIdentifier[];
-  }) {
-    const { parameters, arguments: cadenceArgs } = options;
+  static getArgumentFunction(fclArguments: FclArgumentWithMetadata[]) {
     const argumentFunction: FclArgumentFunction = (arg, t) => {
-      return parameters.map((parameter) => {
-        const argument = cadenceArgs.find(
-          (argument) => argument.identifier === parameter.identifier
-        );
-        return arg(argument.value, this.getFclType(t, parameter.type));
+      return fclArguments.map((argument) => {
+        return arg(argument.value, this.getFclType(t, argument.type));
       });
     };
 
@@ -125,7 +118,7 @@ export class FclValues {
   static isFclOptionalValue(arg: unknown): arg is FclOptionalValue {
     return arg === undefined || this.isFclRequiredValue(arg);
   }
-  static isFclArgument(arg: unknown): arg is FclValue {
+  static isFclValue(arg: unknown): arg is FclValue {
     return this.isFclOptionalValue(arg) || this.isFclRequiredValue(arg);
   }
 }

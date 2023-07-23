@@ -15,6 +15,8 @@ import {
   FclValues,
   FclArgBuilder,
   FclTypeLookup,
+  FclArgumentWithMetadata,
+  TransactionArgument,
 } from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
 
@@ -72,6 +74,18 @@ export function InteractionOutcomeManagerProvider(props: {
         authorizerAddresses: [],
         proposerAddress: accountAddress,
         payerAddress: accountAddress,
+        arguments: parameters.map((parameter): TransactionArgument => {
+          if (!parameter.type) {
+            throw new Error("Expecting parameter type");
+          }
+          return {
+            valueAsJson:
+              JSON.stringify(fclValuesByIdentifier.get(parameter.identifier)) ??
+              "",
+            type: parameter.type,
+            identifier: parameter.identifier,
+          };
+        }),
       });
       setOutcome({
         transaction: {
@@ -96,15 +110,19 @@ export function InteractionOutcomeManagerProvider(props: {
       const result = await fcl.query({
         cadence: definition.sourceCode,
         args: (arg: FclArgBuilder, t: FclTypeLookup) => {
-          const argumentFunction = FclValues.getArgumentFunction({
-            parameters,
-            arguments: Array.from(fclValuesByIdentifier.entries()).map(
-              (entry) => ({
-                identifier: entry[0],
-                value: entry[1],
-              })
-            ),
-          });
+          const fclArguments = parameters.map(
+            (parameter): FclArgumentWithMetadata => {
+              if (!parameter.type) {
+                throw new Error("Expecting parameter type");
+              }
+              return {
+                value: fclValuesByIdentifier.get(parameter.identifier),
+                type: parameter.type,
+                identifier: parameter.identifier,
+              };
+            }
+          );
+          const argumentFunction = FclValues.getArgumentFunction(fclArguments);
           return argumentFunction(arg, t);
         },
       });
