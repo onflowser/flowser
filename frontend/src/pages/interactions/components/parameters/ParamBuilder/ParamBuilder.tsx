@@ -7,6 +7,7 @@ import { NumericBuilder } from "./NumericBuilder/NumericBuilder";
 import { ArrayBuilder } from "./ArrayBuilder/ArrayBuilder";
 import { AddressBuilder } from "./AddressBuilder/AddressBuilder";
 import { DictionaryBuilder } from "./DictionaryBuilder/DictionaryBuilder";
+import { PathBuilder } from "./PathBuilder/PathBuilder";
 
 export function ParamBuilder(props: ParameterBuilder): ReactElement {
   const { parameterType } = props;
@@ -21,6 +22,8 @@ export function ParamBuilder(props: ParameterBuilder): ReactElement {
       return <ArrayBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_DICTIONARY:
       return <DictionaryBuilder {...props} />;
+    case CadenceTypeKind.CADENCE_TYPE_PATH:
+      return <PathBuilder {...props} />;
     default:
       return <div>Unknown type</div>;
   }
