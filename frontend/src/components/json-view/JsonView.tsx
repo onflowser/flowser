@@ -1,14 +1,16 @@
+import classNames from "classnames";
 import React, { ReactElement } from "react";
 import ReactJson from "react-json-view";
 import classes from "./JsonView.module.scss";
 
 type JsonViewProps = {
+  className?: string;
   data: Record<string, unknown>;
 };
 
 export function JsonView(props: JsonViewProps): ReactElement {
   return (
-    <div className={classes.root}>
+    <div className={classNames(classes.root, props.className)}>
       <ReactJson
         style={{ backgroundColor: "none" }}
         theme="ashes"

@@ -44,7 +44,7 @@ export function InternalStorageCard({
       <div className={classes.body}>
         <div className={classes.title}>{storageItem.pathIdentifier}</div>
         {isExpanded ? (
-          <JsonView data={storageItem.data as Record<string, unknown>} />
+          <JsonView className={classes.jsonViewer} data={storageItem.data as Record<string, unknown>} />
         ) : (
           <div className={classes.tags}>
             {storageDataPaths.map((path) => (

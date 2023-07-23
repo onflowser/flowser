@@ -9,11 +9,12 @@ import { TransactionErrorMessage } from "../../../../components/status/ErrorMess
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
 import { Spinner } from "../../../../components/spinner/Spinner";
+import classes from "./InteractionOutcome.module.scss";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
   return (
-    <div>
+    <div className={classes.root}>
       {outcome?.script && <ScriptOutcome outcome={outcome.script} />}
       {outcome?.transaction && (
         <TransactionOutcome outcome={outcome.transaction} />
