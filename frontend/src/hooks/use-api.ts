@@ -219,7 +219,7 @@ export function useGetTransactionsByBlock(
   }
 ): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
-    resourceKey: "/block/transactions/polling",
+    resourceKey: `/block/${blockId}/transactions/polling`,
     fetcher: ({ timestamp }) =>
       transactionsService.getAllByBlockWithPolling({
         blockId,
