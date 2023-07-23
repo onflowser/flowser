@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+// This must match the structure of go structs in `internal/main.go`.
+
 enum InteractionKind {
   INTERACTION_UNKNOWN = 0;
   INTERACTION_SCRIPT = 1;
@@ -24,6 +26,7 @@ enum CadenceTypeKind {
   CADENCE_TYPE_ADDRESS = 4;
   CADENCE_TYPE_ARRAY = 5;
   CADENCE_TYPE_DICTIONARY = 6;
+  CADENCE_TYPE_PATH = 7;
 }
 
 message CadenceType {

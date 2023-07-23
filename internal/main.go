@@ -72,6 +72,7 @@ const (
 	CadenceTypeAddress
 	CadenceTypeArray
 	CadenceTypeDictionary
+	CadenceTypePath
 )
 
 type CadenceType struct {
@@ -182,7 +183,7 @@ func buildCadenceType(uncastedType ast.Type) *CadenceType {
 	}
 }
 
-// TODO: Remove the need for this helper util and use type assertions instead
+// TODO: Remove the need for this helper util and use type assertions instead?
 func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 	switch t.String() {
 	case "Address":
@@ -191,13 +192,14 @@ func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 		return CadenceTypeBoolean
 	case "String",
 		"Character",
-		"Bytes",
-		"Path",
+		"Bytes":
+		return CadenceTypeTextual
+	case "Path",
 		"CapabilityPath",
 		"StoragePath",
 		"PublicPath",
 		"PrivatePath":
-		return CadenceTypeTextual
+		return CadenceTypePath
 	case "Number",
 		"SignedNumber",
 		"Integer",
