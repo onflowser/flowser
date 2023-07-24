@@ -10,7 +10,7 @@ export function NumericBuilder(props: CadenceValueBuilder): ReactElement {
 
   useEffect(() => {
     if (!isInitialised) {
-      setValue(0);
+      setValue("0");
     }
   }, [isInitialised]);
 
@@ -22,7 +22,7 @@ export function NumericBuilder(props: CadenceValueBuilder): ReactElement {
     <Input
       type="number"
       value={value}
-      onChange={(e) => setValue(e.target.valueAsNumber)}
+      onChange={(e) => setValue(e.target.value)}
     />
   );
 }
