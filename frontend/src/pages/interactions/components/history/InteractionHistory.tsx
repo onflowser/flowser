@@ -64,6 +64,9 @@ function BlockItem(props: BlockItemProps) {
 
   function onForkAsTemplate() {
     const transaction = data[0];
+    if (!transaction.proposalKey) {
+      throw new Error("Expecting proposalKey");
+    }
     create({
       id: block.id,
       name: `Tx #${block.height}`,
@@ -76,9 +79,14 @@ function BlockItem(props: BlockItemProps) {
       ),
       initialOutcome: {
         transaction: {
-          transactionId: transaction.id
-        }
-      }
+          transactionId: transaction.id,
+        },
+      },
+      transactionOptions: {
+        proposerAddress: transaction.proposalKey.address,
+        payerAddress: transaction.payer,
+        authorizerAddresses: transaction.authorizers,
+      },
     });
     setFocused(block.id);
   }

@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from "react";
 import { CadenceValueBuilder } from "../interface";
-import { ParamBuilder } from "../ParamBuilder";
+import { ValueBuilder } from "../ValueBuilder";
 import { FclDictionaryEntry, FclValue, FclValues } from "@flowser/shared";
 import { MultiMap } from "utils/multi-map";
 import toast from "react-hot-toast";
@@ -115,7 +115,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
           <div key={index}>
             <div>
               Key:{" "}
-              <ParamBuilder
+              <ValueBuilder
                 type={dictionary.key}
                 value={entry.key}
                 setValue={(newKey) => updateEntryKey(entry.key, newKey)}
@@ -123,7 +123,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
             </div>
             <div>
               Value:{" "}
-              <ParamBuilder
+              <ValueBuilder
                 type={dictionary.value}
                 value={entry.value}
                 setValue={(newValue) => updateEntryValue(entry.key, newValue)}

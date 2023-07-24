@@ -5,10 +5,15 @@ import classes from "./InteractionContent.module.scss";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { InteractionOutcome } from "../outcome/InteractionOutcome";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
-import { ParamListBuilder } from "../parameters/ParamListBuilder/ParamListBuilder";
+import {
+  ParamBuilder,
+  ParamListBuilder,
+} from "../parameters/ParamBuilder/ParamBuilder";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
+import { AddressBuilder } from "../parameters/ValueBuilder/AddressBuilder/AddressBuilder";
+import { CadenceType, CadenceTypeKind, Parameter } from "@flowser/shared";
 
 export function InteractionContent(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
@@ -18,6 +23,7 @@ export function InteractionContent(): ReactElement {
     parameters,
     definition,
     setSourceCode,
+    setTransactionOptions,
   } = useInteractionDefinitionManager();
 
   return (
@@ -39,10 +45,41 @@ export function InteractionContent(): ReactElement {
         <div>
           <h3>Arguments</h3>
           <SizedBox height={20} />
+          {parameters.length === 0 && <div>No arguments</div>}
           <ParamListBuilder
             parameters={parameters}
             setFclValue={setFclValue}
             fclValuesByIdentifier={fclValuesByIdentifier}
+          />
+          <SizedBox height={30} />
+          <h3>Signing</h3>
+          <SizedBox height={20} />
+          <ParamBuilder
+            parameter={Parameter.fromPartial({
+              identifier: "proposer",
+              type: {
+                kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
+              },
+            })}
+            value={definition.transactionOptions.proposerAddress}
+            setValue={(proposerAddress) =>
+              setTransactionOptions({
+                proposerAddress: proposerAddress as string,
+              })
+            }
+          />
+          <SizedBox height={12} />
+          <ParamBuilder
+            parameter={Parameter.fromPartial({
+              identifier: "payer",
+              type: {
+                kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
+              },
+            })}
+            value={definition.transactionOptions.payerAddress}
+            setValue={(payerAddress) =>
+              setTransactionOptions({ payerAddress: payerAddress as string })
+            }
           />
         </div>
         <div className={classes.bottom}>

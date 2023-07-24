@@ -40,9 +40,7 @@ export function InteractionOutcomeManagerProvider(props: {
   const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
 
   useEffect(() => {
-    if (definition.initialOutcome) {
-      setOutcome(definition.initialOutcome);
-    }
+    setOutcome(definition.initialOutcome);
   }, [definition]);
 
   async function execute() {
@@ -61,14 +59,17 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   async function executeTransaction(definition: InteractionDefinition) {
-    const accountAddress = "0xf8d6e0586b0a20c7";
+    const { transactionOptions } = definition;
+    if (!transactionOptions) {
+      throw new Error("Transaction options must be set");
+    }
     try {
       setOutcome({});
       const result = await walletService.sendTransaction({
         cadence: definition.sourceCode,
-        authorizerAddresses: [],
-        proposerAddress: accountAddress,
-        payerAddress: accountAddress,
+        authorizerAddresses: transactionOptions.authorizerAddresses,
+        proposerAddress: transactionOptions.proposerAddress,
+        payerAddress: transactionOptions.payerAddress,
         arguments: parameters.map((parameter): TransactionArgument => {
           if (!parameter.type) {
             throw new Error("Expecting parameter type");

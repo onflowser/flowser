@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import {
   InteractionDefinition,
+  TransactionOptions,
   useInteractionRegistry,
 } from "./interaction-registry.context";
 import { useGetParsedInteraction } from "../../../hooks/use-api";
@@ -20,6 +21,7 @@ type InteractionDefinitionManager = InteractionParameterBuilder & {
   parameters: Parameter[];
   definition: InteractionDefinition;
   setSourceCode: (code: string) => void;
+  setTransactionOptions: (options: Partial<TransactionOptions>) => void;
 };
 
 export type FclValueLookupByIdentifier = Map<string, FclValue>;
@@ -45,13 +47,18 @@ export function InteractionDefinitionManagerProvider(props: {
   );
 
   useEffect(() => {
-    if (definition.initialFclValuesByIdentifier) {
-      setFclValuesByIdentifier(definition.initialFclValuesByIdentifier);
-    }
+    setFclValuesByIdentifier(definition.initialFclValuesByIdentifier);
   }, [definition.initialFclValuesByIdentifier]);
 
   function setSourceCode(sourceCode: string) {
     update({ ...definition, sourceCode });
+  }
+
+  function setTransactionOptions(options: Partial<TransactionOptions>) {
+    update({
+      ...definition,
+      transactionOptions: { ...definition.transactionOptions, ...options },
+    });
   }
 
   function setFclValue(identifier: string, value: FclValue) {
@@ -68,6 +75,7 @@ export function InteractionDefinitionManagerProvider(props: {
         definition,
         setSourceCode,
         setFclValue,
+        setTransactionOptions,
         fclValuesByIdentifier,
         interactionKind:
           data?.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN,

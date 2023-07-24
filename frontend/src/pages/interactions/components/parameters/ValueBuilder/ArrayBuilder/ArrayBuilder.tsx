@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from "react";
 import { CadenceValueBuilder } from "../interface";
-import { ParamBuilder } from "../ParamBuilder";
+import { ValueBuilder } from "../ValueBuilder";
 import classes from "./ArrayBuilder.module.scss";
 import { FclArrayValue, FclValue, FclValues } from "@flowser/shared";
 
@@ -56,7 +56,7 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
         return (
           <div key={index} className={classes.arrayElement}>
             <code className={classes.indexDisplay}>{index}:</code>
-            <ParamBuilder
+            <ValueBuilder
               type={array.element}
               value={value}
               setValue={(value) => setElement(index, value)}

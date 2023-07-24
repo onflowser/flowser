@@ -12,6 +12,7 @@ message CreateAccountResponse {
 
 message SendTransactionRequest {
   string cadence = 1;
+  // Signer roles: https://developers.flow.com/concepts/start-here/transaction-signing#signer-roles
   string proposer_address = 2;
   string payer_address = 3;
   repeated string authorizer_addresses = 4;

@@ -19,8 +19,15 @@ export type InteractionDefinition = {
   id: string;
   name: string;
   sourceCode: string;
-  initialFclValuesByIdentifier?: FclValueLookupByIdentifier;
-  initialOutcome?: FlowInteractionOutcome;
+  initialFclValuesByIdentifier: FclValueLookupByIdentifier;
+  initialOutcome: FlowInteractionOutcome;
+  transactionOptions: TransactionOptions;
+};
+
+export type TransactionOptions = {
+  authorizerAddresses: string[];
+  proposerAddress: string;
+  payerAddress: string;
 };
 
 export type FlowTransactionOutcome = {
@@ -38,9 +45,7 @@ export type FlowInteractionOutcome = {
   script?: FlowScriptOutcome;
 };
 
-const Context = createContext<InteractionsRegistry>(
-  undefined as never
-);
+const Context = createContext<InteractionsRegistry>(undefined as never);
 
 export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
@@ -49,6 +54,13 @@ export function InteractionRegistryProvider(props: {
     name: "Demo",
     id: "demo",
     sourceCode: "transaction {}",
+    initialFclValuesByIdentifier: new Map(),
+    initialOutcome: {},
+    transactionOptions: {
+      authorizerAddresses: [],
+      proposerAddress: "0xf8d6e0586b0a20c7",
+      payerAddress: "0xf8d6e0586b0a20c7",
+    },
   };
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     initialInteractionDefinition,
