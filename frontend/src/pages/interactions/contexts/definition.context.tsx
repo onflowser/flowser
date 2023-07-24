@@ -8,8 +8,8 @@ import React, {
 } from "react";
 import {
   InteractionDefinition,
-  useInteractionDefinitionsRegistry,
-} from "./definitions-registry.context";
+  useInteractionRegistry,
+} from "./interaction-registry.context";
 import { useGetParsedInteraction } from "../../../hooks/use-api";
 import { FclValue, InteractionKind, Parameter } from "@flowser/shared";
 
@@ -35,7 +35,7 @@ export function InteractionDefinitionManagerProvider(props: {
   interactionId: string;
   children: ReactNode;
 }): ReactElement {
-  const { getById, update } = useInteractionDefinitionsRegistry();
+  const { getById, update } = useInteractionRegistry();
   const definition = getById(props.interactionId);
   const { data, isLoading } = useGetParsedInteraction({
     sourceCode: definition.sourceCode,
@@ -45,7 +45,9 @@ export function InteractionDefinitionManagerProvider(props: {
   );
 
   useEffect(() => {
-    setFclValuesByIdentifier(definition.initialFclValuesByIdentifier);
+    if (definition.initialFclValuesByIdentifier) {
+      setFclValuesByIdentifier(definition.initialFclValuesByIdentifier);
+    }
   }, [definition.initialFclValuesByIdentifier]);
 
   function setSourceCode(sourceCode: string) {

@@ -2,9 +2,9 @@ import React, { ReactElement, useState } from "react";
 import classes from "./Interactions.module.scss";
 import { TabList, TabItem } from "../../components/tab-list/TabList";
 import {
-  InteractionDefinitionsRegistryProvider,
-  useInteractionDefinitionsRegistry,
-} from "./contexts/definitions-registry.context";
+  InteractionRegistryProvider,
+  useInteractionRegistry,
+} from "./contexts/interaction-registry.context";
 import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
@@ -12,9 +12,9 @@ import { InteractionDefinitionManagerProvider } from "./contexts/definition.cont
 
 export function Interactions(): ReactElement {
   return (
-    <InteractionDefinitionsRegistryProvider>
+    <InteractionRegistryProvider>
       <ContentWithProvider />
-    </InteractionDefinitionsRegistryProvider>
+    </InteractionRegistryProvider>
   );
 }
 
@@ -37,7 +37,7 @@ function ContentWithProvider() {
 
   // TODO(feature-interact-screen): Add ability to add new tabs and switch between them
   const { definitions, focusedDefinition, setFocused } =
-    useInteractionDefinitionsRegistry();
+    useInteractionRegistry();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
     label: definition.name,

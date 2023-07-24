@@ -1,15 +1,15 @@
 import React, { ReactElement } from "react";
-import {
-  FlowScriptOutcome,
-  FlowTransactionOutcome,
-  useInteractionOutcomeManager,
-} from "../../contexts/outcome.context";
+import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { TransactionOverview } from "../../../transactions/details/components/overview/TransactionOverview";
 import { TransactionErrorMessage } from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import classes from "./InteractionOutcome.module.scss";
+import {
+  FlowScriptOutcome,
+  FlowTransactionOutcome,
+} from "pages/interactions/contexts/interaction-registry.context";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();

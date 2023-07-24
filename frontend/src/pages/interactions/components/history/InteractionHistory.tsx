@@ -13,7 +13,7 @@ import { useProjectActions } from "../../../../contexts/project.context";
 import { FlowserIcon } from "../../../../components/icons/Icons";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { Spinner } from "../../../../components/spinner/Spinner";
-import { useInteractionDefinitionsRegistry } from "../../contexts/definitions-registry.context";
+import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
@@ -55,7 +55,7 @@ function BlockItem(props: BlockItemProps) {
   const blockIconSize = 20;
   const checkoutIconSize = blockIconSize * 0.8;
 
-  const { create, setFocused } = useInteractionDefinitionsRegistry();
+  const { create, setFocused } = useInteractionRegistry();
   const { data } = useGetTransactionsByBlock(block.id, {
     // Assume that every transaction is packaged into a separate block.
     // So once a block exists, no transactions can be appended to it.
@@ -74,6 +74,11 @@ function BlockItem(props: BlockItemProps) {
           JSON.parse(arg.valueAsJson),
         ])
       ),
+      initialOutcome: {
+        transaction: {
+          transactionId: transaction.id
+        }
+      }
     });
     setFocused(block.id);
   }

@@ -1,10 +1,14 @@
 import { ServiceRegistry } from "../../../services/service-registry";
-import { InteractionDefinition } from "./definitions-registry.context";
+import {
+  FlowInteractionOutcome,
+  InteractionDefinition,
+} from "./interaction-registry.context";
 import React, {
   createContext,
   ReactElement,
   ReactNode,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
@@ -20,21 +24,6 @@ import {
 } from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
 
-export type FlowTransactionOutcome = {
-  transactionId?: string;
-  error?: string;
-};
-
-export type FlowScriptOutcome = {
-  result?: unknown;
-  error?: string;
-};
-
-type FlowInteractionOutcome = {
-  transaction?: FlowTransactionOutcome;
-  script?: FlowScriptOutcome;
-};
-
 type InteractionOutcomeManager = {
   outcome: FlowInteractionOutcome | undefined;
   execute: () => Promise<void>;
@@ -49,6 +38,12 @@ export function InteractionOutcomeManagerProvider(props: {
     useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
   const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
+
+  useEffect(() => {
+    if (definition.initialOutcome) {
+      setOutcome(definition.initialOutcome);
+    }
+  }, [definition]);
 
   async function execute() {
     if (!definition) {

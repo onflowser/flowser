@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import { FclValueLookupByIdentifier } from "./definition.context";
 
-type InteractionsDefinitionsRegistry = {
+type InteractionsRegistry = {
   definitions: InteractionDefinition[];
   focusedDefinition: InteractionDefinition;
   getById: (id: string) => InteractionDefinition;
@@ -19,21 +19,36 @@ export type InteractionDefinition = {
   id: string;
   name: string;
   sourceCode: string;
-  initialFclValuesByIdentifier: FclValueLookupByIdentifier;
+  initialFclValuesByIdentifier?: FclValueLookupByIdentifier;
+  initialOutcome?: FlowInteractionOutcome;
 };
 
-const Context = createContext<InteractionsDefinitionsRegistry>(
+export type FlowTransactionOutcome = {
+  transactionId?: string;
+  error?: string;
+};
+
+export type FlowScriptOutcome = {
+  result?: unknown;
+  error?: string;
+};
+
+export type FlowInteractionOutcome = {
+  transaction?: FlowTransactionOutcome;
+  script?: FlowScriptOutcome;
+};
+
+const Context = createContext<InteractionsRegistry>(
   undefined as never
 );
 
-export function InteractionDefinitionsRegistryProvider(props: {
+export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const initialInteractionDefinition: InteractionDefinition = {
     name: "Demo",
     id: "demo",
     sourceCode: "transaction {}",
-    initialFclValuesByIdentifier: new Map(),
   };
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     initialInteractionDefinition,
@@ -86,7 +101,7 @@ export function InteractionDefinitionsRegistryProvider(props: {
   );
 }
 
-export function useInteractionDefinitionsRegistry(): InteractionsDefinitionsRegistry {
+export function useInteractionRegistry(): InteractionsRegistry {
   const context = useContext(Context);
 
   if (context === undefined) {
