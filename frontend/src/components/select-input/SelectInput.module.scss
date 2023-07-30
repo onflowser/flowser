@@ -9,6 +9,7 @@
   display: flex;
   width: 100%;
   overflow: hidden;
+  position: relative;
 
   &:focus-within {
     border-color: $yellow;
@@ -22,5 +23,15 @@
     outline: none;
     color: $color-grey;
     font-size: $font-size-small;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  &::after {
+    content: "▼";
+    font-size: $font-size-xsmall;
+    top: 6px;
+    right: 10px;
+    position: absolute;
   }
 }

@@ -18,6 +18,7 @@ export type FclRequiredValue =
   | FclArrayValue
   | FclNumericValue
   | FclTextualValue
+  | FclBoolValue
   | FclAddressValue;
 export type FclPathDomain = "public" | "private" | "storage";
 export type FclDictionaryEntry = { key: FclValue; value: FclValue };
@@ -27,6 +28,7 @@ export type FclArrayValue = FclValue[];
 // Numeric values must be encoded as strings.
 // See: https://github.com/onflow/fcl-js/blob/master/packages/types/WARNINGS.md
 export type FclNumericValue = string;
+export type FclBoolValue = boolean;
 export type FclTextualValue = string;
 export type FclAddressValue = `0x${string}`;
 export type FclOptionalValue = FclRequiredValue | undefined;
@@ -97,6 +99,9 @@ export class FclValues {
   }
   static isFclPathValue(arg: unknown): arg is FclPathValue {
     return arg instanceof Object && "domain" in arg && "identifier" in arg;
+  }
+  static isFclBoolValue(arg: unknown): arg is FclBoolValue {
+    return typeof arg === "boolean";
   }
   static isFclNumericValue(arg: unknown): arg is FclNumericValue {
     return typeof arg === "string" && !Number.isNaN(Number(arg));

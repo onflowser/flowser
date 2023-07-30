@@ -8,6 +8,7 @@ import { ArrayBuilder } from "./ArrayBuilder/ArrayBuilder";
 import { AddressBuilder } from "./AddressBuilder/AddressBuilder";
 import { DictionaryBuilder } from "./DictionaryBuilder/DictionaryBuilder";
 import { PathBuilder } from "./PathBuilder/PathBuilder";
+import { BoolBuilder } from "./BoolBuilder/BoolBuilder";
 
 export function ValueBuilder(props: CadenceValueBuilder): ReactElement {
   const { type } = props;
@@ -24,6 +25,8 @@ export function ValueBuilder(props: CadenceValueBuilder): ReactElement {
       return <DictionaryBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_PATH:
       return <PathBuilder {...props} />;
+    case CadenceTypeKind.CADENCE_TYPE_BOOLEAN:
+      return <BoolBuilder {...props} />;
     default:
       return <div>Unknown type</div>;
   }

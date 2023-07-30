@@ -12,8 +12,7 @@ import {
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
-import { AddressBuilder } from "../parameters/ValueBuilder/AddressBuilder/AddressBuilder";
-import { CadenceType, CadenceTypeKind, Parameter } from "@flowser/shared";
+import { CadenceTypeKind, Parameter } from "@flowser/shared";
 
 export function InteractionContent(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
