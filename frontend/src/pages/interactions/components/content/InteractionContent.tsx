@@ -12,7 +12,7 @@ import {
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
-import { CadenceTypeKind, Parameter } from "@flowser/shared";
+import { CadenceTypeKind, InteractionKind, Parameter } from "@flowser/shared";
 
 export function InteractionContent(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
@@ -21,8 +21,8 @@ export function InteractionContent(): ReactElement {
     fclValuesByIdentifier,
     parameters,
     definition,
+    interactionKind,
     setSourceCode,
-    setTransactionOptions,
   } = useInteractionDefinitionManager();
 
   return (
@@ -51,35 +51,9 @@ export function InteractionContent(): ReactElement {
             fclValuesByIdentifier={fclValuesByIdentifier}
           />
           <SizedBox height={30} />
-          <h3>Signing</h3>
-          <SizedBox height={20} />
-          <ParamBuilder
-            parameter={Parameter.fromPartial({
-              identifier: "proposer",
-              type: {
-                kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
-              },
-            })}
-            value={definition.transactionOptions.proposerAddress}
-            setValue={(proposerAddress) =>
-              setTransactionOptions({
-                proposerAddress: proposerAddress as string,
-              })
-            }
-          />
-          <SizedBox height={12} />
-          <ParamBuilder
-            parameter={Parameter.fromPartial({
-              identifier: "payer",
-              type: {
-                kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
-              },
-            })}
-            value={definition.transactionOptions.payerAddress}
-            setValue={(payerAddress) =>
-              setTransactionOptions({ payerAddress: payerAddress as string })
-            }
-          />
+          {interactionKind === InteractionKind.INTERACTION_TRANSACTION && (
+            <SigningSettings />
+          )}
         </div>
         <div className={classes.bottom}>
           <SimpleButton className={classes.button} onClick={execute}>
@@ -88,6 +62,44 @@ export function InteractionContent(): ReactElement {
         </div>
       </div>
     </div>
+  );
+}
+
+function SigningSettings() {
+  const { definition, setTransactionOptions } =
+    useInteractionDefinitionManager();
+  return (
+    <>
+      <h3>Signing</h3>
+      <SizedBox height={20} />
+      <ParamBuilder
+        parameter={Parameter.fromPartial({
+          identifier: "proposer",
+          type: {
+            kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
+          },
+        })}
+        value={definition.transactionOptions.proposerAddress}
+        setValue={(proposerAddress) =>
+          setTransactionOptions({
+            proposerAddress: proposerAddress as string,
+          })
+        }
+      />
+      <SizedBox height={12} />
+      <ParamBuilder
+        parameter={Parameter.fromPartial({
+          identifier: "payer",
+          type: {
+            kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
+          },
+        })}
+        value={definition.transactionOptions.payerAddress}
+        setValue={(payerAddress) =>
+          setTransactionOptions({ payerAddress: payerAddress as string })
+        }
+      />
+    </>
   );
 }
 
