@@ -214,16 +214,15 @@ function ProjectsListContent() {
 
 function AboutContent() {
   const [showAnalyticSettings, setShowAnalyticSettings] = useState(false);
-  const [consentAnalyticsSetting, setConsentAnalyticsSetting] =
-    useAnalyticsConsent();
+  const { isConsented, setIsConsented } = useAnalyticsConsent();
   return (
     <div className={classes.bodyCenter}>
       {showAnalyticSettings && (
         <ConsentDialog
           onClose={() => setShowAnalyticSettings(false)}
-          consent={consentAnalyticsSetting ?? true}
+          consent={isConsented}
           setConsent={(consent) => {
-            setConsentAnalyticsSetting(consent);
+            setIsConsented(consent);
             setShowAnalyticSettings(false);
           }}
         />

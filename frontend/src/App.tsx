@@ -123,16 +123,9 @@ export const FlowserRoutes = (): ReactElement => {
 };
 
 function ConsentAnalytics() {
-  const [consentAnalyticsSetting, setConsentAnalyticsSetting] =
-    useAnalyticsConsent();
-  const isAlreadySet = consentAnalyticsSetting !== null;
-  if (isAlreadySet) {
+  const { isConsented, setIsConsented } = useAnalyticsConsent();
+  if (isConsented) {
     return null;
   }
-  return (
-    <ConsentDialog
-      consent={consentAnalyticsSetting ?? true}
-      setConsent={setConsentAnalyticsSetting}
-    />
-  );
+  return <ConsentDialog consent={isConsented} setConsent={setIsConsented} />;
 }
