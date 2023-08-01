@@ -12,10 +12,10 @@ import { FclValue } from "@flowser/shared";
 type InteractionsRegistry = {
   templates: InteractionDefinitionTemplate[];
   definitions: InteractionDefinition[];
-  focusedDefinition: InteractionDefinition;
-  getById: (id: string) => InteractionDefinition;
+  focusedDefinition: InteractionDefinition | undefined;
   update: (interaction: InteractionDefinition) => void;
   create: (interaction: InteractionDefinition) => void;
+  remove: (interactionId: string) => void;
   setFocused: (interactionId: string) => void;
   persist: (interactionId: string) => void;
   forkTemplate: (template: InteractionDefinitionTemplate) => void;
@@ -109,8 +109,13 @@ export function InteractionRegistryProvider(props: {
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     initialInteractionDefinition,
   ]);
-  const [focusedInteractionId, setFocusedInteractionId] = useState<string>(
-    definitions[0].id
+  const [focusedInteractionId, setFocusedInteractionId] = useState<
+    string | undefined
+  >(definitions?.[0]?.id);
+  const focusedDefinition = useMemo(
+    () =>
+      definitions.find((definition) => definition.id === focusedInteractionId),
+    [focusedInteractionId, definitions]
   );
 
   function persist(interactionId: string) {
@@ -133,19 +138,18 @@ export function InteractionRegistryProvider(props: {
   }
 
   function forkTemplate(template: InteractionDefinitionTemplate) {
-    setDefinitions([
-      ...definitions,
-      {
-        id: crypto.randomUUID(),
-        name: template.name,
-        sourceCode: template.sourceCode,
-        initialFclValuesByIdentifier: new Map(
-          Object.entries(template.initialFclValuesByIdentifier)
-        ),
-        transactionOptions: template.transactionOptions,
-        initialOutcome: {},
-      },
-    ]);
+    const definition: InteractionDefinition = {
+      id: crypto.randomUUID(),
+      name: template.name,
+      sourceCode: template.sourceCode,
+      initialFclValuesByIdentifier: new Map(
+        Object.entries(template.initialFclValuesByIdentifier)
+      ),
+      transactionOptions: template.transactionOptions,
+      initialOutcome: {},
+    };
+    setDefinitions([...definitions, definition]);
+    setFocusedInteractionId(definition.id);
   }
 
   function update(updatedInteraction: InteractionDefinition) {
@@ -156,6 +160,12 @@ export function InteractionRegistryProvider(props: {
         }
         return existingInteraction;
       })
+    );
+  }
+
+  function remove(interactionId: string) {
+    setDefinitions((interactions) =>
+      interactions.filter((interaction) => interaction.id !== interactionId)
     );
   }
 
@@ -181,12 +191,12 @@ export function InteractionRegistryProvider(props: {
       value={{
         templates,
         definitions,
-        focusedDefinition: getById(focusedInteractionId),
+        focusedDefinition,
         setFocused: setFocusedInteractionId,
         forkTemplate,
+        remove,
         create,
         update,
-        getById,
         persist,
       }}
     >

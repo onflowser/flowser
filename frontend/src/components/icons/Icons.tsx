@@ -8,6 +8,7 @@ import { ReactComponent as Transaction } from "../../assets/icons/transaction.sv
 import { ReactComponent as ArtistPalette } from "../../assets/icons/artist_palette.svg";
 import { ReactComponent as CircleArrowLeft } from "../../assets/icons/circle_arrow_left.svg";
 import { ReactComponent as Plus } from "../../assets/icons/plus.svg";
+import { ReactComponent as Close } from "../../assets/icons/close.svg";
 
 export const FlowserIcon = {
   Account,
@@ -19,5 +20,6 @@ export const FlowserIcon = {
   Transaction,
   ArtistPalette,
   CircleArrowLeft,
-  Plus
+  Plus,
+  Close,
 };

@@ -37,13 +37,13 @@ function ContentWithProvider() {
   );
 
   // TODO(feature-interact-screen): Add ability to add new tabs and switch between them
-  const { definitions, focusedDefinition, setFocused } =
+  const { definitions, focusedDefinition, remove, setFocused } =
     useInteractionRegistry();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
     label: definition.name,
     content: (
-      <InteractionDefinitionManagerProvider interactionId={definition.id}>
+      <InteractionDefinitionManagerProvider definition={definition}>
         <InteractionOutcomeManagerProvider>
           <InteractionContent />
         </InteractionOutcomeManagerProvider>
@@ -55,17 +55,16 @@ function ContentWithProvider() {
     <div className={classes.pageRoot}>
       <TabList
         className={classes.leftSideMenu}
-        activeTabClassName={classes.activeTab}
-        inactiveTabClassName={classes.inactiveTab}
         currentTabId={currentSideMenuTabId}
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
       />
       <TabList
         className={classes.mainContent}
-        currentTabId={focusedDefinition.id}
+        currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
+        onClose={(tab) => remove(tab.id)}
       />
     </div>
   );

@@ -9,6 +9,10 @@
     display: flex;
     .tabButton {
       flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #272B32;
       background: unset;
       border: none;
       padding: $spacing-base;
@@ -16,6 +20,21 @@
       font-weight: bold;
       font-size: $font-size-large;
       color: $color-light-gray;
+      .closeButton {
+        margin-left: $spacing-s;
+        border-radius: 50%;
+        padding: 1px;
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+    .tabButtonActive {
+      background: #272B32;
+    }
+    .tabButtonInactive {
+      background: #33383e !important;
+      color: rgba(229, 229, 229, 0.56) !important;
     }
   }
   .body {

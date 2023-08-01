@@ -34,11 +34,11 @@ export type InteractionParameterBuilder = {
 const Context = createContext<InteractionDefinitionManager>(undefined as never);
 
 export function InteractionDefinitionManagerProvider(props: {
-  interactionId: string;
+  definition: InteractionDefinition;
   children: ReactNode;
 }): ReactElement {
-  const { getById, update } = useInteractionRegistry();
-  const definition = getById(props.interactionId);
+  const { definition } = props;
+  const { update } = useInteractionRegistry();
   const { data, isLoading } = useGetParsedInteraction({
     sourceCode: definition.sourceCode,
   });
