@@ -9,6 +9,7 @@ import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
 import { InteractionDefinitionManagerProvider } from "./contexts/definition.context";
+import { InteractionTemplates } from "./components/templates/InteractionTemplates";
 
 export function Interactions(): ReactElement {
   return (
@@ -28,7 +29,7 @@ function ContentWithProvider() {
     {
       id: "templates",
       label: "Templates",
-      content: <div>TODO</div>,
+      content: <InteractionTemplates />,
     },
   ];
   const [currentSideMenuTabId, setCurrentSideMenuTabId] = useState(

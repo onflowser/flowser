@@ -5,14 +5,17 @@ import React, {
   useState,
 } from "react";
 import { FclValueLookupByIdentifier } from "./definition.context";
+import { useLocalStorage } from "usehooks-ts";
 
 type InteractionsRegistry = {
+  templates: InteractionDefinition[];
   definitions: InteractionDefinition[];
   focusedDefinition: InteractionDefinition;
   getById: (id: string) => InteractionDefinition;
-  update: (interaction: InteractionDefinition) => void;
-  create: (interaction: InteractionDefinition) => void;
+  update: (interaction: InteractionDefinitionWithoutMetadata) => void;
+  create: (interaction: InteractionDefinitionWithoutMetadata) => void;
   setFocused: (interactionId: string) => void;
+  persist: (interactionId: string) => void;
 };
 
 export type InteractionDefinition = {
@@ -22,7 +25,15 @@ export type InteractionDefinition = {
   initialFclValuesByIdentifier: FclValueLookupByIdentifier;
   initialOutcome: FlowInteractionOutcome;
   transactionOptions: TransactionOptions;
+  // Store dates in serialization-friendly format
+  createdDate: string;
+  updatedDate: string;
 };
+
+type InteractionDefinitionWithoutMetadata = Omit<
+  InteractionDefinition,
+  "createdDate" | "updatedDate"
+>;
 
 export type TransactionOptions = {
   authorizerAddresses: string[];
@@ -61,7 +72,13 @@ export function InteractionRegistryProvider(props: {
       proposerAddress: "0xf8d6e0586b0a20c7",
       payerAddress: "0xf8d6e0586b0a20c7",
     },
+    createdDate: new Date().toISOString(),
+    updatedDate: new Date().toISOString(),
   };
+  const [templates, setTemplates] = useLocalStorage<InteractionDefinition[]>(
+    "interactions",
+    []
+  );
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     initialInteractionDefinition,
   ]);
@@ -69,23 +86,43 @@ export function InteractionRegistryProvider(props: {
     definitions[0].id
   );
 
-  function update(updatedInteraction: InteractionDefinition) {
+  function persist(interactionId: string) {
+    const interaction = getById(interactionId);
+
+    setTemplates([
+      ...templates.filter((template) => template.id !== interactionId),
+      { ...interaction, updatedDate: new Date().toISOString() },
+    ]);
+  }
+
+  function update(updatedInteraction: InteractionDefinitionWithoutMetadata) {
     setDefinitions((interactions) =>
       interactions.map((existingInteraction) => {
         if (existingInteraction.id === updatedInteraction.id) {
-          return updatedInteraction;
+          return {
+            ...existingInteraction,
+            ...updatedInteraction,
+            updatedDate: new Date().toISOString(),
+          };
         }
         return existingInteraction;
       })
     );
   }
 
-  function create(newInteraction: InteractionDefinition) {
+  function create(newInteraction: InteractionDefinitionWithoutMetadata) {
     const isExisting = definitions.some(
       (definition) => definition.id === newInteraction.id
     );
     if (!isExisting) {
-      setDefinitions([...definitions, newInteraction]);
+      setDefinitions([
+        ...definitions,
+        {
+          ...newInteraction,
+          createdDate: new Date().toISOString(),
+          updatedDate: new Date().toISOString(),
+        },
+      ]);
     }
   }
 
@@ -100,12 +137,14 @@ export function InteractionRegistryProvider(props: {
   return (
     <Context.Provider
       value={{
+        templates,
         definitions,
         focusedDefinition: getById(focusedInteractionId),
         setFocused: setFocusedInteractionId,
         create,
         update,
         getById,
+        persist,
       }}
     >
       {props.children}

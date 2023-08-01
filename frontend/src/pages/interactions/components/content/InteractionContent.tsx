@@ -13,8 +13,10 @@ import { useInteractionDefinitionManager } from "../../contexts/definition.conte
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { CadenceTypeKind, InteractionKind, Parameter } from "@flowser/shared";
+import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 
 export function InteractionContent(): ReactElement {
+  const { persist } = useInteractionRegistry();
   const { execute } = useInteractionOutcomeManager();
   const {
     setFclValue,
@@ -56,6 +58,12 @@ export function InteractionContent(): ReactElement {
           )}
         </div>
         <div className={classes.bottom}>
+          <SimpleButton
+            className={classes.button}
+            onClick={() => persist(definition.id)}
+          >
+            Save
+          </SimpleButton>
           <SimpleButton className={classes.button} onClick={execute}>
             Execute
           </SimpleButton>
