@@ -15,12 +15,14 @@ type TabListProps = {
   inactiveTabClassName?: string;
   currentTabId: string | undefined;
   onChangeTab: (tab: TabItem) => void;
+  onChangeLabel?: (tab: TabItem) => void;
   onClose?: (tab: TabItem) => void;
   tabs: TabItem[];
 };
 
 export function TabList(props: TabListProps): ReactElement {
-  const { className, tabs, currentTabId, onChangeTab, onClose } = props;
+  const { className, tabs, currentTabId, onChangeTab, onClose, onChangeLabel } =
+    props;
   const currentTab = tabs.find((tab) => tab.id === currentTabId);
   return (
     <div className={classNames(classes.root, className)}>
@@ -37,7 +39,25 @@ export function TabList(props: TabListProps): ReactElement {
               })}
               onClick={() => onChangeTab(tab)}
             >
-              {tab.label}
+              <input
+                style={{
+                  cursor: onChangeLabel === undefined ? "pointer" : "text",
+                }}
+                className={classes.labelInput}
+                disabled={onChangeLabel === undefined}
+                value={tab.label}
+                onClick={(e) => {
+                  // Prevent selecting a tab when editing label.
+                  if (onChangeLabel) {
+                    e.stopPropagation();
+                  }
+                }}
+                onChange={(e) => {
+                  if (onChangeLabel) {
+                    onChangeLabel({ ...tab, label: e.target.value });
+                  }
+                }}
+              />
               {onClose && (
                 <FlowserIcon.Close
                   className={classes.closeButton}

@@ -17,9 +17,15 @@
       border: none;
       padding: $spacing-base;
       cursor: pointer;
-      font-weight: bold;
-      font-size: $font-size-large;
       color: $color-light-gray;
+      .labelInput {
+        background: none;
+        border: none;
+        font-size: $font-size-normal;
+        color: #E5E5E5;
+        font-family: $font-family-inter;
+        font-weight: bold;
+      }
       .closeButton {
         margin-left: $spacing-s;
         border-radius: 50%;
