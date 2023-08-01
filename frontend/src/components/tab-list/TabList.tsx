@@ -46,12 +46,6 @@ export function TabList(props: TabListProps): ReactElement {
                 className={classes.labelInput}
                 disabled={onChangeLabel === undefined}
                 value={tab.label}
-                onClick={(e) => {
-                  // Prevent selecting a tab when editing label.
-                  if (onChangeLabel) {
-                    e.stopPropagation();
-                  }
-                }}
                 onChange={(e) => {
                   if (onChangeLabel) {
                     onChangeLabel({ ...tab, label: e.target.value });
