@@ -4,13 +4,14 @@
 .root {
   display: flex;
   column-gap: $spacing-base;
-  .accountItem {
+  .selectAccountButton {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     row-gap: $spacing-s;
     cursor: pointer;
+    color: white;
     .selectedAccount {
       border-color: $blue !important;
     }
@@ -38,6 +39,16 @@
             fill: $blue;
           }
         }
+      }
+    }
+  }
+  .newAccountButton {
+    .spinner {
+      border-left-color: $blue;
+    }
+    .avatarWrapper {
+      &:hover {
+        border-color: transparent !important;
       }
     }
   }

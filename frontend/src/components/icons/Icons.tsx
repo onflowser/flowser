@@ -23,5 +23,5 @@ export const FlowserIcon = {
   CircleArrowLeft,
   Plus,
   Close,
-  Trash
+  Trash,
 };

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { ReactElement } from "react";
 import classes from "./Spinner.module.scss";
 
@@ -14,11 +15,9 @@ export function Spinner({
 }: SpinnerProps): ReactElement {
   const adjustedSize = size - borderWidth;
   return (
-    <div className={className}>
-      <div
-        className={classes.spinner}
-        style={{ width: adjustedSize, height: adjustedSize, borderWidth }}
-      />
-    </div>
+    <div
+      className={classNames(classes.spinner, className)}
+      style={{ width: adjustedSize, height: adjustedSize, borderWidth }}
+    />
   );
 }
