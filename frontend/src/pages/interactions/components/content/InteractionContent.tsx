@@ -14,6 +14,7 @@ import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { CadenceTypeKind, InteractionKind, Parameter } from "@flowser/shared";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
+import { LoaderButton } from "../../../../components/buttons/loader-button/LoaderButton";
 
 export function InteractionContent(): ReactElement {
   const { persist } = useInteractionRegistry();
@@ -64,9 +65,13 @@ export function InteractionContent(): ReactElement {
           >
             Save
           </SimpleButton>
-          <SimpleButton className={classes.button} onClick={execute}>
+          <LoaderButton
+            className={classes.button}
+            loadingContent="Executing"
+            onClick={execute}
+          >
             Execute
-          </SimpleButton>
+          </LoaderButton>
         </div>
       </div>
     </div>
@@ -115,7 +120,18 @@ function InteractionDetails() {
   const { parseError, isParsing } = useInteractionDefinitionManager();
 
   if (isParsing) {
-    return <Spinner size={20} />;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <Spinner size={50} />
+      </div>
+    );
   }
 
   if (parseError) {

@@ -34,7 +34,18 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   if (data?.transaction) {
     return <TransactionOverview transaction={data.transaction} />;
   } else {
-    return <Spinner size={50} />;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <Spinner size={50} />
+      </div>
+    );
   }
 }
 

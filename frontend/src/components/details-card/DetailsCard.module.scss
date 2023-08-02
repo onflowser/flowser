@@ -2,10 +2,10 @@
 @import "styles/animations";
 
 .root {
-  padding: $spacing-l $spacing-xl;
 
   .content {
     display: flex;
+    justify-content: space-evenly;
     column-gap: $spacing-xl;
 
     margin-bottom: $spacing-l * 1.5;
