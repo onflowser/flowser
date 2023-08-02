@@ -1,5 +1,5 @@
 import React from "react";
-import { FclValue, FclValues, Parameter } from "@flowser/shared";
+import { FclValue, Parameter } from "@flowser/shared";
 import { ReactElement } from "react";
 import { ValueBuilder } from "../ValueBuilder/ValueBuilder";
 import { InteractionParameterBuilder } from "../../../contexts/definition.context";

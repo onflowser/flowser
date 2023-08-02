@@ -1,7 +1,7 @@
 @import 'styles/colors';
 @import 'styles/spacings';
 @import 'styles/typography';
-@import 'styles/scrollbar';
+@import 'styles/scrollbars';
 
 .root {
   z-index: 99;
@@ -16,7 +16,7 @@
   left: 0;
   right: 0;
 
-  @include styledScrollbar();
+  @include styledScrollbars();
 
   &.opened {
     top: 50%;

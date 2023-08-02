@@ -37,7 +37,6 @@ function ContentWithProvider() {
     sideMenuTabs[0].id
   );
 
-  // TODO(feature-interact-screen): Add ability to add new tabs and switch between them
   const { definitions, focusedDefinition, remove, update, setFocused } =
     useInteractionRegistry();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({

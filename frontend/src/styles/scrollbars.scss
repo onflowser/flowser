@@ -1,6 +1,6 @@
 @import "colors";
 
-@mixin styledScrollbar {
+@mixin styledScrollbars {
   *::-webkit-scrollbar {
     width: 10px;
   }
@@ -17,5 +17,11 @@
 
   *::-webkit-scrollbar-corner {
     background-color: $background;
+  }
+}
+
+@mixin hiddenScrollbars {
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
