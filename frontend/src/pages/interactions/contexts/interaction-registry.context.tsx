@@ -75,14 +75,20 @@ export type FlowInteractionOutcome = {
 
 const Context = createContext<InteractionsRegistry>(undefined as never);
 
+const initialSourceCode = `transaction (prompt: String) {
+  execute {
+    log(prompt)
+  }
+}`;
+
 export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const initialInteractionDefinition: InteractionDefinition = {
-    name: "Demo",
-    id: "demo",
-    sourceCode: "transaction {}",
-    initialFclValuesByIdentifier: new Map(),
+    name: "Hello World",
+    id: crypto.randomUUID(),
+    sourceCode: initialSourceCode,
+    initialFclValuesByIdentifier: new Map([["prompt", "Hello World"]]),
     initialOutcome: {},
     transactionOptions: {
       authorizerAddresses: [],
