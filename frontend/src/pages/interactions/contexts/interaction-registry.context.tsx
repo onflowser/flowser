@@ -177,9 +177,14 @@ export function InteractionRegistryProvider(props: {
   }
 
   function remove(interactionId: string) {
-    setDefinitions((interactions) =>
-      interactions.filter((interaction) => interaction.id !== interactionId)
+    const newDefinitions = definitions.filter(
+      (definition) => definition.id !== interactionId
     );
+    setDefinitions(newDefinitions);
+    const lastDefinition = newDefinitions.reverse()[0];
+    if (lastDefinition) {
+      setFocusedInteractionId(lastDefinition.id);
+    }
   }
 
   function create(newInteraction: InteractionDefinition) {

@@ -56,7 +56,10 @@ export function TabList(props: TabListProps): ReactElement {
               {onClose && (
                 <FlowserIcon.Close
                   className={classes.closeButton}
-                  onClick={() => onClose(tab)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose(tab);
+                  }}
                 />
               )}
             </button>
