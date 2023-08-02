@@ -4,25 +4,39 @@
 .root {
   display: flex;
   column-gap: $spacing-base;
+  row-gap: $spacing-base;
   .selectAccountButton {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    row-gap: $spacing-s;
     cursor: pointer;
     color: white;
     .selectedAccount {
       border-color: $blue !important;
     }
     .avatarWrapper {
-      height: 40px;
-      width: 40px;
+      height: 35px;
+      width: 35px;
       padding: $spacing-s * 1.5;
       border-radius: 50%;
       border: 2px solid transparent;
       &:hover {
         border-color: $blue;
+      }
+      .avatar {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  .newAccountButton {
+    .spinner {
+      border-left-color: $blue;
+    }
+    .avatarWrapper {
+      &:hover {
+        border-color: transparent !important;
       }
       .plusIconWrapper {
         background: white;
@@ -39,16 +53,6 @@
             fill: $blue;
           }
         }
-      }
-    }
-  }
-  .newAccountButton {
-    .spinner {
-      border-left-color: $blue;
-    }
-    .avatarWrapper {
-      &:hover {
-        border-color: transparent !important;
       }
     }
   }

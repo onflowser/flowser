@@ -12,7 +12,7 @@ import { Spinner } from "../../../../../../components/spinner/Spinner";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { value, setValue } = props;
-  const { data, isFetching, refresh } = useGetPollingAccounts();
+  const { data, refresh } = useGetPollingAccounts();
   const managedAccounts = useMemo(
     () =>
       data.filter((account) =>
@@ -57,7 +57,7 @@ function AccountButton(props: AccountButtonProps) {
           [classes.selectedAccount]: isSelected,
         })}
       >
-        <AccountAvatar address={account.address} />
+        <AccountAvatar address={account.address} className={classes.avatar} />
       </div>
       <AccountName address={account.address} shorten />
     </div>

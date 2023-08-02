@@ -1,4 +1,4 @@
-  @mixin fadeInAnimation($time) {
+@mixin fadeInAnimation($time) {
   -webkit-animation: fadeIn #{$time}; /* Safari, Chrome and Opera > 12.1 */
   -moz-animation: fadeIn #{$time}; /* Firefox < 16 */
   -ms-animation: fadeIn #{$time}; /* Internet Explorer */
