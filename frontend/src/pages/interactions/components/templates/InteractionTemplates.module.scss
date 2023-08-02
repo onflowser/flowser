@@ -1,5 +1,23 @@
-@import "styles/colors.scss";
+@import "styles/colors";
+@import "styles/spacings";
+@import "styles/typography";
 
 .root {
+  padding: $spacing-l;
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-base;
+  .item {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    font-size: $font-size-normal;
 
+    .trash {
+      transition: 0.2s ease-in-out all;
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
 }

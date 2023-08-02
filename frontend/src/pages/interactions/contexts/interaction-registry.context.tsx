@@ -19,6 +19,7 @@ type InteractionsRegistry = {
   setFocused: (interactionId: string) => void;
   persist: (interactionId: string) => void;
   forkTemplate: (template: InteractionDefinitionTemplate) => void;
+  removeTemplate: (templateId: string) => void;
 };
 
 export type InteractionDefinition = {
@@ -152,6 +153,12 @@ export function InteractionRegistryProvider(props: {
     setFocusedInteractionId(definition.id);
   }
 
+  function removeTemplate(templateId: string) {
+    setRawTemplates((rawTemplates) =>
+      rawTemplates.filter((template) => template.id !== templateId)
+    );
+  }
+
   function update(updatedInteraction: InteractionDefinition) {
     setDefinitions((interactions) =>
       interactions.map((existingInteraction) => {
@@ -194,6 +201,7 @@ export function InteractionRegistryProvider(props: {
         focusedDefinition,
         setFocused: setFocusedInteractionId,
         forkTemplate,
+        removeTemplate,
         remove,
         create,
         update,

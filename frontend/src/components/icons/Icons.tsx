@@ -9,6 +9,7 @@ import { ReactComponent as ArtistPalette } from "../../assets/icons/artist_palet
 import { ReactComponent as CircleArrowLeft } from "../../assets/icons/circle_arrow_left.svg";
 import { ReactComponent as Plus } from "../../assets/icons/plus.svg";
 import { ReactComponent as Close } from "../../assets/icons/close.svg";
+import { ReactComponent as Trash } from "../../assets/icons/trash.svg";
 
 export const FlowserIcon = {
   Account,
@@ -22,4 +23,5 @@ export const FlowserIcon = {
   CircleArrowLeft,
   Plus,
   Close,
+  Trash
 };
