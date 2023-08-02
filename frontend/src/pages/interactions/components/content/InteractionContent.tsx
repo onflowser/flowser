@@ -36,7 +36,7 @@ export function InteractionContent(): ReactElement {
             onChange={(sourceCode) => setSourceCode(sourceCode)}
           />
         </div>
-        <LineSeparator horizontal />
+        <SizedBox height={20} />
         <div className={classes.details}>
           <InteractionDetails />
         </div>
@@ -44,7 +44,7 @@ export function InteractionContent(): ReactElement {
       <LineSeparator vertical />
       <div className={classes.sidebar}>
         <div>
-          <h3>Arguments</h3>
+          <h2>Arguments</h2>
           <SizedBox height={20} />
           {parameters.length === 0 && <div>No arguments</div>}
           <ParamListBuilder
@@ -78,7 +78,7 @@ function SigningSettings() {
     useInteractionDefinitionManager();
   return (
     <>
-      <h3>Signing</h3>
+      <h2>Signing</h2>
       <SizedBox height={20} />
       <ParamBuilder
         parameter={Parameter.fromPartial({

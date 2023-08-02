@@ -11,6 +11,7 @@ export type TabItem = {
 
 type TabListProps = {
   className?: string;
+  tabClassName?: string;
   activeTabClassName?: string;
   inactiveTabClassName?: string;
   currentTabId: string | undefined;
@@ -32,7 +33,7 @@ export function TabList(props: TabListProps): ReactElement {
           return (
             <button
               key={tab.id}
-              className={classNames(classes.tabButton, {
+              className={classNames(classes.tabButton, props.tabClassName, {
                 [props.activeTabClassName ?? classes.tabButtonActive]: isActive,
                 [props.inactiveTabClassName ?? classes.tabButtonInactive]:
                   !isActive,

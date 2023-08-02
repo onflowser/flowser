@@ -10,6 +10,7 @@ import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
 import { InteractionDefinitionManagerProvider } from "./contexts/definition.context";
 import { InteractionTemplates } from "./components/templates/InteractionTemplates";
+import { SizedBox } from "../../components/sized-box/SizedBox";
 
 export function Interactions(): ReactElement {
   return (
@@ -59,8 +60,10 @@ function ContentWithProvider() {
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
       />
+      <SizedBox width={20} />
       <TabList
         className={classes.mainContent}
+        tabClassName={classes.interactionTab}
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}

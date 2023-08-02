@@ -4,9 +4,13 @@
 .pageRoot {
   display: flex;
   flex: 1;
+  background: #1C2128;
   .leftSideMenu {
     background: #272B32;
     flex: 1;
+  }
+  .interactionTab {
+    max-width: 200px;
   }
   .mainContent {
     flex: 3;
