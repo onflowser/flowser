@@ -11,7 +11,7 @@ import {
   useLimitedArray,
   LimitedArrayState,
 } from "../../../hooks/use-limited-array";
-import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
 import { ProjectItemBadge } from "./ProjectItemBadge";
 import { useProjectActions } from "../../../contexts/project.context";
 import ReactTimeago from "react-timeago";

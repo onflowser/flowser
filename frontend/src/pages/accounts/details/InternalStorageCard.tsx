@@ -3,7 +3,7 @@ import classes from "./BaseStorageCard.module.scss";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
-import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { JsonView } from "../../../components/json-view/JsonView";
 
@@ -44,7 +44,10 @@ export function InternalStorageCard({
       <div className={classes.body}>
         <div className={classes.title}>{storageItem.pathIdentifier}</div>
         {isExpanded ? (
-          <JsonView className={classes.jsonViewer} data={storageItem.data as Record<string, unknown>} />
+          <JsonView
+            className={classes.jsonViewer}
+            data={storageItem.data as Record<string, unknown>}
+          />
         ) : (
           <div className={classes.tags}>
             {storageDataPaths.map((path) => (

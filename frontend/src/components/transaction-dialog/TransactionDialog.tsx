@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import Dialog from "../dialog/Dialog";
-import Button from "../button/Button";
+import Button from "../buttons/button/Button";
 import classes from "./TransactionDialog.module.scss";
 import { FlowScriptArgument, useFlow } from "../../hooks/use-flow";
 import { toast } from "react-hot-toast";

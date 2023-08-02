@@ -2,8 +2,10 @@ import React, { ReactElement, useState } from "react";
 import Dialog from "../dialog/Dialog";
 import classes from "./ConsentDialog.module.scss";
 import logo from "../../assets/images/logo-foreground.svg";
-import ToggleButton, { ToggleButtonProps } from "../toggle-button/ToggleButton";
-import Button from "../button/Button";
+import ToggleButton, {
+  ToggleButtonProps,
+} from "../buttons/toggle-button/ToggleButton";
+import Button from "../buttons/button/Button";
 
 export type ConsentDialogProps = {
   consent: boolean;

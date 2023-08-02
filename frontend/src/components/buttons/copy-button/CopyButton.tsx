@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useCallback } from "react";
 import copy from "copy-to-clipboard";
 import toast from "react-hot-toast";
-import { ReactComponent as CopyIcon } from "../../assets/icons/copy.svg";
+import { ReactComponent as CopyIcon } from "../../../assets/icons/copy.svg";
 import classes from "./CopyButton.module.scss";
 
 export type CopyButtonProps = {

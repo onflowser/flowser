@@ -6,7 +6,7 @@ import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import Value from "../value/Value";
 import { TransactionArgument } from "@flowser/shared";
 import { CadenceEditor } from "../cadence-editor/CadenceEditor";
-import CopyButton from "components/copy-button/CopyButton";
+import CopyButton from "components/buttons/copy-button/CopyButton";
 
 export type ContentDetailsScriptProps = {
   script: string;

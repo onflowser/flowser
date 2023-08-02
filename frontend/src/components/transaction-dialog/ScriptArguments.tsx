@@ -5,7 +5,7 @@ import Input from "../input/Input";
 import * as t from "@onflow/types";
 import SelectInput from "../select-input/SelectInput";
 import { FlowScriptArgument } from "../../hooks/use-flow";
-import IconButton from "../icon-button/IconButton";
+import IconButton from "../buttons/icon-button/IconButton";
 import { ReactComponent as DeleteIcon } from "../../assets/icons/cancel.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg";
 

@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import Button from "../button/Button";
+import Button from "../buttons/button/Button";
 import classes from "./SnapshotDialog.module.scss";
 import toast from "react-hot-toast";
 import { ServiceRegistry } from "../../services/service-registry";

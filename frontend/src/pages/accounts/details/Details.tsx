@@ -5,7 +5,7 @@ import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
-import CopyButton from "../../../components/copy-button/CopyButton";
+import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import {
   DetailsTabItem,
   DetailsTabs,
@@ -41,7 +41,7 @@ import {
 } from "components/details-card/DetailsCard";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import Card from "../../../components/card/Card";
-import { ActionButton } from "../../../components/action-button/ActionButton";
+import { ActionButton } from "../../../components/buttons/action-button/ActionButton";
 import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
 import { useFlow } from "../../../hooks/use-flow";

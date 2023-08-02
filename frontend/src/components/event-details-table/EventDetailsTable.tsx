@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./EventDetailsTable.module.scss";
 import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
-import CopyButton from "../copy-button/CopyButton";
+import CopyButton from "../buttons/copy-button/CopyButton";
 import { EventUtils } from "../../utils/event-utils";
 
 export type EventData = Record<string, any>;

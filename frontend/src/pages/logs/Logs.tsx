@@ -23,7 +23,7 @@ import {
 import { ManagedProcessOutput, ProcessOutputSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
-import { SimpleButton } from "../../components/simple-button/SimpleButton";
+import { SimpleButton } from "../../components/buttons/simple-button/SimpleButton";
 import { TextUtils } from "../../utils/text-utils";
 import { CommonUtils } from "../../utils/common-utils";
 

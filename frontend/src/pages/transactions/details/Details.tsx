@@ -22,7 +22,7 @@ import { SignableObject } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
-import CopyButton from "../../../components/copy-button/CopyButton";
+import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
 import { TextUtils } from "../../../utils/text-utils";
 import { FlowUtils } from "../../../utils/flow-utils";
