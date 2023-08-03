@@ -3,11 +3,11 @@
 .paramListRoot {
   display: flex;
   flex-direction: column;
-  row-gap: $spacing-base;
+  row-gap: $spacing-base * 2;
 }
 
 .paramRoot {
   .label {
-    margin-bottom: $spacing-s;
+    margin-bottom: $spacing-base;
   }
 }

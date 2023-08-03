@@ -127,17 +127,17 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
           throw new Error("Expected dictionary.value field");
         }
         return (
-          <div key={index}>
-            <div>
-              Key:{" "}
+          <div key={index} className={classes.dictionaryEntry}>
+            <div className={classes.keyOrValue}>
+              <pre>Key:{"   "}</pre>
               <ValueBuilder
                 type={dictionary.key}
                 value={entry.key}
                 setValue={(newKey) => updateEntryKey(entry.key, newKey)}
               />
             </div>
-            <div>
-              Value:{" "}
+            <div className={classes.keyOrValue}>
+              <pre>Value: </pre>
               <ValueBuilder
                 type={dictionary.value}
                 value={entry.value}
