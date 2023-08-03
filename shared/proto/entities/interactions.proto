@@ -11,6 +11,13 @@ enum InteractionKind {
 message Interaction {
   InteractionKind kind = 1;
   repeated Parameter parameters = 2;
+  Transaction transaction = 3;
+
+  message Transaction {
+    // Number of authorizers, specified in prepare statement.
+    // https://developers.flow.com/concepts/start-here/transaction-signing
+    int32 authorizer_count = 1;
+  }
 }
 
 message Parameter {
