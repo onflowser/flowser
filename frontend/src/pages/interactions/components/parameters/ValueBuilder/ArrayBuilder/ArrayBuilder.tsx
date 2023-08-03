@@ -3,6 +3,8 @@ import { CadenceValueBuilder } from "../interface";
 import { ValueBuilder } from "../ValueBuilder";
 import classes from "./ArrayBuilder.module.scss";
 import { FclArrayValue, FclValue, FclValues } from "@flowser/shared";
+import { SimpleButton } from "../../../../../../components/buttons/simple-button/SimpleButton";
+import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
 
 export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
   const { type, value, setValue } = props;
@@ -66,8 +68,9 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
       })}
       {!isConstantArray && (
         <div>
-          <button onClick={() => decreaseSize()}>-</button>
-          <button onClick={() => increaseSize()}>+</button>
+          <SimpleButton onClick={() => increaseSize()}>Add</SimpleButton>
+          <SizedBox inline width={10} />
+          <SimpleButton onClick={() => decreaseSize()}>Remove</SimpleButton>
         </div>
       )}
     </div>

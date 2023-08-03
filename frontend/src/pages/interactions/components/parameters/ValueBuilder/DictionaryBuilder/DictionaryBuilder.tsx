@@ -4,6 +4,9 @@ import { ValueBuilder } from "../ValueBuilder";
 import { FclDictionaryEntry, FclValue, FclValues } from "@flowser/shared";
 import { MultiMap } from "utils/multi-map";
 import toast from "react-hot-toast";
+import classes from "./DictionaryBuilder.module.scss";
+import { SimpleButton } from "../../../../../../components/buttons/simple-button/SimpleButton";
+import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
 
 export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
   const { type, value, setValue } = props;
@@ -47,7 +50,13 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
       const deduplicatedEntries = [...value];
       deduplicatedEntries.splice(lastDuplicatedEntryIndex, 1);
       setValue(deduplicatedEntries);
-      toast.error("Duplicated keys found");
+      toast.error(
+        <div>
+          <b>Duplicated keys found</b>
+          <br />
+          <span>Make sure that all keys are unique and specified.</span>
+        </div>
+      );
     }
   }, [value]);
 
@@ -102,8 +111,14 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
     }
   }
 
+  function removeLastEntry() {
+    if (isInitialized) {
+      setValue(value.slice(0, value.length - 1));
+    }
+  }
+
   return (
-    <div>
+    <div className={classes.root}>
       {value.map((entry: FclDictionaryEntry, index: number) => {
         if (!dictionary.key) {
           throw new Error("Expected dictionary.key field");
@@ -132,7 +147,11 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
           </div>
         );
       })}
-      <button onClick={() => addEntry()}>+</button>
+      <div>
+        <SimpleButton onClick={() => addEntry()}>Add</SimpleButton>
+        <SizedBox inline width={10} />
+        <SimpleButton onClick={() => removeLastEntry()}>Remove</SimpleButton>
+      </div>
     </div>
   );
 }
