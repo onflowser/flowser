@@ -10,5 +10,5 @@ export function TransactionErrorMessage({
   errorMessage,
 }: TransactionErrorMessageProps): ReactElement {
   const parsedMessage = CadenceUtils.parseCadenceError(errorMessage);
-  return <JsonView data={parsedMessage} />;
+  return <JsonView name="error" data={parsedMessage} />;
 }
