@@ -3,8 +3,6 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
-  useEffect,
-  useState,
 } from "react";
 import {
   InteractionDefinition,
@@ -42,13 +40,7 @@ export function InteractionDefinitionManagerProvider(props: {
   const { data, isLoading } = useGetParsedInteraction({
     sourceCode: definition.sourceCode,
   });
-  const [fclValuesByIdentifier, setFclValuesByIdentifier] = useState(
-    new Map<string, FclValue>(definition.initialFclValuesByIdentifier)
-  );
-
-  useEffect(() => {
-    setFclValuesByIdentifier(definition.initialFclValuesByIdentifier);
-  }, [definition.initialFclValuesByIdentifier]);
+  const fclValuesByIdentifier = definition.fclValuesByIdentifier;
 
   function setSourceCode(sourceCode: string) {
     update({ ...definition, sourceCode });
@@ -62,10 +54,12 @@ export function InteractionDefinitionManagerProvider(props: {
   }
 
   function setFclValue(identifier: string, value: FclValue) {
-    setFclValuesByIdentifier((oldMapping) => {
-      const newMapping = new Map(oldMapping);
-      newMapping.set(identifier, value);
-      return newMapping;
+    const oldMapping = definition.fclValuesByIdentifier;
+    const newMapping = new Map(oldMapping);
+    newMapping.set(identifier, value);
+    update({
+      ...definition,
+      fclValuesByIdentifier: newMapping,
     });
   }
 

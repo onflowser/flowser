@@ -26,7 +26,7 @@ export type InteractionDefinition = {
   id: string;
   name: string;
   sourceCode: string;
-  initialFclValuesByIdentifier: FclValueLookupByIdentifier;
+  fclValuesByIdentifier: FclValueLookupByIdentifier;
   initialOutcome: FlowInteractionOutcome;
   transactionOptions: TransactionOptions;
 };
@@ -35,7 +35,7 @@ export type InteractionDefinitionTemplate = {
   id: string;
   name: string;
   sourceCode: string;
-  initialFclValuesByIdentifier: FclValueLookupByIdentifier;
+  fclValuesByIdentifier: FclValueLookupByIdentifier;
   transactionOptions: TransactionOptions;
   createdDate: Date;
   updatedDate: Date;
@@ -46,7 +46,7 @@ type RawInteractionDefinitionTemplate = {
   id: string;
   name: string;
   sourceCode: string;
-  initialFclValuesByIdentifier: Record<string, FclValue>;
+  fclValuesByIdentifier: Record<string, FclValue>;
   transactionOptions: TransactionOptions;
   createdDate: string;
   updatedDate: string;
@@ -88,7 +88,7 @@ export function InteractionRegistryProvider(props: {
     name: "Hello World",
     id: crypto.randomUUID(),
     sourceCode: initialSourceCode,
-    initialFclValuesByIdentifier: new Map([["prompt", "Hello World"]]),
+    fclValuesByIdentifier: new Map([["prompt", "Hello World"]]),
     initialOutcome: {},
     transactionOptions: {
       authorizerAddresses: [],
@@ -106,8 +106,8 @@ export function InteractionRegistryProvider(props: {
           ...template,
           createdDate: new Date(template.createdDate),
           updatedDate: new Date(template.updatedDate),
-          initialFclValuesByIdentifier: new Map(
-            Object.entries(template.initialFclValuesByIdentifier)
+          fclValuesByIdentifier: new Map(
+            Object.entries(template.fclValuesByIdentifier)
           ),
         })
       ),
@@ -128,20 +128,19 @@ export function InteractionRegistryProvider(props: {
   function persist(interactionId: string) {
     const interaction = getById(interactionId);
 
-    setRawTemplates([
-      ...rawTemplates,
-      {
-        id: crypto.randomUUID(),
-        name: interaction.name,
-        sourceCode: interaction.sourceCode,
-        initialFclValuesByIdentifier: Object.fromEntries(
-          interaction.initialFclValuesByIdentifier
-        ),
-        transactionOptions: interaction.transactionOptions,
-        createdDate: new Date().toISOString(),
-        updatedDate: new Date().toISOString(),
-      },
-    ]);
+    const newTemplate: RawInteractionDefinitionTemplate = {
+      id: crypto.randomUUID(),
+      name: interaction.name,
+      sourceCode: interaction.sourceCode,
+      fclValuesByIdentifier: Object.fromEntries(
+        interaction.fclValuesByIdentifier
+      ),
+      transactionOptions: interaction.transactionOptions,
+      createdDate: new Date().toISOString(),
+      updatedDate: new Date().toISOString(),
+    };
+
+    setRawTemplates([...rawTemplates, newTemplate]);
   }
 
   function forkTemplate(template: InteractionDefinitionTemplate) {
@@ -149,9 +148,7 @@ export function InteractionRegistryProvider(props: {
       id: crypto.randomUUID(),
       name: template.name,
       sourceCode: template.sourceCode,
-      initialFclValuesByIdentifier: new Map(
-        Object.entries(template.initialFclValuesByIdentifier)
-      ),
+      fclValuesByIdentifier: template.fclValuesByIdentifier,
       transactionOptions: template.transactionOptions,
       initialOutcome: {},
     };

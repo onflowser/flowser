@@ -71,7 +71,7 @@ function BlockItem(props: BlockItemProps) {
       id: block.id,
       name: `Tx #${block.height}`,
       sourceCode: transaction.script,
-      initialFclValuesByIdentifier: new Map(
+      fclValuesByIdentifier: new Map(
         transaction.arguments.map((arg) => [
           arg.identifier,
           JSON.parse(arg.valueAsJson),
