@@ -126,6 +126,14 @@ func TestDictionaryParameter(t *testing.T) {
 	}
 }
 
+func TestAuthorizerCount(t *testing.T) {
+	interaction := parseAndBuildInteraction("transaction { prepare (acct: AuthAccount) {} }")
+
+	if interaction.Transaction.AuthorizerCount != 1 {
+		t.Error("Expected 'AuthorizerCount' to be 1")
+	}
+}
+
 func parseAndBuildInteraction(code string) *Interaction {
 	program, err := parser.ParseProgram(nil, []byte(code), parser.Config{})
 

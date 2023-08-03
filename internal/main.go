@@ -53,8 +53,13 @@ const (
 )
 
 type Interaction struct {
-	Kind       InteractionKind `json:"kind"`
-	Parameters []*Parameter    `json:"parameters"`
+	Kind        InteractionKind     `json:"kind"`
+	Parameters  []*Parameter        `json:"parameters"`
+	Transaction *TransactionDetails `json:"transaction"`
+}
+
+type TransactionDetails struct {
+	AuthorizerCount int `json:"authorizerCount"`
 }
 
 type Parameter struct {
@@ -100,8 +105,9 @@ func buildInteraction(program *ast.Program) *Interaction {
 
 	if transactionDeclaration != nil {
 		return &Interaction{
-			Kind:       InteractionKindTransaction,
-			Parameters: buildInteractionParameterList(transactionDeclaration.ParameterList),
+			Kind:        InteractionKindTransaction,
+			Parameters:  buildInteractionParameterList(transactionDeclaration.ParameterList),
+			Transaction: getTransactionDetails(transactionDeclaration),
 		}
 	}
 
@@ -116,6 +122,18 @@ func buildInteraction(program *ast.Program) *Interaction {
 
 	return &Interaction{
 		Kind: InteractionKindUnknown,
+	}
+}
+
+func getTransactionDetails(transactionDeclaration *ast.TransactionDeclaration) *TransactionDetails {
+	var authorizerCount int
+
+	if transactionDeclaration.Prepare != nil {
+		authorizerCount = len(transactionDeclaration.Prepare.FunctionDeclaration.ParameterList.Parameters)
+	}
+
+	return &TransactionDetails{
+		AuthorizerCount: authorizerCount,
 	}
 }
 
