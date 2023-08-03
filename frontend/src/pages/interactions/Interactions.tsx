@@ -23,8 +23,8 @@ export function Interactions(): ReactElement {
 function ContentWithProvider() {
   const sideMenuTabs: TabItem[] = [
     {
-      id: "action-history",
-      label: "Action History",
+      id: "history",
+      label: "History",
       content: <InteractionHistory />,
     },
     {
