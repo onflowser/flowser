@@ -22,7 +22,7 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
 
   useEffect(() => {
     if (!isInitialized) {
-      setValue(initFclArrayOfSize(isConstantArray ? array.size : 0));
+      setValue(initFclArrayOfSize(isConstantArray ? array.size : 1));
     }
   }, [isConstantArray, isInitialized]);
 
