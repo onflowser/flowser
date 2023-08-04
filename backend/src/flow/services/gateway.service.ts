@@ -159,6 +159,8 @@ export class FlowGatewayService implements ProjectContextLifecycle {
 
   /**
    * Sends the transaction and returns the transaction ID.
+   *
+   * https://developers.flow.com/tooling/fcl-js/transactions
    */
   public async sendTransaction(
     options: SendFlowTransactionOptions

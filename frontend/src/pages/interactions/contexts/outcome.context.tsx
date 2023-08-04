@@ -34,7 +34,7 @@ const Context = createContext<InteractionOutcomeManager>(undefined as never);
 export function InteractionOutcomeManagerProvider(props: {
   children: ReactNode;
 }): ReactElement {
-  const { definition, fclValuesByIdentifier, parameters, interactionKind } =
+  const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
   const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
@@ -47,14 +47,17 @@ export function InteractionOutcomeManagerProvider(props: {
     if (!definition) {
       throw new Error("Assertion error: Expected interaction value");
     }
-    switch (interactionKind) {
+    if (!parsedInteraction) {
+      throw new Error("Interaction not parsed yet");
+    }
+    switch (parsedInteraction.kind) {
       case InteractionKind.INTERACTION_SCRIPT:
         return executeScript(definition);
       case InteractionKind.INTERACTION_TRANSACTION:
         return executeTransaction(definition);
       default:
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
-        throw new Error(`Can't execute interaction: ${interactionKind}`);
+        throw new Error(`Can't execute interaction: ${parsedInteraction.kind}`);
     }
   }
 
@@ -63,6 +66,9 @@ export function InteractionOutcomeManagerProvider(props: {
     if (!transactionOptions) {
       throw new Error("Transaction options must be set");
     }
+    if (!parsedInteraction) {
+      throw new Error("Interaction not parsed yet");
+    }
     try {
       setOutcome({});
       const result = await walletService.sendTransaction({
@@ -70,18 +76,21 @@ export function InteractionOutcomeManagerProvider(props: {
         authorizerAddresses: transactionOptions.authorizerAddresses,
         proposerAddress: transactionOptions.proposerAddress,
         payerAddress: transactionOptions.payerAddress,
-        arguments: parameters.map((parameter): TransactionArgument => {
-          if (!parameter.type) {
-            throw new Error("Expecting parameter type");
+        arguments: parsedInteraction.parameters.map(
+          (parameter): TransactionArgument => {
+            if (!parameter.type) {
+              throw new Error("Expecting parameter type");
+            }
+            return {
+              valueAsJson:
+                JSON.stringify(
+                  fclValuesByIdentifier.get(parameter.identifier)
+                ) ?? "",
+              type: parameter.type,
+              identifier: parameter.identifier,
+            };
           }
-          return {
-            valueAsJson:
-              JSON.stringify(fclValuesByIdentifier.get(parameter.identifier)) ??
-              "",
-            type: parameter.type,
-            identifier: parameter.identifier,
-          };
-        }),
+        ),
       });
       setOutcome({
         transaction: {
@@ -106,7 +115,10 @@ export function InteractionOutcomeManagerProvider(props: {
       const result = await fcl.query({
         cadence: definition.sourceCode,
         args: (arg: FclArgBuilder, t: FclTypeLookup) => {
-          const fclArguments = parameters.map(
+          if (!parsedInteraction) {
+            throw new Error("Interaction not parsed yet");
+          }
+          const fclArguments = parsedInteraction.parameters.map(
             (parameter): FclArgumentWithMetadata => {
               if (!parameter.type) {
                 throw new Error("Expecting parameter type");

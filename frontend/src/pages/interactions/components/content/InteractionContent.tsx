@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useEffect } from "react";
 import { CadenceEditor } from "../../../../components/cadence-editor/CadenceEditor";
 import { SimpleButton } from "../../../../components/buttons/simple-button/SimpleButton";
 import classes from "./InteractionContent.module.scss";
@@ -12,7 +12,13 @@ import {
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
-import { CadenceTypeKind, InteractionKind, Parameter } from "@flowser/shared";
+import {
+  CadenceTypeKind,
+  FclValue,
+  FclValues,
+  InteractionKind,
+  Parameter,
+} from "@flowser/shared";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { LoaderButton } from "../../../../components/buttons/loader-button/LoaderButton";
 
@@ -22,9 +28,8 @@ export function InteractionContent(): ReactElement {
   const {
     setFclValue,
     fclValuesByIdentifier,
-    parameters,
     definition,
-    interactionKind,
+    parsedInteraction,
     setSourceCode,
   } = useInteractionDefinitionManager();
 
@@ -47,16 +52,17 @@ export function InteractionContent(): ReactElement {
         <div>
           <h2>Arguments</h2>
           <SizedBox height={20} />
-          {parameters.length === 0 && <div>No arguments</div>}
+          {parsedInteraction?.parameters?.length === 0 && (
+            <div>No arguments</div>
+          )}
           <ParamListBuilder
-            parameters={parameters}
+            parameters={parsedInteraction?.parameters ?? []}
             setFclValue={setFclValue}
             fclValuesByIdentifier={fclValuesByIdentifier}
           />
           <SizedBox height={30} />
-          {interactionKind === InteractionKind.INTERACTION_TRANSACTION && (
-            <SigningSettings />
-          )}
+          {parsedInteraction?.kind ===
+            InteractionKind.INTERACTION_TRANSACTION && <SigningSettings />}
         </div>
         <div className={classes.bottom}>
           <SimpleButton
@@ -87,7 +93,7 @@ function SigningSettings() {
       <SizedBox height={20} />
       <ParamBuilder
         parameter={Parameter.fromPartial({
-          identifier: "proposer",
+          identifier: "Proposer",
           type: {
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
           },
@@ -102,7 +108,7 @@ function SigningSettings() {
       <SizedBox height={12} />
       <ParamBuilder
         parameter={Parameter.fromPartial({
-          identifier: "payer",
+          identifier: "Payer",
           type: {
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
           },
@@ -112,7 +118,61 @@ function SigningSettings() {
           setTransactionOptions({ payerAddress: payerAddress as string })
         }
       />
+      <AuthorizerSettings />
     </>
+  );
+}
+
+// TODO(feature-interact-screen): Validate that unique addresses are chosen
+function AuthorizerSettings() {
+  const { definition, setTransactionOptions, parsedInteraction } =
+    useInteractionDefinitionManager();
+  const authorizerAddresses =
+    definition.transactionOptions.authorizerAddresses ?? [];
+
+  const expectedAuthorizerCount =
+    parsedInteraction?.transaction?.authorizerCount ?? 0;
+
+  useEffect(() => {
+    if (expectedAuthorizerCount !== authorizerAddresses.length) {
+      setTransactionOptions({
+        authorizerAddresses: Array.from({
+          length: expectedAuthorizerCount,
+        }).map(() => ""),
+      });
+    }
+  }, [expectedAuthorizerCount, authorizerAddresses]);
+
+  function setProposerByIndex(address: FclValue, index: number) {
+    if (!FclValues.isFclAddressValue(address)) {
+      throw new Error("Expected address value");
+    }
+    const newAuthorizers = [...authorizerAddresses];
+    newAuthorizers[index] = address;
+    setTransactionOptions({
+      authorizerAddresses: newAuthorizers,
+    });
+  }
+
+  return (
+    <div>
+      {authorizerAddresses.map((proposer, index) => (
+        <>
+          <SizedBox height={12} />
+          <ParamBuilder
+            key={index}
+            parameter={Parameter.fromPartial({
+              identifier: `Authorizer ${index + 1}`,
+              type: {
+                kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
+              },
+            })}
+            value={proposer}
+            setValue={(payerAddress) => setProposerByIndex(payerAddress, index)}
+          />
+        </>
+      ))}
+    </div>
   );
 }
 

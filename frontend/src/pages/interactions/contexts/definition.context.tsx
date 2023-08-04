@@ -10,13 +10,12 @@ import {
   useInteractionRegistry,
 } from "./interaction-registry.context";
 import { useGetParsedInteraction } from "../../../hooks/use-api";
-import { FclValue, InteractionKind, Parameter } from "@flowser/shared";
+import { FclValue, Interaction } from "@flowser/shared";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
   parseError: string | undefined;
-  interactionKind: InteractionKind;
-  parameters: Parameter[];
+  parsedInteraction: Interaction | undefined;
   definition: InteractionDefinition;
   setSourceCode: (code: string) => void;
   setTransactionOptions: (options: Partial<TransactionOptions>) => void;
@@ -67,13 +66,11 @@ export function InteractionDefinitionManagerProvider(props: {
     <Context.Provider
       value={{
         definition,
+        parsedInteraction: data?.interaction,
         setSourceCode,
         setFclValue,
         setTransactionOptions,
         fclValuesByIdentifier,
-        interactionKind:
-          data?.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN,
-        parameters: data?.interaction?.parameters ?? [],
         parseError: data?.error,
         isParsing: isLoading,
       }}
