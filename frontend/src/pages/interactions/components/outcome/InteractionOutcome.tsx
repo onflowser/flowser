@@ -31,21 +31,18 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
     return <TransactionErrorMessage errorMessage={error} />;
   }
 
-  if (data?.transaction) {
-    return <TransactionOverview transaction={data.transaction} />;
-  } else {
+  if (!data?.transaction) {
+    return <CenteredSpinner />;
+  }
+
+  if (data.transaction.status?.errorMessage) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-        }}
-      >
-        <Spinner size={50} />
-      </div>
+      <TransactionErrorMessage
+        errorMessage={data.transaction.status.errorMessage}
+      />
     );
+  } else {
+    return <TransactionOverview transaction={data.transaction} />;
   }
 }
 
@@ -57,4 +54,19 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
   }
 
   return <JsonView name="result" data={{ value: result }} />;
+}
+
+function CenteredSpinner() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+      }}
+    >
+      <Spinner size={50} />
+    </div>
+  );
 }
