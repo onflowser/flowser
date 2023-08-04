@@ -10,7 +10,7 @@ export function InteractionTemplates(): ReactElement {
     <div className={classes.root}>
       {templates.map((template) => (
         <div
-          key={template.id}
+          key={template.name}
           onClick={() => forkTemplate(template)}
           className={classes.item}
         >
@@ -19,7 +19,7 @@ export function InteractionTemplates(): ReactElement {
             className={classes.trash}
             onClick={(e) => {
               e.stopPropagation();
-              removeTemplate(template.id);
+              removeTemplate(template);
             }}
           />
         </div>

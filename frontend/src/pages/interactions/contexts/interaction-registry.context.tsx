@@ -19,7 +19,7 @@ type InteractionsRegistry = {
   setFocused: (interactionId: string) => void;
   persist: (interactionId: string) => void;
   forkTemplate: (template: InteractionDefinitionTemplate) => void;
-  removeTemplate: (templateId: string) => void;
+  removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
 export type InteractionDefinition = {
@@ -32,7 +32,7 @@ export type InteractionDefinition = {
 };
 
 export type InteractionDefinitionTemplate = {
-  id: string;
+  // Name acts as ID.
   name: string;
   sourceCode: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;
@@ -43,7 +43,6 @@ export type InteractionDefinitionTemplate = {
 
 // Internal structure that's persisted in local storage.
 type RawInteractionDefinitionTemplate = {
-  id: string;
   name: string;
   sourceCode: string;
   fclValuesByIdentifier: Record<string, FclValue>;
@@ -129,7 +128,6 @@ export function InteractionRegistryProvider(props: {
     const interaction = getById(interactionId);
 
     const newTemplate: RawInteractionDefinitionTemplate = {
-      id: crypto.randomUUID(),
       name: interaction.name,
       sourceCode: interaction.sourceCode,
       fclValuesByIdentifier: Object.fromEntries(
@@ -140,7 +138,10 @@ export function InteractionRegistryProvider(props: {
       updatedDate: new Date().toISOString(),
     };
 
-    setRawTemplates([...rawTemplates, newTemplate]);
+    setRawTemplates([
+      ...rawTemplates.filter((template) => template.name !== newTemplate.name),
+      newTemplate,
+    ]);
   }
 
   function forkTemplate(template: InteractionDefinitionTemplate) {
@@ -156,9 +157,11 @@ export function InteractionRegistryProvider(props: {
     setFocusedInteractionId(definition.id);
   }
 
-  function removeTemplate(templateId: string) {
+  function removeTemplate(template: InteractionDefinitionTemplate) {
     setRawTemplates((rawTemplates) =>
-      rawTemplates.filter((template) => template.id !== templateId)
+      rawTemplates.filter(
+        (existingTemplate) => existingTemplate.name !== template.name
+      )
     );
   }
 
