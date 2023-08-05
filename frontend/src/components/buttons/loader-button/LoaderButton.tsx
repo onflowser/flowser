@@ -1,6 +1,7 @@
 import React, { ReactElement, useState } from "react";
-import { SimpleButton, SimpleButtonProps } from "../simple-button/SimpleButton";
+import { SimpleButtonProps } from "../simple-button/SimpleButton";
 import { Spinner } from "../../spinner/Spinner";
+import { PrimaryButton } from '../primary-button/PrimaryButton';
 
 type LoaderButtonProps = Omit<SimpleButtonProps, "onClick"> & {
   onClick: () => Promise<void>;
@@ -17,7 +18,7 @@ export function LoaderButton(props: LoaderButtonProps): ReactElement {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <SimpleButton
+    <PrimaryButton
       {...simpleButtonProps}
       onClick={async () => {
         try {
@@ -38,6 +39,6 @@ export function LoaderButton(props: LoaderButtonProps): ReactElement {
       ) : (
         children
       )}
-    </SimpleButton>
+    </PrimaryButton>
   );
 }

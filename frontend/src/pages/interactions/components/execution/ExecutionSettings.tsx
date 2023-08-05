@@ -37,11 +37,7 @@ export function ExecutionSettings(): ReactElement {
           InteractionKind.INTERACTION_TRANSACTION && <SigningSettings />}
       </div>
       <div className={classes.bottom}>
-        <LoaderButton
-          className={classes.button}
-          loadingContent="Executing"
-          onClick={execute}
-        >
+        <LoaderButton loadingContent="Executing" onClick={execute}>
           Execute
         </LoaderButton>
       </div>

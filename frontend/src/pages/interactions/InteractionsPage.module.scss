@@ -11,6 +11,9 @@
   }
   .interactionTab {
     max-width: 200px;
+    .label {
+      text-align: left;
+    }
   }
   .mainContent {
     flex: 3;

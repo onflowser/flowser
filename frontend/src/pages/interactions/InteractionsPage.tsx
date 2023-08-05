@@ -28,6 +28,9 @@ export function InteractionsPage(): ReactElement {
 }
 
 function ContentWithProvider() {
+  const { definitions, focusedDefinition, remove, setFocused } =
+    useInteractionRegistry();
+
   const sideMenuTabs: TabItem[] = [
     {
       id: "history",
@@ -44,8 +47,6 @@ function ContentWithProvider() {
     sideMenuTabs[0].id
   );
 
-  const { definitions, focusedDefinition, remove, update, setFocused } =
-    useInteractionRegistry();
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
     label: definition.name,
@@ -70,18 +71,11 @@ function ContentWithProvider() {
       <TabList
         className={classes.mainContent}
         tabClassName={classes.interactionTab}
+        tabLabelClassName={classes.label}
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
         onClose={(tab) => remove(tab.id)}
-        onChangeLabel={(tab) => {
-          const definition = definitions.find(
-            (definition) => definition.id === tab.id
-          );
-          if (definition) {
-            update({ ...definition, name: tab.label });
-          }
-        }}
       />
     </div>
   );

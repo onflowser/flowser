@@ -15,14 +15,5 @@
     flex-direction: column;
     margin-bottom: 30px;
     row-gap: $spacing-base;
-    .button {
-      flex: 1;
-      padding: $spacing-base;
-      background: #3B3E5B;
-      color: white;
-      font-weight: bold;
-      font-size: $font-size-large;
-      border-radius: 5px;
-    }
   }
 }
