@@ -1,6 +1,7 @@
 import {
   Injectable,
   PreconditionFailedException,
+  NotFoundException,
   Logger,
 } from "@nestjs/common";
 import { ec as EC } from "elliptic";
@@ -56,15 +57,30 @@ export class WalletService implements ProjectContextLifecycle {
   public async sendTransaction(
     request: SendTransactionRequest
   ): Promise<SendTransactionResponse> {
-    const [proposer, payer, authorizations] = await Promise.all([
-      this.withAuthorization(request.proposerAddress),
-      this.withAuthorization(request.payerAddress),
-      Promise.all(
-        request.authorizerAddresses.map((authorizerAddress) =>
-          this.withAuthorization(authorizerAddress)
-        )
-      ),
+    const uniqueRoleAddresses = new Set([
+      request.proposerAddress,
+      request.payerAddress,
+      ...request.authorizerAddresses,
     ]);
+    const authorizationFunctions = await Promise.all(
+      Array.from(uniqueRoleAddresses).map(
+        async (address): Promise<[string, FlowAuthorizationFunction]> => [
+          address,
+          await this.withAuthorization(address),
+        ]
+      )
+    );
+
+    function getAuthFunction(address: string) {
+      const authFunction = authorizationFunctionsByAddress.get(address);
+      if (authFunction === undefined) {
+        throw new PreconditionFailedException(
+          `Authorization function not found for: ${address}`
+        );
+      }
+      return authFunction;
+    }
+    const authorizationFunctionsByAddress = new Map(authorizationFunctions);
 
     const fclArguments = request.arguments.map(
       (arg): FclArgumentWithMetadata => {
@@ -92,16 +108,29 @@ export class WalletService implements ProjectContextLifecycle {
 
     return this.flowGateway.sendTransaction({
       cadence: request.cadence,
-      proposer,
-      payer,
-      authorizations,
+      proposer: getAuthFunction(request.proposerAddress),
+      payer: getAuthFunction(request.payerAddress),
+      authorizations: request.authorizerAddresses.map((address) =>
+        getAuthFunction(address)
+      ),
       arguments: fclArguments,
     });
   }
 
-  private async withAuthorization(address: string) {
-    const storedAccount =
-      await this.accountsService.findOneWithRelationsByAddress(address);
+  // Returns undefined if provided account doesn't exist.
+  private async withAuthorization(
+    address: string
+  ): Promise<FlowAuthorizationFunction> {
+    let storedAccount;
+
+    try {
+      storedAccount = await this.accountsService.findOneWithRelationsByAddress(
+        address
+      );
+    } catch (e) {
+      console.error(e);
+      throw new NotFoundException(`Account not found '${address}'`);
+    }
 
     if (!storedAccount.keys) {
       throw new Error("Keys not loaded for account");
