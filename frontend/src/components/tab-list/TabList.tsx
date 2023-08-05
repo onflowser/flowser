@@ -10,8 +10,11 @@ export type TabItem = {
 };
 
 type TabListProps = {
+  label?: string;
   className?: string;
   tabClassName?: string;
+  tabWrapperClassName?: string;
+  tabLabelClassName?: string;
   activeTabClassName?: string;
   inactiveTabClassName?: string;
   currentTabId: string | undefined;
@@ -22,12 +25,22 @@ type TabListProps = {
 };
 
 export function TabList(props: TabListProps): ReactElement {
-  const { className, tabs, currentTabId, onChangeTab, onClose, onChangeLabel } =
-    props;
+  const {
+    label,
+    className,
+    tabWrapperClassName,
+    tabLabelClassName,
+    tabs,
+    currentTabId,
+    onChangeTab,
+    onClose,
+    onChangeLabel,
+  } = props;
   const currentTab = tabs.find((tab) => tab.id === currentTabId);
   return (
     <div className={classNames(classes.root, className)}>
-      <div className={classes.navigation}>
+      <div className={classNames(classes.tabWrapper, tabWrapperClassName)}>
+        {label && <span className={classes.label}>{label}:</span>}
         {tabs.map((tab) => {
           const isActive = currentTabId === tab.id;
           return (
@@ -44,7 +57,7 @@ export function TabList(props: TabListProps): ReactElement {
                 style={{
                   cursor: onChangeLabel === undefined ? "pointer" : "text",
                 }}
-                className={classes.labelInput}
+                className={classNames(classes.labelInput, tabLabelClassName)}
                 disabled={onChangeLabel === undefined}
                 value={tab.label}
                 onChange={(e) => {
