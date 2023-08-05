@@ -1,4 +1,5 @@
 @import "styles/spacings";
+@import "styles/colors";
 
 .paramListRoot {
   display: flex;
@@ -9,5 +10,11 @@
 .paramRoot {
   .label {
     margin-bottom: $spacing-base;
+    .identifier {
+      margin-right: $spacing-s;
+    }
+    .type {
+      color: $gray-10;
+    }
   }
 }

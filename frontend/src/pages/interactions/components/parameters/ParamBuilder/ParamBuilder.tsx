@@ -42,7 +42,9 @@ export function ParamBuilder(props: ParameterBuilderProps): ReactElement {
   return (
     <div className={classes.paramRoot}>
       <div className={classes.label}>
-        <b>{parameter.identifier}</b> <code>{parameter.type.rawType}</code>
+        <b className={classes.identifier}>{parameter.identifier}</b>
+        {"  "}
+        <code className={classes.type}>{parameter.type.rawType}</code>
       </div>
       <ValueBuilder
         type={parameter.type}

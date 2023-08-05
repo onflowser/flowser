@@ -29,15 +29,17 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
 
   return (
     <div className={classes.root}>
-      {managedAccounts.map((account) => (
-        <AccountButton
-          key={account.address}
-          account={account}
-          isSelected={value === account.address}
-          onSelect={() => setValue(account.address)}
-        />
-      ))}
-      <NewAccountButton onCreateNewAccount={createNewAccount} />
+      <div className={classes.innerWrapper}>
+        {managedAccounts.map((account) => (
+          <AccountButton
+            key={account.address}
+            account={account}
+            isSelected={value === account.address}
+            onSelect={() => setValue(account.address)}
+          />
+        ))}
+        <NewAccountButton onCreateNewAccount={createNewAccount} />
+      </div>
     </div>
   );
 }
@@ -59,7 +61,7 @@ function AccountButton(props: AccountButtonProps) {
       >
         <AccountAvatar address={account.address} className={classes.avatar} />
       </div>
-      <AccountName address={account.address} shorten />
+      <AccountName className={classes.accountName} address={account.address} shorten />
     </div>
   );
 }
@@ -94,7 +96,7 @@ function NewAccountButton(props: NewAccountButtonProps) {
           )}
         </div>
       </div>
-      <div>New</div>
+      <div className={classes.accountName}>New</div>
     </div>
   );
 }
