@@ -104,7 +104,7 @@ export class FclValues {
     return typeof arg === "boolean";
   }
   static isFclNumericValue(arg: unknown): arg is FclNumericValue {
-    return typeof arg === "string" && !Number.isNaN(Number(arg));
+    return typeof arg === "string" && arg !== "" && !Number.isNaN(Number(arg));
   }
   static isFclTextualValue(arg: unknown): arg is FclTextualValue {
     return typeof arg === "string";
