@@ -23,6 +23,7 @@ import {
   TransactionArgument,
 } from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
+import toast from "react-hot-toast";
 
 type InteractionOutcomeManager = {
   outcome: FlowInteractionOutcome | undefined;
@@ -68,6 +69,17 @@ export function InteractionOutcomeManagerProvider(props: {
     }
     if (!parsedInteraction) {
       throw new Error("Interaction not parsed yet");
+    }
+    const unspecifiedAuthorizers = transactionOptions.authorizerAddresses
+      .map((value, index) => ({ value, index }))
+      .filter((e) => e.value === "");
+    if (unspecifiedAuthorizers.length > 0) {
+      toast.error(
+        `Unspecified authorizers: ${unspecifiedAuthorizers
+          .map((e) => e.index + 1)
+          .join(", ")}`
+      );
+      return;
     }
     try {
       setOutcome({});
