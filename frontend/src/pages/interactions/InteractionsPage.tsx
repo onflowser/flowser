@@ -1,18 +1,25 @@
 import React, { ReactElement, useState } from "react";
-import classes from "./Interactions.module.scss";
+import classes from "./InteractionsPage.module.scss";
 import { TabList, TabItem } from "../../components/tab-list/TabList";
 import {
   InteractionRegistryProvider,
   useInteractionRegistry,
 } from "./contexts/interaction-registry.context";
-import { InteractionContent } from "./components/content/InteractionContent";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
-import { InteractionDefinitionManagerProvider } from "./contexts/definition.context";
+import {
+  InteractionDefinitionManagerProvider,
+  useInteractionDefinitionManager,
+} from "./contexts/definition.context";
 import { InteractionTemplates } from "./components/templates/InteractionTemplates";
 import { SizedBox } from "../../components/sized-box/SizedBox";
+import { LineSeparator } from "../../components/line-separator/LineSeparator";
+import { ExecutionSettings } from "./components/execution/ExecutionSettings";
+import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
+import { Spinner } from "../../components/spinner/Spinner";
+import { InteractionOutcome } from "./components/outcome/InteractionOutcome";
 
-export function Interactions(): ReactElement {
+export function InteractionsPage(): ReactElement {
   return (
     <InteractionRegistryProvider>
       <ContentWithProvider />
@@ -45,7 +52,7 @@ function ContentWithProvider() {
     content: (
       <InteractionDefinitionManagerProvider definition={definition}>
         <InteractionOutcomeManagerProvider>
-          <InteractionContent />
+          <InteractionBody />
         </InteractionOutcomeManagerProvider>
       </InteractionDefinitionManagerProvider>
     ),
@@ -78,4 +85,57 @@ function ContentWithProvider() {
       />
     </div>
   );
+}
+
+function InteractionBody(): ReactElement {
+  return (
+    <div className={classes.body}>
+      <div className={classes.content}>
+        <div className={classes.code}>
+          <InteractionSourceEditor />
+        </div>
+        <SizedBox height={20} />
+        <div className={classes.details}>
+          <InteractionDetails />
+        </div>
+      </div>
+      <LineSeparator vertical />
+      <ExecutionSettings />
+    </div>
+  );
+}
+
+function InteractionSourceEditor() {
+  const { definition, setSourceCode } = useInteractionDefinitionManager();
+  return (
+    <CadenceEditor
+      value={definition.sourceCode}
+      onChange={(sourceCode) => setSourceCode(sourceCode)}
+    />
+  );
+}
+
+function InteractionDetails() {
+  const { parseError, isParsing } = useInteractionDefinitionManager();
+
+  if (isParsing) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <Spinner size={50} />
+      </div>
+    );
+  }
+
+  if (parseError) {
+    return <pre>{parseError}</pre>;
+  }
+
+  return <InteractionOutcome />;
 }

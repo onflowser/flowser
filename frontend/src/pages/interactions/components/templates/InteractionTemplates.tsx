@@ -2,6 +2,9 @@ import React, { ReactElement } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
 import { FlowserIcon } from "../../../../components/icons/Icons";
+import {
+  SimpleButton
+} from '../../../../components/buttons/simple-button/SimpleButton';
 
 export function InteractionTemplates(): ReactElement {
   const { templates, forkTemplate, removeTemplate } = useInteractionRegistry();
@@ -24,6 +27,13 @@ export function InteractionTemplates(): ReactElement {
           />
         </div>
       ))}
+      {/* TODO(feature-interact-screen): Enable */}
+      {/*<SimpleButton*/}
+      {/*  className={classes.button}*/}
+      {/*  onClick={() => persist(definition.id)}*/}
+      {/*>*/}
+      {/*  Save*/}
+      {/*</SimpleButton>*/}
     </div>
   );
 }

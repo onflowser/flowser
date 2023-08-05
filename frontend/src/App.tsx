@@ -37,7 +37,7 @@ import { ConsentDialog } from "./components/consent-dialog/ConsentDialog";
 import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
-import { Interactions } from "./pages/interactions/Interactions";
+import { InteractionsPage } from "./pages/interactions/InteractionsPage";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -109,7 +109,10 @@ export const FlowserRoutes = (): ReactElement => {
         <RouteWithLayout path={routes.transactions} component={Transactions} />
         <RouteWithLayout path={routes.contracts} component={Contracts} />
         <RouteWithLayout path={routes.events} component={Events} />
-        <RouteWithLayout path={routes.interactions} component={Interactions} />
+        <RouteWithLayout
+          path={routes.interactions}
+          component={InteractionsPage}
+        />
         <RouteWithLayout path={routes.project} component={Project} />
         <Redirect from="*" to={routes.start} />
       </Switch>

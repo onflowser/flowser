@@ -1,17 +1,9 @@
 import React, { ReactElement, useEffect } from "react";
-import { CadenceEditor } from "../../../../components/cadence-editor/CadenceEditor";
-import { SimpleButton } from "../../../../components/buttons/simple-button/SimpleButton";
-import classes from "./InteractionContent.module.scss";
-import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
-import { InteractionOutcome } from "../outcome/InteractionOutcome";
-import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
+import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import {
   ParamBuilder,
   ParamListBuilder,
 } from "../parameters/ParamBuilder/ParamBuilder";
-import { useInteractionDefinitionManager } from "../../contexts/definition.context";
-import { Spinner } from "../../../../components/spinner/Spinner";
-import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import {
   CadenceTypeKind,
   FclValue,
@@ -19,66 +11,39 @@ import {
   InteractionKind,
   Parameter,
 } from "@flowser/shared";
-import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
+import classes from "./ExecutionSettings.module.scss";
 import { LoaderButton } from "../../../../components/buttons/loader-button/LoaderButton";
+import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
+import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 
-export function InteractionContent(): ReactElement {
-  const { persist } = useInteractionRegistry();
+export function ExecutionSettings(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
-  const {
-    setFclValue,
-    fclValuesByIdentifier,
-    definition,
-    parsedInteraction,
-    setSourceCode,
-  } = useInteractionDefinitionManager();
+  const { setFclValue, fclValuesByIdentifier, parsedInteraction } =
+    useInteractionDefinitionManager();
 
   return (
     <div className={classes.root}>
-      <div className={classes.content}>
-        <div className={classes.code}>
-          <CadenceEditor
-            value={definition.sourceCode}
-            onChange={(sourceCode) => setSourceCode(sourceCode)}
-          />
-        </div>
+      <div>
+        <h2>Arguments</h2>
         <SizedBox height={20} />
-        <div className={classes.details}>
-          <InteractionDetails />
-        </div>
+        {parsedInteraction?.parameters?.length === 0 && <div>No arguments</div>}
+        <ParamListBuilder
+          parameters={parsedInteraction?.parameters ?? []}
+          setFclValue={setFclValue}
+          fclValuesByIdentifier={fclValuesByIdentifier}
+        />
+        <SizedBox height={30} />
+        {parsedInteraction?.kind ===
+          InteractionKind.INTERACTION_TRANSACTION && <SigningSettings />}
       </div>
-      <LineSeparator vertical />
-      <div className={classes.sidebar}>
-        <div>
-          <h2>Arguments</h2>
-          <SizedBox height={20} />
-          {parsedInteraction?.parameters?.length === 0 && (
-            <div>No arguments</div>
-          )}
-          <ParamListBuilder
-            parameters={parsedInteraction?.parameters ?? []}
-            setFclValue={setFclValue}
-            fclValuesByIdentifier={fclValuesByIdentifier}
-          />
-          <SizedBox height={30} />
-          {parsedInteraction?.kind ===
-            InteractionKind.INTERACTION_TRANSACTION && <SigningSettings />}
-        </div>
-        <div className={classes.bottom}>
-          <SimpleButton
-            className={classes.button}
-            onClick={() => persist(definition.id)}
-          >
-            Save
-          </SimpleButton>
-          <LoaderButton
-            className={classes.button}
-            loadingContent="Executing"
-            onClick={execute}
-          >
-            Execute
-          </LoaderButton>
-        </div>
+      <div className={classes.bottom}>
+        <LoaderButton
+          className={classes.button}
+          loadingContent="Executing"
+          onClick={execute}
+        >
+          Execute
+        </LoaderButton>
       </div>
     </div>
   );
@@ -174,29 +139,4 @@ function AuthorizerSettings() {
       ))}
     </div>
   );
-}
-
-function InteractionDetails() {
-  const { parseError, isParsing } = useInteractionDefinitionManager();
-
-  if (isParsing) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-        }}
-      >
-        <Spinner size={50} />
-      </div>
-    );
-  }
-
-  if (parseError) {
-    return <pre>{parseError}</pre>;
-  }
-
-  return <InteractionOutcome />;
 }

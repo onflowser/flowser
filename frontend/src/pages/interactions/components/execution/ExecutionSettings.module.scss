@@ -1,0 +1,28 @@
+@import 'styles/spacings';
+@import 'styles/typography';
+
+.root {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: $spacing-base;
+  height: 100%;
+  width: 300px;
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+    row-gap: $spacing-base;
+    .button {
+      flex: 1;
+      padding: $spacing-base;
+      background: #3B3E5B;
+      color: white;
+      font-weight: bold;
+      font-size: $font-size-large;
+      border-radius: 5px;
+    }
+  }
+}
