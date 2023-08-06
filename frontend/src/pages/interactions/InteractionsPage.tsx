@@ -18,6 +18,7 @@ import { ExecutionSettings } from "./components/execution/ExecutionSettings";
 import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
 import { Spinner } from "../../components/spinner/Spinner";
 import { InteractionOutcome } from "./components/outcome/InteractionOutcome";
+import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
 
 export function InteractionsPage(): ReactElement {
   return (
@@ -123,22 +124,11 @@ function InteractionDetails() {
   const { parseError, isParsing } = useInteractionDefinitionManager();
 
   if (isParsing) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-        }}
-      >
-        <Spinner size={50} />
-      </div>
-    );
+    return <SpinnerWithLabel label="Parsing" />;
   }
 
   if (parseError) {
-    return <pre>{parseError}</pre>;
+    return <pre className={classes.error}>{parseError}</pre>;
   }
 
   return <InteractionOutcome />;

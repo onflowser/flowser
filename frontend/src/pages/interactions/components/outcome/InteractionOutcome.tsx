@@ -4,7 +4,6 @@ import { TransactionOverview } from "../../../transactions/details/components/ov
 import { TransactionErrorMessage } from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
-import { Spinner } from "../../../../components/spinner/Spinner";
 import classes from "./InteractionOutcome.module.scss";
 import {
   FlowScriptOutcome,
@@ -16,6 +15,7 @@ import { useInteractionDefinitionManager } from "../../contexts/definition.conte
 import { InteractionKind } from "@flowser/shared";
 import { ExternalLink } from "../../../../components/link/ExternalLink";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
+import { SpinnerWithLabel } from "../../../../components/spinner/SpinnerWithLabel";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -113,7 +113,7 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   }, [error, currentTabId]);
 
   if (!data?.transaction) {
-    return <CenteredSpinner />;
+    return <SpinnerWithLabel label="Executing" />;
   }
 
   const tabs: TabItem[] = [];
@@ -185,20 +185,5 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
       onChangeTab={(tab) => setCurrentTabId(tab.id)}
       tabs={tabs}
     />
-  );
-}
-
-function CenteredSpinner() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <Spinner size={50} />
-    </div>
   );
 }
