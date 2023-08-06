@@ -7,13 +7,11 @@
   justify-content: space-between;
   flex-direction: column;
   padding: $spacing-base;
-  height: 100%;
   width: 300px;
 
   .bottom {
     display: flex;
     flex-direction: column;
-    margin-bottom: 30px;
     row-gap: $spacing-base;
   }
 }

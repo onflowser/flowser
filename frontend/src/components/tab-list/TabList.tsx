@@ -67,7 +67,7 @@ export function TabList(props: TabListProps): ReactElement {
           );
         })}
       </div>
-      <div className={classes.body}>{currentTab?.content}</div>
+      {currentTab?.content}
     </div>
   );
 }

@@ -4,10 +4,15 @@ import { routes } from "../../constants/routes";
 import { NavLink } from "react-router-dom";
 import { FlowserIcon } from "components/icons/Icons";
 import { SizedBox } from "../sized-box/SizedBox";
+import classNames from "classnames";
 
-export function SideNavigation(): ReactElement {
+type SideNavigationProps = {
+  className?: string;
+};
+
+export function SideNavigation(props: SideNavigationProps): ReactElement {
   return (
-    <div className={classes.root}>
+    <div className={classNames(classes.root, props.className)}>
       <FlowserLogo />
       <SizedBox height={50} />
       <ProjectLink to={routes.accounts} icon={FlowserIcon.Account} />

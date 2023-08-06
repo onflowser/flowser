@@ -1,11 +1,12 @@
 @import "styles/colors";
+@import "styles/spacings";
 
 .root {
   display: flex;
   flex-direction: column;
   align-items: center;
   background: $new-color-1;
-  padding: 15px;
+  padding: $spacing-base 0;
 
   .inactiveLink {
     background: $new-color-2;

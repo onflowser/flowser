@@ -21,7 +21,7 @@
 }
 
 @mixin hiddenScrollbars {
-  &::-webkit-scrollbar {
+  &::-webkit-scrollbar, *::-webkit-scrollbar {
     display: none;
   }
 }

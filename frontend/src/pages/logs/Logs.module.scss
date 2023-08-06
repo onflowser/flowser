@@ -3,26 +3,32 @@
 @import 'styles/typography';
 @import 'styles/scrollbars';
 
-.root {
+@mixin overlay {
   z-index: 99;
-  padding: 0 $spacing-l * 2;
-  padding-bottom: $spacing-l;
-  border-top: 1px solid $color-logs-border;
-  background-color: $background;
   position: absolute;
-  display: flex;
-  flex-direction: column;
   bottom: 0;
   left: 0;
   right: 0;
+}
 
-  @include styledScrollbars();
+.root {
+  padding: 0 $spacing-l * 2;
+  border-top: 1px solid $color-logs-border;
+  background-color: $background;
+  display: flex;
+  flex-direction: column;
+
+  @include hiddenScrollbars();
 
   &.opened {
+    @include styledScrollbars();
+    @include overlay();
     top: 50%;
   }
 
   &.expanded {
+    @include styledScrollbars();
+    @include overlay();
     top: 0;
   }
 

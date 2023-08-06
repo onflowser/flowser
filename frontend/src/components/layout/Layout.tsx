@@ -43,7 +43,7 @@ const Layout: FunctionComponent = ({ children }) => {
 
   return (
     <div className={classes.root}>
-      <SideNavigation />
+      <SideNavigation className={classes.sideNavigation} />
       <div className={classes.mainContent}>
         <TopRow isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <Breadcrumbs />

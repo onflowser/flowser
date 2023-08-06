@@ -2,12 +2,13 @@
 @import "styles/colors";
 
 $grid-gap: 30px;
+$side-nav-width: 80px;
 
 .root {
   display: flex;
 
   .sideNavigation {
-
+    width: $side-nav-width;
   }
 
   .mainContent {
@@ -16,6 +17,7 @@ $grid-gap: 30px;
     position: relative;
     flex-direction: column;
     min-height: 100vh;
+    width: calc(100vw - $side-nav-width);
 
     .body {
       color: $light-grey;
@@ -23,29 +25,10 @@ $grid-gap: 30px;
       display: flex;
       flex-direction: column;
       flex: 1;
-      // Bottom margin fixes the log drawer hiding some of the page content.
-      padding-bottom: 80px;
     }
 
     .bodyWithMargin {
       margin: $grid-gap $spacing-l 0;
-    }
-
-    .logs {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      bottom: 0;
-      left: 0;
-      right: 0;
-
-      &.opened {
-        top: 50%;
-      }
-
-      &.expanded {
-        top: 118px;
-      }
     }
   }
 
