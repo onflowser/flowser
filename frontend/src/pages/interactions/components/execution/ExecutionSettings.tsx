@@ -16,6 +16,8 @@ import { LoaderButton } from "../../../../components/buttons/loader-button/Loade
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { TransactionOptions } from "../../contexts/interaction-registry.context";
+import { Callout } from "../../../../components/callout/Callout";
+import { ExternalLink } from "../../../../components/link/ExternalLink";
 
 export function ExecutionSettings(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
@@ -25,9 +27,17 @@ export function ExecutionSettings(): ReactElement {
   return (
     <div className={classes.root}>
       <div>
-        <h2>Arguments</h2>
-        <SizedBox height={20} />
-        {parsedInteraction?.parameters?.length === 0 && <div>No arguments</div>}
+        {parsedInteraction &&
+        parsedInteraction.kind !== InteractionKind.INTERACTION_UNKNOWN ? (
+          <div>
+            <h2>Arguments</h2>
+            <SizedBox height={20} />
+            {parsedInteraction.parameters.length === 0 && <NoArgumentsHelp />}
+          </div>
+        ) : (
+          <UnknownInteractionHelp />
+        )}
+
         <ParamListBuilder
           parameters={parsedInteraction?.parameters ?? []}
           setFclValue={setFclValue}
@@ -44,6 +54,76 @@ export function ExecutionSettings(): ReactElement {
       </div>
     </div>
   );
+}
+
+function UnknownInteractionHelp() {
+  return (
+    <Callout
+      icon="💡"
+      title="Unknown interaction"
+      description={
+        <div>
+          <p>
+            This interaction os neither a transaction or script. To learn more,
+            head over to the official Flow documentation.
+          </p>
+          <SizedBox height={10} />
+          <ExternalLink href="https://developers.flow.com/cadence/language/transactions">
+            Transactions docs
+          </ExternalLink>
+          <ExternalLink href="https://developers.flow.com/tooling/fcl-js/scripts">
+            Scripts docs
+          </ExternalLink>
+        </div>
+      }
+    />
+  );
+}
+
+function NoArgumentsHelp() {
+  const { parsedInteraction } = useInteractionDefinitionManager();
+  switch (parsedInteraction?.kind) {
+    case InteractionKind.INTERACTION_TRANSACTION:
+      return (
+        <Callout
+          icon="💡"
+          title="Transaction without parameters"
+          description={
+            <div>
+              <p>
+                Parameters allow you to inject values without having to specify
+                them in code.
+              </p>
+              <SizedBox height={10} />
+              <ExternalLink href="https://developers.flow.com/cadence/language/transactions#transaction-parameters">
+                Learn more in Flow docs
+              </ExternalLink>
+            </div>
+          }
+        />
+      );
+    case InteractionKind.INTERACTION_SCRIPT:
+      return (
+        <Callout
+          icon="💡"
+          title="Script without parameters"
+          description={
+            <div>
+              <p>
+                Parameters allow you to inject values without having to specify
+                them in code.
+              </p>
+              <SizedBox height={10} />
+              <ExternalLink href="https://developers.flow.com/cadence/language/transactions#transaction-parameters">
+                Learn more in Flow docs
+              </ExternalLink>
+            </div>
+          }
+        />
+      );
+    default:
+      return null;
+  }
 }
 
 const initialTransactionOptions: TransactionOptions = {
