@@ -76,7 +76,23 @@ function EmptyState() {
         />
       );
     default:
-      return null;
+      return (
+        <Callout
+          icon="🚀"
+          title="Getting started #onFlow"
+          description={
+            <div>
+              <p>
+                Here are some resources that should help you get started on
+                Flow.
+              </p>
+              <LineSeparator horizontal />
+              <ExternalLink href="https://developers.flow.com/tutorials/intro" />
+              <ExternalLink href="https://academy.ecdao.org/en/catalog/courses/beginner-cadence" />
+            </div>
+          }
+        />
+      );
   }
 }
 
