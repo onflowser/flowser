@@ -12,6 +12,7 @@ import { ReactComponent as Close } from "../../assets/icons/close.svg";
 import { ReactComponent as Trash } from "../../assets/icons/trash.svg";
 import { ReactComponent as Search } from "../../assets/icons/search.svg";
 import { ReactComponent as Cancel } from "../../assets/icons/cancel.svg";
+import { ReactComponent as Link } from "../../assets/icons/link.svg";
 
 export const FlowserIcon = {
   Account,
@@ -28,4 +29,5 @@ export const FlowserIcon = {
   Trash,
   Search,
   Cancel,
+  Link
 };

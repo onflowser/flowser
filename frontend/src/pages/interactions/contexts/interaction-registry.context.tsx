@@ -27,7 +27,7 @@ export type InteractionDefinition = {
   name: string;
   sourceCode: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;
-  initialOutcome: FlowInteractionOutcome;
+  initialOutcome: FlowInteractionOutcome | undefined;
   transactionOptions: TransactionOptions;
 };
 
@@ -88,7 +88,7 @@ export function InteractionRegistryProvider(props: {
     id: crypto.randomUUID(),
     sourceCode: initialSourceCode,
     fclValuesByIdentifier: new Map([["prompt", "Hello World"]]),
-    initialOutcome: {},
+    initialOutcome: undefined,
     transactionOptions: {
       authorizerAddresses: [],
       proposerAddress: "0xf8d6e0586b0a20c7",
@@ -151,7 +151,7 @@ export function InteractionRegistryProvider(props: {
       sourceCode: template.sourceCode,
       fclValuesByIdentifier: template.fclValuesByIdentifier,
       transactionOptions: template.transactionOptions,
-      initialOutcome: {},
+      initialOutcome: undefined,
     };
     setDefinitions([...definitions, definition]);
     setFocusedInteractionId(definition.id);
