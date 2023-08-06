@@ -28,7 +28,7 @@ export function InteractionsPage(): ReactElement {
 }
 
 function ContentWithProvider() {
-  const { definitions, focusedDefinition, remove, setFocused } =
+  const { definitions, focusedDefinition, remove, setFocused, forkTemplate } =
     useInteractionRegistry();
 
   const sideMenuTabs: TabItem[] = [
@@ -76,6 +76,16 @@ function ContentWithProvider() {
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
         onClose={(tab) => remove(tab.id)}
+        onAddNew={() =>
+          forkTemplate({
+            name: "New interaction",
+            sourceCode: "",
+            fclValuesByIdentifier: new Map(),
+            transactionOptions: undefined,
+            createdDate: new Date(),
+            updatedDate: new Date(),
+          })
+        }
       />
     </div>
   );
@@ -100,11 +110,11 @@ function InteractionBody(): ReactElement {
 }
 
 function InteractionSourceEditor() {
-  const { definition, setSourceCode } = useInteractionDefinitionManager();
+  const { definition, partialUpdate } = useInteractionDefinitionManager();
   return (
     <CadenceEditor
       value={definition.sourceCode}
-      onChange={(sourceCode) => setSourceCode(sourceCode)}
+      onChange={(sourceCode) => partialUpdate({ sourceCode })}
     />
   );
 }

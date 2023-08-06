@@ -2,6 +2,7 @@ import React, {
   createContext,
   ReactElement,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -28,7 +29,7 @@ export type InteractionDefinition = {
   sourceCode: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;
   initialOutcome: FlowInteractionOutcome | undefined;
-  transactionOptions: TransactionOptions;
+  transactionOptions: TransactionOptions | undefined;
 };
 
 export type InteractionDefinitionTemplate = {
@@ -36,7 +37,7 @@ export type InteractionDefinitionTemplate = {
   name: string;
   sourceCode: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;
-  transactionOptions: TransactionOptions;
+  transactionOptions: TransactionOptions | undefined;
   createdDate: Date;
   updatedDate: Date;
 };
@@ -46,7 +47,7 @@ type RawInteractionDefinitionTemplate = {
   name: string;
   sourceCode: string;
   fclValuesByIdentifier: Record<string, FclValue>;
-  transactionOptions: TransactionOptions;
+  transactionOptions: TransactionOptions | undefined;
   createdDate: string;
   updatedDate: string;
 };
@@ -74,20 +75,14 @@ export type FlowInteractionOutcome = {
 
 const Context = createContext<InteractionsRegistry>(undefined as never);
 
-const initialSourceCode = `transaction (prompt: String) {
-  execute {
-    log(prompt)
-  }
-}`;
-
 export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const initialInteractionDefinition: InteractionDefinition = {
-    name: "Hello World",
+  const defaultInteraction: InteractionDefinition = {
+    name: "First interaction",
     id: crypto.randomUUID(),
-    sourceCode: initialSourceCode,
-    fclValuesByIdentifier: new Map([["prompt", "Hello World"]]),
+    sourceCode: "",
+    fclValuesByIdentifier: new Map(),
     initialOutcome: undefined,
     transactionOptions: {
       authorizerAddresses: [],
@@ -113,7 +108,7 @@ export function InteractionRegistryProvider(props: {
     [rawTemplates]
   );
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
-    initialInteractionDefinition,
+    defaultInteraction,
   ]);
   const [focusedInteractionId, setFocusedInteractionId] = useState<
     string | undefined
@@ -123,6 +118,15 @@ export function InteractionRegistryProvider(props: {
       definitions.find((definition) => definition.id === focusedInteractionId),
     [focusedInteractionId, definitions]
   );
+
+  useEffect(() => {
+    // Make sure there is always at least one tab open.
+    // Otherwise, the UI looks weird.
+    if (definitions.length === 0) {
+      setDefinitions([defaultInteraction]);
+      setFocusedInteractionId(defaultInteraction.id);
+    }
+  }, [definitions]);
 
   function persist(interactionId: string) {
     const interaction = getById(interactionId);

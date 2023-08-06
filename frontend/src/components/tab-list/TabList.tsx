@@ -20,6 +20,7 @@ type TabListProps = {
   currentTabId: string | undefined;
   onChangeTab: (tab: TabItem) => void;
   onClose?: (tab: TabItem) => void;
+  onAddNew?: () => void;
   tabs: TabItem[];
 };
 
@@ -33,6 +34,7 @@ export function TabList(props: TabListProps): ReactElement {
     currentTabId,
     onChangeTab,
     onClose,
+    onAddNew,
   } = props;
   const currentTab = tabs.find((tab) => tab.id === currentTabId);
   return (
@@ -66,6 +68,11 @@ export function TabList(props: TabListProps): ReactElement {
             </button>
           );
         })}
+        {onAddNew && (
+          <button className={classes.newTabButton} onClick={() => onAddNew()}>
+            <FlowserIcon.Plus />
+          </button>
+        )}
       </div>
       {currentTab?.content}
     </div>

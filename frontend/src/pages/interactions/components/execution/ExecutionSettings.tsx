@@ -15,6 +15,7 @@ import classes from "./ExecutionSettings.module.scss";
 import { LoaderButton } from "../../../../components/buttons/loader-button/LoaderButton";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
+import { TransactionOptions } from "../../contexts/interaction-registry.context";
 
 export function ExecutionSettings(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
@@ -45,9 +46,24 @@ export function ExecutionSettings(): ReactElement {
   );
 }
 
+const initialTransactionOptions: TransactionOptions = {
+  authorizerAddresses: [],
+  proposerAddress: "",
+  payerAddress: "",
+};
+
 function SigningSettings() {
-  const { definition, setTransactionOptions } =
-    useInteractionDefinitionManager();
+  const { definition, partialUpdate } = useInteractionDefinitionManager();
+
+  function setTransactionOptions(options: Partial<TransactionOptions>) {
+    partialUpdate({
+      transactionOptions: {
+        ...(definition.transactionOptions ?? initialTransactionOptions),
+        ...options,
+      },
+    });
+  }
+
   return (
     <>
       <h2>Signing</h2>
@@ -59,7 +75,7 @@ function SigningSettings() {
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
           },
         })}
-        value={definition.transactionOptions.proposerAddress}
+        value={definition.transactionOptions?.proposerAddress}
         setValue={(proposerAddress) =>
           setTransactionOptions({
             proposerAddress: proposerAddress as string,
@@ -74,7 +90,7 @@ function SigningSettings() {
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
           },
         })}
-        value={definition.transactionOptions.payerAddress}
+        value={definition.transactionOptions?.payerAddress}
         setValue={(payerAddress) =>
           setTransactionOptions({ payerAddress: payerAddress as string })
         }
@@ -86,10 +102,19 @@ function SigningSettings() {
 
 // TODO(feature-interact-screen): Validate that unique addresses are chosen
 function AuthorizerSettings() {
-  const { definition, setTransactionOptions, parsedInteraction } =
+  const { definition, parsedInteraction, partialUpdate } =
     useInteractionDefinitionManager();
   const authorizerAddresses =
-    definition.transactionOptions.authorizerAddresses ?? [];
+    definition.transactionOptions?.authorizerAddresses ?? [];
+
+  function setTransactionOptions(options: Partial<TransactionOptions>) {
+    partialUpdate({
+      transactionOptions: {
+        ...(definition.transactionOptions ?? initialTransactionOptions),
+        ...options,
+      },
+    });
+  }
 
   const expectedAuthorizerCount =
     parsedInteraction?.transaction?.authorizerCount ?? 0;
