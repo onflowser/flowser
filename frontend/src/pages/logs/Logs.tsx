@@ -155,7 +155,7 @@ const Logs: FunctionComponent = () => {
         })}
       >
         <SimpleButton
-          className={classes.leftContainer}
+          className={classes.logsButton}
           onClick={() => {
             if (logDrawerSize === "tiny") {
               changeLogDrawerSize("small");

@@ -13,8 +13,7 @@
 
 .root {
   padding: 0 $spacing-l * 2;
-  border-top: 1px solid $color-logs-border;
-  background-color: $background;
+  background: $new-color-1;
   display: flex;
   flex-direction: column;
 
@@ -48,12 +47,15 @@
       height: 88px;
     }
 
-    .leftContainer {
+    .logsButton {
       display: flex;
 
       span {
         margin-left: 5px;
-        color: $purple;
+        color: $blue;
+      }
+      svg * {
+        fill: $blue;
       }
     }
 
@@ -88,8 +90,8 @@
       .control {
         cursor: pointer;
         path {
-          stroke: $purple;
-          fill: $purple;
+          stroke: $blue;
+          fill: $blue;
         }
       }
 
