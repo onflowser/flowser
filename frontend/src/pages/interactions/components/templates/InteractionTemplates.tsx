@@ -1,9 +1,10 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useMemo, useState } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
 import { FlowserIcon } from "../../../../components/icons/Icons";
 import { PrimaryButton } from "../../../../components/buttons/primary-button/PrimaryButton";
 import Input from "../../../../components/input/Input";
+import { SearchInput } from "../../../../components/search-input/SearchInput";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -15,11 +16,23 @@ export function InteractionTemplates(): ReactElement {
 }
 
 function StoredTemplates() {
+  const [searchTerm, setSearchTerm] = useState("");
   const { templates, forkTemplate, removeTemplate } = useInteractionRegistry();
+  const filteredTemplates = useMemo(() => {
+    if (searchTerm === "") {
+      return templates;
+    }
+    return templates.filter((template) => template.name.includes(searchTerm));
+  }, [searchTerm, templates]);
 
   return (
     <div className={classes.storedTemplates}>
-      {templates.map((template) => (
+      <SearchInput
+        placeholder="Search templates..."
+        searchTerm={searchTerm}
+        onChangeSearchTerm={setSearchTerm}
+      />
+      {filteredTemplates.map((template) => (
         <div
           key={template.name}
           onClick={() => forkTemplate(template)}

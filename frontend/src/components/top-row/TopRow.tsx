@@ -25,7 +25,7 @@ export const TopRow: FunctionComponent<{
   return (
     <div className={classes.root}>
       <div className={classes.rightContainer}>
-        <Search className={classes.searchBox} responsive={true} />
+        <Search className={classes.searchBox} />
         {isLoggedIn && (
           <SimpleButton
             className={classes.userButton}

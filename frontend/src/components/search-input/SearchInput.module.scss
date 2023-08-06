@@ -8,7 +8,7 @@
   align-items: center;
   @include fadeInAnimation(0.3s);
 
-  border: #4f5768 1px solid;
+  border: $gray-50 1px solid;
   background: transparent;
   border-radius: 9px;
   padding-left: $spacing-l;
@@ -40,34 +40,16 @@
   & > input {
     flex: 10;
     border: none;
-    margin: $spacing-base + 5px;
+    padding: $spacing-base;
     margin-left: 0;
     background: none;
     outline: none;
-    color: $light-grey;
+    color: $gray-10;
     font-size: $font-size-small;
     padding-left: 0;
 
     &::placeholder {
-      color: #ffffffba;
-    }
-  }
-
-  &.disabled {
-    border: 1px solid $color-not-active-button-text-grey;
-    opacity: 0.5;
-  }
-
-  &.responsive:not(:focus-within) {
-    @media (max-width: 1290px) {
-      border: none !important;
-      border: #4f5768 1px solid;
-      padding: 0;
-
-      & > input {
-        max-width: 0 !important;
-        margin: 0 !important;
-      }
+      color: $gray-20;
     }
   }
 }
