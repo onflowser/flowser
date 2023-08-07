@@ -42,7 +42,7 @@ function EmptyState() {
       return (
         <Callout
           icon="💡"
-          title="Need some help to get started?"
+          title="Cadence scripts"
           description={
             <div>
               <p>
@@ -60,7 +60,7 @@ function EmptyState() {
       return (
         <Callout
           icon="💡"
-          title="Need some help to get started?"
+          title="Cadence transactions"
           description={
             <div>
               <p>
