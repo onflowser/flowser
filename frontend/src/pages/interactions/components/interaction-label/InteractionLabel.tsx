@@ -32,7 +32,7 @@ export function InteractionLabel(props: InteractionLabelProps): ReactElement {
         )}
       </div>
       <SizedBox width={10} inline />
-      <span>{interaction.name}</span>
+      <span className={classes.label}>{interaction.name}</span>
     </div>
   );
 }
