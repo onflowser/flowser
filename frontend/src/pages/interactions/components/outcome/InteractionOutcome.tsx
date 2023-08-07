@@ -87,8 +87,8 @@ function EmptyState() {
                 Flow.
               </p>
               <LineSeparator horizontal />
-              <ExternalLink href="https://developers.flow.com/tutorials/intro" />
-              <ExternalLink href="https://academy.ecdao.org/en/catalog/courses/beginner-cadence" />
+              <ExternalLink href="https://developers.flow.com" />
+              <ExternalLink href="https://academy.ecdao.org" />
             </div>
           }
         />

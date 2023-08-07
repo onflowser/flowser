@@ -21,31 +21,11 @@ import { ExternalLink } from "../../../../components/link/ExternalLink";
 
 export function ExecutionSettings(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
-  const { setFclValue, fclValuesByIdentifier, parsedInteraction } =
-    useInteractionDefinitionManager();
 
   return (
     <div className={classes.root}>
       <div>
-        {parsedInteraction &&
-        parsedInteraction.kind !== InteractionKind.INTERACTION_UNKNOWN ? (
-          <div>
-            <h2>Arguments</h2>
-            <SizedBox height={20} />
-            {parsedInteraction.parameters.length === 0 && <NoArgumentsHelp />}
-          </div>
-        ) : (
-          <UnknownInteractionHelp />
-        )}
-
-        <ParamListBuilder
-          parameters={parsedInteraction?.parameters ?? []}
-          setFclValue={setFclValue}
-          fclValuesByIdentifier={fclValuesByIdentifier}
-        />
-        <SizedBox height={30} />
-        {parsedInteraction?.kind ===
-          InteractionKind.INTERACTION_TRANSACTION && <SigningSettings />}
+        <TopContent />
       </div>
       <div className={classes.bottom}>
         <LoaderButton loadingContent="Executing" onClick={execute}>
@@ -56,15 +36,94 @@ export function ExecutionSettings(): ReactElement {
   );
 }
 
-function UnknownInteractionHelp() {
+function TopContent() {
+  const { setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
+    useInteractionDefinitionManager();
+
+  if (definition.sourceCode === "") {
+    return <EmptyInteractionHelp />;
+  }
+
+  if (!parsedInteraction) {
+    return null;
+  }
+
+  if (parsedInteraction.kind === InteractionKind.INTERACTION_UNKNOWN) {
+    return <UnknownInteractionHelp />;
+  }
+
+  return (
+    <>
+      <div>
+        <h2>Arguments</h2>
+        <SizedBox height={20} />
+        {parsedInteraction.parameters.length === 0 && <NoArgumentsHelp />}
+      </div>
+      <ParamListBuilder
+        parameters={parsedInteraction?.parameters ?? []}
+        setFclValue={setFclValue}
+        fclValuesByIdentifier={fclValuesByIdentifier}
+      />
+      <SizedBox height={30} />
+      {parsedInteraction?.kind === InteractionKind.INTERACTION_TRANSACTION && (
+        <SigningSettings />
+      )}
+    </>
+  );
+}
+
+function EmptyInteractionHelp() {
   return (
     <Callout
       icon="💡"
+      title="Interacting with the blockchain"
+      description={
+        <div>
+          <p>
+            Cadence transactions or scripts are used to interact with the Flow
+            blockchain.
+          </p>
+          <SizedBox height={10} />
+          <p>
+            <b>
+              <ExternalLink
+                inline
+                href="https://developers.flow.com/cadence/language/transactions"
+              >
+                Transactions
+              </ExternalLink>
+            </b>{" "}
+            can be used to trigger state changes, while{" "}
+            <b>
+              <ExternalLink
+                inline
+                href="https://developers.flow.com/tooling/fcl-js/scripts"
+              >
+                scripts
+              </ExternalLink>
+            </b>{" "}
+            are used for reading existing state from the blockchain.
+          </p>
+          <SizedBox height={10} />
+          <p>To learn more about Cadence, check out the resources below.</p>
+          <SizedBox height={10} />
+          <ExternalLink href="https://developers.flow.com/cadence/intro" />
+          <ExternalLink href="https://academy.ecdao.org/en/cadence-by-example" />
+        </div>
+      }
+    />
+  );
+}
+
+function UnknownInteractionHelp() {
+  return (
+    <Callout
+      icon="❓"
       title="Unknown interaction"
       description={
         <div>
           <p>
-            This interaction os neither a transaction or script. To learn more,
+            This interaction is neither a transaction or script. To learn more,
             head over to the official Flow documentation.
           </p>
           <SizedBox height={10} />
