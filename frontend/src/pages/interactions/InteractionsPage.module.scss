@@ -11,6 +11,7 @@
   }
   .interactionTab {
     max-width: 200px;
+    margin-right: $spacing-s;
     .label {
       text-align: left;
     }
@@ -28,6 +29,7 @@
         .code {
           flex: 3;
           background: #272B32;
+          padding-top: $spacing-base;
         }
         .details {
           flex: 1;

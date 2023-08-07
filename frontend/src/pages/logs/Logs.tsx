@@ -248,7 +248,7 @@ function useRelevantLogs(options: {
   const { data: allLogs } = useGetPollingOutputs();
   const emulatorOrWalletLogs = useMemo(
     () =>
-      ([] as any[]).filter((log) =>
+      allLogs.filter((log) =>
         [EMULATOR_PROCESS_ID, DEV_WALLET_PROCESS_ID].includes(log.processId)
       ),
     [allLogs]

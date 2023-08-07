@@ -24,6 +24,9 @@
         &:hover {
           transform: scale(1.1);
         }
+        * {
+          fill: $gray-50;
+        }
       }
     }
   }

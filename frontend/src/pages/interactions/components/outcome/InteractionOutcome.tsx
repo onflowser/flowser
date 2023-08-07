@@ -170,7 +170,12 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
     tabs.push({
       id: resultTabId,
       label: "Result",
-      content: <JsonView name="result" data={{ value: result }} />,
+      content: (
+        // TODO(design-revamp): Consolidate body layout styles
+        <div style={{ padding: 10 }}>
+          <JsonView name="result" data={{ value: result }} />
+        </div>
+      ),
     });
   }
 
