@@ -7,6 +7,9 @@ import Input from "../../../../components/input/Input";
 import { SearchInput } from "../../../../components/search-input/SearchInput";
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
+import { InteractionIcon } from "../interaction-icon/InteractionIcon";
+import { SizedBox } from "../../../../components/sized-box/SizedBox";
+import { InteractionLabel } from "../interaction-label/InteractionLabel";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -44,7 +47,7 @@ function StoredTemplates() {
             [classes.focusedItem]: focusedDefinition?.name === template.name,
           })}
         >
-          <span>{template.name}</span>
+          <InteractionLabel interaction={template} />
           <FlowserIcon.Trash
             className={classes.trash}
             onClick={(e) => {

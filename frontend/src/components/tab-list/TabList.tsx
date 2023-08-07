@@ -5,7 +5,7 @@ import { FlowserIcon } from "../icons/Icons";
 
 export type TabItem = {
   id: string;
-  label: string;
+  label: React.ReactNode | string;
   content: React.ReactNode;
 };
 

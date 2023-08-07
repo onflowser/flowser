@@ -1,0 +1,13 @@
+@import "styles/colors";
+
+.script {
+  * {
+    fill: $blue;
+  }
+}
+
+.transaction {
+  * {
+    fill: $yellow;
+  }
+}

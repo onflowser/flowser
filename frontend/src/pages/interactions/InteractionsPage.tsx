@@ -19,6 +19,8 @@ import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
 import { Spinner } from "../../components/spinner/Spinner";
 import { InteractionOutcome } from "./components/outcome/InteractionOutcome";
 import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
+import { InteractionIcon } from "./components/interaction-icon/InteractionIcon";
+import { InteractionLabel } from "./components/interaction-label/InteractionLabel";
 
 export function InteractionsPage(): ReactElement {
   return (
@@ -50,7 +52,7 @@ function ContentWithProvider() {
 
   const openEditorTabs: TabItem[] = definitions.map((definition) => ({
     id: definition.id,
-    label: definition.name,
+    label: <InteractionLabel interaction={definition} />,
     content: (
       <InteractionDefinitionManagerProvider definition={definition}>
         <InteractionOutcomeManagerProvider>

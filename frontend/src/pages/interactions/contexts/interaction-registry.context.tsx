@@ -23,19 +23,19 @@ type InteractionsRegistry = {
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
-export type InteractionDefinition = {
-  id: string;
+export type CoreInteractionDefinition = {
   name: string;
   sourceCode: string;
+};
+
+export type InteractionDefinition = CoreInteractionDefinition & {
+  id: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;
   initialOutcome: FlowInteractionOutcome | undefined;
   transactionOptions: TransactionOptions | undefined;
 };
 
-export type InteractionDefinitionTemplate = {
-  // Name acts as ID.
-  name: string;
-  sourceCode: string;
+export type InteractionDefinitionTemplate = CoreInteractionDefinition & {
   fclValuesByIdentifier: FclValueLookupByIdentifier;
   transactionOptions: TransactionOptions | undefined;
   createdDate: Date;
@@ -43,9 +43,7 @@ export type InteractionDefinitionTemplate = {
 };
 
 // Internal structure that's persisted in local storage.
-type RawInteractionDefinitionTemplate = {
-  name: string;
-  sourceCode: string;
+type RawInteractionDefinitionTemplate = CoreInteractionDefinition & {
   fclValuesByIdentifier: Record<string, FclValue>;
   transactionOptions: TransactionOptions | undefined;
   createdDate: string;
