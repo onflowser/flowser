@@ -5,6 +5,7 @@ import { FlowserIcon } from "../../../../components/icons/Icons";
 import { PrimaryButton } from "../../../../components/buttons/primary-button/PrimaryButton";
 import Input from "../../../../components/input/Input";
 import { SearchInput } from "../../../../components/search-input/SearchInput";
+import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -16,6 +17,7 @@ export function InteractionTemplates(): ReactElement {
 }
 
 function StoredTemplates() {
+  const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
   const { templates, forkTemplate, removeTemplate } = useInteractionRegistry();
   const filteredTemplates = useMemo(() => {
@@ -43,7 +45,18 @@ function StoredTemplates() {
             className={classes.trash}
             onClick={(e) => {
               e.stopPropagation();
-              removeTemplate(template);
+              showDialog({
+                title: "Remove template",
+                body: (
+                  <span style={{ textAlign: "center" }}>
+                    Do you wanna permanently remove stored template
+                    {`"${template.name}"`}?
+                  </span>
+                ),
+                confirmButtonLabel: "REMOVE",
+                cancelButtonLabel: "CANCEL",
+                onConfirm: () => removeTemplate(template),
+              });
             }}
           />
         </div>
