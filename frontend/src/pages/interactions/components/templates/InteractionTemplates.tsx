@@ -7,8 +7,6 @@ import Input from "../../../../components/input/Input";
 import { SearchInput } from "../../../../components/search-input/SearchInput";
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
-import { InteractionIcon } from "../interaction-icon/InteractionIcon";
-import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { InteractionLabel } from "../interaction-label/InteractionLabel";
 
 export function InteractionTemplates(): ReactElement {
@@ -48,24 +46,26 @@ function StoredTemplates() {
           })}
         >
           <InteractionLabel interaction={template} />
-          <FlowserIcon.Trash
-            className={classes.trash}
-            onClick={(e) => {
-              e.stopPropagation();
-              showDialog({
-                title: "Remove template",
-                body: (
-                  <span style={{ textAlign: "center" }}>
-                    Do you wanna permanently remove stored template
-                    {`"${template.name}"`}?
-                  </span>
-                ),
-                confirmButtonLabel: "REMOVE",
-                cancelButtonLabel: "CANCEL",
-                onConfirm: () => removeTemplate(template),
-              });
-            }}
-          />
+          {template.isMutable && (
+            <FlowserIcon.Trash
+              className={classes.trash}
+              onClick={(e) => {
+                e.stopPropagation();
+                showDialog({
+                  title: "Remove template",
+                  body: (
+                    <span style={{ textAlign: "center" }}>
+                      Do you wanna permanently remove stored template
+                      {`"${template.name}"`}?
+                    </span>
+                  ),
+                  confirmButtonLabel: "REMOVE",
+                  cancelButtonLabel: "CANCEL",
+                  onConfirm: () => removeTemplate(template),
+                });
+              }}
+            />
+          )}
         </div>
       ))}
     </div>

@@ -40,6 +40,7 @@ export type InteractionDefinitionTemplate = CoreInteractionDefinition & {
   transactionOptions: TransactionOptions | undefined;
   createdDate: Date;
   updatedDate: Date;
+  isMutable: boolean;
 };
 
 // Internal structure that's persisted in local storage.
@@ -73,6 +74,24 @@ export type FlowInteractionOutcome = {
 
 const Context = createContext<InteractionsRegistry>(undefined as never);
 
+const helloWorldScript = `pub fun main(): String {
+  return "Hello World"
+}`;
+
+const helloWorldScriptWithArguments = `pub fun main(a: String, b: String): String {
+  return a.concat(" ").concat(b)
+}`;
+
+const helloWorldTransaction = `transaction() {
+  prepare(signer: AuthAccount) {
+    log("Preparing")
+  }
+  execute {
+    log("Executing")    
+  }
+}
+`;
+
 export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
@@ -88,12 +107,45 @@ export function InteractionRegistryProvider(props: {
       payerAddress: "0xf8d6e0586b0a20c7",
     },
   };
-  const [rawTemplates, setRawTemplates] = useLocalStorage<
+  const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
-  const templates = useMemo(
-    () =>
-      rawTemplates.map(
+  const predefinedTemplates = useMemo<
+    (CoreInteractionDefinition & Partial<InteractionDefinitionTemplate>)[]
+  >(
+    () => [
+      {
+        name: "Hello World script",
+        sourceCode: helloWorldScript,
+      },
+      {
+        name: "Script with arguments",
+        sourceCode: helloWorldScriptWithArguments,
+        fclValuesByIdentifier: new Map([
+          ["a", "Hello"],
+          ["b", "World"],
+        ]),
+      },
+      {
+        name: "Hello World transaction",
+        sourceCode: helloWorldTransaction,
+      },
+    ],
+    []
+  );
+  const templates = useMemo<InteractionDefinitionTemplate[]>(
+    () => [
+      ...predefinedTemplates.map(
+        (template): InteractionDefinitionTemplate => ({
+          createdDate: new Date(),
+          updatedDate: new Date(),
+          fclValuesByIdentifier: new Map(),
+          transactionOptions: undefined,
+          isMutable: false,
+          ...template,
+        })
+      ),
+      ...customTemplates.map(
         (template): InteractionDefinitionTemplate => ({
           ...template,
           createdDate: new Date(template.createdDate),
@@ -101,9 +153,11 @@ export function InteractionRegistryProvider(props: {
           fclValuesByIdentifier: new Map(
             Object.entries(template.fclValuesByIdentifier)
           ),
+          isMutable: true,
         })
       ),
-    [rawTemplates]
+    ],
+    [customTemplates]
   );
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     defaultInteraction,
@@ -141,7 +195,9 @@ export function InteractionRegistryProvider(props: {
     };
 
     setRawTemplates([
-      ...rawTemplates.filter((template) => template.name !== newTemplate.name),
+      ...customTemplates.filter(
+        (template) => template.name !== newTemplate.name
+      ),
       newTemplate,
     ]);
   }

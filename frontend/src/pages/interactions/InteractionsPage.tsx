@@ -87,6 +87,8 @@ function ContentWithProvider() {
             transactionOptions: undefined,
             createdDate: new Date(),
             updatedDate: new Date(),
+            // TODO(feature-interact-screen): This should be defined in the implemented function
+            isMutable: true,
           })
         }
       />
