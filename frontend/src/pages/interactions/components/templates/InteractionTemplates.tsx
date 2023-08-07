@@ -6,6 +6,7 @@ import { PrimaryButton } from "../../../../components/buttons/primary-button/Pri
 import Input from "../../../../components/input/Input";
 import { SearchInput } from "../../../../components/search-input/SearchInput";
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
+import classNames from "classnames";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -19,7 +20,8 @@ export function InteractionTemplates(): ReactElement {
 function StoredTemplates() {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
-  const { templates, forkTemplate, removeTemplate } = useInteractionRegistry();
+  const { templates, forkTemplate, removeTemplate, focusedDefinition } =
+    useInteractionRegistry();
   const filteredTemplates = useMemo(() => {
     if (searchTerm === "") {
       return templates;
@@ -38,7 +40,9 @@ function StoredTemplates() {
         <div
           key={template.name}
           onClick={() => forkTemplate(template)}
-          className={classes.item}
+          className={classNames(classes.item, {
+            [classes.focusedItem]: focusedDefinition?.name === template.name,
+          })}
         >
           <span>{template.name}</span>
           <FlowserIcon.Trash

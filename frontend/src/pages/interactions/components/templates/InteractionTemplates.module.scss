@@ -29,6 +29,14 @@
         }
       }
     }
+    .focusedItem {
+      color: $blue;
+      .trash {
+        * {
+          fill: $blue !important;
+        }
+      }
+    }
   }
 
   .focusedTemplate {
