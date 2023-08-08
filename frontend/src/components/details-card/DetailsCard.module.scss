@@ -14,13 +14,16 @@
     .column {
       display: flex;
       flex-direction: column;
-      row-gap: $spacing-base;
+      row-gap: $spacing-l;
 
       & > div {
         display: flex;
 
         .label {
           margin-right: $spacing-base;
+          width: 100px;
+          overflow-x: hidden;
+          white-space: nowrap;
         }
 
         .value {
