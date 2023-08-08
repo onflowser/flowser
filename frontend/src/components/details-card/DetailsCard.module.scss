@@ -5,11 +5,7 @@
 
   .content {
     display: flex;
-    justify-content: space-evenly;
     column-gap: $spacing-xl;
-
-    margin-bottom: $spacing-l * 1.5;
-    margin-top: $spacing-l * 1.5;
 
     @media (max-width: 800px) {
       flex-direction: column;
@@ -18,11 +14,10 @@
     .column {
       display: flex;
       flex-direction: column;
+      row-gap: $spacing-base;
 
       & > div {
         display: flex;
-        margin-top: $spacing-s * 0.5;
-        margin-bottom: $spacing-s * 0.5;
 
         .label {
           margin-right: $spacing-base;
