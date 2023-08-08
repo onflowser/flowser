@@ -70,6 +70,7 @@ export function InteractionOutcomeManagerProvider(props: {
     if (!parsedInteraction) {
       throw new Error("Interaction not parsed yet");
     }
+    let hasErrors = false;
     const unspecifiedAuthorizers = transactionOptions.authorizerAddresses
       .map((value, index) => ({ value, index }))
       .filter((e) => e.value === "");
@@ -79,6 +80,17 @@ export function InteractionOutcomeManagerProvider(props: {
           .map((e) => e.index + 1)
           .join(", ")}`
       );
+      hasErrors = true;
+    }
+    if (!transactionOptions.proposerAddress) {
+      toast.error("Must specify a proposer");
+      hasErrors = true;
+    }
+    if (!transactionOptions.payerAddress) {
+      toast.error("Must specify a payer");
+      hasErrors = true;
+    }
+    if (hasErrors) {
       return;
     }
     try {
