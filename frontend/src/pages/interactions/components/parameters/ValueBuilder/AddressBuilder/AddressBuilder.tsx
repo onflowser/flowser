@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useState } from "react";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import classes from "./AddressBuilder.module.scss";
 import { CadenceValueBuilder } from "../interface";
 import { useGetPollingAccounts } from "../../../../../../hooks/use-api";
@@ -7,7 +7,7 @@ import { AccountName } from "../../../../../../components/account/name/AccountNa
 import { FlowserIcon } from "../../../../../../components/icons/Icons";
 import classNames from "classnames";
 import { ServiceRegistry } from "../../../../../../services/service-registry";
-import { Account } from "@flowser/shared";
+import { Account, FclValues } from "@flowser/shared";
 import { Spinner } from "../../../../../../components/spinner/Spinner";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
@@ -20,6 +20,18 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
       ),
     [data]
   );
+
+  // TODO(polish): Don't trigger this hook on every rerender
+  //  See: https://www.notion.so/flowser/Looks-like-polling-data-isn-t-properly-mutated-and-doesn-t-retrigger-the-useEffect-call-fb84a35b33fb4e6e8518c11cb30bd14d?pvs=4
+  useEffect(() => {
+    const serviceAddress = "0xf8d6e0586b0a20c7";
+    const defaultAccount =
+      managedAccounts.find((account) => account.address === serviceAddress) ??
+      managedAccounts[0];
+    if (!FclValues.isFclAddressValue(value) && defaultAccount) {
+      setValue(defaultAccount.address);
+    }
+  });
 
   async function createNewAccount() {
     const { walletService } = ServiceRegistry.getInstance();
@@ -61,7 +73,11 @@ function AccountButton(props: AccountButtonProps) {
       >
         <AccountAvatar address={account.address} className={classes.avatar} />
       </div>
-      <AccountName className={classes.accountName} address={account.address} shorten />
+      <AccountName
+        className={classes.accountName}
+        address={account.address}
+        shorten
+      />
     </div>
   );
 }

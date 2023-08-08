@@ -92,14 +92,14 @@ export function useTimeoutPolling<
 
   const data = useMemo(
     () => remapWithMetadata(response?.data, lastPollingTime),
-    [response]
+    [response, lastPollingTime]
   );
 
   useEffect(() => {
     if (data) {
       setTimeoutPolling(props.resourceKey, findMaxTimestamp(response?.data));
     }
-  }, [data]);
+  }, [data, response?.data]);
 
   return {
     data,
