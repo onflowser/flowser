@@ -14,6 +14,6 @@ export function InteractionIcon(props: InteractionIconProps): ReactElement {
     case InteractionKind.INTERACTION_TRANSACTION:
       return <FlowserIcon.Transaction className={classes.transaction} />;
     default:
-      return <span>❓</span>;
+      return <FlowserIcon.QuestionMark className={classes.questionMark} />;
   }
 }

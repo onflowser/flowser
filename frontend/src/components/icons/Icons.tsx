@@ -14,6 +14,7 @@ import { ReactComponent as Search } from "../../assets/icons/search.svg";
 import { ReactComponent as Cancel } from "../../assets/icons/cancel.svg";
 import { ReactComponent as Link } from "../../assets/icons/link.svg";
 import { ReactComponent as Script } from "../../assets/icons/script.svg";
+import { ReactComponent as QuestionMark } from "../../assets/icons/question-mark.svg";
 
 export const FlowserIcon = {
   Account,
@@ -24,6 +25,7 @@ export const FlowserIcon = {
   Star,
   Transaction,
   Script,
+  QuestionMark,
   ArtistPalette,
   CircleArrowLeft,
   Plus,
