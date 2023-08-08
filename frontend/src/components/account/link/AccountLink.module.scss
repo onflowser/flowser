@@ -1,0 +1,8 @@
+@import "styles/colors";
+@import "styles/spacings";
+
+.root {
+  display: flex;
+  align-items: center;
+  column-gap: $spacing-s;
+}

@@ -10,6 +10,7 @@ import { GrcpStatusBadge } from "../../../../../components/status/GrcpStatusBadg
 import { TextUtils } from "../../../../../utils/text-utils";
 import { Transaction } from "@flowser/shared";
 import { NavLink } from "react-router-dom";
+import { AccountLink } from "../../../../../components/account/link/AccountLink";
 
 type TransactionOverviewProps = {
   transaction: Transaction;
@@ -60,38 +61,22 @@ export function TransactionOverview(
     [
       {
         label: "Proposer",
-        value: (
-          <NavLink
-            to={
-              transaction.proposalKey
-                ? `/accounts/details/${transaction.proposalKey.address}`
-                : "#"
-            }
-          >
-            {transaction.proposalKey?.address ?? "-"}
-          </NavLink>
+        value: transaction.proposalKey ? (
+          <AccountLink address={transaction.proposalKey.address} />
+        ) : (
+          <div>-</div>
         ),
       },
       {
         label: "Payer",
-        value: (
-          <NavLink to={`/accounts/details/${transaction.payer}`}>
-            {transaction.payer}
-          </NavLink>
-        ),
+        value: <AccountLink address={transaction.payer} />,
       },
       {
         label: "Authorizers",
         value: (
           <>
-            {transaction.authorizers.map((address: string) => (
-              <NavLink
-                key={address}
-                className={classes.authorizersAddress}
-                to={`/accounts/${address}`}
-              >
-                {address}
-              </NavLink>
+            {transaction.authorizers.map((address) => (
+              <AccountLink key={address} address={address} />
             ))}
           </>
         ),

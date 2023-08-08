@@ -15,6 +15,7 @@ import { ExecutionStatus } from "components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 // TRANSACTIONS TABLE
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
@@ -48,11 +49,7 @@ export const transactionTableColumns = [
     header: () => <Label variant="medium">PAYER</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hash}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </NavLink>
+        <AccountLink address={info.getValue()} />
       </Value>
     ),
   }),

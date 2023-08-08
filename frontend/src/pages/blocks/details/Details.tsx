@@ -27,6 +27,7 @@ import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 type RouteParams = {
   blockId: string;
@@ -52,11 +53,7 @@ const txTableColumns = [
     header: () => <Label variant="medium">PAYER</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hash}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </NavLink>
+        <AccountLink address={info.getValue()} />
       </Value>
     ),
   }),
@@ -64,12 +61,8 @@ const txTableColumns = [
     header: () => <Label variant="medium">PROPOSER</Label>,
     cell: (info) => (
       <Value>
-        {info.getValue() ? (
-          <NavLink
-            to={`/accounts/details/${info.row.original.proposalKey?.address}`}
-          >
-            {info.row.original.proposalKey?.address}
-          </NavLink>
+        {info.row.original.proposalKey ? (
+          <AccountLink address={info.row.original.proposalKey.address} />
         ) : (
           "-"
         )}

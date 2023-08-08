@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect } from "react";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { useNavigation } from "../../../hooks/use-navigation";
-import { NavLink } from "react-router-dom";
 import { useSearch } from "../../../hooks/use-search";
 import { useFilterData } from "../../../hooks/use-filter-data";
 import { useGetPollingAccounts } from "../../../hooks/use-api";
@@ -12,6 +11,7 @@ import { Account } from "@flowser/shared";
 import { TextUtils } from "../../../utils/text-utils";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -21,9 +21,7 @@ const columns = [
     header: () => <Label variant="medium">ADDRESS</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`accounts/details/${info.getValue()}`}>
-          {info.getValue()}
-        </NavLink>
+        <AccountLink address={info.getValue()} />
       </Value>
     ),
   }),
