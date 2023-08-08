@@ -112,11 +112,9 @@ export function InteractionOutcomeManagerProvider(props: {
     } catch (error: unknown) {
       console.log(error);
       if (CommonUtils.isStandardError(error)) {
-        setOutcome({
-          transaction: {
-            error: error.message,
-          },
-        });
+        toast.error(`Unexpected error: ${error.message}`);
+      } else {
+        toast.error("Unexpected error");
       }
     }
   }
@@ -154,11 +152,9 @@ export function InteractionOutcomeManagerProvider(props: {
     } catch (error: unknown) {
       console.error(error);
       if (CommonUtils.isStandardError(error)) {
-        setOutcome({
-          script: {
-            error: error.message,
-          },
-        });
+        toast.error(`Unexpected error: ${error.message}`);
+      } else {
+        toast.error("Unexpected error");
       }
     }
   }
