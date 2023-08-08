@@ -21,6 +21,11 @@ import { ExternalLink } from "../../../../components/link/ExternalLink";
 
 export function ExecutionSettings(): ReactElement {
   const { execute } = useInteractionOutcomeManager();
+  const { parsedInteraction } = useInteractionDefinitionManager();
+
+  const isKnownInteraction =
+    parsedInteraction &&
+    parsedInteraction.kind !== InteractionKind.INTERACTION_UNKNOWN;
 
   return (
     <div className={classes.root}>
@@ -28,7 +33,11 @@ export function ExecutionSettings(): ReactElement {
         <TopContent />
       </div>
       <div className={classes.bottom}>
-        <LoaderButton loadingContent="Executing" onClick={execute}>
+        <LoaderButton
+          loadingContent="Executing"
+          onClick={execute}
+          disabled={!isKnownInteraction}
+        >
           Execute
         </LoaderButton>
       </div>

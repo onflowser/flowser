@@ -11,4 +11,8 @@
   font-weight: bold;
   font-size: $font-size-large;
   border-radius: $border-radius-button;
+  &[disabled] {
+    background: $gray-50;
+    cursor: not-allowed;
+  }
 }
