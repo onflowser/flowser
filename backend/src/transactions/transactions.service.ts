@@ -17,7 +17,7 @@ export class TransactionsService {
   }
 
   async updateStatus(transactionId: string, status: TransactionStatus) {
-    const transaction = await this.findOne(transactionId);
+    const transaction = await this.findOneOrThrow(transactionId);
     transaction.status = status;
     await this.createOrUpdate(transaction);
   }
@@ -65,8 +65,14 @@ export class TransactionsService {
     });
   }
 
-  async findOne(id: string) {
+  async findOneOrThrow(id: string) {
     return this.transactionRepository.findOneOrFail({
+      where: { id },
+    });
+  }
+
+  async findOne(id: string) {
+    return this.transactionRepository.findOne({
       where: { id },
     });
   }
