@@ -283,7 +283,7 @@ export class ProcessorService implements ProjectContextLifecycle {
   private async subscribeToTransactionStatusUpdates(
     transactionId: string
   ): Promise<void> {
-    const unsubscribe = await this.flowGatewayService
+    const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
       .subscribe((newStatus) =>
         this.transactionService.updateStatus(

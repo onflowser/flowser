@@ -132,9 +132,12 @@ type FlowTxStatusCallback = (status: FlowTransactionStatus) => void;
 
 type FlowTxSubscribe = (callback: FlowTxStatusCallback) => FlowTxUnsubscribe;
 
+// https://developers.flow.com/tooling/fcl-js/api#returns-19
 type FlowTxStatusSubscription = {
   subscribe: FlowTxSubscribe;
-  onceSealed: () => void;
+  onceFinalized: () => Promise<void>;
+  onceExecuted: () => Promise<void>;
+  onceSealed: () => Promise<void>;
 };
 
 @Injectable()
