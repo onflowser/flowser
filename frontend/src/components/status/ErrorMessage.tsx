@@ -1,14 +1,14 @@
 import React, { ReactElement } from "react";
-import { CadenceUtils } from "utils/cadence-utils";
 import { JsonView } from "../json-view/JsonView";
+import { FlowUtils } from "../../utils/flow-utils";
 
-export type TransactionErrorMessageProps = {
+export type FlowApiErrorMessageProps = {
   errorMessage: string;
 };
 
-export function TransactionErrorMessage({
+export function FlowApiErrorMessage({
   errorMessage,
-}: TransactionErrorMessageProps): ReactElement {
-  const parsedMessage = CadenceUtils.parseCadenceError(errorMessage);
+}: FlowApiErrorMessageProps): ReactElement {
+  const parsedMessage = FlowUtils.rawApiErrorToObject(errorMessage);
   return <JsonView name="error" data={parsedMessage} />;
 }

@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import { CommonUtils } from "../../utils/common-utils";
 import { ActionDialog } from "../action-dialog/ActionDialog";
-import { TransactionErrorMessage } from "../status/ErrorMessage";
+import { FlowApiErrorMessage } from "../status/ErrorMessage";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 
 export type TransactionDialogProps = {
@@ -105,7 +105,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
     return (
       <Dialog className={classes.dialog} onClose={onClose}>
         <div className={classes.errorRoot} style={{ padding: 0 }}>
-          <TransactionErrorMessage errorMessage={longError} />
+          <FlowApiErrorMessage errorMessage={longError} />
           <div className={classes.actions}>
             <Button
               loading={loading}

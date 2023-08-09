@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { TransactionOverview } from "../../../transactions/details/components/overview/TransactionOverview";
-import { TransactionErrorMessage } from "../../../../components/status/ErrorMessage";
+import { FlowApiErrorMessage } from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
 import classes from "./InteractionOutcome.module.scss";
@@ -122,7 +122,7 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: <TransactionErrorMessage errorMessage={error} />,
+      content: <FlowApiErrorMessage errorMessage={error} />,
     });
   } else {
     tabs.push({
@@ -164,7 +164,7 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: <TransactionErrorMessage errorMessage={error} />,
+      content: <FlowApiErrorMessage errorMessage={error} />,
     });
   } else {
     tabs.push({

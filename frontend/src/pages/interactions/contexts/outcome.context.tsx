@@ -162,9 +162,13 @@ export function InteractionOutcomeManagerProvider(props: {
         },
       });
     } catch (error: unknown) {
-      console.error(error);
+      console.log(error);
       if (CommonUtils.isStandardError(error)) {
-        toast.error(`Unexpected error: ${error.message}`);
+        setOutcome({
+          script: {
+            error: error.toString(),
+          },
+        });
       } else {
         toast.error("Unexpected error");
       }
