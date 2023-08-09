@@ -179,14 +179,18 @@ export class ProjectsService {
       try {
         this.logger.debug(`Entering project context for service: ${i}`);
         await service.onEnterProjectContext(this.currentProject);
-      } catch (e: unknown) {
-        this.logger.debug(
+      } catch (error: unknown) {
+        this.logger.error(
           `Project context initialization failed for service with index: ${i}`,
-          e
+          error
         );
-        throw new InternalServerErrorException(
-          e ?? "Project context initialization failed"
-        );
+        if (error) {
+          throw error;
+        } else {
+          throw new InternalServerErrorException(
+            "Project context initialization failed"
+          );
+        }
       }
     }
 
