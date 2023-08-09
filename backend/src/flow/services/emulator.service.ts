@@ -6,6 +6,7 @@ import {
   Emulator,
   SignatureAlgorithm,
   HashAlgorithm,
+  ProcessOutputSource,
 } from "@flowser/shared";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/project.entity";
@@ -13,7 +14,7 @@ import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { FlowGatewayService } from "./gateway.service";
 import { isDefined, waitForMs } from "../../utils/common-utils";
-import { EventEmitter } from 'node:events';
+import { EventEmitter } from "node:events";
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;
@@ -28,11 +29,14 @@ export type WellKnownAddressesOptions = {
 };
 
 export enum FlowEmulatorEvent {
-  APIS_STARTED = "APIS_STARTED"
+  APIS_STARTED = "APIS_STARTED",
 }
 
 @Injectable()
-export class FlowEmulatorService extends EventEmitter implements ProjectContextLifecycle {
+export class FlowEmulatorService
+  extends EventEmitter
+  implements ProjectContextLifecycle
+{
   public static readonly processId = "emulator";
   private projectContext: ProjectEntity | undefined;
   private process: ManagedProcessEntity | undefined;
@@ -109,8 +113,11 @@ export class FlowEmulatorService extends EventEmitter implements ProjectContextL
       },
     });
     await this.processManagerService.start(this.process);
-    await this.waitUntilApisStarted();
-    this.emit(FlowEmulatorEvent.APIS_STARTED)
+
+    // Resolves if APIs started or throws an error otherwise
+    await Promise.race([this.waitUntilApisStarted(), this.throwIfErrored()]);
+
+    this.emit(FlowEmulatorEvent.APIS_STARTED);
   }
 
   public static getDefaultFlags(): Emulator {
@@ -143,18 +150,45 @@ export class FlowEmulatorService extends EventEmitter implements ProjectContextL
     };
   }
 
+  // Resolves once emulator process emits "Started <API-name>" logs.
   private async waitUntilApisStarted() {
-    // Wait until emulator process emits "Started <API-name>" logs.
     const hasStarted = () => {
       if (!this.process) {
         throw new Error("Process not found");
       }
-      return this.process.output.some((output) =>
-        output.data.includes("Started")
+      return this.process.output.some(
+        (output) =>
+          output.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT &&
+          output.data.includes("Started")
       );
     };
     while (!hasStarted()) {
       await waitForMs(100);
+    }
+  }
+
+  private async throwIfErrored() {
+    const getErrorOutput = () => {
+      if (!this.process) {
+        throw new Error("Process not found");
+      }
+      return this.process.output.find(
+        (output) =>
+          output.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR &&
+          output.data !== ""
+      );
+    };
+    let retries = 5;
+    while (retries >= 0) {
+      const error = getErrorOutput();
+      if (error) {
+        throw new InternalServerErrorException(
+          "Emulator failed to start",
+          error.data
+        );
+      }
+      await waitForMs(100);
+      retries--;
     }
   }
 
@@ -165,7 +199,7 @@ export class FlowEmulatorService extends EventEmitter implements ProjectContextL
       throw new Error("Emulator not found in project context");
     }
 
-    const formatTokenSupply = (tokenSupply: number) => tokenSupply.toFixed(1);
+    const toFixedPoint = (tokenSupply: number) => tokenSupply.toFixed(1);
     const flag = (name: string, userValue: any, defaultValue?: any) => {
       const value = userValue || defaultValue;
       return value ? `--${name}=${value}` : undefined;
@@ -206,10 +240,10 @@ export class FlowEmulatorService extends EventEmitter implements ProjectContextL
       flag("snapshot", emulator.snapshot),
       flag("dbpath", emulator.databasePath),
       flag("simple-addresses", emulator.useSimpleAddresses),
-      flag("token-supply", formatTokenSupply(emulator.tokenSupply)),
+      flag("token-supply", toFixedPoint(emulator.tokenSupply)),
       flag("transaction-expiry", emulator.transactionExpiry),
       flag("storage-limit", emulator.storageLimit),
-      flag("storage-per-flow", emulator.storagePerFlow),
+      flag("storage-per-flow", toFixedPoint(emulator.storagePerFlow)),
       flag("min-account-balance", emulator.minAccountBalance),
       flag("transaction-fees", emulator.transactionFees),
       flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
