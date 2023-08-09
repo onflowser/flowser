@@ -1,5 +1,6 @@
 import React, { ReactElement } from "react";
 import { FlowUtils } from "../../utils/flow-utils";
+import classes from "./ErrorMessage.module.scss";
 
 type ScriptErrorProps = {
   errorMessage: string;
@@ -8,11 +9,13 @@ type ScriptErrorProps = {
 export function ScriptError({ errorMessage }: ScriptErrorProps): ReactElement {
   const parsedMessage = FlowUtils.parseScriptError(errorMessage);
 
-  if (parsedMessage === undefined) {
-    return <pre>{parsedMessage}</pre>;
-  }
-
-  return <pre>{parsedMessage.responseBody.message}</pre>;
+  return (
+    <pre className={classes.root}>
+      {parsedMessage === undefined
+        ? errorMessage
+        : parsedMessage.responseBody.message}
+    </pre>
+  );
 }
 
 type TransactionErrorProps = {
@@ -20,5 +23,5 @@ type TransactionErrorProps = {
 };
 
 export function TransactionError(props: TransactionErrorProps): ReactElement {
-  return <pre>{props.errorMessage}</pre>;
+  return <pre className={classes.root}>{props.errorMessage}</pre>;
 }
