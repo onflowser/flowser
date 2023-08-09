@@ -52,17 +52,19 @@ export function useProjectTimeoutPolling<
   Entity extends PollingEntity,
   Response extends PollingResponse<Entity[]>
 >(props: UseTimeoutPollingProps<Entity, Response>): TimeoutPollingHook<Entity> {
-  const { isInitialLoad, error: initialLoadError } = useGatewayStatus();
+  // TODO(react-query): Temporary disable initial load checks as they are causing issues
+  //  See: https://www.notion.so/flowser/react-query-weird-behavior-d40ea15498b740b6899be3e42cb32945?pvs=4
+  // const { isInitialLoad, error: initialLoadError } = useGatewayStatus();
 
   const timeoutPollingState = useTimeoutPolling<Entity, Response>({
     ...props,
-    enabled: !isInitialLoad,
+    // enabled: !isInitialLoad,
   });
 
   return {
     ...timeoutPollingState,
-    error: initialLoadError || timeoutPollingState.error,
-    firstFetch: isInitialLoad || timeoutPollingState.firstFetch,
+    // error: initialLoadError || timeoutPollingState.error,
+    // firstFetch: timeoutPollingState.firstFetch,
   };
 }
 

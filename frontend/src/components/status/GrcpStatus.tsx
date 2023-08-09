@@ -25,23 +25,9 @@ function GrcpStatusIcon(props: { statusCode: GrcpStatusCode | undefined }) {
   switch (props.statusCode) {
     case GrcpStatusCode.GRCP_STATUS_OK:
       return <SealedIcon />;
-    case GrcpStatusCode.GRCP_STATUS_CANCELLED:
-    case GrcpStatusCode.GRCP_STATUS_INVALID_ARGUMENT:
-    case GrcpStatusCode.GRCP_STATUS_DEADLINE_EXCEEDED:
-    case GrcpStatusCode.GRCP_STATUS_NOT_FOUND:
-    case GrcpStatusCode.GRCP_STATUS_ALREADY_EXISTS:
-    case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
-    case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
-    case GrcpStatusCode.GRCP_STATUS_FAILED_PRECONDITION:
-    case GrcpStatusCode.GRCP_STATUS_ABORTED:
-    case GrcpStatusCode.GRCP_STATUS_OUT_OF_RANGE:
-    case GrcpStatusCode.GRCP_STATUS_UNIMPLEMENTED:
-    case GrcpStatusCode.GRCP_STATUS_INTERNAL:
-    case GrcpStatusCode.GRCP_STATUS_UNAVAILABLE:
-    case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
-    case GrcpStatusCode.GRCP_STATUS_UNAUTHENTICATED:
+    case GrcpStatusCode.GRCP_STATUS_FAILED:
       return <ExpiredIcon />;
-    case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
+    case GrcpStatusCode.UNRECOGNIZED:
     default:
       return <UnknownIcon />;
   }

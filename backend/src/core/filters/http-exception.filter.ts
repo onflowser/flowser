@@ -16,11 +16,30 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     response.status(status).json(
       ErrorResponse.toJSON({
-        error: FlowserError.fromPartial({
-          name: exception.name,
-          message: exception.message,
-        }),
+        error: getFlowserError(exception),
       })
     );
   }
+}
+
+function getFlowserError(exception: HttpException): FlowserError {
+  return {
+    name: exception.name,
+    message: exception.message,
+    description: getDescription(exception),
+  };
+}
+
+function getDescription(exception: HttpException): string {
+  const response = exception.getResponse() as string | Record<string, string>;
+
+  if (typeof response === "object" && "error" in response) {
+    return response.error;
+  }
+
+  if (typeof response === "string") {
+    return response;
+  }
+
+  return "";
 }
