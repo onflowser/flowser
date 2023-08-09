@@ -199,7 +199,7 @@ export class FlowEmulatorService
       throw new Error("Emulator not found in project context");
     }
 
-    const formatTokenSupply = (tokenSupply: number) => tokenSupply.toFixed(1);
+    const toFixedPoint = (tokenSupply: number) => tokenSupply.toFixed(1);
     const flag = (name: string, userValue: any, defaultValue?: any) => {
       const value = userValue || defaultValue;
       return value ? `--${name}=${value}` : undefined;
@@ -240,10 +240,10 @@ export class FlowEmulatorService
       flag("snapshot", emulator.snapshot),
       flag("dbpath", emulator.databasePath),
       flag("simple-addresses", emulator.useSimpleAddresses),
-      flag("token-supply", formatTokenSupply(emulator.tokenSupply)),
+      flag("token-supply", toFixedPoint(emulator.tokenSupply)),
       flag("transaction-expiry", emulator.transactionExpiry),
       flag("storage-limit", emulator.storageLimit),
-      flag("storage-per-flow", emulator.storagePerFlow),
+      flag("storage-per-flow", toFixedPoint(emulator.storagePerFlow)),
       flag("min-account-balance", emulator.minAccountBalance),
       flag("transaction-fees", emulator.transactionFees),
       flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
