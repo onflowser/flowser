@@ -29,24 +29,10 @@ export const GrcpStatusBadge: FunctionComponent<GrcpStatusBadgeProps> = ({
 
 function getBackground(statusCode: GrcpStatusCode | undefined) {
   switch (statusCode) {
-    case GrcpStatusCode.GRCP_STATUS_ABORTED:
-    case GrcpStatusCode.GRCP_STATUS_CANCELLED:
-    case GrcpStatusCode.GRCP_STATUS_UNAVAILABLE:
-    case GrcpStatusCode.GRCP_STATUS_UNAUTHENTICATED:
-    case GrcpStatusCode.GRCP_STATUS_DEADLINE_EXCEEDED:
-    case GrcpStatusCode.GRCP_STATUS_ALREADY_EXISTS:
-    case GrcpStatusCode.GRCP_STATUS_FAILED_PRECONDITION:
-    case GrcpStatusCode.GRCP_STATUS_INVALID_ARGUMENT:
-    case GrcpStatusCode.GRCP_STATUS_OUT_OF_RANGE:
-    case GrcpStatusCode.GRCP_STATUS_INTERNAL:
-    case GrcpStatusCode.GRCP_STATUS_UNIMPLEMENTED:
-    case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
-    case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
-    case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
+    case GrcpStatusCode.GRCP_STATUS_FAILED:
       return "#dd868b";
     case GrcpStatusCode.GRCP_STATUS_OK:
       return "#A2CE8D";
-    case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
     default:
       return "#D0D2D6";
   }
@@ -54,24 +40,10 @@ function getBackground(statusCode: GrcpStatusCode | undefined) {
 
 function getTextColor(statusCode: GrcpStatusCode | undefined) {
   switch (statusCode) {
-    case GrcpStatusCode.GRCP_STATUS_ABORTED:
-    case GrcpStatusCode.GRCP_STATUS_CANCELLED:
-    case GrcpStatusCode.GRCP_STATUS_UNAVAILABLE:
-    case GrcpStatusCode.GRCP_STATUS_UNAUTHENTICATED:
-    case GrcpStatusCode.GRCP_STATUS_DEADLINE_EXCEEDED:
-    case GrcpStatusCode.GRCP_STATUS_ALREADY_EXISTS:
-    case GrcpStatusCode.GRCP_STATUS_FAILED_PRECONDITION:
-    case GrcpStatusCode.GRCP_STATUS_INVALID_ARGUMENT:
-    case GrcpStatusCode.GRCP_STATUS_OUT_OF_RANGE:
-    case GrcpStatusCode.GRCP_STATUS_INTERNAL:
-    case GrcpStatusCode.GRCP_STATUS_UNIMPLEMENTED:
-    case GrcpStatusCode.GRCP_STATUS_DATA_LOSS:
-    case GrcpStatusCode.GRCP_STATUS_PERMISSION_DENIED:
-    case GrcpStatusCode.GRCP_STATUS_RESOURCE_EXHAUSTED:
-      return "#FFFFF";
     case GrcpStatusCode.GRCP_STATUS_OK:
       return "#218300";
-    case GrcpStatusCode.GRCP_STATUS_UNKNOWN:
+    case GrcpStatusCode.GRCP_STATUS_FAILED:
+      return "#FFFFF";
     default:
       return "#D0D2D6";
   }
