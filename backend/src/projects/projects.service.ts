@@ -13,16 +13,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../flow/services/gateway.service";
 import { ProcessorService } from "../data-processing/processor.service";
 import { FlowEmulatorService } from "../flow/services/emulator.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { BlocksService } from "../blocks/blocks.service";
-import { EventsService } from "../events/events.service";
-import { TransactionsService } from "../transactions/transactions.service";
 import { FlowCliService } from "../flow/services/cli.service";
-import { ContractsService } from "../accounts/services/contracts.service";
-import { KeysService } from "../accounts/services/keys.service";
 import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
-import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   DevWallet,
   Gateway,
@@ -77,13 +70,6 @@ export class ProjectsService {
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
-    private accountsService: AccountsService,
-    private accountKeysService: KeysService,
-    private accountStorageService: AccountStorageService,
-    private contractsService: ContractsService,
-    private blocksService: BlocksService,
-    private eventsService: EventsService,
-    private transactionsService: TransactionsService,
     private commonService: CacheRemovalService,
     private flowDevWalletService: FlowDevWalletService,
     private walletService: WalletService,
@@ -191,6 +177,7 @@ export class ProjectsService {
     for (let i = 0; i < this.servicesWithProjectLifecycleContext.length; i++) {
       const service = this.servicesWithProjectLifecycleContext[i];
       try {
+        this.logger.debug(`Entering project context for service: ${i}`);
         await service.onEnterProjectContext(this.currentProject);
       } catch (e: unknown) {
         this.logger.debug(
