@@ -308,8 +308,14 @@ export function useGetProjectStatus(options?: {
   const { refetchInterval = 1000, enabled = true } = options ?? {};
   return useQuery<GetProjectStatusResponse>(
     `/projects/status`,
-    () => projectsService.getStatus(),
-    { refetchInterval, enabled }
+    () => {
+      try {
+        return projectsService.getStatus();
+      } catch (e) {
+        return GetProjectStatusResponse.fromPartial({});
+      }
+    },
+    { refetchInterval: 1000 }
   );
 }
 
