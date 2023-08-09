@@ -4,7 +4,6 @@ import {
   HashAlgorithm,
   SignatureAlgorithm,
   ExecutionStatusCode,
-  Block,
 } from "@flowser/shared";
 
 export class FlowUtils {
