@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 // @ts-ignore
 import * as fcl from "@onflow/fcl";
-// @ts-ignore
-import * as t from "@onflow/types";
 import { toast } from "react-hot-toast";
-import {
-  useGetCurrentProject,
-  useGetPollingAccounts,
-  useGetProjectStatus,
-} from "./use-api";
+import { useGetCurrentProject, useGetPollingProjectStatus } from "./use-api";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "./use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
@@ -40,8 +34,7 @@ function configureFcl(options: {
 export function useFlow() {
   const { track } = useAnalytics();
   const { data } = useGetCurrentProject();
-  const { data: storedAccounts } = useGetPollingAccounts();
-  const { data: projectStatus } = useGetProjectStatus();
+  const { data: projectStatus } = useGetPollingProjectStatus();
   const { project } = data ?? {};
   const [loggedInUser, setLoggedInUser] = useState<{
     loggedIn: null;

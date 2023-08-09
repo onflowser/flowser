@@ -274,7 +274,7 @@ export function useGatewayStatus(): {
 } {
   const [error, setError] = useState<FlowserError | undefined>();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const { data } = useGetProjectStatus();
+  const { data } = useGetPollingProjectStatus();
 
   useEffect(() => {
     if (isInitialLoad) {
@@ -301,11 +301,7 @@ export function useGatewayStatus(): {
   };
 }
 
-export function useGetProjectStatus(options?: {
-  refetchInterval?: number;
-  enabled?: boolean;
-}) {
-  const { refetchInterval = 1000, enabled = true } = options ?? {};
+export function useGetPollingProjectStatus() {
   return useQuery<GetProjectStatusResponse>(
     `/projects/status`,
     () => {
