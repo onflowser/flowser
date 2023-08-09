@@ -1,10 +1,7 @@
 import React, { ReactElement, useState } from "react";
 import classes from "./InteractionsPage.module.scss";
 import { TabList, TabItem } from "../../components/tab-list/TabList";
-import {
-  InteractionRegistryProvider,
-  useInteractionRegistry,
-} from "./contexts/interaction-registry.context";
+import { useInteractionRegistry } from "./contexts/interaction-registry.context";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
 import {
@@ -16,21 +13,11 @@ import { SizedBox } from "../../components/sized-box/SizedBox";
 import { LineSeparator } from "../../components/line-separator/LineSeparator";
 import { ExecutionSettings } from "./components/execution/ExecutionSettings";
 import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
-import { Spinner } from "../../components/spinner/Spinner";
 import { InteractionOutcome } from "./components/outcome/InteractionOutcome";
 import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
-import { InteractionIcon } from "./components/interaction-icon/InteractionIcon";
 import { InteractionLabel } from "./components/interaction-label/InteractionLabel";
 
 export function InteractionsPage(): ReactElement {
-  return (
-    <InteractionRegistryProvider>
-      <ContentWithProvider />
-    </InteractionRegistryProvider>
-  );
-}
-
-function ContentWithProvider() {
   const { definitions, focusedDefinition, remove, setFocused, forkTemplate } =
     useInteractionRegistry();
 

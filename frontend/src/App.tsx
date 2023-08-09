@@ -38,6 +38,7 @@ import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
 import { InteractionsPage } from "./pages/interactions/InteractionsPage";
+import { InteractionRegistryProvider } from "pages/interactions/contexts/interaction-registry.context";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -86,7 +87,9 @@ export const FlowserClientApp = ({
             <UiStateContextProvider>
               <PlatformAdapterProvider {...platformAdapter}>
                 <ProjectProvider>
-                  <FlowserRoutes />
+                  <InteractionRegistryProvider>
+                    <FlowserRoutes />
+                  </InteractionRegistryProvider>
                 </ProjectProvider>
               </PlatformAdapterProvider>
             </UiStateContextProvider>
