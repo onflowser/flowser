@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "entities/accounts.proto";
-import "entities/interactions.proto";
 import "entities/transactions.proto";
 
 message CreateAccountRequest {}
