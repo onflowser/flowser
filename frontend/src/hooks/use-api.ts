@@ -305,6 +305,8 @@ export function useGetPollingProjectStatus() {
   return useQuery<GetProjectStatusResponse>(
     `/projects/status`,
     () => {
+      // TODO(react-query): This is a temporary fix that ensures polling continues
+      //  See: https://www.notion.so/flowser/react-query-stopping-polling-once-it-encounters-an-error-d40ea15498b740b6899be3e42cb32945?pvs=4
       try {
         return projectsService.getStatus();
       } catch (e) {
