@@ -26,7 +26,7 @@ import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
 import { TextUtils } from "../../../utils/text-utils";
 import { FlowUtils } from "../../../utils/flow-utils";
-import { FlowApiErrorMessage } from "../../../components/status/ErrorMessage";
+import { TransactionError } from "../../../components/status/ErrorMessage";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
 import { TransactionOverview } from "./components/overview/TransactionOverview";
@@ -237,9 +237,7 @@ const Details: FunctionComponent = () => {
             label="ERROR"
             value={FlowUtils.getGrcpStatusName(transaction?.status?.grcpStatus)}
           >
-            <FlowApiErrorMessage
-              errorMessage={transaction?.status?.errorMessage}
-            />
+            <TransactionError errorMessage={transaction.status.errorMessage} />
           </DetailsTabItem>
         )}
         <DetailsTabItem label="SCRIPT" value="<>">

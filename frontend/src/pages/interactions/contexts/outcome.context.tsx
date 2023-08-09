@@ -162,7 +162,7 @@ export function InteractionOutcomeManagerProvider(props: {
         },
       });
     } catch (error: unknown) {
-      console.log(error);
+      console.error(error);
       if (CommonUtils.isStandardError(error)) {
         setOutcome({
           script: {

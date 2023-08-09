@@ -7,8 +7,27 @@ import {
 } from "@flowser/shared";
 import { CommonUtils } from "./common-utils";
 
+type FlowScriptError = {
+  hostname: string;
+  path: string;
+  method: string;
+  requestBody: {
+    script: string;
+    arguments: unknown[];
+  };
+  responseBody: {
+    number: string;
+    message: string;
+  };
+  statusCode: number;
+  responseStatusText: string;
+};
+
 export class FlowUtils {
-  static rawApiErrorToObject(errorMessage: string): Record<string, unknown> {
+  // Returned by fcl.script call.
+  // https://developers.flow.com/tooling/fcl-js/api#script
+  // In case the error can't be parsed, it returns `undefined`.
+  static parseScriptError(errorMessage: string): FlowScriptError | undefined {
     function parseKeyValueEntry(entry: string) {
       const targetKeys = [
         "hostname",
@@ -49,7 +68,7 @@ export class FlowUtils {
 
     // If no structured entries are found, fallback to raw error message.
     if (structuredEntries.length === 0) {
-      return { message: errorMessage };
+      return undefined;
     }
 
     return structuredEntries.reduce(
@@ -58,7 +77,7 @@ export class FlowUtils {
         [entry.key]: formatEntryValue(entry.value),
       }),
       {}
-    );
+    ) as FlowScriptError;
   }
 
   static getUserAvatarUrl(address: string): string {

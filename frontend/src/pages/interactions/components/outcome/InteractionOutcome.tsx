@@ -1,7 +1,10 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { TransactionOverview } from "../../../transactions/details/components/overview/TransactionOverview";
-import { FlowApiErrorMessage } from "../../../../components/status/ErrorMessage";
+import {
+  ScriptError,
+  TransactionError,
+} from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
 import classes from "./InteractionOutcome.module.scss";
@@ -110,7 +113,7 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
     if (error && currentTabId !== errorTabId) {
       setCurrentTabId(errorTabId);
     }
-  }, [error, currentTabId]);
+  }, [error]);
 
   if (!data?.transaction) {
     return <SpinnerWithLabel label="Executing" />;
@@ -118,17 +121,28 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
 
   const tabs: TabItem[] = [];
 
+  tabs.push({
+    id: overviewTabId,
+    label: "Overview",
+    content: <TransactionOverview transaction={data.transaction} />,
+  });
+
   if (error) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: <FlowApiErrorMessage errorMessage={error} />,
-    });
-  } else {
-    tabs.push({
-      id: overviewTabId,
-      label: "Overview",
-      content: <TransactionOverview transaction={data.transaction} />,
+      content: (
+        // TODO(design-revamp): Consolidate body layout styles
+        <div style={{ padding: 10 }}>
+          {data.transaction.status?.errorMessage ? (
+            <TransactionError
+              errorMessage={data.transaction.status.errorMessage}
+            />
+          ) : (
+            <pre>{outcome.error}</pre>
+          )}
+        </div>
+      ),
     });
   }
 
@@ -164,7 +178,12 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: <FlowApiErrorMessage errorMessage={error} />,
+      content: (
+        // TODO(design-revamp): Consolidate body layout styles
+        <div style={{ padding: 10 }}>
+          <ScriptError errorMessage={error} />
+        </div>
+      ),
     });
   } else {
     tabs.push({
