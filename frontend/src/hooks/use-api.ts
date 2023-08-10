@@ -252,15 +252,13 @@ export function useCurrentProjectId(): string | undefined {
 export const getCurrentProjectKey = "/projects/current";
 
 export function useGetCurrentProject() {
-  const { data, error, ...rest } = useQuery<GetSingleProjectResponse>(
+  const { data, ...rest } = useQuery<GetSingleProjectResponse | undefined>(
     getCurrentProjectKey,
-    () => projectsService.getCurrentProject()
+    () => projectsService.getCurrentProject().catch(() => undefined)
   );
 
-  // In case there is no current project, 404 error is thrown
   return {
-    data: error ? undefined : data,
-    error,
+    data,
     ...rest,
   };
 }
