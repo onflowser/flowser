@@ -1,7 +1,10 @@
 @import "styles/spacings";
 @import "styles/animations";
+@import "styles/scrollbars";
 
 .root {
+  overflow: scroll;
+  @include hiddenScrollbars();
 
   .content {
     display: flex;

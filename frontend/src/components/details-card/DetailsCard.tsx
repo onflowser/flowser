@@ -4,6 +4,7 @@ import Value from "components/value/Value";
 import React, { FC, ReactElement } from "react";
 import Card from "../card/Card";
 import classes from "./DetailsCard.module.scss";
+import { SizedBox } from "../sized-box/SizedBox";
 
 export type DetailsCardRow = {
   label: ReactElement | string;
@@ -35,6 +36,9 @@ export const DetailsCard: FC<DetailsCardProps> = ({ columns, className }) => {
             ))}
           </div>
         ))}
+        {/* TODO(design-revamp): Avoid this hack */}
+        {/* A hack to add some padding at the end using col-gap */}
+        <SizedBox width={1} />
       </div>
     </Card>
   );
