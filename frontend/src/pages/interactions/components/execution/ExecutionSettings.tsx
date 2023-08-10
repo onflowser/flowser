@@ -231,6 +231,9 @@ function SigningSettings() {
             proposerAddress: proposerAddress as string,
           })
         }
+        addressBuilderOptions={{
+          showManagedAccountsOnly: true,
+        }}
       />
       <SizedBox height={12} />
       <ParamBuilder
@@ -244,6 +247,9 @@ function SigningSettings() {
         setValue={(payerAddress) =>
           setTransactionOptions({ payerAddress: payerAddress as string })
         }
+        addressBuilderOptions={{
+          showManagedAccountsOnly: true,
+        }}
       />
       <AuthorizerSettings />
     </>
@@ -305,6 +311,9 @@ function AuthorizerSettings() {
             })}
             value={proposer}
             setValue={(payerAddress) => setProposerByIndex(payerAddress, index)}
+            addressBuilderOptions={{
+              showManagedAccountsOnly: true,
+            }}
           />
         </>
       ))}

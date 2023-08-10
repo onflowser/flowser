@@ -1,9 +1,10 @@
 import React from "react";
-import { FclValue, Parameter } from "@flowser/shared";
+import { Parameter } from "@flowser/shared";
 import { ReactElement } from "react";
 import { ValueBuilder } from "../ValueBuilder/ValueBuilder";
 import { InteractionParameterBuilder } from "../../../contexts/definition.context";
 import classes from "./ParamBuilder.module.scss";
+import { CadenceValueBuilder } from "../ValueBuilder/interface";
 
 export type ParameterListBuilderProps = InteractionParameterBuilder & {
   parameters: Parameter[];
@@ -27,14 +28,12 @@ export function ParamListBuilder(
   );
 }
 
-export type ParameterBuilderProps = {
+export type ParameterBuilderProps = Omit<CadenceValueBuilder, "type"> & {
   parameter: Parameter;
-  value: FclValue;
-  setValue: (value: FclValue) => void;
 };
 
 export function ParamBuilder(props: ParameterBuilderProps): ReactElement {
-  const { parameter, value, setValue } = props;
+  const { parameter, ...valueBuilderProps } = props;
   if (!parameter.type) {
     throw new Error("Expected parameter.type");
   }
@@ -46,11 +45,7 @@ export function ParamBuilder(props: ParameterBuilderProps): ReactElement {
         {"  "}
         <code className={classes.type}>{parameter.type.rawType}</code>
       </div>
-      <ValueBuilder
-        type={parameter.type}
-        value={value}
-        setValue={(value) => setValue(value)}
-      />
+      <ValueBuilder type={parameter.type} {...valueBuilderProps} />
     </div>
   );
 }

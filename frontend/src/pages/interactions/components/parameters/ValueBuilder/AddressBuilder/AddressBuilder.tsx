@@ -11,13 +11,15 @@ import { Account, FclValues } from "@flowser/shared";
 import { Spinner } from "../../../../../../components/spinner/Spinner";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
-  const { value, setValue } = props;
+  const { value, setValue, addressBuilderOptions } = props;
   const { data, refresh } = useGetPollingAccounts();
   const managedAccounts = useMemo(
     () =>
-      data.filter((account) =>
-        account.keys.some((key) => key.privateKey !== "")
-      ),
+      addressBuilderOptions?.showManagedAccountsOnly
+        ? data.filter((account) =>
+            account.keys.some((key) => key.privateKey !== "")
+          )
+        : data,
     [data]
   );
 
