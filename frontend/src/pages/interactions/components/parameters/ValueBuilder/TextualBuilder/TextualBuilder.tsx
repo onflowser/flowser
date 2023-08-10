@@ -7,11 +7,13 @@ export function TextualBuilder(props: CadenceValueBuilder): ReactElement {
 
   const isInitialised = typeof value === "string";
 
+  // TODO(polish): Don't trigger this hook on every rerender
+  //  See: https://www.notion.so/flowser/Sometimes-arguments-don-t-get-initialized-properly-80c34018155646d08e4da0bc6c977ed9?pvs=4
   useEffect(() => {
     if (!isInitialised) {
       setValue("");
     }
-  }, [isInitialised]);
+  });
 
   if (!isInitialised) {
     return <></>;

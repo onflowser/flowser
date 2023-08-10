@@ -20,11 +20,13 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
     isConstantArray && isFclArray && value.length !== array.size;
   const isInitialized = isFclArray && !isUninitializedConstantArray;
 
+  // TODO(polish): Don't trigger this hook on every rerender
+  //  See: https://www.notion.so/flowser/Sometimes-arguments-don-t-get-initialized-properly-80c34018155646d08e4da0bc6c977ed9?pvs=4
   useEffect(() => {
     if (!isInitialized) {
       setValue(initFclArrayOfSize(isConstantArray ? array.size : 1));
     }
-  }, [isConstantArray, isInitialized]);
+  });
 
   function setElement(index: number, element: FclValue) {
     if (isInitialized) {

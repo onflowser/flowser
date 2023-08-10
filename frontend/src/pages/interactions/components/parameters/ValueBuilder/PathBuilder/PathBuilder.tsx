@@ -13,6 +13,8 @@ export function PathBuilder(props: CadenceValueBuilder): ReactElement {
   const isInitialized = FclValues.isFclPathValue(value);
   const specifiedDomain = getPredefinedDomain(type);
 
+  // TODO(polish): Don't trigger this hook on every rerender
+  //  See: https://www.notion.so/flowser/Sometimes-arguments-don-t-get-initialized-properly-80c34018155646d08e4da0bc6c977ed9?pvs=4
   useEffect(() => {
     if (!isInitialized) {
       setValue({
@@ -20,7 +22,7 @@ export function PathBuilder(props: CadenceValueBuilder): ReactElement {
         identifier: "",
       });
     }
-  }, [isInitialized, specifiedDomain]);
+  });
 
   if (!isInitialized) {
     return <></>;

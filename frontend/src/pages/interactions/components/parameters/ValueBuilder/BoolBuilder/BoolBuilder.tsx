@@ -8,11 +8,13 @@ export function BoolBuilder(props: CadenceValueBuilder): ReactElement {
 
   const isInitialised = FclValues.isFclBoolValue(value);
 
+  // TODO(polish): Don't trigger this hook on every rerender
+  //  See: https://www.notion.so/flowser/Sometimes-arguments-don-t-get-initialized-properly-80c34018155646d08e4da0bc6c977ed9?pvs=4
   useEffect(() => {
     if (!isInitialised) {
       setValue(false);
     }
-  }, [isInitialised]);
+  });
 
   if (!isInitialised) {
     return <></>;
