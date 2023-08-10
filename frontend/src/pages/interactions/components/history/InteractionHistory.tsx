@@ -10,6 +10,7 @@ import { FlowserIcon } from "../../../../components/icons/Icons";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
+import { useInteractionName } from "../../hooks/use-interaction-name";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
@@ -52,31 +53,35 @@ function BlockItem(props: BlockItemProps) {
     // So once a block exists, no transactions can be appended to it.
     pollingInterval: 0,
   });
+  const firstTransaction = data[0];
+
+  const transactionName = useInteractionName({
+    sourceCode: firstTransaction?.script ?? "",
+  });
 
   function onForkAsTemplate() {
-    const transaction = data[0];
-    if (!transaction.proposalKey) {
+    if (!firstTransaction.proposalKey) {
       throw new Error("Expecting proposalKey");
     }
     create({
       id: block.id,
       name: `Tx from block #${block.height}`,
-      sourceCode: transaction.script,
+      sourceCode: firstTransaction.script,
       fclValuesByIdentifier: new Map(
-        transaction.arguments.map((arg) => [
+        firstTransaction.arguments.map((arg) => [
           arg.identifier,
           JSON.parse(arg.valueAsJson),
         ])
       ),
       initialOutcome: {
         transaction: {
-          transactionId: transaction.id,
+          transactionId: firstTransaction.id,
         },
       },
       transactionOptions: {
-        proposerAddress: transaction.proposalKey.address,
-        payerAddress: transaction.payer,
-        authorizerAddresses: transaction.authorizers,
+        proposerAddress: firstTransaction.proposalKey.address,
+        payerAddress: firstTransaction.payer,
+        authorizerAddresses: firstTransaction.authorizers,
       },
     });
     setFocused(block.id);
@@ -92,6 +97,10 @@ function BlockItem(props: BlockItemProps) {
         />
         <SizedBox width={10} />
         <span>#{String(block.height).padStart(3, "0")}</span>
+        <SizedBox width={10} />
+        <FlowserIcon.Transaction className={classes.icon} width={12} />
+        <SizedBox width={10} />
+        <span>{transactionName ?? "Unknown"}</span>
       </div>
       <div className={classes.actions}>
         <FlowserIcon.CircleArrowLeft
