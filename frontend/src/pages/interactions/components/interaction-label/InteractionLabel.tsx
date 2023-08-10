@@ -15,7 +15,7 @@ export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   const { interaction } = props;
 
   const { data } = useGetParsedInteraction({
-    id: interaction.name,
+    id: interaction.id,
     sourceCode: interaction.sourceCode,
   });
 

@@ -96,7 +96,7 @@ export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const defaultInteraction: InteractionDefinition = {
-    name: "First interaction",
+    name: "Your first interaction",
     id: crypto.randomUUID(),
     sourceCode: "",
     fclValuesByIdentifier: new Map(),
@@ -116,12 +116,12 @@ export function InteractionRegistryProvider(props: {
     () => [
       {
         id: "hello-world-script",
-        name: "Hello World script",
+        name: "Hello World",
         sourceCode: helloWorldScript,
       },
       {
         id: "script-with-arguments",
-        name: "Script with arguments",
+        name: "Arguments example",
         sourceCode: helloWorldScriptWithArguments,
         fclValuesByIdentifier: new Map([
           ["a", "Hello"],
@@ -130,7 +130,7 @@ export function InteractionRegistryProvider(props: {
       },
       {
         id: "hello-world-transaction",
-        name: "Hello World transaction",
+        name: "Hello World",
         sourceCode: helloWorldTransaction,
       },
     ],
@@ -215,8 +215,13 @@ export function InteractionRegistryProvider(props: {
       transactionOptions: template.transactionOptions,
       initialOutcome: undefined,
     };
-    setDefinitions([...definitions, definition]);
-    setFocusedInteractionId(definition.id);
+    const isAlreadyOpen = definitions.some(
+      (definition) => definition.id === template.id
+    );
+    if (!isAlreadyOpen) {
+      setDefinitions([...definitions, definition]);
+      setFocusedInteractionId(definition.id);
+    }
   }
 
   function removeTemplate(template: InteractionDefinitionTemplate) {

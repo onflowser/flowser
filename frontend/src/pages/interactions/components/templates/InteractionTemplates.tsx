@@ -33,16 +33,16 @@ function StoredTemplates() {
   return (
     <div className={classes.storedTemplates}>
       <SearchInput
-        placeholder="Search templates..."
+        placeholder="Search interactions ..."
         searchTerm={searchTerm}
         onChangeSearchTerm={setSearchTerm}
       />
       {filteredTemplates.map((template) => (
         <div
-          key={template.name}
+          key={template.id}
           onClick={() => forkTemplate(template)}
           className={classNames(classes.item, {
-            [classes.focusedItem]: focusedDefinition?.name === template.name,
+            [classes.focusedItem]: focusedDefinition?.id === template.id,
           })}
         >
           <InteractionLabel interaction={template} />
