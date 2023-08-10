@@ -239,7 +239,7 @@ func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 		"UInt128",
 		"UInt256",
 		"Fix64",
-		"UFIx64":
+		"UFix64":
 		return CadenceTypeNumeric
 	default:
 		return CadenceTypeUnknown
