@@ -348,8 +348,9 @@ export function useGetFlowserVersion() {
 }
 
 export function useGetParsedInteraction(request: GetParsedInteractionRequest) {
-  return useQuery<GetParsedInteractionResponse>(request.sourceCode, () =>
-    interactionsService.parseInteraction(request)
+  return useQuery<GetParsedInteractionResponse>(
+    `/interactions/parse/${request.sourceCode}`,
+    () => interactionsService.parseInteraction(request)
   );
 }
 

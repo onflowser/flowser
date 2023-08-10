@@ -8,8 +8,7 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
-  useEffect,
-  useState,
+  useMemo,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
 // @ts-ignore FCL types
@@ -24,6 +23,7 @@ import {
 } from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
 import toast from "react-hot-toast";
+import { useQuery } from "react-query";
 
 type InteractionOutcomeManager = {
   outcome: FlowInteractionOutcome | undefined;
@@ -38,31 +38,46 @@ export function InteractionOutcomeManagerProvider(props: {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
   const { walletService } = ServiceRegistry.getInstance();
-  const [outcome, setOutcome] = useState<FlowInteractionOutcome>();
+  const { data, refetch } = useQuery(
+    `/interactions/execute/${JSON.stringify(definition)}`,
+    async () => {
+      if (!definition) {
+        throw new Error("Assertion error: Expected interaction value");
+      }
+      if (!parsedInteraction) {
+        throw new Error("Interaction not parsed yet");
+      }
+      switch (parsedInteraction.kind) {
+        case InteractionKind.INTERACTION_SCRIPT:
+          return executeScript(definition);
+        case InteractionKind.INTERACTION_TRANSACTION:
+          return executeTransaction(definition);
+        default:
+          // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
+          throw new Error(
+            `Can't execute interaction: ${parsedInteraction.kind}`
+          );
+      }
+    },
+    {
+      // Prevent automatic fetching when cache key changes.
+      // https://tanstack.com/query/v4/docs/react/guides/disabling-queries
+      enabled: false,
+    }
+  );
 
-  useEffect(() => {
-    setOutcome(definition.initialOutcome);
-  }, [definition]);
+  const outcome = useMemo(
+    () => data ?? definition.initialOutcome,
+    [definition, data]
+  );
 
   async function execute() {
-    if (!definition) {
-      throw new Error("Assertion error: Expected interaction value");
-    }
-    if (!parsedInteraction) {
-      throw new Error("Interaction not parsed yet");
-    }
-    switch (parsedInteraction.kind) {
-      case InteractionKind.INTERACTION_SCRIPT:
-        return executeScript(definition);
-      case InteractionKind.INTERACTION_TRANSACTION:
-        return executeTransaction(definition);
-      default:
-        // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
-        throw new Error(`Can't execute interaction: ${parsedInteraction.kind}`);
-    }
+    await refetch();
   }
 
-  async function executeTransaction(definition: InteractionDefinition) {
+  async function executeTransaction(
+    definition: InteractionDefinition
+  ): Promise<FlowInteractionOutcome | undefined> {
     const { transactionOptions } = definition;
     if (!transactionOptions) {
       throw new Error("Transaction options must be set");
@@ -91,10 +106,9 @@ export function InteractionOutcomeManagerProvider(props: {
       hasErrors = true;
     }
     if (hasErrors) {
-      return;
+      return undefined;
     }
     try {
-      setOutcome({});
       const result = await walletService.sendTransaction({
         cadence: definition.sourceCode,
         authorizerAddresses: transactionOptions.authorizerAddresses,
@@ -116,11 +130,11 @@ export function InteractionOutcomeManagerProvider(props: {
           }
         ),
       });
-      setOutcome({
+      return {
         transaction: {
           transactionId: result.transactionId,
         },
-      });
+      };
     } catch (error: unknown) {
       console.log(error);
       if (CommonUtils.isStandardError(error)) {
@@ -128,12 +142,12 @@ export function InteractionOutcomeManagerProvider(props: {
       } else {
         toast.error("Unexpected error");
       }
+      return undefined;
     }
   }
 
   async function executeScript(definition: InteractionDefinition) {
     try {
-      setOutcome({});
       const result = await fcl.query({
         cadence: definition.sourceCode,
         args: (arg: FclArgBuilder, t: FclTypeLookup) => {
@@ -156,21 +170,22 @@ export function InteractionOutcomeManagerProvider(props: {
           return argumentFunction(arg, t);
         },
       });
-      setOutcome({
+      return {
         script: {
           result,
         },
-      });
+      };
     } catch (error: unknown) {
       console.error(error);
       if (CommonUtils.isStandardError(error)) {
-        setOutcome({
+        return {
           script: {
             error: error.toString(),
           },
-        });
+        };
       } else {
         toast.error("Unexpected error");
+        return undefined;
       }
     }
   }
