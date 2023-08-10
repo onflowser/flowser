@@ -56,7 +56,7 @@ function BlockItem(props: BlockItemProps) {
   const firstTransaction = data[0];
 
   const transactionName = useInteractionName({
-    sourceCode: firstTransaction?.script ?? "",
+    sourceCode: firstTransaction?.script,
   });
 
   function onForkAsTemplate() {
@@ -97,10 +97,14 @@ function BlockItem(props: BlockItemProps) {
         />
         <SizedBox width={10} />
         <span>#{String(block.height).padStart(3, "0")}</span>
-        <SizedBox width={10} />
-        <FlowserIcon.Transaction className={classes.icon} width={12} />
-        <SizedBox width={10} />
-        <span>{transactionName ?? "Unknown"}</span>
+        {firstTransaction && (
+          <>
+            <SizedBox width={10} />
+            <FlowserIcon.Transaction className={classes.icon} width={12} />
+            <SizedBox width={10} />
+            <span>{transactionName ?? "Unknown"}</span>
+          </>
+        )}
       </div>
       <div className={classes.actions}>
         <FlowserIcon.CircleArrowLeft

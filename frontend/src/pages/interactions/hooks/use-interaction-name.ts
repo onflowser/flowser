@@ -2,7 +2,7 @@ import { useInteractionRegistry } from "../contexts/interaction-registry.context
 import { useMemo } from "react";
 
 type UseInteractionNameProps = {
-  sourceCode: string;
+  sourceCode: string | undefined;
 };
 
 export function useInteractionName(
