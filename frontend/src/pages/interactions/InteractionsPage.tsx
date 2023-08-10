@@ -68,6 +68,7 @@ export function InteractionsPage(): ReactElement {
         onClose={(tab) => remove(tab.id)}
         onAddNew={() =>
           forkTemplate({
+            id: crypto.randomUUID(),
             name: "New interaction",
             sourceCode: "",
             fclValuesByIdentifier: new Map(),

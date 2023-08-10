@@ -347,11 +347,28 @@ export function useGetFlowserVersion() {
   );
 }
 
-export function useGetParsedInteraction(request: GetParsedInteractionRequest) {
-  return useQuery<GetParsedInteractionResponse>(
-    `/interactions/parse/${request.sourceCode}`,
+type UseGetParsedInteractionRequest = {
+  // Used as a cache key.
+  id: string;
+  sourceCode: string;
+};
+
+export function useGetParsedInteraction(
+  request: UseGetParsedInteractionRequest
+) {
+  // We are not using `sourceCode` as the cache key,
+  // to avoid the flickering UI effect that's caused
+  // by undefined parsed interaction every time the source code changes.
+  const queryState = useQuery<GetParsedInteractionResponse>(
+    `/interactions/parse/${request.id}`,
     () => interactionsService.parseInteraction(request)
   );
+
+  useEffect(() => {
+    queryState.refetch();
+  }, [request.sourceCode]);
+
+  return queryState;
 }
 
 export function useGetFlowCliInfo() {

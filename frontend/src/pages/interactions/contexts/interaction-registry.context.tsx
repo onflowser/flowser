@@ -24,12 +24,12 @@ type InteractionsRegistry = {
 };
 
 export type CoreInteractionDefinition = {
+  id: string;
   name: string;
   sourceCode: string;
 };
 
 export type InteractionDefinition = CoreInteractionDefinition & {
-  id: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;
   initialOutcome: FlowInteractionOutcome | undefined;
   transactionOptions: TransactionOptions | undefined;
@@ -115,10 +115,12 @@ export function InteractionRegistryProvider(props: {
   >(
     () => [
       {
+        id: "hello-world-script",
         name: "Hello World script",
         sourceCode: helloWorldScript,
       },
       {
+        id: "script-with-arguments",
         name: "Script with arguments",
         sourceCode: helloWorldScriptWithArguments,
         fclValuesByIdentifier: new Map([
@@ -127,6 +129,7 @@ export function InteractionRegistryProvider(props: {
         ]),
       },
       {
+        id: "hello-world-transaction",
         name: "Hello World transaction",
         sourceCode: helloWorldTransaction,
       },
@@ -184,6 +187,7 @@ export function InteractionRegistryProvider(props: {
     const interaction = getById(interactionId);
 
     const newTemplate: RawInteractionDefinitionTemplate = {
+      id: interaction.name,
       name: interaction.name,
       sourceCode: interaction.sourceCode,
       fclValuesByIdentifier: Object.fromEntries(
@@ -204,7 +208,7 @@ export function InteractionRegistryProvider(props: {
 
   function forkTemplate(template: InteractionDefinitionTemplate) {
     const definition: InteractionDefinition = {
-      id: crypto.randomUUID(),
+      id: template.id,
       name: template.name,
       sourceCode: template.sourceCode,
       fclValuesByIdentifier: template.fclValuesByIdentifier,

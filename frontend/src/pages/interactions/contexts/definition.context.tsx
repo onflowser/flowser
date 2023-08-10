@@ -35,6 +35,7 @@ export function InteractionDefinitionManagerProvider(props: {
   const { definition } = props;
   const { update } = useInteractionRegistry();
   const { data, isLoading } = useGetParsedInteraction({
+    id: definition.id,
     sourceCode: definition.sourceCode,
   });
   const fclValuesByIdentifier = definition.fclValuesByIdentifier;
