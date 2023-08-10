@@ -20,17 +20,25 @@
   width: 100%;
   margin-bottom: $spacing-base;
   .info {
+    width: 90%;
     display: flex;
     align-items: center;
     cursor: pointer;
     color: $gray-20;
     @include whitenOnHover();
+    .transactionName {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .icon * {
       fill: $gray-20;
     }
   }
   .actions {
+    display: flex;
+    align-items: center;
     .checkout {
       cursor: pointer;
     }

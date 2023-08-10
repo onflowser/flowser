@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo } from "react";
+import React, { ReactElement } from "react";
 import classes from "./InteractionHistory.module.scss";
 import {
   useGetPollingBlocks,
@@ -102,7 +102,9 @@ function BlockItem(props: BlockItemProps) {
             <SizedBox width={10} />
             <FlowserIcon.Transaction className={classes.icon} width={12} />
             <SizedBox width={10} />
-            <span>{transactionName ?? "Unknown"}</span>
+            <span className={classes.transactionName}>
+              {transactionName ?? "Unknown"}
+            </span>
           </>
         )}
       </div>
