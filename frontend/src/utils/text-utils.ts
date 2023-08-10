@@ -31,7 +31,13 @@ export class TextUtils {
   }
 
   static formatProcessOutput(log: ManagedProcessOutput): string {
-    const convert = new AnsiHtmlConvert();
+    const convert = new AnsiHtmlConvert({
+      // See default colors used:
+      // https://github.com/rburns/ansi-to-html/blob/master/lib/ansi_to_html.js#L12
+      colors: {
+        4: "#9bdefa",
+      },
+    });
     // The msg field in logs can contain escaped ansi codes
     // We need to unescape them so that they can be parsed by ansi-to-html lib
     const unescaped = log.data.replace(/\\x1b/g, "\x1b");
