@@ -5,6 +5,7 @@
   display: flex;
   align-items: center;
   column-gap: $spacing-s;
+  color: transparentize($blue, 0.1);
   .icon * {
     fill: $blue
   }
