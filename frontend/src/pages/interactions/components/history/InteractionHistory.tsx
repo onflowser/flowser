@@ -4,10 +4,6 @@ import {
   useGetPollingBlocks,
   useGetTransactionsByBlock,
 } from "../../../../hooks/use-api";
-import {
-  Timeline,
-  TimelineItem,
-} from "../../../../components/timeline/Timeline";
 import { Block } from "@flowser/shared";
 import { useProjectActions } from "../../../../contexts/project.context";
 import { FlowserIcon } from "../../../../components/icons/Icons";
@@ -19,17 +15,6 @@ export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
   const { checkoutBlock } = useProjectActions();
 
-  const blocksTimeline = useMemo<TimelineItem[]>(
-    () =>
-      blocks.map((block) => ({
-        id: block.id,
-        label: (
-          <BlockItem block={block} onCheckout={() => checkoutBlock(block.id)} />
-        ),
-      })),
-    [blocks]
-  );
-
   if (firstFetch) {
     return (
       <div className={classes.loadingRoot}>
@@ -40,7 +25,13 @@ export function InteractionHistory(): ReactElement {
 
   return (
     <div className={classes.root}>
-      <Timeline items={blocksTimeline} />
+      {blocks.map((block) => (
+        <BlockItem
+          key={block.id}
+          block={block}
+          onCheckout={() => checkoutBlock(block.id)}
+        />
+      ))}
     </div>
   );
 }
@@ -94,7 +85,11 @@ function BlockItem(props: BlockItemProps) {
   return (
     <div className={classes.blockItem}>
       <div className={classes.info} onClick={onForkAsTemplate}>
-        <FlowserIcon.Block width={blockIconSize} height={blockIconSize} />
+        <FlowserIcon.Block
+          className={classes.icon}
+          width={blockIconSize}
+          height={blockIconSize}
+        />
         <SizedBox width={10} />
         <span>#{String(block.height).padStart(3, "0")}</span>
       </div>
