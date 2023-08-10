@@ -20,6 +20,19 @@ import { Callout } from "../../../../components/callout/Callout";
 import { ExternalLink } from "../../../../components/link/ExternalLink";
 
 export function ExecutionSettings(): ReactElement {
+  return (
+    <div className={classes.root}>
+      <div>
+        <TopContent />
+      </div>
+      <div className={classes.bottom}>
+        <ExecuteButton />
+      </div>
+    </div>
+  );
+}
+
+function ExecuteButton() {
   const { execute } = useInteractionOutcomeManager();
   const { parsedInteraction } = useInteractionDefinitionManager();
 
@@ -28,20 +41,13 @@ export function ExecutionSettings(): ReactElement {
     parsedInteraction.kind !== InteractionKind.INTERACTION_UNKNOWN;
 
   return (
-    <div className={classes.root}>
-      <div>
-        <TopContent />
-      </div>
-      <div className={classes.bottom}>
-        <LoaderButton
-          loadingContent="Executing"
-          onClick={execute}
-          disabled={!isKnownInteraction}
-        >
-          Execute
-        </LoaderButton>
-      </div>
-    </div>
+    <LoaderButton
+      loadingContent="Executing"
+      onClick={execute}
+      disabled={!isKnownInteraction}
+    >
+      Execute
+    </LoaderButton>
   );
 }
 
@@ -53,11 +59,7 @@ function TopContent() {
     return <EmptyInteractionHelp />;
   }
 
-  if (!parsedInteraction) {
-    return null;
-  }
-
-  if (parsedInteraction.kind === InteractionKind.INTERACTION_UNKNOWN) {
+  if (parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN) {
     return <UnknownInteractionHelp />;
   }
 
@@ -66,7 +68,7 @@ function TopContent() {
       <div>
         <h2>Arguments</h2>
         <SizedBox height={20} />
-        {parsedInteraction.parameters.length === 0 && <NoArgumentsHelp />}
+        {parsedInteraction?.parameters.length === 0 && <NoArgumentsHelp />}
       </div>
       <ParamListBuilder
         parameters={parsedInteraction?.parameters ?? []}
