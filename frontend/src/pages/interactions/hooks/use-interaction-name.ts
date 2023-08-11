@@ -8,15 +8,12 @@ type UseInteractionNameProps = {
 export function useInteractionName(
   props: UseInteractionNameProps
 ): string | undefined {
-  const { templates, definitions } = useInteractionRegistry();
+  const { templates } = useInteractionRegistry();
 
   return useMemo(
     () =>
       templates.find((template) => template.sourceCode === props.sourceCode)
-        ?.name ??
-      definitions.find(
-        (definition) => definition.sourceCode === props.sourceCode
-      )?.name,
-    [props.sourceCode, templates, definitions]
+        ?.name,
+    [props.sourceCode, templates]
   );
 }
