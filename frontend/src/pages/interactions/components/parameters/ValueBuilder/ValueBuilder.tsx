@@ -3,7 +3,7 @@ import { CadenceTypeKind } from "@flowser/shared";
 import { ReactElement } from "react";
 import { CadenceValueBuilder } from "./interface";
 import { TextualBuilder } from "./TextualBuilder/TextualBuilder";
-import { NumericBuilder } from "./NumericBuilder/NumericBuilder";
+import { FixedPointNumberBuilder } from "./FixedPointNumberBuilder/FixedPointNumberBuilder";
 import { ArrayBuilder } from "./ArrayBuilder/ArrayBuilder";
 import { AddressBuilder } from "./AddressBuilder/AddressBuilder";
 import { DictionaryBuilder } from "./DictionaryBuilder/DictionaryBuilder";
@@ -13,6 +13,7 @@ import { Callout } from "../../../../../components/callout/Callout";
 import { ExternalLink } from "../../../../../components/link/ExternalLink";
 import { FlowserIcon } from "../../../../../components/icons/Icons";
 import { SizedBox } from "../../../../../components/sized-box/SizedBox";
+import { IntegerNumberBuilder } from "./IntegerNumberBuilder/IntegerNumberBuilder";
 
 export function ValueBuilder(props: CadenceValueBuilder): ReactElement {
   const { type } = props;
@@ -21,8 +22,10 @@ export function ValueBuilder(props: CadenceValueBuilder): ReactElement {
       return <AddressBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_TEXTUAL:
       return <TextualBuilder {...props} />;
-    case CadenceTypeKind.CADENCE_TYPE_NUMERIC:
-      return <NumericBuilder {...props} />;
+    case CadenceTypeKind.CADENCE_TYPE_INTEGER_NUMBER:
+      return <IntegerNumberBuilder {...props} />;
+    case CadenceTypeKind.CADENCE_TYPE_FIXED_POINT_NUMBER:
+      return <FixedPointNumberBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_ARRAY:
       return <ArrayBuilder {...props} />;
     case CadenceTypeKind.CADENCE_TYPE_DICTIONARY:

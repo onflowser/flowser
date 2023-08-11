@@ -71,7 +71,8 @@ type CadenceTypeKind uint
 
 const (
 	CadenceTypeUnknown CadenceTypeKind = iota
-	CadenceTypeNumeric
+	CadenceTypeFixedPointNumber
+	CadenceTypeIntegerNumber
 	CadenceTypeTextual
 	CadenceTypeBoolean
 	CadenceTypeAddress
@@ -202,6 +203,8 @@ func buildCadenceType(uncastedType ast.Type) *CadenceType {
 }
 
 // TODO: Remove the need for this helper util and use type assertions instead?
+// For a list of all available types, see:
+// https://developers.flow.com/tooling/fcl-js/api#ftype
 func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 	switch t.String() {
 	case "Address":
@@ -218,12 +221,16 @@ func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 		"PublicPath",
 		"PrivatePath":
 		return CadenceTypePath
-	case "Number",
+	case
+		// Bellow are number super-types.
+		// https://developers.flow.com/cadence/language/values-and-types#integers
+		"Number",
 		"SignedNumber",
 		"Integer",
 		"SignedInteger",
 		"FixedPoint",
 		"SignedFixedPoint",
+
 		"Int",
 		"Int8",
 		"Int16",
@@ -237,10 +244,14 @@ func getDefaultCadenceTypeKind(t ast.Type) CadenceTypeKind {
 		"UInt32",
 		"UInt64",
 		"UInt128",
-		"UInt256",
-		"Fix64",
+		"UInt256":
+		return CadenceTypeIntegerNumber
+	// We need to treat these ones seperatelly,
+	// because their values are formatted differently ƒrom integers.
+	// See: https://developers.flow.com/tooling/fcl-js/api#ftype
+	case "Fix64",
 		"UFix64":
-		return CadenceTypeNumeric
+		return CadenceTypeFixedPointNumber
 	default:
 		return CadenceTypeUnknown
 	}

@@ -16,7 +16,7 @@ export type FclRequiredValue =
   | FclDictionaryValue
   | FclPathValue
   | FclArrayValue
-  | FclNumericValue
+  | FclIntegerNumberValue
   | FclTextualValue
   | FclBoolValue
   | FclAddressValue;
@@ -27,7 +27,8 @@ export type FclPathValue = { domain: FclPathDomain; identifier: string };
 export type FclArrayValue = FclValue[];
 // Numeric values must be encoded as strings.
 // See: https://github.com/onflow/fcl-js/blob/master/packages/types/WARNINGS.md
-export type FclNumericValue = string;
+export type FclIntegerNumberValue = string;
+export type FclFixedPointNumberValue = `${string}.${string}`;
 export type FclBoolValue = boolean;
 export type FclTextualValue = string;
 export type FclAddressValue = `0x${string}`;
@@ -40,6 +41,8 @@ export type FclArgumentWithMetadata = {
 };
 
 export class FclValues {
+  private static readonly decimalNumberPattern = /[0-9]+\.[0-9]+/;
+
   // Builds a list of fcl encoded parameters.
   // See: https://developers.flow.com/tooling/fcl-js/api#argumentfunction
   static getArgumentFunction(fclArguments: FclArgumentWithMetadata[]) {
@@ -59,7 +62,8 @@ export class FclValues {
     cadenceType: CadenceType
   ): unknown {
     switch (cadenceType.kind) {
-      case CadenceTypeKind.CADENCE_TYPE_NUMERIC:
+      case CadenceTypeKind.CADENCE_TYPE_FIXED_POINT_NUMBER:
+      case CadenceTypeKind.CADENCE_TYPE_INTEGER_NUMBER:
       case CadenceTypeKind.CADENCE_TYPE_TEXTUAL:
       case CadenceTypeKind.CADENCE_TYPE_ADDRESS:
       case CadenceTypeKind.CADENCE_TYPE_BOOLEAN:
@@ -103,8 +107,23 @@ export class FclValues {
   static isFclBoolValue(arg: unknown): arg is FclBoolValue {
     return typeof arg === "boolean";
   }
-  static isFclNumericValue(arg: unknown): arg is FclNumericValue {
-    return typeof arg === "string" && arg !== "" && !Number.isNaN(Number(arg));
+  static isFclFixedPointNumberValue(
+    arg: unknown
+  ): arg is FclFixedPointNumberValue {
+    return (
+      typeof arg === "string" &&
+      arg !== "" &&
+      this.decimalNumberPattern.test(arg) &&
+      !Number.isNaN(Number(arg))
+    );
+  }
+  static isFclIntegerNumberValue(arg: unknown): arg is FclIntegerNumberValue {
+    return (
+      typeof arg === "string" &&
+      arg !== "" &&
+      !this.decimalNumberPattern.test(arg) &&
+      !Number.isNaN(Number(arg))
+    );
   }
   static isFclTextualValue(arg: unknown): arg is FclTextualValue {
     return typeof arg === "string";
@@ -117,7 +136,8 @@ export class FclValues {
       this.isFclDictionaryValue(arg) ||
       this.isFclArrayValue(arg) ||
       this.isFclPathValue(arg) ||
-      this.isFclNumericValue(arg) ||
+      this.isFclIntegerNumberValue(arg) ||
+      this.isFclFixedPointNumberValue(arg) ||
       this.isFclTextualValue(arg) ||
       this.isFclAddressValue(arg)
     );
