@@ -9,6 +9,10 @@ import { AddressBuilder } from "./AddressBuilder/AddressBuilder";
 import { DictionaryBuilder } from "./DictionaryBuilder/DictionaryBuilder";
 import { PathBuilder } from "./PathBuilder/PathBuilder";
 import { BoolBuilder } from "./BoolBuilder/BoolBuilder";
+import { Callout } from "../../../../../components/callout/Callout";
+import { ExternalLink } from "../../../../../components/link/ExternalLink";
+import { FlowserIcon } from "../../../../../components/icons/Icons";
+import { SizedBox } from "../../../../../components/sized-box/SizedBox";
 
 export function ValueBuilder(props: CadenceValueBuilder): ReactElement {
   const { type } = props;
@@ -28,6 +32,23 @@ export function ValueBuilder(props: CadenceValueBuilder): ReactElement {
     case CadenceTypeKind.CADENCE_TYPE_BOOLEAN:
       return <BoolBuilder {...props} />;
     default:
-      return <div>Unknown type</div>;
+      return <UnknownType />;
   }
+}
+
+function UnknownType() {
+  return (
+    <Callout
+      icon={<FlowserIcon.QuestionMark width={15} height={15} />}
+      title="Unknown data type"
+      description={
+        <div>
+          <p>This is either a non-existing type or a user-defined one.</p>
+          <p>Check the official Cadence documentation bellow for more info.</p>
+          <SizedBox height={10} />
+          <ExternalLink href="https://developers.flow.com/cadence/language/values-and-types" />
+        </div>
+      }
+    />
+  );
 }
