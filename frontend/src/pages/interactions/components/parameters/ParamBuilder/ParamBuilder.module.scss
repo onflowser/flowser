@@ -1,0 +1,20 @@
+@import "styles/spacings";
+@import "styles/colors";
+
+.paramListRoot {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-base * 2;
+}
+
+.paramRoot {
+  .label {
+    margin-bottom: $spacing-base;
+    .identifier {
+      margin-right: $spacing-s;
+    }
+    .type {
+      color: $gray-10;
+    }
+  }
+}

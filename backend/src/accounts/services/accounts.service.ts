@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountEntity } from "../entities/account.entity";
 import { MoreThan, Repository } from "typeorm";
-import { TransactionEntity } from "../../transactions/transaction.entity";
 import { removeByBlockIds } from "../../blocks/entities/block-context.entity";
 
 type PartialAccountWithPrimaryKey = Pick<AccountEntity, "address"> &
@@ -12,9 +11,7 @@ type PartialAccountWithPrimaryKey = Pick<AccountEntity, "address"> &
 export class AccountsService {
   constructor(
     @InjectRepository(AccountEntity)
-    private accountRepository: Repository<AccountEntity>,
-    @InjectRepository(TransactionEntity)
-    private transactionRepository: Repository<TransactionEntity>
+    private accountRepository: Repository<AccountEntity>
   ) {}
 
   findAll() {

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from "react";
-import Button from "../button/Button";
+import Button from "../buttons/button/Button";
 import { ActionDialog, ActionDialogProps } from "../action-dialog/ActionDialog";
 
 export type ConfirmDialogProps = ActionDialogProps & {

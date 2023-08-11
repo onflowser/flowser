@@ -1,15 +1,14 @@
 @import "styles/spacings";
 @import "styles/animations";
+@import "styles/scrollbars";
 
 .root {
-  padding: $spacing-l $spacing-xl;
-  margin-bottom: $spacing-xl;
+  overflow: scroll;
+  @include hiddenScrollbars();
 
   .content {
     display: flex;
-
-    margin-bottom: $spacing-l * 1.5;
-    margin-top: $spacing-l * 1.5;
+    column-gap: $spacing-xl;
 
     @media (max-width: 800px) {
       flex-direction: column;
@@ -18,38 +17,20 @@
     .column {
       display: flex;
       flex-direction: column;
-
-      &:not(:last-child) {
-        margin-right: $spacing-xl * 3;
-      }
-
-      @media (max-width: 1000px) {
-        margin-right: $spacing-xl !important;
-      }
-
-      @media (max-width: 800px) {
-        margin-right: 0 !important;
-        margin-bottom: $spacing-xl;
-      }
+      row-gap: $spacing-l;
 
       & > div {
         display: flex;
-        margin-top: $spacing-s * 0.5;
-        margin-bottom: $spacing-s * 0.5;
 
         .label {
-          min-width: 130px;
-          display: inline-flex;
+          margin-right: $spacing-base;
+          width: 100px;
+          overflow-x: hidden;
+          white-space: nowrap;
         }
 
         .value {
           font-weight: bold;
-
-          .elipsis {
-            max-width: 13vw;
-            display: inline-block;
-            overflow: hidden;
-          }
         }
       }
     }

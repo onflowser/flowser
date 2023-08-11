@@ -10,7 +10,6 @@ import {
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import Card from "../../../components/card/Card";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import CaretIcon from "../../../components/caret-icon/CaretIcon";
@@ -23,19 +22,15 @@ import { SignableObject } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
-import CopyButton from "../../../components/copy-button/CopyButton";
+import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import { flexRender } from "@tanstack/react-table";
-import ReactTimeAgo from "react-timeago";
-import {
-  DetailsCard,
-  DetailsCardColumn,
-} from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
-import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { FlowUtils } from "../../../utils/flow-utils";
-import { TransactionErrorMessage } from "../../../components/status/ErrorMessage";
+import { TransactionError } from "../../../components/status/ErrorMessage";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
+import { TransactionOverview } from "./components/overview/TransactionOverview";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
 
 type RouteParams = {
   transactionId: string;
@@ -232,109 +227,23 @@ const Details: FunctionComponent = () => {
     return <FullScreenLoading />;
   }
 
-  const detailsColumns: DetailsCardColumn[] = [
-    [
-      {
-        label: "Transaction",
-        value: (
-          <>
-            <MiddleEllipsis className={classes.elipsis}>
-              {transaction.id}
-            </MiddleEllipsis>
-            <ExecutionStatusBadge
-              className={classes.txStatusBadge}
-              status={transaction.status}
-            />
-          </>
-        ),
-      },
-      {
-        label: "API Status",
-        value: <GrcpStatusBadge status={transaction.status} />,
-      },
-      {
-        label: "Created date",
-        value: TextUtils.longDate(transaction.createdAt),
-      },
-      {
-        label: "Block ID",
-        value: (
-          <NavLink to={`/blocks/details/${transaction.blockId}`}>
-            <MiddleEllipsis className={classes.elipsis}>
-              {transaction.blockId}
-            </MiddleEllipsis>
-          </NavLink>
-        ),
-      },
-    ],
-    [
-      {
-        label: "Proposer",
-        value: (
-          <NavLink
-            to={
-              transaction.proposalKey
-                ? `/accounts/details/${transaction.proposalKey.address}`
-                : "#"
-            }
-          >
-            {transaction.proposalKey?.address ?? "-"}
-          </NavLink>
-        ),
-      },
-      {
-        label: "Payer",
-        value: (
-          <NavLink to={`/accounts/details/${transaction.payer}`}>
-            {transaction.payer}
-          </NavLink>
-        ),
-      },
-      {
-        label: "Authorizers",
-        value: (
-          <>
-            {transaction.authorizers.map((address: string) => (
-              <NavLink
-                key={address}
-                className={classes.authorizersAddress}
-                to={`/accounts/${address}`}
-              >
-                {address}
-              </NavLink>
-            ))}
-          </>
-        ),
-      },
-      {
-        label: "Sequence nb.",
-        value: <>{transaction.proposalKey?.sequenceNumber ?? "-"}</>,
-      },
-      {
-        label: "Gas limit",
-        value: `${transaction?.gasLimit}`,
-      },
-    ],
-  ];
-
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns} />
+      <TransactionOverview transaction={transaction} />
+      <SizedBox height={30} />
       <DetailsTabs>
         {transaction?.status?.errorMessage && (
           <DetailsTabItem
             label="ERROR"
             value={FlowUtils.getGrcpStatusName(transaction?.status?.grcpStatus)}
           >
-            <TransactionErrorMessage
-              errorMessage={transaction?.status?.errorMessage}
-            />
+            <TransactionError errorMessage={transaction.status.errorMessage} />
           </DetailsTabItem>
         )}
         <DetailsTabItem label="SCRIPT" value="<>">
           <ContentDetailsScript
             script={transaction.script}
-            args={transaction.args}
+            arguments={transaction.arguments}
           />
         </DetailsTabItem>
         <DetailsTabItem

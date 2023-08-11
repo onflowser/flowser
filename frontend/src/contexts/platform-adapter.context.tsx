@@ -6,11 +6,9 @@ export type PlatformAdapterState = {
   monitoringService?: MonitoringServiceInt;
 };
 
-const PlatformAdapterContext = createContext<PlatformAdapterState>({});
-
-export function usePlatformAdapter(): PlatformAdapterState {
-  return useContext(PlatformAdapterContext);
-}
+const PlatformAdapterContext = createContext<PlatformAdapterState>(
+  undefined as never
+);
 
 export type PlatformAdapterProviderProps = PlatformAdapterState & {
   children: ReactElement;
@@ -25,4 +23,12 @@ export function PlatformAdapterProvider({
       {children}
     </PlatformAdapterContext.Provider>
   );
+}
+
+export function usePlatformAdapter(): PlatformAdapterState {
+  const context = useContext(PlatformAdapterContext);
+  if (!context) {
+    throw new Error("Platform adapter context not found");
+  }
+  return context;
 }

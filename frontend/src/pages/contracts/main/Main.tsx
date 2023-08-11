@@ -11,6 +11,7 @@ import Table from "../../../components/table/Table";
 import { AccountContract } from "@flowser/shared";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import ReactTimeago from "react-timeago";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 // CONTRACTS TABLE
 const columnHelper =
@@ -31,9 +32,7 @@ const columns = [
     header: () => <Label variant="medium">ACCOUNT</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/accounts/details/${info.getValue()}`}>
-          {info.getValue()}
-        </NavLink>
+        <AccountLink address={info.getValue()} />
       </Value>
     ),
   }),

@@ -11,7 +11,7 @@ import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus-round.svg";
 import { ReactComponent as CreateSnapshotIcon } from "../../assets/icons/create-snapshot.svg";
 import { ReactComponent as RestartIcon } from "../../assets/icons/restart.svg";
-import { SimpleButton } from "../simple-button/SimpleButton";
+import { SimpleButton } from "../buttons/simple-button/SimpleButton";
 import {
   useGetCurrentProject,
   useGetPollingProcesses,
@@ -21,13 +21,13 @@ import { useProjectActions } from "../../contexts/project.context";
 import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
-import { UserIcon } from "../user-icon/UserIcon";
+import { LoggedInAccountAvatar } from "../account/avatar/AccountAvatar";
 import { useGetAccountBalance } from "../../hooks/use-account-balance";
 import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
 import { ServiceRegistry } from "../../services/service-registry";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 import { Spinner } from "../spinner/Spinner";
-import { ActionButton } from "../action-button/ActionButton";
+import { ActionButton } from "../buttons/action-button/ActionButton";
 import { useAnalytics } from "../../hooks/use-analytics";
 import { AnalyticEvent } from "../../services/analytics.service";
 
@@ -113,7 +113,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
               onClick={onClickUserProfile}
               title={user?.addr ?? "-"}
               footer={flowBalance}
-              icon={<UserIcon />}
+              icon={<LoggedInAccountAvatar />}
             />
           )}
           {isLoggedIn && (

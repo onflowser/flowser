@@ -30,44 +30,17 @@ export class TextUtils {
     return dateFormat(value, "dS mmm yyyy, hh:MM:ss");
   }
 
-  static highlightLogKeywords(logLine: string): string {
-    const syntax = {
-      blue: [
-        "level",
-        "time",
-        "txID",
-        "blockID",
-        "blockHeight",
-        "address",
-        "msg",
-      ],
-      red: ["error"],
-      yellow: [],
-      green: ["event"],
-      lightGrey: [],
-      darkGrey: [],
-    };
-
-    Object.keys(syntax).forEach((color: string) => {
-      (syntax as any)[color].forEach((keyword: string) => {
-        if (logLine && logLine.replace) {
-          const regStr = `\\b(${keyword})\\b`;
-          const regex = new RegExp(regStr, "g");
-          logLine = logLine.replace(
-            regex,
-            '<span class="' + color + '">$1</span>'
-          );
-        }
-      });
-    });
-    return logLine;
-  }
-
   static formatProcessOutput(log: ManagedProcessOutput): string {
-    const convert = new AnsiHtmlConvert();
+    const convert = new AnsiHtmlConvert({
+      // See default colors used:
+      // https://github.com/rburns/ansi-to-html/blob/master/lib/ansi_to_html.js#L12
+      colors: {
+        4: "#9bdefa",
+      },
+    });
     // The msg field in logs can contain escaped ansi codes
     // We need to unescape them so that they can be parsed by ansi-to-html lib
     const unescaped = log.data.replace(/\\x1b/g, "\x1b");
-    return this.highlightLogKeywords(convert.toHtml(unescaped));
+    return convert.toHtml(unescaped);
   }
 }

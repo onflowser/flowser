@@ -33,6 +33,8 @@ import {
   GetPollingProjectsResponse,
   ServiceStatus,
   FlowserError,
+  GetParsedInteractionRequest,
+  GetParsedInteractionResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -55,6 +57,7 @@ const {
   processesService,
   accountsService,
   snapshotService,
+  interactionsService,
 } = ServiceRegistry.getInstance();
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
@@ -209,24 +212,35 @@ export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
   });
 }
 
-export function useGetPollingTransactionsByBlock(
-  blockId: string
+export function useGetTransactionsByBlock(
+  blockId: string,
+  options?: {
+    pollingInterval?: number;
+  }
 ): TimeoutPollingHook<Transaction> {
   return useTimeoutPolling<Transaction, GetPollingTransactionsResponse>({
-    resourceKey: "/block/transactions/polling",
+    resourceKey: `/block/${blockId}/transactions/polling`,
     fetcher: ({ timestamp }) =>
       transactionsService.getAllByBlockWithPolling({
         blockId,
         timestamp,
       }),
+    interval: options?.pollingInterval,
   });
 }
 
-export function useGetTransaction(transactionId: string) {
+export function useGetTransaction(transactionId: string | undefined) {
   return useQuery<GetSingleTransactionResponse>(
     `/transactions/${transactionId}`,
-    () => transactionsService.getSingle(transactionId),
-    { refetchInterval: 1000 }
+    () =>
+      transactionId
+        ? transactionsService.getSingle(transactionId)
+        : GetSingleTransactionResponse.fromPartial({}),
+    {
+      // Poll until the transaction is found
+      refetchInterval: (data) => (data?.transaction ? false : 500),
+      enabled: Boolean(transactionId),
+    }
   );
 }
 
@@ -238,15 +252,13 @@ export function useCurrentProjectId(): string | undefined {
 export const getCurrentProjectKey = "/projects/current";
 
 export function useGetCurrentProject() {
-  const { data, error, ...rest } = useQuery<GetSingleProjectResponse>(
+  const { data, ...rest } = useQuery<GetSingleProjectResponse | undefined>(
     getCurrentProjectKey,
-    () => projectsService.getCurrentProject()
+    () => projectsService.getCurrentProject().catch(() => undefined)
   );
 
-  // In case there is no current project, 404 error is thrown
   return {
-    data: error ? undefined : data,
-    error,
+    data,
     ...rest,
   };
 }
@@ -333,6 +345,30 @@ export function useGetFlowserVersion() {
   return useQuery<GetFlowserVersionResponse>("/version", () =>
     commonService.getFlowserVersion()
   );
+}
+
+type UseGetParsedInteractionRequest = {
+  // Used as a cache key.
+  id: string;
+  sourceCode: string;
+};
+
+export function useGetParsedInteraction(
+  request: UseGetParsedInteractionRequest
+) {
+  // We are not using `sourceCode` as the cache key,
+  // to avoid the flickering UI effect that's caused
+  // by undefined parsed interaction every time the source code changes.
+  const queryState = useQuery<GetParsedInteractionResponse>(
+    `/interactions/parse/${request.id}`,
+    () => interactionsService.parseInteraction(request)
+  );
+
+  useEffect(() => {
+    queryState.refetch();
+  }, [request.sourceCode]);
+
+  return queryState;
 }
 
 export function useGetFlowCliInfo() {

@@ -4,18 +4,18 @@ import classes from "./ContentDetailsScript.module.scss";
 import Label from "../label/Label";
 import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import Value from "../value/Value";
-import { CadenceObject } from "@flowser/shared";
-import { CadenceUtils } from "../../utils/cadence-utils";
+import { TransactionArgument } from "@flowser/shared";
 import { CadenceEditor } from "../cadence-editor/CadenceEditor";
+import CopyButton from "components/buttons/copy-button/CopyButton";
 
 export type ContentDetailsScriptProps = {
   script: string;
-  args?: CadenceObject[];
+  arguments?: TransactionArgument[];
 };
 
 const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
   script,
-  args,
+  arguments: args,
 }) => {
   return (
     <Card variant="black" className={classes.root}>
@@ -31,19 +31,16 @@ const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
                 <Value className={classes.value}>{`{${index}}`}</Value>
 
                 <Label>TYPE:</Label>
-                <Value className={classes.value}>
-                  {CadenceUtils.getDisplayType(arg)}
-                </Value>
+                <Value className={classes.value}>{arg.type?.rawType}</Value>
 
                 <Label>VALUE:</Label>
                 <Value className={classes.value}>
                   <MiddleEllipsis className={classes.argValue}>
-                    {CadenceUtils.getDisplayValue(arg)}
+                    {arg.valueAsJson}
                   </MiddleEllipsis>
                 </Value>
 
-                {/* FIXME: fix getEventDataValue function */}
-                {/*<CopyButton value={getEventDataValue(arg, true)} />*/}
+                <CopyButton value={arg.valueAsJson} />
               </div>
             ))}
           </div>

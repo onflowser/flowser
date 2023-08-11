@@ -19,15 +19,16 @@ export * from "../generated/api/transactions";
 export * from "../generated/api/flow";
 export * from "../generated/api/snapshots";
 export * from "../generated/api/wallet";
+export * from "../generated/api/interactions";
 
 // Entities
 export * from "../generated/entities/config";
 export * from "../generated/entities/accounts";
 export * from "../generated/entities/blocks";
 export * from "../generated/entities/common";
-export * from "../generated/entities/cadence";
 export * from "../generated/entities/events";
 export * from "../generated/entities/processes";
 export * from "../generated/entities/projects";
 export * from "../generated/entities/transactions";
 export * from "../generated/entities/snapshots";
+export * from "../generated/entities/interactions";

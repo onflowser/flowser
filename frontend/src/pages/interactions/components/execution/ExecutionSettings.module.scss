@@ -1,0 +1,17 @@
+@import 'styles/spacings';
+@import 'styles/typography';
+
+.root {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: $spacing-base;
+  width: 300px;
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+  }
+}

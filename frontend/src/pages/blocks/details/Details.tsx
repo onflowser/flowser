@@ -11,10 +11,7 @@ import {
 } from "../../../components/details-tabs/DetailsTabs";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import Fragment from "../../../components/fragment/Fragment";
-import {
-  useGetBlock,
-  useGetPollingTransactionsByBlock,
-} from "../../../hooks/use-api";
+import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Transaction } from "@flowser/shared";
@@ -29,6 +26,8 @@ import { TextUtils } from "../../../utils/text-utils";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 type RouteParams = {
   blockId: string;
@@ -54,11 +53,7 @@ const txTableColumns = [
     header: () => <Label variant="medium">PAYER</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/accounts/details/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hash}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </NavLink>
+        <AccountLink address={info.getValue()} />
       </Value>
     ),
   }),
@@ -66,12 +61,8 @@ const txTableColumns = [
     header: () => <Label variant="medium">PROPOSER</Label>,
     cell: (info) => (
       <Value>
-        {info.getValue() ? (
-          <NavLink
-            to={`/accounts/details/${info.row.original.proposalKey?.address}`}
-          >
-            {info.row.original.proposalKey?.address}
-          </NavLink>
+        {info.row.original.proposalKey ? (
+          <AccountLink address={info.row.original.proposalKey.address} />
         ) : (
           "-"
         )}
@@ -108,7 +99,7 @@ const Details: FunctionComponent = () => {
 
   const { isLoading, data } = useGetBlock(blockId);
   const { block } = data ?? {};
-  const { data: transactions } = useGetPollingTransactionsByBlock(blockId);
+  const { data: transactions } = useGetTransactionsByBlock(blockId);
 
   useEffect(() => {
     showNavigationDrawer(true);
@@ -145,6 +136,7 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
+      <SizedBox height={30} />
       <DetailsTabs>
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
           <Fragment

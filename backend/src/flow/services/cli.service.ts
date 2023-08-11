@@ -15,6 +15,7 @@ import {
   SignatureAlgorithm,
   signatureAlgorithmToJSON,
 } from "@flowser/shared/dist/src/generated/entities/common";
+import { randomUUID } from "crypto";
 
 export type GenerateKeyOptions = {
   derivationPath?: string;
@@ -97,7 +98,7 @@ export class FlowCliService implements ProjectContextLifecycle {
 
   async initConfig() {
     if (!this.projectContext) {
-      throw new Error("Project context not found")
+      throw new Error("Project context not found");
     }
     const childProcess = new ManagedProcessEntity({
       id: FlowCliService.processId,
@@ -204,14 +205,14 @@ export class FlowCliService implements ProjectContextLifecycle {
       (outputLine) => outputLine.data.length > 0
     );
     if (!lineWithData) {
-      throw new Error("Output line with JSON data not found")
+      throw new Error("Output line with JSON data not found");
     }
     return JSON.parse(lineWithData.data) as Output;
   }
 
   private async runAndGetOutput(options: RunCliCommandOptions) {
     const childProcess = new ManagedProcessEntity({
-      id: options.name.toLowerCase().replace(/ /g, "-"),
+      id: randomUUID(),
       name: options.name,
       command: {
         name: "flow",

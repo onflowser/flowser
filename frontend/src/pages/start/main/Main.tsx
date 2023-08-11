@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
-import IconButton from "../../../components/icon-button/IconButton";
+import IconButton from "../../../components/buttons/icon-button/IconButton";
 // @ts-ignore .png import error
 import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
@@ -26,7 +26,7 @@ import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import { useProjectActions } from "../../../contexts/project.context";
-import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { useAnalytics } from "../../../hooks/use-analytics";
@@ -214,16 +214,15 @@ function ProjectsListContent() {
 
 function AboutContent() {
   const [showAnalyticSettings, setShowAnalyticSettings] = useState(false);
-  const [consentAnalyticsSetting, setConsentAnalyticsSetting] =
-    useAnalyticsConsent();
+  const { isConsented, setIsConsented } = useAnalyticsConsent();
   return (
     <div className={classes.bodyCenter}>
       {showAnalyticSettings && (
         <ConsentDialog
           onClose={() => setShowAnalyticSettings(false)}
-          consent={consentAnalyticsSetting ?? true}
+          consent={isConsented}
           setConsent={(consent) => {
-            setConsentAnalyticsSetting(consent);
+            setIsConsented(consent);
             setShowAnalyticSettings(false);
           }}
         />

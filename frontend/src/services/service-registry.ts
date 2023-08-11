@@ -11,6 +11,8 @@ import { StorageService } from "./storage.service";
 import { TransactionsService } from "./transactions.service";
 import { SnapshotService } from "./snapshots.service";
 import { AnalyticsService } from "./analytics.service";
+import { WalletService } from "./wallet.service";
+import { InteractionsService } from "./interactions.service";
 
 export class ServiceRegistry {
   private static instance: ServiceRegistry | undefined;
@@ -25,6 +27,8 @@ export class ServiceRegistry {
   public transactionsService: TransactionsService;
   public snapshotService: SnapshotService;
   public analyticsService: AnalyticsService;
+  public walletService: WalletService;
+  public interactionsService: InteractionsService;
 
   constructor(private readonly transport: TransportService) {
     this.projectsService = new ProjectsService(transport);
@@ -38,6 +42,8 @@ export class ServiceRegistry {
     this.transactionsService = new TransactionsService(transport);
     this.storageService = new StorageService(transport);
     this.snapshotService = new SnapshotService(transport);
+    this.walletService = new WalletService(transport);
+    this.interactionsService = new InteractionsService(transport);
     this.analyticsService = new AnalyticsService();
   }
 

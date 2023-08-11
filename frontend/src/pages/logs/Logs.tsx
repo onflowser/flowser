@@ -16,16 +16,13 @@ import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
-import {
-  useGetPollingOutputs,
-  useGetPollingProcesses,
-} from "../../hooks/use-api";
+import { useGetPollingOutputs } from "../../hooks/use-api";
 import { ManagedProcessOutput, ProcessOutputSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
-import { SimpleButton } from "../../components/simple-button/SimpleButton";
+import { SimpleButton } from "../../components/buttons/simple-button/SimpleButton";
 import { TextUtils } from "../../utils/text-utils";
-import { CommonUtils } from "../../utils/common-utils";
+import { Callout } from "../../components/callout/Callout";
 
 const SEARCH_CONTEXT_NAME = "logs";
 const EMULATOR_PROCESS_ID = "emulator";
@@ -49,12 +46,6 @@ const Logs: FunctionComponent = () => {
     searchTerm,
     tailSize: 5,
   });
-  const { data: processes } = useGetPollingProcesses();
-  const isCapturingProcessLogs = processes.some(
-    (process) =>
-      CommonUtils.isEmulatorProcess(process) ||
-      CommonUtils.isDevWalletProcess(process)
-  );
   const mouseEvent = useMouseMove(trackMousePosition);
 
   const getDrawerSizeClass = useCallback(() => {
@@ -134,10 +125,6 @@ const Logs: FunctionComponent = () => {
     setTrackMousePosition(false);
   }, []);
 
-  if (!isCapturingProcessLogs) {
-    return null;
-  }
-
   return (
     <div
       className={classNames(classes.root, getDrawerSizeClass())}
@@ -155,7 +142,7 @@ const Logs: FunctionComponent = () => {
         })}
       >
         <SimpleButton
-          className={classes.leftContainer}
+          className={classes.logsButton}
           onClick={() => {
             if (logDrawerSize === "tiny") {
               changeLogDrawerSize("small");
@@ -213,6 +200,7 @@ const Logs: FunctionComponent = () => {
           {logs.map((log) => (
             <LogLine key={log.id} log={log} />
           ))}
+          {logs.length === 0 && <NoLogsHelpBanner />}
         </div>
       )}
     </div>
@@ -232,6 +220,23 @@ function LogLine({ log }: { log: ManagedProcessOutput }) {
       dangerouslySetInnerHTML={{
         __html: TextUtils.formatProcessOutput(log),
       }}
+    />
+  );
+}
+
+function NoLogsHelpBanner() {
+  return (
+    <Callout
+      icon="❓"
+      title="No logs found"
+      description={
+        <div>
+          <p>
+            To view emulator logs within Flowser, you need to enable managed
+            emulator (started by Flowser itself) in project settings.
+          </p>
+        </div>
+      }
     />
   );
 }

@@ -1,0 +1,17 @@
+@import "styles/colors";
+
+.root {
+  display: inline-block;
+  font-size: 14px;
+  overflow: scroll;
+  height: 100%;
+  width: 100%;
+
+  &::-webkit-scrollbar-track {
+    background-color: $code-background;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: $code-background;
+  }
+}

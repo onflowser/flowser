@@ -7,6 +7,7 @@ export const routes = {
   transactions: "/transactions",
   contracts: "/contracts",
   events: "/events",
+  interactions: "/interactions",
   logs: "/logs",
   firstRouteAfterStart: "/accounts",
   project: "/project",

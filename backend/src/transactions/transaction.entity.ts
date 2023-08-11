@@ -5,11 +5,10 @@ import {
   TransactionProposalKey,
   SignableObject,
   TransactionStatus,
+  TransactionArgument,
 } from "@flowser/shared";
-import { FlowCadenceObject } from "../flow/services/gateway.service";
 import { typeOrmProtobufTransformer } from "../utils/common-utils";
 import { AccountEntity } from "../accounts/entities/account.entity";
-import { CadenceUtils } from "../flow/utils/cadence-utils";
 import { BlockContextEntity } from "../blocks/entities/block-context.entity";
 import { PollingEntityInitArguments } from "../utils/type-utils";
 
@@ -44,8 +43,10 @@ export class TransactionEntity
   @Column("simple-array")
   authorizers: string[]; // authorizers account addresses
 
-  @Column("simple-json")
-  args: FlowCadenceObject[];
+  @Column("simple-json", {
+    transformer: typeOrmProtobufTransformer(TransactionArgument)
+  })
+  args: TransactionArgument[];
 
   @Column("simple-json", {
     transformer: typeOrmProtobufTransformer(TransactionProposalKey),
@@ -98,7 +99,7 @@ export class TransactionEntity
       gasLimit: this.gasLimit,
       payer: this.payerAddress,
       authorizers: this.authorizers,
-      args: this.args.map((arg) => CadenceUtils.serializeCadenceObject(arg)),
+      arguments: this.args,
       proposalKey: this.proposalKey,
       envelopeSignatures: this.envelopeSignatures,
       payloadSignatures: this.payloadSignatures,

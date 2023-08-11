@@ -1,0 +1,78 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/scrollbars";
+@import 'styles/rules';
+
+$avatar-size: 30px;
+
+.root {
+  width: 100%;
+  overflow-x: scroll;
+  background: $gray-80;
+  border-radius: $border-radius-input;
+
+  @include hiddenScrollbars();
+
+  .innerWrapper {
+    display: flex;
+    column-gap: $spacing-base;
+    row-gap: $spacing-base;
+    padding: $spacing-base;
+
+    .selectAccountButton {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      color: white;
+      .accountName {
+        color: $gray-10;
+        margin-top: $spacing-s;
+      }
+      .selectedAccount {
+        border-color: $blue !important;
+      }
+      .avatarWrapper {
+        height: $avatar-size;
+        width: $avatar-size;
+        padding: $spacing-s;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        &:hover {
+          border-color: $blue;
+        }
+        .avatar {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+    .newAccountButton {
+      .spinner {
+        border-left-color: $blue;
+      }
+      .avatarWrapper {
+        &:hover {
+          border-color: transparent !important;
+        }
+        .plusIconWrapper {
+          background: white;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          svg {
+            width: 50%;
+            height: 50%;
+            * {
+              fill: $blue;
+            }
+          }
+        }
+      }
+    }
+  }
+}

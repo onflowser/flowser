@@ -1,3 +1,4 @@
+rm -rf ./dist
 rm -rf ./src/generated
 
 mkdir -p ./src/generated

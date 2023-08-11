@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import Dialog from "../dialog/Dialog";
-import Button from "../button/Button";
+import Button from "../buttons/button/Button";
 import classes from "./TransactionDialog.module.scss";
 import { FlowScriptArgument, useFlow } from "../../hooks/use-flow";
 import { toast } from "react-hot-toast";
@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
 import { CommonUtils } from "../../utils/common-utils";
 import { ActionDialog } from "../action-dialog/ActionDialog";
-import { TransactionErrorMessage } from "../status/ErrorMessage";
+import { TransactionError } from "../status/ErrorMessage";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 
 export type TransactionDialogProps = {
@@ -105,7 +105,7 @@ const TransactionDialog: FC<TransactionDialogProps> = ({ show, setShow }) => {
     return (
       <Dialog className={classes.dialog} onClose={onClose}>
         <div className={classes.errorRoot} style={{ padding: 0 }}>
-          <TransactionErrorMessage errorMessage={longError} />
+          <TransactionError errorMessage={longError} />
           <div className={classes.actions}>
             <Button
               loading={loading}

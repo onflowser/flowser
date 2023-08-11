@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+// This must match the structure of go structs in `internal/main.go`.
+
+enum InteractionKind {
+  INTERACTION_UNKNOWN = 0;
+  INTERACTION_SCRIPT = 1;
+  INTERACTION_TRANSACTION = 2;
+}
+
+message Interaction {
+  InteractionKind kind = 1;
+  repeated Parameter parameters = 2;
+  Transaction transaction = 3;
+
+  message Transaction {
+    // Number of authorizers, specified in prepare statement.
+    // https://developers.flow.com/concepts/start-here/transaction-signing
+    int32 authorizer_count = 1;
+  }
+}
+
+message Parameter {
+  string identifier = 1;
+  CadenceType type = 2;
+}
+
+enum CadenceTypeKind {
+  CADENCE_TYPE_UNKNOWN = 0;
+  CADENCE_TYPE_FIXED_POINT_NUMBER = 1;
+  CADENCE_TYPE_INTEGER_NUMBER = 2;
+  CADENCE_TYPE_TEXTUAL = 3;
+  CADENCE_TYPE_BOOLEAN = 4;
+  CADENCE_TYPE_ADDRESS = 5;
+  CADENCE_TYPE_ARRAY = 6;
+  CADENCE_TYPE_DICTIONARY = 7;
+  CADENCE_TYPE_PATH = 8;
+}
+
+message CadenceType {
+  CadenceTypeKind kind = 1;
+  string raw_type = 2;
+  bool optional = 3;
+
+  Array array = 4;
+  Dictionary dictionary = 5;
+
+  message Array {
+    CadenceType element = 1;
+    int32 size = 2;
+  }
+
+  message Dictionary {
+    CadenceType key = 1;
+    CadenceType value = 2;
+  }
+}

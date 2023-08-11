@@ -6,7 +6,14 @@ import {
 import * as http from "http";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/project.entity";
-import { Gateway, ServiceStatus } from "@flowser/shared";
+import {
+  FclArgBuilder,
+  FclArgumentWithMetadata,
+  FclTypeLookup,
+  FclValues,
+  Gateway,
+  ServiceStatus,
+} from "@flowser/shared";
 
 const fcl = require("@onflow/fcl");
 
@@ -55,12 +62,10 @@ export type FlowCollection = {
   transactionIds: string[];
 };
 
-export type FlowCadenceObject = {
-  type: string; // See CadenceType
-  value: string | FlowCadenceObject | FlowCadenceObject[];
-  // Each object can contain other type-specific attributes
-  // Refer to: https://github.com/onflow/cadence/blob/master/values.go
-  [key: string]: unknown;
+export type FlowTypeAnnotatedValue = {
+  // https://developers.flow.com/tooling/fcl-js/api#ftype
+  type: string;
+  value: Record<string, any>;
 };
 
 // https://docs.onflow.org/fcl/reference/api/#proposalkeyobject
@@ -89,7 +94,7 @@ export type FlowTransactionStatus = {
 export type FlowTransaction = {
   id: string;
   script: string;
-  args: FlowCadenceObject[];
+  args: FlowTypeAnnotatedValue[];
   referenceBlockId: string;
   gasLimit: number;
   proposalKey: FlowProposalKey;
@@ -118,6 +123,7 @@ type SendFlowTransactionOptions = {
   proposer: FlowAuthorizationFunction;
   payer: FlowAuthorizationFunction;
   authorizations: FlowAuthorizationFunction[];
+  arguments: FclArgumentWithMetadata[];
 };
 
 type FlowTxUnsubscribe = () => void;
@@ -126,9 +132,12 @@ type FlowTxStatusCallback = (status: FlowTransactionStatus) => void;
 
 type FlowTxSubscribe = (callback: FlowTxStatusCallback) => FlowTxUnsubscribe;
 
+// https://developers.flow.com/tooling/fcl-js/api#returns-19
 type FlowTxStatusSubscription = {
   subscribe: FlowTxSubscribe;
-  onceSealed: () => void;
+  onceFinalized: () => Promise<void>;
+  onceExecuted: () => Promise<void>;
+  onceSealed: () => Promise<void>;
 };
 
 @Injectable()
@@ -153,13 +162,20 @@ export class FlowGatewayService implements ProjectContextLifecycle {
 
   /**
    * Sends the transaction and returns the transaction ID.
+   *
+   * https://developers.flow.com/tooling/fcl-js/transactions
    */
   public async sendTransaction(
     options: SendFlowTransactionOptions
   ): Promise<{ transactionId: string }> {
     const transactionId = await fcl.mutate({
       cadence: options.cadence,
-      args: (_arg: unknown, _t: unknown) => [],
+      args: (arg: FclArgBuilder, t: FclTypeLookup) => {
+        const argumentFunction = FclValues.getArgumentFunction(
+          options.arguments
+        );
+        return argumentFunction(arg, t);
+      },
       proposer: options.proposer,
       authorizations: options.authorizations,
       payer: options.payer,

@@ -1,22 +1,29 @@
-import { LocalStorageState, useLocalStorage } from "./use-local-storage";
 import { useEffect } from "react";
 import { ServiceRegistry } from "../services/service-registry";
+import { useLocalStorage } from "usehooks-ts";
 
-export function useAnalyticsConsent(): LocalStorageState<boolean> {
+type AnalyticsConsent = {
+  setIsConsented: (isConsented: boolean) => void;
+  isConsented: boolean;
+};
+
+export function useAnalyticsConsent(): AnalyticsConsent {
   const { analyticsService } = ServiceRegistry.getInstance();
-  const storedSetting = useLocalStorage<boolean>({
-    key: "consent-analytics",
-  });
-
-  const [consent] = storedSetting;
+  const [isConsented, setIsConsented] = useLocalStorage<boolean>(
+    "consent-analytics",
+    false
+  );
 
   useEffect(() => {
-    if (consent) {
+    if (isConsented) {
       analyticsService.enable();
     } else {
       analyticsService.disable();
     }
-  }, [consent]);
+  }, [isConsented]);
 
-  return storedSetting;
+  return {
+    isConsented,
+    setIsConsented,
+  };
 }

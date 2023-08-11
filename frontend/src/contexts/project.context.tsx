@@ -3,7 +3,6 @@ import React, {
   ReactElement,
   useCallback,
   useContext,
-  useEffect,
   useState,
   useMemo,
 } from "react";
@@ -60,7 +59,7 @@ export function ProjectProvider({
   const { data: currentProject, refetch: refetchCurrentProject } =
     useGetCurrentProject();
   const { isLoggedIn, logout } = useFlow();
-  const { data: blocks, refetchBlocks } = useGetPollingBlocks();
+  const { data: blocks, refresh } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
@@ -178,7 +177,7 @@ export function ProjectProvider({
           blockId: snapshot.blockId,
           projectId: currentProject.project.id,
         });
-        refetchBlocks();
+        refresh();
         toast.success(
           `Moved to block: ${FlowUtils.getShortedBlockId(snapshot.blockId)}`
         );
@@ -219,7 +218,7 @@ export function ProjectProvider({
         await snapshotService.rollback({
           blockHeight: targetBlock.height,
         });
-        refetchBlocks();
+        refresh();
         toast.success(
           `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock.id)}`
         );

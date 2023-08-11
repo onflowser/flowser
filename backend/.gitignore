@@ -52,3 +52,4 @@ src/app/homepage/pages/**/*.html
 *.sqlite
 
 openapi.json
+src/interactions/bin

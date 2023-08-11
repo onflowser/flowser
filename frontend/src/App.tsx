@@ -22,7 +22,6 @@ import Blocks from "./pages/blocks/Blocks";
 import Transactions from "./pages/transactions/Transactions";
 import Contracts from "./pages/contracts/Contracts";
 import Events from "./pages/events/Events";
-import Logs from "./pages/logs/Logs";
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
@@ -38,6 +37,8 @@ import { ConsentDialog } from "./components/consent-dialog/ConsentDialog";
 import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
+import { InteractionsPage } from "./pages/interactions/InteractionsPage";
+import { InteractionRegistryProvider } from "pages/interactions/contexts/interaction-registry.context";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -70,7 +71,7 @@ const BrowserRouterEvents = withRouter(
 );
 
 export type FlowserClientAppProps = {
-  platformAdapter?: PlatformAdapterState;
+  platformAdapter: PlatformAdapterState;
   enableTimeoutPolling?: boolean;
 };
 
@@ -83,13 +84,15 @@ export const FlowserClientApp = ({
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <BrowserRouter>
           <ConfirmDialogProvider>
-            <ProjectProvider>
-              <UiStateContextProvider>
-                <PlatformAdapterProvider {...platformAdapter}>
-                  <FlowserRoutes />
-                </PlatformAdapterProvider>
-              </UiStateContextProvider>
-            </ProjectProvider>
+            <UiStateContextProvider>
+              <PlatformAdapterProvider {...platformAdapter}>
+                <ProjectProvider>
+                  <InteractionRegistryProvider>
+                    <FlowserRoutes />
+                  </InteractionRegistryProvider>
+                </ProjectProvider>
+              </PlatformAdapterProvider>
+            </UiStateContextProvider>
           </ConfirmDialogProvider>
         </BrowserRouter>
       </TimeoutPollingProvider>
@@ -109,7 +112,10 @@ export const FlowserRoutes = (): ReactElement => {
         <RouteWithLayout path={routes.transactions} component={Transactions} />
         <RouteWithLayout path={routes.contracts} component={Contracts} />
         <RouteWithLayout path={routes.events} component={Events} />
-        <RouteWithLayout path={routes.logs} component={Logs} />
+        <RouteWithLayout
+          path={routes.interactions}
+          component={InteractionsPage}
+        />
         <RouteWithLayout path={routes.project} component={Project} />
         <Redirect from="*" to={routes.start} />
       </Switch>
@@ -123,16 +129,9 @@ export const FlowserRoutes = (): ReactElement => {
 };
 
 function ConsentAnalytics() {
-  const [consentAnalyticsSetting, setConsentAnalyticsSetting] =
-    useAnalyticsConsent();
-  const isAlreadySet = consentAnalyticsSetting !== null;
-  if (isAlreadySet) {
+  const { isConsented, setIsConsented } = useAnalyticsConsent();
+  if (isConsented) {
     return null;
   }
-  return (
-    <ConsentDialog
-      consent={consentAnalyticsSetting ?? true}
-      setConsent={setConsentAnalyticsSetting}
-    />
-  );
+  return <ConsentDialog consent={isConsented} setConsent={setIsConsented} />;
 }

@@ -1,4 +1,23 @@
-  @mixin fadeInAnimation($time) {
+@mixin scaleOnHover($scaleFactor: 1.05) {
+  transition: 0.2s ease-in-out all;
+  &:hover {
+    transform: scale($scaleFactor);
+  }
+}
+
+@mixin whitenOnHover() {
+  &, * {
+    transition: 0.1s ease-in-out color;
+  }
+  &:hover {
+    &, * {
+      color: white;
+      fill: white;
+    }
+  }
+}
+
+@mixin fadeInAnimation($time) {
   -webkit-animation: fadeIn #{$time}; /* Safari, Chrome and Opera > 12.1 */
   -moz-animation: fadeIn #{$time}; /* Firefox < 16 */
   -ms-animation: fadeIn #{$time}; /* Internet Explorer */

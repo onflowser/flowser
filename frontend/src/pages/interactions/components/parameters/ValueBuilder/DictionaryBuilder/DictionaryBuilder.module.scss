@@ -1,0 +1,20 @@
+@import "styles/spacings";
+@import "styles/colors";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-base;
+
+  .dictionaryEntry {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+
+    .keyOrValue {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+}

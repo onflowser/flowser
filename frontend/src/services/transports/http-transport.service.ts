@@ -21,7 +21,7 @@ export class HttpTransportService implements TransportService {
         throw (
           error.response.data.error ??
           FlowserError.fromPartial({
-            message: "Unknown error",
+            message: error.response.data.message ?? "Unknown error",
           })
         );
       }

@@ -1,11 +1,11 @@
 import { CommonUtils } from "../../../utils/common-utils";
-import RadioButton from "../../../components/radio-button/RadioButton";
+import RadioButton from "../../../components/buttons/radio-button/RadioButton";
 import React, { ReactElement } from "react";
 import Input, { InputProps } from "../../../components/input/Input";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import classes from "./FormFields.module.scss";
-import ToggleButton from "../../../components/toggle-button/ToggleButton";
+import ToggleButton from "../../../components/buttons/toggle-button/ToggleButton";
 import { FormikErrors } from "formik";
 
 export type FieldProps = InputProps & {

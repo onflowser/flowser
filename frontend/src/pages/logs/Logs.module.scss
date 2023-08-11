@@ -1,25 +1,33 @@
 @import 'styles/colors';
 @import 'styles/spacings';
 @import 'styles/typography';
+@import 'styles/scrollbars';
 
-.root {
+@mixin overlay {
   z-index: 99;
-  padding: 0 $spacing-l * 2;
-  padding-bottom: $spacing-l;
-  border-top: 1px solid $color-logs-border;
-  background-color: $background;
   position: absolute;
-  display: flex;
-  flex-direction: column;
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.root {
+  padding: 0 $spacing-l * 2;
+  background: $new-color-1;
+  display: flex;
+  flex-direction: column;
+
+  @include hiddenScrollbars();
 
   &.opened {
+    @include styledScrollbars();
+    @include overlay();
     top: 50%;
   }
 
   &.expanded {
+    @include styledScrollbars();
+    @include overlay();
     top: 0;
   }
 
@@ -39,12 +47,15 @@
       height: 88px;
     }
 
-    .leftContainer {
+    .logsButton {
       display: flex;
 
       span {
         margin-left: 5px;
-        color: $purple;
+        color: $blue;
+      }
+      svg * {
+        fill: $blue;
       }
     }
 
@@ -79,8 +90,8 @@
       .control {
         cursor: pointer;
         path {
-          stroke: $purple;
-          fill: $purple;
+          stroke: $blue;
+          fill: $blue;
         }
       }
 

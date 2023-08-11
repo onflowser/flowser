@@ -21,6 +21,7 @@ type ContainerProps = {
   children: ReactElement<TabItemProps, "DetailsTabItem">[] | any;
 };
 
+// TODO: Replace / consolidate with TabList?
 export const DetailsTabs: FunctionComponent<ContainerProps> = ({
   children,
 }) => {

@@ -14,6 +14,7 @@
     "@fingerprintjs/fingerprintjs": "^3.3.6",
     "@flowser/backend": "0.0.1",
     "@flowser/shared": "0.0.1",
+    "@onflow/cadence-parser": "^0.26.0",
     "@onflow/fcl": "^1.2.0",
     "@onflow/types": "^1.0.3",
     "@sentry/electron": "^4.0.2",
@@ -61,6 +62,7 @@
     "react-timeago": "^6.2.1",
     "sqlite3": "^5.0.11",
     "typescript": "^4.4.3",
+    "usehooks-ts": "^2.9.1",
     "wait-on": "^6.0.1",
     "web-vitals": "^1.1.2",
     "yup": "^0.32.11"

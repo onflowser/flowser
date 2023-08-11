@@ -14,7 +14,7 @@ import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../../../hooks/use-api";
-import { SimpleButton } from "../../../components/simple-button/SimpleButton";
+import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import ReactTimeago from "react-timeago";
 import { useProjectActions } from "../../../contexts/project.context";

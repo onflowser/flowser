@@ -13,7 +13,7 @@ import { useGatewayStatus } from "../hooks/use-api";
 export interface TimeoutPollingHook<Response extends PollingEntity> {
   stopPolling: () => void;
   startPolling: () => void;
-  refetchBlocks: () => void;
+  refresh: () => void;
   isFetching: boolean;
   firstFetch: boolean;
   error: Error | null;
@@ -94,21 +94,21 @@ export function useTimeoutPolling<
 
   const data = useMemo(
     () => remapWithMetadata(response?.data, lastPollingTime),
-    [response]
+    [response, lastPollingTime]
   );
 
   useEffect(() => {
     if (data) {
       setTimeoutPolling(props.resourceKey, findMaxTimestamp(response?.data));
     }
-  }, [data]);
+  }, [data, response?.data]);
 
   return {
     data,
     firstFetch: !response && isFetching,
     startPolling: () => null,
     stopPolling: () => null,
-    refetchBlocks: () => null,
+    refresh: () => null,
     isFetching,
     error,
   };

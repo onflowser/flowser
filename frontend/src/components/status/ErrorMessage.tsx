@@ -1,12 +1,27 @@
 import React, { ReactElement } from "react";
-import { CadenceEditor } from "../cadence-editor/CadenceEditor";
+import { FlowUtils } from "../../utils/flow-utils";
+import classes from "./ErrorMessage.module.scss";
 
-export type TransactionErrorMessageProps = {
+type ScriptErrorProps = {
   errorMessage: string;
 };
 
-export function TransactionErrorMessage({
-  errorMessage,
-}: TransactionErrorMessageProps): ReactElement {
-  return <CadenceEditor value={errorMessage} editable={false} />;
+export function ScriptError({ errorMessage }: ScriptErrorProps): ReactElement {
+  const parsedMessage = FlowUtils.parseScriptError(errorMessage);
+
+  return (
+    <pre className={classes.root}>
+      {parsedMessage === undefined
+        ? errorMessage
+        : parsedMessage.responseBody.message}
+    </pre>
+  );
+}
+
+type TransactionErrorProps = {
+  errorMessage: string;
+};
+
+export function TransactionError(props: TransactionErrorProps): ReactElement {
+  return <pre className={classes.root}>{props.errorMessage}</pre>;
 }

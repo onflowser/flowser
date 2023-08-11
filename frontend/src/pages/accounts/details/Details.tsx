@@ -5,7 +5,7 @@ import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
 import Label from "../../../components/label/Label";
 import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
-import CopyButton from "../../../components/copy-button/CopyButton";
+import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import {
   DetailsTabItem,
   DetailsTabs,
@@ -41,12 +41,12 @@ import {
 } from "components/details-card/DetailsCard";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import Card from "../../../components/card/Card";
-import { ActionButton } from "../../../components/action-button/ActionButton";
+import { ActionButton } from "../../../components/buttons/action-button/ActionButton";
 import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
 import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
 import { useFlow } from "../../../hooks/use-flow";
 import { useProjectActions } from "../../../contexts/project.context";
-import { UserIcon } from "../../../components/user-icon/UserIcon";
+import { LoggedInAccountAvatar } from "../../../components/account/avatar/AccountAvatar";
 // @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
@@ -54,6 +54,7 @@ import { AnalyticEvent } from "../../../services/analytics.service";
 import { TextUtils } from "../../../utils/text-utils";
 import { transactionTableColumns } from "../../transactions/main/Main";
 import { enableDetailsIntroAnimation } from "../../../config/common";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -230,6 +231,7 @@ const Details: FunctionComponent = () => {
         <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
         <ProfileActionsCard currentAddress={accountId} />
       </div>
+      <SizedBox height={30} />
       <DetailsTabs>
         <DetailsTabItem label="STORAGE" value={storageItems?.length}>
           <div className={classes.grid}>
@@ -319,7 +321,7 @@ function ProfileActionsCard({ currentAddress }: { currentAddress: string }) {
     <Card className={classes.actionCard}>
       <img className={classes.background} src={gradient} alt="" />
       <div className={classes.avatarWrapper}>
-        <UserIcon size={50} />
+        <LoggedInAccountAvatar size={50} />
       </div>
       <div className={classes.actionsWrapper}>
         <ActionButton

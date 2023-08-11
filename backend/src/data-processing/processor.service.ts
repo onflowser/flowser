@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import {
   FlowAccount,
   FlowBlock,
+  FlowTypeAnnotatedValue,
   FlowCollection,
   FlowEvent,
   FlowGatewayService,
@@ -29,13 +30,18 @@ import {
 import { getDataSourceInstance } from "../database";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
-import { FlowAccountStorageService } from "../flow/services/storage.service";
+import {
+  FlowAccountStorageService,
+  FlowCadenceValue,
+} from "../flow/services/storage.service";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   FlowCoreEventType,
+  GetParsedInteractionResponse,
   ManagedProcessState,
   ServiceStatus,
   SignableObject,
+  TransactionArgument,
   TransactionStatus,
 } from "@flowser/shared";
 import {
@@ -53,6 +59,7 @@ import {
   WellKnownAddressesOptions,
 } from "../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
+import { InteractionsService } from "../interactions/interactions.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -95,7 +102,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     private flowGatewayService: FlowGatewayService,
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
-    private flowEmulatorService: FlowEmulatorService
+    private flowEmulatorService: FlowEmulatorService,
+    private interactionService: InteractionsService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -275,7 +283,7 @@ export class ProcessorService implements ProjectContextLifecycle {
   private async subscribeToTransactionStatusUpdates(
     transactionId: string
   ): Promise<void> {
-    const unsubscribe = await this.flowGatewayService
+    const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
       .subscribe((newStatus) =>
         this.transactionService.updateStatus(
@@ -490,8 +498,16 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
   }) {
+    const parsedInteraction = await this.interactionService.parse({
+      sourceCode: options.flowTransaction.script,
+    });
+    if (parsedInteraction.error) {
+      this.logger.error(
+        `Unexpected interaction parsing error: ${parsedInteraction.error}`
+      );
+    }
     this.transactionService.createOrUpdate(
-      this.createTransactionEntity(options)
+      this.createTransactionEntity({ ...options, parsedInteraction })
     );
   }
 
@@ -769,8 +785,44 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowBlock: FlowBlock;
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
+    parsedInteraction: GetParsedInteractionResponse;
   }): TransactionEntity {
-    const { flowBlock, flowTransaction, flowTransactionStatus } = options;
+    const {
+      flowBlock,
+      flowTransaction,
+      flowTransactionStatus,
+      parsedInteraction,
+    } = options;
+
+    // FCL-JS returns type-annotated argument values.
+    // But we don't need the type info since we already have
+    // our own system of representing types with `CadenceType` message.
+    function fromTypeAnnotatedFclArguments(
+      object: FlowTypeAnnotatedValue
+    ): FlowCadenceValue {
+      const { type, value } = object;
+      // Available type values are listed here:
+      // https://developers.flow.com/tooling/fcl-js/api#ftype
+      switch (type) {
+        case "Dictionary":
+          return value.map((entry: any) => ({
+            key: fromTypeAnnotatedFclArguments(entry.key),
+            value: fromTypeAnnotatedFclArguments(entry.value),
+          }));
+        case "Array":
+          return value.map((element: any) =>
+            fromTypeAnnotatedFclArguments(element)
+          );
+        case "Path":
+        case "PublicPath":
+        case "PrivatePath":
+        case "StoragePath":
+        case "CapabilityPath":
+        default:
+          return value;
+      }
+    }
+
     return new TransactionEntity({
       id: flowTransaction.id,
       script: flowTransaction.script,
@@ -781,7 +833,16 @@ export class ProcessorService implements ProjectContextLifecycle {
       authorizers: flowTransaction.authorizers.map((address) =>
         ensurePrefixedAddress(address)
       ),
-      args: flowTransaction.args,
+      args:
+        parsedInteraction.interaction?.parameters.map(
+          (parameter, index): TransactionArgument => ({
+            identifier: parameter.identifier,
+            type: parameter.type,
+            valueAsJson: JSON.stringify(
+              fromTypeAnnotatedFclArguments(flowTransaction.args[index])
+            ),
+          })
+        ) ?? [],
       proposalKey: {
         ...flowTransaction.proposalKey,
         address: ensurePrefixedAddress(flowTransaction.proposalKey.address),

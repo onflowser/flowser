@@ -110,7 +110,7 @@ export class ProcessManagerService extends EventEmitter {
     if (
       process.childProcess &&
       process.childProcess.exitCode !== null &&
-      process.childProcess.exitCode > 0
+      process.childProcess.exitCode !== 0
     ) {
       const errorOutput = process.output.filter(
         (outputLine) =>

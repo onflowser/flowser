@@ -92,7 +92,8 @@ export class TransactionsController {
   async findOne(@Param("id") id: string) {
     const transaction = await this.transactionsService.findOne(id);
     return GetSingleTransactionResponse.fromPartial({
-      transaction: transaction.toProto(),
+      // Instead of throwing an error, include empty response.
+      transaction: transaction?.toProto(),
     });
   }
 }

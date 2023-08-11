@@ -5,8 +5,81 @@ import {
   SignatureAlgorithm,
   ExecutionStatusCode,
 } from "@flowser/shared";
+import { CommonUtils } from "./common-utils";
+
+type FlowScriptError = {
+  hostname: string;
+  path: string;
+  method: string;
+  requestBody: {
+    script: string;
+    arguments: unknown[];
+  };
+  responseBody: {
+    number: string;
+    message: string;
+  };
+  statusCode: number;
+  responseStatusText: string;
+};
 
 export class FlowUtils {
+  // Returned by fcl.script call.
+  // https://developers.flow.com/tooling/fcl-js/api#script
+  // In case the error can't be parsed, it returns `undefined`.
+  static parseScriptError(errorMessage: string): FlowScriptError | undefined {
+    function parseKeyValueEntry(entry: string) {
+      const targetKeys = [
+        "hostname",
+        "path",
+        "method",
+        "requestBody",
+        "responseBody",
+        "responseStatusText",
+        "statusCode",
+      ];
+      const indexOfSeparator = entry.indexOf("=");
+      const key = entry.slice(0, indexOfSeparator);
+      const value = entry.slice(indexOfSeparator + 1, entry.length);
+      if (targetKeys.includes(key)) {
+        return { key, value };
+      } else {
+        return undefined;
+      }
+    }
+
+    function formatEntryValue(value: string) {
+      try {
+        // Try parsing it as JSON, if that fails assume it's a plain string.
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
+    }
+
+    // We only care about subset of the raw error,
+    // which contains the structured info in `key=value` pairs.
+    // The other part can be discarded as all the info is found in the structured part.
+    const structuredEntries = errorMessage
+      .split(/\n[ +]/)
+      .map((line) => line.trim().replace("\n", " "))
+      .map((line) => parseKeyValueEntry(line))
+      .filter(CommonUtils.isDefined);
+
+    // If no structured entries are found, fallback to raw error message.
+    if (structuredEntries.length === 0) {
+      return undefined;
+    }
+
+    return structuredEntries.reduce(
+      (union, entry) => ({
+        ...union,
+        [entry.key]: formatEntryValue(entry.value),
+      }),
+      {}
+    ) as FlowScriptError;
+  }
+
   static getUserAvatarUrl(address: string): string {
     const isServiceAccount = [
       "0xf8d6e0586b0a20c7",

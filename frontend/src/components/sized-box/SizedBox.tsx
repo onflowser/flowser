@@ -5,10 +5,11 @@ export type SizedBoxProps = {
   width?: number;
   className?: string;
   children?: React.ReactNode;
+  inline?: boolean;
 };
 
 export function SizedBox(props: SizedBoxProps): ReactElement {
-  const { height, width, children, className } = props;
+  const { height, width, children, className, inline } = props;
   return (
     <div
       className={className}
@@ -17,6 +18,7 @@ export function SizedBox(props: SizedBoxProps): ReactElement {
         minHeight: height,
         width: width,
         minWidth: width,
+        display: inline ? "inline-block" : "block",
       }}
     >
       {children}

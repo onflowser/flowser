@@ -1,0 +1,26 @@
+.root {
+  list-style: none;
+  position: relative;
+
+  li {
+    position: relative;
+    color: #d2d1f6;
+    display: flex;
+  }
+
+  li:before {
+    content: "\25CF";
+    margin-right: 15px;
+    font-size: 30px;
+  }
+
+  .line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    content: "";
+    border-left: 3px solid #d2d1f6;
+    margin-left: 8px;
+  }
+}

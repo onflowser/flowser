@@ -2,6 +2,18 @@ import { FlowserError, ManagedProcess } from "@flowser/shared";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 export class CommonUtils {
+  static shorten(text: string, maxLength: number): string {
+    if (maxLength >= text.length) {
+      return text;
+    }
+    const delimiter = "...";
+    const charsToTake = maxLength / 2;
+    return `${text.slice(0, charsToTake)}${delimiter}${text.slice(
+      text.length - charsToTake,
+      text.length
+    )}`;
+  }
+
   static isEmulatorProcess(process: ManagedProcess): boolean {
     return process.id === "emulator";
   }
@@ -48,5 +60,9 @@ export class CommonUtils {
 
   static isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
+  }
+
+  static isDefined<Value>(value: Value | null | undefined): value is Value {
+    return value !== null && value !== undefined;
   }
 }
