@@ -26,7 +26,6 @@ message Project {
   int32 start_block_height = 5;
 
   Gateway gateway = 6;
-  DevWallet dev_wallet = 11;
   Emulator emulator = 7;
 
   string created_at = 8;
@@ -37,10 +36,6 @@ message Gateway {
   string rest_server_address = 1;
   string grpc_server_address = 2;
   ServiceStatus status = 3;
-}
-
-message DevWallet {
-  int32 port = 2;
 }
 
 message Emulator {

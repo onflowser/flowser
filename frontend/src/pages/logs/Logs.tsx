@@ -23,10 +23,9 @@ import classNames from "classnames";
 import { SimpleButton } from "../../components/buttons/simple-button/SimpleButton";
 import { TextUtils } from "../../utils/text-utils";
 import { Callout } from "../../components/callout/Callout";
+import { CommonUtils } from "../../utils/common-utils";
 
 const SEARCH_CONTEXT_NAME = "logs";
-const EMULATOR_PROCESS_ID = "emulator";
-const DEV_WALLET_PROCESS_ID = "dev-wallet";
 
 const Logs: FunctionComponent = () => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
@@ -248,9 +247,7 @@ function useRelevantLogs(options: {
   const { data: allLogs } = useGetPollingOutputs();
   const emulatorOrWalletLogs = useMemo(
     () =>
-      allLogs.filter((log) =>
-        [EMULATOR_PROCESS_ID, DEV_WALLET_PROCESS_ID].includes(log.processId)
-      ),
+      allLogs.filter((log) => CommonUtils.isEmulatorProcessId(log.processId)),
     [allLogs]
   );
   const { filteredData: logs } = useFilterData(

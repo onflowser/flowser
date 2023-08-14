@@ -5,10 +5,10 @@ import React, {
   useContext,
   useState,
   useMemo,
+  useEffect,
 } from "react";
 import { routes } from "../constants/routes";
 import { useHistory } from "react-router-dom";
-import { useFlow } from "../hooks/use-flow";
 import toast from "react-hot-toast";
 import { Block, EmulatorSnapshot, Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
@@ -19,17 +19,17 @@ import {
   useGetPollingEmulatorSnapshots,
 } from "../hooks/use-api";
 import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
-import TransactionDialog from "../components/transaction-dialog/TransactionDialog";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
+// @ts-ignore missing fcl types
+import * as fcl from "@onflow/fcl";
 
 export type ProjectActionsContextState = {
   switchProject: () => Promise<void>;
 
-  sendTransaction: () => void;
   createSnapshot: () => void;
   checkoutBlock: (blockId: string) => void;
 
@@ -58,7 +58,6 @@ export function ProjectProvider({
   const { showDialog, hideDialog } = useConfirmDialog();
   const { data: currentProject, refetch: refetchCurrentProject } =
     useGetCurrentProject();
-  const { isLoggedIn, logout } = useFlow();
   const { data: blocks, refresh } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
@@ -68,9 +67,21 @@ export function ProjectProvider({
       ),
     [emulatorSnapshots]
   );
-
-  const [showTxDialog, setShowTxDialog] = useState(false);
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
+
+  useEffect(() => {
+    if (currentProject?.project) {
+      const accessNodePort =
+        currentProject.project.emulator?.restServerPort ?? 8888;
+      fcl
+        .config()
+        // flowser app details
+        .put("app.detail.icon", `http://localhost:6061/icon.png`)
+        .put("app.detail.title", "Flowser")
+        // Point App at Emulator
+        .put("accessNode.api", `http://localhost:${accessNodePort}`);
+    }
+  }, [currentProject]);
 
   const confirmProjectRemove = async (project: Project) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
@@ -108,7 +119,6 @@ export function ProjectProvider({
         // nothing critical happened, ignore the error
         console.warn("Couldn't stop the emulator: ", e);
       }
-      await logout(); // logout from dev-wallet, because config may change
       // Clear the entire cache,
       // so that previous data isn't there when using another project
       queryClient.clear();
@@ -134,18 +144,6 @@ export function ProjectProvider({
       );
     } else {
       setShowSnapshotModal(true);
-    }
-  }
-
-  function sendTransaction() {
-    track(AnalyticEvent.CLICK_SEND_TRANSACTION);
-
-    if (!isLoggedIn) {
-      toast("You need to login with wallet to send transactions", {
-        duration: 5000,
-      });
-    } else {
-      setShowTxDialog(true);
     }
   }
 
@@ -267,12 +265,10 @@ export function ProjectProvider({
       value={{
         switchProject,
         createSnapshot,
-        sendTransaction,
         checkoutBlock,
         removeProject,
       }}
     >
-      <TransactionDialog show={showTxDialog} setShow={setShowTxDialog} />
       <SnapshotDialog show={showSnapshotModal} setShow={setShowSnapshotModal} />
       {children}
     </ProjectContext.Provider>

@@ -15,15 +15,11 @@ export enum AnalyticEvent {
   CLICK_EXPAND_STORAGE_CARD = "click_expand_storage_card",
   CLICK_PROJECT_SETTINGS = "click_project_settings",
   CLICK_CREATE_SNAPSHOT = "click_create_snapshot",
-  CLICK_SEND_TRANSACTION = "click_send_transaction",
   CLICK_CHECKOUT_SNAPSHOT = "click_checkout_snapshot",
 
   CREATE_SNAPSHOT = "create_snapshot",
   CHECKOUT_SNAPSHOT = "checkout_snapshot",
-  SEND_TRANSACTION = "send_transaction",
 
-  DISCONNECT_WALLET = "disconnect_wallet",
-  CONNECT_WALLET = "connect_wallet",
   RESTART_PROCESS = "restart_process",
 }
 

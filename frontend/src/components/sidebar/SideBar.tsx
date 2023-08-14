@@ -4,9 +4,6 @@ import "react-modern-drawer/dist/index.css";
 import classes from "./SideBar.module.scss";
 import { ReactComponent as SettingsIcon } from "../../assets/icons/settings-circle.svg";
 import { ReactComponent as ShareFeedbackIcon } from "../../assets/icons/share-feedback.svg";
-import { ReactComponent as ConnectIcon } from "../../assets/icons/connect-circle.svg";
-import { ReactComponent as LogoutIcon } from "../../assets/icons/logout.svg";
-import { ReactComponent as SendTxIcon } from "../../assets/icons/send-tx.svg";
 import { ReactComponent as SwitchIcon } from "../../assets/icons/switch.svg";
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus-round.svg";
 import { ReactComponent as CreateSnapshotIcon } from "../../assets/icons/create-snapshot.svg";
@@ -18,11 +15,8 @@ import {
 } from "../../hooks/use-api";
 import { useHistory } from "react-router-dom";
 import { useProjectActions } from "../../contexts/project.context";
-import { useFlow } from "../../hooks/use-flow";
 import { routes } from "../../constants/routes";
 import classNames from "classnames";
-import { LoggedInAccountAvatar } from "../account/avatar/AccountAvatar";
-import { useGetAccountBalance } from "../../hooks/use-account-balance";
 import { ManagedProcess, ManagedProcessState } from "@flowser/shared";
 import { ServiceRegistry } from "../../services/service-registry";
 import { useErrorHandler } from "../../hooks/use-error-handler";
@@ -40,10 +34,7 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
   const history = useHistory();
   const { track } = useAnalytics();
   const { data: currentProjectData } = useGetCurrentProject();
-  const { login, logout, user, isLoggedIn } = useFlow();
-  const { switchProject, sendTransaction, createSnapshot } =
-    useProjectActions();
-  const { flow: flowBalance } = useGetAccountBalance(user?.addr ?? "");
+  const { switchProject, createSnapshot } = useProjectActions();
   const { data: processes } = useGetPollingProcesses();
   const { project: currentProject } = currentProjectData ?? {};
   const createProject = useCallback(() => {
@@ -55,11 +46,6 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
 
     history.push(`/start/configure/${currentProject?.id}`);
   };
-
-  function onClickUserProfile() {
-    history.push(`/accounts/details/${user?.addr}`);
-    toggleSidebar();
-  }
 
   return (
     <Drawer
@@ -106,40 +92,6 @@ export function SideBar({ toggled, toggleSidebar }: Sidebar): ReactElement {
             title="Create snapshot"
             icon={<CreateSnapshotIcon />}
           />
-          <div className={classes.menuDivider} />
-          <span className={classes.menuSectionTitle}>WALLET</span>
-          {isLoggedIn && (
-            <ActionButton
-              onClick={onClickUserProfile}
-              title={user?.addr ?? "-"}
-              footer={flowBalance}
-              icon={<LoggedInAccountAvatar />}
-            />
-          )}
-          {isLoggedIn && (
-            <ActionButton
-              onClick={() => {
-                track(AnalyticEvent.CLICK_CREATE_SNAPSHOT);
-                toggleSidebar();
-                sendTransaction();
-              }}
-              title="Send transaction"
-              icon={<SendTxIcon />}
-            />
-          )}
-          {isLoggedIn ? (
-            <ActionButton
-              onClick={logout}
-              title="Disconnect wallet"
-              icon={<LogoutIcon />}
-            />
-          ) : (
-            <ActionButton
-              onClick={login}
-              title="Connect wallet"
-              icon={<ConnectIcon />}
-            />
-          )}
           <div className={classes.menuDivider} />
           <span className={classes.menuSectionTitle}>PROCESSES</span>
           <div className={classes.processItemsWrapper}>

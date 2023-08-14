@@ -17,7 +17,6 @@ import { FlowCliService } from "../flow/services/cli.service";
 import { FlowConfigService } from "../flow/services/config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import {
-  DevWallet,
   Gateway,
   ServiceStatus,
   GetProjectStatusResponse,
@@ -27,7 +26,6 @@ import {
 } from "@flowser/shared";
 import * as fs from "fs";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
-import { FlowDevWalletService } from "../flow/services/dev-wallet.service";
 import { WalletService } from "../wallet/wallet.service";
 import { FlowSnapshotService } from "../flow/services/snapshot.service";
 
@@ -54,7 +52,6 @@ export class ProjectsService {
       // since it's listening for events emitted by that service.
       this.processorService,
       this.flowEmulatorService,
-      this.flowDevWalletService,
       // Snapshot and wallet services must be started after emulator service,
       // as it depends on REST APIs that emulator process exposes.
       this.flowSnapshotsService,
@@ -71,7 +68,6 @@ export class ProjectsService {
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
     private commonService: CacheRemovalService,
-    private flowDevWalletService: FlowDevWalletService,
     private walletService: WalletService,
     private flowSnapshotsService: FlowSnapshotService
   ) {}
@@ -98,9 +94,6 @@ export class ProjectsService {
     const flowApiStatus = await FlowGatewayService.getApiStatus(
       this.currentProject.gateway
     );
-    const devWalletApiStatus = await FlowDevWalletService.getApiStatus(
-      this.currentProject.devWallet
-    );
     const totalBlocksToProcess =
       flowApiStatus === ServiceStatus.SERVICE_STATUS_ONLINE
         ? await this.processorService.getTotalBlocksToProcess()
@@ -108,7 +101,6 @@ export class ProjectsService {
     return {
       totalBlocksToProcess,
       flowApiStatus,
-      devWalletApiStatus,
     };
   }
 
@@ -272,9 +264,6 @@ export class ProjectsService {
       gateway: Gateway.fromPartial({
         restServerAddress: `http://localhost:${defaultEmulator.restServerPort}`,
         grpcServerAddress: `http://localhost:${defaultEmulator.grpcServerPort}`,
-      }),
-      devWallet: DevWallet.fromJSON({
-        port: 8701,
       }),
       emulator: defaultEmulator,
     });
