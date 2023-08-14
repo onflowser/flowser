@@ -4,9 +4,10 @@
 .root {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
   background: $new-color-1;
   padding: $spacing-base 0;
+  align-items: center;
 
   .inactiveLink {
     background: $new-color-2;

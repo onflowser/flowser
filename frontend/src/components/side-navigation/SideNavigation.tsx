@@ -19,20 +19,22 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
 
   return (
     <div className={classNames(classes.root, props.className)}>
-      <FlowserLogo />
-      <SizedBox height={50} />
-      <ProjectLink to={routes.accounts} icon={FlowserIcon.Account} />
-      <ProjectLink to={routes.blocks} icon={FlowserIcon.Block} />
-      <ProjectLink to={routes.transactions} icon={FlowserIcon.Transaction} />
-      <ProjectLink to={routes.contracts} icon={FlowserIcon.Contract} />
-      <ProjectLink to={routes.events} icon={FlowserIcon.Star} />
-      <ProjectLink to={routes.interactions} icon={FlowserIcon.CursorClick} />
-      {currentProject && (
-        <ProjectLink
-          to={`/configure/${currentProject.id}`}
-          icon={FlowserIcon.Settings}
-        />
-      )}
+      <div>
+        <FlowserLogo />
+        <SizedBox height={50} />
+        <ProjectLink to={routes.accounts} icon={FlowserIcon.Account} />
+        <ProjectLink to={routes.blocks} icon={FlowserIcon.Block} />
+        <ProjectLink to={routes.transactions} icon={FlowserIcon.Transaction} />
+        <ProjectLink to={routes.contracts} icon={FlowserIcon.Contract} />
+        <ProjectLink to={routes.events} icon={FlowserIcon.Star} />
+        <ProjectLink to={routes.interactions} icon={FlowserIcon.CursorClick} />
+        {currentProject && (
+          <ProjectLink
+            to={`/configure/${currentProject.id}`}
+            icon={FlowserIcon.Settings}
+          />
+        )}
+      </div>
       <ProjectLink
         to={routes.start}
         icon={FlowserIcon.Switch}
