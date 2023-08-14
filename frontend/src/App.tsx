@@ -24,7 +24,6 @@ import Events from "./pages/events/Events";
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
-import { Project } from "./pages/project/Project";
 import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
 import {
@@ -111,7 +110,6 @@ export const FlowserRoutes = (): ReactElement => {
           path={routes.interactions}
           component={InteractionsPage}
         />
-        <RouteWithLayout path={routes.project} component={Project} />
         <Redirect from="*" to={routes.start} />
       </Switch>
       <Toaster

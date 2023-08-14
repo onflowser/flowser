@@ -27,7 +27,6 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
       <ProjectLink to={routes.contracts} icon={FlowserIcon.Contract} />
       <ProjectLink to={routes.events} icon={FlowserIcon.Star} />
       <ProjectLink to={routes.interactions} icon={FlowserIcon.CursorClick} />
-      <ProjectLink to={routes.project} icon={FlowserIcon.ArtistPalette} />
       {currentProject && (
         <ProjectLink
           to={`/start/configure/${currentProject.id}`}
