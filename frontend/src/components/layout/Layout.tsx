@@ -1,8 +1,7 @@
-import React, { FC, FunctionComponent, useState } from "react";
+import React, { FC, FunctionComponent } from "react";
 import classes from "./Layout.module.scss";
 import { TopRow } from "../top-row/TopRow";
 import Logs from "../../pages/logs/Logs";
-import { SideBar } from "components/sidebar/SideBar";
 import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
@@ -36,18 +35,13 @@ export const RouteWithLayout: FC<RouteProps> = (props) => (
 const Layout: FunctionComponent = ({ children }) => {
   const location = useLocation();
   const showMargin = !location.pathname.startsWith(routes.interactions);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prevState) => !prevState);
-  };
 
   return (
     <div className={classes.root}>
       <SideNavigation className={classes.sideNavigation} />
       <div className={classes.mainContent}>
-        <TopRow isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        <TopRow />
         <Breadcrumbs />
-        <SideBar toggled={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <div
           className={classNames(classes.body, {
             [classes.bodyWithMargin]: showMargin,
