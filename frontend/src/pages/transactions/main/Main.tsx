@@ -1,8 +1,6 @@
 import React, { FunctionComponent, useEffect } from "react";
 import classes from "./Main.module.scss";
 import { useNavigation } from "../../../hooks/use-navigation";
-import { useSearch } from "../../../hooks/use-search";
-import { useFilterData } from "../../../hooks/use-filter-data";
 import { useGetPollingTransactions } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Transaction } from "@flowser/shared";
@@ -80,13 +78,10 @@ export const transactionTableColumns = [
 ];
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { data, firstFetch, error } = useGetPollingTransactions();
-  const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
-    setPlaceholder("Search transactions");
     showNavigationDrawer(false);
   }, []);
 
@@ -94,7 +89,7 @@ const Main: FunctionComponent = () => {
     <Table<DecoratedPollingEntity<Transaction>>
       isInitialLoading={firstFetch}
       error={error}
-      data={filteredData}
+      data={data}
       columns={transactionTableColumns}
     />
   );

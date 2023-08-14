@@ -3,8 +3,6 @@ import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { NavLink } from "react-router-dom";
-import { useSearch } from "../../../hooks/use-search";
-import { useFilterData } from "../../../hooks/use-filter-data";
 import { useGetPollingContracts } from "../../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
@@ -55,13 +53,10 @@ const columns = [
 ];
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { data, firstFetch, error } = useGetPollingContracts();
-  const { filteredData } = useFilterData(data, searchTerm);
 
   useEffect(() => {
-    setPlaceholder("Search contracts");
     showNavigationDrawer(false);
   }, []);
 
@@ -70,7 +65,7 @@ const Main: FunctionComponent = () => {
       isInitialLoading={firstFetch}
       error={error}
       columns={columns}
-      data={filteredData}
+      data={data}
     />
   );
 };

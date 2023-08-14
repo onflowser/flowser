@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import { useSearch } from "../../../hooks/use-search";
 import classes from "./Details.module.scss";
 import Value from "../../../components/value/Value";
 import Label from "../../../components/label/Label";
@@ -12,7 +11,6 @@ import {
 } from "../../../components/details-tabs/DetailsTabs";
 import { NavLink, useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import Fragment from "../../../components/fragment/Fragment";
 import {
   useGetAccount,
   useGetPollingContractsByAccount,
@@ -116,7 +114,6 @@ const Details: FunctionComponent = () => {
   const { accountId } = useParams<AccountDetailsRouteParams>();
   const urlQueryParams = useUrlQuery();
   const focusedStorageId = urlQueryParams.get("focusedStorageId");
-  const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
@@ -249,26 +246,14 @@ const Details: FunctionComponent = () => {
             ))}
           </div>
         </DetailsTabItem>
-        <DetailsTabItem
-          label="TRANSACTIONS"
-          value={transactions.length}
-          onClick={() =>
-            updateSearchBar("search for transactions", !transactions.length)
-          }
-        >
+        <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
           <Table<DecoratedPollingEntity<Transaction>>
             enableIntroAnimations={enableDetailsIntroAnimation}
             columns={transactionTableColumns}
             data={transactions}
           />
         </DetailsTabItem>
-        <DetailsTabItem
-          label="CONTRACTS"
-          value={contracts.length}
-          onClick={() =>
-            updateSearchBar("search for contracts", !contracts.length)
-          }
-        >
+        <DetailsTabItem label="CONTRACTS" value={contracts.length}>
           <Table<DecoratedPollingEntity<AccountContract>>
             enableIntroAnimations={enableDetailsIntroAnimation}
             columns={columnsContract}
@@ -276,23 +261,15 @@ const Details: FunctionComponent = () => {
           />
         </DetailsTabItem>
         <DetailsTabItem label="KEYS" value={keys.length}>
-          <Fragment
-            onMount={() => updateSearchBar("search for keys", !keys.length)}
-          >
-            <Table<DecoratedPollingEntity<AccountKey>>
-              enableIntroAnimations={enableDetailsIntroAnimation}
-              columns={columnsKeys}
-              data={keys}
-            />
-          </Fragment>
+          <Table<DecoratedPollingEntity<AccountKey>>
+            enableIntroAnimations={enableDetailsIntroAnimation}
+            columns={columnsKeys}
+            data={keys}
+          />
         </DetailsTabItem>
         {!!account.code && (
           <DetailsTabItem label="SCRIPTS" value="<>">
-            <Fragment
-              onMount={() => updateSearchBar("search for scripts", true)}
-            >
-              <ContentDetailsScript script={account.code} />
-            </Fragment>
+            <ContentDetailsScript script={account.code} />
           </DetailsTabItem>
         )}
       </DetailsTabs>

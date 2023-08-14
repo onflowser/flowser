@@ -1,11 +1,11 @@
 import React, { ReactElement, useState } from "react";
-import Dialog from "../dialog/Dialog";
+import { BaseDialog } from "../base/BaseDialog";
 import classes from "./ConsentDialog.module.scss";
-import logo from "../../assets/images/logo-foreground.svg";
+import logo from "../../../assets/images/logo-foreground.svg";
 import ToggleButton, {
   ToggleButtonProps,
-} from "../buttons/toggle-button/ToggleButton";
-import Button from "../buttons/button/Button";
+} from "../../buttons/toggle-button/ToggleButton";
+import Button from "../../buttons/button/Button";
 
 export type ConsentDialogProps = {
   consent: boolean;
@@ -21,7 +21,7 @@ export function ConsentDialog({
   const [tempConsent, setTempConsent] = useState(consent);
 
   return (
-    <Dialog onClose={onClose} className={classes.modal}>
+    <BaseDialog onClose={onClose} className={classes.modal}>
       <div className={classes.root}>
         <div className={classes.header}>
           <img alt="Flowser logo" src={logo} className={classes.logo} />
@@ -53,7 +53,7 @@ export function ConsentDialog({
           <Button onClick={() => setConsent(tempConsent)}>Continue</Button>
         </div>
       </div>
-    </Dialog>
+    </BaseDialog>
   );
 }
 

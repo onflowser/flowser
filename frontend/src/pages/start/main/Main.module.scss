@@ -125,25 +125,10 @@
 
   .projectList {
     flex: 1;
-    .projectListHeader {
-      box-sizing: border-box;
-      height: 162px;
-      width: 100%;
-      padding: 23px 20px;
-
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: flex-end;
-
-      .projectSearch {
-        width: 400px;
-      }
-    }
 
     .projectListBody {
       list-style-type: none;
-      padding-left: 23px;
+      padding: $spacing-l;
 
       display: flex;
       flex-direction: column;

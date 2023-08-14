@@ -11,7 +11,6 @@ import { Toaster } from "react-hot-toast";
 import { RouteWithLayout } from "./components/layout/Layout";
 import { routes } from "./constants/routes";
 import { UiStateContextProvider } from "./contexts/ui-state.context";
-import { useSearch } from "./hooks/use-search";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
@@ -25,7 +24,6 @@ import Events from "./pages/events/Events";
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
-import { Project } from "./pages/project/Project";
 import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
 import {
@@ -33,12 +31,13 @@ import {
   PlatformAdapterState,
 } from "./contexts/platform-adapter.context";
 import { queryClient } from "./config/react-query";
-import { ConsentDialog } from "./components/consent-dialog/ConsentDialog";
+import { ConsentDialog } from "./components/dialogs/consent/ConsentDialog";
 import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
 import { InteractionsPage } from "./pages/interactions/InteractionsPage";
 import { InteractionRegistryProvider } from "pages/interactions/contexts/interaction-registry.context";
+import { Configuration } from "./pages/start/configuration/Configuration";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -46,7 +45,6 @@ const BrowserRouterEvents = withRouter(
     history,
     location,
   }: RouteComponentProps & { children: ReactElement[] }) => {
-    const { setSearchTerm } = useSearch();
     const { analyticsService } = ServiceRegistry.getInstance();
 
     useEffect(() => {
@@ -55,9 +53,6 @@ const BrowserRouterEvents = withRouter(
           location,
           action,
         });
-        if (action === "PUSH") {
-          setSearchTerm("");
-        }
       });
     }, []);
 
@@ -116,7 +111,10 @@ export const FlowserRoutes = (): ReactElement => {
           path={routes.interactions}
           component={InteractionsPage}
         />
-        <RouteWithLayout path={routes.project} component={Project} />
+        <RouteWithLayout
+          path={routes.configureCurrent}
+          component={Configuration}
+        />
         <Redirect from="*" to={routes.start} />
       </Switch>
       <Toaster

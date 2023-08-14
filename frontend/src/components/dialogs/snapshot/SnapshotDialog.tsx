@@ -1,12 +1,12 @@
 import React, { FC, useState } from "react";
-import Button from "../buttons/button/Button";
+import Button from "../../buttons/button/Button";
 import classes from "./SnapshotDialog.module.scss";
 import toast from "react-hot-toast";
-import { ServiceRegistry } from "../../services/service-registry";
-import Input from "../input/Input";
-import { ActionDialog } from "../action-dialog/ActionDialog";
-import { useCurrentProjectId, useGetCurrentProject } from "../../hooks/use-api";
-import { useErrorHandler } from "../../hooks/use-error-handler";
+import { ServiceRegistry } from "../../../services/service-registry";
+import Input from "../../input/Input";
+import { ActionDialog } from "../action/ActionDialog";
+import { useCurrentProjectId } from "../../../hooks/use-api";
+import { useErrorHandler } from "../../../hooks/use-error-handler";
 
 export type SnapshotDialogProps = {
   show?: boolean;
@@ -15,7 +15,6 @@ export type SnapshotDialogProps = {
 
 export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
   const projectId = useCurrentProjectId();
-  const { data } = useGetCurrentProject();
   const { handleError } = useErrorHandler(SnapshotDialog.name);
   const { snapshotService } = ServiceRegistry.getInstance();
   const [loading, setLoading] = useState(false);

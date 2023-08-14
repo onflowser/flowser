@@ -1,7 +1,5 @@
 import React, { FunctionComponent, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { useFilterData } from "../../../hooks/use-filter-data";
-import { useSearch } from "../../../hooks/use-search";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./Main.module.scss";
@@ -27,12 +25,10 @@ import classNames from "classnames";
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
 const Main: FunctionComponent = () => {
-  const { searchTerm, setPlaceholder } = useSearch();
   const { showNavigationDrawer } = useNavigation();
   const { checkoutBlock } = useProjectActions();
 
   const { data: blocks, firstFetch, error } = useGetPollingBlocks();
-  const { filteredData } = useFilterData(blocks, searchTerm);
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
@@ -43,7 +39,6 @@ const Main: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    setPlaceholder("Search blocks");
     showNavigationDrawer(false);
   }, []);
 
@@ -130,7 +125,7 @@ const Main: FunctionComponent = () => {
     <Table<DecoratedPollingEntity<Block>>
       isInitialLoading={firstFetch}
       error={error}
-      data={filteredData}
+      data={blocks}
       columns={columns}
       renderCustomHeader={(headerGroup) => (
         <Card
