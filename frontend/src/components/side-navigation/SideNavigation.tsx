@@ -29,7 +29,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
       <ProjectLink to={routes.interactions} icon={FlowserIcon.CursorClick} />
       {currentProject && (
         <ProjectLink
-          to={`/start/configure/${currentProject.id}`}
+          to={`/configure/${currentProject.id}`}
           icon={FlowserIcon.Settings}
         />
       )}

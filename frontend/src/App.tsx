@@ -37,6 +37,7 @@ import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
 import { InteractionsPage } from "./pages/interactions/InteractionsPage";
 import { InteractionRegistryProvider } from "pages/interactions/contexts/interaction-registry.context";
+import { Configuration } from "./pages/start/configuration/Configuration";
 
 const BrowserRouterEvents = withRouter(
   ({
@@ -109,6 +110,10 @@ export const FlowserRoutes = (): ReactElement => {
         <RouteWithLayout
           path={routes.interactions}
           component={InteractionsPage}
+        />
+        <RouteWithLayout
+          path={routes.configureCurrent}
+          component={Configuration}
         />
         <Redirect from="*" to={routes.start} />
       </Switch>
