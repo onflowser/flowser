@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { useSearch } from "../../../hooks/use-search";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
@@ -10,7 +9,6 @@ import {
   DetailsTabs,
 } from "../../../components/details-tabs/DetailsTabs";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
-import Fragment from "../../../components/fragment/Fragment";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import { createColumnHelper } from "@tanstack/table-core";
@@ -89,7 +87,6 @@ const txTableColumns = [
 
 const Details: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
-  const { updateSearchBar } = useSearch();
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const breadcrumbs: Breadcrumb[] = [
@@ -139,19 +136,13 @@ const Details: FunctionComponent = () => {
       <SizedBox height={30} />
       <DetailsTabs>
         <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
-          <Fragment
-            onMount={() =>
-              updateSearchBar("search for transactions", !transactions.length)
-            }
-          >
-            {transactions && (
-              <Table<DecoratedPollingEntity<Transaction>>
-                data={transactions}
-                columns={txTableColumns}
-                enableIntroAnimations={enableDetailsIntroAnimation}
-              />
-            )}
-          </Fragment>
+          {transactions && (
+            <Table<DecoratedPollingEntity<Transaction>>
+              data={transactions}
+              columns={txTableColumns}
+              enableIntroAnimations={enableDetailsIntroAnimation}
+            />
+          )}
         </DetailsTabItem>
         <DetailsTabItem label="HEIGHT" value={block.height} />
         <DetailsTabItem

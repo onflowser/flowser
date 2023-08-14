@@ -11,7 +11,6 @@ import { Toaster } from "react-hot-toast";
 import { RouteWithLayout } from "./components/layout/Layout";
 import { routes } from "./constants/routes";
 import { UiStateContextProvider } from "./contexts/ui-state.context";
-import { useSearch } from "./hooks/use-search";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
@@ -46,7 +45,6 @@ const BrowserRouterEvents = withRouter(
     history,
     location,
   }: RouteComponentProps & { children: ReactElement[] }) => {
-    const { setSearchTerm } = useSearch();
     const { analyticsService } = ServiceRegistry.getInstance();
 
     useEffect(() => {
@@ -55,9 +53,6 @@ const BrowserRouterEvents = withRouter(
           location,
           action,
         });
-        if (action === "PUSH") {
-          setSearchTerm("");
-        }
       });
     }, []);
 

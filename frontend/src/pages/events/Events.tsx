@@ -6,8 +6,6 @@ import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../components/ellipsis/MiddleEllipsis";
-import { useFilterData } from "../../hooks/use-filter-data";
-import { useSearch } from "../../hooks/use-search";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useGetPollingEvents } from "../../hooks/use-api";
 import { createColumnHelper } from "@tanstack/table-core";
@@ -60,9 +58,7 @@ const subTableColumns = [
 const Events: FunctionComponent = () => {
   const [openedLog, setOpenedLog] = useState("");
   const { showNavigationDrawer } = useNavigation();
-  const { searchTerm, setPlaceholder } = useSearch();
   const { data, firstFetch, error } = useGetPollingEvents();
-  const { filteredData } = useFilterData(data, searchTerm);
   const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
   const columns = useMemo(
@@ -129,7 +125,6 @@ const Events: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    setPlaceholder("Search events");
     showNavigationDrawer(false);
   }, []);
 
@@ -140,7 +135,7 @@ const Events: FunctionComponent = () => {
   return (
     <Table<DecoratedPollingEntity<Event>>
       isInitialLoading={firstFetch}
-      data={filteredData}
+      data={data}
       error={error}
       columns={columns}
       renderCustomHeader={(headerGroup) => (

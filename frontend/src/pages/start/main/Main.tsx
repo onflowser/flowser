@@ -21,7 +21,6 @@ import {
 } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
-import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import { useProjectActions } from "../../../contexts/project.context";
@@ -146,17 +145,12 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
 
 function ProjectsListContent() {
   const { data: projects } = useGetAllProjects();
-  const { searchTerm, setPlaceholder } = useSearch("projectSearch");
   const { removeProject } = useProjectActions();
   const { handleError } = useErrorHandler(ProjectsListContent.name);
   const history = useHistory();
   const { track } = useAnalytics();
   const projectService = ServiceRegistry.getInstance().projectsService;
   const showProjectList = projects && projects.length > 0;
-
-  useEffect(() => {
-    setPlaceholder("Search projects");
-  }, []);
 
   const runProject = async (project: Project) => {
     try {
@@ -177,14 +171,10 @@ function ProjectsListContent() {
     );
   }
 
-  const filteredProjects = projects?.filter(
-    (p) => !searchTerm || p.name.includes(searchTerm)
-  );
-
   return (
     <div className={classes.projectList}>
       <ul className={classes.projectListBody}>
-        {filteredProjects.map((project) => (
+        {projects.map((project) => (
           <li key={project.id} className={classes.projectItem}>
             <span
               className={classes.projectName}
