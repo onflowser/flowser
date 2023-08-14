@@ -1,6 +1,5 @@
 import React, { FC, FunctionComponent } from "react";
 import classes from "./Layout.module.scss";
-import { TopRow } from "../top-row/TopRow";
 import Logs from "../../pages/logs/Logs";
 import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
@@ -40,7 +39,6 @@ const Layout: FunctionComponent = ({ children }) => {
     <div className={classes.root}>
       <SideNavigation className={classes.sideNavigation} />
       <div className={classes.mainContent}>
-        <TopRow />
         <Breadcrumbs />
         <div
           className={classNames(classes.body, {
