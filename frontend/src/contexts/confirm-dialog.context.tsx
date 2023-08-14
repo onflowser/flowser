@@ -4,7 +4,7 @@ import React, {
   useContext,
   useState,
 } from "react";
-import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
+import { ConfirmationDialog } from "../components/dialogs/confirmation/ConfirmationDialog";
 
 export type ConfirmDialogContextState = {
   showDialog: (props: OpenConfirmDialogProps) => void;
@@ -53,7 +53,7 @@ export function ConfirmDialogProvider({
     <ConfirmDialogContext.Provider value={{ showDialog, hideDialog }}>
       {children}
       {isShowingDialog && (
-        <ConfirmDialog
+        <ConfirmationDialog
           onClose={hideDialog}
           title={dialogProps.title}
           onConfirm={dialogProps.onConfirm ?? defaultOnConfirm}
@@ -61,7 +61,7 @@ export function ConfirmDialogProvider({
           cancelButtonLabel={dialogProps.cancelButtonLabel}
         >
           {dialogProps.body}
-        </ConfirmDialog>
+        </ConfirmationDialog>
       )}
     </ConfirmDialogContext.Provider>
   );

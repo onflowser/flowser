@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from "react";
-import Button from "../buttons/button/Button";
-import { ActionDialog, ActionDialogProps } from "../action-dialog/ActionDialog";
+import Button from "../../buttons/button/Button";
+import { ActionDialog, ActionDialogProps } from "../action/ActionDialog";
 
 export type ConfirmDialogProps = ActionDialogProps & {
   onClose: () => void | Promise<void>;
@@ -11,7 +11,7 @@ export type ConfirmDialogProps = ActionDialogProps & {
   title: string;
 };
 
-const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
+export const ConfirmationDialog: FunctionComponent<ConfirmDialogProps> = ({
   onConfirm,
   onClose,
   title,
@@ -52,5 +52,3 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({
     </ActionDialog>
   );
 };
-
-export default ConfirmDialog;

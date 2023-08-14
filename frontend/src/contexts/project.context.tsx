@@ -18,7 +18,6 @@ import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../hooks/use-api";
-import { SnapshotDialog } from "../components/snapshot-dialog/SnapshotDialog";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
@@ -26,6 +25,7 @@ import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
 // @ts-ignore missing fcl types
 import * as fcl from "@onflow/fcl";
+import { SnapshotDialog } from "components/dialogs/snapshot/SnapshotDialog";
 
 export type ProjectActionsContextState = {
   switchProject: () => Promise<void>;

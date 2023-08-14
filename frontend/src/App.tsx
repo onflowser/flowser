@@ -31,7 +31,7 @@ import {
   PlatformAdapterState,
 } from "./contexts/platform-adapter.context";
 import { queryClient } from "./config/react-query";
-import { ConsentDialog } from "./components/consent-dialog/ConsentDialog";
+import { ConsentDialog } from "./components/dialogs/consent/ConsentDialog";
 import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";

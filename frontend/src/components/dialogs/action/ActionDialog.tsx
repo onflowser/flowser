@@ -1,7 +1,7 @@
 import React, { FC, ReactElement } from "react";
 import classes from "./ActionDialog.module.scss";
 import classNames from "classnames";
-import Dialog, { DialogProps } from "../dialog/Dialog";
+import { BaseDialog, DialogProps } from "../base/BaseDialog";
 
 export type ActionDialogProps = {
   title: string;
@@ -17,12 +17,12 @@ export const ActionDialog: FC<ActionDialogProps> = ({
   ...dialogProps
 }) => {
   return (
-    <Dialog {...dialogProps}>
+    <BaseDialog {...dialogProps}>
       <div className={classes.root}>
         <h3>{title}</h3>
         <div className={classNames(classes.body, bodyClass)}>{children}</div>
         {footer && <div className={classes.actions}>{footer}</div>}
       </div>
-    </Dialog>
+    </BaseDialog>
   );
 };

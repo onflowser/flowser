@@ -3,9 +3,9 @@ import React, {
   MouseEventHandler,
   ReactElement,
 } from "react";
-import classes from "./Dialog.module.scss";
+import classes from "./BaseDialog.module.scss";
 import classNames from "classnames";
-import Card from "../card/Card";
+import Card from "../../card/Card";
 
 export type DialogProps = {
   children: ReactElement[] | ReactElement;
@@ -13,7 +13,7 @@ export type DialogProps = {
   className?: string;
 };
 
-const Dialog: FunctionComponent<DialogProps> = ({
+export const BaseDialog: FunctionComponent<DialogProps> = ({
   children,
   onClose,
   className,
@@ -37,5 +37,3 @@ const Dialog: FunctionComponent<DialogProps> = ({
     </div>
   );
 };
-
-export default Dialog;

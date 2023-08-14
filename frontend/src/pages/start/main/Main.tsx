@@ -29,7 +29,7 @@ import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
-import { ConsentDialog } from "../../../components/consent-dialog/ConsentDialog";
+import { ConsentDialog } from "../../../components/dialogs/consent/ConsentDialog";
 import { useAnalyticsConsent } from "../../../hooks/use-analytics-consent";
 
 type ProjectTab = {
