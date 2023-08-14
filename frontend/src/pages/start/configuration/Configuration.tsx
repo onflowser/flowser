@@ -10,7 +10,6 @@ import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
 import {
-  DevWallet,
   Emulator,
   Gateway,
   Project,
@@ -31,7 +30,6 @@ import {
   ToggleField,
 } from "./FormFields";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
-import { useFlow } from "../../../hooks/use-flow";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { useAnalytics } from "../../../hooks/use-analytics";
 
@@ -48,7 +46,6 @@ export const Configuration: FunctionComponent = () => {
   const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
-  const { isLoggedIn, logout } = useFlow();
   const { handleError } = useErrorHandler(Configuration.name);
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
@@ -59,18 +56,10 @@ export const Configuration: FunctionComponent = () => {
     validateOnChange: false,
     initialValues: Project.fromPartial({
       filesystemPath: "",
-      devWallet: DevWallet.fromPartial({}),
       emulator: Emulator.fromPartial({}),
       gateway: Gateway.fromPartial({}),
     }),
     onSubmit: async () => {
-      if (isLoggedIn) {
-        toast.promise(logout(), {
-          loading: "Signing out ...",
-          success: "Signed out",
-          error: "Sign out failed!",
-        });
-      }
       toast.promise(runProject(), {
         loading: "Running project",
         success: "Project started",
@@ -188,21 +177,6 @@ export const Configuration: FunctionComponent = () => {
                     formik.setFieldValue("filesystemPath", path);
                   }
                 }}
-                formik={formik}
-              />
-            </Card>
-          </ConfigurationSection>
-          <ConfigurationSection
-            title="Dev wallet"
-            description="If fcl-dev-wallet is not running, Flowser will start it automatically."
-            collapseChildren
-            className={classes.section}
-          >
-            <Card className={classes.card}>
-              <DevWalletTextField
-                label="Port"
-                path="port"
-                description="Port to start the dev-wallet on"
                 formik={formik}
               />
             </Card>
@@ -410,13 +384,6 @@ function getSignatureAlgorithmRadioOptions(
     label: FlowUtils.getSignatureAlgoName(algo),
     value: algo,
   }));
-}
-
-function DevWalletTextField({
-  path,
-  ...restProps
-}: FieldProps & { path: keyof DevWallet }) {
-  return <TextField path={`devWallet.${path}`} {...restProps} />;
 }
 
 function EmulatorTextField({

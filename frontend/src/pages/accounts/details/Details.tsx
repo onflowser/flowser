@@ -40,15 +40,6 @@ import {
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import Card from "../../../components/card/Card";
-import { ActionButton } from "../../../components/buttons/action-button/ActionButton";
-import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
-import { ReactComponent as SendTxIcon } from "../../../assets/icons/send-tx.svg";
-import { useFlow } from "../../../hooks/use-flow";
-import { useProjectActions } from "../../../contexts/project.context";
-import { LoggedInAccountAvatar } from "../../../components/account/avatar/AccountAvatar";
-// @ts-ignore .png import error
-import gradient from "../../../assets/images/gradient.png";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { TextUtils } from "../../../utils/text-utils";
@@ -229,7 +220,6 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <div className={classes.header}>
         <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
-        <ProfileActionsCard currentAddress={accountId} />
       </div>
       <SizedBox height={30} />
       <DetailsTabs>
@@ -309,34 +299,5 @@ const Details: FunctionComponent = () => {
     </div>
   );
 };
-
-function ProfileActionsCard({ currentAddress }: { currentAddress: string }) {
-  const { logout, user, isLoggedIn } = useFlow();
-  const { sendTransaction } = useProjectActions();
-
-  if (!isLoggedIn || currentAddress !== user.addr) {
-    return null;
-  }
-  return (
-    <Card className={classes.actionCard}>
-      <img className={classes.background} src={gradient} alt="" />
-      <div className={classes.avatarWrapper}>
-        <LoggedInAccountAvatar size={50} />
-      </div>
-      <div className={classes.actionsWrapper}>
-        <ActionButton
-          onClick={() => sendTransaction()}
-          title="Send transaction"
-          icon={<SendTxIcon />}
-        />
-        <ActionButton
-          onClick={logout}
-          title="Disconnect wallet"
-          icon={<LogoutIcon />}
-        />
-      </div>
-    </Card>
-  );
-}
 
 export default Details;
