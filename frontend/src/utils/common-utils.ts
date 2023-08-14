@@ -1,4 +1,4 @@
-import { FlowserError, ManagedProcess } from "@flowser/shared";
+import { FlowserError } from "@flowser/shared";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 export class CommonUtils {
@@ -14,12 +14,8 @@ export class CommonUtils {
     )}`;
   }
 
-  static isEmulatorProcess(process: ManagedProcess): boolean {
-    return process.id === "emulator";
-  }
-
-  static isDevWalletProcess(process: ManagedProcess): boolean {
-    return process.id === "dev-wallet";
+  static isEmulatorProcessId(processId: string): boolean {
+    return processId === "emulator";
   }
 
   static isDecoratedPollingEntity<Entity>(

@@ -20,7 +20,6 @@ flow flowser
 
 - **Blockchain state**: See the whole state of your local Flow blockchain in real-time
 - **State snapshots**: Create and jump to [blockchain state snapshots](https://github.com/onflow/flow-emulator#managing-emulator-state) - similar to how Git works
-- **Development wallet**: Built in [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) integration for easy blockchain interactions
 - **Account storage inspection**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
 
 
