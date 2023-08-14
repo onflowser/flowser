@@ -7,13 +7,11 @@ import React, {
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
-import Search from "../../components/search/Search";
 import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
 import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
 import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
 import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
-import { useSearch } from "../../hooks/use-search";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetPollingOutputs } from "../../hooks/use-api";
@@ -24,8 +22,7 @@ import { SimpleButton } from "../../components/buttons/simple-button/SimpleButto
 import { TextUtils } from "../../utils/text-utils";
 import { Callout } from "../../components/callout/Callout";
 import { CommonUtils } from "../../utils/common-utils";
-
-const SEARCH_CONTEXT_NAME = "logs";
+import { SearchInput } from "../../components/search-input/SearchInput";
 
 const Logs: FunctionComponent = () => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
@@ -40,7 +37,7 @@ const Logs: FunctionComponent = () => {
   const scrollHeight = logWrapperElement?.scrollHeight ?? 0;
   const scrollDistanceToBottom = Math.abs(scrollBottom - scrollHeight);
   const shouldScrollToBottom = scrollDistanceToBottom < 10;
-  const { searchTerm, setPlaceholder } = useSearch(SEARCH_CONTEXT_NAME);
+  const [searchTerm, setSearchTerm] = useState("");
   const { logs, tailLogs } = useRelevantLogs({
     searchTerm,
     tailSize: 5,
@@ -67,10 +64,6 @@ const Logs: FunctionComponent = () => {
       logWrapperRef.current.scrollTo(options);
     }
   };
-
-  useEffect(() => {
-    setPlaceholder("Search logs");
-  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -164,9 +157,11 @@ const Logs: FunctionComponent = () => {
 
         <div className={classes.rightContainer}>
           {logDrawerSize !== "tiny" && (
-            <Search
-              context={SEARCH_CONTEXT_NAME}
+            <SearchInput
               className={classes.searchBox}
+              placeholder="Search logs ...."
+              searchTerm={searchTerm}
+              onChangeSearchTerm={setSearchTerm}
             />
           )}
           <div>

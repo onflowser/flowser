@@ -21,7 +21,6 @@ import {
 } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
-import Search from "../../../components/search/Search";
 import { useSearch } from "../../../hooks/use-search";
 import moment from "moment";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
@@ -184,9 +183,6 @@ function ProjectsListContent() {
 
   return (
     <div className={classes.projectList}>
-      <div className={classes.projectListHeader}>
-        <Search className={classes.projectSearch} context="projectSearch" />
-      </div>
       <ul className={classes.projectListBody}>
         {filteredProjects.map((project) => (
           <li key={project.id} className={classes.projectItem}>
