@@ -3,7 +3,7 @@ import { BadRequestException } from "@nestjs/common";
 import { typeOrmProtobufTransformer } from "../utils/common-utils";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { PollingEntity } from "../core/entities/polling.entity";
-import { DevWallet, Emulator, Gateway, Project } from "@flowser/shared";
+import { Emulator, Gateway, Project } from "@flowser/shared";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import * as crypto from "crypto";
 import { PollingEntityInitArguments } from "../utils/type-utils";
@@ -20,12 +20,6 @@ export class ProjectEntity extends PollingEntity {
 
   @Column()
   filesystemPath: string;
-
-  @Column("simple-json", {
-    nullable: true,
-    transformer: typeOrmProtobufTransformer(DevWallet),
-  })
-  devWallet: DevWallet;
 
   // TODO(milestone-3): gateway should be synced with network settings in flow.json
   @Column("simple-json", {
@@ -53,7 +47,6 @@ export class ProjectEntity extends PollingEntity {
     this.id = args?.id ?? "";
     this.name = args?.name ?? "";
     this.filesystemPath = args?.filesystemPath ?? "";
-    this.devWallet = args?.devWallet ?? DevWallet.fromPartial({});
     this.gateway = args?.gateway ?? Gateway.fromPartial({});
     this.emulator = args?.emulator ?? Emulator.fromPartial({});
     this.startBlockHeight = args?.startBlockHeight ?? 0;
@@ -70,7 +63,6 @@ export class ProjectEntity extends PollingEntity {
       filesystemPath: this.filesystemPath,
       startBlockHeight: this.startBlockHeight ?? -1,
       gateway: this.gateway,
-      devWallet: this.devWallet,
       emulator: this.emulator ?? undefined,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
@@ -104,7 +96,6 @@ export class ProjectEntity extends PollingEntity {
             grpcServerAddress: `http://localhost:${projectDto.emulator.grpcServerPort}`,
           })
         : Gateway.fromJSON(projectDto.gateway),
-      devWallet: DevWallet.fromJSON(projectDto.devWallet),
       emulator: Emulator.fromJSON(projectDto.emulator),
     });
   }

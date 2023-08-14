@@ -8,10 +8,9 @@ import { FlowConfigService } from "./services/config.service";
 import { FlowAccountStorageService } from "./services/storage.service";
 import { SnapshotEntity } from "./entities/snapshot.entity";
 import { FlowSnapshotService } from "./services/snapshot.service";
-import { FlowDevWalletService } from "./services/dev-wallet.service";
 import { ProcessesModule } from "../processes/processes.module";
 import { CoreModule } from "../core/core.module";
-import { BlocksModule } from '../blocks/blocks.module';
+import { BlocksModule } from "../blocks/blocks.module";
 
 @Module({
   imports: [
@@ -32,16 +31,14 @@ import { BlocksModule } from '../blocks/blocks.module';
     FlowConfigService,
     FlowAccountStorageService,
     FlowSnapshotService,
-    FlowDevWalletService,
   ],
   exports: [
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,
     FlowConfigService,
-    FlowDevWalletService,
     FlowAccountStorageService,
-    FlowSnapshotService
+    FlowSnapshotService,
   ],
 })
 export class FlowModule {}
