@@ -55,7 +55,7 @@ export class GoBindingsService {
         rawResponse += data.toString();
       });
 
-      if (request.stdIn) {
+      if (request.stdIn !== undefined) {
         childProcess.stdin.write(request.stdIn);
         // Write null char to signal the end of input.
         childProcess.stdin.write(new Uint8Array([0]));
