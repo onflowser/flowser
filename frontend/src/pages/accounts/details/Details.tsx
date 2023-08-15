@@ -44,6 +44,8 @@ import { TextUtils } from "../../../utils/text-utils";
 import { transactionTableColumns } from "../../transactions/main/Main";
 import { enableDetailsIntroAnimation } from "../../../config/common";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { AccountAvatar } from "../../../components/account/avatar/AccountAvatar";
+import { AccountName } from "../../../components/account/name/AccountName";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -195,7 +197,13 @@ const Details: FunctionComponent = () => {
     [
       {
         label: "Address",
-        value: account.address,
+        value: (
+          <>
+            <AccountAvatar address={account.address} />
+            <SizedBox width={10} />
+            <AccountName address={account.address} />
+          </>
+        ),
       },
       {
         label: "Balance",
