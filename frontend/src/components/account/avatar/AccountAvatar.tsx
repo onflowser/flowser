@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useMemo } from "react";
 
 import service from "../../../assets/images/avatars/service.svg";
 
@@ -18,32 +18,8 @@ import avatar13 from "../../../assets/images/avatars/13.jpg";
 import avatar14 from "../../../assets/images/avatars/14.jpg";
 import avatar15 from "../../../assets/images/avatars/15.jpg";
 import avatar16 from "../../../assets/images/avatars/16.jpg";
-
-type AccountAvatarProps = {
-  size?: number;
-  address: string;
-  className?: string;
-};
-
-export function AccountAvatar({
-  size,
-  address,
-  className,
-}: AccountAvatarProps): ReactElement | null {
-  return (
-    <img
-      className={className}
-      style={{
-        borderRadius: "50%",
-        backgroundColor: "ghostwhite",
-        height: size,
-        width: size,
-      }}
-      alt={address}
-      src={getUserAvatarUrl(address)}
-    />
-  );
-}
+import { useGetAddressIndex } from "../../../hooks/use-api";
+import { Spinner } from "../../spinner/Spinner";
 
 const avatarUrls = [
   avatar1,
@@ -64,20 +40,54 @@ const avatarUrls = [
   avatar16,
 ];
 
-// https://github.com/onflow/flow-go/blob/master/model/flow/chain.go#L98-L113
-function getUserAvatarUrl(address: string): string {
-  const isServiceAccount = [
-    "0xf8d6e0586b0a20c7",
-    "0x0000000000000001", // When using monotonic addresses setting
-  ].includes(address);
+type AccountAvatarProps = {
+  size?: number;
+  address: string;
+  className?: string;
+};
 
-  if (isServiceAccount) {
-    return service;
+export function AccountAvatar({
+  size = 30,
+  address,
+  className,
+}: AccountAvatarProps): ReactElement | null {
+  const { data } = useGetAddressIndex({
+    hexAddress: address,
+    chainId: "flow-emulator",
+  });
+
+  const avatarUrl = useMemo(() => {
+    const isServiceAccount = [
+      "0xf8d6e0586b0a20c7",
+      "0x0000000000000001", // When using monotonic addresses setting
+    ].includes(address);
+
+    if (isServiceAccount) {
+      return service;
+    }
+
+    if (!data) {
+      return undefined;
+    }
+
+    return avatarUrls[data.index % avatarUrls.length];
+  }, [data]);
+
+  if (avatarUrl === undefined) {
+    return <Spinner size={size} />;
   }
 
-  const normalizedDecAddress = Math.round(parseInt(address, 16) / 100000);
-
-  const avatarIndex = normalizedDecAddress % avatarUrls.length;
-
-  return avatarUrls[avatarIndex];
+  return (
+    <img
+      className={className}
+      style={{
+        borderRadius: "50%",
+        backgroundColor: "ghostwhite",
+        height: size,
+        width: size,
+      }}
+      alt={address}
+      src={avatarUrl}
+    />
+  );
 }

@@ -18,7 +18,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { WalletModule } from "./wallet/wallet.module";
 import { DataProcessingModule } from "./data-processing/data-processing.module";
-import { InteractionsModule } from "./interactions/interactions.module";
+import { GoBindingsModule } from "./go-bindings/go-bindings.module";
 
 @Global()
 @Module({
@@ -40,7 +40,7 @@ import { InteractionsModule } from "./interactions/interactions.module";
     ProcessesModule,
     WalletModule,
     DataProcessingModule,
-    InteractionsModule,
+    GoBindingsModule,
   ],
   controllers: [AppController],
 })

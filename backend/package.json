@@ -12,7 +12,7 @@
     "copy-static-assets": "cp -r ./static ./dist",
     "cleanup": "rm -rf node_modules && rm -rf dist",
     "build": "nest build --path ./tsconfig.build.json && yarn run copy-static-assets && npm run build:bin",
-    "build:bin": "go build -o dist/interactions/bin/parser ../internal/main.go",
+    "build:bin": "go build -o dist/go-bindings/bin/internal ../internal/main.go",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "rm -rf dist && mkdir -p dist && yarn run copy-static-assets && npm run build:bin && nest start --debug --watch --preserveWatchOutput",
     "start:prod": "node dist/main",
