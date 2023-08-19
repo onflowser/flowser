@@ -30,6 +30,13 @@ function StoredTemplates() {
     }
     return templates.filter((template) => template.name.includes(searchTerm));
   }, [searchTerm, templates]);
+  const filteredAndSortedTemplates = useMemo(
+    () =>
+      filteredTemplates.sort(
+        (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime()
+      ),
+    [filteredTemplates]
+  );
 
   return (
     <div>
@@ -40,7 +47,7 @@ function StoredTemplates() {
       />
       <SizedBox height={20} />
       <div className={classes.storedTemplates}>
-        {filteredTemplates.map((template) => (
+        {filteredAndSortedTemplates.map((template) => (
           <div
             key={template.id}
             onClick={() => forkTemplate(template)}

@@ -5,6 +5,8 @@ message InteractionTemplate {
   string name = 2;
   string code = 3;
   Source source = 4;
+  string created_date = 5;
+  string updated_date = 6;
 
   message Source {
     string file_path = 1;

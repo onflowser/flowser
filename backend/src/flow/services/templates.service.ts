@@ -39,7 +39,10 @@ export class FlowTemplatesService implements ProjectContextLifecycle {
   private async buildMaybeTemplate(
     filePath: string
   ): Promise<InteractionTemplate | undefined> {
-    const fileContent = await fs.readFile(filePath);
+    const [fileContent, fileStats] = await Promise.all([
+      fs.readFile(filePath),
+      fs.stat(filePath)
+    ]);
     const code = fileContent.toString("utf-8");
     const parseResponse = await this.goBindings.getParsedInteraction({
       sourceCode: code,
@@ -51,11 +54,14 @@ export class FlowTemplatesService implements ProjectContextLifecycle {
         InteractionKind.INTERACTION_SCRIPT,
         InteractionKind.INTERACTION_TRANSACTION,
       ].includes(parseResponse.interaction.kind);
+
     if (isValidInteraction) {
       return {
         id: filePath,
         name: path.basename(filePath),
         code,
+        updatedDate: fileStats.mtime.toISOString(),
+        createdDate: fileStats.ctime.toISOString(),
         source: {
           filePath,
         },

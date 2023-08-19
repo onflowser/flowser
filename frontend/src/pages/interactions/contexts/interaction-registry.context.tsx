@@ -24,7 +24,10 @@ type InteractionsRegistry = {
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
-export type CoreInteractionDefinition = Omit<InteractionTemplate, "source">;
+export type CoreInteractionDefinition = Omit<
+  InteractionTemplate,
+  "source" | "createdDate" | "updatedDate"
+>;
 
 export type InteractionDefinition = CoreInteractionDefinition & {
   fclValuesByIdentifier: FclValueLookupByIdentifier;
@@ -164,9 +167,8 @@ export function InteractionRegistryProvider(props: {
           isMutable: false,
           transactionOptions: undefined,
           fclValuesByIdentifier: new Map(),
-          // TODO(show-project-templates): Set updated/created date on the core template message
-          createdDate: new Date(),
-          updatedDate: new Date(),
+          createdDate: new Date(template.createdDate),
+          updatedDate: new Date(template.updatedDate),
         })
       ) ?? []),
     ],
