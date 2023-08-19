@@ -59,7 +59,7 @@ import {
   WellKnownAddressesOptions,
 } from "../flow/services/emulator.service";
 import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
-import { InteractionsService } from "../interactions/interactions.service";
+import { GoBindingsService } from "../go-bindings/go-bindings.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -103,7 +103,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
     private flowEmulatorService: FlowEmulatorService,
-    private interactionService: InteractionsService
+    private interactionService: GoBindingsService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -498,9 +498,10 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
   }) {
-    const parsedInteraction = await this.interactionService.parse({
-      sourceCode: options.flowTransaction.script,
-    });
+    const parsedInteraction =
+      await this.interactionService.getParsedInteraction({
+        sourceCode: options.flowTransaction.script,
+      });
     if (parsedInteraction.error) {
       this.logger.error(
         `Unexpected interaction parsing error: ${parsedInteraction.error}`

@@ -19,7 +19,7 @@ export * from "../generated/api/transactions";
 export * from "../generated/api/flow";
 export * from "../generated/api/snapshots";
 export * from "../generated/api/wallet";
-export * from "../generated/api/interactions";
+export * from "../generated/api/go-bindings";
 
 // Entities
 export * from "../generated/entities/config";

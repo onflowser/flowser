@@ -33,8 +33,9 @@ import {
   GetPollingProjectsResponse,
   ServiceStatus,
   FlowserError,
-  GetParsedInteractionRequest,
   GetParsedInteractionResponse,
+  GetAddressIndexResponse,
+  GetAddressIndexRequest,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -57,7 +58,7 @@ const {
   processesService,
   accountsService,
   snapshotService,
-  interactionsService,
+  goBindingsService,
 } = ServiceRegistry.getInstance();
 
 export function useGetPollingAccounts(): TimeoutPollingHook<Account> {
@@ -360,8 +361,8 @@ export function useGetParsedInteraction(
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
   const queryState = useQuery<GetParsedInteractionResponse>(
-    `/interactions/parse/${request.id}`,
-    () => interactionsService.parseInteraction(request)
+    `/go-bindings/get-parsed-interaction/${request.id}`,
+    () => goBindingsService.getParsedInteraction(request)
   );
 
   useEffect(() => {
@@ -369,6 +370,13 @@ export function useGetParsedInteraction(
   }, [request.sourceCode]);
 
   return queryState;
+}
+
+export function useGetAddressIndex(request: GetAddressIndexRequest) {
+  return useQuery<GetAddressIndexResponse>(
+    `/go-bindings/get-address-index/${JSON.stringify(request)}`,
+    () => goBindingsService.getAddressIndex(request)
+  );
 }
 
 export function useGetFlowCliInfo() {

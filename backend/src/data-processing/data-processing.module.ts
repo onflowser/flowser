@@ -8,7 +8,7 @@ import { ProcessorService } from "./processor.service";
 import { FlowModule } from "../flow/flow.module";
 import { ProcessesModule } from "../processes/processes.module";
 import { WalletModule } from "../wallet/wallet.module";
-import { InteractionsModule } from '../interactions/interactions.module';
+import { GoBindingsModule } from "../go-bindings/go-bindings.module";
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { InteractionsModule } from '../interactions/interactions.module';
     CoreModule,
     ProcessesModule,
     WalletModule,
-    InteractionsModule
+    GoBindingsModule,
   ],
   providers: [ProcessorService],
   exports: [ProcessorService],

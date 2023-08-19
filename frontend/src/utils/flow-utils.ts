@@ -80,18 +80,6 @@ export class FlowUtils {
     ) as FlowScriptError;
   }
 
-  static getUserAvatarUrl(address: string): string {
-    const isServiceAccount = [
-      "0xf8d6e0586b0a20c7",
-      "0x0000000000000001", // When using monotonic addresses setting
-    ].includes(address);
-    if (isServiceAccount) {
-      return "http://localhost:8701/settings.svg";
-    }
-    const appName = "Flowser";
-    return `https://avatars.onflow.org/avatar/avatar/${address}-${appName}.svg`;
-  }
-
   static isInitialBlockId(blockId: number | string): boolean {
     // initial parent id contains only zeros
     return `${blockId}`.replaceAll("0", "").length === 0;

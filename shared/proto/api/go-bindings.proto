@@ -12,3 +12,12 @@ message GetParsedInteractionResponse {
   google.protobuf.Struct program = 2;
   string error = 3;
 }
+
+message GetAddressIndexRequest {
+  string chain_id = 1;
+  string hex_address = 2;
+}
+
+message GetAddressIndexResponse {
+  uint32 index = 1;
+}
