@@ -41,7 +41,7 @@ export class FlowTemplatesService implements ProjectContextLifecycle {
   ): Promise<InteractionTemplate | undefined> {
     const [fileContent, fileStats] = await Promise.all([
       fs.readFile(filePath),
-      fs.stat(filePath)
+      fs.stat(filePath),
     ]);
     const code = fileContent.toString("utf-8");
     const parseResponse = await this.goBindings.getParsedInteraction({
@@ -72,7 +72,10 @@ export class FlowTemplatesService implements ProjectContextLifecycle {
   }
 
   private async findAllCadenceFiles(rootDirPath: string): Promise<string[]> {
-    const filePaths = await fs.readdir(rootDirPath);
+    const filePaths = await fs.readdir(rootDirPath).catch(() => {
+      // Likely a "not a directory" error, ignore.
+      return [];
+    });
 
     const ignoredDirNames = new Set(["node_modules"]);
 
