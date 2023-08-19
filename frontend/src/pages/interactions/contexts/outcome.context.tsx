@@ -11,8 +11,7 @@ import React, {
   useMemo,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
-// @ts-ignore FCL types
-import * as fcl from "@onflow/fcl";
+import fcl from "@onflow/fcl";
 import {
   InteractionKind,
   FclValues,

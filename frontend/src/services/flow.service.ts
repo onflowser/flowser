@@ -1,4 +1,7 @@
-import { GetFlowInteractionTemplatesResponse } from "@flowser/shared";
+import {
+  GetFlowInteractionTemplatesResponse,
+  GetFlowConfigResponse,
+} from "@flowser/shared";
 import { TransportService } from "./transports/transport.service";
 
 export class FlowService {
@@ -9,6 +12,14 @@ export class FlowService {
       requestMethod: "GET",
       resourceIdentifier: `/api/flow/templates`,
       responseProtobuf: GetFlowInteractionTemplatesResponse,
+    });
+  }
+
+  getConfig(): Promise<GetFlowConfigResponse> {
+    return this.transport.send({
+      requestMethod: "GET",
+      resourceIdentifier: `/api/flow/config`,
+      responseProtobuf: GetFlowConfigResponse,
     });
   }
 }

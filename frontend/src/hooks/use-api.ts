@@ -36,6 +36,7 @@ import {
   GetAddressIndexResponse,
   GetAddressIndexRequest,
   GetFlowInteractionTemplatesResponse,
+  GetFlowConfigResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
@@ -326,6 +327,14 @@ export function useGetPollingFlowInteractionTemplates() {
   return useQuery<GetFlowInteractionTemplatesResponse>(
     `/projects/templates`,
     () => flowService.getInteractionTemplates(),
+    { refetchInterval: 3000 }
+  );
+}
+
+export function useGetFlowConfig() {
+  return useQuery<GetFlowConfigResponse>(
+    `/projects/config`,
+    () => flowService.getConfig(),
     { refetchInterval: 3000 }
   );
 }

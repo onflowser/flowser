@@ -14,8 +14,7 @@ import {
   Gateway,
   ServiceStatus,
 } from "@flowser/shared";
-
-const fcl = require("@onflow/fcl");
+import fcl from "@onflow/fcl";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {

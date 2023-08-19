@@ -18,17 +18,28 @@ import {
   RollbackToHeightRequest,
   RollbackToHeightResponse,
   GetFlowInteractionTemplatesResponse,
+  GetFlowConfigResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowTemplatesService } from "./services/templates.service";
+import { FlowConfigService } from "./services/config.service";
 
 @Controller("flow")
 export class FlowController {
   constructor(
     private flowCliService: FlowCliService,
+    private flowConfigService: FlowConfigService,
     private flowSnapshotService: FlowSnapshotService,
     private flowTemplatesService: FlowTemplatesService
   ) {}
+
+  @Get("config")
+  async getConfig() {
+    const flowJson = this.flowConfigService.getRawConfig();
+    return GetFlowConfigResponse.toJSON({
+      flowJson: JSON.stringify(flowJson),
+    });
+  }
 
   @Get("version")
   async getVersion() {

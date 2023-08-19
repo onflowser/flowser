@@ -98,6 +98,10 @@ export class FlowConfigService implements ProjectContextLifecycle {
     this.detachListeners();
   }
 
+  public getRawConfig(): FlowCliConfig {
+    return this.config;
+  }
+
   public async reload() {
     this.logger.debug("Reloading flow.json config");
     this.detachListeners();
