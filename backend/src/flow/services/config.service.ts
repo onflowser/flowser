@@ -84,7 +84,7 @@ export type FlowAbstractAccountConfig = {
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
   private fileListenerController: AbortController | undefined;
-  private config: FlowCliConfig = {};
+  private config: FlowCliConfig | undefined;
   private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
 
@@ -98,7 +98,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
     this.detachListeners();
   }
 
-  public getRawConfig(): FlowCliConfig {
+  public getRawConfig(): FlowCliConfig | undefined {
     return this.config;
   }
 
@@ -110,7 +110,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   public getAccounts(): FlowAbstractAccountConfig[] {
-    if (!this.config.accounts) {
+    if (!this.config?.accounts) {
       throw new Error("Accounts config not loaded");
     }
     const accountEntries = Object.entries(this.config.accounts);
@@ -139,7 +139,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
   public async updateAccounts(
     newOrUpdatedAccounts: FlowAbstractAccountConfig[]
   ): Promise<void> {
-    if (!this.config.accounts) {
+    if (!this.config?.accounts) {
       throw new Error("Accounts config not loaded");
     }
     for (const newOrUpdatedAccount of newOrUpdatedAccounts) {

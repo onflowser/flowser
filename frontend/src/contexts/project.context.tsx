@@ -81,7 +81,7 @@ export function ProjectProvider({
         "flow.network": "emulator",
       });
 
-      if (flowConfigData) {
+      if (flowConfigData?.flowJson) {
         fcl.config().load({
           flowJSON: JSON.parse(flowConfigData.flowJson),
         });

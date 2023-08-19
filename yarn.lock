@@ -3841,7 +3841,7 @@
     eslint "^8.34.0"
     eslint-plugin-jsdoc "^40.0.0"
 
-"@onflow/fcl@^1.4.0":
+"@onflow/fcl@^1.5.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@onflow/fcl/-/fcl-1.5.1.tgz#3012c1013f8456a6119405023cd3f44a7c0bbcf6"
   integrity sha512-1jDcpWD9/f5qLZjC1TddyAZWjP7x9b75ZfL29fchdanu+WfwTeqvw9qL3AlgqI73VIMt7xU7mK4+sQWAnXAgrg==

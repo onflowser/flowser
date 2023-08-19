@@ -37,7 +37,7 @@ export class FlowController {
   async getConfig() {
     const flowJson = this.flowConfigService.getRawConfig();
     return GetFlowConfigResponse.toJSON({
-      flowJson: JSON.stringify(flowJson),
+      flowJson: flowJson ? JSON.stringify(flowJson) : "",
     });
   }
 
