@@ -12,6 +12,7 @@ import { ProcessesModule } from "../processes/processes.module";
 import { CoreModule } from "../core/core.module";
 import { BlocksModule } from "../blocks/blocks.module";
 import { FlowTemplatesService } from './services/templates.service';
+import { GoBindingsModule } from '../go-bindings/go-bindings.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FlowTemplatesService } from './services/templates.service';
     // to access data removal service from snapshots service.
     // Otherwise, this module shouldn't depend on many other modules.
     CoreModule,
+    GoBindingsModule
   ],
   controllers: [FlowController],
   providers: [
