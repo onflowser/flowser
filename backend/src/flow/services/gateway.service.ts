@@ -14,7 +14,7 @@ import {
   Gateway,
   ServiceStatus,
 } from "@flowser/shared";
-import fcl from "@onflow/fcl";
+import * as fcl from "@onflow/fcl";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {

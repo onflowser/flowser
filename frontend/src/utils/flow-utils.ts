@@ -15,7 +15,7 @@ type FlowScriptError = {
     script: string;
     arguments: unknown[];
   };
-  responseBody: {
+  responseBody?: {
     number: string;
     message: string;
   };

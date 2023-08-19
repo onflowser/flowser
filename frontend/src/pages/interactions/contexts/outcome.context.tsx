@@ -11,7 +11,7 @@ import React, {
   useMemo,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
-import fcl from "@onflow/fcl";
+import * as fcl from "@onflow/fcl";
 import {
   InteractionKind,
   FclValues,

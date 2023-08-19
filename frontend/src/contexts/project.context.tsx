@@ -24,7 +24,7 @@ import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
-import fcl from "@onflow/fcl";
+import * as fcl from "@onflow/fcl";
 import { SnapshotDialog } from "components/dialogs/snapshot/SnapshotDialog";
 
 export type ProjectActionsContextState = {
@@ -74,13 +74,12 @@ export function ProjectProvider({
     if (currentProject?.project) {
       const accessNodePort =
         currentProject.project.emulator?.restServerPort ?? 8888;
-      fcl
-        .config()
-        // flowser app details
-        .put("app.detail.icon", `http://localhost:6061/icon.png`)
-        .put("app.detail.title", "Flowser")
-        // Point App at Emulator
-        .put("accessNode.api", `http://localhost:${accessNodePort}`);
+      fcl.config({
+        "app.detail.icon": `http://localhost:6061/icon.png`,
+        "app.detail.title": "Flowser",
+        "accessNode.api": `http://localhost:${accessNodePort}`,
+        "flow.network": "emulator",
+      });
 
       if (flowConfigData) {
         fcl.config().load({
