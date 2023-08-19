@@ -80,12 +80,6 @@ export type FlowAbstractAccountConfig = {
   privateKey: string | undefined;
 };
 
-type ProjectContract = {
-  filePath: string;
-  name: string;
-  sourceCode: string;
-};
-
 @Injectable()
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
@@ -161,29 +155,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
   }
 
-  public async getProjectContracts(): Promise<ProjectContract[]> {
-    const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
-      (nameKey) => ({
-        name: nameKey,
-        filePath: this.getContractFilePath(nameKey),
-      })
-    );
-
-    const contractsSourceCode = await Promise.all(
-      contractNamesAndPaths.map(({ filePath }) =>
-        this.readProjectFile(filePath)
-      )
-    );
-
-    return contractNamesAndPaths.map(
-      ({ name, filePath }, index): ProjectContract => ({
-        name,
-        filePath,
-        sourceCode: contractsSourceCode[index],
-      })
-    );
-  }
-
   public hasConfigFile(): boolean {
     return fs.existsSync(this.getConfigPath());
   }
@@ -208,15 +179,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
 
   private detachListeners() {
     this.fileListenerController?.abort();
-  }
-
-  private getContractFilePath(contractNameKey: string) {
-    if (!this.config.contracts) {
-      throw new Error("Contracts config not loaded");
-    }
-    const contractConfig = this.config.contracts[contractNameKey];
-    const isSimpleFormat = typeof contractConfig === "string";
-    return isSimpleFormat ? contractConfig : contractConfig?.source;
   }
 
   private async load() {
