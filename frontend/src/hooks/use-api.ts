@@ -326,7 +326,7 @@ export function useGetPollingFlowInteractionTemplates() {
   return useQuery<GetFlowInteractionTemplatesResponse>(
     `/projects/templates`,
     () => flowService.getInteractionTemplates(),
-    { refetchInterval: 1000 }
+    { refetchInterval: 3000 }
   );
 }
 
