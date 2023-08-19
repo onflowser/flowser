@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  PreconditionFailedException,
 } from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
@@ -35,8 +36,8 @@ type FlowAccountsConfig = Record<FlowAccountName, FlowAccountConfig>;
 type FlowAccountName = "emulator-account" | string;
 
 type FlowAccountConfig = {
-  address: string;
-  key: FlowAccountKeyConfig;
+  address?: string;
+  key?: FlowAccountKeyConfig;
 };
 
 type FlowAccountKeySimpleConfig = string;
@@ -76,7 +77,7 @@ export type FlowAbstractAccountConfig = {
   name: string;
   // Possibly without the '0x' prefix.
   address: string;
-  privateKey: string;
+  privateKey: string | undefined;
 };
 
 type ProjectContract = {
@@ -117,11 +118,23 @@ export class FlowConfigService implements ProjectContextLifecycle {
     const accountEntries = Object.entries(this.config.accounts);
 
     return accountEntries.map(
-      ([name, config]): FlowAbstractAccountConfig => ({
-        name,
-        address: config.address,
-        privateKey: this.getPrivateKey(config.key),
-      })
+      ([name, accountConfig]): FlowAbstractAccountConfig => {
+        if (!accountConfig.address) {
+          throw this.missingConfigError(
+            `accounts.${accountConfig.address}.address`
+          );
+        }
+        if (!accountConfig.key) {
+          throw this.missingConfigError(
+            `accounts.${accountConfig.address}.key`
+          );
+        }
+        return {
+          name,
+          address: accountConfig.address,
+          privateKey: this.getPrivateKey(accountConfig.key),
+        };
+      }
     );
   }
 
@@ -140,13 +153,12 @@ export class FlowConfigService implements ProjectContextLifecycle {
     await this.save();
   }
 
-  private getPrivateKey(keyConfig: FlowAccountKeyConfig): string {
-    const privateKey =
-      typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
-    if (!privateKey) {
-      throw new Error("Private key not found in config");
-    }
-    return privateKey;
+  private getPrivateKey(keyConfig: FlowAccountKeyConfig): string | undefined {
+    // Private keys can also be defined in external files or env variables,
+    // but for now just ignore those, since those are likely very sensitive credentials,
+    // that should be used for deployments only.
+    // See: https://developers.flow.com/next/tools/toolchains/flow-cli/flow.json/configuration#accounts
+    return typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
   }
 
   public async getProjectContracts(): Promise<ProjectContract[]> {
@@ -245,5 +257,11 @@ export class FlowConfigService implements ProjectContextLifecycle {
     }
     // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);
+  }
+
+  private missingConfigError(path: string) {
+    return new PreconditionFailedException(
+      `Missing flow.json configuration key: ${path}`
+    );
   }
 }
