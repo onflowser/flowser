@@ -11,6 +11,7 @@ import { FlowSnapshotService } from "./services/snapshot.service";
 import { ProcessesModule } from "../processes/processes.module";
 import { CoreModule } from "../core/core.module";
 import { BlocksModule } from "../blocks/blocks.module";
+import { FlowTemplatesService } from './services/templates.service';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { BlocksModule } from "../blocks/blocks.module";
   ],
   controllers: [FlowController],
   providers: [
+    FlowTemplatesService,
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,
@@ -33,6 +35,7 @@ import { BlocksModule } from "../blocks/blocks.module";
     FlowSnapshotService,
   ],
   exports: [
+    FlowTemplatesService,
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,

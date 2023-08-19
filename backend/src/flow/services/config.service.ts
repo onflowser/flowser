@@ -7,7 +7,6 @@ import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/project.entity";
-import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
 import { isObject } from "../../utils/common-utils";
@@ -80,6 +79,12 @@ export type FlowAbstractAccountConfig = {
   privateKey: string;
 };
 
+type ProjectContract = {
+  filePath: string;
+  name: string;
+  sourceCode: string;
+};
+
 @Injectable()
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
@@ -124,7 +129,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
     newOrUpdatedAccounts: FlowAbstractAccountConfig[]
   ): Promise<void> {
     if (!this.config.accounts) {
-      throw new Error("Accounts config not loaded")
+      throw new Error("Accounts config not loaded");
     }
     for (const newOrUpdatedAccount of newOrUpdatedAccounts) {
       this.config.accounts[newOrUpdatedAccount.name] = {
@@ -144,7 +149,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
     return privateKey;
   }
 
-  public async getContractTemplates(): Promise<ContractTemplate[]> {
+  public async getProjectContracts(): Promise<ProjectContract[]> {
     const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
       (nameKey) => ({
         name: nameKey,
@@ -158,23 +163,13 @@ export class FlowConfigService implements ProjectContextLifecycle {
       )
     );
 
-    return contractNamesAndPaths.map(({ name, filePath }, index) =>
-      ContractTemplate.fromPartial({
+    return contractNamesAndPaths.map(
+      ({ name, filePath }, index): ProjectContract => ({
         name,
         filePath,
         sourceCode: contractsSourceCode[index],
       })
     );
-  }
-
-  public async getTransactionTemplates(): Promise<TransactionTemplate[]> {
-    // TODO(milestone-x): Is there a way to retrieve all project transaction files?
-    // For now we can't reliably tell where are transactions source files located,
-    // because they are not defined in flow.json config file - but this may be doable in the future.
-    // For now we have 2 options:
-    // - try to find a /transactions folder and read all files (hopefully transactions) within it
-    // - provide a Flowser setting to specify a path to the transactions folder
-    return [];
   }
 
   public hasConfigFile(): boolean {
@@ -205,7 +200,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
 
   private getContractFilePath(contractNameKey: string) {
     if (!this.config.contracts) {
-      throw new Error("Contracts config not loaded")
+      throw new Error("Contracts config not loaded");
     }
     const contractConfig = this.config.contracts[contractNameKey];
     const isSimpleFormat = typeof contractConfig === "string";
@@ -246,7 +241,7 @@ export class FlowConfigService implements ProjectContextLifecycle {
       throw new InternalServerErrorException("Postfix path not provided");
     }
     if (!this.projectContext) {
-      throw new Error("Project context not found")
+      throw new Error("Project context not found");
     }
     // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);

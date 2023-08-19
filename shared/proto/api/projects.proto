@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "entities/projects.proto";
-import "entities/config.proto";
+import "entities/interactions.proto";
 import "entities/common.proto";
 import "api/core.proto";
 
@@ -47,10 +47,6 @@ message GetSingleProjectResponse {
   Project project = 1;
 }
 
-// Represents the set of all objects associated with your project.
-// This response won't support the default polling behaviour.
-// In case this will be needed, implement separate endpoints for retrieving individual objects.
-message GetProjectObjectsResponse {
-  repeated TransactionTemplate transactions = 1;
-  repeated ContractTemplate contracts = 2;
+message GetProjectInteractionTemplates {
+  repeated InteractionTemplate templates = 1;
 }

@@ -25,7 +25,6 @@ import {
   GetPollingOutputsResponse,
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
-  GetProjectObjectsResponse,
   GetPollingManagedProcessesResponse,
   GetProjectRequirementsResponse,
   GetProjectStatusResponse,
@@ -319,18 +318,6 @@ export function useGetPollingProjectStatus() {
     `/projects/status`,
     () => projectsService.getStatus(),
     { refetchInterval: 1000 }
-  );
-}
-
-export function useGetProjectObjects() {
-  const { enabled } = useTimeoutPollingState();
-  return useQuery<GetProjectObjectsResponse>(
-    `/flow/objects`,
-    () => projectsService.getAllProjectObjects(),
-    {
-      refetchInterval: 1000,
-      enabled,
-    }
   );
 }
 

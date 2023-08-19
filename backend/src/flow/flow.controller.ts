@@ -6,8 +6,6 @@ import {
   Put,
   UseInterceptors,
 } from "@nestjs/common";
-import { FlowGatewayService } from "./services/gateway.service";
-import { FlowEmulatorService } from "./services/emulator.service";
 import { FlowCliService } from "./services/cli.service";
 import { FlowSnapshotService } from "./services/snapshot.service";
 import {
@@ -17,21 +15,18 @@ import {
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
   GetPollingEmulatorSnapshotsRequest,
-  GetProjectObjectsResponse,
   RollbackToHeightRequest,
   RollbackToHeightResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
-import { FlowConfigService } from "./services/config.service";
+import { FlowTemplatesService } from "./services/templates.service";
 
 @Controller("flow")
 export class FlowController {
   constructor(
-    private flowGatewayService: FlowGatewayService,
-    private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
-    private flowConfigService: FlowConfigService,
-    private flowSnapshotService: FlowSnapshotService
+    private flowSnapshotService: FlowSnapshotService,
+    private flowTemplatesService: FlowTemplatesService
   ) {}
 
   @Get("version")
@@ -40,18 +35,9 @@ export class FlowController {
     return GetFlowCliInfoResponse.toJSON(info);
   }
 
-  @Get("objects")
-  async findCurrentProjectObjects() {
-    const [transactions, contracts] = await Promise.all([
-      this.flowConfigService.getTransactionTemplates(),
-      this.flowConfigService.getContractTemplates(),
-    ]);
-    return GetProjectObjectsResponse.toJSON(
-      GetProjectObjectsResponse.fromPartial({
-        transactions,
-        contracts,
-      })
-    );
+  @Get("templates")
+  getInteractionTemplates() {
+    return this.flowTemplatesService.getLocalTemplates();
   }
 
   @Post("snapshots/polling")
