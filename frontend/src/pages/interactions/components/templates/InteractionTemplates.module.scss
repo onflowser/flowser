@@ -2,6 +2,7 @@
 @import "styles/spacings";
 @import "styles/typography";
 @import "styles/animations";
+@import "styles/scrollbars";
 
 .root {
   padding: $spacing-l;
@@ -14,6 +15,9 @@
     display: flex;
     flex-direction: column;
     row-gap: $spacing-base;
+    height: 500px;
+    overflow-y: scroll;
+    @include styledScrollbars();
     .item {
       cursor: pointer;
       display: flex;
