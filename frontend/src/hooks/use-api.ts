@@ -35,19 +35,20 @@ import {
   GetParsedInteractionResponse,
   GetAddressIndexResponse,
   GetAddressIndexRequest,
+  GetFlowInteractionTemplatesResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
 import {
   useTimeoutPolling,
   TimeoutPollingHook,
-  useTimeoutPollingState,
   useProjectTimeoutPolling,
 } from "contexts/timeout-polling.context";
 import { useEffect, useState } from "react";
 
 const {
   projectsService,
+  flowService,
   commonService,
   contractsService,
   transactionsService,
@@ -317,6 +318,14 @@ export function useGetPollingProjectStatus() {
   return useQuery<GetProjectStatusResponse>(
     `/projects/status`,
     () => projectsService.getStatus(),
+    { refetchInterval: 1000 }
+  );
+}
+
+export function useGetPollingFlowInteractionTemplates() {
+  return useQuery<GetFlowInteractionTemplatesResponse>(
+    `/projects/templates`,
+    () => flowService.getInteractionTemplates(),
     { refetchInterval: 1000 }
   );
 }

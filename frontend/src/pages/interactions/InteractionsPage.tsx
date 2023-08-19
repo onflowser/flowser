@@ -70,7 +70,7 @@ export function InteractionsPage(): ReactElement {
           forkTemplate({
             id: crypto.randomUUID(),
             name: "New interaction",
-            sourceCode: "",
+            code: "",
             fclValuesByIdentifier: new Map(),
             transactionOptions: undefined,
             createdDate: new Date(),
@@ -106,8 +106,8 @@ function InteractionSourceEditor() {
   const { definition, partialUpdate } = useInteractionDefinitionManager();
   return (
     <CadenceEditor
-      value={definition.sourceCode}
-      onChange={(sourceCode) => partialUpdate({ sourceCode })}
+      value={definition.code}
+      onChange={(sourceCode) => partialUpdate({ code: sourceCode })}
     />
   );
 }

@@ -12,8 +12,7 @@ export function useInteractionName(
 
   return useMemo(
     () =>
-      templates.find((template) => template.sourceCode === props.sourceCode)
-        ?.name,
+      templates.find((template) => template.code === props.sourceCode)?.name,
     [props.sourceCode, templates]
   );
 }

@@ -17,6 +17,7 @@ import {
   GetPollingEmulatorSnapshotsRequest,
   RollbackToHeightRequest,
   RollbackToHeightResponse,
+  GetFlowInteractionTemplatesResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowTemplatesService } from "./services/templates.service";
@@ -36,8 +37,11 @@ export class FlowController {
   }
 
   @Get("templates")
-  getInteractionTemplates() {
-    return this.flowTemplatesService.getLocalTemplates();
+  async getInteractionTemplates() {
+    const templates = await this.flowTemplatesService.getLocalTemplates();
+    return GetFlowInteractionTemplatesResponse.toJSON({
+      templates,
+    });
   }
 
   @Post("snapshots/polling")

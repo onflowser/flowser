@@ -1,5 +1,11 @@
 syntax = "proto3";
 
+import "entities/interactions.proto";
+
 message GetFlowCliInfoResponse {
   string version = 1;
+}
+
+message GetFlowInteractionTemplatesResponse {
+  repeated InteractionTemplate templates = 1;
 }
