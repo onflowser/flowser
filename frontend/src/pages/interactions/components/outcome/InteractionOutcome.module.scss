@@ -8,19 +8,4 @@
     padding: $spacing-base;
   }
 
-  .tab {
-    max-width: 120px;
-    padding: $spacing-s !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .tabLabel {
-    text-align: center;
-  }
-
-  .tabWrapper, .inactiveTab {
-    background: #1C2128;
-  }
 }

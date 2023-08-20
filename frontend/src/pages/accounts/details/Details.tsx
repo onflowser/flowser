@@ -29,8 +29,8 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import Table from "../../../components/table/Table";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import Badge from "../../../components/badge/Badge";
-import { PublicPrivateStorageCard } from "./PublicPrivateStorageCard";
-import { InternalStorageCard } from "./InternalStorageCard";
+import { PublicPrivateStorageCard } from "./storage/cards/PublicPrivateStorageCard";
+import { InternalStorageCard } from "./storage/cards/InternalStorageCard";
 import classNames from "classnames";
 import { useUrlQuery } from "../../../hooks/use-url-query";
 import {
@@ -46,6 +46,8 @@ import { enableDetailsIntroAnimation } from "../../../config/common";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { AccountAvatar } from "../../../components/account/avatar/AccountAvatar";
 import { AccountName } from "../../../components/account/name/AccountName";
+import { StyledTabs } from "../../../components/tabs/StyledTabs";
+import { AccountStorage } from "./storage/AccountStorage";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -112,72 +114,14 @@ const columnsKeys = [
 ];
 
 const Details: FunctionComponent = () => {
-  const { track } = useAnalytics();
   const { accountId } = useParams<AccountDetailsRouteParams>();
-  const urlQueryParams = useUrlQuery();
-  const focusedStorageId = urlQueryParams.get("focusedStorageId");
   const { setBreadcrumbs } = useNavigation();
   const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
-  const { data: storageItems } = useGetPollingStorageByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
-  const [expandedCardIds, setExpandedCardIds] = useState(
-    new Set<string>(focusedStorageId ? [focusedStorageId] : [])
-  );
-
-  useEffect(() => {
-    if (focusedStorageId) {
-      expandCardById(focusedStorageId);
-      // We need to wait for the virtual nodes to be added to the browser DOM.
-      // This is achieved with setTimeout call - wait for the next window paint.
-      // There might be a better React way to do this.
-      setTimeout(() => {
-        const targetDomNode = document.getElementById(focusedStorageId);
-        window.scrollTo(0, targetDomNode?.offsetTop ?? 0);
-      });
-    }
-  }, [focusedStorageId, storageItems]);
-
-  const expandCardById = (id: string) => {
-    setExpandedCardIds((prev) => new Set(prev.add(id)));
-  };
-
-  const minimizeCardById = (id: string) => {
-    expandedCardIds.delete(id);
-    setExpandedCardIds(new Set(expandedCardIds));
-  };
-
-  const toggleCardExpand = (id: string) => {
-    if (expandedCardIds.has(id)) {
-      track(AnalyticEvent.CLICK_MINIMIZE_STORAGE_CARD, {
-        storageId: id,
-      });
-      minimizeCardById(id);
-    } else {
-      track(AnalyticEvent.CLICK_EXPAND_STORAGE_CARD, {
-        storageId: id,
-      });
-      expandCardById(id);
-    }
-  };
-
-  const privateStorageItems = storageItems.filter(
-    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PRIVATE
-  );
-  const publicStorageItems = storageItems.filter(
-    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
-  );
-  const internalStorageItems = storageItems.filter(
-    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
-  );
-
-  const privateAndPublicStorageItems = [
-    ...publicStorageItems,
-    ...privateStorageItems,
-  ];
 
   const breadcrumbs: Breadcrumb[] = [
     { to: "/accounts", label: "Accounts" },
@@ -227,60 +171,53 @@ const Details: FunctionComponent = () => {
         <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
       </div>
       <SizedBox height={30} />
-      <DetailsTabs>
-        <DetailsTabItem label="STORAGE" value={storageItems?.length}>
-          <div className={classes.grid}>
-            {privateAndPublicStorageItems.map((item) => (
-              <PublicPrivateStorageCard
-                key={item.id}
-                enableIntroAnimation={enableDetailsIntroAnimation}
-                currentAccountAddress={account.address}
-                storageItem={item}
+      <StyledTabs
+        tabs={[
+          {
+            id: "storage",
+            label: "Storage",
+            content: <AccountStorage account={account} />,
+          },
+          {
+            id: "transactions",
+            label: "Transactions",
+            content: (
+              <Table<DecoratedPollingEntity<Transaction>>
+                enableIntroAnimations={enableDetailsIntroAnimation}
+                columns={transactionTableColumns}
+                data={transactions}
               />
-            ))}
-          </div>
-          <div className={classes.gridExtendable}>
-            {internalStorageItems.map((item) => (
-              <InternalStorageCard
-                key={item.id}
-                storageItem={item}
-                enableIntroAnimation={enableDetailsIntroAnimation}
-                onToggleExpand={() => toggleCardExpand(item.id)}
-                isExpanded={expandedCardIds.has(item.id)}
-                className={classNames({
-                  [classes.gridItemExtended]: expandedCardIds.has(item.id),
-                })}
+            ),
+          },
+          {
+            id: "contracts",
+            label: "Contracts",
+            content: (
+              <Table<DecoratedPollingEntity<AccountContract>>
+                enableIntroAnimations={enableDetailsIntroAnimation}
+                columns={columnsContract}
+                data={contracts}
               />
-            ))}
-          </div>
-        </DetailsTabItem>
-        <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
-          <Table<DecoratedPollingEntity<Transaction>>
-            enableIntroAnimations={enableDetailsIntroAnimation}
-            columns={transactionTableColumns}
-            data={transactions}
-          />
-        </DetailsTabItem>
-        <DetailsTabItem label="CONTRACTS" value={contracts.length}>
-          <Table<DecoratedPollingEntity<AccountContract>>
-            enableIntroAnimations={enableDetailsIntroAnimation}
-            columns={columnsContract}
-            data={contracts}
-          />
-        </DetailsTabItem>
-        <DetailsTabItem label="KEYS" value={keys.length}>
-          <Table<DecoratedPollingEntity<AccountKey>>
-            enableIntroAnimations={enableDetailsIntroAnimation}
-            columns={columnsKeys}
-            data={keys}
-          />
-        </DetailsTabItem>
-        {!!account.code && (
-          <DetailsTabItem label="SCRIPTS" value="<>">
-            <ContentDetailsScript script={account.code} />
-          </DetailsTabItem>
-        )}
-      </DetailsTabs>
+            ),
+          },
+          {
+            id: "keys",
+            label: "Keys",
+            content: (
+              <Table<DecoratedPollingEntity<AccountKey>>
+                enableIntroAnimations={enableDetailsIntroAnimation}
+                columns={columnsKeys}
+                data={keys}
+              />
+            ),
+          },
+          {
+            id: "scripts",
+            label: "Scripts",
+            content: <ContentDetailsScript script={account.code} />,
+          },
+        ]}
+      />
     </div>
   );
 };

@@ -5,9 +5,7 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
   variant?: "table-line" | "black" | "header-row" | "dark-blue";
   active?: boolean;
-  loading?: boolean;
   showIntroAnimation?: boolean;
-  loadingText?: string;
 };
 
 const Card: FunctionComponent<CardProps> = ({
@@ -15,8 +13,6 @@ const Card: FunctionComponent<CardProps> = ({
   className,
   variant = "dark-blue",
   active = false,
-  loading = false,
-  loadingText = "Loading ...",
   showIntroAnimation,
   ...restProps
 }) => {
@@ -28,7 +24,6 @@ const Card: FunctionComponent<CardProps> = ({
       } ${className} ${showIntroAnimation ? classes.introAnimation : ""}`}
       {...restProps}
     >
-      {loading && <span className={classes.loading}>{loadingText}</span>}
       {children}
     </div>
   );

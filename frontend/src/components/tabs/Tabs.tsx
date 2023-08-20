@@ -1,6 +1,6 @@
 import classNames from "classnames";
-import React, { ReactElement } from "react";
-import classes from "./TabList.module.scss";
+import React, { ReactElement, useState } from "react";
+import classes from "./Tabs.module.scss";
 import { FlowserIcon } from "../icons/Icons";
 
 export type TabItem = {
@@ -9,7 +9,7 @@ export type TabItem = {
   content: React.ReactNode;
 };
 
-type TabListProps = {
+export type TabsProps = {
   label?: string;
   className?: string;
   tabClassName?: string;
@@ -17,25 +17,38 @@ type TabListProps = {
   tabLabelClassName?: string;
   activeTabClassName?: string;
   inactiveTabClassName?: string;
-  currentTabId: string | undefined;
-  onChangeTab: (tab: TabItem) => void;
+  contentClassName?: string;
+  currentTabId?: string | undefined;
+  onChangeTab?: (tab: TabItem) => void;
   onClose?: (tab: TabItem) => void;
   onAddNew?: () => void;
   tabs: TabItem[];
 };
 
-export function TabList(props: TabListProps): ReactElement {
+export function Tabs(props: TabsProps): ReactElement {
   const {
     label,
     className,
     tabWrapperClassName,
     tabLabelClassName,
     tabs,
-    currentTabId,
-    onChangeTab,
     onClose,
     onAddNew,
   } = props;
+
+  const [fallbackCurrentTabId, setFallbackCurrentTabId] = useState(
+    props.tabs[0]?.id
+  );
+  const currentTabId = props.currentTabId ?? fallbackCurrentTabId;
+
+  function onChangeTab(tab: TabItem) {
+    if (props.onChangeTab) {
+      props.onChangeTab(tab);
+    } else {
+      setFallbackCurrentTabId(tab.id);
+    }
+  }
+
   const currentTab = tabs.find((tab) => tab.id === currentTabId);
   return (
     <div className={classNames(classes.root, className)}>
@@ -74,7 +87,9 @@ export function TabList(props: TabListProps): ReactElement {
           </button>
         )}
       </div>
-      {currentTab?.content}
+      <div className={props.contentClassName} style={{ flex: 1 }}>
+        {currentTab?.content}
+      </div>
     </div>
   );
 }

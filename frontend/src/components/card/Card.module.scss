@@ -13,20 +13,6 @@
     @include addNewContentAnimation(.4s);
   }
 
-  .loading {
-    position: absolute;
-    display: flex;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: $table-line-background;
-    align-items: center;
-    justify-content: center;
-    color: $gray-10;
-    opacity: 0.8;
-  }
-
   &.header-row {
     background-color: $dark-violet;
     color: $grey;

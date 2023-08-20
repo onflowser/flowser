@@ -1,11 +1,11 @@
 import React, { ReactElement } from "react";
 import classes from "./PublicPrivateStorageCard.module.scss";
-import { StorageDomainBadge } from "./StorageDomainBadge";
+import { StorageDomainBadge } from "../StorageDomainBadge";
 import { NavLink } from "react-router-dom";
-import { ReactComponent as LinkIcon } from "../../../assets/icons/link.svg";
+import { ReactComponent as LinkIcon } from "../../../../../assets/icons/link.svg";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import gradient from "../../../assets/images/gradient.png";
+import gradient from "../../../../../assets/images/gradient.png";
 import classNames from "classnames";
 
 type StorageCardProps = {
