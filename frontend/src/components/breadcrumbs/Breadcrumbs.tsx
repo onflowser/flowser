@@ -5,7 +5,6 @@ import classes from "./Breadcrumbs.module.scss";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 
 export function Breadcrumbs(): ReactElement | null {
-  const breadCrumbsBarHeight = 50;
   const { isShowBackButtonVisible, isBreadcrumbsVisible, breadcrumbs } =
     useNavigation();
   const history = useHistory();
@@ -35,7 +34,9 @@ export function Breadcrumbs(): ReactElement | null {
           ))
           .reduce((prev, curr, i) => [
             prev,
-            <span key={++i}>{">>"}</span>,
+            <span key={++i} className={classes.arrow}>
+              {">>"}
+            </span>,
             curr,
           ])}
       </div>

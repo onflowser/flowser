@@ -5,7 +5,6 @@ import { NavLink } from "react-router-dom";
 import { ReactComponent as LinkIcon } from "../../../assets/icons/link.svg";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-// @ts-ignore .png import error
 import gradient from "../../../assets/images/gradient.png";
 import classNames from "classnames";
 

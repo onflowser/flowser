@@ -9,8 +9,6 @@
   padding: 0 $spacing-base - 2px;
   border-radius: $border-radius-card;
   align-items: center;
-  background: $medium-violet;
-  margin: 0 $spacing-l;
 
   .backButtonWrapper {
     width: 40px;
@@ -39,13 +37,13 @@
     display: flex;
     align-items: center;
 
-    & span {
+    .arrow {
       margin: 0 $spacing-base * 0.5;
     }
 
     * {
       font-family: $font-family-inter;
-      font-size: $font-size-small - 1px;
+      font-size: $font-size-small;
       color: $color-grey;
       text-decoration: none;
     }

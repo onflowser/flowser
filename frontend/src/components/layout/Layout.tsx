@@ -39,12 +39,12 @@ const ProjectLayout: FunctionComponent = ({ children }) => {
     <div className={classes.root}>
       <SideNavigation className={classes.sideNavigation} />
       <div className={classes.mainContent}>
-        <Breadcrumbs />
         <div
           className={classNames(classes.body, {
             [classes.bodyWithMargin]: showMargin,
           })}
         >
+          <Breadcrumbs />
           {children}
         </div>
         <Logs />

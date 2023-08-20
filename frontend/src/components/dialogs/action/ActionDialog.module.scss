@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: $light-grey;
+  color: $gray-10;
   padding: $spacing-l * 3 $spacing-l * 6;
   @include fadeInAnimation(.5s);
 

@@ -23,7 +23,7 @@
     background-color: $table-line-background;
     align-items: center;
     justify-content: center;
-    color: $light-grey;
+    color: $gray-10;
     opacity: 0.8;
   }
 
@@ -34,10 +34,6 @@
 
   &.table-line {
     background-color: $table-line-background;
-  }
-
-  &.dark-blue {
-    //background-color: $dark-blue;
   }
 
   &.active {
