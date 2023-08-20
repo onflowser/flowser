@@ -25,13 +25,13 @@ export const RouteWithBackButton: FC<RouteProps> = (props) => {
   );
 };
 
-export const RouteWithLayout: FC<RouteProps> = (props) => (
-  <Layout>
+export const RouteWithProjectLayout: FC<RouteProps> = (props) => (
+  <ProjectLayout>
     <Route {...props} />
-  </Layout>
+  </ProjectLayout>
 );
 
-const Layout: FunctionComponent = ({ children }) => {
+const ProjectLayout: FunctionComponent = ({ children }) => {
   const location = useLocation();
   const showMargin = !location.pathname.startsWith(routes.interactions);
 
