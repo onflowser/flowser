@@ -8,7 +8,8 @@ import React, {
 } from "react";
 import { FclValueLookupByIdentifier } from "./definition.context";
 import { useLocalStorage } from "usehooks-ts";
-import { FclValue } from "@flowser/shared";
+import { FclValue, InteractionTemplate } from "@flowser/shared";
+import { useGetPollingFlowInteractionTemplates } from "../../../hooks/use-api";
 
 type InteractionsRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -23,11 +24,10 @@ type InteractionsRegistry = {
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
-export type CoreInteractionDefinition = {
-  id: string;
-  name: string;
-  sourceCode: string;
-};
+export type CoreInteractionDefinition = Omit<
+  InteractionTemplate,
+  "source" | "createdDate" | "updatedDate"
+>;
 
 export type InteractionDefinition = CoreInteractionDefinition & {
   fclValuesByIdentifier: FclValueLookupByIdentifier;
@@ -98,7 +98,7 @@ export function InteractionRegistryProvider(props: {
   const defaultInteraction: InteractionDefinition = {
     name: "Your first interaction",
     id: crypto.randomUUID(),
-    sourceCode: "",
+    code: "",
     fclValuesByIdentifier: new Map(),
     initialOutcome: undefined,
     transactionOptions: {
@@ -107,6 +107,8 @@ export function InteractionRegistryProvider(props: {
       payerAddress: "0xf8d6e0586b0a20c7",
     },
   };
+  const { data: projectTemplatesData } =
+    useGetPollingFlowInteractionTemplates();
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
@@ -117,12 +119,12 @@ export function InteractionRegistryProvider(props: {
       {
         id: "hello-world-script",
         name: "Hello World",
-        sourceCode: helloWorldScript,
+        code: helloWorldScript,
       },
       {
         id: "script-with-arguments",
         name: "Arguments example",
-        sourceCode: helloWorldScriptWithArguments,
+        code: helloWorldScriptWithArguments,
         fclValuesByIdentifier: new Map([
           ["a", "Hello"],
           ["b", "World"],
@@ -131,7 +133,7 @@ export function InteractionRegistryProvider(props: {
       {
         id: "hello-world-transaction",
         name: "Hello World",
-        sourceCode: helloWorldTransaction,
+        code: helloWorldTransaction,
       },
     ],
     []
@@ -159,8 +161,18 @@ export function InteractionRegistryProvider(props: {
           isMutable: true,
         })
       ),
+      ...(projectTemplatesData?.templates?.map(
+        (template): InteractionDefinitionTemplate => ({
+          ...template,
+          isMutable: false,
+          transactionOptions: undefined,
+          fclValuesByIdentifier: new Map(),
+          createdDate: new Date(template.createdDate),
+          updatedDate: new Date(template.updatedDate),
+        })
+      ) ?? []),
     ],
-    [customTemplates]
+    [customTemplates, projectTemplatesData]
   );
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     defaultInteraction,
@@ -189,7 +201,7 @@ export function InteractionRegistryProvider(props: {
     const newTemplate: RawInteractionDefinitionTemplate = {
       id: interaction.name,
       name: interaction.name,
-      sourceCode: interaction.sourceCode,
+      code: interaction.code,
       fclValuesByIdentifier: Object.fromEntries(
         interaction.fclValuesByIdentifier
       ),
@@ -210,7 +222,7 @@ export function InteractionRegistryProvider(props: {
     const definition: InteractionDefinition = {
       id: template.id,
       name: template.name,
-      sourceCode: template.sourceCode,
+      code: template.code,
       fclValuesByIdentifier: template.fclValuesByIdentifier,
       transactionOptions: template.transactionOptions,
       initialOutcome: undefined,

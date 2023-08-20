@@ -22,7 +22,6 @@ export * from "../generated/api/wallet";
 export * from "../generated/api/go-bindings";
 
 // Entities
-export * from "../generated/entities/config";
 export * from "../generated/entities/accounts";
 export * from "../generated/entities/blocks";
 export * from "../generated/entities/common";

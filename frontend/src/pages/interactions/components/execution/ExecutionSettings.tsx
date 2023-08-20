@@ -55,7 +55,7 @@ function TopContent() {
   const { setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
     useInteractionDefinitionManager();
 
-  if (definition.sourceCode === "") {
+  if (definition.code === "") {
     return <EmptyInteractionHelp />;
   }
 

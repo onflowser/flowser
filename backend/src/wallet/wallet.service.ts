@@ -188,7 +188,7 @@ export class WalletService implements ProjectContextLifecycle {
         // so just use empty value for now.
         // This should be updated by the aggregator service once it's picked up.
         keyEntity.publicKey = "";
-        keyEntity.privateKey = accountConfig.privateKey;
+        keyEntity.privateKey = accountConfig.privateKey ?? "";
 
         const accountEntity = AccountEntity.createDefault();
         accountEntity.address = accountAddress;

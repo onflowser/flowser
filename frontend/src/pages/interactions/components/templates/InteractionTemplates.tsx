@@ -8,6 +8,7 @@ import { SearchInput } from "../../../../components/search-input/SearchInput";
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../interaction-label/InteractionLabel";
+import { SizedBox } from "../../../../components/sized-box/SizedBox";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -29,45 +30,55 @@ function StoredTemplates() {
     }
     return templates.filter((template) => template.name.includes(searchTerm));
   }, [searchTerm, templates]);
+  const filteredAndSortedTemplates = useMemo(
+    () =>
+      filteredTemplates.sort(
+        (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime()
+      ),
+    [filteredTemplates]
+  );
 
   return (
-    <div className={classes.storedTemplates}>
+    <div>
       <SearchInput
         placeholder="Search interactions ..."
         searchTerm={searchTerm}
         onChangeSearchTerm={setSearchTerm}
       />
-      {filteredTemplates.map((template) => (
-        <div
-          key={template.id}
-          onClick={() => forkTemplate(template)}
-          className={classNames(classes.item, {
-            [classes.focusedItem]: focusedDefinition?.id === template.id,
-          })}
-        >
-          <InteractionLabel interaction={template} />
-          {template.isMutable && (
-            <FlowserIcon.Trash
-              className={classes.trash}
-              onClick={(e) => {
-                e.stopPropagation();
-                showDialog({
-                  title: "Remove template",
-                  body: (
-                    <span style={{ textAlign: "center" }}>
-                      Do you wanna permanently remove stored template
-                      {`"${template.name}"`}?
-                    </span>
-                  ),
-                  confirmButtonLabel: "REMOVE",
-                  cancelButtonLabel: "CANCEL",
-                  onConfirm: () => removeTemplate(template),
-                });
-              }}
-            />
-          )}
-        </div>
-      ))}
+      <SizedBox height={20} />
+      <div className={classes.storedTemplates}>
+        {filteredAndSortedTemplates.map((template) => (
+          <div
+            key={template.id}
+            onClick={() => forkTemplate(template)}
+            className={classNames(classes.item, {
+              [classes.focusedItem]: focusedDefinition?.id === template.id,
+            })}
+          >
+            <InteractionLabel interaction={template} />
+            {template.isMutable && (
+              <FlowserIcon.Trash
+                className={classes.trash}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showDialog({
+                    title: "Remove template",
+                    body: (
+                      <span style={{ textAlign: "center" }}>
+                        Do you wanna permanently remove stored template
+                        {`"${template.name}"`}?
+                      </span>
+                    ),
+                    confirmButtonLabel: "REMOVE",
+                    cancelButtonLabel: "CANCEL",
+                    onConfirm: () => removeTemplate(template),
+                  });
+                }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

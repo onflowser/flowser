@@ -6,8 +6,6 @@ import {
   Put,
   UseInterceptors,
 } from "@nestjs/common";
-import { FlowGatewayService } from "./services/gateway.service";
-import { FlowEmulatorService } from "./services/emulator.service";
 import { FlowCliService } from "./services/cli.service";
 import { FlowSnapshotService } from "./services/snapshot.service";
 import {
@@ -17,22 +15,31 @@ import {
   RevertToEmulatorSnapshotRequest,
   RevertToEmulatorSnapshotResponse,
   GetPollingEmulatorSnapshotsRequest,
-  GetProjectObjectsResponse,
   RollbackToHeightRequest,
   RollbackToHeightResponse,
+  GetFlowInteractionTemplatesResponse,
+  GetFlowConfigResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
+import { FlowTemplatesService } from "./services/templates.service";
 import { FlowConfigService } from "./services/config.service";
 
 @Controller("flow")
 export class FlowController {
   constructor(
-    private flowGatewayService: FlowGatewayService,
-    private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
-    private flowSnapshotService: FlowSnapshotService
+    private flowSnapshotService: FlowSnapshotService,
+    private flowTemplatesService: FlowTemplatesService
   ) {}
+
+  @Get("config")
+  async getConfig() {
+    const flowJson = this.flowConfigService.getRawConfig();
+    return GetFlowConfigResponse.toJSON({
+      flowJson: flowJson ? JSON.stringify(flowJson) : "",
+    });
+  }
 
   @Get("version")
   async getVersion() {
@@ -40,18 +47,12 @@ export class FlowController {
     return GetFlowCliInfoResponse.toJSON(info);
   }
 
-  @Get("objects")
-  async findCurrentProjectObjects() {
-    const [transactions, contracts] = await Promise.all([
-      this.flowConfigService.getTransactionTemplates(),
-      this.flowConfigService.getContractTemplates(),
-    ]);
-    return GetProjectObjectsResponse.toJSON(
-      GetProjectObjectsResponse.fromPartial({
-        transactions,
-        contracts,
-      })
-    );
+  @Get("templates")
+  async getInteractionTemplates() {
+    const templates = await this.flowTemplatesService.getLocalTemplates();
+    return GetFlowInteractionTemplatesResponse.toJSON({
+      templates,
+    });
   }
 
   @Post("snapshots/polling")

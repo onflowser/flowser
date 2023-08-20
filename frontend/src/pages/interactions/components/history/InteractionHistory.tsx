@@ -60,13 +60,13 @@ function BlockItem(props: BlockItemProps) {
   });
 
   function onForkAsTemplate() {
-    if (!firstTransaction.proposalKey) {
-      throw new Error("Expecting proposalKey");
+    if (!firstTransaction?.proposalKey) {
+      return;
     }
     create({
       id: block.id,
       name: `Tx from block #${block.height}`,
-      sourceCode: firstTransaction.script,
+      code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
         firstTransaction.arguments.map((arg) => [
           arg.identifier,

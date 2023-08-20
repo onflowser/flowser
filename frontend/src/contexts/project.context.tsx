@@ -15,6 +15,7 @@ import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
 import {
   useGetCurrentProject,
+  useGetFlowConfig,
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../hooks/use-api";
@@ -23,7 +24,6 @@ import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
-// @ts-ignore missing fcl types
 import * as fcl from "@onflow/fcl";
 import { SnapshotDialog } from "components/dialogs/snapshot/SnapshotDialog";
 
@@ -58,6 +58,7 @@ export function ProjectProvider({
   const { showDialog, hideDialog } = useConfirmDialog();
   const { data: currentProject, refetch: refetchCurrentProject } =
     useGetCurrentProject();
+  const { data: flowConfigData } = useGetFlowConfig();
   const { data: blocks, refresh } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
@@ -70,18 +71,21 @@ export function ProjectProvider({
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
 
   useEffect(() => {
-    if (currentProject?.project) {
+    if (currentProject?.project && flowConfigData?.flowJson) {
       const accessNodePort =
         currentProject.project.emulator?.restServerPort ?? 8888;
       fcl
-        .config()
-        // flowser app details
-        .put("app.detail.icon", `http://localhost:6061/icon.png`)
-        .put("app.detail.title", "Flowser")
-        // Point App at Emulator
-        .put("accessNode.api", `http://localhost:${accessNodePort}`);
+        .config({
+          "app.detail.icon": `http://localhost:6061/icon.png`,
+          "app.detail.title": "Flowser",
+          "accessNode.api": `http://localhost:${accessNodePort}`,
+          "flow.network": "local",
+        })
+        .load({
+          flowJSON: JSON.parse(flowConfigData.flowJson),
+        });
     }
-  }, [currentProject]);
+  }, [currentProject, flowConfigData]);
 
   const confirmProjectRemove = async (project: Project) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });

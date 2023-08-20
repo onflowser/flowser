@@ -25,7 +25,6 @@ import {
   GetPollingOutputsResponse,
   EmulatorSnapshot,
   GetPollingEmulatorSnapshotsResponse,
-  GetProjectObjectsResponse,
   GetPollingManagedProcessesResponse,
   GetProjectRequirementsResponse,
   GetProjectStatusResponse,
@@ -36,19 +35,21 @@ import {
   GetParsedInteractionResponse,
   GetAddressIndexResponse,
   GetAddressIndexRequest,
+  GetFlowInteractionTemplatesResponse,
+  GetFlowConfigResponse,
 } from "@flowser/shared";
 import { ServiceRegistry } from "../services/service-registry";
 import { useQuery } from "react-query";
 import {
   useTimeoutPolling,
   TimeoutPollingHook,
-  useTimeoutPollingState,
   useProjectTimeoutPolling,
 } from "contexts/timeout-polling.context";
 import { useEffect, useState } from "react";
 
 const {
   projectsService,
+  flowService,
   commonService,
   contractsService,
   transactionsService,
@@ -322,15 +323,19 @@ export function useGetPollingProjectStatus() {
   );
 }
 
-export function useGetProjectObjects() {
-  const { enabled } = useTimeoutPollingState();
-  return useQuery<GetProjectObjectsResponse>(
-    `/flow/objects`,
-    () => projectsService.getAllProjectObjects(),
-    {
-      refetchInterval: 1000,
-      enabled,
-    }
+export function useGetPollingFlowInteractionTemplates() {
+  return useQuery<GetFlowInteractionTemplatesResponse>(
+    `/projects/templates`,
+    () => flowService.getInteractionTemplates(),
+    { refetchInterval: 3000 }
+  );
+}
+
+export function useGetFlowConfig() {
+  return useQuery<GetFlowConfigResponse>(
+    `/projects/config`,
+    () => flowService.getConfig(),
+    { refetchInterval: 3000 }
   );
 }
 

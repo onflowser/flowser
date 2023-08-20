@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { PollingEntity, PollingResponse } from "@flowser/shared";
 import { useQuery } from "react-query";
-import { useGatewayStatus } from "../hooks/use-api";
 
 export interface TimeoutPollingHook<Response extends PollingEntity> {
   stopPolling: () => void;

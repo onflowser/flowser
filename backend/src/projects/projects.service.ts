@@ -28,6 +28,7 @@ import * as fs from "fs";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
 import { WalletService } from "../wallet/wallet.service";
 import { FlowSnapshotService } from "../flow/services/snapshot.service";
+import { FlowTemplatesService } from '../flow/services/templates.service';
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -57,6 +58,7 @@ export class ProjectsService {
       this.flowSnapshotsService,
       // Wallet service also depends on the gateway service (needs to initialize fcl).
       this.walletService,
+      this.flowTemplatesService
     ];
 
   constructor(
@@ -69,7 +71,8 @@ export class ProjectsService {
     private flowConfigService: FlowConfigService,
     private commonService: CacheRemovalService,
     private walletService: WalletService,
-    private flowSnapshotsService: FlowSnapshotService
+    private flowSnapshotsService: FlowSnapshotService,
+    private flowTemplatesService: FlowTemplatesService
   ) {}
 
   getCurrentProject(): ProjectEntity | undefined {

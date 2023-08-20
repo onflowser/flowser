@@ -13,6 +13,7 @@ import { SnapshotService } from "./snapshots.service";
 import { AnalyticsService } from "./analytics.service";
 import { WalletService } from "./wallet.service";
 import { GoBindingsService } from "./go-bindings.service";
+import { FlowService } from "./flow.service";
 
 export class ServiceRegistry {
   private static instance: ServiceRegistry | undefined;
@@ -29,8 +30,9 @@ export class ServiceRegistry {
   public analyticsService: AnalyticsService;
   public walletService: WalletService;
   public goBindingsService: GoBindingsService;
+  public flowService: FlowService;
 
-  constructor(private readonly transport: TransportService) {
+  constructor(transport: TransportService) {
     this.projectsService = new ProjectsService(transport);
     this.commonService = new CommonService(transport);
     this.accountsService = new AccountsService(transport);
@@ -38,12 +40,12 @@ export class ServiceRegistry {
     this.contractsService = new ContractsService(transport);
     this.eventsService = new EventsService(transport);
     this.processesService = new ProcessesService(transport);
-    this.storageService = new StorageService(transport);
     this.transactionsService = new TransactionsService(transport);
     this.storageService = new StorageService(transport);
     this.snapshotService = new SnapshotService(transport);
     this.walletService = new WalletService(transport);
     this.goBindingsService = new GoBindingsService(transport);
+    this.flowService = new FlowService(transport);
     this.analyticsService = new AnalyticsService();
   }
 

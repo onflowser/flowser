@@ -11,7 +11,6 @@ import React, {
   useMemo,
 } from "react";
 import { CommonUtils } from "../../../utils/common-utils";
-// @ts-ignore FCL types
 import * as fcl from "@onflow/fcl";
 import {
   InteractionKind,
@@ -110,7 +109,7 @@ export function InteractionOutcomeManagerProvider(props: {
     }
     try {
       const result = await walletService.sendTransaction({
-        cadence: definition.sourceCode,
+        cadence: definition.code,
         authorizerAddresses: transactionOptions.authorizerAddresses,
         proposerAddress: transactionOptions.proposerAddress,
         payerAddress: transactionOptions.payerAddress,
@@ -149,7 +148,7 @@ export function InteractionOutcomeManagerProvider(props: {
   async function executeScript(definition: InteractionDefinition) {
     try {
       const result = await fcl.query({
-        cadence: definition.sourceCode,
+        cadence: definition.code,
         args: (arg: FclArgBuilder, t: FclTypeLookup) => {
           if (!parsedInteraction) {
             throw new Error("Interaction not parsed yet");

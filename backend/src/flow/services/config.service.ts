@@ -2,12 +2,12 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  PreconditionFailedException,
 } from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/project.entity";
-import { ContractTemplate, TransactionTemplate } from "@flowser/shared";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
 import { isObject } from "../../utils/common-utils";
@@ -36,8 +36,8 @@ type FlowAccountsConfig = Record<FlowAccountName, FlowAccountConfig>;
 type FlowAccountName = "emulator-account" | string;
 
 type FlowAccountConfig = {
-  address: string;
-  key: FlowAccountKeyConfig;
+  address?: string;
+  key?: FlowAccountKeyConfig;
 };
 
 type FlowAccountKeySimpleConfig = string;
@@ -77,14 +77,14 @@ export type FlowAbstractAccountConfig = {
   name: string;
   // Possibly without the '0x' prefix.
   address: string;
-  privateKey: string;
+  privateKey: string | undefined;
 };
 
 @Injectable()
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
   private fileListenerController: AbortController | undefined;
-  private config: FlowCliConfig = {};
+  private config: FlowCliConfig | undefined;
   private configFileName = "flow.json";
   private projectContext: ProjectEntity | undefined;
 
@@ -98,6 +98,10 @@ export class FlowConfigService implements ProjectContextLifecycle {
     this.detachListeners();
   }
 
+  public getRawConfig(): FlowCliConfig | undefined {
+    return this.config;
+  }
+
   public async reload() {
     this.logger.debug("Reloading flow.json config");
     this.detachListeners();
@@ -106,25 +110,37 @@ export class FlowConfigService implements ProjectContextLifecycle {
   }
 
   public getAccounts(): FlowAbstractAccountConfig[] {
-    if (!this.config.accounts) {
+    if (!this.config?.accounts) {
       throw new Error("Accounts config not loaded");
     }
     const accountEntries = Object.entries(this.config.accounts);
 
     return accountEntries.map(
-      ([name, config]): FlowAbstractAccountConfig => ({
-        name,
-        address: config.address,
-        privateKey: this.getPrivateKey(config.key),
-      })
+      ([name, accountConfig]): FlowAbstractAccountConfig => {
+        if (!accountConfig.address) {
+          throw this.missingConfigError(
+            `accounts.${accountConfig.address}.address`
+          );
+        }
+        if (!accountConfig.key) {
+          throw this.missingConfigError(
+            `accounts.${accountConfig.address}.key`
+          );
+        }
+        return {
+          name,
+          address: accountConfig.address,
+          privateKey: this.getPrivateKey(accountConfig.key),
+        };
+      }
     );
   }
 
   public async updateAccounts(
     newOrUpdatedAccounts: FlowAbstractAccountConfig[]
   ): Promise<void> {
-    if (!this.config.accounts) {
-      throw new Error("Accounts config not loaded")
+    if (!this.config?.accounts) {
+      throw new Error("Accounts config not loaded");
     }
     for (const newOrUpdatedAccount of newOrUpdatedAccounts) {
       this.config.accounts[newOrUpdatedAccount.name] = {
@@ -135,46 +151,12 @@ export class FlowConfigService implements ProjectContextLifecycle {
     await this.save();
   }
 
-  private getPrivateKey(keyConfig: FlowAccountKeyConfig): string {
-    const privateKey =
-      typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
-    if (!privateKey) {
-      throw new Error("Private key not found in config");
-    }
-    return privateKey;
-  }
-
-  public async getContractTemplates(): Promise<ContractTemplate[]> {
-    const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
-      (nameKey) => ({
-        name: nameKey,
-        filePath: this.getContractFilePath(nameKey),
-      })
-    );
-
-    const contractsSourceCode = await Promise.all(
-      contractNamesAndPaths.map(({ filePath }) =>
-        this.readProjectFile(filePath)
-      )
-    );
-
-    return contractNamesAndPaths.map(({ name, filePath }, index) =>
-      ContractTemplate.fromPartial({
-        name,
-        filePath,
-        sourceCode: contractsSourceCode[index],
-      })
-    );
-  }
-
-  public async getTransactionTemplates(): Promise<TransactionTemplate[]> {
-    // TODO(milestone-x): Is there a way to retrieve all project transaction files?
-    // For now we can't reliably tell where are transactions source files located,
-    // because they are not defined in flow.json config file - but this may be doable in the future.
-    // For now we have 2 options:
-    // - try to find a /transactions folder and read all files (hopefully transactions) within it
-    // - provide a Flowser setting to specify a path to the transactions folder
-    return [];
+  private getPrivateKey(keyConfig: FlowAccountKeyConfig): string | undefined {
+    // Private keys can also be defined in external files or env variables,
+    // but for now just ignore those, since those are likely very sensitive credentials,
+    // that should be used for deployments only.
+    // See: https://developers.flow.com/next/tools/toolchains/flow-cli/flow.json/configuration#accounts
+    return typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
   }
 
   public hasConfigFile(): boolean {
@@ -201,15 +183,6 @@ export class FlowConfigService implements ProjectContextLifecycle {
 
   private detachListeners() {
     this.fileListenerController?.abort();
-  }
-
-  private getContractFilePath(contractNameKey: string) {
-    if (!this.config.contracts) {
-      throw new Error("Contracts config not loaded")
-    }
-    const contractConfig = this.config.contracts[contractNameKey];
-    const isSimpleFormat = typeof contractConfig === "string";
-    return isSimpleFormat ? contractConfig : contractConfig?.source;
   }
 
   private async load() {
@@ -246,9 +219,15 @@ export class FlowConfigService implements ProjectContextLifecycle {
       throw new InternalServerErrorException("Postfix path not provided");
     }
     if (!this.projectContext) {
-      throw new Error("Project context not found")
+      throw new Error("Project context not found");
     }
     // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
     return path.join(this.projectContext.filesystemPath, pathPostfix);
+  }
+
+  private missingConfigError(path: string) {
+    return new PreconditionFailedException(
+      `Missing flow.json configuration key: ${path}`
+    );
   }
 }

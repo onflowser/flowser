@@ -1,7 +1,6 @@
 import {
   CreateProjectResponse,
   GetPollingProjectsRequest,
-  GetProjectObjectsResponse,
   GetProjectRequirementsResponse,
   GetProjectStatusResponse,
   Project,
@@ -59,14 +58,6 @@ export class ProjectsService {
       requestMethod: "GET",
       resourceIdentifier: "/api/projects",
       responseProtobuf: GetAllProjectsResponse,
-    });
-  }
-
-  getAllProjectObjects(): Promise<GetProjectObjectsResponse> {
-    return this.transport.send({
-      requestMethod: "GET",
-      resourceIdentifier: "/api/flow/objects",
-      responseProtobuf: GetProjectObjectsResponse,
     });
   }
 

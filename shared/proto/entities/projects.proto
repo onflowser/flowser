@@ -20,13 +20,13 @@ message ProjectRequirement {
 message Project {
   string id = 1;
   string name = 2;
-  string filesystem_path = 10;
+  string filesystem_path = 3;
   // Blockchain data will be fetched from this block height
   // Set this -1 to start fetching from the latest block
-  int32 start_block_height = 5;
+  int32 start_block_height = 4;
 
-  Gateway gateway = 6;
-  Emulator emulator = 7;
+  Gateway gateway = 5;
+  Emulator emulator = 6;
 
   string created_at = 8;
   string updated_at = 9;

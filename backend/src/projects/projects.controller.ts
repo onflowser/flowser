@@ -16,7 +16,6 @@ import {
   GetAllProjectsResponse,
   GetSingleProjectResponse,
   GetPollingProjectsResponse,
-  GetProjectObjectsResponse,
   UseProjectResponse,
   UpdateProjectResponse,
   CreateProjectResponse,
@@ -25,14 +24,10 @@ import {
   GetProjectStatusResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
-import { FlowConfigService } from "../flow/services/config.service";
 
 @Controller("projects")
 export class ProjectsController {
-  constructor(
-    private readonly projectsService: ProjectsService,
-    private readonly flowConfigService: FlowConfigService
-  ) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto) {
@@ -79,24 +74,10 @@ export class ProjectsController {
 
   @Get("current")
   async findCurrent() {
-    const project = await this.projectsService.getCurrentProjectOrFail();
+    const project = this.projectsService.getCurrentProjectOrFail();
     return GetSingleProjectResponse.toJSON(
       GetSingleProjectResponse.fromPartial({
         project: project.toProto(),
-      })
-    );
-  }
-
-  @Get("current/objects")
-  async findCurrentProjectObjects() {
-    const [transactions, contracts] = await Promise.all([
-      this.flowConfigService.getTransactionTemplates(),
-      this.flowConfigService.getContractTemplates(),
-    ]);
-    return GetProjectObjectsResponse.toJSON(
-      GetProjectObjectsResponse.fromPartial({
-        transactions,
-        contracts,
       })
     );
   }
@@ -105,7 +86,7 @@ export class ProjectsController {
   async default() {
     return GetSingleProjectResponse.toJSON(
       GetSingleProjectResponse.fromPartial({
-        project: await this.projectsService.getDefaultProject(),
+        project: this.projectsService.getDefaultProject(),
       })
     );
   }

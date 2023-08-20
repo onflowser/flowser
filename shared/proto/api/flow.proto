@@ -1,5 +1,16 @@
 syntax = "proto3";
 
+import "entities/interactions.proto";
+
 message GetFlowCliInfoResponse {
   string version = 1;
+}
+
+message GetFlowInteractionTemplatesResponse {
+  repeated InteractionTemplate templates = 1;
+}
+
+message GetFlowConfigResponse {
+  // flow.json configuration serialized as a JSON string.
+  string flowJson = 1;
 }
