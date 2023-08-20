@@ -71,21 +71,19 @@ export function ProjectProvider({
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
 
   useEffect(() => {
-    if (currentProject?.project) {
+    if (currentProject?.project && flowConfigData?.flowJson) {
       const accessNodePort =
         currentProject.project.emulator?.restServerPort ?? 8888;
-      fcl.config({
-        "app.detail.icon": `http://localhost:6061/icon.png`,
-        "app.detail.title": "Flowser",
-        "accessNode.api": `http://localhost:${accessNodePort}`,
-        "flow.network": "emulator",
-      });
-
-      if (flowConfigData?.flowJson) {
-        fcl.config().load({
+      fcl
+        .config({
+          "app.detail.icon": `http://localhost:6061/icon.png`,
+          "app.detail.title": "Flowser",
+          "accessNode.api": `http://localhost:${accessNodePort}`,
+          "flow.network": "local",
+        })
+        .load({
           flowJSON: JSON.parse(flowConfigData.flowJson),
         });
-      }
     }
   }, [currentProject, flowConfigData]);
 

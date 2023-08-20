@@ -15,6 +15,7 @@ import {
   ServiceStatus,
 } from "@flowser/shared";
 import * as fcl from "@onflow/fcl";
+import { FlowConfigService } from "./config.service";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -144,6 +145,8 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   private static readonly logger = new Logger(FlowGatewayService.name);
   private projectContext: ProjectEntity | undefined;
 
+  constructor(private readonly flowConfigService: FlowConfigService) {}
+
   onEnterProjectContext(project: ProjectEntity): void {
     this.projectContext = project;
     const { restServerAddress } = this.projectContext.gateway ?? {};
@@ -153,7 +156,14 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     FlowGatewayService.logger.debug(
       `@onflow/fcl listening on ${restServerAddress}`
     );
-    fcl.config().put("accessNode.api", restServerAddress);
+    fcl
+      .config({
+        "accessNode.api": restServerAddress,
+        "flow.network": "emulator",
+      })
+      .load({
+        flowJSON: this.flowConfigService.getRawConfig(),
+      });
   }
   onExitProjectContext(): void {
     this.projectContext = undefined;
