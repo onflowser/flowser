@@ -22,7 +22,6 @@ type CustomTableProps<TData> = {
   renderCustomRow?: (row: Row<TableData<TData>>) => ReactElement;
   headerRowClass?: string;
   bodyRowClass?: string | ((row: Row<TableData<TData>>) => string);
-  footerRowClass?: string;
   isInitialLoading?: boolean;
   error?: Error | string | null | undefined;
 };
@@ -54,7 +53,6 @@ function Table<TData>({
   renderCustomHeader,
   headerRowClass,
   bodyRowClass,
-  footerRowClass,
   className,
   error,
   enableIntroAnimations = true,
@@ -95,7 +93,6 @@ function Table<TData>({
               headerRowClass
             )}
             key={headerGroup.id}
-            variant="header-row"
           >
             {headerGroup.headers.map((header) => (
               <div
@@ -126,7 +123,6 @@ function Table<TData>({
             showIntroAnimation={
               showIntroAnimation(row.original) && enableIntroAnimations
             }
-            variant="table-line"
           >
             {row.getVisibleCells().map((cell) => (
               <div
@@ -139,21 +135,6 @@ function Table<TData>({
           </Card>
         )
       )}
-      {table.getFooterGroups().map((footerGroup) => (
-        <div
-          className={classNames(classes.tableRow, footerRowClass)}
-          key={footerGroup.id}
-        >
-          {footerGroup.headers.map((header) => (
-            <div
-              key={header.id}
-              className={header.column.columnDef.meta?.className}
-            >
-              {flexRender(header.column.columnDef.footer, header.getContext())}
-            </div>
-          ))}
-        </div>
-      ))}
     </div>
   );
 }
