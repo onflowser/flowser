@@ -29,11 +29,11 @@
       &.inactive {
         transform: translateX(0);
         transition: all 100ms;
-        background-color: #5B5E62;
+        background-color: $gray-30;
       }
 
       &.disabled {
-        background-color: $dark-grey;
+        background-color: $gray-50;
       }
     }
   }

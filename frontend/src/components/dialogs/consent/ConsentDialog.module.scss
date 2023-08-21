@@ -6,14 +6,12 @@
 }
 
 .root {
-  color: $grey;
   padding: $spacing-xl;
   .header {
     display: flex;
     align-items: center;
     .logo {
       border-radius: 50%;
-      background: $background;
       object-fit: scale-down;
       width: 50px;
       height: 50px;
@@ -32,7 +30,7 @@
       }
     }
     .rightSide {
-      color: $dark-grey;
+      color: $gray-20;
       flex: 1;
       text-align: end;
       li {
@@ -50,7 +48,6 @@
 
 .toggleAnalytics {
   display: flex;
-  color: $grey;
   .toggleButton {
     margin-right: $spacing-base;
   }

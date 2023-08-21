@@ -1,9 +1,9 @@
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Card.module.scss";
+import classNames from "classnames";
 
 type CardProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
-  variant?: "table-line" | "black" | "header-row" | "dark-blue";
   active?: boolean;
   showIntroAnimation?: boolean;
 };
@@ -11,17 +11,16 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
 const Card: FunctionComponent<CardProps> = ({
   children,
   className,
-  variant = "dark-blue",
   active = false,
   showIntroAnimation,
   ...restProps
 }) => {
   return (
     <div
-      className={`${classes.root} ${classes[variant]} ${
-        // TODO: fix the possibly undefined index "variant"
-        active ? classes.active : ""
-      } ${className} ${showIntroAnimation ? classes.introAnimation : ""}`}
+      className={classNames(classes.root, className, {
+        [classes.active]: active,
+        [classes.introAnimation]: showIntroAnimation,
+      })}
       {...restProps}
     >
       {children}

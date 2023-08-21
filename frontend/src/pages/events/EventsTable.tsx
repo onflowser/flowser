@@ -141,7 +141,6 @@ export function EventsTable(props: EventsTableProps): ReactElement {
             tableClasses.headerRow
           )}
           key={headerGroup.id}
-          variant="header-row"
         >
           {headerGroup.headers.map((header) => (
             <div
@@ -158,7 +157,6 @@ export function EventsTable(props: EventsTableProps): ReactElement {
           <Card
             className={classNames(tableClasses.tableRow, classes.tableRow)}
             showIntroAnimation={row.original.isNew}
-            variant="table-line"
           >
             {row.getVisibleCells().map((cell) => (
               <div

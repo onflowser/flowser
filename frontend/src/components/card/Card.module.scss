@@ -13,16 +13,4 @@
     @include addNewContentAnimation(.4s);
   }
 
-  &.header-row {
-    background-color: $dark-violet;
-    color: $grey;
-  }
-
-  &.table-line {
-    background-color: $table-line-background;
-  }
-
-  &.active {
-    border: 1px solid $yellow;
-  }
 }
