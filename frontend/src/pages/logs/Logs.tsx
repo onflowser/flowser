@@ -22,7 +22,7 @@ import { SimpleButton } from "../../components/buttons/simple-button/SimpleButto
 import { TextUtils } from "../../utils/text-utils";
 import { Callout } from "../../components/callout/Callout";
 import { CommonUtils } from "../../utils/common-utils";
-import { SearchInput } from "../../components/search-input/SearchInput";
+import { SearchInput } from "../../components/inputs/search-input/SearchInput";
 
 const Logs: FunctionComponent = () => {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
