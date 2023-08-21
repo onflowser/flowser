@@ -11,11 +11,15 @@
 
 .activeTab {
   background: $gray-100 !important;
-  border-bottom: 3px solid $violet-100 !important;
 }
 
 .tabLabel {
   text-align: center;
+}
+
+.tabWrapper {
+  border-bottom: 2px solid $violet-100 !important;
+
 }
 
 .tabWrapper, .inactiveTab {
