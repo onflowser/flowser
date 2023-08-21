@@ -4,10 +4,6 @@ import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./Details.module.scss";
-import {
-  DetailsTabItem,
-  DetailsTabs,
-} from "../../../components/details-tabs/DetailsTabs";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
@@ -26,6 +22,7 @@ import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { AccountLink } from "../../../components/account/link/AccountLink";
+import { StyledTabs } from "../../../components/tabs/StyledTabs";
 
 type RouteParams = {
   blockId: string;
@@ -110,6 +107,10 @@ const Details: FunctionComponent = () => {
   const detailsColumns: DetailsCardColumn[] = [
     [
       {
+        label: "Height",
+        value: String(block.height),
+      },
+      {
         label: "Block ID",
         value: block.id,
       },
@@ -124,6 +125,10 @@ const Details: FunctionComponent = () => {
         ),
       },
       {
+        label: "Collections",
+        value: String(block.collectionGuarantees?.length ?? 0),
+      },
+      {
         label: "Created date",
         value: TextUtils.longDate(block.createdAt),
       },
@@ -134,22 +139,21 @@ const Details: FunctionComponent = () => {
     <div className={classes.root}>
       <DetailsCard columns={detailsColumns} />
       <SizedBox height={30} />
-      <DetailsTabs>
-        <DetailsTabItem label="TRANSACTIONS" value={transactions.length}>
-          {transactions && (
-            <Table<DecoratedPollingEntity<Transaction>>
-              data={transactions}
-              columns={txTableColumns}
-              enableIntroAnimations={enableDetailsIntroAnimation}
-            />
-          )}
-        </DetailsTabItem>
-        <DetailsTabItem label="HEIGHT" value={block.height} />
-        <DetailsTabItem
-          label="COLLECTIONS"
-          value={block.collectionGuarantees?.length ?? 0}
-        />
-      </DetailsTabs>
+      <StyledTabs
+        tabs={[
+          {
+            id: "transactions",
+            label: "Transactions",
+            content: (
+              <Table<DecoratedPollingEntity<Transaction>>
+                data={transactions}
+                columns={txTableColumns}
+                enableIntroAnimations={enableDetailsIntroAnimation}
+              />
+            ),
+          },
+        ]}
+      />
     </div>
   );
 };
