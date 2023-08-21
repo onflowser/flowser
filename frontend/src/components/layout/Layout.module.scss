@@ -1,7 +1,6 @@
 @import "styles/spacings";
 @import "styles/colors";
 
-$grid-gap: 30px;
 $side-nav-width: 80px;
 
 .root {
@@ -18,6 +17,15 @@ $side-nav-width: 80px;
     flex-direction: column;
     min-height: 100vh;
     width: calc(100vw - $side-nav-width);
+    max-height: 100vh;
+    overflow-y: scroll;
+
+    .breadcrumbs {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: $gray-110;
+    }
 
     .body {
       color: $gray-10;
@@ -28,7 +36,12 @@ $side-nav-width: 80px;
     }
 
     .bodyWithMargin {
-      margin: $grid-gap $spacing-l 0;
+      margin: $spacing-l;
+    }
+
+    .logs {
+      position: sticky;
+      bottom: 0;
     }
   }
 

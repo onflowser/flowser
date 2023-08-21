@@ -1,6 +1,6 @@
 import React, { FC, FunctionComponent } from "react";
 import classes from "./Layout.module.scss";
-import Logs from "../../pages/logs/Logs";
+import { Logs } from "../../pages/logs/Logs";
 import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
@@ -39,15 +39,15 @@ const ProjectLayout: FunctionComponent = ({ children }) => {
     <div className={classes.root}>
       <SideNavigation className={classes.sideNavigation} />
       <div className={classes.mainContent}>
+        <Breadcrumbs className={classes.breadcrumbs} />
         <div
           className={classNames(classes.body, {
             [classes.bodyWithMargin]: showMargin,
           })}
         >
-          <Breadcrumbs />
           {children}
         </div>
-        <Logs />
+        <Logs className={classes.logs} />
       </div>
     </div>
   );

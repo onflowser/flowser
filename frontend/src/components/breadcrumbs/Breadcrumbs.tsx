@@ -3,8 +3,13 @@ import { NavLink, useHistory } from "react-router-dom";
 import { useNavigation } from "../../hooks/use-navigation";
 import classes from "./Breadcrumbs.module.scss";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
+import classNames from "classnames";
 
-export function Breadcrumbs(): ReactElement | null {
+type BreadcrumbsProps = {
+  className?: string;
+};
+
+export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
   const { isShowBackButtonVisible, isBreadcrumbsVisible, breadcrumbs } =
     useNavigation();
   const history = useHistory();
@@ -19,7 +24,7 @@ export function Breadcrumbs(): ReactElement | null {
   }
 
   return (
-    <div className={classes.root}>
+    <div className={classNames(classes.root, props.className)}>
       {isShowBackButtonVisible && (
         <div className={classes.backButtonWrapper} onClick={onBack}>
           <IconBackButton className={classes.backButton} />
