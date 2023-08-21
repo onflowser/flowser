@@ -11,6 +11,7 @@
 
 .activeTab {
   background: $gray-100 !important;
+  border-bottom: 2px solid $violet-100 !important;
 }
 
 .tabLabel {
@@ -18,8 +19,6 @@
 }
 
 .tabWrapper {
-  border-bottom: 2px solid $violet-100 !important;
-
 }
 
 .tabWrapper, .inactiveTab {
@@ -27,5 +26,6 @@
 }
 
 .content {
-  padding: $spacing-base 0;
+  padding: $spacing-l;
+  background: $gray-100;
 }

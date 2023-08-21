@@ -8,7 +8,7 @@
   flex-direction: column;
   width: 100%;
   border-radius: 10px;
-  background-color: $gray-100;
+  background-color: transparentize($gray-110, 0.5);
 
   &.introAnimation {
     @include addNewContentAnimation(.4s);
