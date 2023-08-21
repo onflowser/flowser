@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import classes from "./Details.module.scss";
-import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
+import { TransactionSource } from "./source/TransactionSource";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import {
@@ -61,8 +61,8 @@ const Details: FunctionComponent = () => {
         id: "script",
         label: "Script",
         content: (
-          <ContentDetailsScript
-            script={transaction.script}
+          <TransactionSource
+            code={transaction.script}
             arguments={transaction.arguments}
           />
         ),

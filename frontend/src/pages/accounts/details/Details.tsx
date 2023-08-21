@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import classes from "./Details.module.scss";
-import ContentDetailsScript from "../../../components/content-details-script/ContentDetailsScript";
 import { useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import {
@@ -23,6 +22,7 @@ import { AccountStorage } from "./storage/AccountStorage";
 import { TransactionsTable } from "../../transactions/main/TransactionsTable";
 import { ContractsTable } from "../../contracts/main/ContractsTable";
 import { KeysTable } from "./KeysTable";
+import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -111,7 +111,7 @@ const Details: FunctionComponent = () => {
           {
             id: "scripts",
             label: "Scripts",
-            content: <ContentDetailsScript script={account.code} />,
+            content: <CadenceEditor value={account.code} editable={false} />,
           },
         ]}
       />
