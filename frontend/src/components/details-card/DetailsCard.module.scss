@@ -4,6 +4,7 @@
 
 .root {
   overflow: scroll;
+  background: $gray-100;
   @include hiddenScrollbars();
 
   .content {
@@ -17,7 +18,7 @@
     .column {
       display: flex;
       flex-direction: column;
-      row-gap: $spacing-l;
+      row-gap: $spacing-s;
 
       & > div {
         display: flex;
