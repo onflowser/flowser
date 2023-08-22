@@ -95,7 +95,7 @@ export class WalletService implements ProjectContextLifecycle {
           parsedValue === "" && type.optional ? undefined : parsedValue;
 
         if (!FclValues.isFclValue(value)) {
-          throw new Error("Value not a fcl value");
+          throw new Error("Value not a fcl Value");
         }
 
         return {
@@ -185,7 +185,7 @@ export class WalletService implements ProjectContextLifecycle {
         keyEntity.index = 0;
         keyEntity.accountAddress = accountAddress;
         // Public key is not stored in flow.json,
-        // so just use empty value for now.
+        // so just use empty Value for now.
         // This should be updated by the aggregator service once it's picked up.
         keyEntity.publicKey = "";
         keyEntity.privateKey = accountConfig.privateKey ?? "";

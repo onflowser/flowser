@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
-import Card from "../../../components/card/Card";
+import Card from "../../../components/cards/base/Card";
 import Button from "../../../components/buttons/button/Button";
 import { routes } from "../../../constants/routes";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";

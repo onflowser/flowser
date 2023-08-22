@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { ReactElement, useState } from "react";
-import classes from "./Tabs.module.scss";
-import { FlowserIcon } from "../icons/Icons";
+import classes from "./BaseTabs.module.scss";
+import { FlowserIcon } from "../../icons/Icons";
 
 export type TabItem = {
   id: string;
@@ -9,7 +9,7 @@ export type TabItem = {
   content: React.ReactNode;
 };
 
-export type TabsProps = {
+export type BaseTabsProps = {
   label?: string;
   className?: string;
   tabClassName?: string;
@@ -25,7 +25,7 @@ export type TabsProps = {
   tabs: TabItem[];
 };
 
-export function Tabs(props: TabsProps): ReactElement {
+export function BaseTabs(props: BaseTabsProps): ReactElement {
   const {
     label,
     className,

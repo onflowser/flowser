@@ -10,7 +10,7 @@ type ValueProps = {
   variant?: ValueVariant;
 };
 
-const Value: FunctionComponent<ValueProps> = ({
+export const Value: FunctionComponent<ValueProps> = ({
   children,
   className,
   style,

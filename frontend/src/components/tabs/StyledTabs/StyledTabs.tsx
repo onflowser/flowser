@@ -1,12 +1,12 @@
 import classes from "./StyledTabs.module.scss";
-import { Tabs, TabsProps } from "./Tabs";
+import { BaseTabs, BaseTabsProps } from "../BaseTabs/BaseTabs";
 import React, { ReactElement } from "react";
 
-type StyledTabsProps = TabsProps;
+type StyledTabsProps = BaseTabsProps;
 
 export function StyledTabs(props: StyledTabsProps): ReactElement {
   return (
-    <Tabs
+    <BaseTabs
       tabWrapperClassName={classes.tabWrapper}
       inactiveTabClassName={classes.inactiveTab}
       tabLabelClassName={classes.tabLabel}

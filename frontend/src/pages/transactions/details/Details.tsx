@@ -3,16 +3,16 @@ import { useParams } from "react-router-dom";
 import classes from "./Details.module.scss";
 import { TransactionSource } from "./source/TransactionSource";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "@flowser/ui/fullscreen-loading/FullScreenLoading";
 import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
 } from "../../../hooks/use-api";
-import { TransactionError } from "../../../components/status/ErrorMessage";
+import { TransactionError } from "@flowser/ui/status/ErrorMessage";
 import { TransactionOverview } from "./TransactionOverview";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
-import { StyledTabs } from "../../../components/tabs/StyledTabs";
-import { TabItem } from "../../../components/tabs/Tabs";
+import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { StyledTabs } from "@flowser/ui/tabs/StyledTabs";
+import { TabItem } from "@flowser/ui/tabs/Tabs";
 import { EventsTable } from "../../events/EventsTable";
 import { SignaturesTable } from "./SignaturesTable";
 

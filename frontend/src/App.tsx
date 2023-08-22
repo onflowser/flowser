@@ -24,7 +24,6 @@ import Events from "./pages/events/Events";
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
-import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
 import {
   PlatformAdapterProvider,
@@ -99,7 +98,6 @@ export const FlowserRoutes = (): ReactElement => {
   return (
     <BrowserRouterEvents>
       <ConsentAnalytics />
-      <ProjectRequirements />
       <Switch>
         <Route path={routes.start} component={Start} />
         <RouteWithProjectLayout path={routes.accounts} component={Accounts} />

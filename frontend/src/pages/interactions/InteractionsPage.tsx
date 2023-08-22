@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from "react";
 import classes from "./InteractionsPage.module.scss";
-import { Tabs, TabItem } from "../../components/tabs/Tabs";
+import { Tabs, TabItem } from "@flowser/ui/tabs/Tabs";
 import { useInteractionRegistry } from "./contexts/interaction-registry.context";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
@@ -9,12 +9,12 @@ import {
   useInteractionDefinitionManager,
 } from "./contexts/definition.context";
 import { InteractionTemplates } from "./components/templates/InteractionTemplates";
-import { SizedBox } from "../../components/sized-box/SizedBox";
-import { LineSeparator } from "../../components/line-separator/LineSeparator";
+import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { LineSeparator } from "@flowser/uimisc/LineSeparator/LineSeparator";
 import { ExecutionSettings } from "./components/execution/ExecutionSettings";
-import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
+import { CadenceEditor } from "@flowser/ui/code/cadence/CadenceEditor";
 import { InteractionOutcome } from "./components/outcome/InteractionOutcome";
-import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
+import { SpinnerWithLabel } from "@flowser/ui/spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/interaction-label/InteractionLabel";
 
 export function InteractionsPage(): ReactElement {

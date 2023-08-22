@@ -78,7 +78,7 @@ export class FclValues {
           throw new Error("Expected dictionary.key to be set");
         }
         if (!cadenceType.dictionary?.value) {
-          throw new Error("Expected dictionary.value to be set");
+          throw new Error("Expected dictionary.Value to be set");
         }
         return t.Dictionary({
           key: this.getFclType(t, cadenceType.dictionary.key),

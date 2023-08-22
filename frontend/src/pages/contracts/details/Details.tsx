@@ -1,16 +1,13 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "@flowser/ui/fullscreen-loading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
 import classes from "./Details.module.scss";
-import {
-  DetailsCard,
-  DetailsCardColumn,
-} from "components/details-card/DetailsCard";
+import { TableCard, DetailsCardColumn } from "components/cards/table/TableCard";
 import { TextUtils } from "../../../utils/text-utils";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
-import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
+import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { CadenceEditor } from "@flowser/ui/code/cadence/CadenceEditor";
 
 type RouteParams = {
   contractId: string;
@@ -65,7 +62,7 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns} />
+      <TableCard columns={detailsColumns} />
       <SizedBox height={30} />
       <CadenceEditor value={contract.code} editable={false} />
     </div>

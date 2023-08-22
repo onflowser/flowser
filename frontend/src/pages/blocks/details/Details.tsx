@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "@flowser/uimisc/Label/Label";
+import Value from "@flowser/uimisc/Value/Value";
 import classes from "./Details.module.scss";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
@@ -12,17 +12,14 @@ import { Transaction } from "@flowser/shared";
 import Table from "../../../components/table/Table";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { ExecutionStatus } from "components/status/ExecutionStatus";
-import {
-  DetailsCard,
-  DetailsCardColumn,
-} from "components/details-card/DetailsCard";
+import { TableCard, DetailsCardColumn } from "components/cards/table/TableCard";
 import { TextUtils } from "../../../utils/text-utils";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { enableDetailsIntroAnimation } from "../../../config/common";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
-import { AccountLink } from "../../../components/account/link/AccountLink";
-import { StyledTabs } from "../../../components/tabs/StyledTabs";
+import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { AccountLink } from "@flowser/ui";
+import { StyledTabs } from "@flowser/ui/tabs/StyledTabs";
 
 type RouteParams = {
   blockId: string;
@@ -137,7 +134,7 @@ const Details: FunctionComponent = () => {
 
   return (
     <div className={classes.root}>
-      <DetailsCard columns={detailsColumns} />
+      <TableCard columns={detailsColumns} />
       <SizedBox height={30} />
       <StyledTabs
         tabs={[

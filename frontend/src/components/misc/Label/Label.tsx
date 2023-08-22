@@ -8,7 +8,7 @@ type LabelProps = {
   title?: string;
 };
 
-const Label: FunctionComponent<LabelProps> = ({
+export const Label: FunctionComponent<LabelProps> = ({
   children,
   className,
   variant = "normal",

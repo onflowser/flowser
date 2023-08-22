@@ -8,7 +8,7 @@ import { SearchInput } from "../../../../components/inputs/search-input/SearchIn
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../interaction-label/InteractionLabel";
-import { SizedBox } from "../../../../components/sized-box/SizedBox";
+import { SizedBox } from "@flowser/uimisc/SizedBox";
 
 export function InteractionTemplates(): ReactElement {
   return (

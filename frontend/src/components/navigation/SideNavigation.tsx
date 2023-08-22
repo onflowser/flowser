@@ -3,7 +3,7 @@ import classes from "./SideNavigation.module.scss";
 import { routes } from "../../constants/routes";
 import { NavLink } from "react-router-dom";
 import { FlowserIcon } from "components/icons/Icons";
-import { SizedBox } from "../sized-box/SizedBox";
+import { SizedBox } from "../misc/SizedBox";
 import classNames from "classnames";
 import { useGetCurrentProject } from "../../hooks/use-api";
 import { useProjectActions } from "../../contexts/project.context";

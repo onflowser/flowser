@@ -1,18 +1,18 @@
 import React, { FunctionComponent, useEffect, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "@flowser/uimisc/Label/Label";
+import Value from "@flowser/uimisc/Value/Value";
 import classes from "./Main.module.scss";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import MiddleEllipsis from "@flowser/ui/ellipsis/MiddleEllipsis";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { createColumnHelper } from "@tanstack/table-core";
-import Table from "../../../components/table/Table";
+import Table from "@flowser/ui/table/Table";
 import { Block } from "@flowser/shared";
 import {
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../../../hooks/use-api";
-import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
+import { SimpleButton } from "@flowser/ui/buttons/simple-button/SimpleButton";
 import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.svg";
 import ReactTimeago from "react-timeago";
 import { useProjectActions } from "../../../contexts/project.context";

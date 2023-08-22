@@ -5,7 +5,7 @@ import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
 import { SimpleButton } from "../../../../../components/buttons/simple-button/SimpleButton";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { JsonView } from "../../../../../components/json-view/JsonView";
+import { JsonView } from "../../../../../components/code/json/JsonView";
 
 type ExtendableStorageCardProps = {
   storageItem: DecoratedPollingEntity<AccountStorageItem>;

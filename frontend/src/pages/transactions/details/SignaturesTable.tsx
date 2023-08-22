@@ -1,12 +1,12 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "@flowser/uimisc/Label/Label";
+import Value from "@flowser/uimisc/Value/Value";
 import { NavLink } from "react-router-dom";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import MiddleEllipsis from "@flowser/ui/ellipsis/MiddleEllipsis";
 import classes from "./Details.module.scss";
 import React, { ReactElement } from "react";
-import Table from "../../../components/table/Table";
+import Table from "@flowser/ui/table/Table";
 
 const columnsHelper = createColumnHelper<SignableObject>();
 

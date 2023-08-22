@@ -36,7 +36,7 @@ export class ProjectEntity extends PollingEntity {
   emulator: Emulator | null;
 
   // User can specify (on a project level) the starting block height.
-  // Blockchain data will be fetched from this height value if set.
+  // Blockchain data will be fetched from this height Value if set.
   @Column({ nullable: true })
   startBlockHeight: number = 0;
 

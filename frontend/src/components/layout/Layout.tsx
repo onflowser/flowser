@@ -5,7 +5,7 @@ import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
 import { Breadcrumbs } from "../breadcrumbs/Breadcrumbs";
-import { SideNavigation } from "../side-navigation/SideNavigation";
+import { SideNavigation } from "../navigation/SideNavigation";
 import { routes } from "../../constants/routes";
 
 export const RouteWithBackButton: FC<RouteProps> = (props) => {

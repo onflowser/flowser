@@ -78,7 +78,7 @@ function getTargetStorageCardUrl(options: {
     params.set(focusedStorageIdParamKey, targetStorageId);
   }
 
-  // TODO(milestone-x): Navigate to a specific sub-structure of the react-json-view (research)?
+  // TODO(milestone-x): Navigate to a specific sub-structure of the react-json (research)?
   return borrowTypePathParts
     ? `/accounts/details/${targetAccountAddress}?${params.toString()}`
     : "#";

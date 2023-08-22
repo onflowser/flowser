@@ -1,6 +1,6 @@
 import React from "react";
-import { ActionDialog } from "../dialogs/action/ActionDialog";
-import { useGetProjectRequirements } from "../../hooks/use-api";
+import { ActionDialog } from "../../../../components/dialogs/action/ActionDialog";
+import { useGetProjectRequirements } from "../../../../hooks/use-api";
 import { ReactElement } from "react";
 import { ProjectRequirement, ProjectRequirementType } from "@flowser/shared";
 import classes from "./ProjectRequirements.module.scss";
