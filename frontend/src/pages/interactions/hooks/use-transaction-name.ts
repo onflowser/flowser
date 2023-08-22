@@ -54,7 +54,7 @@ export function useTransactionName(
 
   return useMemo(() => {
     if (!transaction?.script) {
-      return "Unknown";
+      return undefined;
     }
 
     const sanitizedTargetCode = sanitizeCadenceSource(transaction.script);
@@ -64,7 +64,7 @@ export function useTransactionName(
         sanitizeCadenceSource(template.code) === sanitizedTargetCode
     )?.name;
 
-    return matchingTemplateName ?? getDynamicName(transaction) ?? "Unknown";
+    return matchingTemplateName ?? getDynamicName(transaction);
   }, [transaction, templates]);
 }
 
