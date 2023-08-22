@@ -5,13 +5,14 @@ import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
-import classes from "./Main.module.scss";
+import classes from "./TransactionsTable.module.scss";
 import { AccountLink } from "../../../components/account/link/AccountLink";
 import { ExecutionStatus } from "../../../components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
+import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
@@ -45,6 +46,15 @@ const columns = [
     cell: (info) => (
       <Value>
         <AccountLink address={info.getValue()} />
+      </Value>
+    ),
+  }),
+  columnHelper.display({
+    id: "name",
+    header: () => <Label variant="medium">NAME</Label>,
+    cell: (info) => (
+      <Value>
+        <TransactionName transaction={info.row.original} />
       </Value>
     ),
   }),
@@ -85,4 +95,11 @@ export function TransactionsTable(props: TransactionsTableProps): ReactElement {
       columns={columns}
     />
   );
+}
+
+function TransactionName(props: { transaction: Transaction }) {
+  const name = useTransactionName({
+    transaction: props.transaction,
+  });
+  return <span>{name}</span>;
 }
