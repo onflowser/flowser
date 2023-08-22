@@ -17,10 +17,6 @@ import { ReactComponent as SnapshotIcon } from "../../../assets/icons/snapshot.s
 import ReactTimeago from "react-timeago";
 import { useProjectActions } from "../../../contexts/project.context";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import Card from "components/card/Card";
-import tableClasses from "../../../components/table/Table.module.scss";
-import { flexRender } from "@tanstack/react-table";
-import classNames from "classnames";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -127,45 +123,8 @@ const Main: FunctionComponent = () => {
       error={error}
       data={blocks}
       columns={columns}
-      renderCustomHeader={(headerGroup) => (
-        <Card
-          className={classNames(
-            tableClasses.tableRow,
-            classes.tableRow,
-            tableClasses.headerRow
-          )}
-          key={headerGroup.id}
-          variant="header-row"
-        >
-          {headerGroup.headers.map((header) => (
-            <div
-              key={header.id}
-              className={header.column.columnDef.meta?.className}
-            >
-              {flexRender(header.column.columnDef.header, header.getContext())}
-            </div>
-          ))}
-        </Card>
-      )}
-      renderCustomRow={(row) => (
-        <>
-          <Card
-            className={classNames(tableClasses.tableRow, classes.tableRow)}
-            key={row.id}
-            showIntroAnimation={row.original.isNew}
-            variant="table-line"
-          >
-            {row.getVisibleCells().map((cell) => (
-              <div
-                key={cell.id}
-                className={cell.column.columnDef.meta?.className}
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </div>
-            ))}
-          </Card>
-        </>
-      )}
+      headerRowClass={classes.tableRow}
+      bodyRowClass={classes.tableRow}
     />
   );
 };

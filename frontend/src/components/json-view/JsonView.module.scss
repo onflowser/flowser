@@ -1,4 +1,5 @@
 @import "styles/colors";
+@import "styles/scrollbars";
 
 .root {
   display: inline-block;
@@ -7,11 +8,5 @@
   height: 100%;
   width: 100%;
 
-  &::-webkit-scrollbar-track {
-    background-color: $code-background;
-  }
-
-  &::-webkit-scrollbar-corner {
-    background-color: $code-background;
-  }
+  @include hiddenScrollbars()
 }

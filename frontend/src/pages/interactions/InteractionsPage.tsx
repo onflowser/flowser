@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from "react";
 import classes from "./InteractionsPage.module.scss";
-import { TabList, TabItem } from "../../components/tab-list/TabList";
+import { Tabs, TabItem } from "../../components/tabs/Tabs";
 import { useInteractionRegistry } from "./contexts/interaction-registry.context";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/history/InteractionHistory";
@@ -51,14 +51,14 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
-      <TabList
+      <Tabs
         className={classes.leftSideMenu}
         currentTabId={currentSideMenuTabId}
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
       />
       <SizedBox width={20} />
-      <TabList
+      <Tabs
         className={classes.mainContent}
         tabClassName={classes.interactionTab}
         tabLabelClassName={classes.label}

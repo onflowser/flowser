@@ -1,4 +1,5 @@
 @import 'styles/colors';
+@import 'styles/rules';
 
 .root {
   z-index: 1001;
@@ -9,20 +10,22 @@
   left: 0;
   right: 0;
   overflow: hidden;
-  background-color: rgba(20, 28, 45, .9);
   justify-content: center;
   align-items: center;
-
+  background: transparentize($gray-110, 0.5);
+  backdrop-filter: blur(2px);
 
   .dialog {
     width: 600px;
     max-width: 90vw;
     min-height: 100px;
+    background: $gray-110;
+    border-radius: $border-radius-md;
+    border: 1px solid $gray-50;
 
     .card {
       max-height: 90vh;
       overflow-y: scroll;
     }
-
   }
 }

@@ -1,6 +1,6 @@
 import React, { FC, FunctionComponent } from "react";
 import classes from "./Layout.module.scss";
-import Logs from "../../pages/logs/Logs";
+import { Logs } from "../../pages/logs/Logs";
 import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
@@ -25,13 +25,13 @@ export const RouteWithBackButton: FC<RouteProps> = (props) => {
   );
 };
 
-export const RouteWithLayout: FC<RouteProps> = (props) => (
-  <Layout>
+export const RouteWithProjectLayout: FC<RouteProps> = (props) => (
+  <ProjectLayout>
     <Route {...props} />
-  </Layout>
+  </ProjectLayout>
 );
 
-const Layout: FunctionComponent = ({ children }) => {
+const ProjectLayout: FunctionComponent = ({ children }) => {
   const location = useLocation();
   const showMargin = !location.pathname.startsWith(routes.interactions);
 
@@ -39,7 +39,7 @@ const Layout: FunctionComponent = ({ children }) => {
     <div className={classes.root}>
       <SideNavigation className={classes.sideNavigation} />
       <div className={classes.mainContent}>
-        <Breadcrumbs />
+        <Breadcrumbs className={classes.breadcrumbs} />
         <div
           className={classNames(classes.body, {
             [classes.bodyWithMargin]: showMargin,
@@ -47,7 +47,7 @@ const Layout: FunctionComponent = ({ children }) => {
         >
           {children}
         </div>
-        <Logs />
+        <Logs className={classes.logs} />
       </div>
     </div>
   );

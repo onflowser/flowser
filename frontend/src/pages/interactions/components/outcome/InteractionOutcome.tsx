@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
-import { TransactionOverview } from "../../../transactions/details/components/overview/TransactionOverview";
+import { TransactionOverview } from "../../../transactions/details/TransactionOverview";
 import {
   ScriptError,
   TransactionError,
@@ -12,13 +12,14 @@ import {
   FlowScriptOutcome,
   FlowTransactionOutcome,
 } from "pages/interactions/contexts/interaction-registry.context";
-import { TabItem, TabList } from "../../../../components/tab-list/TabList";
+import { TabItem, Tabs } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { InteractionKind } from "@flowser/shared";
 import { ExternalLink } from "../../../../components/link/ExternalLink";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
 import { SpinnerWithLabel } from "../../../../components/spinner/SpinnerWithLabel";
+import { StyledTabs } from "../../../../components/tabs/StyledTabs";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -147,13 +148,9 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   }
 
   return (
-    <TabList
+    <StyledTabs
       label="Transaction"
       currentTabId={currentTabId}
-      tabWrapperClassName={classes.tabWrapper}
-      inactiveTabClassName={classes.inactiveTab}
-      tabLabelClassName={classes.tabLabel}
-      tabClassName={classes.tab}
       onChangeTab={(tab) => setCurrentTabId(tab.id)}
       tabs={tabs}
     />
@@ -199,13 +196,9 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
   }
 
   return (
-    <TabList
+    <StyledTabs
       label="Script"
       currentTabId={currentTabId}
-      tabWrapperClassName={classes.tabWrapper}
-      inactiveTabClassName={classes.inactiveTab}
-      tabLabelClassName={classes.tabLabel}
-      tabClassName={classes.tab}
       onChangeTab={(tab) => setCurrentTabId(tab.id)}
       tabs={tabs}
     />

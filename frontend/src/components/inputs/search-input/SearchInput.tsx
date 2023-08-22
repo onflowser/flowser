@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { ReactElement, useRef } from "react";
 import classes from "./SearchInput.module.scss";
-import { FlowserIcon } from "../icons/Icons";
+import { FlowserIcon } from "../../icons/Icons";
 
 type SearchInputProps = {
   className?: string;

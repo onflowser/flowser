@@ -2,15 +2,15 @@ import React, { ReactElement } from "react";
 import {
   DetailsCard,
   DetailsCardColumn,
-} from "../../../../../components/details-card/DetailsCard";
-import MiddleEllipsis from "../../../../../components/ellipsis/MiddleEllipsis";
-import classes from "../../Details.module.scss";
-import { ExecutionStatusBadge } from "../../../../../components/status/ExecutionStatusBadge";
-import { GrcpStatusBadge } from "../../../../../components/status/GrcpStatusBadge";
-import { TextUtils } from "../../../../../utils/text-utils";
+} from "../../../components/details-card/DetailsCard";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import classes from "./Details.module.scss";
+import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
+import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
+import { TextUtils } from "../../../utils/text-utils";
 import { Transaction } from "@flowser/shared";
 import { NavLink } from "react-router-dom";
-import { AccountLink } from "../../../../../components/account/link/AccountLink";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 type TransactionOverviewProps = {
   transaction: Transaction;

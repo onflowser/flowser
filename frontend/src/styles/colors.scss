@@ -1,51 +1,20 @@
-$color-additional-info-grey: #272f3e;
-$color-table-black: #272e3e;
 $color-not-active-button-grey: #606060;
 $color-not-active-button-text-grey: #8d8d8d;
-$color-main-text: #191919;
 $color-grey: #ABB4B8;
 $color-light-gray: #F7FAFC;
-$color-table-light: #424D61;
 $color-red: #D02525;
 $color-red-light: #CE5E5E;
-$color-input-border: #707070;
-
-$color-logs-border: #3188ca;
-
-/* TODO(milestone-x): Remove at some point */
-$dark-grey: #a2a2a2;
-$black: #353535;
-$color-mid-grey: #444b58;
 
 // new colors
 $purple: #cfc5f8;
 $yellow: #ffdd62;
 $blue: #9bdefa;
 $dark-violet: #3b3e5b;
-$background: #202a40;
-$background-highlight-1: #333c51;
-$background-highlight-2: #232d43;
-$light-grey: #E5E5E5;
-$light-green: #A2CD8C;
 $strong-green: #00E786;
 $gradient-1: linear-gradient(90deg, rgba(127, 137, 174, 1) 0%, rgba(138, 146, 175, 1) 4%, rgba(140, 147, 174, 1) 11%, rgba(147, 146, 176, 1) 15%, rgba(141, 143, 176, 1) 21%, rgba(131, 147, 175, 1) 57%, rgba(132, 149, 175, 1) 72%, rgba(124, 150, 175, 1) 89%, rgba(136, 160, 169, 1) 100%);
 
 // Se uporabi za besedilo, ki je na dark violet podlagi (navigacijska vrstica, 1st row in table)
 $grey: #c7cad0;
-
-$hover-background: #41465b;
-$code-background: #273045;
-$table-line-background: #363f53;
-
-// Se uporabi na details tabu
-$dark-blue: #273148;
-
-// se uporabi na popupih in ba details page za selected box
-$pop-up: #2c354a;
-
-// se uporabi za navigation drawer background (breadcrumbs)
-$medium-violet: #282e46;
-
 
 // --------- NEW COLORS -----------
 
@@ -54,11 +23,8 @@ $gray-20: #ffffffba;
 $gray-30: #707070;
 $gray-50: #565A5F;
 $gray-80: #31363C;
-// TODO(ui-revamp): Replace this with gray-100
-$new-color-2: #272B32;
 $gray-100: #272B32;
 $gray-110: #1C2128;
-// TODO(ui-revamp): Replace this with gray-110
-$new-color-1: #1C2128;
 
 $violet-100: #3B3E5B;
+$white: #FFF;

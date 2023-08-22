@@ -1,8 +1,7 @@
 import React, { FC, useState } from "react";
 import classes from "./ConfigurationSection.module.scss";
 import classNames from "classnames";
-import { ReactComponent as OpenIcon } from "assets/icons/open.svg";
-import { ReactComponent as CloseIcon } from "assets/icons/close.svg";
+import { FlowserIcon } from "../../../components/icons/Icons";
 
 export type ConfigurationSectionProps = {
   title: string;
@@ -37,9 +36,9 @@ export const ConfigurationSection: FC<ConfigurationSectionProps> = ({
                 {title.toLowerCase()} settings
               </span>
               {showAdvanced ? (
-                <CloseIcon className={classes.closeIcon} />
+                <FlowserIcon.Close className={classes.closeIcon} />
               ) : (
-                <OpenIcon className={classes.openIcon} />
+                <FlowserIcon.Open className={classes.openIcon} />
               )}
             </div>
           )}

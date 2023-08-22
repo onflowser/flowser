@@ -8,7 +8,7 @@ import {
   withRouter,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { RouteWithLayout } from "./components/layout/Layout";
+import { RouteWithProjectLayout } from "./components/layout/Layout";
 import { routes } from "./constants/routes";
 import { UiStateContextProvider } from "./contexts/ui-state.context";
 import "./App.scss";
@@ -102,16 +102,19 @@ export const FlowserRoutes = (): ReactElement => {
       <ProjectRequirements />
       <Switch>
         <Route path={routes.start} component={Start} />
-        <RouteWithLayout path={routes.accounts} component={Accounts} />
-        <RouteWithLayout path={routes.blocks} component={Blocks} />
-        <RouteWithLayout path={routes.transactions} component={Transactions} />
-        <RouteWithLayout path={routes.contracts} component={Contracts} />
-        <RouteWithLayout path={routes.events} component={Events} />
-        <RouteWithLayout
+        <RouteWithProjectLayout path={routes.accounts} component={Accounts} />
+        <RouteWithProjectLayout path={routes.blocks} component={Blocks} />
+        <RouteWithProjectLayout
+          path={routes.transactions}
+          component={Transactions}
+        />
+        <RouteWithProjectLayout path={routes.contracts} component={Contracts} />
+        <RouteWithProjectLayout path={routes.events} component={Events} />
+        <RouteWithProjectLayout
           path={routes.interactions}
           component={InteractionsPage}
         />
-        <RouteWithLayout
+        <RouteWithProjectLayout
           path={routes.configureCurrent}
           component={Configuration}
         />

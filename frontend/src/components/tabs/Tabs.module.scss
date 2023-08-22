@@ -34,7 +34,7 @@
         background: none;
         border: none;
         font-size: $font-size-normal;
-        color: #E5E5E5;
+        color: $gray-10;
         font-family: $font-family-inter;
         font-weight: bold;
         width: 100%;
@@ -49,11 +49,11 @@
       }
     }
     .tabButtonActive {
-      background: #272B32;
+      background: $gray-100;
     }
     .tabButtonInactive {
-      background: #33383e !important;
-      color: rgba(229, 229, 229, 0.56) !important;
+      background: $gray-80 !important;
+      color: $gray-20 !important;
     }
     .newTabButton {
       width: 20px;

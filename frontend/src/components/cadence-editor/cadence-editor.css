@@ -1,6 +1,7 @@
 /* Main editor container */
 .cadence-editor {
     width: 100%;
+    background: #272B32;
 }
 
 .cadence-editor .cm-editor {

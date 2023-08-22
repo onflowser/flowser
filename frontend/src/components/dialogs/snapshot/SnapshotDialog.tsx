@@ -3,7 +3,7 @@ import Button from "../../buttons/button/Button";
 import classes from "./SnapshotDialog.module.scss";
 import toast from "react-hot-toast";
 import { ServiceRegistry } from "../../../services/service-registry";
-import Input from "../../input/Input";
+import Input from "../../inputs/input/Input";
 import { ActionDialog } from "../action/ActionDialog";
 import { useCurrentProjectId } from "../../../hooks/use-api";
 import { useErrorHandler } from "../../../hooks/use-error-handler";

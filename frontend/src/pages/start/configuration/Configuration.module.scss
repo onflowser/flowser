@@ -19,7 +19,7 @@
       margin-top: $spacing-xl;
 
       .card {
-        padding: $spacing-l * 2;
+        padding: $spacing-l * 2 0;
         margin-bottom: $spacing-base;
       }
 
@@ -35,7 +35,7 @@
     }
 
     .title {
-      color: $light-grey;
+      color: $gray-10;
     }
   }
 

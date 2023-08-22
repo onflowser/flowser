@@ -20,7 +20,7 @@
     font-size: $font-size-small;
 
     margin-bottom: $spacing-base;
-    margin-left: $spacing-base * 3;
+    margin-left: $spacing-base;
 
     & > span:not(:first-child) {
       margin-left: $spacing-l;
@@ -37,7 +37,8 @@
     & > span:first-child {
       border-radius: 50%;
       background-color: $yellow;
-      color: $color-table-black;
+      color: $gray-80;
+      font-weight: bold;
       opacity: .8;
       width: 18px;
       height: 18px;

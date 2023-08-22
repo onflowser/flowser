@@ -1,5 +1,5 @@
 import React, {
-  FunctionComponent,
+  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -22,9 +22,13 @@ import { SimpleButton } from "../../components/buttons/simple-button/SimpleButto
 import { TextUtils } from "../../utils/text-utils";
 import { Callout } from "../../components/callout/Callout";
 import { CommonUtils } from "../../utils/common-utils";
-import { SearchInput } from "../../components/search-input/SearchInput";
+import { SearchInput } from "../../components/inputs/search-input/SearchInput";
 
-const Logs: FunctionComponent = () => {
+type LogsProps = {
+  className?: string;
+};
+
+export function Logs(props: LogsProps): ReactElement {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
   const { logDrawerSize, setSize } = useLogDrawer();
   const tinyLogRef = useRef<HTMLDivElement>(null);
@@ -119,7 +123,11 @@ const Logs: FunctionComponent = () => {
 
   return (
     <div
-      className={classNames(classes.root, getDrawerSizeClass())}
+      className={classNames(
+        classes.root,
+        getDrawerSizeClass(),
+        props.className
+      )}
       style={logDrawerSize === "custom" ? { top: mouseEvent?.clientY } : {}}
     >
       <VerticalDragLine
@@ -199,7 +207,7 @@ const Logs: FunctionComponent = () => {
       )}
     </div>
   );
-};
+}
 
 function LogLine({ log }: { log: ManagedProcessOutput }) {
   return (
@@ -287,5 +295,3 @@ const VerticalDragLine = ({
     />
   );
 };
-
-export default Logs;

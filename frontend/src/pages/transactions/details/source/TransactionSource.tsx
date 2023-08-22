@@ -1,24 +1,24 @@
 import React, { FunctionComponent } from "react";
-import Card from "../card/Card";
-import classes from "./ContentDetailsScript.module.scss";
-import Label from "../label/Label";
-import MiddleEllipsis from "../ellipsis/MiddleEllipsis";
-import Value from "../value/Value";
+import Card from "../../../../components/card/Card";
+import classes from "./TransactionSource.module.scss";
+import Label from "../../../../components/label/Label";
+import MiddleEllipsis from "../../../../components/ellipsis/MiddleEllipsis";
+import Value from "../../../../components/value/Value";
 import { TransactionArgument } from "@flowser/shared";
-import { CadenceEditor } from "../cadence-editor/CadenceEditor";
+import { CadenceEditor } from "../../../../components/cadence-editor/CadenceEditor";
 import CopyButton from "components/buttons/copy-button/CopyButton";
 
-export type ContentDetailsScriptProps = {
-  script: string;
-  arguments?: TransactionArgument[];
+type TransactionSourceProps = {
+  code: string;
+  arguments: TransactionArgument[];
 };
 
-const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
-  script,
+export const TransactionSource: FunctionComponent<TransactionSourceProps> = ({
+  code,
   arguments: args,
 }) => {
   return (
-    <Card variant="black" className={classes.root}>
+    <Card className={classes.root}>
       {args && args.length > 0 && (
         <>
           <div className={classes.params}>
@@ -47,9 +47,7 @@ const ContentDetailsScript: FunctionComponent<ContentDetailsScriptProps> = ({
           <Label className={classes.codeTitle}>CODE:</Label>
         </>
       )}
-      <CadenceEditor value={script} editable={false} />
+      <CadenceEditor value={code} editable={false} />
     </Card>
   );
 };
-
-export default ContentDetailsScript;

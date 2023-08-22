@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import classes from "./StorageBadge.module.scss";
 import { AccountStorageDomain } from "@flowser/shared";
-import { FlowUtils } from "../../../utils/flow-utils";
+import { FlowUtils } from "../../../../utils/flow-utils";
 
 export type StorageBadgeProps = {
   pathDomain: AccountStorageDomain;

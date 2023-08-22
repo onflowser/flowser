@@ -159,7 +159,7 @@ export const Configuration: FunctionComponent = () => {
         </header>
 
         <main>
-          <ConfigurationSection title="Flowser" className={classes.section}>
+          <ConfigurationSection title="General" className={classes.section}>
             <Card className={classes.card}>
               <TextField
                 label="Project name"

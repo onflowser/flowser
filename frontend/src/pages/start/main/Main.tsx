@@ -8,12 +8,9 @@ import React, {
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/buttons/icon-button/IconButton";
-// @ts-ignore .png import error
 import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
 import newProject from "../../../assets/icons/new_project.svg";
-import openProject from "../../../assets/icons/open_project.svg";
-import yellowLine from "../../../assets/icons/yellow_line.svg";
 import classes from "./Main.module.scss";
 import {
   useGetAllProjects,
@@ -52,8 +49,6 @@ const tabs: ProjectTab[] = [
     content: <AboutContent />,
   },
 ];
-
-const enableOpenProjectAction = false;
 
 const Main: FunctionComponent<RouteChildrenProps> = (props) => {
   const { showDialog } = useConfirmDialog();
@@ -105,28 +100,12 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
               })}
             >
               <Link to={`/start#${tab.id}`} className={classes.tabLink}>
-                <img
-                  src={yellowLine}
-                  alt="yellow line"
-                  className={classes.yellowLine}
-                />
                 {tab.label}
               </Link>
             </li>
           ))}
         </ul>
         <div className={classes.sideBarFooter}>
-          {enableOpenProjectAction && (
-            <IconButton
-              variant="middle"
-              onClick={() => showOpenProjectDialog()}
-              icon={<img src={openProject} alt="open project icon" />}
-              iconPosition="before"
-              className={classes.openProjectButton}
-            >
-              OPEN
-            </IconButton>
-          )}
           <IconButton
             variant="middle"
             onClick={onConfigure}

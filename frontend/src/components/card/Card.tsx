@@ -1,34 +1,28 @@
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Card.module.scss";
+import classNames from "classnames";
 
 type CardProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
-  variant?: "table-line" | "black" | "header-row" | "dark-blue";
   active?: boolean;
-  loading?: boolean;
   showIntroAnimation?: boolean;
-  loadingText?: string;
 };
 
 const Card: FunctionComponent<CardProps> = ({
   children,
   className,
-  variant = "dark-blue",
   active = false,
-  loading = false,
-  loadingText = "Loading ...",
   showIntroAnimation,
   ...restProps
 }) => {
   return (
     <div
-      className={`${classes.root} ${classes[variant]} ${
-        // TODO: fix the possibly undefined index "variant"
-        active ? classes.active : ""
-      } ${className} ${showIntroAnimation ? classes.introAnimation : ""}`}
+      className={classNames(classes.root, className, {
+        [classes.active]: active,
+        [classes.introAnimation]: showIntroAnimation,
+      })}
       {...restProps}
     >
-      {loading && <span className={classes.loading}>{loadingText}</span>}
       {children}
     </div>
   );
