@@ -16,18 +16,22 @@ export function useInteractionName(
         (template) =>
           props.sourceCode &&
           template.code &&
-          // Ignore imports for comparison,
-          // since those can differ due to address replacement.
-          // See: https://developers.flow.com/tooling/fcl-js/api#address-replacement
-          stripImports(template.code) === stripImports(props.sourceCode)
+          sanitizeCadenceSource(template.code) ===
+            sanitizeCadenceSource(props.sourceCode)
       )?.name,
     [props.sourceCode, templates]
   );
 }
 
-function stripImports(code: string) {
-  return code
+function sanitizeCadenceSource(code: string) {
+  // Ignore imports for comparison,
+  // since those can differ due to address replacement.
+  // See: https://developers.flow.com/tooling/fcl-js/api#address-replacement
+  const strippedImports = code
     .split("\n")
     .filter((line) => !line.startsWith("import"))
     .join("\n");
+
+  // Replace all whitespace and newlines
+  return strippedImports.replaceAll(/[\n\t ]/g, "");
 }
