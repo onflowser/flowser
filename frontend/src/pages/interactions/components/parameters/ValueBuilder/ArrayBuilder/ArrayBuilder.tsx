@@ -4,7 +4,7 @@ import { ValueBuilder } from "../ValueBuilder";
 import classes from "./ArrayBuilder.module.scss";
 import { FclArrayValue, FclValue, FclValues } from "@flowser/shared";
 import { SimpleButton } from "../../../../../../components/buttons/simple-button/SimpleButton";
-import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
 
 export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
   const { type, value, setValue } = props;

@@ -1,8 +1,10 @@
 import classNames from "classnames";
+import Label from "components/label/Label";
+import Value from "components/value/Value";
 import React, { FC, ReactElement } from "react";
-import Card from "../base/Card";
-import classes from "./TableCard.module.scss";
-import { Label, Value, SizedBox } from "../../misc";
+import Card from "../card/Card";
+import classes from "./DetailsCard.module.scss";
+import { SizedBox } from "../sized-box/SizedBox";
 
 export type DetailsCardRow = {
   label: ReactElement | string;
@@ -16,7 +18,7 @@ export type DetailsCardProps = {
   className?: string;
 };
 
-export const TableCard: FC<DetailsCardProps> = ({ columns, className }) => {
+export const DetailsCard: FC<DetailsCardProps> = ({ columns, className }) => {
   return (
     <Card className={classNames(classes.root, className)}>
       <div className={classes.content}>

@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { Spinner } from "./Spinner";
-import { SizedBox } from "../misc";
+import { SizedBox } from "../sized-box/SizedBox";
 
 type SpinnerWithLabelProps = {
   label: string;

@@ -59,7 +59,7 @@ type FlowCliVersion = {
 type SimpleFlowCliFlag = string;
 type KeyValueFlowCliFlag = {
   key: string;
-  // Flags with undefined Value will be excluded.
+  // Flags with undefined value will be excluded.
   value: string | number | undefined;
 };
 type FlowCliFlag = SimpleFlowCliFlag | KeyValueFlowCliFlag;

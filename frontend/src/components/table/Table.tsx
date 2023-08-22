@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import Card from "../cards/base/Card";
+import Card from "../card/Card";
 import classes from "./Table.module.scss";
 import classNames from "classnames";
 import {

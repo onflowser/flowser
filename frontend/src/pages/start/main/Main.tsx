@@ -19,6 +19,7 @@ import {
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import moment from "moment";
+import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import { useProjectActions } from "../../../contexts/project.context";
 import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
@@ -27,7 +28,6 @@ import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { ConsentDialog } from "../../../components/dialogs/consent/ConsentDialog";
 import { useAnalyticsConsent } from "../../../hooks/use-analytics-consent";
-import { ProjectRequirements } from "./requirements/ProjectRequirements";
 
 type ProjectTab = {
   id: string;
@@ -51,6 +51,7 @@ const tabs: ProjectTab[] = [
 ];
 
 const Main: FunctionComponent<RouteChildrenProps> = (props) => {
+  const { showDialog } = useConfirmDialog();
   const history = useHistory();
   const { data: currentProject, isFetching: isFetchingProject } =
     useGetCurrentProject();
@@ -73,45 +74,51 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
     history.push(routes.configure);
   }, []);
 
+  function showOpenProjectDialog() {
+    showDialog({
+      title: "New emulator",
+      body: <span>Not supported yet :(</span>,
+      confirmButtonLabel: "CREATE",
+      cancelButtonLabel: "CANCEL",
+    });
+  }
+
   return (
-    <>
-      <ProjectRequirements />
-      <div className={classes.container}>
-        <aside className={classes.sidebar}>
-          <div className={classes.sideBarHeader}>
-            <span className={classes.logoWrapper}>
-              <img className={classes.logo} src={longLogo} alt="FLOWSER" />
-            </span>
-          </div>
-          <ul className={classes.sideBarBody}>
-            {tabs.map((tab) => (
-              <li
-                key={tab.id}
-                className={classNames(classes.tabWrapper, {
-                  [classes.activeTab]: tab.id === activeTab.id,
-                })}
-              >
-                <Link to={`/start#${tab.id}`} className={classes.tabLink}>
-                  {tab.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className={classes.sideBarFooter}>
-            <IconButton
-              variant="middle"
-              onClick={onConfigure}
-              icon={<img src={newProject} alt="new project icon" />}
-              iconPosition="before"
-              className={classes.newProjectButton}
+    <div className={classes.container}>
+      <aside className={classes.sidebar}>
+        <div className={classes.sideBarHeader}>
+          <span className={classes.logoWrapper}>
+            <img className={classes.logo} src={longLogo} alt="FLOWSER" />
+          </span>
+        </div>
+        <ul className={classes.sideBarBody}>
+          {tabs.map((tab) => (
+            <li
+              key={tab.id}
+              className={classNames(classes.tabWrapper, {
+                [classes.activeTab]: tab.id === activeTab.id,
+              })}
             >
-              NEW PROJECT
-            </IconButton>
-          </div>
-        </aside>
-        {activeTab.content}
-      </div>
-    </>
+              <Link to={`/start#${tab.id}`} className={classes.tabLink}>
+                {tab.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <div className={classes.sideBarFooter}>
+          <IconButton
+            variant="middle"
+            onClick={onConfigure}
+            icon={<img src={newProject} alt="new project icon" />}
+            iconPosition="before"
+            className={classes.newProjectButton}
+          >
+            NEW PROJECT
+          </IconButton>
+        </div>
+      </aside>
+      {activeTab.content}
+    </div>
   );
 };
 

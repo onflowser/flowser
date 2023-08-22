@@ -58,7 +58,7 @@ export class FlowUtils {
     }
 
     // We only care about subset of the raw error,
-    // which contains the structured info in `key=Value` pairs.
+    // which contains the structured info in `key=value` pairs.
     // The other part can be discarded as all the info is found in the structured part.
     const structuredEntries = errorMessage
       .split(/\n[ +]/)

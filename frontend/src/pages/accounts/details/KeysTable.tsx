@@ -1,15 +1,15 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountKey } from "@flowser/shared";
-import Label from "@flowser/uimisc/Label/Label";
+import Label from "../../../components/label/Label";
 import classes from "./Details.module.scss";
-import MiddleEllipsis from "@flowser/ui/ellipsis/MiddleEllipsis";
-import CopyButton from "@flowser/ui/buttons/copy-button/CopyButton";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import classNames from "classnames";
-import { Badge } from "@flowser/uimisc/Badge/Badge";
+import Badge from "../../../components/badge/Badge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import React, { ReactElement } from "react";
-import Table from "@flowser/ui/table/Table";
+import Table from "../../../components/table/Table";
 
 const columnsHelper = createColumnHelper<DecoratedPollingEntity<AccountKey>>();
 

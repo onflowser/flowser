@@ -76,7 +76,7 @@ export class FlowAccountStorageService {
   }
 
   private async fetchStorageByAddress(address: string) {
-    // TODO(milestone-3): use Value from emulator config object
+    // TODO(milestone-3): use value from emulator config object
     const response = await axios.get(
       `http://localhost:8080/emulator/storages/${address}`
     );
@@ -103,8 +103,8 @@ export class FlowAccountStorageService {
       // But in the future we will want to parse it so that we can extract info
       // This will be possible after storage API implements proper deserialization of storage data
       if (typeof storageData !== "object") {
-        // In case the data is a simple Value (string, number, boolean,...)
-        // we need to store it in object form (e.g. under "Value" key).
+        // In case the data is a simple value (string, number, boolean,...)
+        // we need to store it in object form (e.g. under "value" key).
         // Otherwise, it won't get properly encoded/decoded by protocol buffers.
         return { value: storageData };
       } else {

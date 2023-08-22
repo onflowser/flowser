@@ -1,15 +1,15 @@
 import React, { FunctionComponent, useEffect } from "react";
-import Label from "@flowser/uimisc/Label/Label";
-import Value from "@flowser/uimisc/Value/Value";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { useGetPollingAccounts } from "../../../hooks/use-api";
-import Table from "@flowser/ui/table/Table";
+import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
 import { TextUtils } from "../../../utils/text-utils";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { AccountLink } from "@flowser/ui/account/link/AccountLink";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 

@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import { FlowUtils } from "../../utils/flow-utils";
 import classes from "./ErrorMessage.module.scss";
-import { JsonView } from "../code/json/JsonView";
+import { JsonView } from "../json-view/JsonView";
 
 type ScriptErrorProps = {
   errorMessage: string;

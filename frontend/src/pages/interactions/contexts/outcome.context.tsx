@@ -41,7 +41,7 @@ export function InteractionOutcomeManagerProvider(props: {
     `/interactions/execute/${JSON.stringify(definition)}`,
     async () => {
       if (!definition) {
-        throw new Error("Assertion error: Expected interaction Value");
+        throw new Error("Assertion error: Expected interaction value");
       }
       if (!parsedInteraction) {
         throw new Error("Interaction not parsed yet");

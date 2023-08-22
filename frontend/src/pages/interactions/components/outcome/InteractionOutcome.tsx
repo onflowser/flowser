@@ -5,24 +5,21 @@ import {
   ScriptError,
   TransactionError,
 } from "../../../../components/status/ErrorMessage";
-import { JsonView } from "../../../../components/code/json/JsonView";
+import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
 import classes from "./InteractionOutcome.module.scss";
 import {
   FlowScriptOutcome,
   FlowTransactionOutcome,
 } from "pages/interactions/contexts/interaction-registry.context";
-import {
-  TabItem,
-  BaseTabs,
-} from "../../../../components/tabs/BaseTabs/BaseTabs";
+import { TabItem, Tabs } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { InteractionKind } from "@flowser/shared";
 import { ExternalLink } from "../../../../components/link/ExternalLink";
-import { LineSeparator } from "@flowser/uimisc/LineSeparator/LineSeparator";
+import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
 import { SpinnerWithLabel } from "../../../../components/spinner/SpinnerWithLabel";
-import { StyledTabs } from "../../../../components/tabs/StyledTabs/StyledTabs";
+import { StyledTabs } from "../../../../components/tabs/StyledTabs";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();

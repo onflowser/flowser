@@ -15,7 +15,7 @@ const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
 }) => {
   const elRef = useRef<HTMLSpanElement>(null);
   const [show, setShow] = useState(false);
-  const [croppedText, setCroppedText] = useState(children);
+  const [state, setState] = useState(children);
 
   const makeEllipsis = () => {
     const offsetWidth = elRef.current ? elRef.current.offsetWidth : 0;
@@ -26,16 +26,16 @@ const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
       const ellipsisHalf = Math.ceil(ellipsis.length / charWidth / 2);
       const half = textHalf - ellipsisHalf - 2; // safety 2 :)
       const ellipsisText =
-        children.substring(0, half) +
+        children.substr(0, half) +
         ellipsis +
         children.substring(children.length - half);
-      setCroppedText(ellipsisText);
+      setState(ellipsisText);
     }
     setShow(true);
   };
 
   const resize = () => {
-    setCroppedText(children);
+    setState(children);
     // Wait for browser to write DOM updates from setState call (on next event loop)
     setTimeout(() => makeEllipsis(), 0);
   };
@@ -54,7 +54,7 @@ const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
       className={className}
       style={{ ...style, opacity: show ? 1 : 0, transition: "0.3s ease" }}
     >
-      {croppedText}
+      {state}
     </span>
   );
 };

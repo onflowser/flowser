@@ -12,7 +12,7 @@ import { BoolBuilder } from "./BoolBuilder/BoolBuilder";
 import { Callout } from "../../../../../components/callout/Callout";
 import { ExternalLink } from "../../../../../components/link/ExternalLink";
 import { FlowserIcon } from "../../../../../components/icons/Icons";
-import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { SizedBox } from "../../../../../components/sized-box/SizedBox";
 import { IntegerNumberBuilder } from "./IntegerNumberBuilder/IntegerNumberBuilder";
 
 export function ValueBuilder(props: CadenceValueBuilder): ReactElement {

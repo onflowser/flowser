@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect } from "react";
-import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import {
   ParamBuilder,
   ParamListBuilder,
@@ -287,7 +287,7 @@ function AuthorizerSettings() {
 
   function setProposerByIndex(address: FclValue, index: number) {
     if (!FclValues.isFclAddressValue(address)) {
-      throw new Error("Expected address Value");
+      throw new Error("Expected address value");
     }
     const newAuthorizers = [...authorizerAddresses];
     newAuthorizers[index] = address;

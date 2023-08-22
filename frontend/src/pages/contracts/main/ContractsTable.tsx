@@ -1,14 +1,13 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountContract } from "@flowser/shared";
-import Label from "@flowser/uimisc/Label/Label";
-import Value from "@flowser/uimisc/Value/Value";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import { AccountLink } from "@flowser/ui/account/link/AccountLink";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
-import { TimeAgo } from "@flowser/uimisc/TimeAgo/TimeAgo";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();
@@ -36,7 +35,7 @@ const columns = [
     header: () => <Label variant="medium">UPDATED</Label>,
     cell: (info) => (
       <Value>
-        <TimeAgo date={info.getValue()} />
+        <ReactTimeago date={info.getValue()} />
       </Value>
     ),
   }),
@@ -44,7 +43,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <TimeAgo date={info.getValue()} />
+        <ReactTimeago date={info.getValue()} />
       </Value>
     ),
   }),

@@ -1,16 +1,16 @@
 import React, { ReactElement } from "react";
 import {
-  TableCard,
+  DetailsCard,
   DetailsCardColumn,
-} from "@flowser/ui/cards/table/TableCard";
-import MiddleEllipsis from "@flowser/ui/ellipsis/MiddleEllipsis";
+} from "../../../components/details-card/DetailsCard";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./Details.module.scss";
-import { ExecutionStatusBadge } from "@flowser/ui/status/ExecutionStatusBadge";
-import { GrcpStatusBadge } from "@flowser/ui/status/GrcpStatusBadge";
+import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
+import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { TextUtils } from "../../../utils/text-utils";
 import { Transaction } from "@flowser/shared";
 import { NavLink } from "react-router-dom";
-import { AccountLink } from "@flowser/ui/account/link/AccountLink";
+import { AccountLink } from "../../../components/account/link/AccountLink";
 
 type TransactionOverviewProps = {
   transaction: Transaction;
@@ -92,5 +92,5 @@ export function TransactionOverview(
     ],
   ];
 
-  return <TableCard columns={detailsColumns} />;
+  return <DetailsCard columns={detailsColumns} />;
 }

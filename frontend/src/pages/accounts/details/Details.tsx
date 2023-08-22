@@ -9,17 +9,20 @@ import {
   useGetPollingKeysByAccount,
   useGetPollingTransactionsByAccount,
 } from "../../../hooks/use-api";
-import { TableCard, DetailsCardColumn } from "components/cards/table/TableCard";
+import {
+  DetailsCard,
+  DetailsCardColumn,
+} from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
-import { SizedBox } from "@flowser/ui";
-import { AccountAvatar } from "@flowser/ui";
-import { AccountName } from "@flowser/ui";
-import { StyledTabs } from "@flowser/ui";
+import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { AccountAvatar } from "../../../components/account/avatar/AccountAvatar";
+import { AccountName } from "../../../components/account/name/AccountName";
+import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { AccountStorage } from "./storage/AccountStorage";
 import { TransactionsTable } from "../../transactions/main/TransactionsTable";
 import { ContractsTable } from "../../contracts/main/ContractsTable";
 import { KeysTable } from "./KeysTable";
-import { CadenceEditor } from "@flowser/ui";
+import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 
 export type AccountDetailsRouteParams = {
   accountId: string;
@@ -80,7 +83,7 @@ const Details: FunctionComponent = () => {
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <TableCard className={classes.detailsCard} columns={detailsColumns} />
+        <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
       </div>
       <SizedBox height={30} />
       <StyledTabs

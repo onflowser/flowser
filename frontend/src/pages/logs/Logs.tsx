@@ -11,7 +11,7 @@ import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
 import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
 import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
 import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
-import CaretIcon from "../../components/icons/caret/CaretIcon";
+import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetPollingOutputs } from "../../hooks/use-api";

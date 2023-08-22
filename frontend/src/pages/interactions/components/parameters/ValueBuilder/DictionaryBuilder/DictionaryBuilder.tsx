@@ -6,7 +6,7 @@ import { MultiMap } from "utils/multi-map";
 import toast from "react-hot-toast";
 import classes from "./DictionaryBuilder.module.scss";
 import { SimpleButton } from "../../../../../../components/buttons/simple-button/SimpleButton";
-import { SizedBox } from "@flowser/uimisc/SizedBox";
+import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
 
 export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
   const { type, value, setValue } = props;
@@ -95,7 +95,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
     if (!isKeyFound) {
       // The following scenario happens during initialization phase:
       // 1. entry key is updated
-      // 2. entry Value is updated using the old key immediately after
+      // 2. entry value is updated using the old key immediately after
       // This makes the second update unsuccessful, as the outdated key is used.
       // To solve this, without needing to change the child components,
       // we store a lookup of the key renaming and use the new key when update fails.
@@ -126,7 +126,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
           throw new Error("Expected dictionary.key field");
         }
         if (!dictionary.value) {
-          throw new Error("Expected dictionary.Value field");
+          throw new Error("Expected dictionary.value field");
         }
         return (
           <div key={index} className={classes.dictionaryEntry}>

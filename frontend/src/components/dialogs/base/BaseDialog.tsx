@@ -5,7 +5,7 @@ import React, {
 } from "react";
 import classes from "./BaseDialog.module.scss";
 import classNames from "classnames";
-import Card from "../../cards/base/Card";
+import Card from "../../card/Card";
 
 export type DialogProps = {
   children: ReactElement[] | ReactElement;

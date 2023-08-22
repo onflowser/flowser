@@ -1,8 +1,8 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { Transaction } from "@flowser/shared";
-import Label from "@flowser/uimisc/Label/Label";
-import Value from "@flowser/uimisc/Value/Value";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./Main.module.scss";

@@ -1,22 +1,23 @@
-import React, { useState, useMemo, ReactElement } from "react";
+import React, { useEffect, useState, useMemo, ReactElement } from "react";
 import classes from "./EventsTable.module.scss";
-import tableClasses from "@flowser/ui/table/Table.module.scss";
-import Card from "@flowser/ui/cards/base/Card";
-import Label from "@flowser/uimisc/Label/Label";
-import Value from "@flowser/uimisc/Value/Value";
+import tableClasses from "../../components/table/Table.module.scss";
+import Card from "../../components/card/Card";
+import Label from "../../components/label/Label";
+import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import MiddleEllipsis from "@flowser/ui/ellipsis/MiddleEllipsis";
-import CaretIcon from "@flowser/ui/icons/caret/CaretIcon";
+import MiddleEllipsis from "../../components/ellipsis/MiddleEllipsis";
+import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";
 import { ComputedEventData, EventUtils } from "../../utils/event-utils";
-import CopyButton from "@flowser/ui/buttons/copy-button/CopyButton";
-import Table from "@flowser/ui/table/Table";
+import CopyButton from "../../components/buttons/copy-button/CopyButton";
+import Table from "../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
 import ReactTimeago from "react-timeago";
 import classNames from "classnames";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { Ellipsis } from "@flowser/ui/ellipsis/Ellipsis";
+import { Ellipsis } from "../../components/ellipsis/Ellipsis";
+import { useNavigation } from "../../hooks/use-navigation";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
