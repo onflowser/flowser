@@ -1,6 +1,7 @@
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Button.module.scss";
 import Loader from "react-loader-spinner";
+import classNames from "classnames";
 
 export type ButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -28,16 +29,26 @@ const Button: FunctionComponent<ButtonProps> = ({
       {...restProps}
       onClick={onClick}
       disabled={disabled}
-      className={`${classes.button} ${classes[variant]} ${
-        disabled ? classes.disabled : ""
-      } ${restProps.className} ${outlined ? classes.outlined : ""}`}
+      className={classNames(
+        classes.button,
+        classes[variant],
+        restProps.className,
+        {
+          [classes.disabled]: disabled,
+          [classes.outlined]: outlined,
+        }
+      )}
     >
       {loading && (
         <div className={classes.loaderWrapper}>
           <Loader type="Oval" color={loaderColor} height={25} width={25} />
         </div>
       )}
-      <div className={loading ? classes.hiddenChildren : ""}>
+      <div
+        className={classNames({
+          [classes.hiddenChildren]: loading,
+        })}
+      >
         {restProps.children}
       </div>
     </button>
