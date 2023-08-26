@@ -38,8 +38,8 @@ const columns = [
     ),
   }),
   columnHelper.display({
-    id: "name",
-    header: () => <Label variant="medium">NAME</Label>,
+    id: "description",
+    header: () => <Label variant="medium">DESCRIPTION</Label>,
     meta: {
       className: classes.nameColumn,
     },
