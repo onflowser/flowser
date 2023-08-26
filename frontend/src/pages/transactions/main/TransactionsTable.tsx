@@ -12,6 +12,7 @@ import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
+import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
@@ -39,8 +40,11 @@ const columns = [
   columnHelper.display({
     id: "name",
     header: () => <Label variant="medium">NAME</Label>,
+    meta: {
+      className: classes.nameColumn,
+    },
     cell: (info) => (
-      <Value>
+      <Value style={{ width: "100%" }}>
         <TransactionName transaction={info.row.original} />
       </Value>
     ),
@@ -80,5 +84,5 @@ function TransactionName(props: { transaction: Transaction }) {
   const name = useTransactionName({
     transaction: props.transaction,
   });
-  return <span>{name}</span>;
+  return <Ellipsis>{name}</Ellipsis>;
 }
