@@ -45,7 +45,7 @@ export class GoBindingsService {
 
   private execute(request: ExecuteGoBinRequest): Promise<ExecuteGoBinResponse> {
     return new Promise((resolve, reject) => {
-      const childProcess = spawn(path.join(__dirname, "bin/internal"), [
+      const childProcess = spawn(path.join(__dirname, "bin", "internal"), [
         request.command,
         ...request.arguments,
       ]);

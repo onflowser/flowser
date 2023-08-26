@@ -3,6 +3,7 @@
   "extends": null,
   "appId": "dev.flowser.app",
   "electronVersion": "20.1.0",
+  "asar": false,
   "afterSign": "./scripts/notarize.js",
   "asarUnpack": [
     "node_modules/sqlite3/lib/binding/**"
