@@ -62,20 +62,6 @@ const Main: FunctionComponent = () => {
         },
         cell: (info) => <Value>{info.getValue()}</Value>,
       }),
-      columnHelper.accessor("blockSeals", {
-        header: () => <Label variant="medium">SEALS COUNT</Label>,
-        meta: {
-          className: classes.blockSeals,
-        },
-        cell: (info) => <Value>{info.getValue()?.length}</Value>,
-      }),
-      columnHelper.accessor("signatures", {
-        header: () => <Label variant="medium">SIGS COUNT</Label>,
-        meta: {
-          className: classes.signatures,
-        },
-        cell: (info) => <Value>{info.getValue()?.length}</Value>,
-      }),
       columnHelper.accessor("timestamp", {
         header: () => <Label variant="medium">CREATED</Label>,
         meta: {

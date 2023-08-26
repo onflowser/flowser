@@ -29,18 +29,6 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("blockId", {
-    header: () => <Label variant="medium">BLOCK ID</Label>,
-    cell: (info) => (
-      <Value>
-        <NavLink to={`/blocks/details/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hash}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </NavLink>
-      </Value>
-    ),
-  }),
   columnHelper.accessor("payer", {
     header: () => <Label variant="medium">PAYER</Label>,
     cell: (info) => (

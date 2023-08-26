@@ -24,7 +24,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("accountAddress", {
-    header: () => <Label variant="medium">ACCOUNT</Label>,
+    header: () => <Label variant="medium">DEPLOYED ON</Label>,
     cell: (info) => (
       <Value>
         <AccountLink address={info.getValue()} />
