@@ -18,6 +18,8 @@
       color: $color-grey;
       margin: 0 $spacing-l;
       overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
     .tabButton {
       flex: 1;
