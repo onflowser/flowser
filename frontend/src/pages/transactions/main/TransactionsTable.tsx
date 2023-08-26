@@ -17,7 +17,7 @@ const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
 const columns = [
   columnHelper.accessor("id", {
-    header: () => <Label variant="medium">ID</Label>,
+    header: () => <Label variant="medium">IDENTIFIER</Label>,
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>

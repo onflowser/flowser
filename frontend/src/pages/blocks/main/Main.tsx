@@ -25,7 +25,7 @@ const Main: FunctionComponent = () => {
   const columns = useMemo(
     () => [
       columnHelper.accessor("id", {
-        header: () => <Label variant="medium">ID</Label>,
+        header: () => <Label variant="medium">IDENTIFIER</Label>,
         meta: {
           className: classes.blockID,
         },
