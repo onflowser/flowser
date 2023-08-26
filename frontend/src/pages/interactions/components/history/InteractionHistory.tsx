@@ -10,7 +10,7 @@ import { FlowserIcon } from "../../../../components/icons/Icons";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
-import { useInteractionName } from "../../hooks/use-interaction-name";
+import { useTransactionName } from "../../hooks/use-transaction-name";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
@@ -55,8 +55,8 @@ function BlockItem(props: BlockItemProps) {
   });
   const firstTransaction = data[0];
 
-  const transactionName = useInteractionName({
-    sourceCode: firstTransaction?.script,
+  const transactionName = useTransactionName({
+    transaction: firstTransaction,
   });
 
   function onForkAsTemplate() {
@@ -65,7 +65,7 @@ function BlockItem(props: BlockItemProps) {
     }
     create({
       id: block.id,
-      name: `Tx from block #${block.height}`,
+      name: transactionName ?? `Tx from block #${block.height}`,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
         firstTransaction.arguments.map((arg) => [
