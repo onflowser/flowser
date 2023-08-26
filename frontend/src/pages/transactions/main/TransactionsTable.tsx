@@ -7,7 +7,6 @@ import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionsTable.module.scss";
 import { AccountLink } from "../../../components/account/link/AccountLink";
-import { ExecutionStatus } from "../../../components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
@@ -44,14 +43,6 @@ const columns = [
       <Value>
         <TransactionName transaction={info.row.original} />
       </Value>
-    ),
-  }),
-  columnHelper.accessor("status.executionStatus", {
-    header: () => <Label variant="medium">STATUS</Label>,
-    cell: (info) => (
-      <div>
-        <ExecutionStatus status={info.row.original.status} />
-      </div>
     ),
   }),
   columnHelper.accessor("status.grcpStatus", {
