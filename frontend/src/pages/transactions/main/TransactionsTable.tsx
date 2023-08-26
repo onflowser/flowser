@@ -59,7 +59,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("status.executionStatus", {
-    header: () => <Label variant="medium">EXECUTION</Label>,
+    header: () => <Label variant="medium">STATUS</Label>,
     cell: (info) => (
       <div>
         <ExecutionStatus status={info.row.original.status} />
@@ -67,7 +67,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("status.grcpStatus", {
-    header: () => <Label variant="medium">API</Label>,
+    header: () => <Label variant="medium">EXECUTION</Label>,
     cell: (info) => (
       <div>
         <GrcpStatus status={info.row.original.status} />
