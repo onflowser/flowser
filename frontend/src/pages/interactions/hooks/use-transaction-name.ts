@@ -8,6 +8,7 @@ type UseInteractionNameProps = {
 
 enum TransactionKind {
   DEPLOY_CONTRACT,
+  REMOVE_CONTRACT,
   INITIALIZE_ACCOUNT,
 }
 
@@ -19,6 +20,14 @@ const hardcodedTemplates: [string, TransactionKind][] = [
         }
       }`,
     TransactionKind.DEPLOY_CONTRACT,
+  ],
+  [
+    `transaction(name: String) {
+      prepare(signer: AuthAccount) {
+        signer.contracts.remove(name: name)
+      }
+    }`,
+    TransactionKind.REMOVE_CONTRACT,
   ],
   [
     `import Crypto
@@ -76,6 +85,10 @@ function getDynamicName(transaction: Transaction) {
   switch (kind) {
     case TransactionKind.DEPLOY_CONTRACT:
       return `Deploy ${
+        getArgumentValueById(transaction, "name") ?? "contract"
+      }`;
+    case TransactionKind.REMOVE_CONTRACT:
+      return `Remove ${
         getArgumentValueById(transaction, "name") ?? "contract"
       }`;
     case TransactionKind.INITIALIZE_ACCOUNT:
