@@ -5,10 +5,14 @@
 @import "styles/scrollbars";
 
 .root {
+  height: 100%;
   padding: $spacing-l;
+  // Padding is present on focused template view.
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 
   .storedTemplates {
     display: flex;
@@ -45,5 +49,9 @@
     display: flex;
     flex-direction: column;
     row-gap: $spacing-base;
+    position: sticky;
+    padding: $spacing-base 0;
+    background: $gray-100;
+    bottom: 0;
   }
 }

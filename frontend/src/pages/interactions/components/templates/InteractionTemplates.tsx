@@ -39,7 +39,7 @@ function StoredTemplates() {
   );
 
   return (
-    <div>
+    <>
       <SearchInput
         placeholder="Search interactions ..."
         searchTerm={searchTerm}
@@ -79,7 +79,7 @@ function StoredTemplates() {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
