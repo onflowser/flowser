@@ -10,7 +10,6 @@
   .tabWrapper {
     display: flex;
     align-items: center;
-    overflow-x: scroll;
     @include hiddenScrollbars();
     .label {
       font-size: $font-size-normal;
@@ -73,7 +72,9 @@
       }
     }
   }
-  .body {
-    height: 100%;
+  .content {
+    flex: 1;
+    overflow: scroll;
+    @include hiddenScrollbars();
   }
 }

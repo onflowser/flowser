@@ -87,7 +87,10 @@ export function Tabs(props: TabsProps): ReactElement {
           </button>
         )}
       </div>
-      <div className={props.contentClassName} style={{ flex: 1 }}>
+      <div
+        className={classNames(props.contentClassName, classes.content)}
+        style={{ flex: 1 }}
+      >
         {currentTab?.content}
       </div>
     </div>

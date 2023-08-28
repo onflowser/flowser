@@ -42,7 +42,7 @@ const ProjectLayout: FunctionComponent = ({ children }) => {
         <Breadcrumbs className={classes.breadcrumbs} />
         <div
           className={classNames(classes.body, {
-            [classes.bodyWithMargin]: showMargin,
+            [classes.bodyWithBorderSpacing]: showMargin,
           })}
         >
           {children}

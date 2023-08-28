@@ -60,6 +60,7 @@ export function InteractionsPage(): ReactElement {
       <SizedBox width={20} />
       <Tabs
         className={classes.mainContent}
+        tabWrapperClassName={classes.interactionsTabWrapper}
         tabClassName={classes.interactionTab}
         tabLabelClassName={classes.label}
         currentTabId={focusedDefinition?.id}

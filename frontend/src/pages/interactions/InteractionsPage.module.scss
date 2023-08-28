@@ -2,6 +2,7 @@
 @import 'styles/colors';
 
 .pageRoot {
+  height: 100%;
   display: flex;
   flex: 1;
   background: #1C2128;
@@ -9,11 +10,14 @@
     background: #272B32;
     flex: 1;
   }
-  .interactionTab {
-    max-width: 200px;
-    margin-right: $spacing-s;
-    .label {
-      text-align: left;
+  .interactionsTabWrapper {
+    overflow-x: scroll;
+    .interactionTab {
+      max-width: 200px;
+      margin-right: $spacing-s;
+      .label {
+        text-align: left;
+      }
     }
   }
   .mainContent {
