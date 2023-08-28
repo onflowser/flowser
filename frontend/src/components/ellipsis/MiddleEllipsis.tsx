@@ -2,29 +2,36 @@ import React, { FunctionComponent, useRef } from "react";
 
 export type EllipsisProps = {
   children: string;
-  delimiter?: string;
   className?: string;
   style?: React.CSSProperties;
 };
 
 const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
   children,
-  delimiter = "...",
   className,
   style,
 }) => {
   const elRef = useRef<HTMLSpanElement>(null);
-  const pieceLength = 10;
-  const ellipsisText =
-    children.substring(0, pieceLength) +
-    delimiter +
-    children.substring(children.length - pieceLength, children.length);
+  const maxLength = 20;
 
   return (
     <span ref={elRef} className={className} style={style}>
-      {ellipsisText}
+      {trimText(children, maxLength)}
     </span>
   );
 };
+
+function trimText(text: string, maxLength: number) {
+  const delimiter = "...";
+  if (text.length <= maxLength) {
+    return text;
+  } else {
+    return (
+      text.substring(0, maxLength / 2) +
+      delimiter +
+      text.substring(text.length - maxLength / 2, text.length)
+    );
+  }
+}
 
 export default MiddleEllipsis;
