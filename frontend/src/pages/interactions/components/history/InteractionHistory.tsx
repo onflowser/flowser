@@ -25,7 +25,7 @@ export function InteractionHistory(): ReactElement {
   }
 
   return (
-    <div className={classes.root}>
+    <div>
       {blocks.map((block) => (
         <BlockItem
           key={block.id}

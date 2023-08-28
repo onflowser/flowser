@@ -9,6 +9,9 @@
   .leftSideMenu {
     background: #272B32;
     flex: 1;
+    .content {
+      margin: $spacing-base;
+    }
   }
   .interactionsTabWrapper {
     overflow-x: scroll;

@@ -53,6 +53,7 @@ export function InteractionsPage(): ReactElement {
     <div className={classes.pageRoot}>
       <Tabs
         className={classes.leftSideMenu}
+        contentClassName={classes.content}
         currentTabId={currentSideMenuTabId}
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
