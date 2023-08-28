@@ -16,6 +16,7 @@
   padding-bottom: $spacing-base * 0.8;
   padding-top: $spacing-base * 0.8;
   background: transparentize($gray-80, 0.2);
+  column-gap: $spacing-base;
 
   & > div {
     display: flex;
@@ -23,5 +24,6 @@
     width: 100%;
     justify-content: flex-start;
     align-items: center;
+    overflow: hidden;
   }
 }
