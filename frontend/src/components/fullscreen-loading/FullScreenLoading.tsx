@@ -10,7 +10,9 @@ type FullScreenLoadingProps = {
 const FullScreenLoading: FC<FullScreenLoadingProps> = ({ className }) => {
   return (
     <div className={classNames(classes.container, className)}>
-      <Spinner className={classes.logo} size={60} borderWidth={6} />
+      <div className={classes.logo}>
+        <Spinner size={60} borderWidth={6} />
+      </div>
       <p className={classes.text}>Loading</p>
     </div>
   );

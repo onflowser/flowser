@@ -290,7 +290,7 @@ export class ProcessorService implements ProjectContextLifecycle {
           transactionId,
           TransactionStatus.fromJSON({
             errorMessage: newStatus.errorMessage,
-            grcpStatus: newStatus.statusCode,
+            grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
             executionStatus: newStatus.status,
           })
         )
@@ -856,11 +856,17 @@ export class ProcessorService implements ProjectContextLifecycle {
       ),
       status: TransactionStatus.fromJSON({
         errorMessage: flowTransactionStatus.errorMessage,
-        grcpStatus: flowTransactionStatus.statusCode,
+        grcpStatus: this.reMapGrcpStatus(flowTransactionStatus.statusCode),
         executionStatus: flowTransactionStatus.status,
       }),
       payer: undefined,
     });
+  }
+
+  private reMapGrcpStatus(statusCode: number) {
+    // Older versions of the emulator use incorrect statusCode values.
+    // See: https://github.com/onflow/flow-go/issues/4494#issuecomment-1601995168
+    return [0, 1].includes(statusCode) ? statusCode : 1;
   }
 
   private deserializeSignableObjects(signableObjects: FlowSignableObject[]) {

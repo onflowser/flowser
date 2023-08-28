@@ -26,21 +26,19 @@ export function TransactionOverview(
       {
         label: "Transaction",
         value: (
-          <>
-            <NavLink to={`/transactions/details/${transaction.id}`}>
-              <MiddleEllipsis className={classes.elipsis}>
-                {transaction.id}
-              </MiddleEllipsis>
-            </NavLink>
-            <ExecutionStatusBadge
-              className={classes.txStatusBadge}
-              status={transaction.status}
-            />
-          </>
+          <NavLink to={`/transactions/details/${transaction.id}`}>
+            <MiddleEllipsis className={classes.elipsis}>
+              {transaction.id}
+            </MiddleEllipsis>
+          </NavLink>
         ),
       },
       {
-        label: "API Status",
+        label: "Status",
+        value: <ExecutionStatusBadge status={transaction.status} />,
+      },
+      {
+        label: "Execution",
         value: <GrcpStatusBadge status={transaction.status} />,
       },
       {

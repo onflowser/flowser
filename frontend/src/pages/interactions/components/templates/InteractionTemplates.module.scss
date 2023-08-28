@@ -5,16 +5,16 @@
 @import "styles/scrollbars";
 
 .root {
-  padding: $spacing-l;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 
   .storedTemplates {
     display: flex;
     flex-direction: column;
     row-gap: $spacing-base;
-    height: 500px;
     overflow-y: scroll;
     @include styledScrollbars();
     .item {
@@ -46,5 +46,9 @@
     display: flex;
     flex-direction: column;
     row-gap: $spacing-base;
+    position: sticky;
+    padding-top: $spacing-base;
+    background: $gray-100;
+    bottom: 0;
   }
 }

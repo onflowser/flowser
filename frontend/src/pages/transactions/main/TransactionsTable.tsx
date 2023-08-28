@@ -7,33 +7,21 @@ import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionsTable.module.scss";
 import { AccountLink } from "../../../components/account/link/AccountLink";
-import { ExecutionStatus } from "../../../components/status/ExecutionStatus";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
+import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
 const columns = [
   columnHelper.accessor("id", {
-    header: () => <Label variant="medium">ID</Label>,
+    header: () => <Label variant="medium">IDENTIFIER</Label>,
     cell: (info) => (
       <Value>
         <NavLink to={`/transactions/details/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hash}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </NavLink>
-      </Value>
-    ),
-  }),
-  columnHelper.accessor("blockId", {
-    header: () => <Label variant="medium">BLOCK ID</Label>,
-    cell: (info) => (
-      <Value>
-        <NavLink to={`/blocks/details/${info.getValue()}`}>
           <MiddleEllipsis className={classes.hash}>
             {info.getValue()}
           </MiddleEllipsis>
@@ -50,24 +38,19 @@ const columns = [
     ),
   }),
   columnHelper.display({
-    id: "name",
-    header: () => <Label variant="medium">NAME</Label>,
+    id: "description",
+    header: () => <Label variant="medium">DESCRIPTION</Label>,
+    meta: {
+      className: classes.nameColumn,
+    },
     cell: (info) => (
-      <Value>
+      <Value style={{ width: "100%" }}>
         <TransactionName transaction={info.row.original} />
       </Value>
     ),
   }),
-  columnHelper.accessor("status.executionStatus", {
-    header: () => <Label variant="medium">EXECUTION</Label>,
-    cell: (info) => (
-      <div>
-        <ExecutionStatus status={info.row.original.status} />
-      </div>
-    ),
-  }),
   columnHelper.accessor("status.grcpStatus", {
-    header: () => <Label variant="medium">API</Label>,
+    header: () => <Label variant="medium">EXECUTION</Label>,
     cell: (info) => (
       <div>
         <GrcpStatus status={info.row.original.status} />
@@ -101,5 +84,5 @@ function TransactionName(props: { transaction: Transaction }) {
   const name = useTransactionName({
     transaction: props.transaction,
   });
-  return <span>{name}</span>;
+  return <Ellipsis>{name}</Ellipsis>;
 }

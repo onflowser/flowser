@@ -2,18 +2,25 @@
 @import 'styles/colors';
 
 .pageRoot {
+  height: 100%;
   display: flex;
   flex: 1;
   background: #1C2128;
   .leftSideMenu {
     background: #272B32;
     flex: 1;
+    .content {
+      margin: $spacing-base;
+    }
   }
-  .interactionTab {
-    max-width: 200px;
-    margin-right: $spacing-s;
-    .label {
-      text-align: left;
+  .interactionsTabWrapper {
+    overflow-x: scroll;
+    .interactionTab {
+      max-width: 200px;
+      margin-right: $spacing-s;
+      .label {
+        text-align: left;
+      }
     }
   }
   .mainContent {

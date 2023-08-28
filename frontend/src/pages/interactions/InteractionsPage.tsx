@@ -53,6 +53,7 @@ export function InteractionsPage(): ReactElement {
     <div className={classes.pageRoot}>
       <Tabs
         className={classes.leftSideMenu}
+        contentClassName={classes.content}
         currentTabId={currentSideMenuTabId}
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
@@ -60,6 +61,7 @@ export function InteractionsPage(): ReactElement {
       <SizedBox width={20} />
       <Tabs
         className={classes.mainContent}
+        tabWrapperClassName={classes.interactionsTabWrapper}
         tabClassName={classes.interactionTab}
         tabLabelClassName={classes.label}
         currentTabId={focusedDefinition?.id}

@@ -17,7 +17,6 @@ import ReactTimeago from "react-timeago";
 import classNames from "classnames";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { Ellipsis } from "../../components/ellipsis/Ellipsis";
-import { useNavigation } from "../../hooks/use-navigation";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -65,7 +64,7 @@ export function EventsTable(props: EventsTableProps): ReactElement {
   const columns = useMemo(
     () => [
       columnHelper.accessor("blockId", {
-        header: () => <Label variant="medium">BLOCK ID</Label>,
+        header: () => <Label variant="medium">BLOCK</Label>,
         cell: (info) => (
           <Value>
             <NavLink to={`/blocks/details/${info.getValue()}`}>
@@ -77,7 +76,7 @@ export function EventsTable(props: EventsTableProps): ReactElement {
         ),
       }),
       columnHelper.accessor("transactionId", {
-        header: () => <Label variant="medium">TX ID</Label>,
+        header: () => <Label variant="medium">TRANSACTION</Label>,
         cell: (info) => (
           <Value>
             <NavLink to={`/transactions/details/${info.getValue()}`}>
