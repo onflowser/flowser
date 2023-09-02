@@ -8,6 +8,11 @@
   flex-direction: column;
   padding: $spacing-base;
   min-width: 300px;
+  row-gap: $spacing-base;
+
+  .top {
+    overflow-y: scroll;
+  }
 
   .bottom {
     display: flex;
