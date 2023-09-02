@@ -7,7 +7,7 @@
   justify-content: space-between;
   flex-direction: column;
   padding: $spacing-base;
-  width: 300px;
+  min-width: 300px;
 
   .bottom {
     display: flex;
