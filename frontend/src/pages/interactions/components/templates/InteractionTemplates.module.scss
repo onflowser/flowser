@@ -11,6 +11,15 @@
   justify-content: space-between;
   position: relative;
 
+  .header {
+    background: $gray-100;
+    position: sticky;
+    top: 0;
+    padding-bottom: $spacing-base;
+    // Question mark icon is displayed above the header for some reason.
+    z-index: 1;
+  }
+
   .storedTemplates {
     display: flex;
     flex-direction: column;
