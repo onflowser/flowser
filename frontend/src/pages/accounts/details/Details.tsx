@@ -1,5 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
-import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
+import React, { FunctionComponent } from "react";
 import classes from "./Details.module.scss";
 import { useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
@@ -20,7 +19,7 @@ import { AccountName } from "../../../components/account/name/AccountName";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { AccountStorage } from "./storage/AccountStorage";
 import { TransactionsTable } from "../../transactions/main/TransactionsTable";
-import { ContractsTable } from "../../contracts/main/ContractsTable";
+import { ContractsTable } from "../../contracts/ContractsTable";
 import { KeysTable } from "./KeysTable";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 
@@ -28,25 +27,13 @@ export type AccountDetailsRouteParams = {
   accountId: string;
 };
 
-const Details: FunctionComponent = () => {
+export const AccountDetails: FunctionComponent = () => {
   const { accountId } = useParams<AccountDetailsRouteParams>();
-  const { setBreadcrumbs } = useNavigation();
-  const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetAccount(accountId);
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);
   const { data: keys } = useGetPollingKeysByAccount(accountId);
   const { account } = data ?? {};
-
-  const breadcrumbs: Breadcrumb[] = [
-    { to: "/accounts", label: "Accounts" },
-    { label: "Details" },
-  ];
-
-  useEffect(() => {
-    showNavigationDrawer(true);
-    setBreadcrumbs(breadcrumbs);
-  }, []);
 
   if (isLoading || !account) {
     return <FullScreenLoading />;
@@ -118,5 +105,3 @@ const Details: FunctionComponent = () => {
     </div>
   );
 };
-
-export default Details;

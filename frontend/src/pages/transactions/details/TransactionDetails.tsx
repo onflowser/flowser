@@ -1,8 +1,7 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent } from "react";
 import { useParams } from "react-router-dom";
 import classes from "./Details.module.scss";
 import { TransactionSource } from "./source/TransactionSource";
-import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import {
   useGetPollingEventsByTransaction,
@@ -13,31 +12,18 @@ import { TransactionOverview } from "./TransactionOverview";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { TabItem } from "../../../components/tabs/Tabs";
-import { EventsTable } from "../../events/EventsTable";
+import { EventsTable } from "../../events/EventsTable/EventsTable";
 import { SignaturesTable } from "./SignaturesTable";
 
 type RouteParams = {
   transactionId: string;
 };
 
-const Details: FunctionComponent = () => {
+export const TransactionDetails: FunctionComponent = () => {
   const { transactionId } = useParams<RouteParams>();
-  const { setBreadcrumbs, showSearchBar } = useNavigation();
-  const { showNavigationDrawer } = useNavigation();
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};
-
-  const breadcrumbs: Breadcrumb[] = [
-    { to: "/transactions", label: "Transactions" },
-    { label: "Details" },
-  ];
-
-  useEffect(() => {
-    showNavigationDrawer(true);
-    setBreadcrumbs(breadcrumbs);
-    showSearchBar(false);
-  }, []);
 
   if (isLoading || !transaction) {
     return <FullScreenLoading />;
@@ -95,5 +81,3 @@ const Details: FunctionComponent = () => {
     </div>
   );
 };
-
-export default Details;

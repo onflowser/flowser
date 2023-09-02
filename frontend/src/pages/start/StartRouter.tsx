@@ -1,14 +1,14 @@
 import React, { FunctionComponent } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
-import Main from "./main/Main";
+import { ProjectListPage } from "./ProjectListPage/ProjectListPage";
 import { Configuration } from "./configuration/Configuration";
 import { RouteWithBackButton } from "components/layout/Layout";
 import { routes } from "../../constants/routes";
 
-const Start: FunctionComponent = () => {
+export const StartRouter: FunctionComponent = () => {
   return (
     <Switch>
-      <Route exact path={routes.start} component={Main} />
+      <Route exact path={routes.start} component={ProjectListPage} />
       <RouteWithBackButton
         path={routes.configure}
         exact={true}
@@ -22,5 +22,3 @@ const Start: FunctionComponent = () => {
     </Switch>
   );
 };
-
-export default Start;

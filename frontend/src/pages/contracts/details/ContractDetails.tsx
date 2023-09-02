@@ -1,6 +1,5 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
 import classes from "./Details.module.scss";
@@ -16,23 +15,10 @@ type RouteParams = {
   contractId: string;
 };
 
-const Details: FunctionComponent = () => {
+export const ContractDetails: FunctionComponent = () => {
   const { contractId } = useParams<RouteParams>();
-  const { setBreadcrumbs, showSearchBar } = useNavigation();
-  const { showNavigationDrawer } = useNavigation();
   const { isLoading, data } = useGetContract(contractId);
   const { contract } = data ?? {};
-
-  const breadcrumbs: Breadcrumb[] = [
-    { to: "/contracts", label: "Contracts" },
-    { label: "Details" },
-  ];
-
-  useEffect(() => {
-    showNavigationDrawer(true);
-    setBreadcrumbs(breadcrumbs);
-    showSearchBar(false);
-  }, []);
 
   if (isLoading || !contract) {
     return <FullScreenLoading />;
@@ -71,5 +57,3 @@ const Details: FunctionComponent = () => {
     </div>
   );
 };
-
-export default Details;

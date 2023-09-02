@@ -10,7 +10,7 @@ import IconButton from "../../../components/buttons/icon-button/IconButton";
 import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
 import newProject from "../../../assets/icons/new_project.svg";
-import classes from "./Main.module.scss";
+import classes from "./ProjectListPage.module.scss";
 import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
@@ -45,7 +45,9 @@ const tabs: ProjectTab[] = [
   },
 ];
 
-const Main: FunctionComponent<RouteChildrenProps> = (props) => {
+export const ProjectListPage: FunctionComponent<RouteChildrenProps> = (
+  props
+) => {
   const history = useHistory();
 
   const providedTabId = props.location.hash?.replace("#", "");
@@ -199,5 +201,3 @@ function AboutContent() {
     </div>
   );
 }
-
-export default Main;

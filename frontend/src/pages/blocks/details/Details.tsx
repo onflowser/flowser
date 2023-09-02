@@ -1,6 +1,5 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { Breadcrumb, useNavigation } from "../../../hooks/use-navigation";
 import classes from "./Details.module.scss";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
@@ -18,23 +17,12 @@ type RouteParams = {
   blockId: string;
 };
 
-const Details: FunctionComponent = () => {
+export const BlockDetails: FunctionComponent = () => {
   const { blockId } = useParams<RouteParams>();
-  const { setBreadcrumbs } = useNavigation();
-  const { showNavigationDrawer } = useNavigation();
-  const breadcrumbs: Breadcrumb[] = [
-    { to: "/blocks", label: "Blocks" },
-    { label: "Details" },
-  ];
 
   const { isLoading, data } = useGetBlock(blockId);
   const { block } = data ?? {};
   const { data: transactions } = useGetTransactionsByBlock(blockId);
-
-  useEffect(() => {
-    showNavigationDrawer(true);
-    setBreadcrumbs(breadcrumbs);
-  }, []);
 
   if (isLoading || !block) {
     return <FullScreenLoading />;
@@ -87,5 +75,3 @@ const Details: FunctionComponent = () => {
     </div>
   );
 };
-
-export default Details;

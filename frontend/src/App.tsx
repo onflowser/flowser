@@ -15,12 +15,12 @@ import "./App.scss";
 import { toastOptions } from "./config/toast";
 
 // pages
-import Start from "./pages/start/Start";
-import Accounts from "./pages/accounts/Accounts";
-import Blocks from "./pages/blocks/Blocks";
-import Transactions from "./pages/transactions/Transactions";
-import Contracts from "./pages/contracts/Contracts";
-import Events from "./pages/events/Events";
+import { StartRouter } from "./pages/start/StartRouter";
+import { AccountsRouter } from "./pages/accounts/AccountsRouter";
+import { BlocksRouter } from "./pages/blocks/BlocksRouter";
+import { TransactionsRouter } from "./pages/transactions/TransactionsRouter";
+import { ContractsRouter } from "./pages/contracts/ContractsRouter";
+import { EventsRouter } from "./pages/events/EventsRouter";
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
@@ -101,15 +101,21 @@ export const FlowserRoutes = (): ReactElement => {
       <ConsentAnalytics />
       <ProjectRequirements />
       <Switch>
-        <Route path={routes.start} component={Start} />
-        <RouteWithProjectLayout path={routes.accounts} component={Accounts} />
-        <RouteWithProjectLayout path={routes.blocks} component={Blocks} />
+        <Route path={routes.start} component={StartRouter} />
+        <RouteWithProjectLayout
+          path={routes.accounts}
+          component={AccountsRouter}
+        />
+        <RouteWithProjectLayout path={routes.blocks} component={BlocksRouter} />
         <RouteWithProjectLayout
           path={routes.transactions}
-          component={Transactions}
+          component={TransactionsRouter}
         />
-        <RouteWithProjectLayout path={routes.contracts} component={Contracts} />
-        <RouteWithProjectLayout path={routes.events} component={Events} />
+        <RouteWithProjectLayout
+          path={routes.contracts}
+          component={ContractsRouter}
+        />
+        <RouteWithProjectLayout path={routes.events} component={EventsRouter} />
         <RouteWithProjectLayout
           path={routes.interactions}
           component={InteractionsPage}

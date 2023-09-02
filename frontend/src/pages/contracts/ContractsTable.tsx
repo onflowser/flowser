@@ -1,13 +1,13 @@
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
+import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
 import { AccountContract } from "@flowser/shared";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "../../components/label/Label";
+import Value from "../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import { AccountLink } from "../../../components/account/link/AccountLink";
+import { AccountLink } from "../../components/account/link/AccountLink";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
-import Table from "../../../components/table/Table";
+import Table from "../../components/table/Table";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();

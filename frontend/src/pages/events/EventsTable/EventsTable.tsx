@@ -1,22 +1,22 @@
-import React, { useEffect, useState, useMemo, ReactElement } from "react";
+import React, { useState, useMemo, ReactElement } from "react";
 import classes from "./EventsTable.module.scss";
-import tableClasses from "../../components/table/Table.module.scss";
-import Card from "../../components/card/Card";
-import Label from "../../components/label/Label";
-import Value from "../../components/value/Value";
+import tableClasses from "../../../components/table/Table.module.scss";
+import Card from "../../../components/card/Card";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
 import { NavLink } from "react-router-dom";
-import MiddleEllipsis from "../../components/ellipsis/MiddleEllipsis";
-import CaretIcon from "../../components/caret-icon/CaretIcon";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import CaretIcon from "../../../components/caret-icon/CaretIcon";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";
-import { ComputedEventData, EventUtils } from "../../utils/event-utils";
-import CopyButton from "../../components/buttons/copy-button/CopyButton";
-import Table from "../../components/table/Table";
+import { ComputedEventData, EventUtils } from "../../../utils/event-utils";
+import CopyButton from "../../../components/buttons/copy-button/CopyButton";
+import Table from "../../../components/table/Table";
 import { flexRender } from "@tanstack/react-table";
 import ReactTimeago from "react-timeago";
 import classNames from "classnames";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { Ellipsis } from "../../components/ellipsis/Ellipsis";
+import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [

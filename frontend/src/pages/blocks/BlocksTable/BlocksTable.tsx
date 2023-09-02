@@ -1,10 +1,9 @@
-import React, { FunctionComponent, useEffect, useMemo } from "react";
+import React, { FunctionComponent, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import classes from "./Main.module.scss";
+import classes from "./BlocksTable.module.scss";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
-import { useNavigation } from "../../../hooks/use-navigation";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { Block } from "@flowser/shared";
@@ -14,13 +13,8 @@ import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
-const Main: FunctionComponent = () => {
-  const { showNavigationDrawer } = useNavigation();
+export const BlocksTable: FunctionComponent = () => {
   const { data: blocks, firstFetch, error } = useGetPollingBlocks();
-
-  useEffect(() => {
-    showNavigationDrawer(false);
-  }, []);
 
   const columns = useMemo(
     () => [
@@ -72,5 +66,3 @@ const Main: FunctionComponent = () => {
     />
   );
 };
-
-export default Main;
