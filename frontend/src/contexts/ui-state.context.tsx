@@ -6,10 +6,9 @@ import React, {
   useContext,
   useState,
 } from "react";
-import { LogDrawerUiState } from "../hooks/use-log-drawer";
 import { NavigationUiState } from "../hooks/use-navigation";
 
-export interface UiState extends LogDrawerUiState, NavigationUiState {
+export interface UiState extends NavigationUiState {
   placeholder: { [key: string]: string };
   searchTerm: { [key: string]: string };
   searchDisabled: boolean;
@@ -19,7 +18,6 @@ export const defaultUiState: UiState = {
   placeholder: { default: "Search" },
   searchTerm: { default: "" },
   searchDisabled: false,
-  logDrawerSize: "tiny",
   breadcrumbs: [],
   isBreadcrumbsVisible: false,
   isShowBackButtonVisible: true,
