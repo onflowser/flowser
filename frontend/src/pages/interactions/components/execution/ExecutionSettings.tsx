@@ -22,7 +22,7 @@ import { ExternalLink } from "../../../../components/link/ExternalLink";
 export function ExecutionSettings(): ReactElement {
   return (
     <div className={classes.root}>
-      <div>
+      <div className={classes.top}>
         <TopContent />
       </div>
       <div className={classes.bottom}>

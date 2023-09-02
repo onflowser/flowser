@@ -2,7 +2,6 @@ import React, {
   FunctionComponent,
   ReactElement,
   useCallback,
-  useEffect,
   useState,
 } from "react";
 import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
@@ -12,14 +11,10 @@ import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
 import newProject from "../../../assets/icons/new_project.svg";
 import classes from "./Main.module.scss";
-import {
-  useGetAllProjects,
-  useGetCurrentProject,
-} from "../../../hooks/use-api";
+import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import moment from "moment";
-import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import { useProjectActions } from "../../../contexts/project.context";
 import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
@@ -51,10 +46,7 @@ const tabs: ProjectTab[] = [
 ];
 
 const Main: FunctionComponent<RouteChildrenProps> = (props) => {
-  const { showDialog } = useConfirmDialog();
   const history = useHistory();
-  const { data: currentProject, isFetching: isFetchingProject } =
-    useGetCurrentProject();
 
   const providedTabId = props.location.hash?.replace("#", "");
   const providedTab = tabs.find((tab) => tab.id === providedTabId);
@@ -62,26 +54,9 @@ const Main: FunctionComponent<RouteChildrenProps> = (props) => {
   const fallbackTab = tabs[0];
   const activeTab = providedTab ?? defaultTab ?? fallbackTab;
 
-  useEffect(() => {
-    const isStartPage = history.location.pathname.startsWith("/start");
-    const isRunningProject = Boolean(currentProject?.project);
-    if (isStartPage && isRunningProject && !isFetchingProject) {
-      history.push(routes.firstRouteAfterStart);
-    }
-  }, [history.location, currentProject]);
-
   const onConfigure = useCallback(() => {
     history.push(routes.configure);
   }, []);
-
-  function showOpenProjectDialog() {
-    showDialog({
-      title: "New emulator",
-      body: <span>Not supported yet :(</span>,
-      confirmButtonLabel: "CREATE",
-      cancelButtonLabel: "CANCEL",
-    });
-  }
 
   return (
     <div className={classes.container}>

@@ -14,6 +14,7 @@ import { AccountLink } from "../../../components/account/link/AccountLink";
 
 type TransactionOverviewProps = {
   transaction: Transaction;
+  className?: string;
 };
 
 export function TransactionOverview(
@@ -90,5 +91,5 @@ export function TransactionOverview(
     ],
   ];
 
-  return <DetailsCard columns={detailsColumns} />;
+  return <DetailsCard columns={detailsColumns} className={props.className} />;
 }

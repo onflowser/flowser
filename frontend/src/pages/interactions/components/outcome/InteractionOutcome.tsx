@@ -12,7 +12,7 @@ import {
   FlowScriptOutcome,
   FlowTransactionOutcome,
 } from "pages/interactions/contexts/interaction-registry.context";
-import { TabItem, Tabs } from "../../../../components/tabs/Tabs";
+import { TabItem } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { InteractionKind } from "@flowser/shared";
@@ -125,24 +125,22 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   tabs.push({
     id: overviewTabId,
     label: "Overview",
-    content: <TransactionOverview transaction={data.transaction} />,
+    content: (
+      <TransactionOverview
+        transaction={data.transaction}
+        className={classes.transactionOverview}
+      />
+    ),
   });
 
   if (error) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: (
-        // TODO(design-revamp): Consolidate body layout styles
-        <div style={{ padding: 10 }}>
-          {data.transaction.status?.errorMessage ? (
-            <TransactionError
-              errorMessage={data.transaction.status.errorMessage}
-            />
-          ) : (
-            <pre>{outcome.error}</pre>
-          )}
-        </div>
+      content: data.transaction.status?.errorMessage ? (
+        <TransactionError errorMessage={data.transaction.status.errorMessage} />
+      ) : (
+        <pre>{outcome.error}</pre>
       ),
     });
   }
@@ -175,23 +173,13 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: (
-        // TODO(design-revamp): Consolidate body layout styles
-        <div style={{ padding: 10 }}>
-          <ScriptError errorMessage={error} />
-        </div>
-      ),
+      content: <ScriptError errorMessage={error} />,
     });
   } else {
     tabs.push({
       id: resultTabId,
       label: "Result",
-      content: (
-        // TODO(design-revamp): Consolidate body layout styles
-        <div style={{ padding: 10 }}>
-          <JsonView name="result" data={{ value: result }} />
-        </div>
-      ),
+      content: <JsonView name="result" data={{ value: result }} />,
     });
   }
 

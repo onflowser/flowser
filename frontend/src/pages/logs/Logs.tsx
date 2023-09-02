@@ -10,7 +10,6 @@ import classes from "./Logs.module.scss";
 import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
 import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
 import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
-import { LogDrawerSize, useLogDrawer } from "../../hooks/use-log-drawer";
 import CaretIcon from "../../components/caret-icon/CaretIcon";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
@@ -28,9 +27,11 @@ type LogsProps = {
   className?: string;
 };
 
+type LogDrawerSize = "tiny" | "small" | "big" | "custom";
+
 export function Logs(props: LogsProps): ReactElement {
   const [trackMousePosition, setTrackMousePosition] = useState(false);
-  const { logDrawerSize, setSize } = useLogDrawer();
+  const [logDrawerSize, setLogDrawerSize] = useState<LogDrawerSize>("tiny");
   const tinyLogRef = useRef<HTMLDivElement>(null);
   const nonTinyLogRef = useRef<HTMLDivElement>(null);
   const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
@@ -86,8 +87,8 @@ export function Logs(props: LogsProps): ReactElement {
     scrollToBottom();
   }, [logs]);
 
-  const onCaretChange = useCallback((state) => {
-    if (state === false) {
+  const onCaretChange = useCallback((isExpanded) => {
+    if (isExpanded === false) {
       changeLogDrawerSize("small");
     } else {
       changeLogDrawerSize("tiny");
@@ -95,7 +96,7 @@ export function Logs(props: LogsProps): ReactElement {
   }, []);
 
   const changeLogDrawerSize = useCallback((size: LogDrawerSize) => {
-    setSize(size);
+    setLogDrawerSize(size);
     setTimeout(() => {
       scrollToBottom(false);
     }, 100);
@@ -107,14 +108,14 @@ export function Logs(props: LogsProps): ReactElement {
     const bottomPosition = window.innerHeight - mouseEvent.clientY;
     // collapse if user drags drawer downwards and reaches a certain threshold
     if (bottomPosition <= 130) {
-      setSize("tiny");
+      setLogDrawerSize("tiny");
       setTrackMousePosition(false);
     }
   }, [mouseEvent]);
 
   const startPositionDrag = useCallback(() => {
     setTrackMousePosition(true);
-    setSize("custom");
+    setLogDrawerSize("custom");
   }, []);
 
   const endPositionDrag = useCallback(() => {
@@ -141,16 +142,7 @@ export function Logs(props: LogsProps): ReactElement {
           [classes.expanded]: logDrawerSize !== "tiny",
         })}
       >
-        <SimpleButton
-          className={classes.logsButton}
-          onClick={() => {
-            if (logDrawerSize === "tiny") {
-              changeLogDrawerSize("small");
-            } else {
-              changeLogDrawerSize("tiny");
-            }
-          }}
-        >
+        <SimpleButton className={classes.logsButton}>
           <LogsIcon />
           <span>LOGS</span>
         </SimpleButton>

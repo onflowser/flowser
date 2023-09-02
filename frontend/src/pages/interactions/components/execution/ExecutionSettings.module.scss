@@ -7,7 +7,12 @@
   justify-content: space-between;
   flex-direction: column;
   padding: $spacing-base;
-  width: 300px;
+  min-width: 300px;
+  row-gap: $spacing-base;
+
+  .top {
+    overflow-y: scroll;
+  }
 
   .bottom {
     display: flex;

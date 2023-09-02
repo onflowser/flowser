@@ -32,15 +32,15 @@
       .content {
         flex: 2;
         display: flex;
+        row-gap: $spacing-base;
         flex-direction: column;
         overflow: hidden;
         .code {
-          flex: 3;
+          height: 60%;
           background: #272B32;
-          padding-top: $spacing-base;
         }
         .details {
-          flex: 1;
+          height: 40%;
           background: #272B32;
           .error {
             padding: $spacing-base;

@@ -39,13 +39,14 @@ function StoredTemplates() {
   );
 
   return (
-    <>
-      <SearchInput
-        placeholder="Search interactions ..."
-        searchTerm={searchTerm}
-        onChangeSearchTerm={setSearchTerm}
-      />
-      <SizedBox height={20} />
+    <div>
+      <div className={classes.header}>
+        <SearchInput
+          placeholder="Search interactions ..."
+          searchTerm={searchTerm}
+          onChangeSearchTerm={setSearchTerm}
+        />
+      </div>
       <div className={classes.storedTemplates}>
         {filteredAndSortedTemplates.map((template) => (
           <div
@@ -79,7 +80,7 @@ function StoredTemplates() {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 

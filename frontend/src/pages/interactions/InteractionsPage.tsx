@@ -93,7 +93,6 @@ function InteractionBody(): ReactElement {
         <div className={classes.code}>
           <InteractionSourceEditor />
         </div>
-        <SizedBox height={20} />
         <div className={classes.details}>
           <InteractionDetails />
         </div>
