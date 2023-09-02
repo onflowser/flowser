@@ -31,12 +31,13 @@
       display: flex;
       .content {
         flex: 2;
+        display: flex;
+        row-gap: $spacing-base;
         flex-direction: column;
         overflow: hidden;
         .code {
           height: 60%;
           background: #272B32;
-          padding-top: $spacing-base;
         }
         .details {
           height: 40%;
