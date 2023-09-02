@@ -12,7 +12,7 @@ import {
   FlowScriptOutcome,
   FlowTransactionOutcome,
 } from "pages/interactions/contexts/interaction-registry.context";
-import { TabItem, Tabs } from "../../../../components/tabs/Tabs";
+import { TabItem } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { InteractionKind } from "@flowser/shared";
@@ -125,7 +125,12 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   tabs.push({
     id: overviewTabId,
     label: "Overview",
-    content: <TransactionOverview transaction={data.transaction} />,
+    content: (
+      <TransactionOverview
+        transaction={data.transaction}
+        className={classes.transactionOverview}
+      />
+    ),
   });
 
   if (error) {
