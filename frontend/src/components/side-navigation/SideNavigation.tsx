@@ -28,7 +28,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
         <Link to="/interactions" icon={FlowserIcon.CursorClick} />
         <Link to="/settings" icon={FlowserIcon.Settings} />
       </div>
-      <Link to="/" icon={FlowserIcon.Switch} onClick={switchProject} />
+      <Link to="/" icon={FlowserIcon.Exit} onClick={switchProject} />
     </div>
   );
 }

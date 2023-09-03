@@ -16,7 +16,7 @@ import { ReactComponent as Cancel } from "../../assets/icons/cancel.svg";
 import { ReactComponent as Link } from "../../assets/icons/link.svg";
 import { ReactComponent as Script } from "../../assets/icons/script.svg";
 import { ReactComponent as QuestionMark } from "../../assets/icons/question-mark.svg";
-import { ReactComponent as Switch } from "../../assets/icons/switch.svg";
+import { ReactComponent as Exit } from "../../assets/icons/exit.svg";
 import { ReactComponent as Restart } from "../../assets/icons/restart.svg";
 import { ReactComponent as Open } from "assets/icons/open.svg";
 
@@ -32,7 +32,7 @@ export const FlowserIcon = {
   QuestionMark,
   ArtistPalette,
   Settings,
-  Switch,
+  Exit,
   Restart,
   CircleArrowLeft,
   Plus,
