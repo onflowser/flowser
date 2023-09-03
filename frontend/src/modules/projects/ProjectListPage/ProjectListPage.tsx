@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import IconButton from "../../../components/buttons/icon-button/IconButton";
 import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
-import newProject from "../../../assets/icons/new_project.svg";
 import classes from "./ProjectListPage.module.scss";
 import { useGetAllProjects } from "../../../hooks/use-api";
 import { Project } from "@flowser/shared";
@@ -17,6 +16,7 @@ import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { ConsentDialog } from "../../../components/dialogs/consent/ConsentDialog";
 import { useAnalyticsConsent } from "../../../hooks/use-analytics-consent";
+import { FlowserIcon } from "../../../components/icons/Icons";
 
 type ProjectTab = {
   id: string;
@@ -65,7 +65,8 @@ export const ProjectListPage: FunctionComponent = () => {
                 [classes.activeTab]: tab.id === activeTab.id,
               })}
             >
-              <Link to={`/start#${tab.id}`} className={classes.tabLink}>
+              <Link to={`/projects#${tab.id}`} className={classes.tabLink}>
+                <div className={classes.indicator} />
                 {tab.label}
               </Link>
             </li>
@@ -75,7 +76,7 @@ export const ProjectListPage: FunctionComponent = () => {
           <IconButton
             variant="middle"
             onClick={() => navigate("/projects/create")}
-            icon={<img src={newProject} alt="new project icon" />}
+            icon={<FlowserIcon.Plus />}
             iconPosition="before"
             className={classes.newProjectButton}
           >

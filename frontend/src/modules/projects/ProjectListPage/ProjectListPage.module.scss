@@ -48,12 +48,19 @@
 
       .tabWrapper {
         .tabLink {
-          display: block;
+          .indicator {
+            height: 40px;
+            width: 8px;
+            border-radius: 10px;
+            margin-right: $spacing-l;
+          }
+          display: flex;
+          align-items: center;
           text-decoration: none;
           color: $gray-10;
           font-size: $font-size-large;
           width: 100%;
-          padding: 12px 53px;
+          padding: $spacing-s $spacing-l;
           box-sizing: border-box;
           position: relative;
 
@@ -69,8 +76,11 @@
         }
 
         &.activeTab {
+          .indicator {
+            background: $violet-50;
+          }
           a {
-            background-color: transparentize($gray-50, 0.5);
+            background-color: transparentize($gray-50, 0.8);
           }
         }
       }
@@ -106,8 +116,11 @@
       }
 
       .newProjectButton {
-        background-color: $yellow;
-        color: $gray-110;
+        background-color: $violet-100;
+        color: $white;
+        svg path {
+          fill: white;
+        }
         border: none;
         width: 100%;
       }

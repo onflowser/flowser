@@ -128,7 +128,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "ProjectSettings",
+            path: "settings",
             element: <ProjectSettingsPage />,
           },
           {
