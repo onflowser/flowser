@@ -9,7 +9,7 @@ import Table from "../../../components/table/Table";
 import { Block } from "@flowser/shared";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { ProjectLink } from "../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 

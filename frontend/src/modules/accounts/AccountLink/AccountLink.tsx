@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { AccountAvatar } from "../AccountAvatar/AccountAvatar";
 import { AccountName } from "../AccountName/AccountName";
 import classes from "./AccountLink.module.scss";
-import { ProjectLink } from "../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 type AccountLinkProps = {
   address: string;

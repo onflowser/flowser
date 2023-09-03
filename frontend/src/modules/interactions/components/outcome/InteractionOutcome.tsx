@@ -16,7 +16,7 @@ import { TabItem } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { InteractionKind } from "@flowser/shared";
-import { ExternalLink } from "../../../../components/link/ExternalLink";
+import { ExternalLink } from "../../../../components/links/ExternalLink";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
 import { SpinnerWithLabel } from "../../../../components/spinner/SpinnerWithLabel";
 import { StyledTabs } from "../../../../components/tabs/StyledTabs";

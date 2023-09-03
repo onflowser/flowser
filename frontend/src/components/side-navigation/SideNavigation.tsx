@@ -5,8 +5,9 @@ import { FlowserIcon } from "components/icons/Icons";
 import { SizedBox } from "../sized-box/SizedBox";
 import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project.context";
-import { buildProjectUrl, ProjectLink } from "../link/ProjectLink";
+import { buildProjectUrl, ProjectLink } from "../links/ProjectLink";
 import { useCurrentProjectId } from "hooks/use-current-project-id";
+import { Tooltip } from "../tooltips/Tooltip";
 
 type SideNavigationProps = {
   className?: string;
@@ -20,15 +21,28 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
       <div>
         <FlowserLogo />
         <SizedBox height={50} />
-        <Link to="/accounts" icon={FlowserIcon.Account} />
-        <Link to="/blocks" icon={FlowserIcon.Block} />
-        <Link to="/transactions" icon={FlowserIcon.Transaction} />
-        <Link to="/contracts" icon={FlowserIcon.Contract} />
-        <Link to="/events" icon={FlowserIcon.Star} />
-        <Link to="/interactions" icon={FlowserIcon.CursorClick} />
-        <Link to="/settings" icon={FlowserIcon.Settings} />
+        <Link to="/accounts" name="Accounts" icon={FlowserIcon.Account} />
+        <Link to="/blocks" name="Blocks" icon={FlowserIcon.Block} />
+        <Link
+          to="/transactions"
+          name="Transactions"
+          icon={FlowserIcon.Transaction}
+        />
+        <Link to="/contracts" name="Contracts" icon={FlowserIcon.Contract} />
+        <Link to="/events" name="Events" icon={FlowserIcon.Star} />
+        <Link
+          to="/interactions"
+          name="Interactions"
+          icon={FlowserIcon.CursorClick}
+        />
+        <Link to="/settings" name="Settings" icon={FlowserIcon.Settings} />
       </div>
-      <Link to="/" icon={FlowserIcon.Exit} onClick={switchProject} />
+      <Link
+        to="/"
+        name="Exit"
+        icon={FlowserIcon.Exit}
+        onClick={switchProject}
+      />
     </div>
   );
 }
@@ -40,6 +54,7 @@ function FlowserLogo() {
 
 function Link(props: {
   to: string;
+  name: string;
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   onClick?: () => void;
 }) {
@@ -54,14 +69,16 @@ function Link(props: {
   const iconSize = 20;
 
   return (
-    <ProjectLink
-      to={props.to}
-      className={classNames(classes.inactiveLink, {
-        [classes.activeLink]: isActive,
-      })}
-      onClick={props.onClick}
-    >
-      <Icon width={iconSize} height={iconSize} />
-    </ProjectLink>
+    <Tooltip content={props.name} position="right">
+      <ProjectLink
+        to={props.to}
+        className={classNames(classes.inactiveLink, {
+          [classes.activeLink]: isActive,
+        })}
+        onClick={props.onClick}
+      >
+        <Icon width={iconSize} height={iconSize} />
+      </ProjectLink>
+    </Tooltip>
   );
 }

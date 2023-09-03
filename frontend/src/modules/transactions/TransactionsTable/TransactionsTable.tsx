@@ -12,7 +12,7 @@ import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
-import { ProjectLink } from "../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 

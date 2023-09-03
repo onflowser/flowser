@@ -10,6 +10,7 @@
   "main": "dist/targets/electron/main.js",
   "homepage": "./",
   "dependencies": {
+    "react-tooltip": "5.21.1",
     "@codemirror/legacy-modes": "^6.1.0",
     "@fingerprintjs/fingerprintjs": "^3.3.6",
     "@flowser/backend": "0.0.1",

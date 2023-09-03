@@ -6,7 +6,7 @@ import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./Details.module.scss";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
-import { ProjectLink } from "../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 const columnsHelper = createColumnHelper<SignableObject>();
 

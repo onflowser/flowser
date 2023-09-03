@@ -6,7 +6,7 @@ import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import gradient from "../../../assets/images/gradient.png";
 import classNames from "classnames";
-import { ProjectLink } from "../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 type StorageCardProps = {
   currentAccountAddress: string;

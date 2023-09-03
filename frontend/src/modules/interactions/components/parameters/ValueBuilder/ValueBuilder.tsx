@@ -10,7 +10,7 @@ import { DictionaryBuilder } from "./DictionaryBuilder/DictionaryBuilder";
 import { PathBuilder } from "./PathBuilder/PathBuilder";
 import { BoolBuilder } from "./BoolBuilder/BoolBuilder";
 import { Callout } from "../../../../../components/callout/Callout";
-import { ExternalLink } from "../../../../../components/link/ExternalLink";
+import { ExternalLink } from "../../../../../components/links/ExternalLink";
 import { FlowserIcon } from "../../../../../components/icons/Icons";
 import { SizedBox } from "../../../../../components/sized-box/SizedBox";
 import { IntegerNumberBuilder } from "./IntegerNumberBuilder/IntegerNumberBuilder";

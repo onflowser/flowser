@@ -17,7 +17,7 @@ import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { TransactionOptions } from "../../contexts/interaction-registry.context";
 import { Callout } from "../../../../components/callout/Callout";
-import { ExternalLink } from "../../../../components/link/ExternalLink";
+import { ExternalLink } from "../../../../components/links/ExternalLink";
 
 export function ExecutionSettings(): ReactElement {
   return (

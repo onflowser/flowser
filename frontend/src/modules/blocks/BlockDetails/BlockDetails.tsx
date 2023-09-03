@@ -11,7 +11,7 @@ import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
-import { ProjectLink } from "../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 type BlockDetailsProps = {
   blockId: string;
