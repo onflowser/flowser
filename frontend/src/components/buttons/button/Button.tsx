@@ -12,7 +12,6 @@ export type ButtonProps = React.DetailedHTMLProps<
     disabled?: boolean;
     outlined?: boolean;
     loading?: boolean;
-    loaderColor?: string;
   };
 
 const Button: FunctionComponent<ButtonProps> = ({
@@ -21,7 +20,6 @@ const Button: FunctionComponent<ButtonProps> = ({
   variant = "normal",
   outlined = false,
   loading = false,
-  loaderColor = "#363F53",
   ...restProps
 }) => {
   return (

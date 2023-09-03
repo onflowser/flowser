@@ -66,9 +66,9 @@
 }
 
 .disabled {
-  background: $color-not-active-button-grey;
-  color: $color-not-active-button-text-grey;
-  border: 2px solid $color-not-active-button-grey;
+  background: $gray-50;
+  color: $gray-30;
+  border: 2px solid $gray-50;
   cursor: default;
   font-size: $font-size-normal;
 
@@ -82,10 +82,10 @@
 }
 
 .outlined {
-  background: none;
+  background: transparentize($violet-100, 0.8);
   color: $white;
 
   &.disabled {
-    color: $color-not-active-button-text-grey;
+    color: $gray-30;
   }
 }
