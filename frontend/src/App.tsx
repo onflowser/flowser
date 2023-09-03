@@ -1,6 +1,7 @@
 import React, { FunctionComponent, ReactElement, useEffect } from "react";
 import {
   BrowserRouter,
+  Outlet,
   Route,
   Routes,
   useLocation,
@@ -113,47 +114,38 @@ export const FlowserRoutes = (): ReactElement => {
               </BackButtonLayout>
             }
           />
+          <Route
+            path=":projectId"
+            element={
+              <ProjectLayout>
+                <Outlet />
+              </ProjectLayout>
+            }
+          >
+            <Route path="settings" element={<ProjectSettingsPage />} />
+            <Route path="accounts">
+              <Route index element={<AccountsTablePage />} />
+              <Route path=":accountId" element={<AccountDetailsPage />} />
+            </Route>
+            <Route path="blocks">
+              <Route index element={<BlocksTablePage />} />
+              <Route path=":blockId" element={<BlockDetailsPage />} />
+            </Route>
+            <Route path="transactions">
+              <Route index element={<TransactionsTablePage />} />
+              <Route
+                path=":transactionId"
+                element={<TransactionDetailsPage />}
+              />
+            </Route>
+            <Route path="contracts">
+              <Route index element={<ContractsTablePage />} />
+              <Route path=":contractId" element={<ContractDetailsPage />} />
+            </Route>
+            <Route path="events" element={<EventsTablePage />} />
+            <Route path="interactions" element={<InteractionsPage />} />
+          </Route>
         </Route>
-        <Route path="accounts">
-          <Route index element={<AccountsTablePage />} />
-          <Route path=":accountId" element={<AccountDetailsPage />} />
-        </Route>
-        <Route path="blocks">
-          <Route index element={<BlocksTablePage />} />
-          <Route path=":blockId" element={<BlockDetailsPage />} />
-        </Route>
-        <Route path="transactions">
-          <Route index element={<TransactionsTablePage />} />
-          <Route path=":transactionId" element={<TransactionDetailsPage />} />
-        </Route>
-        <Route path="contracts">
-          <Route index element={<ContractsTablePage />} />
-          <Route path=":contractId" element={<ContractDetailsPage />} />
-        </Route>
-        <Route
-          path="events"
-          element={
-            <ProjectLayout>
-              <EventsTablePage />
-            </ProjectLayout>
-          }
-        />
-        <Route
-          path="interactions"
-          element={
-            <ProjectLayout>
-              <InteractionsPage />
-            </ProjectLayout>
-          }
-        />
-        <Route
-          path=":projectId"
-          element={
-            <ProjectLayout>
-              <ProjectSettingsPage />
-            </ProjectLayout>
-          }
-        />
       </Routes>
       <Toaster
         position="bottom-center"

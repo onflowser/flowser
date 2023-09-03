@@ -1,11 +1,5 @@
-import React, {
-  FunctionComponent,
-  ReactElement,
-  useCallback,
-  useState,
-} from "react";
+import React, { FunctionComponent, ReactElement, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/buttons/icon-button/IconButton";
 import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
@@ -55,10 +49,6 @@ export const ProjectListPage: FunctionComponent = () => {
   const fallbackTab = tabs[0];
   const activeTab = providedTab ?? defaultTab ?? fallbackTab;
 
-  const onConfigure = useCallback(() => {
-    navigate(routes.configure);
-  }, []);
-
   return (
     <div className={classes.container}>
       <aside className={classes.sidebar}>
@@ -84,7 +74,7 @@ export const ProjectListPage: FunctionComponent = () => {
         <div className={classes.sideBarFooter}>
           <IconButton
             variant="middle"
-            onClick={onConfigure}
+            onClick={() => navigate("/projects/create")}
             icon={<img src={newProject} alt="new project icon" />}
             iconPosition="before"
             className={classes.newProjectButton}
@@ -111,10 +101,10 @@ function ProjectsListContent() {
     try {
       await projectService.useProject(project.id);
       track(AnalyticEvent.PROJECT_STARTED);
-      navigate(routes.firstRouteAfterStart);
+      navigate(`/projects/${project.id}/accounts`);
     } catch (e: unknown) {
       handleError(e);
-      navigate(`/start/configure/${project.id}`, {
+      navigate(`/projects/${project.id}/settings`, {
         replace: true,
       });
     }

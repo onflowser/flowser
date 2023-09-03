@@ -7,7 +7,6 @@ import React, {
   useMemo,
   useEffect,
 } from "react";
-import { routes } from "../constants/routes";
 import toast from "react-hot-toast";
 import { Block, EmulatorSnapshot, Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
@@ -96,7 +95,7 @@ export function ProjectProvider({
         error: `Failed to delete project "${project.name}"`,
         success: `Project "${project.name}" deleted!`,
       });
-      navigate(routes.start, {
+      navigate("/projects", {
         replace: true,
       });
     } catch (e) {
@@ -128,7 +127,7 @@ export function ProjectProvider({
       // Clear the entire cache,
       // so that previous data isn't there when using another project
       queryClient.clear();
-      navigate(routes.start, {
+      navigate("/projects", {
         replace: true,
       });
     };

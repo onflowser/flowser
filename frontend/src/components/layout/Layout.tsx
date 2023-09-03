@@ -6,7 +6,6 @@ import { ReactComponent as IconBackButton } from "../../assets/icons/back-button
 import classNames from "classnames";
 import { Breadcrumbs } from "../breadcrumbs/Breadcrumbs";
 import { SideNavigation } from "../side-navigation/SideNavigation";
-import { routes } from "../../constants/routes";
 
 export const BackButtonLayout: FC<{ children: ReactNode }> = (props) => {
   const navigate = useNavigate();
@@ -25,7 +24,7 @@ export const BackButtonLayout: FC<{ children: ReactNode }> = (props) => {
 
 export const ProjectLayout: FunctionComponent = ({ children }) => {
   const location = useLocation();
-  const showMargin = !location.pathname.startsWith(routes.interactions);
+  const showMargin = !location.pathname.endsWith("interactions");
 
   return (
     <div className={classes.root}>

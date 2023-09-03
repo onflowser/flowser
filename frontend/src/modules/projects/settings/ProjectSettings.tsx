@@ -1,10 +1,9 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
 import Card from "../../../components/card/Card";
 import Button from "../../../components/buttons/button/Button";
-import { routes } from "../../../constants/routes";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
@@ -96,11 +95,11 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
     }
     try {
       await projectService.useProject(project.id);
-      navigate(routes.firstRouteAfterStart, {
+      navigate(`/projects/${project.id}/accounts`, {
         replace: true,
       });
     } catch (e) {
-      navigate(`/start/configure/${project.id}`, {
+      navigate(`/projects/${project.id}/settings`, {
         replace: true,
       });
       handleError(e);
