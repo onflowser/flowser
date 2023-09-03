@@ -2,11 +2,11 @@ import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./Details.module.scss";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 const columnsHelper = createColumnHelper<SignableObject>();
 
@@ -15,9 +15,9 @@ const columns = [
     header: () => <Label variant="medium">ACCOUNT ADDRESS</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/accounts/details/${info.getValue()}`}>
+        <ProjectLink to={`/accounts/${info.getValue()}`}>
           {info.getValue()}
-        </NavLink>
+        </ProjectLink>
       </Value>
     ),
   }),

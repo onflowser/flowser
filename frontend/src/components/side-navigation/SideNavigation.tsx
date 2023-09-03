@@ -6,7 +6,7 @@ import { SizedBox } from "../sized-box/SizedBox";
 import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project.context";
 import { buildProjectUrl, ProjectLink } from "../link/ProjectLink";
-import { useGetCurrentProject } from "../../hooks/use-api";
+import { useCurrentProjectId } from "hooks/use-current-project-id";
 
 type SideNavigationProps = {
   className?: string;
@@ -43,9 +43,9 @@ function Link(props: {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   onClick?: () => void;
 }) {
-  const { data } = useGetCurrentProject();
+  const projectId = useCurrentProjectId();
   const fullTargetUrl = buildProjectUrl({
-    projectId: data!.project!.id,
+    projectId,
     subPath: props.to,
   });
   const matches = useMatches();

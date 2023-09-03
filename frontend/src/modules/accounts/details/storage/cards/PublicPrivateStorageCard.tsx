@@ -7,6 +7,7 @@ import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import gradient from "../../../../../assets/images/gradient.png";
 import classNames from "classnames";
+import { ProjectLink } from "../../../../../components/link/ProjectLink";
 
 type StorageCardProps = {
   currentAccountAddress: string;
@@ -39,10 +40,10 @@ export function PublicPrivateStorageCard({
       <div className={classes.content}>
         <StorageDomainBadge pathDomain={storageItem.pathDomain} />
         <div className={classes.identifier}>{storageItem.pathIdentifier}</div>
-        <NavLink className={classes.link} to={targetStorageCardUrl}>
+        <ProjectLink className={classes.link} to={targetStorageCardUrl}>
           <LinkIcon />
           <div className={classes.linkText}>{targetPathIdentifier}</div>
-        </NavLink>
+        </ProjectLink>
         <span title={borrowType} className={classes.bottomText}>
           {borrowType}
         </span>
@@ -80,6 +81,6 @@ function getTargetStorageCardUrl(options: {
 
   // TODO(milestone-x): Navigate to a specific sub-structure of the react-json-view (research)?
   return borrowTypePathParts
-    ? `/accounts/details/${targetAccountAddress}?${params.toString()}`
+    ? `/accounts/${targetAccountAddress}?${params.toString()}`
     : "#";
 }
