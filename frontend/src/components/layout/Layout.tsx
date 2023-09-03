@@ -22,6 +22,8 @@ export const BackButtonLayout: FC<{ children: ReactNode }> = (props) => {
   );
 };
 
+export const scrollableElementId = "flowser-scroll";
+
 export const ProjectLayout: FunctionComponent = ({ children }) => {
   const location = useLocation();
   const showMargin = !location.pathname.endsWith("interactions");
@@ -32,6 +34,7 @@ export const ProjectLayout: FunctionComponent = ({ children }) => {
       <div className={classes.mainContent}>
         <Breadcrumbs className={classes.breadcrumbs} />
         <div
+          id={scrollableElementId}
           className={classNames(classes.body, {
             [classes.bodyWithBorderSpacing]: showMargin,
           })}

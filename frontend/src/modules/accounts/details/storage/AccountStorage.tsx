@@ -9,6 +9,7 @@ import { enableDetailsIntroAnimation } from "../../../../config/common";
 import { InternalStorageCard } from "./cards/InternalStorageCard";
 import classNames from "classnames";
 import classes from "./AccountStorage.module.scss";
+import { scrollableElementId } from "../../../../components/layout/Layout";
 
 type AccountStorageProps = {
   account: Account;
@@ -32,7 +33,9 @@ export function AccountStorage(props: AccountStorageProps): ReactElement {
       // There might be a better React way to do this.
       setTimeout(() => {
         const targetDomNode = document.getElementById(focusedStorageId);
-        window.scrollTo(0, targetDomNode?.offsetTop ?? 0);
+        document
+          .getElementById(scrollableElementId)
+          ?.scrollTo(0, targetDomNode?.offsetTop ?? 0);
       });
     }
   }, [focusedStorageId, storageItems]);

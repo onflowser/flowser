@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react";
 import classes from "./PublicPrivateStorageCard.module.scss";
 import { StorageDomainBadge } from "../StorageDomainBadge";
-import { NavLink } from "react-router-dom";
 import { ReactComponent as LinkIcon } from "../../../../../assets/icons/link.svg";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
@@ -40,7 +39,7 @@ export function PublicPrivateStorageCard({
       <div className={classes.content}>
         <StorageDomainBadge pathDomain={storageItem.pathDomain} />
         <div className={classes.identifier}>{storageItem.pathIdentifier}</div>
-        <ProjectLink className={classes.link} to={targetStorageCardUrl}>
+        <ProjectLink className={classes.link} to={targetStorageCardUrl} replace>
           <LinkIcon />
           <div className={classes.linkText}>{targetPathIdentifier}</div>
         </ProjectLink>
