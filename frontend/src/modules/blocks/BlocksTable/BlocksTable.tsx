@@ -9,6 +9,7 @@ import Table from "../../../components/table/Table";
 import { Block } from "@flowser/shared";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -28,11 +29,11 @@ export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
         },
         cell: (info) => (
           <Value>
-            <NavLink to={`/blocks/details/${info.getValue()}`}>
+            <ProjectLink to={`/blocks/${info.getValue()}`}>
               <MiddleEllipsis className={classes.hash}>
                 {info.getValue()}
               </MiddleEllipsis>
-            </NavLink>
+            </ProjectLink>
           </Value>
         ),
       }),

@@ -17,6 +17,7 @@ import ReactTimeago from "react-timeago";
 import classNames from "classnames";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 const subTableColumnHelper = createColumnHelper<ComputedEventData>();
 const subTableColumns = [
@@ -67,11 +68,11 @@ export function EventsTable(props: EventsTableProps): ReactElement {
         header: () => <Label variant="medium">BLOCK</Label>,
         cell: (info) => (
           <Value>
-            <NavLink to={`/blocks/details/${info.getValue()}`}>
+            <ProjectLink to={`/blocks/${info.getValue()}`}>
               <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
               </MiddleEllipsis>
-            </NavLink>
+            </ProjectLink>
           </Value>
         ),
       }),
@@ -79,11 +80,11 @@ export function EventsTable(props: EventsTableProps): ReactElement {
         header: () => <Label variant="medium">TRANSACTION</Label>,
         cell: (info) => (
           <Value>
-            <NavLink to={`/transactions/details/${info.getValue()}`}>
+            <ProjectLink to={`/transactions/${info.getValue()}`}>
               <MiddleEllipsis className={classes.hashEvents}>
                 {info.getValue()}
               </MiddleEllipsis>
-            </NavLink>
+            </ProjectLink>
           </Value>
         ),
       }),

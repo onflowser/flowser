@@ -3,7 +3,6 @@ import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.contex
 import { Transaction } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import { NavLink } from "react-router-dom";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionsTable.module.scss";
 import { AccountLink } from "../../../components/account/link/AccountLink";
@@ -13,6 +12,7 @@ import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
@@ -21,11 +21,11 @@ const columns = [
     header: () => <Label variant="medium">IDENTIFIER</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/transactions/details/${info.getValue()}`}>
+        <ProjectLink to={`/transactions/${info.getValue()}`}>
           <MiddleEllipsis className={classes.hash}>
             {info.getValue()}
           </MiddleEllipsis>
-        </NavLink>
+        </ProjectLink>
       </Value>
     ),
   }),

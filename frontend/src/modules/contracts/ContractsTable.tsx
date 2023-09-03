@@ -3,11 +3,11 @@ import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
 import { AccountContract } from "@flowser/shared";
 import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
-import { NavLink } from "react-router-dom";
 import { AccountLink } from "../../components/account/link/AccountLink";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../components/table/Table";
+import { ProjectLink } from "../../components/link/ProjectLink";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();
@@ -17,9 +17,9 @@ const columns = [
     header: () => <Label variant="medium">NAME</Label>,
     cell: (info) => (
       <Value>
-        <NavLink to={`/contracts/details/${info.row.original.id}`}>
+        <ProjectLink to={`/contracts/${info.row.original.id}`}>
           {info.row.original.name}
-        </NavLink>
+        </ProjectLink>
       </Value>
     ),
   }),
