@@ -9,8 +9,8 @@ import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatus
 import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { TextUtils } from "../../../utils/text-utils";
 import { Transaction } from "@flowser/shared";
-import { NavLink } from "react-router-dom";
 import { AccountLink } from "../../../components/account/link/AccountLink";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 type TransactionOverviewProps = {
   transaction: Transaction;
@@ -27,11 +27,11 @@ export function TransactionOverview(
       {
         label: "Transaction",
         value: (
-          <NavLink to={`/transactions/details/${transaction.id}`}>
+          <ProjectLink to={`/transactions/${transaction.id}`}>
             <MiddleEllipsis className={classes.elipsis}>
               {transaction.id}
             </MiddleEllipsis>
-          </NavLink>
+          </ProjectLink>
         ),
       },
       {
@@ -49,11 +49,11 @@ export function TransactionOverview(
       {
         label: "Block ID",
         value: (
-          <NavLink to={`/blocks/details/${transaction.blockId}`}>
+          <ProjectLink to={`/blocks/${transaction.blockId}`}>
             <MiddleEllipsis className={classes.elipsis}>
               {transaction.blockId}
             </MiddleEllipsis>
-          </NavLink>
+          </ProjectLink>
         ),
       },
     ],

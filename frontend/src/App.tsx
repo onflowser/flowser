@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { BackButtonLayout, ProjectLayout } from "./components/layout/Layout";
-import { UiStateContextProvider } from "./contexts/ui-state.context";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
@@ -46,6 +45,7 @@ import { ProjectListPage } from "./modules/projects/ProjectListPage/ProjectListP
 import { ContractsTable } from "./modules/contracts/ContractsTable";
 import { ContractDetails } from "./modules/contracts/details/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
+import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
@@ -78,20 +78,18 @@ export const FlowserClientApp = ({
     <QueryClientProvider client={queryClient}>
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <ConfirmDialogProvider>
-          <UiStateContextProvider>
-            <PlatformAdapterProvider {...platformAdapter}>
-              <InteractionRegistryProvider>
-                <ConsentAnalytics />
-                <ProjectRequirements />
-                <RouterProvider router={router} />
-                <Toaster
-                  position="bottom-center"
-                  gutter={8}
-                  toastOptions={toastOptions}
-                />
-              </InteractionRegistryProvider>
-            </PlatformAdapterProvider>
-          </UiStateContextProvider>
+          <PlatformAdapterProvider {...platformAdapter}>
+            <InteractionRegistryProvider>
+              <ConsentAnalytics />
+              <ProjectRequirements />
+              <RouterProvider router={router} />
+              <Toaster
+                position="bottom-center"
+                gutter={8}
+                toastOptions={toastOptions}
+              />
+            </InteractionRegistryProvider>
+          </PlatformAdapterProvider>
         </ConfirmDialogProvider>
       </TimeoutPollingProvider>
     </QueryClientProvider>
@@ -135,6 +133,9 @@ const router = createBrowserRouter([
           },
           {
             path: "accounts",
+            handle: createCrumbHandle({
+              crumbName: "Accounts",
+            }),
             children: [
               {
                 index: true,
@@ -143,11 +144,17 @@ const router = createBrowserRouter([
               {
                 path: ":accountId",
                 element: <AccountDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: "Details",
+                }),
               },
             ],
           },
           {
             path: "blocks",
+            handle: createCrumbHandle({
+              crumbName: "Blocks",
+            }),
             children: [
               {
                 index: true,
@@ -156,24 +163,36 @@ const router = createBrowserRouter([
               {
                 path: ":blockId",
                 element: <BlockDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: "Details",
+                }),
               },
             ],
           },
           {
             path: "transactions",
+            handle: createCrumbHandle({
+              crumbName: "Transactions",
+            }),
             children: [
               {
                 index: true,
                 element: <TransactionsTablePage />,
               },
               {
-                path: ":transactionsId",
+                path: ":transactionId",
                 element: <TransactionDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: "Details",
+                }),
               },
             ],
           },
           {
             path: "contracts",
+            handle: createCrumbHandle({
+              crumbName: "Contracts",
+            }),
             children: [
               {
                 index: true,
@@ -182,11 +201,17 @@ const router = createBrowserRouter([
               {
                 path: ":contractId",
                 element: <ContractDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: "Details",
+                }),
               },
             ],
           },
           {
             path: "events",
+            handle: createCrumbHandle({
+              crumbName: "Events",
+            }),
             children: [
               {
                 index: true,

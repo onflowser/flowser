@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import { NavLink } from "react-router-dom";
 import classes from "./Details.module.scss";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
@@ -12,6 +11,7 @@ import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 type BlockDetailsProps = {
   blockId: string;
@@ -41,9 +41,9 @@ export const BlockDetails: FunctionComponent<BlockDetailsProps> = (props) => {
         value: FlowUtils.isInitialBlockId(block.parentId) ? (
           block.parentId
         ) : (
-          <NavLink to={`/blocks/details/${block.parentId}`}>
+          <ProjectLink to={`/blocks/${block.parentId}`}>
             {block.parentId}
-          </NavLink>
+          </ProjectLink>
         ),
       },
       {
