@@ -1,5 +1,5 @@
 // Don't show intro animation,
-// because that gets shown every time you visit "EventsModule" tab,
+// because that gets shown every time you visit "Events" tab,
 // (table is rebuild everytime you visit tab)
 // which is kinda disturbing
 // TODO: Rework unseen/new logic

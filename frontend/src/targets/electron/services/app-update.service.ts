@@ -40,7 +40,7 @@ export class AppUpdateService {
         })
         .then((buttonIndex) => {
           if (buttonIndex.response === 0) {
-            webContents?.send("update-download-projects");
+            webContents?.send("update-download-start");
             autoUpdater.downloadUpdate();
           }
         });
