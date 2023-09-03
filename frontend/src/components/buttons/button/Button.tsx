@@ -1,7 +1,7 @@
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Button.module.scss";
-import Loader from "react-loader-spinner";
 import classNames from "classnames";
+import { Spinner } from "../../spinner/Spinner";
 
 export type ButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -41,7 +41,7 @@ const Button: FunctionComponent<ButtonProps> = ({
     >
       {loading && (
         <div className={classes.loaderWrapper}>
-          <Loader type="Oval" color={loaderColor} height={25} width={25} />
+          <Spinner size={25} />
         </div>
       )}
       <div

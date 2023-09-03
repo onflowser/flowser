@@ -1,12 +1,12 @@
 import React, { ReactElement } from "react";
 import classes from "./SideNavigation.module.scss";
-import { routes } from "../../constants/routes";
-import { NavLink } from "react-router-dom";
+import { useMatches } from "react-router-dom";
 import { FlowserIcon } from "components/icons/Icons";
 import { SizedBox } from "../sized-box/SizedBox";
 import classNames from "classnames";
-import { useGetCurrentProject } from "../../hooks/use-api";
 import { useProjectActions } from "../../contexts/project.context";
+import { buildProjectUrl, ProjectLink } from "../link/ProjectLink";
+import { useCurrentProjectId } from "hooks/use-current-project-id";
 
 type SideNavigationProps = {
   className?: string;
@@ -14,32 +14,21 @@ type SideNavigationProps = {
 
 export function SideNavigation(props: SideNavigationProps): ReactElement {
   const { switchProject } = useProjectActions();
-  const { data: currentProjectData } = useGetCurrentProject();
-  const { project: currentProject } = currentProjectData ?? {};
 
   return (
     <div className={classNames(classes.root, props.className)}>
       <div>
         <FlowserLogo />
         <SizedBox height={50} />
-        <ProjectLink to={routes.accounts} icon={FlowserIcon.Account} />
-        <ProjectLink to={routes.blocks} icon={FlowserIcon.Block} />
-        <ProjectLink to={routes.transactions} icon={FlowserIcon.Transaction} />
-        <ProjectLink to={routes.contracts} icon={FlowserIcon.Contract} />
-        <ProjectLink to={routes.events} icon={FlowserIcon.Star} />
-        <ProjectLink to={routes.interactions} icon={FlowserIcon.CursorClick} />
-        {currentProject && (
-          <ProjectLink
-            to={`/configure/${currentProject.id}`}
-            icon={FlowserIcon.Settings}
-          />
-        )}
+        <Link to="/accounts" icon={FlowserIcon.Account} />
+        <Link to="/blocks" icon={FlowserIcon.Block} />
+        <Link to="/transactions" icon={FlowserIcon.Transaction} />
+        <Link to="/contracts" icon={FlowserIcon.Contract} />
+        <Link to="/events" icon={FlowserIcon.Star} />
+        <Link to="/interactions" icon={FlowserIcon.CursorClick} />
+        <Link to="/settings" icon={FlowserIcon.Settings} />
       </div>
-      <ProjectLink
-        to={routes.start}
-        icon={FlowserIcon.Switch}
-        onClick={switchProject}
-      />
+      <Link to="/" icon={FlowserIcon.Switch} onClick={switchProject} />
     </div>
   );
 }
@@ -49,21 +38,30 @@ function FlowserLogo() {
   return <FlowserIcon.LogoRound width={size} height={size} />;
 }
 
-function ProjectLink(props: {
+function Link(props: {
   to: string;
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   onClick?: () => void;
 }) {
+  const projectId = useCurrentProjectId();
+  const fullTargetUrl = buildProjectUrl({
+    projectId,
+    subPath: props.to,
+  });
+  const matches = useMatches();
+  const isActive = matches.some((match) => match.pathname === fullTargetUrl);
   const Icon = props.icon;
   const iconSize = 20;
+
   return (
-    <NavLink
+    <ProjectLink
       to={props.to}
-      className={classes.inactiveLink}
-      activeClassName={classes.activeLink}
+      className={classNames(classes.inactiveLink, {
+        [classes.activeLink]: isActive,
+      })}
       onClick={props.onClick}
     >
       <Icon width={iconSize} height={iconSize} />
-    </NavLink>
+    </ProjectLink>
   );
 }

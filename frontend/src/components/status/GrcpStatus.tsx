@@ -12,7 +12,6 @@ export type GrcpStatusProps = {
 
 export function GrcpStatus({ status }: GrcpStatusProps): ReactElement {
   const { grcpStatus } = status ?? {};
-  console.log(grcpStatus);
   const statusName = FlowUtils.getGrcpStatusName(grcpStatus);
   return (
     <div className={classes.root}>

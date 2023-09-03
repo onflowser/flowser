@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 import { ServiceRegistry } from "../../../services/service-registry";
 import Input from "../../inputs/input/Input";
 import { ActionDialog } from "../action/ActionDialog";
-import { useCurrentProjectId } from "../../../hooks/use-api";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
+import { useCurrentProjectId } from "../../../hooks/use-current-project-id";
 
 export type SnapshotDialogProps = {
   show?: boolean;
