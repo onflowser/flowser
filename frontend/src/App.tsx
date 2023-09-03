@@ -1,9 +1,8 @@
-import React, { FunctionComponent, ReactElement, useEffect } from "react";
+import React, { ReactElement, ReactNode, useEffect } from "react";
 import {
-  BrowserRouter,
+  createBrowserRouter,
   Outlet,
-  Route,
-  Routes,
+  RouterProvider,
   useLocation,
   useParams,
 } from "react-router-dom";
@@ -48,9 +47,7 @@ import { ContractsTable } from "./modules/contracts/ContractsTable";
 import { ContractDetails } from "./modules/contracts/details/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
 
-const BrowserRouterEvents = (props: {
-  children: ReactElement[];
-}): ReactElement => {
+const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
   const { analyticsService } = ServiceRegistry.getInstance();
 
@@ -80,81 +77,137 @@ export const FlowserClientApp = ({
   return (
     <QueryClientProvider client={queryClient}>
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
-        <BrowserRouter>
-          <ConfirmDialogProvider>
-            <UiStateContextProvider>
-              <PlatformAdapterProvider {...platformAdapter}>
-                <ProjectProvider>
-                  <InteractionRegistryProvider>
-                    <FlowserRoutes />
-                  </InteractionRegistryProvider>
-                </ProjectProvider>
-              </PlatformAdapterProvider>
-            </UiStateContextProvider>
-          </ConfirmDialogProvider>
-        </BrowserRouter>
+        <ConfirmDialogProvider>
+          <UiStateContextProvider>
+            <PlatformAdapterProvider {...platformAdapter}>
+              <InteractionRegistryProvider>
+                <ConsentAnalytics />
+                <ProjectRequirements />
+                <RouterProvider router={router} />
+                <Toaster
+                  position="bottom-center"
+                  gutter={8}
+                  toastOptions={toastOptions}
+                />
+              </InteractionRegistryProvider>
+            </PlatformAdapterProvider>
+          </UiStateContextProvider>
+        </ConfirmDialogProvider>
       </TimeoutPollingProvider>
     </QueryClientProvider>
   );
 };
 
-export const FlowserRoutes = (): ReactElement => {
-  return (
-    <BrowserRouterEvents>
-      <ConsentAnalytics />
-      <ProjectRequirements />
-      <Routes>
-        <Route path="projects">
-          <Route index element={<ProjectListPage />} />
-          <Route
-            path="create"
-            element={
-              <BackButtonLayout>
-                <ProjectSettingsPage />
-              </BackButtonLayout>
-            }
-          />
-          <Route
-            path=":projectId"
-            element={
-              <ProjectLayout>
-                <Outlet />
-              </ProjectLayout>
-            }
-          >
-            <Route path="settings" element={<ProjectSettingsPage />} />
-            <Route path="accounts">
-              <Route index element={<AccountsTablePage />} />
-              <Route path=":accountId" element={<AccountDetailsPage />} />
-            </Route>
-            <Route path="blocks">
-              <Route index element={<BlocksTablePage />} />
-              <Route path=":blockId" element={<BlockDetailsPage />} />
-            </Route>
-            <Route path="transactions">
-              <Route index element={<TransactionsTablePage />} />
-              <Route
-                path=":transactionId"
-                element={<TransactionDetailsPage />}
-              />
-            </Route>
-            <Route path="contracts">
-              <Route index element={<ContractsTablePage />} />
-              <Route path=":contractId" element={<ContractDetailsPage />} />
-            </Route>
-            <Route path="events" element={<EventsTablePage />} />
-            <Route path="interactions" element={<InteractionsPage />} />
-          </Route>
-        </Route>
-      </Routes>
-      <Toaster
-        position="bottom-center"
-        gutter={8}
-        toastOptions={toastOptions}
-      />
-    </BrowserRouterEvents>
-  );
-};
+const router = createBrowserRouter([
+  {
+    path: "projects",
+    element: (
+      <ProjectProvider>
+        <BrowserRouterEvents>
+          <Outlet />
+        </BrowserRouterEvents>
+      </ProjectProvider>
+    ),
+    children: [
+      {
+        index: true,
+        element: <ProjectListPage />,
+      },
+      {
+        path: "create",
+        element: (
+          <BackButtonLayout>
+            <ProjectSettingsPage />
+          </BackButtonLayout>
+        ),
+      },
+      {
+        path: ":projectId",
+        element: (
+          <ProjectLayout>
+            <Outlet />
+          </ProjectLayout>
+        ),
+        children: [
+          {
+            path: "settings",
+            element: <ProjectSettingsPage />,
+          },
+          {
+            path: "accounts",
+            children: [
+              {
+                index: true,
+                element: <AccountsTablePage />,
+              },
+              {
+                path: ":accountId",
+                element: <AccountDetailsPage />,
+              },
+            ],
+          },
+          {
+            path: "blocks",
+            children: [
+              {
+                index: true,
+                element: <BlocksTablePage />,
+              },
+              {
+                path: ":blockId",
+                element: <BlockDetailsPage />,
+              },
+            ],
+          },
+          {
+            path: "transactions",
+            children: [
+              {
+                index: true,
+                element: <TransactionsTablePage />,
+              },
+              {
+                path: ":transactionsId",
+                element: <TransactionDetailsPage />,
+              },
+            ],
+          },
+          {
+            path: "contracts",
+            children: [
+              {
+                index: true,
+                element: <ContractsTablePage />,
+              },
+              {
+                path: ":contractId",
+                element: <ContractDetailsPage />,
+              },
+            ],
+          },
+          {
+            path: "events",
+            children: [
+              {
+                index: true,
+                element: <EventsTablePage />,
+              },
+            ],
+          },
+          {
+            path: "interactions",
+            children: [
+              {
+                index: true,
+                element: <InteractionsPage />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+]);
 
 function ConsentAnalytics() {
   const { isConsented, setIsConsented } = useAnalyticsConsent();
@@ -170,11 +223,11 @@ function ProjectSettingsPage() {
   return <ProjectSettings projectId={projectId!} />;
 }
 
-const TransactionsTablePage: FunctionComponent = () => {
+function TransactionsTablePage() {
   const { data } = useGetPollingTransactions();
 
   return <TransactionsTable transactions={data} />;
-};
+}
 
 function TransactionDetailsPage() {
   const { transactionId } = useParams();
@@ -218,8 +271,8 @@ function ContractDetailsPage() {
   return <ContractDetails contractId={contractId!} />;
 }
 
-export const EventsTablePage: FunctionComponent = () => {
+function EventsTablePage() {
   const { data } = useGetPollingEvents();
 
   return <EventsTable events={data} />;
-};
+}
