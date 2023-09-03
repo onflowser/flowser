@@ -11,12 +11,14 @@ import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 
-type RouteParams = {
+type ContractDetailsProps = {
   contractId: string;
 };
 
-export const ContractDetails: FunctionComponent = () => {
-  const { contractId } = useParams<RouteParams>();
+export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
+  props
+) => {
+  const { contractId } = props;
   const { isLoading, data } = useGetContract(contractId);
   const { contract } = data ?? {};
 

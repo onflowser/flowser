@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useState,
 } from "react";
-import { Link, RouteChildrenProps, useHistory } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { routes } from "../../../constants/routes";
 import IconButton from "../../../components/buttons/icon-button/IconButton";
 import longLogo from "../../../assets/images/long_logo.png";
@@ -45,19 +45,18 @@ const tabs: ProjectTab[] = [
   },
 ];
 
-export const ProjectListPage: FunctionComponent<RouteChildrenProps> = (
-  props
-) => {
-  const history = useHistory();
+export const ProjectListPage: FunctionComponent = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const providedTabId = props.location.hash?.replace("#", "");
+  const providedTabId = location.hash?.replace("#", "");
   const providedTab = tabs.find((tab) => tab.id === providedTabId);
   const defaultTab = tabs.find((tab) => tab.isDefault);
   const fallbackTab = tabs[0];
   const activeTab = providedTab ?? defaultTab ?? fallbackTab;
 
   const onConfigure = useCallback(() => {
-    history.push(routes.configure);
+    navigate(routes.configure);
   }, []);
 
   return (
@@ -103,7 +102,7 @@ function ProjectsListContent() {
   const { data: projects } = useGetAllProjects();
   const { removeProject } = useProjectActions();
   const { handleError } = useErrorHandler(ProjectsListContent.name);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { track } = useAnalytics();
   const projectService = ServiceRegistry.getInstance().projectsService;
   const showProjectList = projects && projects.length > 0;
@@ -112,10 +111,12 @@ function ProjectsListContent() {
     try {
       await projectService.useProject(project.id);
       track(AnalyticEvent.PROJECT_STARTED);
-      history.push(routes.firstRouteAfterStart);
+      navigate(routes.firstRouteAfterStart);
     } catch (e: unknown) {
       handleError(e);
-      history.replace(`/start/configure/${project.id}`);
+      navigate(`/start/configure/${project.id}`, {
+        replace: true,
+      });
     }
   };
 

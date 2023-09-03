@@ -11,7 +11,7 @@ import classes from "./InteractionOutcome.module.scss";
 import {
   FlowScriptOutcome,
   FlowTransactionOutcome,
-} from "pages/interactions/contexts/interaction-registry.context";
+} from "modules/interactions/contexts/interaction-registry.context";
 import { TabItem } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";

@@ -7,14 +7,17 @@ import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { Block } from "@flowser/shared";
-import { useGetPollingBlocks } from "../../../hooks/use-api";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
-export const BlocksTable: FunctionComponent = () => {
-  const { data: blocks, firstFetch, error } = useGetPollingBlocks();
+type BlocksTableProps = {
+  blocks: DecoratedPollingEntity<Block>[];
+};
+
+export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
+  const { blocks } = props;
 
   const columns = useMemo(
     () => [
@@ -57,8 +60,6 @@ export const BlocksTable: FunctionComponent = () => {
 
   return (
     <Table<DecoratedPollingEntity<Block>>
-      isInitialLoading={firstFetch}
-      error={error}
       data={blocks}
       columns={columns}
       headerRowClass={classes.tableRow}

@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
 import classes from "./Details.module.scss";
-import { useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import {
   useGetAccount,
@@ -18,17 +17,19 @@ import { AccountAvatar } from "../../../components/account/avatar/AccountAvatar"
 import { AccountName } from "../../../components/account/name/AccountName";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { AccountStorage } from "./storage/AccountStorage";
-import { TransactionsTable } from "../../transactions/main/TransactionsTable";
+import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
 import { ContractsTable } from "../../contracts/ContractsTable";
 import { KeysTable } from "./KeysTable";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 
-export type AccountDetailsRouteParams = {
+type AccountDetailsProps = {
   accountId: string;
 };
 
-export const AccountDetails: FunctionComponent = () => {
-  const { accountId } = useParams<AccountDetailsRouteParams>();
+export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
+  props
+) => {
+  const { accountId } = props;
   const { data, isLoading } = useGetAccount(accountId);
   const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
   const { data: contracts } = useGetPollingContractsByAccount(accountId);

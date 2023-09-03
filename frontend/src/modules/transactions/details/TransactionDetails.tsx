@@ -15,12 +15,14 @@ import { TabItem } from "../../../components/tabs/Tabs";
 import { EventsTable } from "../../events/EventsTable/EventsTable";
 import { SignaturesTable } from "./SignaturesTable";
 
-type RouteParams = {
+type TransactionDetailsProps = {
   transactionId: string;
 };
 
-export const TransactionDetails: FunctionComponent = () => {
-  const { transactionId } = useParams<RouteParams>();
+export const TransactionDetails: FunctionComponent<TransactionDetailsProps> = (
+  props
+) => {
+  const { transactionId } = props;
   const { data, isLoading } = useGetTransaction(transactionId);
   const { data: events } = useGetPollingEventsByTransaction(transactionId);
   const { transaction } = data ?? {};

@@ -12,6 +12,7 @@ type JsonViewProps = {
 export function JsonView(props: JsonViewProps): ReactElement {
   return (
     <div className={classNames(classes.root, props.className)}>
+      {/* @ts-ignore */}
       <ReactJson
         name={props.name}
         style={{ backgroundColor: "none" }}

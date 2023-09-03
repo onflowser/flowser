@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import classes from "./Details.module.scss";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
@@ -11,18 +11,16 @@ import {
 import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
-import { TransactionsTable } from "../../transactions/main/TransactionsTable";
+import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
 
-type RouteParams = {
+type BlockDetailsProps = {
   blockId: string;
 };
 
-export const BlockDetails: FunctionComponent = () => {
-  const { blockId } = useParams<RouteParams>();
-
-  const { isLoading, data } = useGetBlock(blockId);
+export const BlockDetails: FunctionComponent<BlockDetailsProps> = (props) => {
+  const { isLoading, data } = useGetBlock(props.blockId);
   const { block } = data ?? {};
-  const { data: transactions } = useGetTransactionsByBlock(blockId);
+  const { data: transactions } = useGetTransactionsByBlock(props.blockId);
 
   if (isLoading || !block) {
     return <FullScreenLoading />;

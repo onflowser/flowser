@@ -1,7 +1,7 @@
 export const routes = {
-  start: "/start",
-  configure: "/start/configure",
-  configureExisting: "/start/configure/:id",
+  start: "/projects",
+  configure: "/projects/configure",
+  configureExisting: "/projects/configure/:id",
   configureCurrent: "/configure/:id",
   accounts: "/accounts",
   blocks: "/blocks",

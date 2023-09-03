@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import classes from "./Configuration.module.scss";
 import Card from "../../../components/card/Card";
@@ -38,7 +38,14 @@ const projectSchema = yup.object().shape({
   filesystemPath: yup.string().required("Required"),
 });
 
-export const Configuration: FunctionComponent = () => {
+type ProjectSettingsProps = {
+  projectId: string;
+};
+
+export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
+  props
+) => {
+  const { projectId } = props;
   const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,10 +53,9 @@ export const Configuration: FunctionComponent = () => {
   const { onPickProjectPath } = usePlatformAdapter();
   const { removeProject } = useProjectActions();
   const { data: flowCliInfo } = useGetFlowCliInfo();
-  const { handleError } = useErrorHandler(Configuration.name);
-  const history = useHistory();
-  const { id } = useParams<{ id: string }>();
-  const isExistingProject = Boolean(id);
+  const { handleError } = useErrorHandler(ProjectSettings.name);
+  const navigate = useNavigate();
+  const isExistingProject = Boolean(projectId);
 
   const formik = useFormik({
     validationSchema: projectSchema,
@@ -63,7 +69,7 @@ export const Configuration: FunctionComponent = () => {
       toast.promise(runProject(), {
         loading: "Running project",
         success: "Project started",
-        error: "Failed to start project",
+        error: "Failed to projects project",
       });
     },
   });
@@ -90,9 +96,13 @@ export const Configuration: FunctionComponent = () => {
     }
     try {
       await projectService.useProject(project.id);
-      history.replace(routes.firstRouteAfterStart);
+      navigate(routes.firstRouteAfterStart, {
+        replace: true,
+      });
     } catch (e) {
-      history.replace(`/start/configure/${project.id}`);
+      navigate(`/start/configure/${project.id}`, {
+        replace: true,
+      });
       handleError(e);
       throw e;
     }
@@ -111,7 +121,7 @@ export const Configuration: FunctionComponent = () => {
   useEffect(() => {
     setIsLoading(true);
     (isExistingProject
-      ? loadExistingProject(id)
+      ? loadExistingProject(projectId)
       : loadDefaultProject()
     ).finally(() => {
       setIsLoading(false);
@@ -342,7 +352,7 @@ export const Configuration: FunctionComponent = () => {
               onClick={() => removeProject(formik.values)}
               variant="middle"
               outlined={true}
-              disabled={!id}
+              disabled={!projectId}
             >
               DELETE
             </Button>

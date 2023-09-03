@@ -1,37 +1,29 @@
-import React, { FC, FunctionComponent } from "react";
+import React, { FC, FunctionComponent, ReactNode } from "react";
 import classes from "./Layout.module.scss";
-import { Logs } from "../../pages/logs/Logs";
-import { Route, RouteProps, useHistory, useLocation } from "react-router-dom";
+import { Logs } from "../../modules/logs/Logs";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
 import { Breadcrumbs } from "../breadcrumbs/Breadcrumbs";
 import { SideNavigation } from "../side-navigation/SideNavigation";
 import { routes } from "../../constants/routes";
 
-export const RouteWithBackButton: FC<RouteProps> = (props) => {
-  const history = useHistory();
+export const BackButtonLayout: FC<{ children: ReactNode }> = (props) => {
+  const navigate = useNavigate();
   return (
     <div style={{ height: "100%" }}>
       <div className={classNames(classes.backButtonWrapper)}>
         <IconBackButton
-          onClick={() => {
-            history.goBack();
-          }}
+          onClick={() => navigate(-1)}
           className={classes.backButton}
         />
       </div>
-      <Route {...props} />
+      {props.children}
     </div>
   );
 };
 
-export const RouteWithProjectLayout: FC<RouteProps> = (props) => (
-  <ProjectLayout>
-    <Route {...props} />
-  </ProjectLayout>
-);
-
-const ProjectLayout: FunctionComponent = ({ children }) => {
+export const ProjectLayout: FunctionComponent = ({ children }) => {
   const location = useLocation();
   const showMargin = !location.pathname.startsWith(routes.interactions);
 

@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from "react";
 import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
-import { useGetPollingAccounts } from "../../hooks/use-api";
 import Table from "../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
@@ -45,15 +44,15 @@ const columns = [
   }),
 ];
 
-export const AccountsTable: FunctionComponent = () => {
-  const { data: accounts, firstFetch, error } = useGetPollingAccounts();
+type AccountsTableProps = {
+  accounts: DecoratedPollingEntity<Account>[];
+};
 
+export const AccountsTable: FunctionComponent<AccountsTableProps> = (props) => {
   return (
     <Table<DecoratedPollingEntity<Account>>
-      isInitialLoading={firstFetch}
-      error={error}
       columns={columns}
-      data={accounts}
+      data={props.accounts}
     />
   );
 };

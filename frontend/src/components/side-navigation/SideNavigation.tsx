@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import classes from "./SideNavigation.module.scss";
 import { routes } from "../../constants/routes";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { FlowserIcon } from "components/icons/Icons";
 import { SizedBox } from "../sized-box/SizedBox";
 import classNames from "classnames";
@@ -54,13 +54,15 @@ function ProjectLink(props: {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   onClick?: () => void;
 }) {
+  const location = useLocation();
   const Icon = props.icon;
   const iconSize = 20;
   return (
     <NavLink
       to={props.to}
-      className={classes.inactiveLink}
-      activeClassName={classes.activeLink}
+      className={classNames(classes.inactiveLink, {
+        [classes.activeLink]: location.pathname === props.to,
+      })}
       onClick={props.onClick}
     >
       <Icon width={iconSize} height={iconSize} />

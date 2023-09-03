@@ -8,7 +8,6 @@ import React, {
   useEffect,
 } from "react";
 import { routes } from "../constants/routes";
-import { useHistory } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Block, EmulatorSnapshot, Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
@@ -26,6 +25,7 @@ import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
 import * as fcl from "@onflow/fcl";
 import { SnapshotDialog } from "components/dialogs/snapshot/SnapshotDialog";
+import { useNavigate } from "react-router-dom";
 
 export type ProjectActionsContextState = {
   switchProject: () => Promise<void>;
@@ -53,7 +53,7 @@ export function ProjectProvider({
 
   const { track } = useAnalytics();
   const queryClient = useQueryClient();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { handleError } = useErrorHandler(ProjectProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
   const { data: currentProject, refetch: refetchCurrentProject } =
@@ -96,7 +96,9 @@ export function ProjectProvider({
         error: `Failed to delete project "${project.name}"`,
         success: `Project "${project.name}" deleted!`,
       });
-      history.replace(routes.start);
+      navigate(routes.start, {
+        replace: true,
+      });
     } catch (e) {
       toast.error("Something went wrong: can not delete custom emulator");
     } finally {
@@ -126,7 +128,9 @@ export function ProjectProvider({
       // Clear the entire cache,
       // so that previous data isn't there when using another project
       queryClient.clear();
-      history.replace(routes.start);
+      navigate(routes.start, {
+        replace: true,
+      });
     };
     await toast.promise(execute(), {
       loading: "Closing project...",
