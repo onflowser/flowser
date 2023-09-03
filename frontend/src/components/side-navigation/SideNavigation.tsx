@@ -1,10 +1,12 @@
 import React, { ReactElement } from "react";
 import classes from "./SideNavigation.module.scss";
-import { NavLink, useLocation } from "react-router-dom";
+import { useMatches } from "react-router-dom";
 import { FlowserIcon } from "components/icons/Icons";
 import { SizedBox } from "../sized-box/SizedBox";
 import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project.context";
+import { buildProjectUrl, ProjectLink } from "../link/ProjectLink";
+import { useGetCurrentProject } from "../../hooks/use-api";
 
 type SideNavigationProps = {
   className?: string;
@@ -18,19 +20,15 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
       <div>
         <FlowserLogo />
         <SizedBox height={50} />
-        <ProjectLink to="accounts" icon={FlowserIcon.Account} />
-        <ProjectLink to="blocks" icon={FlowserIcon.Block} />
-        <ProjectLink to="transactions" icon={FlowserIcon.Transaction} />
-        <ProjectLink to="contracts" icon={FlowserIcon.Contract} />
-        <ProjectLink to="events" icon={FlowserIcon.Star} />
-        <ProjectLink to="interactions" icon={FlowserIcon.CursorClick} />
-        <ProjectLink to="settings" icon={FlowserIcon.Settings} />
+        <Link to="/accounts" icon={FlowserIcon.Account} />
+        <Link to="/blocks" icon={FlowserIcon.Block} />
+        <Link to="/transactions" icon={FlowserIcon.Transaction} />
+        <Link to="/contracts" icon={FlowserIcon.Contract} />
+        <Link to="/events" icon={FlowserIcon.Star} />
+        <Link to="/interactions" icon={FlowserIcon.CursorClick} />
+        <Link to="/settings" icon={FlowserIcon.Settings} />
       </div>
-      <ProjectLink
-        to="/projects"
-        icon={FlowserIcon.Switch}
-        onClick={switchProject}
-      />
+      <Link to="/" icon={FlowserIcon.Switch} onClick={switchProject} />
     </div>
   );
 }
@@ -40,23 +38,30 @@ function FlowserLogo() {
   return <FlowserIcon.LogoRound width={size} height={size} />;
 }
 
-function ProjectLink(props: {
+function Link(props: {
   to: string;
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   onClick?: () => void;
 }) {
-  const location = useLocation();
+  const { data } = useGetCurrentProject();
+  const fullTargetUrl = buildProjectUrl({
+    projectId: data!.project!.id,
+    subPath: props.to,
+  });
+  const matches = useMatches();
+  const isActive = matches.some((match) => match.pathname === fullTargetUrl);
   const Icon = props.icon;
   const iconSize = 20;
+
   return (
-    <NavLink
+    <ProjectLink
       to={props.to}
       className={classNames(classes.inactiveLink, {
-        [classes.activeLink]: location.pathname.endsWith(props.to),
+        [classes.activeLink]: isActive,
       })}
       onClick={props.onClick}
     >
       <Icon width={iconSize} height={iconSize} />
-    </NavLink>
+    </ProjectLink>
   );
 }
