@@ -43,7 +43,7 @@ export type InteractionDefinitionTemplate = CoreInteractionDefinition & {
   isMutable: boolean;
 };
 
-// Internal structure that's persisted in local storage.
+// Internal structure that's persisted in local StorageDomainBadge.
 type RawInteractionDefinitionTemplate = CoreInteractionDefinition & {
   fclValuesByIdentifier: Record<string, FclValue>;
   transactionOptions: TransactionOptions | undefined;

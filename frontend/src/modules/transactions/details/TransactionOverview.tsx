@@ -9,7 +9,7 @@ import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatus
 import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { TextUtils } from "../../../utils/text-utils";
 import { Transaction } from "@flowser/shared";
-import { AccountLink } from "../../../components/account/link/AccountLink";
+import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import { ProjectLink } from "../../../components/link/ProjectLink";
 
 type TransactionOverviewProps = {

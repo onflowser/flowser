@@ -1,13 +1,13 @@
 import React, { FunctionComponent } from "react";
-import Label from "../../components/label/Label";
-import Value from "../../components/value/Value";
-import Table from "../../components/table/Table";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
+import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
-import { TextUtils } from "../../utils/text-utils";
+import { TextUtils } from "../../../utils/text-utils";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { AccountLink } from "../../components/account/link/AccountLink";
+import { AccountLink } from "../AccountLink/AccountLink";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 

@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import classes from "./ConfigurationSection.module.scss";
+import classes from "./SettingsSection.module.scss";
 import classNames from "classnames";
 import { FlowserIcon } from "../../../components/icons/Icons";
 
@@ -11,7 +11,7 @@ export type ConfigurationSectionProps = {
   collapseChildren?: boolean;
 };
 
-export const ConfigurationSection: FC<ConfigurationSectionProps> = ({
+export const SettingsSection: FC<ConfigurationSectionProps> = ({
   title,
   description,
   children,

@@ -1,9 +1,9 @@
 import React, { ReactElement } from "react";
 import { NavLink } from "react-router-dom";
-import { AccountAvatar } from "../avatar/AccountAvatar";
-import { AccountName } from "../name/AccountName";
+import { AccountAvatar } from "../AccountAvatar/AccountAvatar";
+import { AccountName } from "../AccountName/AccountName";
 import classes from "./AccountLink.module.scss";
-import { ProjectLink } from "../../link/ProjectLink";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 type AccountLinkProps = {
   address: string;

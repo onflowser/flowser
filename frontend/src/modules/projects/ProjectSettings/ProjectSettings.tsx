@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import classes from "./Configuration.module.scss";
+import classes from "./ProjectSettings.module.scss";
 import Card from "../../../components/card/Card";
 import Button from "../../../components/buttons/button/Button";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
@@ -20,14 +20,14 @@ import * as yup from "yup";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
 import { useProjectActions } from "../../../contexts/project.context";
-import { ConfigurationSection } from "./ConfigurationSection";
+import { SettingsSection } from "../SettingsSection/SettingsSection";
 import {
   RadioField,
   RadioFieldProps,
   TextField,
   FieldProps,
   ToggleField,
-} from "./FormFields";
+} from "../FormFields/FormFields";
 import { usePlatformAdapter } from "../../../contexts/platform-adapter.context";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { useAnalytics } from "../../../hooks/use-analytics";
@@ -151,7 +151,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
       }
     } catch (e) {
       toast.error(
-        "Something went wrong: Can not fetch default settings from server"
+        "Something went wrong: Can not fetch default ProjectSettings from server"
       );
     }
   }
@@ -168,7 +168,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
         </header>
 
         <main>
-          <ConfigurationSection title="General" className={classes.section}>
+          <SettingsSection title="General" className={classes.section}>
             <Card className={classes.card}>
               <TextField
                 label="Project name"
@@ -189,8 +189,8 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                 formik={formik}
               />
             </Card>
-          </ConfigurationSection>
-          <ConfigurationSection
+          </SettingsSection>
+          <SettingsSection
             title="Emulator"
             description="If flow-emulator is not running, Flowser will start it automatically."
             collapseChildren
@@ -341,7 +341,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                 formik={formik}
               />
             </Card>
-          </ConfigurationSection>
+          </SettingsSection>
         </main>
 
         <footer className={classes.footer}>

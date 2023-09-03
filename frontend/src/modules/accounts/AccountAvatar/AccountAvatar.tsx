@@ -19,7 +19,7 @@ import avatar14 from "../../../assets/images/avatars/14.jpg";
 import avatar15 from "../../../assets/images/avatars/15.jpg";
 import avatar16 from "../../../assets/images/avatars/16.jpg";
 import { useGetAddressIndex } from "../../../hooks/use-api";
-import { Spinner } from "../../spinner/Spinner";
+import { Spinner } from "../../../components/spinner/Spinner";
 
 const avatarUrls = [
   avatar1,

@@ -5,7 +5,7 @@ import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionsTable.module.scss";
-import { AccountLink } from "../../../components/account/link/AccountLink";
+import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";

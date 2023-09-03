@@ -3,7 +3,7 @@ import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
 import { AccountContract } from "@flowser/shared";
 import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
-import { AccountLink } from "../../components/account/link/AccountLink";
+import { AccountLink } from "../accounts/AccountLink/AccountLink";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../components/table/Table";

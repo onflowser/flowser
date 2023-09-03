@@ -2,7 +2,7 @@ import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountKey } from "@flowser/shared";
 import Label from "../../../components/label/Label";
-import classes from "./Details.module.scss";
+import classes from "../AccountDetails/AccountDetails.module.scss";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
 import CopyButton from "../../../components/buttons/copy-button/CopyButton";
 import classNames from "classnames";
@@ -46,7 +46,7 @@ type KeysTableProps = {
   keys: DecoratedPollingEntity<AccountKey>[];
 };
 
-export function KeysTable(props: KeysTableProps): ReactElement {
+export function AccountKeysTable(props: KeysTableProps): ReactElement {
   return (
     <Table<DecoratedPollingEntity<AccountKey>>
       columns={columns}

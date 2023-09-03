@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import classes from "./Details.module.scss";
+import classes from "./BlockDetails.module.scss";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";

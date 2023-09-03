@@ -1,0 +1,34 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.keysRoot {
+  display: flex;
+  flex-direction: column;
+  font-size: $font-size-small;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+}
+
+.hash {
+  display: inline-block;
+
+  max-width: 90vw;
+  margin: $spacing-base;
+}
+
+.badges {
+  color: $color-grey;
+  font-family: $font-family-inter;
+  margin-bottom: $spacing-base;
+  flex-wrap: wrap;
+  & > * {
+    margin-top: $spacing-base;
+    margin-right: $spacing-base;
+  }
+}

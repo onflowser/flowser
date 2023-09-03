@@ -27,7 +27,7 @@ import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
 import { InteractionsPage } from "./modules/interactions/InteractionsPage";
 import { InteractionRegistryProvider } from "modules/interactions/contexts/interaction-registry.context";
-import { ProjectSettings } from "./modules/projects/settings/ProjectSettings";
+import { ProjectSettings } from "./modules/projects/ProjectSettings/ProjectSettings";
 import {
   useGetPollingAccounts,
   useGetPollingBlocks,
@@ -37,13 +37,13 @@ import {
 } from "./hooks/use-api";
 import { TransactionsTable } from "./modules/transactions/TransactionsTable/TransactionsTable";
 import { TransactionDetails } from "./modules/transactions/details/TransactionDetails";
-import { BlockDetails } from "./modules/blocks/details/Details";
+import { BlockDetails } from "./modules/blocks/BlockDetails/BlockDetails";
 import { BlocksTable } from "./modules/blocks/BlocksTable/BlocksTable";
-import { AccountDetails } from "./modules/accounts/details/AccountDetails";
-import { AccountsTable } from "./modules/accounts/AccountsTable";
+import { AccountDetails } from "./modules/accounts/AccountDetails/AccountDetails";
+import { AccountsTable } from "./modules/accounts/AccountsTable/AccountsTable";
 import { ProjectListPage } from "./modules/projects/ProjectListPage/ProjectListPage";
 import { ContractsTable } from "./modules/contracts/ContractsTable";
-import { ContractDetails } from "./modules/contracts/details/ContractDetails";
+import { ContractDetails } from "./modules/contracts/ContractDetails/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
 import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";
 
@@ -128,7 +128,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "settings",
+            path: "ProjectSettings",
             element: <ProjectSettingsPage />,
           },
           {

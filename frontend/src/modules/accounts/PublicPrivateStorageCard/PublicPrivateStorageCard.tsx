@@ -1,12 +1,12 @@
 import React, { ReactElement } from "react";
 import classes from "./PublicPrivateStorageCard.module.scss";
-import { StorageDomainBadge } from "../StorageDomainBadge";
-import { ReactComponent as LinkIcon } from "../../../../../assets/icons/link.svg";
+import { StorageDomainBadge } from "../StorageDomainBadge/StorageDomainBadge";
+import { ReactComponent as LinkIcon } from "../../../assets/icons/link.svg";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import gradient from "../../../../../assets/images/gradient.png";
+import gradient from "../../../assets/images/gradient.png";
 import classNames from "classnames";
-import { ProjectLink } from "../../../../../components/link/ProjectLink";
+import { ProjectLink } from "../../../components/link/ProjectLink";
 
 type StorageCardProps = {
   currentAccountAddress: string;
@@ -65,8 +65,8 @@ function getTargetStorageCardUrl(options: {
   // Example: &String
 
   const borrowTypePathParts = options.data?.BorrowType?.split(".");
-  // Public or private storage paths can only
-  // point to "internal" storage paths of the same account.
+  // Public or private StorageDomainBadge paths can only
+  // point to "internal" StorageDomainBadge paths of the same account.
   // https://developers.flow.com/cadence/language/capability-based-access-control
   const targetAccountAddress = options.currentAccountAddress;
 

@@ -1,15 +1,15 @@
 import { Account, AccountStorageDomain } from "@flowser/shared";
-import { useAnalytics } from "../../../../hooks/use-analytics";
-import { useUrlQuery } from "../../../../hooks/use-url-query";
-import { useGetPollingStorageByAccount } from "../../../../hooks/use-api";
+import { useAnalytics } from "../../../hooks/use-analytics";
+import { useUrlQuery } from "../../../hooks/use-url-query";
+import { useGetPollingStorageByAccount } from "../../../hooks/use-api";
 import React, { ReactElement, useEffect, useState } from "react";
-import { AnalyticEvent } from "../../../../services/analytics.service";
-import { PublicPrivateStorageCard } from "./cards/PublicPrivateStorageCard";
-import { enableDetailsIntroAnimation } from "../../../../config/common";
-import { InternalStorageCard } from "./cards/InternalStorageCard";
+import { AnalyticEvent } from "../../../services/analytics.service";
+import { PublicPrivateStorageCard } from "../PublicPrivateStorageCard/PublicPrivateStorageCard";
+import { enableDetailsIntroAnimation } from "../../../config/common";
+import { InternalStorageCard } from "../InternalStorageCard/InternalStorageCard";
 import classNames from "classnames";
 import classes from "./AccountStorage.module.scss";
-import { scrollableElementId } from "../../../../components/layout/Layout";
+import { scrollableElementId } from "../../../components/layout/Layout";
 
 type AccountStorageProps = {
   account: Account;

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import classes from "./Details.module.scss";
+import classes from "./AccountDetails.module.scss";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import {
   useGetAccount,
@@ -13,13 +13,13 @@ import {
 } from "components/details-card/DetailsCard";
 import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
-import { AccountAvatar } from "../../../components/account/avatar/AccountAvatar";
-import { AccountName } from "../../../components/account/name/AccountName";
+import { AccountAvatar } from "../AccountAvatar/AccountAvatar";
+import { AccountName } from "../AccountName/AccountName";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
-import { AccountStorage } from "./storage/AccountStorage";
+import { AccountStorage } from "../AccountStorage/AccountStorage";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
 import { ContractsTable } from "../../contracts/ContractsTable";
-import { KeysTable } from "./KeysTable";
+import { AccountKeysTable } from "../AccountKeysTable/AccountKeysTable";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 
 type AccountDetailsProps = {
@@ -94,7 +94,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
           {
             id: "keys",
             label: "Keys",
-            content: <KeysTable keys={keys} />,
+            content: <AccountKeysTable keys={keys} />,
           },
           {
             id: "scripts",
