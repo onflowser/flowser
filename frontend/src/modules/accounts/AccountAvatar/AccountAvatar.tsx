@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from "react";
 
-import service from "../../../assets/images/avatars/service.svg";
+import service from "../../../assets/images/avatars/service.png";
 
 import avatar1 from "../../../assets/images/avatars/1.jpg";
 import avatar2 from "../../../assets/images/avatars/2.jpg";
@@ -82,7 +82,6 @@ export function AccountAvatar({
       className={className}
       style={{
         borderRadius: "50%",
-        backgroundColor: "ghostwhite",
         height: size,
         width: size,
       }}
