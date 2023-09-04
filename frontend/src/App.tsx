@@ -1,6 +1,7 @@
 import React, { ReactElement, ReactNode, useEffect } from "react";
 import {
   createBrowserRouter,
+  Navigate,
   Outlet,
   RouterProvider,
   useLocation,
@@ -127,6 +128,10 @@ const router = createBrowserRouter([
           </ProjectLayout>
         ),
         children: [
+          {
+            index: true,
+            element: <Navigate to="accounts" replace />,
+          },
           {
             path: "settings",
             element: <ProjectSettingsPage />,

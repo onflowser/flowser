@@ -102,7 +102,7 @@ function ProjectsListContent() {
     try {
       await projectService.useProject(project.id);
       track(AnalyticEvent.PROJECT_STARTED);
-      navigate(`/projects/${project.id}/accounts`);
+      navigate(`/projects/${project.id}`);
     } catch (e: unknown) {
       handleError(e);
       navigate(`/projects/${project.id}/settings`, {
