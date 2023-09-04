@@ -4,7 +4,7 @@ import {
   useGetPollingBlocks,
   useGetTransactionsByBlock,
 } from "../../../../hooks/use-api";
-import { Block } from "@flowser/shared";
+import { Block, Transaction } from "@flowser/shared";
 import { useProjectActions } from "../../../../contexts/project.context";
 import { FlowserIcon } from "../../../../components/icons/Icons";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
@@ -41,8 +41,7 @@ type BlockItemProps = {
 
 function BlockItem(props: BlockItemProps) {
   const { block } = props;
-  const blockIconSize = 20;
-  const menuIconSize = blockIconSize * 0.8;
+  const menuIconSize = 15;
 
   const { checkoutBlock } = useProjectActions();
   const { create, setFocused } = useInteractionRegistry();
@@ -91,34 +90,8 @@ function BlockItem(props: BlockItemProps) {
       align="center"
       direction="right"
       menuButton={
-        <div className={classes.blockItem}>
-          <div className={classes.info}>
-            <FlowserIcon.Block
-              className={classes.icon}
-              width={blockIconSize}
-              height={blockIconSize}
-            />
-            <SizedBox width={10} />
-            <span>#{String(block.height).padStart(3, "0")}</span>
-            {firstTransaction && (
-              <>
-                <SizedBox width={10} />
-                <FlowserIcon.Transaction className={classes.icon} width={12} />
-                <SizedBox width={10} />
-                <span className={classes.transactionName}>
-                  {transactionName ?? "Unknown"}
-                </span>
-              </>
-            )}
-          </div>
-          <div className={classes.actions}>
-            {firstTransaction?.status && (
-              <GrcpStatusIcon
-                size={15}
-                statusCode={firstTransaction.status.grcpStatus}
-              />
-            )}
-          </div>
+        <div style={{ pointerEvents: firstTransaction ? "all" : "none" }}>
+          <BlockItemContent block={block} transaction={firstTransaction} />
         </div>
       }
     >
@@ -136,5 +109,51 @@ function BlockItem(props: BlockItemProps) {
         Rollback
       </MenuItem>
     </FlowserMenu>
+  );
+}
+
+type BlockItemContentProps = {
+  block: Block;
+  transaction: Transaction | undefined;
+};
+
+function BlockItemContent(props: BlockItemContentProps) {
+  const { block, transaction } = props;
+  const blockIconSize = 20;
+
+  const transactionName = useTransactionName({
+    transaction,
+  });
+
+  return (
+    <div className={classes.blockItem}>
+      <div className={classes.info}>
+        <FlowserIcon.Block
+          className={classes.icon}
+          width={blockIconSize}
+          height={blockIconSize}
+        />
+        <SizedBox width={10} />
+        <span>#{String(block.height).padStart(3, "0")}</span>
+        {transaction && (
+          <>
+            <SizedBox width={10} />
+            <FlowserIcon.Transaction className={classes.icon} width={12} />
+            <SizedBox width={10} />
+            <span className={classes.transactionName}>
+              {transactionName ?? "Unknown"}
+            </span>
+          </>
+        )}
+      </div>
+      <div className={classes.actions}>
+        {transaction?.status && (
+          <GrcpStatusIcon
+            size={15}
+            statusCode={transaction.status.grcpStatus}
+          />
+        )}
+      </div>
+    </div>
   );
 }

@@ -3,6 +3,9 @@ import {
   Menu as ReactMenu,
   MenuProps as ReactMenuProps,
 } from "@szhsin/react-menu";
+
+import "@szhsin/react-menu/dist/index.css";
+import "@szhsin/react-menu/dist/transitions/slide.css";
 import "./Menu.scss";
 
 type MenuProps = ReactMenuProps;
