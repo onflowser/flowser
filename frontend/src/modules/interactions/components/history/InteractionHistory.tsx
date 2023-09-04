@@ -11,10 +11,11 @@ import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { useTransactionName } from "../../hooks/use-transaction-name";
+import { MenuItem } from "@szhsin/react-menu";
+import { FlowserMenu } from "../../../../components/menus/Menu";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
-  const { checkoutBlock } = useProjectActions();
 
   if (firstFetch) {
     return (
@@ -27,11 +28,7 @@ export function InteractionHistory(): ReactElement {
   return (
     <div>
       {blocks.map((block) => (
-        <BlockItem
-          key={block.id}
-          block={block}
-          onCheckout={() => checkoutBlock(block.id)}
-        />
+        <BlockItem key={block.id} block={block} />
       ))}
     </div>
   );
@@ -39,7 +36,6 @@ export function InteractionHistory(): ReactElement {
 
 type BlockItemProps = {
   block: Block;
-  onCheckout: () => void;
 };
 
 function BlockItem(props: BlockItemProps) {
@@ -47,6 +43,7 @@ function BlockItem(props: BlockItemProps) {
   const blockIconSize = 20;
   const checkoutIconSize = blockIconSize * 0.8;
 
+  const { checkoutBlock } = useProjectActions();
   const { create, setFocused } = useInteractionRegistry();
   const { data } = useGetTransactionsByBlock(block.id, {
     // Assume that every transaction is packaged into a separate block.
@@ -88,34 +85,43 @@ function BlockItem(props: BlockItemProps) {
   }
 
   return (
-    <div className={classes.blockItem}>
-      <div className={classes.info} onClick={onForkAsTemplate}>
-        <FlowserIcon.Block
-          className={classes.icon}
-          width={blockIconSize}
-          height={blockIconSize}
-        />
-        <SizedBox width={10} />
-        <span>#{String(block.height).padStart(3, "0")}</span>
-        {firstTransaction && (
-          <>
+    <FlowserMenu
+      position="anchor"
+      align="center"
+      direction="right"
+      menuButton={
+        <div className={classes.blockItem}>
+          <div className={classes.info}>
+            <FlowserIcon.Block
+              className={classes.icon}
+              width={blockIconSize}
+              height={blockIconSize}
+            />
             <SizedBox width={10} />
-            <FlowserIcon.Transaction className={classes.icon} width={12} />
-            <SizedBox width={10} />
-            <span className={classes.transactionName}>
-              {transactionName ?? "Unknown"}
-            </span>
-          </>
-        )}
-      </div>
-      <div className={classes.actions}>
-        <FlowserIcon.CircleArrowLeft
-          onClick={props.onCheckout}
-          className={classes.checkout}
-          width={checkoutIconSize}
-          height={checkoutIconSize}
-        />
-      </div>
-    </div>
+            <span>#{String(block.height).padStart(3, "0")}</span>
+            {firstTransaction && (
+              <>
+                <SizedBox width={10} />
+                <FlowserIcon.Transaction className={classes.icon} width={12} />
+                <SizedBox width={10} />
+                <span className={classes.transactionName}>
+                  {transactionName ?? "Unknown"}
+                </span>
+              </>
+            )}
+          </div>
+          <div className={classes.actions}>
+            <FlowserIcon.CircleArrowLeft
+              className={classes.checkout}
+              width={checkoutIconSize}
+              height={checkoutIconSize}
+            />
+          </div>
+        </div>
+      }
+    >
+      <MenuItem onClick={() => onForkAsTemplate()}>Open</MenuItem>
+      <MenuItem onClick={() => checkoutBlock(block.id)}>Checkout</MenuItem>
+    </FlowserMenu>
   );
 }

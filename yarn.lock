@@ -4957,6 +4957,14 @@
   dependencies:
     tslib "^2.4.0"
 
+"@szhsin/react-menu@4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@szhsin/react-menu/-/react-menu-4.0.3.tgz#c7adc0ec4a7019dafccb56bbda5609fddfcfc9a1"
+  integrity sha512-TPsOKLEkesE79802evnLt2Mbv/+zwRJdX8776/vxK5ST9SK8SO0A8kRrus6JuxijLxZxFpmY/3VMdoyeCWQHKA==
+  dependencies:
+    prop-types "^15.7.2"
+    react-transition-state "^2.1.0"
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.npmjs.org/@szmarczak/http-timer/-/http-timer-1.1.2.tgz"
@@ -15534,7 +15542,7 @@ promzard@^0.3.0:
   dependencies:
     read "1"
 
-prop-types@^15.8.1:
+prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -15983,6 +15991,11 @@ react-tooltip@5.21.1:
   dependencies:
     "@floating-ui/dom" "^1.0.0"
     classnames "^2.3.0"
+
+react-transition-state@^2.1.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/react-transition-state/-/react-transition-state-2.1.1.tgz#1601a6177926b647041b7d598bf124321ab8d25b"
+  integrity sha512-kQx5g1FVu9knoz1T1WkapjUgFz08qQ/g1OmuWGi3/AoEFfS0kStxrPlZx81urjCXdz2d+1DqLpU6TyLW/Ro04Q==
 
 react@^17.0.2:
   version "17.0.2"
