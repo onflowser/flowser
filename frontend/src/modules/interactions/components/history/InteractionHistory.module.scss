@@ -26,6 +26,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: transparentize($gray-20, 0.25);
     }
 
     .icon * {

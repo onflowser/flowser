@@ -135,15 +135,11 @@ function BlockItemContent(props: BlockItemContentProps) {
         />
         <SizedBox width={10} />
         <span>#{String(block.height).padStart(3, "0")}</span>
+        <SizedBox width={10} />
         {transaction && (
-          <>
-            <SizedBox width={10} />
-            <FlowserIcon.Transaction className={classes.icon} width={12} />
-            <SizedBox width={10} />
-            <span className={classes.transactionName}>
-              {transactionName ?? "Unknown"}
-            </span>
-          </>
+          <span className={classes.transactionName}>
+            {transactionName ?? "Unknown"}
+          </span>
         )}
       </div>
       <div className={classes.actions}>
