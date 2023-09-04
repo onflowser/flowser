@@ -1,18 +1,32 @@
-import React, { ReactElement, ReactNode, useState } from "react";
-import "@szhsin/react-menu/dist/index.css";
-import "@szhsin/react-menu/dist/transitions/slide.css";
-import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
+import React, { createRef, ReactElement, ReactNode } from "react";
+import { PlacesType } from "react-tooltip";
+import { FlowserMenu } from "../menus/Menu";
+import { MenuInstance, MenuItem } from "@szhsin/react-menu";
 
 type TooltipProps = {
   content: string;
-  children: ReactElement;
+  children: ReactNode;
+  position?: PlacesType;
 };
 
 export function Tooltip(props: TooltipProps): ReactElement {
+  const menuRef = createRef<MenuInstance>();
+
   return (
-    <Menu menuButton={() => props.children} direction="right">
+    <FlowserMenu
+      instanceRef={menuRef}
+      menuButton={
+        <div
+          onMouseEnter={() => menuRef.current?.openMenu()}
+          onMouseLeave={() => menuRef.current?.closeMenu()}
+        >
+          {props.children}
+        </div>
+      }
+      direction="right"
+      align="center"
+    >
       <MenuItem>{props.content}</MenuItem>
-      <MenuItem>{props.content}</MenuItem>
-    </Menu>
+    </FlowserMenu>
   );
 }
