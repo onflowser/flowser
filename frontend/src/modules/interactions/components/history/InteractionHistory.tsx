@@ -13,6 +13,7 @@ import { useInteractionRegistry } from "../../contexts/interaction-registry.cont
 import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../../components/menus/Menu";
+import { GrcpStatusIcon } from "../../../../components/status/GrcpStatus";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks, firstFetch } = useGetPollingBlocks();
@@ -111,11 +112,12 @@ function BlockItem(props: BlockItemProps) {
             )}
           </div>
           <div className={classes.actions}>
-            <FlowserIcon.CircleArrowLeft
-              className={classes.checkout}
-              width={menuIconSize}
-              height={menuIconSize}
-            />
+            {firstTransaction?.status && (
+              <GrcpStatusIcon
+                size={15}
+                statusCode={firstTransaction.status.grcpStatus}
+              />
+            )}
           </div>
         </div>
       }
