@@ -69,7 +69,7 @@ function Link(props: {
   const iconSize = 20;
 
   return (
-    <Tooltip content={props.name} position="right">
+    <Tooltip content={props.name}>
       <ProjectLink
         to={props.to}
         className={classNames(classes.inactiveLink, {

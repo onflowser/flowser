@@ -1,26 +1,18 @@
 import React, { ReactElement, ReactNode, useState } from "react";
-import { PlacesType, Tooltip as ReactTooltip } from "react-tooltip";
+import "@szhsin/react-menu/dist/index.css";
+import "@szhsin/react-menu/dist/transitions/slide.css";
+import { Menu, MenuDivider, MenuItem } from "@szhsin/react-menu";
 
 type TooltipProps = {
   content: string;
-  children: ReactNode;
-  position?: PlacesType;
+  children: ReactElement;
 };
 
 export function Tooltip(props: TooltipProps): ReactElement {
-  const [id] = useState(String(Math.random() * 10000));
-
   return (
-    <>
-      <ReactTooltip id={id} style={{ backgroundColor: "#272B32" }} />
-
-      <div
-        data-tooltip-id={id}
-        data-tooltip-content={props.content}
-        data-tooltip-place={props.position}
-      >
-        {props.children}
-      </div>
-    </>
+    <Menu menuButton={() => props.children} direction="right">
+      <MenuItem>{props.content}</MenuItem>
+      <MenuItem>{props.content}</MenuItem>
+    </Menu>
   );
 }

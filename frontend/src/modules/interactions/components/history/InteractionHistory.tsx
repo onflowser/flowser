@@ -41,7 +41,7 @@ type BlockItemProps = {
 function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const blockIconSize = 20;
-  const checkoutIconSize = blockIconSize * 0.8;
+  const menuIconSize = blockIconSize * 0.8;
 
   const { checkoutBlock } = useProjectActions();
   const { create, setFocused } = useInteractionRegistry();
@@ -113,15 +113,26 @@ function BlockItem(props: BlockItemProps) {
           <div className={classes.actions}>
             <FlowserIcon.CircleArrowLeft
               className={classes.checkout}
-              width={checkoutIconSize}
-              height={checkoutIconSize}
+              width={menuIconSize}
+              height={menuIconSize}
             />
           </div>
         </div>
       }
     >
-      <MenuItem onClick={() => onForkAsTemplate()}>Open</MenuItem>
-      <MenuItem onClick={() => checkoutBlock(block.id)}>Checkout</MenuItem>
+      <MenuItem onClick={() => onForkAsTemplate()}>
+        <FlowserIcon.Share width={menuIconSize} height={menuIconSize} />
+        <SizedBox width={10} />
+        Open
+      </MenuItem>
+      <MenuItem onClick={() => checkoutBlock(block.id)}>
+        <FlowserIcon.CircleArrowLeft
+          width={menuIconSize}
+          height={menuIconSize}
+        />
+        <SizedBox width={10} />
+        Rollback
+      </MenuItem>
     </FlowserMenu>
   );
 }

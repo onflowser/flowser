@@ -18,28 +18,30 @@ import { ReactComponent as Script } from "../../assets/icons/script.svg";
 import { ReactComponent as QuestionMark } from "../../assets/icons/question-mark.svg";
 import { ReactComponent as Exit } from "../../assets/icons/exit.svg";
 import { ReactComponent as Restart } from "../../assets/icons/restart.svg";
-import { ReactComponent as Open } from "assets/icons/open.svg";
+import { ReactComponent as Open } from "../../assets/icons/open.svg";
+import { ReactComponent as Share } from "../../assets/icons/share.svg";
 
 export const FlowserIcon = {
-  Account,
-  Block,
-  Contract,
-  CursorClick,
-  LogoRound,
-  Star,
-  Transaction,
-  Script,
-  QuestionMark,
-  ArtistPalette,
-  Settings,
-  Exit,
-  Restart,
-  CircleArrowLeft,
-  Plus,
-  Close,
-  Trash,
-  Search,
-  Cancel,
-  Link,
-  Open,
+  Account: Account,
+  Block: Block,
+  Contract: Contract,
+  CursorClick: CursorClick,
+  LogoRound: LogoRound,
+  Star: Star,
+  Transaction: Transaction,
+  Script: Script,
+  QuestionMark: QuestionMark,
+  ArtistPalette: ArtistPalette,
+  Settings: Settings,
+  Exit: Exit,
+  Restart: Restart,
+  CircleArrowLeft: CircleArrowLeft,
+  Plus: Plus,
+  Close: Close,
+  Trash: Trash,
+  Search: Search,
+  Cancel: Cancel,
+  Link: Link,
+  Open: Open,
+  Share: Share,
 };
