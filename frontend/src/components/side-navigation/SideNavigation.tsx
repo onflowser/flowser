@@ -21,6 +21,12 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
       <div>
         <FlowserLogo />
         <SizedBox height={50} />
+        <Link
+          to="/interactions"
+          name="Interactions"
+          icon={FlowserIcon.CursorClick}
+        />
+        <SizedBox height={20} />
         <Link to="/accounts" name="Accounts" icon={FlowserIcon.Account} />
         <Link to="/blocks" name="Blocks" icon={FlowserIcon.Block} />
         <Link
@@ -30,19 +36,16 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
         />
         <Link to="/contracts" name="Contracts" icon={FlowserIcon.Contract} />
         <Link to="/events" name="Events" icon={FlowserIcon.Star} />
-        <Link
-          to="/interactions"
-          name="Interactions"
-          icon={FlowserIcon.CursorClick}
-        />
-        <Link to="/settings" name="Settings" icon={FlowserIcon.Settings} />
       </div>
-      <Link
-        to="/"
-        name="Exit"
-        icon={FlowserIcon.Exit}
-        onClick={switchProject}
-      />
+      <div>
+        <Link to="/settings" name="Settings" icon={FlowserIcon.Settings} />
+        <Link
+          to="/"
+          name="Exit"
+          icon={FlowserIcon.Exit}
+          onClick={switchProject}
+        />
+      </div>
     </div>
   );
 }

@@ -130,7 +130,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="accounts" replace />,
+            element: <Navigate to="interactions" replace />,
           },
           {
             path: "settings",
