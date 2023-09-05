@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { InteractionIcon } from "../interaction-icon/InteractionIcon";
+import { InteractionIcon } from "../InteractionIcon/InteractionIcon";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
 import { CoreInteractionDefinition } from "../../contexts/interaction-registry.context";
 import { useGetParsedInteraction } from "../../../../hooks/use-api";

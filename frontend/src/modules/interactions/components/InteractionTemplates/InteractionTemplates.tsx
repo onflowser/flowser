@@ -7,7 +7,7 @@ import Input from "../../../../components/inputs/input/Input";
 import { SearchInput } from "../../../../components/inputs/search-input/SearchInput";
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
-import { InteractionLabel } from "../interaction-label/InteractionLabel";
+import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 
 export function InteractionTemplates(): ReactElement {
   return (

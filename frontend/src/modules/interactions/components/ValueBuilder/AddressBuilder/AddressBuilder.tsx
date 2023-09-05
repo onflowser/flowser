@@ -1,14 +1,14 @@
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import classes from "./AddressBuilder.module.scss";
 import { CadenceValueBuilder } from "../interface";
-import { useGetPollingAccounts } from "../../../../../../hooks/use-api";
-import { AccountAvatar } from "../../../../../accounts/AccountAvatar/AccountAvatar";
-import { AccountName } from "../../../../../accounts/AccountName/AccountName";
-import { FlowserIcon } from "../../../../../../components/icons/Icons";
+import { useGetPollingAccounts } from "../../../../../hooks/use-api";
+import { AccountAvatar } from "../../../../accounts/AccountAvatar/AccountAvatar";
+import { AccountName } from "../../../../accounts/AccountName/AccountName";
+import { FlowserIcon } from "../../../../../components/icons/Icons";
 import classNames from "classnames";
-import { ServiceRegistry } from "../../../../../../services/service-registry";
+import { ServiceRegistry } from "../../../../../services/service-registry";
 import { Account, FclValues } from "@flowser/shared";
-import { Spinner } from "../../../../../../components/spinner/Spinner";
+import { Spinner } from "../../../../../components/spinner/Spinner";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { value, setValue, addressBuilderOptions } = props;

@@ -1,9 +1,6 @@
 import React, { ReactElement, useEffect } from "react";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
-import {
-  ParamBuilder,
-  ParamListBuilder,
-} from "../parameters/ParamBuilder/ParamBuilder";
+import { ParamBuilder, ParamListBuilder } from "../ParamBuilder/ParamBuilder";
 import {
   CadenceTypeKind,
   FclValue,
@@ -226,7 +223,7 @@ function SigningSettings() {
           },
         })}
         value={definition.transactionOptions?.proposerAddress}
-        setValue={(proposerAddress) =>
+        setValue={(proposerAddress: FclValue) =>
           setTransactionOptions({
             proposerAddress: proposerAddress as string,
           })
@@ -244,7 +241,7 @@ function SigningSettings() {
           },
         })}
         value={definition.transactionOptions?.payerAddress}
-        setValue={(payerAddress) =>
+        setValue={(payerAddress: FclValue) =>
           setTransactionOptions({ payerAddress: payerAddress as string })
         }
         addressBuilderOptions={{

@@ -5,8 +5,8 @@ import { FclDictionaryEntry, FclValue, FclValues } from "@flowser/shared";
 import { MultiMap } from "utils/multi-map";
 import toast from "react-hot-toast";
 import classes from "./DictionaryBuilder.module.scss";
-import { SimpleButton } from "../../../../../../components/buttons/simple-button/SimpleButton";
-import { SizedBox } from "../../../../../../components/sized-box/SizedBox";
+import { SimpleButton } from "../../../../../components/buttons/simple-button/SimpleButton";
+import { SizedBox } from "../../../../../components/sized-box/SizedBox";
 
 export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
   const { type, value, setValue } = props;

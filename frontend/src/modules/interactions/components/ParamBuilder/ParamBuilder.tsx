@@ -2,7 +2,7 @@ import React from "react";
 import { Parameter } from "@flowser/shared";
 import { ReactElement } from "react";
 import { ValueBuilder } from "../ValueBuilder/ValueBuilder";
-import { InteractionParameterBuilder } from "../../../contexts/definition.context";
+import { InteractionParameterBuilder } from "../../contexts/definition.context";
 import classes from "./ParamBuilder.module.scss";
 import { CadenceValueBuilder } from "../ValueBuilder/interface";
 

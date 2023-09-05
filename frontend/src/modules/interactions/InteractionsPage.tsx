@@ -3,19 +3,19 @@ import classes from "./InteractionsPage.module.scss";
 import { Tabs, TabItem } from "../../components/tabs/Tabs";
 import { useInteractionRegistry } from "./contexts/interaction-registry.context";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
-import { InteractionHistory } from "./components/history/InteractionHistory";
+import { InteractionHistory } from "./components/InteractionHistory/InteractionHistory";
 import {
   InteractionDefinitionManagerProvider,
   useInteractionDefinitionManager,
 } from "./contexts/definition.context";
-import { InteractionTemplates } from "./components/templates/InteractionTemplates";
+import { InteractionTemplates } from "./components/InteractionTemplates/InteractionTemplates";
 import { SizedBox } from "../../components/sized-box/SizedBox";
 import { LineSeparator } from "../../components/line-separator/LineSeparator";
-import { ExecutionSettings } from "./components/execution/ExecutionSettings";
+import { ExecutionSettings } from "./components/ExecutionSettings/ExecutionSettings";
 import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
-import { InteractionOutcome } from "./components/outcome/InteractionOutcome";
+import { InteractionOutcome } from "./components/InteractionOutcome/InteractionOutcome";
 import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
-import { InteractionLabel } from "./components/interaction-label/InteractionLabel";
+import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 
 export function InteractionsPage(): ReactElement {
   const { definitions, focusedDefinition, remove, setFocused, forkTemplate } =
