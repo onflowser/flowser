@@ -7,7 +7,6 @@ import classNames from "classnames";
 import { useProjectActions } from "../../contexts/project.context";
 import { buildProjectUrl, ProjectLink } from "../links/ProjectLink";
 import { useCurrentProjectId } from "hooks/use-current-project-id";
-import { Tooltip } from "../tooltips/Tooltip";
 
 type SideNavigationProps = {
   className?: string;
@@ -72,16 +71,14 @@ function Link(props: {
   const iconSize = 20;
 
   return (
-    <Tooltip content={props.name}>
-      <ProjectLink
-        to={props.to}
-        className={classNames(classes.inactiveLink, {
-          [classes.activeLink]: isActive,
-        })}
-        onClick={props.onClick}
-      >
-        <Icon width={iconSize} height={iconSize} />
-      </ProjectLink>
-    </Tooltip>
+    <ProjectLink
+      to={props.to}
+      className={classNames(classes.inactiveLink, {
+        [classes.activeLink]: isActive,
+      })}
+      onClick={props.onClick}
+    >
+      <Icon width={iconSize} height={iconSize} />
+    </ProjectLink>
   );
 }
