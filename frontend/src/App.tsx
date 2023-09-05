@@ -99,6 +99,10 @@ export const FlowserClientApp = ({
 
 const router = createBrowserRouter([
   {
+    index: true,
+    element: <Navigate to="projects" replace />,
+  },
+  {
     path: "projects",
     element: (
       <ProjectProvider>
