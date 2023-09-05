@@ -4,7 +4,7 @@ import Input from "../../../../../components/inputs/input/Input";
 import { FclValues } from "@flowser/shared";
 
 export function IntegerNumberBuilder(props: CadenceValueBuilder): ReactElement {
-  const { value, setValue } = props;
+  const { disabled, value, setValue } = props;
 
   const isInitialised = FclValues.isFclIntegerNumberValue(value);
 
@@ -23,6 +23,7 @@ export function IntegerNumberBuilder(props: CadenceValueBuilder): ReactElement {
   return (
     <Input
       type="number"
+      disabled={disabled}
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />

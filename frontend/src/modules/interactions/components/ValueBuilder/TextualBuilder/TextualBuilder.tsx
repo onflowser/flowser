@@ -3,7 +3,7 @@ import { CadenceValueBuilder } from "../interface";
 import Input from "../../../../../components/inputs/input/Input";
 
 export function TextualBuilder(props: CadenceValueBuilder): ReactElement {
-  const { value, setValue } = props;
+  const { disabled, value, setValue } = props;
 
   const isInitialised = typeof value === "string";
 
@@ -22,6 +22,7 @@ export function TextualBuilder(props: CadenceValueBuilder): ReactElement {
   return (
     <Input
       type="text"
+      disabled={disabled}
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />

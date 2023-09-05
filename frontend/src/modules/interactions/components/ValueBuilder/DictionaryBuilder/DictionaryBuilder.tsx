@@ -9,7 +9,7 @@ import { SimpleButton } from "../../../../../components/buttons/simple-button/Si
 import { SizedBox } from "../../../../../components/sized-box/SizedBox";
 
 export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
-  const { type, value, setValue } = props;
+  const { disabled, type, value, setValue } = props;
   const { dictionary } = type;
 
   const defaultEntry: FclDictionaryEntry = {
@@ -134,6 +134,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
               <pre>Key:{"   "}</pre>
               <ValueBuilder
                 type={dictionary.key}
+                disabled={disabled}
                 value={entry.key}
                 setValue={(newKey) => updateEntryKey(entry.key, newKey)}
               />
@@ -142,6 +143,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
               <pre>Value: </pre>
               <ValueBuilder
                 type={dictionary.value}
+                disabled={disabled}
                 value={entry.value}
                 setValue={(newValue) => updateEntryValue(entry.key, newValue)}
               />
@@ -149,11 +151,13 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
           </div>
         );
       })}
-      <div>
-        <SimpleButton onClick={() => addEntry()}>Add</SimpleButton>
-        <SizedBox inline width={10} />
-        <SimpleButton onClick={() => removeLastEntry()}>Remove</SimpleButton>
-      </div>
+      {!disabled && (
+        <div>
+          <SimpleButton onClick={() => addEntry()}>Add</SimpleButton>
+          <SizedBox inline width={10} />
+          <SimpleButton onClick={() => removeLastEntry()}>Remove</SimpleButton>
+        </div>
+      )}
     </div>
   );
 }

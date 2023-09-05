@@ -7,7 +7,7 @@ import { SimpleButton } from "../../../../../components/buttons/simple-button/Si
 import { SizedBox } from "../../../../../components/sized-box/SizedBox";
 
 export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
-  const { type, value, setValue } = props;
+  const { disabled, type, value, setValue } = props;
 
   const { array } = type;
   if (array === undefined) {
@@ -61,6 +61,7 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
           <div key={index} className={classes.arrayElement}>
             <code className={classes.indexDisplay}>{index}:</code>
             <ValueBuilder
+              disabled={disabled}
               type={array.element}
               value={value}
               setValue={(value) => setElement(index, value)}
@@ -68,7 +69,7 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
           </div>
         );
       })}
-      {!isConstantArray && (
+      {!isConstantArray && !disabled && (
         <div>
           <SimpleButton onClick={() => increaseSize()}>Add</SimpleButton>
           <SizedBox inline width={10} />

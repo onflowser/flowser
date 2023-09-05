@@ -11,7 +11,7 @@ import { Account, FclValues } from "@flowser/shared";
 import { Spinner } from "../../../../../components/spinner/Spinner";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
-  const { value, setValue, addressBuilderOptions } = props;
+  const { disabled, value, setValue, addressBuilderOptions } = props;
   const { data, refresh } = useGetPollingAccounts();
   const managedAccounts = useMemo(
     () =>
@@ -47,12 +47,15 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
         {managedAccounts.map((account) => (
           <AccountButton
             key={account.address}
+            disabled={disabled}
             account={account}
             isSelected={value === account.address}
             onSelect={() => setValue(account.address)}
           />
         ))}
-        <NewAccountButton onCreateNewAccount={createNewAccount} />
+        {!disabled && (
+          <NewAccountButton onCreateNewAccount={createNewAccount} />
+        )}
       </div>
     </div>
   );
@@ -62,15 +65,21 @@ type AccountButtonProps = {
   isSelected: boolean;
   onSelect: () => void;
   account: Account;
+  disabled?: boolean;
 };
 
 function AccountButton(props: AccountButtonProps) {
-  const { isSelected, account, onSelect } = props;
+  const { disabled, isSelected, account, onSelect } = props;
   return (
-    <div className={classes.selectAccountButton} onClick={() => onSelect()}>
+    <button
+      disabled={disabled}
+      className={classes.selectAccountButton}
+      onClick={() => onSelect()}
+    >
       <div
         className={classNames(classes.avatarWrapper, {
           [classes.selectedAccount]: isSelected,
+          [classes.avatarWrapper__enabled]: !disabled,
         })}
       >
         <AccountAvatar address={account.address} className={classes.avatar} />
@@ -80,7 +89,7 @@ function AccountButton(props: AccountButtonProps) {
         address={account.address}
         shorten
       />
-    </div>
+    </button>
   );
 }
 

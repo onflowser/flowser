@@ -8,7 +8,7 @@ import SelectInput, {
 import Input from "../../../../../components/inputs/input/Input";
 
 export function PathBuilder(props: CadenceValueBuilder): ReactElement {
-  const { type, value, setValue } = props;
+  const { disabled, type, value, setValue } = props;
 
   const isInitialized = FclValues.isFclPathValue(value);
   const specifiedDomain = getPredefinedDomain(type);
@@ -57,13 +57,14 @@ export function PathBuilder(props: CadenceValueBuilder): ReactElement {
     <div>
       Domain:{" "}
       <SelectInput
-        disabled={specifiedDomain !== undefined}
+        disabled={specifiedDomain !== undefined || disabled}
         value={value.domain}
         options={options}
         onChange={(e) => setDomain(e.target.value as FclPathDomain)}
       />
       Identifier:{" "}
       <Input
+        disabled={disabled}
         value={value.identifier}
         onChange={(e) => setIdentifier(e.target.value)}
       />

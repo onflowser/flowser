@@ -4,7 +4,7 @@ import { FclValues } from "@flowser/shared";
 import SelectInput from "../../../../../components/inputs/select-input/SelectInput";
 
 export function BoolBuilder(props: CadenceValueBuilder): ReactElement {
-  const { value, setValue } = props;
+  const { disabled, value, setValue } = props;
 
   const isInitialised = FclValues.isFclBoolValue(value);
 
@@ -22,6 +22,7 @@ export function BoolBuilder(props: CadenceValueBuilder): ReactElement {
 
   return (
     <SelectInput
+      disabled={disabled}
       value={String(value)}
       options={[
         {

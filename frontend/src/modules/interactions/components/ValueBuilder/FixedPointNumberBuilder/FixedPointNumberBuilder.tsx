@@ -6,7 +6,7 @@ import { FclValues } from "@flowser/shared";
 export function FixedPointNumberBuilder(
   props: CadenceValueBuilder
 ): ReactElement {
-  const { value, setValue } = props;
+  const { disabled, value, setValue } = props;
 
   const isInitialised = FclValues.isFclFixedPointNumberValue(value);
 
@@ -25,6 +25,7 @@ export function FixedPointNumberBuilder(
   return (
     <Input
       type="number"
+      disabled={disabled}
       value={value}
       step={0.1}
       onChange={(e) => setValue(e.target.value)}
