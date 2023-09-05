@@ -42,7 +42,7 @@ const columns = [
   columnHelper.accessor("type", {
     header: () => <Label variant="medium">TYPE</Label>,
     meta: {
-      className: classes.typeColumn,
+      className: classes.eventTypeColumn,
     },
     cell: (info) => (
       <Value style={{ width: "100%" }}>
@@ -59,6 +59,9 @@ const columns = [
     ),
   }),
   columnHelper.accessor("data", {
+    meta: {
+      className: classes.dataColumn,
+    },
     header: () => <Label variant="medium">DATA</Label>,
     cell: (info) => (
       <Value>
