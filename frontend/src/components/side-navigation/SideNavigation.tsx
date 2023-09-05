@@ -25,7 +25,6 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
           name="Interactions"
           icon={FlowserIcon.CursorClick}
         />
-        <SizedBox height={20} />
         <Link to="/accounts" name="Accounts" icon={FlowserIcon.Account} />
         <Link to="/blocks" name="Blocks" icon={FlowserIcon.Block} />
         <Link
