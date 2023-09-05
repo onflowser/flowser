@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
-import { TransactionOverview } from "../../../transactions/details/TransactionOverview";
+import { TransactionOverview } from "../../../transactions/TransactionOverview/TransactionOverview";
 import {
   ScriptError,
   TransactionError,

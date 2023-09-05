@@ -3,7 +3,7 @@ import { SignableObject } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
-import classes from "./Details.module.scss";
+import classes from "./SignaturesTable.module.scss";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
 import { ProjectLink } from "../../../components/links/ProjectLink";

@@ -1,19 +1,18 @@
 import React, { FunctionComponent } from "react";
-import { useParams } from "react-router-dom";
-import classes from "./Details.module.scss";
-import { TransactionSource } from "./source/TransactionSource";
+import classes from "./TransactionDetails.module.scss";
+import { TransactionSource } from "../TransactionSource/TransactionSource";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import {
   useGetPollingEventsByTransaction,
   useGetTransaction,
 } from "../../../hooks/use-api";
 import { TransactionError } from "../../../components/status/ErrorMessage";
-import { TransactionOverview } from "./TransactionOverview";
+import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { TabItem } from "../../../components/tabs/Tabs";
 import { EventsTable } from "../../events/EventsTable/EventsTable";
-import { SignaturesTable } from "./SignaturesTable";
+import { SignaturesTable } from "../SignaturesTable/SignaturesTable";
 
 type TransactionDetailsProps = {
   transactionId: string;

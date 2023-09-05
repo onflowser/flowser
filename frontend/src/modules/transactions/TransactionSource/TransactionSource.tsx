@@ -1,11 +1,11 @@
 import React, { FunctionComponent } from "react";
-import Card from "../../../../components/card/Card";
+import Card from "../../../components/card/Card";
 import classes from "./TransactionSource.module.scss";
-import Label from "../../../../components/label/Label";
-import MiddleEllipsis from "../../../../components/ellipsis/MiddleEllipsis";
-import Value from "../../../../components/value/Value";
+import Label from "../../../components/label/Label";
+import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import Value from "../../../components/value/Value";
 import { TransactionArgument } from "@flowser/shared";
-import { CadenceEditor } from "../../../../components/cadence-editor/CadenceEditor";
+import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import CopyButton from "components/buttons/copy-button/CopyButton";
 
 type TransactionSourceProps = {

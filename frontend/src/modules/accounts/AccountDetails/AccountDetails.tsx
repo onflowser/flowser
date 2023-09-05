@@ -57,7 +57,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
         value: (
           <>
             {account.balance}
-            <span className={classes.currency}>FLOW</span>
+            <span className={classes.flowCurrency}>FLOW</span>
           </>
         ),
       },

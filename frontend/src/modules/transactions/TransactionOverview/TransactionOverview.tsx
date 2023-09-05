@@ -4,7 +4,7 @@ import {
   DetailsCardColumn,
 } from "../../../components/details-card/DetailsCard";
 import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
-import classes from "./Details.module.scss";
+import classes from "./TransactionOverview.module.scss";
 import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
 import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
 import { TextUtils } from "../../../utils/text-utils";
@@ -28,7 +28,7 @@ export function TransactionOverview(
         label: "Transaction",
         value: (
           <ProjectLink to={`/transactions/${transaction.id}`}>
-            <MiddleEllipsis className={classes.elipsis}>
+            <MiddleEllipsis className={classes.ellipsis}>
               {transaction.id}
             </MiddleEllipsis>
           </ProjectLink>
@@ -50,7 +50,7 @@ export function TransactionOverview(
         label: "Block ID",
         value: (
           <ProjectLink to={`/blocks/${transaction.blockId}`}>
-            <MiddleEllipsis className={classes.elipsis}>
+            <MiddleEllipsis className={classes.ellipsis}>
               {transaction.blockId}
             </MiddleEllipsis>
           </ProjectLink>

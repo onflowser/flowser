@@ -37,7 +37,7 @@ import {
   useGetPollingTransactions,
 } from "./hooks/use-api";
 import { TransactionsTable } from "./modules/transactions/TransactionsTable/TransactionsTable";
-import { TransactionDetails } from "./modules/transactions/details/TransactionDetails";
+import { TransactionDetails } from "./modules/transactions/TransactionDetails/TransactionDetails";
 import { BlockDetails } from "./modules/blocks/BlockDetails/BlockDetails";
 import { BlocksTable } from "./modules/blocks/BlocksTable/BlocksTable";
 import { AccountDetails } from "./modules/accounts/AccountDetails/AccountDetails";
