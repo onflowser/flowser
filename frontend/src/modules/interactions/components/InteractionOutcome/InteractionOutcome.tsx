@@ -1,10 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
-import { TransactionOverview } from "../../../transactions/TransactionOverview/TransactionOverview";
-import {
-  ScriptError,
-  TransactionError,
-} from "../../../../components/status/ErrorMessage";
+import { ScriptError } from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
 import classes from "./InteractionOutcome.module.scss";
@@ -20,6 +16,7 @@ import { ExternalLink } from "../../../../components/links/ExternalLink";
 import { LineSeparator } from "../../../../components/line-separator/LineSeparator";
 import { SpinnerWithLabel } from "../../../../components/spinner/SpinnerWithLabel";
 import { StyledTabs } from "../../../../components/tabs/StyledTabs";
+import { TransactionDetailsTabs } from "../../../transactions/TransactionDetailsTabs/TransactionDetailsTabs";
 
 export function InteractionOutcome(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -103,54 +100,21 @@ function EmptyState() {
 function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   const { outcome } = props;
   const { data } = useGetTransaction(outcome.transactionId);
-  const error = outcome.error ?? data?.transaction?.status?.errorMessage;
-  const overviewTabId = "overview";
-  const errorTabId = "error";
-  const [currentTabId, setCurrentTabId] = useState(
-    error ? errorTabId : overviewTabId
-  );
 
-  useEffect(() => {
-    if (error && currentTabId !== errorTabId) {
-      setCurrentTabId(errorTabId);
-    }
-  }, [error]);
+  if (outcome.error) {
+    return <ScriptError errorMessage={outcome.error} />;
+  }
 
   if (!data?.transaction) {
     return <SpinnerWithLabel label="Executing" />;
   }
 
-  const tabs: TabItem[] = [];
-
-  tabs.push({
-    id: overviewTabId,
-    label: "Overview",
-    content: (
-      <TransactionOverview
-        transaction={data.transaction}
-        className={classes.transactionOverview}
-      />
-    ),
-  });
-
-  if (error) {
-    tabs.push({
-      id: errorTabId,
-      label: "Error",
-      content: data.transaction.status?.errorMessage ? (
-        <TransactionError errorMessage={data.transaction.status.errorMessage} />
-      ) : (
-        <pre>{outcome.error}</pre>
-      ),
-    });
-  }
-
   return (
-    <StyledTabs
+    <TransactionDetailsTabs
       label="Transaction"
-      currentTabId={currentTabId}
-      onChangeTab={(tab) => setCurrentTabId(tab.id)}
-      tabs={tabs}
+      includeOverviewTab={true}
+      includeScriptTab={false}
+      transaction={data.transaction}
     />
   );
 }
