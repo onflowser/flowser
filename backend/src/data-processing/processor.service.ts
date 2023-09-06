@@ -705,15 +705,19 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowBlock: FlowBlock;
   }): AccountEntity {
     const { flowAccount, flowBlock } = options;
-    const account = AccountEntity.createDefault();
-    account.blockId = flowBlock.id;
-    account.address = ensurePrefixedAddress(flowAccount.address);
-    account.balance = flowAccount.balance;
-    account.code = flowAccount.code;
-    account.keys = flowAccount.keys.map((flowKey) =>
-      this.createKeyEntity({ flowAccount, flowKey, flowBlock })
-    );
-    return account;
+    return new AccountEntity({
+      balance: flowAccount.balance,
+      address: ensurePrefixedAddress(flowAccount.address),
+      blockId: flowBlock.id,
+      isDefaultAccount: false,
+      contracts: [],
+      storage: [],
+      transactions: [],
+      code: flowAccount.code,
+      keys: flowAccount.keys.map((flowKey) =>
+        this.createKeyEntity({ flowAccount, flowKey, flowBlock })
+      ),
+    });
   }
 
   private createKeyEntity(options: {

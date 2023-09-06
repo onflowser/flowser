@@ -2,9 +2,8 @@
 @import 'styles/spacings';
 
 .root {
-  border: .5px solid $color-light-gray;
-  color: $color-light-gray;
-
-  border-radius: 8px;
-  padding: ($spacing-l * 0.1) $spacing-l * 0.75;
+  border: 1px solid $gray-10;
+  color: $gray-10;
+  border-radius: 12px;
+  padding: 0 $spacing-s;
 }

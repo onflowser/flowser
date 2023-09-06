@@ -5,7 +5,7 @@ import Label from "../../../components/label/Label";
 import classes from "./AccountKeysTable.module.scss";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import CopyButton from "../../../components/buttons/copy-button/CopyButton";
-import Badge from "../../../components/badge/Badge";
+import { Badge } from "../../../components/badge/Badge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
