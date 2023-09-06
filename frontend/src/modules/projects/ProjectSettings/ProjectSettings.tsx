@@ -95,7 +95,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
     }
     try {
       await projectService.useProject(project.id);
-      navigate(`/projects/${project.id}/accounts`, {
+      navigate(`/projects/${project.id}`, {
         replace: true,
       });
     } catch (e) {

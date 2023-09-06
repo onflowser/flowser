@@ -59,7 +59,7 @@ export function useTransactionName(
   props: UseInteractionNameProps
 ): string | undefined {
   const { transaction } = props;
-  const { templates } = useInteractionRegistry();
+  const { templates, definitions } = useInteractionRegistry();
 
   return useMemo(() => {
     if (!transaction?.script) {
@@ -67,7 +67,7 @@ export function useTransactionName(
     }
 
     const sanitizedTargetCode = sanitizeCadenceSource(transaction.script);
-    const matchingTemplateName = templates.find(
+    const matchingTemplateName = [...templates, ...definitions].find(
       (template) =>
         template.code &&
         sanitizeCadenceSource(template.code) === sanitizedTargetCode

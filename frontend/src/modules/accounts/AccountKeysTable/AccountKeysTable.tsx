@@ -2,11 +2,10 @@ import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountKey } from "@flowser/shared";
 import Label from "../../../components/label/Label";
-import classes from "../AccountDetails/AccountDetails.module.scss";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import classes from "./AccountKeysTable.module.scss";
+import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import CopyButton from "../../../components/buttons/copy-button/CopyButton";
-import classNames from "classnames";
-import Badge from "../../../components/badge/Badge";
+import { Badge } from "../../../components/badge/Badge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
@@ -17,14 +16,14 @@ const columns = [
   columnsHelper.accessor("accountAddress", {
     header: () => <Label variant="medium">KEY</Label>,
     cell: (info) => (
-      <div className={classes.keysRoot}>
-        <div className={classes.row}>
-          <MiddleEllipsis className={classes.hash}>
+      <div className={classes.cellRoot}>
+        <div className={classes.keyWrapper}>
+          <MiddleEllipsis maxLength={100}>
             {info.row.original.publicKey}
           </MiddleEllipsis>
           <CopyButton value={info.row.original.publicKey} />
         </div>
-        <div className={classNames(classes.badges, classes.row)}>
+        <div className={classes.badges}>
           <Badge>WEIGHT: {info.row.original.weight}</Badge>
           <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
           <Badge>INDEX: {info.row.original.index}</Badge>

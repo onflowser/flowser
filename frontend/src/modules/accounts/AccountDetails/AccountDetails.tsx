@@ -21,6 +21,7 @@ import { TransactionsTable } from "../../transactions/TransactionsTable/Transact
 import { ContractsTable } from "../../contracts/ContractsTable";
 import { AccountKeysTable } from "../AccountKeysTable/AccountKeysTable";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
+import { TabItem } from "../../../components/tabs/Tabs";
 
 type AccountDetailsProps = {
   accountId: string;
@@ -57,7 +58,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
         value: (
           <>
             {account.balance}
-            <span className={classes.currency}>FLOW</span>
+            <span className={classes.flowCurrency}>FLOW</span>
           </>
         ),
       },
@@ -68,41 +69,44 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
     ],
   ];
 
+  const tabs: TabItem[] = [
+    {
+      id: "storage",
+      label: "Storage",
+      content: <AccountStorage account={account} />,
+    },
+    {
+      id: "transactions",
+      label: "Transactions",
+      content: <TransactionsTable transactions={transactions} />,
+    },
+    {
+      id: "contracts",
+      label: "Contracts",
+      content: <ContractsTable contracts={contracts} />,
+    },
+    {
+      id: "keys",
+      label: "Keys",
+      content: <AccountKeysTable keys={keys} />,
+    },
+  ];
+
+  if (account.code) {
+    tabs.push({
+      id: "scripts",
+      label: "Scripts",
+      content: <CadenceEditor value={account.code} editable={false} />,
+    });
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
         <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
       </div>
       <SizedBox height={30} />
-      <StyledTabs
-        tabs={[
-          {
-            id: "storage",
-            label: "Storage",
-            content: <AccountStorage account={account} />,
-          },
-          {
-            id: "transactions",
-            label: "Transactions",
-            content: <TransactionsTable transactions={transactions} />,
-          },
-          {
-            id: "contracts",
-            label: "Contracts",
-            content: <ContractsTable contracts={contracts} />,
-          },
-          {
-            id: "keys",
-            label: "Keys",
-            content: <AccountKeysTable keys={keys} />,
-          },
-          {
-            id: "scripts",
-            label: "Scripts",
-            content: <CadenceEditor value={account.code} editable={false} />,
-          },
-        ]}
-      />
+      <StyledTabs tabs={tabs} />
     </div>
   );
 };

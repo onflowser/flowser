@@ -2,33 +2,22 @@
 @import "styles/colors";
 @import "styles/typography";
 
-.keysRoot {
+.cellRoot {
   display: flex;
   flex-direction: column;
+  row-gap: $spacing-base;
   font-size: $font-size-small;
 
-  .row {
+  .keyWrapper {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    column-gap: $spacing-base;
   }
-}
 
-.hash {
-  display: inline-block;
-
-  max-width: 90vw;
-  margin: $spacing-base;
-}
-
-.badges {
-  color: $color-grey;
-  font-family: $font-family-inter;
-  margin-bottom: $spacing-base;
-  flex-wrap: wrap;
-  & > * {
-    margin-top: $spacing-base;
-    margin-right: $spacing-base;
+  .badges {
+    display: flex;
+    column-gap: $spacing-base;
   }
 }

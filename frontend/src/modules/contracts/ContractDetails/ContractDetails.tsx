@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
-import classes from "./Details.module.scss";
+import classes from "./ContractDetails.module.scss";
 import {
   DetailsCard,
   DetailsCardColumn,

@@ -8,6 +8,9 @@ import { TextUtils } from "../../../utils/text-utils";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { AccountLink } from "../AccountLink/AccountLink";
+import { Badge } from "../../../components/badge/Badge";
+import classes from "./AccountsTable.module.scss";
+import { Tooltip } from "../../../components/tooltips/Tooltip";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -17,6 +20,21 @@ const columns = [
     cell: (info) => (
       <Value>
         <AccountLink address={info.getValue()} />
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("tags", {
+    cell: (info) => (
+      <Value className={classes.tagsColumn}>
+        {info.getValue().map((tag) => (
+          <Tooltip
+            key={tag.name}
+            content={tag.description}
+            position="right center"
+          >
+            <Badge className={classes.tag}>{tag.name}</Badge>
+          </Tooltip>
+        ))}
       </Value>
     ),
   }),

@@ -7,7 +7,7 @@ import { AccountLink } from "../accounts/AccountLink/AccountLink";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../components/table/Table";
-import { ProjectLink } from "../../components/link/ProjectLink";
+import { ProjectLink } from "../../components/links/ProjectLink";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();

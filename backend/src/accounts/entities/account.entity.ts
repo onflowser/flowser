@@ -2,7 +2,7 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { AccountKeyEntity } from "./key.entity";
 import { AccountContractEntity } from "./contract.entity";
-import { Account } from "@flowser/shared";
+import { Account, AccountTag } from "@flowser/shared";
 import { TransactionEntity } from "../../transactions/transaction.entity";
 import { AccountStorageItemEntity } from "./storage-item.entity";
 import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
@@ -92,6 +92,29 @@ export class AccountEntity extends PollingEntity implements BlockContextEntity {
   }
 
   toProto(): Account {
+    const tags: AccountTag[] = [];
+
+    if (this.isDefaultAccount) {
+      tags.push({
+        name: "Default",
+        description: "This account was created automatically by the emulator.",
+      });
+    }
+
+    const isServiceAccount = [
+      "0xf8d6e0586b0a20c7",
+      "0x0000000000000001", // When using monotonic addresses setting
+    ].includes(this.address);
+
+    // https://developers.flow.com/concepts/flow-token/concepts#flow-service-account
+    if (isServiceAccount) {
+      tags.push({
+        name: "Service",
+        description:
+          "A special account in Flow that has special permissions to manage system contracts. It is able to mint tokens, set fees, and update network-level contracts.",
+      });
+    }
+
     return {
       address: this.address,
       balance: this.balance,
@@ -101,7 +124,7 @@ export class AccountEntity extends PollingEntity implements BlockContextEntity {
       contracts: this.contracts?.map((contract) => contract.toProto()) ?? [],
       transactions:
         this.transactions?.map((transaction) => transaction.toProto()) ?? [],
-      isDefaultAccount: this.isDefaultAccount,
+      tags,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };

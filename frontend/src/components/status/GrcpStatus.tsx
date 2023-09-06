@@ -21,14 +21,20 @@ export function GrcpStatus({ status }: GrcpStatusProps): ReactElement {
   );
 }
 
-function GrcpStatusIcon(props: { statusCode: GrcpStatusCode | undefined }) {
+type GrcpStatusIconProps = {
+  statusCode: GrcpStatusCode | undefined;
+  size?: number;
+};
+
+export function GrcpStatusIcon(props: GrcpStatusIconProps): ReactElement {
+  const iconProps = props.size ? { width: props.size, height: props.size } : {};
   switch (props.statusCode) {
     case GrcpStatusCode.GRCP_STATUS_OK:
-      return <SealedIcon />;
+      return <SealedIcon {...iconProps} />;
     case GrcpStatusCode.GRCP_STATUS_FAILED:
-      return <ExpiredIcon />;
+      return <ExpiredIcon {...iconProps} />;
     case GrcpStatusCode.UNRECOGNIZED:
     default:
-      return <UnknownIcon />;
+      return <UnknownIcon {...iconProps} />;
   }
 }

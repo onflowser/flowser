@@ -1,6 +1,7 @@
 import React, { ReactElement, ReactNode, useEffect } from "react";
 import {
   createBrowserRouter,
+  Navigate,
   Outlet,
   RouterProvider,
   useLocation,
@@ -36,7 +37,7 @@ import {
   useGetPollingTransactions,
 } from "./hooks/use-api";
 import { TransactionsTable } from "./modules/transactions/TransactionsTable/TransactionsTable";
-import { TransactionDetails } from "./modules/transactions/details/TransactionDetails";
+import { TransactionDetails } from "./modules/transactions/TransactionDetails/TransactionDetails";
 import { BlockDetails } from "./modules/blocks/BlockDetails/BlockDetails";
 import { BlocksTable } from "./modules/blocks/BlocksTable/BlocksTable";
 import { AccountDetails } from "./modules/accounts/AccountDetails/AccountDetails";
@@ -98,6 +99,10 @@ export const FlowserClientApp = ({
 
 const router = createBrowserRouter([
   {
+    index: true,
+    element: <Navigate to="projects" replace />,
+  },
+  {
     path: "projects",
     element: (
       <ProjectProvider>
@@ -128,7 +133,11 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "ProjectSettings",
+            index: true,
+            element: <Navigate to="interactions" replace />,
+          },
+          {
+            path: "settings",
             element: <ProjectSettingsPage />,
           },
           {
