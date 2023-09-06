@@ -1,6 +1,5 @@
-import React, { ReactElement, useCallback } from "react";
-import { NavLink, useHistory } from "react-router-dom";
-import { useNavigation } from "../../hooks/use-navigation";
+import React, { ReactElement } from "react";
+import { NavLink, useMatches, useNavigate } from "react-router-dom";
 import classes from "./Breadcrumbs.module.scss";
 import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
@@ -9,24 +8,52 @@ type BreadcrumbsProps = {
   className?: string;
 };
 
+type CrumbHandle = {
+  crumbName: string;
+};
+
+type Match = { pathname: string; handle: unknown };
+
+type MatchWithCrumb = {
+  pathname: string;
+  handle: CrumbHandle;
+};
+
+type Breadcrumb = {
+  to: string;
+  label: string;
+};
+
+// Utility function used to create a handle with crumbs in a type-safe way.
+export function createCrumbHandle(crumbHandle: CrumbHandle): CrumbHandle {
+  return crumbHandle;
+}
+
+function isMatchWithCrumb(match: Match): match is MatchWithCrumb {
+  return match.handle instanceof Object && "crumbName" in match.handle;
+}
+
 export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
-  const { isShowBackButtonVisible, isBreadcrumbsVisible, breadcrumbs } =
-    useNavigation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const currentUrl = window.location.pathname;
 
-  const onBack = useCallback(() => {
-    history.goBack();
-  }, []);
+  const matches: Match[] = useMatches();
+  const matchesWithCrumbs: MatchWithCrumb[] = matches.filter(isMatchWithCrumb);
+  const breadcrumbs = matchesWithCrumbs.map(
+    (match): Breadcrumb => ({
+      to: match.pathname,
+      label: match.handle.crumbName,
+    })
+  );
 
-  if (!isBreadcrumbsVisible) {
+  if (breadcrumbs.length === 0) {
     return null;
   }
 
   return (
     <div className={classNames(classes.root, props.className)}>
-      {isShowBackButtonVisible && (
-        <div className={classes.backButtonWrapper} onClick={onBack}>
+      {breadcrumbs.length > 1 && (
+        <div className={classes.backButtonWrapper} onClick={() => navigate(-1)}>
           <IconBackButton className={classes.backButton} />
         </div>
       )}

@@ -6,7 +6,6 @@
 .root {
   display: flex;
   align-items: center;
-  @include fadeInAnimation(0.3s);
 
   border: $gray-50 1px solid;
   background: transparent;

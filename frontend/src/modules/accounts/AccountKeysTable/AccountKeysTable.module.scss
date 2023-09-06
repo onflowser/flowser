@@ -1,0 +1,23 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.cellRoot {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-base;
+  font-size: $font-size-small;
+
+  .keyWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: $spacing-base;
+  }
+
+  .badges {
+    display: flex;
+    column-gap: $spacing-base;
+  }
+}

@@ -5,10 +5,10 @@
 
 .root {
   display: flex;
-  height: 50px;
-  padding: 0 $spacing-base;
+  padding: $spacing-s $spacing-base;
   border-radius: $border-radius-card;
   align-items: center;
+  height: 40px;
 
   .backButtonWrapper {
     width: 40px;

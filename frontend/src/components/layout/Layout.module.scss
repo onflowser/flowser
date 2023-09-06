@@ -28,15 +28,16 @@ $side-nav-width: 80px;
     }
 
     .body {
+      height: 100%;
+      overflow: scroll;
       color: $gray-10;
-      align-items: stretch;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
 
-    .bodyWithMargin {
-      margin: $spacing-l;
+    .bodyWithBorderSpacing {
+      padding: 0 $spacing-l;
     }
 
     .logs {

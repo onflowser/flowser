@@ -1,0 +1,22 @@
+@import 'styles/spacings';
+@import 'styles/typography';
+
+.root {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: $spacing-base;
+  min-width: 300px;
+  row-gap: $spacing-base;
+
+  .top {
+    overflow-y: scroll;
+  }
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+  }
+}

@@ -7,16 +7,18 @@ type JsonViewProps = {
   className?: string;
   name: string;
   data: Record<string, unknown>;
+  collapseAtDepth?: number;
 };
 
 export function JsonView(props: JsonViewProps): ReactElement {
   return (
     <div className={classNames(classes.root, props.className)}>
+      {/* @ts-ignore */}
       <ReactJson
         name={props.name}
         style={{ backgroundColor: "none" }}
         theme="ashes"
-        collapsed={4}
+        collapsed={props.collapseAtDepth ?? 4}
         src={props.data}
       />
     </div>

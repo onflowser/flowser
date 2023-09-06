@@ -1,0 +1,23 @@
+@import "styles/typography";
+@import "styles/spacings";
+@import "styles/colors";
+
+.root {
+  display: flex;
+  column-gap: $spacing-xl;
+
+  .left {
+    flex: 1;
+    max-width: 400px;
+
+    .argumentsWrapper {
+      display: flex;
+      flex-direction: column;
+      row-gap: $spacing-base * 2;
+    }
+  }
+
+  .right {
+    flex: 3;
+  }
+}

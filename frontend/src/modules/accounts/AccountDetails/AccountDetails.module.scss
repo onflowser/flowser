@@ -1,0 +1,21 @@
+@import "styles/spacings";
+@import "styles/colors";
+@import "styles/typography";
+
+.root {
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    .detailsCard {
+      flex: 3;
+    }
+  }
+
+  .flowCurrency {
+    color: $strong-green;
+    margin-left: $spacing-s;
+  }
+
+}

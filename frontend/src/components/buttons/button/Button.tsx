@@ -1,7 +1,7 @@
 import React, { FunctionComponent, HTMLAttributes } from "react";
 import classes from "./Button.module.scss";
-import Loader from "react-loader-spinner";
 import classNames from "classnames";
+import { Spinner } from "../../spinner/Spinner";
 
 export type ButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -12,7 +12,6 @@ export type ButtonProps = React.DetailedHTMLProps<
     disabled?: boolean;
     outlined?: boolean;
     loading?: boolean;
-    loaderColor?: string;
   };
 
 const Button: FunctionComponent<ButtonProps> = ({
@@ -21,7 +20,6 @@ const Button: FunctionComponent<ButtonProps> = ({
   variant = "normal",
   outlined = false,
   loading = false,
-  loaderColor = "#363F53",
   ...restProps
 }) => {
   return (
@@ -41,7 +39,7 @@ const Button: FunctionComponent<ButtonProps> = ({
     >
       {loading && (
         <div className={classes.loaderWrapper}>
-          <Loader type="Oval" color={loaderColor} height={25} width={25} />
+          <Spinner size={25} />
         </div>
       )}
       <div

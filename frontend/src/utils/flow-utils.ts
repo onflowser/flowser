@@ -101,7 +101,7 @@ export class FlowUtils {
   static getGrcpStatusName(statusCode: GrcpStatusCode | undefined): string {
     switch (statusCode) {
       case GrcpStatusCode.GRCP_STATUS_OK:
-        return "Ok";
+        return "Success";
       case GrcpStatusCode.GRCP_STATUS_FAILED:
         return "Failed";
       default:

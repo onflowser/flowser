@@ -1,0 +1,16 @@
+@import "styles/spacings";
+
+.root {
+  max-height: 40vh;
+  height: 100%;
+
+  .emptyStateWrapper {
+    padding: $spacing-base;
+  }
+
+  .transactionOverview {
+    height: 100%;
+    padding: 0;
+  }
+
+}

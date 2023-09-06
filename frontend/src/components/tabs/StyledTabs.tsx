@@ -2,7 +2,7 @@ import classes from "./StyledTabs.module.scss";
 import { Tabs, TabsProps } from "./Tabs";
 import React, { ReactElement } from "react";
 
-type StyledTabsProps = TabsProps;
+export type StyledTabsProps = TabsProps;
 
 export function StyledTabs(props: StyledTabsProps): ReactElement {
   return (

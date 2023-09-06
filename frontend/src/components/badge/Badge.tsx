@@ -4,7 +4,7 @@ import classes from "./Badge.module.scss";
 
 export type BadgeProps = HTMLAttributes<HTMLSpanElement>;
 
-const Badge: FunctionComponent<BadgeProps> = ({
+export const Badge: FunctionComponent<BadgeProps> = ({
   className,
   children,
   ...restProps
@@ -15,5 +15,3 @@ const Badge: FunctionComponent<BadgeProps> = ({
     </span>
   );
 };
-
-export default Badge;

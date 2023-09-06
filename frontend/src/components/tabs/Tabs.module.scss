@@ -7,10 +7,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100%;
   .tabWrapper {
     display: flex;
     align-items: center;
-    overflow-x: scroll;
     @include hiddenScrollbars();
     .label {
       font-size: $font-size-normal;
@@ -18,6 +18,8 @@
       color: $color-grey;
       margin: 0 $spacing-l;
       overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
     .tabButton {
       flex: 1;
@@ -71,7 +73,9 @@
       }
     }
   }
-  .body {
-    height: 100%;
+  .content {
+    flex: 1;
+    overflow: scroll;
+    @include hiddenScrollbars();
   }
 }

@@ -12,9 +12,14 @@ message Account {
   repeated AccountStorageItem storage = 5;
   repeated AccountContract contracts = 6;
   repeated Transaction transactions = 7;
+  repeated AccountTag tags = 10;
   string created_at = 8;
   string updated_at = 9;
-  bool is_default_account = 10;
+}
+
+message AccountTag {
+  string name = 1;
+  string description = 2;
 }
 
 message AccountKey {

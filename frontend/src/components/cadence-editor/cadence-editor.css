@@ -1,11 +1,13 @@
 /* Main editor container */
 .cadence-editor {
     width: 100%;
+    height: 100%;
     background: #272B32;
 }
 
 .cadence-editor .cm-editor {
     background: none;
+    height: 100%;
 }
 
 .cm-focused {

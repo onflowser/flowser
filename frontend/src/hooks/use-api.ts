@@ -46,6 +46,7 @@ import {
   useProjectTimeoutPolling,
 } from "contexts/timeout-polling.context";
 import { useEffect, useState } from "react";
+import { useCurrentProjectId } from "./use-current-project-id";
 
 const {
   projectsService,
@@ -246,11 +247,6 @@ export function useGetTransaction(transactionId: string | undefined) {
   );
 }
 
-export function useCurrentProjectId(): string | undefined {
-  const { data } = useGetCurrentProject();
-  return data?.project?.id;
-}
-
 export const getCurrentProjectKey = "/projects/current";
 
 export function useGetCurrentProject() {
@@ -391,7 +387,7 @@ export function useGetFlowCliInfo() {
 }
 
 export function useGetPollingEmulatorSnapshots(): TimeoutPollingHook<EmulatorSnapshot> {
-  const projectId = useCurrentProjectId() ?? "";
+  const projectId = useCurrentProjectId();
   return useTimeoutPolling<
     EmulatorSnapshot,
     GetPollingEmulatorSnapshotsResponse
