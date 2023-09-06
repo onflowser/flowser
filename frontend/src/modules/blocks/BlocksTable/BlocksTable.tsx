@@ -1,9 +1,8 @@
 import React, { FunctionComponent, useMemo } from "react";
-import { NavLink } from "react-router-dom";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import classes from "./BlocksTable.module.scss";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { Block } from "@flowser/shared";

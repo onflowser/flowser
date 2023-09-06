@@ -2,7 +2,7 @@ import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./SignaturesTable.module.scss";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";

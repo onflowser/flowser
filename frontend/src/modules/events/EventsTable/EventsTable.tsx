@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import classes from "./EventsTable.module.scss";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";
 import Table from "../../../components/table/Table";

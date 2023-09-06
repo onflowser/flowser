@@ -3,16 +3,17 @@ import React, { FunctionComponent, useRef } from "react";
 export type EllipsisProps = {
   children: string;
   className?: string;
+  maxLength?: number;
   style?: React.CSSProperties;
 };
 
-const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
+export const MiddleEllipsis: FunctionComponent<EllipsisProps> = ({
   children,
   className,
   style,
+  maxLength = 20,
 }) => {
   const elRef = useRef<HTMLSpanElement>(null);
-  const maxLength = 20;
 
   return (
     <span ref={elRef} className={className} style={style}>
@@ -33,5 +34,3 @@ function trimText(text: string, maxLength: number) {
     );
   }
 }
-
-export default MiddleEllipsis;

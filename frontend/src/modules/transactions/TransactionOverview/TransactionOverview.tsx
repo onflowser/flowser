@@ -3,7 +3,7 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "../../../components/details-card/DetailsCard";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionOverview.module.scss";
 import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
 import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";

@@ -3,7 +3,7 @@ import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.contex
 import { Transaction } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
-import MiddleEllipsis from "../../../components/ellipsis/MiddleEllipsis";
+import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionsTable.module.scss";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
