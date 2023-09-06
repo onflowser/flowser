@@ -10,6 +10,7 @@
   "main": "dist/targets/electron/main.js",
   "homepage": "./",
   "dependencies": {
+    "reactjs-popup": "2.0.5",
     "@szhsin/react-menu": "4.0.3",
     "@codemirror/legacy-modes": "^6.1.0",
     "@fingerprintjs/fingerprintjs": "^3.3.6",

@@ -10,6 +10,7 @@ import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { AccountLink } from "../AccountLink/AccountLink";
 import { Badge } from "../../../components/badge/Badge";
 import classes from "./AccountsTable.module.scss";
+import { Tooltip } from "../../../components/tooltips/Tooltip";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -23,13 +24,16 @@ const columns = [
     ),
   }),
   columnHelper.accessor("tags", {
-    header: () => <Label variant="medium">TAGS</Label>,
     cell: (info) => (
       <Value className={classes.tagsColumn}>
         {info.getValue().map((tag) => (
-          <Badge key={tag.name} className={classes.tag}>
-            {tag.name}
-          </Badge>
+          <Tooltip
+            key={tag.name}
+            content={tag.description}
+            position="right center"
+          >
+            <Badge className={classes.tag}>{tag.name}</Badge>
+          </Tooltip>
         ))}
       </Value>
     ),
