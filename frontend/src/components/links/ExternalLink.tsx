@@ -22,7 +22,7 @@ export function ExternalLink({
       style={{ display: inline ? "inline" : "flex" }}
     >
       {!inline && <FlowserIcon.Link className={classes.icon} />}
-      {children ?? prettifyUrl(href)}
+      {children ?? <span className={classes.url}>{prettifyUrl(href)}</span>}
     </a>
   );
 }

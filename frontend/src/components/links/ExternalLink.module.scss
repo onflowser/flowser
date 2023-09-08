@@ -6,7 +6,15 @@
   align-items: center;
   column-gap: $spacing-s;
   color: transparentize($blue, 0.1);
+  .icon {
+    width: 20px;
+  }
   .icon * {
-    fill: $blue
+    fill: $blue;
+  }
+  .url {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
