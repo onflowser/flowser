@@ -45,7 +45,7 @@ export class GoBindingsService {
 
   private execute(request: ExecuteGoBinRequest): Promise<ExecuteGoBinResponse> {
     return new Promise((resolve, reject) => {
-      const childProcess = spawn(path.join(__dirname, "bin", "internal"), [
+      const childProcess = spawn(this.getExecutablePath(), [
         request.command,
         ...request.arguments,
       ]);
@@ -69,5 +69,17 @@ export class GoBindingsService {
         }
       });
     });
+  }
+
+  private getExecutablePath(): string {
+    // When running this within electron env,
+    // make sure to reference the executable in unpacked asar folder.
+    // This is a hacky solution, but it's also the simplest one for now.
+    // For more context, see:
+    // - https://github.com/epsitec-sa/hazardous#what-is-the-real-purpose-of-asarunpacked
+    // - https://github.com/electron/electron/issues/6262#issuecomment-273312942
+    return path
+      .join(__dirname, "bin", "internal")
+      .replace("app.asar/", "app.asar.unpacked/");
   }
 }

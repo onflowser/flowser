@@ -3,10 +3,11 @@
   "extends": null,
   "appId": "dev.flowser.app",
   "electronVersion": "20.1.0",
-  "asar": false,
+  "asar": true,
   "afterSign": "./scripts/notarize.js",
   "asarUnpack": [
-    "node_modules/sqlite3/lib/binding/**"
+    "node_modules/sqlite3/lib/binding/**",
+    "**/go-bindings/bin/*"
   ],
   "files": [
     "build/electron/**/*",
