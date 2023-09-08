@@ -154,7 +154,7 @@ function AboutContent() {
       {showAnalyticSettings && (
         <ConsentDialog
           onClose={() => setShowAnalyticSettings(false)}
-          consent={isConsented}
+          consent={isConsented ?? true}
           setConsent={(consent) => {
             setIsConsented(consent);
             setShowAnalyticSettings(false);

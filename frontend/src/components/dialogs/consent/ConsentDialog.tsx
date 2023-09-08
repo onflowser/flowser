@@ -18,7 +18,7 @@ export function ConsentDialog({
   setConsent,
   onClose = () => null,
 }: ConsentDialogProps): ReactElement | null {
-  const [tempConsent, setTempConsent] = useState(consent);
+  const [tempConsent, setTempConsent] = useState<boolean>(consent);
 
   return (
     <BaseDialog onClose={onClose} className={classes.modal}>

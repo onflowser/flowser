@@ -254,10 +254,12 @@ const hashRouter = createHashRouter(routes);
 
 function ConsentAnalytics() {
   const { isConsented, setIsConsented } = useAnalyticsConsent();
-  if (isConsented) {
+  if (isConsented !== undefined) {
     return null;
   }
-  return <ConsentDialog consent={isConsented} setConsent={setIsConsented} />;
+  return (
+    <ConsentDialog consent={isConsented ?? true} setConsent={setIsConsented} />
+  );
 }
 
 function ProjectSettingsPage() {
