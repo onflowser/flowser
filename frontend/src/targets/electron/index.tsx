@@ -54,9 +54,9 @@ function Root() {
         <UpdateLoader loadingPercentage={appUpdateDownloadPercentage} />
       )}
       <FlowserClientApp
+        // https://github.com/remix-run/react-router/issues/8331
+        useHashRouter
         enableTimeoutPolling={!isExiting}
-        // TODO(feature-interact-screen): Import cadence-parser.wasm directly from @onflow/cadence-parser lib
-        //  See: https://github.com/onflow/cadence/blob/master/npm-packages/cadence-parser/tests/index.test.ts
         platformAdapter={{
           monitoringService: sentryService,
           onPickProjectPath: window.platformAdapter.showDirectoryPicker,
