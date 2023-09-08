@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import {
   GetParsedInteractionRequest,
   GetParsedInteractionResponse,
@@ -7,6 +7,7 @@ import {
 } from "@flowser/shared";
 import { spawn } from "node:child_process";
 import * as path from "path";
+import * as os from "os";
 
 type ExecuteGoBinRequest = {
   command: string;
@@ -79,7 +80,22 @@ export class GoBindingsService {
     // - https://github.com/epsitec-sa/hazardous#what-is-the-real-purpose-of-asarunpacked
     // - https://github.com/electron/electron/issues/6262#issuecomment-273312942
     return path
-      .join(__dirname, "bin", "internal")
+      .join(__dirname, "bin", this.getExecutableName())
       .replace("app.asar/", "app.asar.unpacked/");
+  }
+
+  private getExecutableName(): string {
+    switch (os.platform()) {
+      case "darwin":
+        return "internal-amd64-darwin";
+      case "linux":
+        return "internal-amd64-linux";
+      case "win32":
+        return "internal-amd64.exe";
+      default:
+        throw new InternalServerErrorException(
+          `Unsupported platform: ${os.platform()}`
+        );
+    }
   }
 }
