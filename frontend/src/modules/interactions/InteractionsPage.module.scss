@@ -6,9 +6,9 @@
   display: flex;
   column-gap: $spacing-base;
   flex: 1;
-  background: #1C2128;
+  background: $gray-110;
   .leftSideMenu {
-    background: #272B32;
+    background: $gray-100;
     flex: 1;
     .content {
       margin: $spacing-base;
@@ -38,11 +38,11 @@
         overflow: hidden;
         .code {
           height: 60%;
-          background: #272B32;
+          background: $gray-100;
         }
         .details {
           height: 40%;
-          background: #272B32;
+          background: $gray-100;
           .error {
             padding: $spacing-base;
           }
