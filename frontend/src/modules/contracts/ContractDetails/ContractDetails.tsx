@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
 import classes from "./ContractDetails.module.scss";
@@ -7,9 +7,9 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
-import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
+import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
 
 type ContractDetailsProps = {
   contractId: string;
@@ -42,11 +42,11 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
       },
       {
         label: "Updated date",
-        value: TextUtils.longDate(contract.updatedAt),
+        value: <DateDisplay date={contract.updatedAt} />,
       },
       {
         label: "Created date",
-        value: TextUtils.longDate(contract.createdAt),
+        value: <DateDisplay date={contract.createdAt} />,
       },
     ],
   ];

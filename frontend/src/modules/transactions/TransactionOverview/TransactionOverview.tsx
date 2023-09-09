@@ -7,10 +7,10 @@ import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionOverview.module.scss";
 import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";
 import { GrcpStatusBadge } from "../../../components/status/GrcpStatusBadge";
-import { TextUtils } from "../../../utils/text-utils";
 import { Transaction } from "@flowser/shared";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import { ProjectLink } from "../../../components/links/ProjectLink";
+import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
 
 type TransactionOverviewProps = {
   transaction: Transaction;
@@ -44,7 +44,7 @@ export function TransactionOverview(
       },
       {
         label: "Created date",
-        value: TextUtils.longDate(transaction.createdAt),
+        value: <DateDisplay date={transaction.createdAt} />,
       },
       {
         label: "Block ID",
