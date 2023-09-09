@@ -17,21 +17,23 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
 }) => {
   return (
     <Card className={classes.root}>
-      <div className={classes.left}>
-        <h3>Arguments</h3>
-        <SizedBox height={20} />
-        <div className={classes.argumentsWrapper}>
-          {args.map((arg) => (
-            <ParamBuilder
-              key={arg.identifier}
-              disabled
-              value={JSON.parse(arg.valueAsJson)}
-              setValue={console.log}
-              parameter={arg}
-            />
-          ))}
+      {args.length > 0 && (
+        <div className={classes.left}>
+          <h3>Arguments</h3>
+          <SizedBox height={20} />
+          <div className={classes.argumentsWrapper}>
+            {args.map((arg) => (
+              <ParamBuilder
+                key={arg.identifier}
+                disabled
+                value={JSON.parse(arg.valueAsJson)}
+                setValue={console.log}
+                parameter={arg}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       <div className={classes.right}>
         <CadenceEditor value={code} editable={false} />
       </div>
