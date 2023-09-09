@@ -1,28 +1,30 @@
 import React, { FC } from "react";
 import Card from "../../../components/card/Card";
 import classes from "./TransactionSource.module.scss";
-import { TransactionArgument } from "@flowser/shared";
+import { Transaction } from "@flowser/shared";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import { ParamBuilder } from "../../interactions/components/ParamBuilder/ParamBuilder";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { ProjectLink } from "../../../components/links/ProjectLink";
+import { FlowserIcon } from "../../../components/icons/Icons";
+import { useInteractionRegistry } from "../../interactions/contexts/interaction-registry.context";
 
 type TransactionSourceProps = {
-  code: string;
-  arguments: TransactionArgument[];
+  transaction: Transaction;
 };
 
 export const TransactionSource: FC<TransactionSourceProps> = ({
-  code,
-  arguments: args,
+  transaction,
 }) => {
+  const { setFocused, create } = useInteractionRegistry();
   return (
     <Card className={classes.root}>
-      {args.length > 0 && (
+      {transaction.arguments.length > 0 && (
         <div className={classes.left}>
           <h3>Arguments</h3>
           <SizedBox height={20} />
           <div className={classes.argumentsWrapper}>
-            {args.map((arg) => (
+            {transaction.arguments.map((arg) => (
               <ParamBuilder
                 key={arg.identifier}
                 disabled
@@ -35,8 +37,39 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
         </div>
       )}
       <div className={classes.right}>
-        <CadenceEditor value={code} editable={false} />
+        <CadenceEditor value={transaction.script} editable={false} />
       </div>
+      <ProjectLink
+        className={classes.interactLink}
+        to="/interactions"
+        onClick={() => {
+          create({
+            code: transaction.script,
+            fclValuesByIdentifier: new Map(
+              transaction.arguments.map((arg) => [
+                arg.identifier,
+                JSON.parse(arg.valueAsJson),
+              ])
+            ),
+            id: transaction.id,
+            initialOutcome: {
+              transaction: {
+                transactionId: transaction.id,
+                error: transaction.status?.errorMessage,
+              },
+            },
+            name: "Test",
+            transactionOptions: {
+              authorizerAddresses: transaction.authorizers,
+              payerAddress: transaction.payer,
+              proposerAddress: transaction.proposalKey!.address,
+            },
+          });
+          setFocused(transaction.id);
+        }}
+      >
+        <FlowserIcon.CursorClick /> Interact
+      </ProjectLink>
     </Card>
   );
 };

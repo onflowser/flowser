@@ -5,6 +5,20 @@
 .root {
   display: flex;
   column-gap: $spacing-xl;
+  position: relative;
+
+  .interactLink {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    column-gap: $spacing-s;
+
+    svg * {
+      fill: $blue;
+    }
+  }
 
   .left {
     flex: 1;

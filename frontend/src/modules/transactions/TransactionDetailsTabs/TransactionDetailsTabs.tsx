@@ -50,12 +50,7 @@ export function TransactionDetailsTabs(
     tabs.push({
       id: "script",
       label: "Script",
-      content: (
-        <TransactionSource
-          code={transaction.script}
-          arguments={transaction.arguments}
-        />
-      ),
+      content: <TransactionSource transaction={transaction} />,
     });
   }
 
