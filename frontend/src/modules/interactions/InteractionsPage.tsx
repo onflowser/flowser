@@ -58,7 +58,6 @@ export function InteractionsPage(): ReactElement {
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
       />
-      <SizedBox width={20} />
       <Tabs
         className={classes.mainContent}
         tabWrapperClassName={classes.interactionsTabWrapper}
@@ -97,7 +96,6 @@ function InteractionBody(): ReactElement {
           <InteractionDetails />
         </div>
       </div>
-      <LineSeparator vertical />
       <ExecutionSettings />
     </div>
   );

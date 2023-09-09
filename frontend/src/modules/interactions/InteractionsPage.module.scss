@@ -4,6 +4,7 @@
 .pageRoot {
   height: 100%;
   display: flex;
+  column-gap: $spacing-base;
   flex: 1;
   background: #1C2128;
   .leftSideMenu {
