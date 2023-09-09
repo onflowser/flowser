@@ -74,24 +74,6 @@ export type FlowInteractionOutcome = {
 
 const Context = createContext<InteractionsRegistry>(undefined as never);
 
-const helloWorldScript = `pub fun main(): String {
-  return "Hello World"
-}`;
-
-const helloWorldScriptWithArguments = `pub fun main(a: String, b: String): String {
-  return a.concat(" ").concat(b)
-}`;
-
-const helloWorldTransaction = `transaction() {
-  prepare(signer: AuthAccount) {
-    log("Preparing")
-  }
-  execute {
-    log("Executing")    
-  }
-}
-`;
-
 export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
@@ -112,44 +94,8 @@ export function InteractionRegistryProvider(props: {
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
-  const predefinedTemplates = useMemo<
-    (CoreInteractionDefinition & Partial<InteractionDefinitionTemplate>)[]
-  >(
-    () => [
-      {
-        id: "hello-world-script",
-        name: "Hello World",
-        code: helloWorldScript,
-      },
-      {
-        id: "script-with-arguments",
-        name: "Arguments example",
-        code: helloWorldScriptWithArguments,
-        fclValuesByIdentifier: new Map([
-          ["a", "Hello"],
-          ["b", "World"],
-        ]),
-      },
-      {
-        id: "hello-world-transaction",
-        name: "Hello World",
-        code: helloWorldTransaction,
-      },
-    ],
-    []
-  );
   const templates = useMemo<InteractionDefinitionTemplate[]>(
     () => [
-      ...predefinedTemplates.map(
-        (template): InteractionDefinitionTemplate => ({
-          createdDate: new Date(),
-          updatedDate: new Date(),
-          fclValuesByIdentifier: new Map(),
-          transactionOptions: undefined,
-          isMutable: false,
-          ...template,
-        })
-      ),
       ...customTemplates.map(
         (template): InteractionDefinitionTemplate => ({
           ...template,
