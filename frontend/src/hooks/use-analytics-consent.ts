@@ -4,14 +4,14 @@ import { useLocalStorage } from "usehooks-ts";
 
 type AnalyticsConsent = {
   setIsConsented: (isConsented: boolean) => void;
-  isConsented: boolean;
+  isConsented: boolean | undefined;
 };
 
 export function useAnalyticsConsent(): AnalyticsConsent {
   const { analyticsService } = ServiceRegistry.getInstance();
-  const [isConsented, setIsConsented] = useLocalStorage<boolean>(
+  const [isConsented, setIsConsented] = useLocalStorage<boolean | undefined>(
     "consent-analytics",
-    false
+    undefined
   );
 
   useEffect(() => {

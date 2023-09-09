@@ -11,7 +11,6 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "components/details-card/DetailsCard";
-import { TextUtils } from "../../../utils/text-utils";
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { AccountAvatar } from "../AccountAvatar/AccountAvatar";
 import { AccountName } from "../AccountName/AccountName";
@@ -22,6 +21,7 @@ import { ContractsTable } from "../../contracts/ContractsTable";
 import { AccountKeysTable } from "../AccountKeysTable/AccountKeysTable";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import { TabItem } from "../../../components/tabs/Tabs";
+import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
 
 type AccountDetailsProps = {
   accountId: string;
@@ -64,7 +64,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
       },
       {
         label: "Created date",
-        value: TextUtils.longDate(account.createdAt),
+        value: <DateDisplay date={account.createdAt} />,
       },
     ],
   ];

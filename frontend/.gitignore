@@ -26,5 +26,3 @@ yarn-error.log*
 
 # Do not track entry point, because it's generated dynamically
 src/index.tsx
-
-public/cadence-parser.wasm

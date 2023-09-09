@@ -12,8 +12,6 @@ import {
   RowData,
 } from "@tanstack/react-table";
 import { CommonUtils } from "../../utils/common-utils";
-import { ErrorMessage } from "../errors/ErrorMessage";
-import FullScreenLoading from "../fullscreen-loading/FullScreenLoading";
 import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
 import { Message } from "../errors/Message";
 
@@ -22,8 +20,6 @@ type CustomTableProps<TData> = {
   renderCustomRow?: (row: Row<TableData<TData>>) => ReactElement;
   headerRowClass?: string;
   bodyRowClass?: string | ((row: Row<TableData<TData>>) => string);
-  isInitialLoading?: boolean;
-  error?: Error | string | null | undefined;
 };
 
 export type TableProps<TData> = Pick<
@@ -46,7 +42,6 @@ declare module "@tanstack/table-core" {
 }
 
 function Table<TData>({
-  isInitialLoading,
   columns,
   data,
   renderCustomRow,
@@ -54,7 +49,6 @@ function Table<TData>({
   headerRowClass,
   bodyRowClass,
   className,
-  error,
   enableIntroAnimations = true,
 }: TableProps<TData>): ReactElement {
   const table = useReactTable<TableData<TData>>({
@@ -62,23 +56,6 @@ function Table<TData>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
-  if (error) {
-    return <ErrorMessage error={error} />;
-  }
-
-  if (!isInitialLoading && data.length === 0) {
-    return (
-      <Message
-        title="No results"
-        description="It looks like there is nothing here."
-      />
-    );
-  }
-
-  if (isInitialLoading) {
-    return <FullScreenLoading />;
-  }
 
   return (
     <div className={classNames(classes.root, className)}>
@@ -107,6 +84,13 @@ function Table<TData>({
             ))}
           </Card>
         )
+      )}
+      {table.getRowModel().rows.length === 0 && (
+        <Message
+          className={classes.message}
+          title="No results"
+          description="It looks like there is nothing here."
+        />
       )}
       {table.getRowModel().rows.map((row) =>
         renderCustomRow ? (

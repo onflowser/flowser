@@ -1,8 +1,10 @@
 import React, { ReactElement, ReactNode, useEffect } from "react";
 import {
   createBrowserRouter,
+  createHashRouter,
   Navigate,
   Outlet,
+  RouteObject,
   RouterProvider,
   useLocation,
   useParams,
@@ -67,11 +69,13 @@ const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
 };
 
 export type FlowserClientAppProps = {
+  useHashRouter?: boolean;
   platformAdapter: PlatformAdapterState;
   enableTimeoutPolling?: boolean;
 };
 
 export const FlowserClientApp = ({
+  useHashRouter,
   platformAdapter,
   enableTimeoutPolling = true,
 }: FlowserClientAppProps): ReactElement => {
@@ -83,7 +87,9 @@ export const FlowserClientApp = ({
             <InteractionRegistryProvider>
               <ConsentAnalytics />
               <ProjectRequirements />
-              <RouterProvider router={router} />
+              <RouterProvider
+                router={useHashRouter ? hashRouter : browserRouter}
+              />
               <Toaster
                 position="bottom-center"
                 gutter={8}
@@ -97,7 +103,7 @@ export const FlowserClientApp = ({
   );
 };
 
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     index: true,
     element: <Navigate to="projects" replace />,
@@ -241,14 +247,19 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+];
+
+const browserRouter = createBrowserRouter(routes);
+const hashRouter = createHashRouter(routes);
 
 function ConsentAnalytics() {
   const { isConsented, setIsConsented } = useAnalyticsConsent();
-  if (isConsented) {
+  if (isConsented !== undefined) {
     return null;
   }
-  return <ConsentDialog consent={isConsented} setConsent={setIsConsented} />;
+  return (
+    <ConsentDialog consent={isConsented ?? true} setConsent={setIsConsented} />
+  );
 }
 
 function ProjectSettingsPage() {

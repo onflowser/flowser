@@ -24,6 +24,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor("tags", {
+    header: () => "",
     cell: (info) => (
       <Value className={classes.tagsColumn}>
         {info.getValue().map((tag) => (

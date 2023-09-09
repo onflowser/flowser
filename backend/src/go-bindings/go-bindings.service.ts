@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import {
   GetParsedInteractionRequest,
   GetParsedInteractionResponse,
@@ -7,6 +7,7 @@ import {
 } from "@flowser/shared";
 import { spawn } from "node:child_process";
 import * as path from "path";
+import * as os from "os";
 
 type ExecuteGoBinRequest = {
   command: string;
@@ -45,7 +46,7 @@ export class GoBindingsService {
 
   private execute(request: ExecuteGoBinRequest): Promise<ExecuteGoBinResponse> {
     return new Promise((resolve, reject) => {
-      const childProcess = spawn(path.join(__dirname, "bin/internal"), [
+      const childProcess = spawn(this.getExecutablePath(), [
         request.command,
         ...request.arguments,
       ]);
@@ -69,5 +70,32 @@ export class GoBindingsService {
         }
       });
     });
+  }
+
+  private getExecutablePath(): string {
+    // When running this within electron env,
+    // make sure to reference the executable in unpacked asar folder.
+    // This is a hacky solution, but it's also the simplest one for now.
+    // For more context, see:
+    // - https://github.com/epsitec-sa/hazardous#what-is-the-real-purpose-of-asarunpacked
+    // - https://github.com/electron/electron/issues/6262#issuecomment-273312942
+    return path
+      .join(__dirname, "bin", this.getExecutableName())
+      .replace("app.asar/", "app.asar.unpacked/");
+  }
+
+  private getExecutableName(): string {
+    switch (os.platform()) {
+      case "darwin":
+        return "internal-amd64-darwin";
+      case "linux":
+        return "internal-amd64-linux";
+      case "win32":
+        return "internal-amd64.exe";
+      default:
+        throw new InternalServerErrorException(
+          `Unsupported platform: ${os.platform()}`
+        );
+    }
   }
 }
