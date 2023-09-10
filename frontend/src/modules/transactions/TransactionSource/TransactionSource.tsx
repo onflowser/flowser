@@ -8,6 +8,7 @@ import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { FlowserIcon } from "../../../components/icons/Icons";
 import { useInteractionRegistry } from "../../interactions/contexts/interaction-registry.context";
+import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 
 type TransactionSourceProps = {
   transaction: Transaction;
@@ -17,6 +18,8 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
   transaction,
 }) => {
   const { setFocused, create } = useInteractionRegistry();
+  const transactionName = useTransactionName({ transaction });
+
   return (
     <Card className={classes.root}>
       {transaction.arguments.length > 0 && (
@@ -44,6 +47,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
         to="/interactions"
         onClick={() => {
           const createdInteraction = create({
+            name: transactionName ?? "Unknown",
             code: transaction.script,
             fclValuesByIdentifier: new Map(
               transaction.arguments.map((arg) => [
@@ -57,7 +61,6 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
                 error: transaction.status?.errorMessage,
               },
             },
-            name: "Test",
             transactionOptions: {
               authorizerAddresses: transaction.authorizers,
               payerAddress: transaction.payer,
