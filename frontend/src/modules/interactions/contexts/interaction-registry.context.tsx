@@ -14,10 +14,17 @@ type CreateInteractionDefinition = Omit<
   "id" | "createdDate" | "updatedDate"
 >;
 
+type CreateInteractionOptions = {
+  allowDuplicates: boolean;
+};
+
 type InteractionsRegistry = {
   definitions: InteractionDefinition[];
   focusedDefinition: InteractionDefinition | undefined;
-  create: (interaction: CreateInteractionDefinition) => InteractionDefinition;
+  create: (
+    interaction: CreateInteractionDefinition,
+    options?: CreateInteractionOptions
+  ) => InteractionDefinition;
   update: (interaction: InteractionDefinition) => void;
   remove: (interactionId: string) => void;
   setFocused: (interactionId: string) => void;
@@ -86,12 +93,13 @@ export function InteractionRegistryProvider(props: {
   }
 
   function create(
-    newPartialInteraction: CreateInteractionDefinition
+    newPartialInteraction: CreateInteractionDefinition,
+    options?: CreateInteractionOptions
   ): InteractionDefinition {
     const existingInteraction = definitions.find((definition) =>
       InteractionUtils.areEqual(newPartialInteraction, definition)
     );
-    if (existingInteraction) {
+    if (existingInteraction && !options?.allowDuplicates) {
       return existingInteraction;
     } else {
       const newInteractionDefinition: InteractionDefinition = {
