@@ -9,6 +9,7 @@ import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
+import { InteractionUtils } from "../../core/core-utils";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -89,9 +90,17 @@ function StoredTemplates() {
 
 function FocusedDefinitionSettings() {
   const { focusedDefinition, update } = useInteractionRegistry();
-  const { saveTemplate } = useTemplatesRegistry();
+  const { templates, saveTemplate } = useTemplatesRegistry();
 
   if (!focusedDefinition) {
+    return null;
+  }
+
+  const correspondingTemplate = templates.find((template) =>
+    InteractionUtils.areEqual(template, focusedDefinition)
+  );
+
+  if (!correspondingTemplate?.isMutable) {
     return null;
   }
 
