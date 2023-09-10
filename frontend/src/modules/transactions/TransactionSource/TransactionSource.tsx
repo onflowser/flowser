@@ -43,7 +43,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
         className={classes.interactLink}
         to="/interactions"
         onClick={() => {
-          create({
+          const createdInteraction = create({
             code: transaction.script,
             fclValuesByIdentifier: new Map(
               transaction.arguments.map((arg) => [
@@ -51,7 +51,6 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
                 JSON.parse(arg.valueAsJson),
               ])
             ),
-            id: transaction.id,
             initialOutcome: {
               transaction: {
                 transactionId: transaction.id,
@@ -65,7 +64,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
               proposerAddress: transaction.proposalKey!.address,
             },
           });
-          setFocused(transaction.id);
+          setFocused(createdInteraction.id);
         }}
       >
         <FlowserIcon.CursorClick /> Interact

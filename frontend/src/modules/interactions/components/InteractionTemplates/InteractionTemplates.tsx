@@ -22,7 +22,7 @@ export function InteractionTemplates(): ReactElement {
 function StoredTemplates() {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
-  const { forkTemplate, focusedDefinition } = useInteractionRegistry();
+  const { create, focusedDefinition, setFocused } = useInteractionRegistry();
   const { templates, removeTemplate } = useTemplatesRegistry();
   const filteredTemplates = useMemo(() => {
     if (searchTerm === "") {
@@ -51,7 +51,10 @@ function StoredTemplates() {
         {filteredAndSortedTemplates.map((template) => (
           <div
             key={template.id}
-            onClick={() => forkTemplate(template)}
+            onClick={() => {
+              const createdInteraction = create(template);
+              setFocused(createdInteraction.id);
+            }}
             className={classNames(classes.item, {
               [classes.focusedItem]: focusedDefinition?.id === template.id,
             })}

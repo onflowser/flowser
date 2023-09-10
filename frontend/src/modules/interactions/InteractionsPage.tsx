@@ -9,16 +9,14 @@ import {
   useInteractionDefinitionManager,
 } from "./contexts/definition.context";
 import { InteractionTemplates } from "./components/InteractionTemplates/InteractionTemplates";
-import { SizedBox } from "../../components/sized-box/SizedBox";
-import { LineSeparator } from "../../components/line-separator/LineSeparator";
 import { ExecutionSettings } from "./components/ExecutionSettings/ExecutionSettings";
 import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
-import { InteractionOutcome } from "./components/InteractionOutcome/InteractionOutcome";
+import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDisplay/InteractionOutcomeDisplay";
 import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 
 export function InteractionsPage(): ReactElement {
-  const { definitions, focusedDefinition, remove, setFocused, forkTemplate } =
+  const { definitions, focusedDefinition, remove, setFocused, create } =
     useInteractionRegistry();
 
   const sideMenuTabs: TabItem[] = [
@@ -68,16 +66,12 @@ export function InteractionsPage(): ReactElement {
         tabs={openEditorTabs}
         onClose={(tab) => remove(tab.id)}
         onAddNew={() =>
-          forkTemplate({
-            id: crypto.randomUUID(),
+          create({
             name: "New interaction",
             code: "",
             fclValuesByIdentifier: new Map(),
             transactionOptions: undefined,
-            createdDate: new Date(),
-            updatedDate: new Date(),
-            // TODO(feature-interact-screen): This should be defined in the implemented function
-            isMutable: true,
+            initialOutcome: undefined,
           })
         }
       />
@@ -122,5 +116,5 @@ function InteractionDetails() {
     return <pre className={classes.error}>{parseError}</pre>;
   }
 
-  return <InteractionOutcome />;
+  return <InteractionOutcomeDisplay />;
 }

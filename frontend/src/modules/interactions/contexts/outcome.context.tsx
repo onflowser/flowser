@@ -1,8 +1,4 @@
 import { ServiceRegistry } from "../../../services/service-registry";
-import {
-  FlowInteractionOutcome,
-  InteractionDefinition,
-} from "./interaction-registry.context";
 import React, {
   createContext,
   ReactElement,
@@ -23,9 +19,10 @@ import {
 import { useInteractionDefinitionManager } from "./definition.context";
 import toast from "react-hot-toast";
 import { useQuery } from "react-query";
+import { InteractionDefinition, InteractionOutcome } from "../core/core-types";
 
 type InteractionOutcomeManager = {
-  outcome: FlowInteractionOutcome | undefined;
+  outcome: InteractionOutcome | undefined;
   execute: () => Promise<void>;
 };
 
@@ -76,7 +73,7 @@ export function InteractionOutcomeManagerProvider(props: {
 
   async function executeTransaction(
     definition: InteractionDefinition
-  ): Promise<FlowInteractionOutcome | undefined> {
+  ): Promise<InteractionOutcome | undefined> {
     const { transactionOptions } = definition;
     if (!transactionOptions) {
       throw new Error("Transaction options must be set");

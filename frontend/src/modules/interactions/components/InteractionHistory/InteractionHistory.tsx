@@ -61,7 +61,6 @@ function BlockItem(props: BlockItemProps) {
       return;
     }
     create({
-      id: block.id,
       name: transactionName ?? `Tx from block #${block.height}`,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(

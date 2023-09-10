@@ -6,57 +6,21 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { FclValueLookupByIdentifier } from "./definition.context";
-import { InteractionTemplate } from "@flowser/shared";
+import { InteractionDefinition } from "../core/core-types";
+import { InteractionUtils } from "../core/core-utils";
+
+type CreateInteractionDefinition = Omit<
+  InteractionDefinition,
+  "id" | "createdDate" | "updatedDate"
+>;
 
 type InteractionsRegistry = {
   definitions: InteractionDefinition[];
   focusedDefinition: InteractionDefinition | undefined;
+  create: (interaction: CreateInteractionDefinition) => InteractionDefinition;
   update: (interaction: InteractionDefinition) => void;
-  create: (interaction: InteractionDefinition) => void;
   remove: (interactionId: string) => void;
   setFocused: (interactionId: string) => void;
-  forkTemplate: (template: InteractionDefinitionTemplate) => void;
-};
-
-export type CoreInteractionDefinition = Omit<
-  InteractionTemplate,
-  "source" | "createdDate" | "updatedDate"
->;
-
-export type InteractionDefinition = CoreInteractionDefinition & {
-  fclValuesByIdentifier: FclValueLookupByIdentifier;
-  initialOutcome: FlowInteractionOutcome | undefined;
-  transactionOptions: TransactionOptions | undefined;
-};
-
-export type InteractionDefinitionTemplate = CoreInteractionDefinition & {
-  fclValuesByIdentifier: FclValueLookupByIdentifier;
-  transactionOptions: TransactionOptions | undefined;
-  createdDate: Date;
-  updatedDate: Date;
-  isMutable: boolean;
-};
-
-export type TransactionOptions = {
-  authorizerAddresses: string[];
-  proposerAddress: string;
-  payerAddress: string;
-};
-
-export type FlowTransactionOutcome = {
-  transactionId?: string;
-  error?: string;
-};
-
-export type FlowScriptOutcome = {
-  result?: unknown;
-  error?: string;
-};
-
-export type FlowInteractionOutcome = {
-  transaction?: FlowTransactionOutcome;
-  script?: FlowScriptOutcome;
 };
 
 const Context = createContext<InteractionsRegistry>(undefined as never);
@@ -65,8 +29,8 @@ export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const defaultInteraction: InteractionDefinition = {
-    name: "Your first interaction",
     id: crypto.randomUUID(),
+    name: "Your first interaction",
     code: "",
     fclValuesByIdentifier: new Map(),
     initialOutcome: undefined,
@@ -75,13 +39,15 @@ export function InteractionRegistryProvider(props: {
       proposerAddress: "0xf8d6e0586b0a20c7",
       payerAddress: "0xf8d6e0586b0a20c7",
     },
+    createdDate: new Date(),
+    updatedDate: new Date(),
   };
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     defaultInteraction,
   ]);
   const [focusedInteractionId, setFocusedInteractionId] = useState<
     string | undefined
-  >(definitions?.[0]?.id);
+  >();
   const focusedDefinition = useMemo(
     () =>
       definitions.find((definition) => definition.id === focusedInteractionId),
@@ -96,24 +62,6 @@ export function InteractionRegistryProvider(props: {
       setFocusedInteractionId(defaultInteraction.id);
     }
   }, [definitions]);
-
-  function forkTemplate(template: InteractionDefinitionTemplate) {
-    const definition: InteractionDefinition = {
-      id: template.id,
-      name: template.name,
-      code: template.code,
-      fclValuesByIdentifier: template.fclValuesByIdentifier,
-      transactionOptions: template.transactionOptions,
-      initialOutcome: undefined,
-    };
-    const isAlreadyOpen = definitions.some(
-      (definition) => definition.id === template.id
-    );
-    if (!isAlreadyOpen) {
-      setDefinitions([...definitions, definition]);
-      setFocusedInteractionId(definition.id);
-    }
-  }
 
   function update(updatedInteraction: InteractionDefinition) {
     setDefinitions((interactions) =>
@@ -137,12 +85,23 @@ export function InteractionRegistryProvider(props: {
     }
   }
 
-  function create(newInteraction: InteractionDefinition) {
-    const isExisting = definitions.some(
-      (definition) => definition.id === newInteraction.id
+  function create(
+    newPartialInteraction: CreateInteractionDefinition
+  ): InteractionDefinition {
+    const existingInteraction = definitions.find((definition) =>
+      InteractionUtils.areEqual(newPartialInteraction, definition)
     );
-    if (!isExisting) {
-      setDefinitions([...definitions, newInteraction]);
+    if (existingInteraction) {
+      return existingInteraction;
+    } else {
+      const newInteractionDefinition: InteractionDefinition = {
+        id: crypto.randomUUID(),
+        ...newPartialInteraction,
+        createdDate: new Date(),
+        updatedDate: new Date(),
+      };
+      setDefinitions([...definitions, newInteractionDefinition]);
+      return newInteractionDefinition;
     }
   }
 
@@ -152,7 +111,6 @@ export function InteractionRegistryProvider(props: {
         definitions,
         focusedDefinition,
         setFocused: setFocusedInteractionId,
-        forkTemplate,
         remove,
         create,
         update,

@@ -12,9 +12,9 @@ import classes from "./ExecutionSettings.module.scss";
 import { LoaderButton } from "../../../../components/buttons/loader-button/LoaderButton";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
-import { TransactionOptions } from "../../contexts/interaction-registry.context";
 import { Callout } from "../../../../components/callout/Callout";
 import { ExternalLink } from "../../../../components/links/ExternalLink";
+import { TransactionOptions } from "modules/interactions/core/core-types";
 
 export function ExecutionSettings(): ReactElement {
   return (

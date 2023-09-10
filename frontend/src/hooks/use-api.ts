@@ -47,6 +47,7 @@ import {
 } from "contexts/timeout-polling.context";
 import { useEffect, useState } from "react";
 import { useCurrentProjectId } from "./use-current-project-id";
+import { InteractionDefinition } from "../modules/interactions/core/core-types";
 
 const {
   projectsService,
@@ -349,26 +350,21 @@ export function useGetFlowserVersion() {
   );
 }
 
-type UseGetParsedInteractionRequest = {
-  // Used as a cache key.
-  id: string;
-  sourceCode: string;
-};
-
-export function useGetParsedInteraction(
-  request: UseGetParsedInteractionRequest
-) {
+export function useGetParsedInteraction(request: InteractionDefinition) {
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
   const queryState = useQuery<GetParsedInteractionResponse>(
     `/go-bindings/get-parsed-interaction/${request.id}`,
-    () => goBindingsService.getParsedInteraction(request)
+    () =>
+      goBindingsService.getParsedInteraction({
+        sourceCode: request.code,
+      })
   );
 
   useEffect(() => {
     queryState.refetch();
-  }, [request.sourceCode]);
+  }, [request.code]);
 
   return queryState;
 }

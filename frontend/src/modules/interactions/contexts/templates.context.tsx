@@ -1,12 +1,8 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
-import { FclValueLookupByIdentifier } from "./definition.context";
 import { useLocalStorage } from "usehooks-ts";
 import { FclValue } from "@flowser/shared";
 import { useGetPollingFlowInteractionTemplates } from "../../../hooks/use-api";
-import {
-  CoreInteractionDefinition,
-  InteractionDefinition,
-} from "./interaction-registry.context";
+import { InteractionDefinition } from "../core/core-types";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -14,16 +10,14 @@ type InteractionTemplatesRegistry = {
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
-export type InteractionDefinitionTemplate = CoreInteractionDefinition & {
-  fclValuesByIdentifier: FclValueLookupByIdentifier;
-  transactionOptions: TransactionOptions | undefined;
-  createdDate: Date;
-  updatedDate: Date;
+export type InteractionDefinitionTemplate = InteractionDefinition & {
   isMutable: boolean;
 };
 
 // Internal structure that's persisted in local storage.
-type RawInteractionDefinitionTemplate = CoreInteractionDefinition & {
+type RawInteractionDefinitionTemplate = {
+  name: string;
+  code: string;
   fclValuesByIdentifier: Record<string, FclValue>;
   transactionOptions: TransactionOptions | undefined;
   createdDate: string;
@@ -50,7 +44,11 @@ export function TemplatesRegistryProvider(props: {
     () => [
       ...customTemplates.map(
         (template): InteractionDefinitionTemplate => ({
-          ...template,
+          id: crypto.randomUUID(),
+          name: template.name,
+          code: template.code,
+          transactionOptions: undefined,
+          initialOutcome: undefined,
           createdDate: new Date(template.createdDate),
           updatedDate: new Date(template.updatedDate),
           fclValuesByIdentifier: new Map(
@@ -61,12 +59,15 @@ export function TemplatesRegistryProvider(props: {
       ),
       ...(projectTemplatesData?.templates?.map(
         (template): InteractionDefinitionTemplate => ({
-          ...template,
-          isMutable: false,
+          id: crypto.randomUUID(),
+          name: template.name,
+          code: template.code,
           transactionOptions: undefined,
+          initialOutcome: undefined,
           fclValuesByIdentifier: new Map(),
           createdDate: new Date(template.createdDate),
           updatedDate: new Date(template.updatedDate),
+          isMutable: false,
         })
       ) ?? []),
     ],
@@ -75,7 +76,6 @@ export function TemplatesRegistryProvider(props: {
 
   function saveTemplate(interaction: InteractionDefinition) {
     const newTemplate: RawInteractionDefinitionTemplate = {
-      id: interaction.name,
       name: interaction.name,
       code: interaction.code,
       fclValuesByIdentifier: Object.fromEntries(
