@@ -98,10 +98,6 @@ function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
   const { data } = useGetTransaction(outcome.transactionId);
 
-  if (outcome.error) {
-    return <ScriptError errorMessage={outcome.error} />;
-  }
-
   if (!data?.transaction) {
     return <SpinnerWithLabel label="Executing" />;
   }
