@@ -18,6 +18,7 @@
     overflow-x: scroll;
     .interactionTab {
       max-width: 200px;
+      min-width: 200px;
       margin-right: $spacing-s;
       .label {
         text-align: left;
