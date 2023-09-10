@@ -49,6 +49,9 @@ import { ContractsTable } from "./modules/contracts/ContractsTable";
 import { ContractDetails } from "./modules/contracts/ContractDetails/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
 import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";
+import {
+  TemplatesRegistryProvider
+} from './modules/interactions/contexts/templates.context';
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
@@ -85,16 +88,18 @@ export const FlowserClientApp = ({
         <ConfirmDialogProvider>
           <PlatformAdapterProvider {...platformAdapter}>
             <InteractionRegistryProvider>
-              <ConsentAnalytics />
-              <ProjectRequirements />
-              <RouterProvider
-                router={useHashRouter ? hashRouter : browserRouter}
-              />
-              <Toaster
-                position="bottom-center"
-                gutter={8}
-                toastOptions={toastOptions}
-              />
+              <TemplatesRegistryProvider>
+                <ConsentAnalytics />
+                <ProjectRequirements />
+                <RouterProvider
+                  router={useHashRouter ? hashRouter : browserRouter}
+                />
+                <Toaster
+                  position="bottom-center"
+                  gutter={8}
+                  toastOptions={toastOptions}
+                />
+              </TemplatesRegistryProvider>
             </InteractionRegistryProvider>
           </PlatformAdapterProvider>
         </ConfirmDialogProvider>

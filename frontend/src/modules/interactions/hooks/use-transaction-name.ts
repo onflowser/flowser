@@ -1,6 +1,7 @@
 import { useInteractionRegistry } from "../contexts/interaction-registry.context";
 import { useMemo } from "react";
 import { Transaction } from "@flowser/shared";
+import { useTemplatesRegistry } from "../contexts/templates.context";
 
 type UseInteractionNameProps = {
   transaction: Transaction | undefined;
@@ -59,7 +60,8 @@ export function useTransactionName(
   props: UseInteractionNameProps
 ): string | undefined {
   const { transaction } = props;
-  const { templates, definitions } = useInteractionRegistry();
+  const { templates } = useTemplatesRegistry();
+  const { definitions } = useInteractionRegistry();
 
   return useMemo(() => {
     if (!transaction?.script) {

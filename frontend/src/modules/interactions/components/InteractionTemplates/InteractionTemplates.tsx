@@ -8,6 +8,7 @@ import { SearchInput } from "../../../../components/inputs/search-input/SearchIn
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
+import { useTemplatesRegistry } from "../../contexts/templates.context";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -21,8 +22,8 @@ export function InteractionTemplates(): ReactElement {
 function StoredTemplates() {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
-  const { templates, forkTemplate, removeTemplate, focusedDefinition } =
-    useInteractionRegistry();
+  const { forkTemplate, focusedDefinition } = useInteractionRegistry();
+  const { templates, removeTemplate } = useTemplatesRegistry();
   const filteredTemplates = useMemo(() => {
     if (searchTerm === "") {
       return templates;
@@ -84,7 +85,8 @@ function StoredTemplates() {
 }
 
 function FocusedDefinitionSettings() {
-  const { focusedDefinition, update, persist } = useInteractionRegistry();
+  const { focusedDefinition, update } = useInteractionRegistry();
+  const { saveTemplate } = useTemplatesRegistry();
 
   if (!focusedDefinition) {
     return null;
@@ -97,7 +99,7 @@ function FocusedDefinitionSettings() {
         value={focusedDefinition.name}
         onChange={(e) => update({ ...focusedDefinition, name: e.target.value })}
       />
-      <PrimaryButton onClick={() => persist(focusedDefinition.id)}>
+      <PrimaryButton onClick={() => saveTemplate(focusedDefinition)}>
         Save
       </PrimaryButton>
     </div>

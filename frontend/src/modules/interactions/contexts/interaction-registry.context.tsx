@@ -7,21 +7,16 @@ import React, {
   useState,
 } from "react";
 import { FclValueLookupByIdentifier } from "./definition.context";
-import { useLocalStorage } from "usehooks-ts";
-import { FclValue, InteractionTemplate } from "@flowser/shared";
-import { useGetPollingFlowInteractionTemplates } from "../../../hooks/use-api";
+import { InteractionTemplate } from "@flowser/shared";
 
 type InteractionsRegistry = {
-  templates: InteractionDefinitionTemplate[];
   definitions: InteractionDefinition[];
   focusedDefinition: InteractionDefinition | undefined;
   update: (interaction: InteractionDefinition) => void;
   create: (interaction: InteractionDefinition) => void;
   remove: (interactionId: string) => void;
   setFocused: (interactionId: string) => void;
-  persist: (interactionId: string) => void;
   forkTemplate: (template: InteractionDefinitionTemplate) => void;
-  removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
 export type CoreInteractionDefinition = Omit<
@@ -41,14 +36,6 @@ export type InteractionDefinitionTemplate = CoreInteractionDefinition & {
   createdDate: Date;
   updatedDate: Date;
   isMutable: boolean;
-};
-
-// Internal structure that's persisted in local storage.
-type RawInteractionDefinitionTemplate = CoreInteractionDefinition & {
-  fclValuesByIdentifier: Record<string, FclValue>;
-  transactionOptions: TransactionOptions | undefined;
-  createdDate: string;
-  updatedDate: string;
 };
 
 export type TransactionOptions = {
@@ -89,37 +76,6 @@ export function InteractionRegistryProvider(props: {
       payerAddress: "0xf8d6e0586b0a20c7",
     },
   };
-  const { data: projectTemplatesData } =
-    useGetPollingFlowInteractionTemplates();
-  const [customTemplates, setRawTemplates] = useLocalStorage<
-    RawInteractionDefinitionTemplate[]
-  >("interactions", []);
-  const templates = useMemo<InteractionDefinitionTemplate[]>(
-    () => [
-      ...customTemplates.map(
-        (template): InteractionDefinitionTemplate => ({
-          ...template,
-          createdDate: new Date(template.createdDate),
-          updatedDate: new Date(template.updatedDate),
-          fclValuesByIdentifier: new Map(
-            Object.entries(template.fclValuesByIdentifier)
-          ),
-          isMutable: true,
-        })
-      ),
-      ...(projectTemplatesData?.templates?.map(
-        (template): InteractionDefinitionTemplate => ({
-          ...template,
-          isMutable: false,
-          transactionOptions: undefined,
-          fclValuesByIdentifier: new Map(),
-          createdDate: new Date(template.createdDate),
-          updatedDate: new Date(template.updatedDate),
-        })
-      ) ?? []),
-    ],
-    [customTemplates, projectTemplatesData]
-  );
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
     defaultInteraction,
   ]);
@@ -141,29 +97,6 @@ export function InteractionRegistryProvider(props: {
     }
   }, [definitions]);
 
-  function persist(interactionId: string) {
-    const interaction = getById(interactionId);
-
-    const newTemplate: RawInteractionDefinitionTemplate = {
-      id: interaction.name,
-      name: interaction.name,
-      code: interaction.code,
-      fclValuesByIdentifier: Object.fromEntries(
-        interaction.fclValuesByIdentifier
-      ),
-      transactionOptions: interaction.transactionOptions,
-      createdDate: new Date().toISOString(),
-      updatedDate: new Date().toISOString(),
-    };
-
-    setRawTemplates([
-      ...customTemplates.filter(
-        (template) => template.name !== newTemplate.name
-      ),
-      newTemplate,
-    ]);
-  }
-
   function forkTemplate(template: InteractionDefinitionTemplate) {
     const definition: InteractionDefinition = {
       id: template.id,
@@ -180,14 +113,6 @@ export function InteractionRegistryProvider(props: {
       setDefinitions([...definitions, definition]);
       setFocusedInteractionId(definition.id);
     }
-  }
-
-  function removeTemplate(template: InteractionDefinitionTemplate) {
-    setRawTemplates((rawTemplates) =>
-      rawTemplates.filter(
-        (existingTemplate) => existingTemplate.name !== template.name
-      )
-    );
   }
 
   function update(updatedInteraction: InteractionDefinition) {
@@ -221,27 +146,16 @@ export function InteractionRegistryProvider(props: {
     }
   }
 
-  function getById(id: string) {
-    const definition = definitions.find((definition) => definition.id === id);
-    if (!definition) {
-      throw new Error(`Definition not found by id: ${id}`);
-    }
-    return definition;
-  }
-
   return (
     <Context.Provider
       value={{
-        templates,
         definitions,
         focusedDefinition,
         setFocused: setFocusedInteractionId,
         forkTemplate,
-        removeTemplate,
         remove,
         create,
         update,
-        persist,
       }}
     >
       {props.children}
@@ -253,7 +167,7 @@ export function useInteractionRegistry(): InteractionsRegistry {
   const context = useContext(Context);
 
   if (context === undefined) {
-    throw new Error("Interaction definitions manager provider not found");
+    throw new Error("Interaction definitions registry provider not found");
   }
 
   return context;
