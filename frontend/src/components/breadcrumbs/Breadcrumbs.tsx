@@ -3,6 +3,7 @@ import { NavLink, useMatches, useNavigate } from "react-router-dom";
 import classes from "./Breadcrumbs.module.scss";
 import classNames from "classnames";
 import { FlowserIcon } from "../icons/Icons";
+import { useCurrentProjectId } from "../../hooks/use-current-project-id";
 
 type BreadcrumbsProps = {
   className?: string;
@@ -35,10 +36,18 @@ function isMatchWithCrumb(match: Match): match is MatchWithCrumb {
 
 export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
   const navigate = useNavigate();
-  const currentUrl = window.location.pathname;
+  const projectId = useCurrentProjectId();
+
+  function shouldShowMatch(match: Match) {
+    // For project pages, only show matches from project-scoped routes.
+    // This is to avoid showing the "Projects" crumb on every page.
+    return !projectId || match.pathname.startsWith(`/projects/${projectId}`);
+  }
 
   const matches: Match[] = useMatches();
-  const matchesWithCrumbs: MatchWithCrumb[] = matches.filter(isMatchWithCrumb);
+  const matchesWithCrumbs: MatchWithCrumb[] = matches
+    .filter(isMatchWithCrumb)
+    .filter(shouldShowMatch);
   const breadcrumbs = matchesWithCrumbs.map(
     (match): Breadcrumb => ({
       to: match.pathname,
@@ -60,7 +69,7 @@ export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
       <div className={classes.breadcrumbs}>
         {breadcrumbs
           .map<React.ReactNode>((item, key) => (
-            <NavLink key={key} to={item.to || currentUrl}>
+            <NavLink key={key} to={item.to}>
               {item.label}
             </NavLink>
           ))
