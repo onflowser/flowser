@@ -21,6 +21,8 @@ $side-nav-width: 80px;
     max-height: 100vh;
     overflow-y: scroll;
 
+    @include hiddenScrollbars();
+
     .breadcrumbs {
       position: sticky;
       top: 0;
