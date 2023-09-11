@@ -20,8 +20,10 @@ import { ReactComponent as Exit } from "../../assets/icons/exit.svg";
 import { ReactComponent as Restart } from "../../assets/icons/restart.svg";
 import { ReactComponent as Open } from "../../assets/icons/open.svg";
 import { ReactComponent as Share } from "../../assets/icons/share.svg";
+import { ReactComponent as Back } from "../../assets/icons/back-button.svg";
 
 export const FlowserIcon = {
+  Back: Back,
   Account: Account,
   Block: Block,
   Contract: Contract,

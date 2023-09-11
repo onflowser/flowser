@@ -1,0 +1,10 @@
+@import "styles/colors";
+
+.root {
+  .header {
+    position: sticky;
+    top: 0;
+    background: $gray-110;
+    z-index: 100;
+  }
+}

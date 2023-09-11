@@ -112,11 +112,6 @@ function EmptyInteractionHelp() {
             </b>{" "}
             are used for reading existing state from the blockchain.
           </p>
-          <SizedBox height={10} />
-          <p>To learn more about Cadence, check out the resources below.</p>
-          <SizedBox height={10} />
-          <ExternalLink href="https://developers.flow.com/cadence/intro" />
-          <ExternalLink href="https://academy.ecdao.org/en/cadence-by-example" />
         </div>
       }
     />

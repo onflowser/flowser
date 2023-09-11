@@ -1,8 +1,8 @@
 import React, { ReactElement } from "react";
 import { NavLink, useMatches, useNavigate } from "react-router-dom";
 import classes from "./Breadcrumbs.module.scss";
-import { ReactComponent as IconBackButton } from "../../assets/icons/back-button.svg";
 import classNames from "classnames";
+import { FlowserIcon } from "../icons/Icons";
 
 type BreadcrumbsProps = {
   className?: string;
@@ -54,7 +54,7 @@ export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
     <div className={classNames(classes.root, props.className)}>
       {breadcrumbs.length > 1 && (
         <div className={classes.backButtonWrapper} onClick={() => navigate(-1)}>
-          <IconBackButton className={classes.backButton} />
+          <FlowserIcon.Back className={classes.backButton} />
         </div>
       )}
       <div className={classes.breadcrumbs}>
