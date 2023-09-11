@@ -67,7 +67,7 @@ const columns = [
       <Value>
         <JsonView
           name="data"
-          collapseAtDepth={1}
+          collapseAtDepth={0}
           data={info.getValue() as Record<string, unknown>}
         />
       </Value>
