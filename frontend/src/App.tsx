@@ -86,20 +86,16 @@ export const FlowserClientApp = ({
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <ConfirmDialogProvider>
           <PlatformAdapterProvider {...platformAdapter}>
-            <InteractionRegistryProvider>
-              <TemplatesRegistryProvider>
-                <ConsentAnalytics />
-                <ProjectRequirements />
-                <RouterProvider
-                  router={useHashRouter ? hashRouter : browserRouter}
-                />
-                <Toaster
-                  position="bottom-center"
-                  gutter={8}
-                  toastOptions={toastOptions}
-                />
-              </TemplatesRegistryProvider>
-            </InteractionRegistryProvider>
+            <ConsentAnalytics />
+            <ProjectRequirements />
+            <RouterProvider
+              router={useHashRouter ? hashRouter : browserRouter}
+            />
+            <Toaster
+              position="bottom-center"
+              gutter={8}
+              toastOptions={toastOptions}
+            />
           </PlatformAdapterProvider>
         </ConfirmDialogProvider>
       </TimeoutPollingProvider>
@@ -144,7 +140,11 @@ const routes: RouteObject[] = [
         path: ":projectId",
         element: (
           <ProjectLayout>
-            <Outlet />
+            <InteractionRegistryProvider>
+              <TemplatesRegistryProvider>
+                <Outlet />
+              </TemplatesRegistryProvider>
+            </InteractionRegistryProvider>
           </ProjectLayout>
         ),
         children: [
