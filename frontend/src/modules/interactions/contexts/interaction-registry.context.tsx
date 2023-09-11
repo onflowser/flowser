@@ -86,7 +86,7 @@ export function InteractionRegistryProvider(props: {
       (definition) => definition.id !== interactionId
     );
     setDefinitions(newDefinitions);
-    const lastDefinition = newDefinitions.reverse()[0];
+    const lastDefinition = newDefinitions[newDefinitions.length - 1];
     if (lastDefinition) {
       setFocusedInteractionId(lastDefinition.id);
     }
@@ -97,7 +97,7 @@ export function InteractionRegistryProvider(props: {
     options?: CreateInteractionOptions
   ): InteractionDefinition {
     const existingInteraction = definitions.find((definition) =>
-      InteractionUtils.areEqual(newPartialInteraction, definition)
+      InteractionUtils.areLogicallyEqual(newPartialInteraction, definition)
     );
     if (existingInteraction && !options?.allowDuplicates) {
       return existingInteraction;

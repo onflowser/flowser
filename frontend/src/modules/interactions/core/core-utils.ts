@@ -7,7 +7,7 @@ export class InteractionUtils {
   // should be treated as the same entity.
   // See how this is handled within FLIX standard:
   // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#data-structure-serialization--identifier-generation
-  static areEqual(
+  static areLogicallyEqual(
     a: IdentifiableInteractionDefinition,
     b: IdentifiableInteractionDefinition
   ): boolean {
