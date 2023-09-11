@@ -111,7 +111,7 @@ export function ProjectProvider({
       body: <span>Are you sure you want to delete this project?</span>,
       onConfirm: () => confirmProjectRemove(project),
       confirmButtonLabel: "DELETE",
-      cancelButtonLabel: "BACK",
+      cancelButtonLabel: "CANCEL",
     });
   }
 
