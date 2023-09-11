@@ -96,11 +96,11 @@ function FocusedDefinitionSettings() {
     return null;
   }
 
-  const correspondingTemplate = templates.find((template) =>
-    InteractionUtils.areLogicallyEqual(template, focusedDefinition)
+  const correspondingTemplate = templates.find(
+    (template) => template.id === focusedDefinition.id
   );
 
-  if (!correspondingTemplate?.isMutable) {
+  if (correspondingTemplate && !correspondingTemplate.isMutable) {
     return null;
   }
 

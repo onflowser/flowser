@@ -12,10 +12,13 @@ import { InteractionUtils } from "../core/core-utils";
 type CreateInteractionDefinition = Omit<
   InteractionDefinition,
   "id" | "createdDate" | "updatedDate"
->;
+> & {
+  // If not provided, a random UUID will be used.
+  id?: string;
+};
 
 type CreateInteractionOptions = {
-  allowDuplicates: boolean;
+  deduplicateBySourceCodeSemantics: boolean;
 };
 
 type InteractionsRegistry = {
@@ -96,15 +99,22 @@ export function InteractionRegistryProvider(props: {
     newPartialInteraction: CreateInteractionDefinition,
     options?: CreateInteractionOptions
   ): InteractionDefinition {
+    const newPartialDefinitionId =
+      newPartialInteraction.id ?? crypto.randomUUID();
     const existingInteraction = definitions.find((definition) =>
-      InteractionUtils.areLogicallyEqual(newPartialInteraction, definition)
+      options?.deduplicateBySourceCodeSemantics
+        ? InteractionUtils.areSemanticallyEquivalent(
+            newPartialInteraction,
+            definition
+          )
+        : definition.id === newPartialDefinitionId
     );
-    if (existingInteraction && !options?.allowDuplicates) {
+    if (existingInteraction) {
       return existingInteraction;
     } else {
       const newInteractionDefinition: InteractionDefinition = {
-        id: crypto.randomUUID(),
         ...newPartialInteraction,
+        id: newPartialDefinitionId,
         createdDate: new Date(),
         updatedDate: new Date(),
       };

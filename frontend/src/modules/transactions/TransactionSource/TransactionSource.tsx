@@ -46,27 +46,32 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
         className={classes.interactLink}
         to="/interactions"
         onClick={() => {
-          const createdInteraction = create({
-            name: transactionName ?? "Unknown",
-            code: transaction.script,
-            fclValuesByIdentifier: new Map(
-              transaction.arguments.map((arg) => [
-                arg.identifier,
-                JSON.parse(arg.valueAsJson),
-              ])
-            ),
-            initialOutcome: {
-              transaction: {
-                transactionId: transaction.id,
-                error: transaction.status?.errorMessage,
+          const createdInteraction = create(
+            {
+              name: transactionName ?? "Unknown",
+              code: transaction.script,
+              fclValuesByIdentifier: new Map(
+                transaction.arguments.map((arg) => [
+                  arg.identifier,
+                  JSON.parse(arg.valueAsJson),
+                ])
+              ),
+              initialOutcome: {
+                transaction: {
+                  transactionId: transaction.id,
+                  error: transaction.status?.errorMessage,
+                },
+              },
+              transactionOptions: {
+                authorizerAddresses: transaction.authorizers,
+                payerAddress: transaction.payer,
+                proposerAddress: transaction.proposalKey!.address,
               },
             },
-            transactionOptions: {
-              authorizerAddresses: transaction.authorizers,
-              payerAddress: transaction.payer,
-              proposerAddress: transaction.proposalKey!.address,
-            },
-          });
+            {
+              deduplicateBySourceCodeSemantics: true,
+            }
+          );
           setFocused(createdInteraction.id);
         }}
       >

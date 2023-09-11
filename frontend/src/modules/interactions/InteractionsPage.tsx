@@ -66,18 +66,13 @@ export function InteractionsPage(): ReactElement {
         tabs={openEditorTabs}
         onClose={(tab) => remove(tab.id)}
         onAddNew={() => {
-          const createdInteraction = create(
-            {
-              name: "New interaction",
-              code: "",
-              fclValuesByIdentifier: new Map(),
-              transactionOptions: undefined,
-              initialOutcome: undefined,
-            },
-            {
-              allowDuplicates: true,
-            }
-          );
+          const createdInteraction = create({
+            name: "New interaction",
+            code: "",
+            fclValuesByIdentifier: new Map(),
+            transactionOptions: undefined,
+            initialOutcome: undefined,
+          });
           setFocused(createdInteraction.id);
         }}
       />
