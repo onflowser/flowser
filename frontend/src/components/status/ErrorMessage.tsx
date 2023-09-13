@@ -5,6 +5,8 @@ import { JsonView } from "../json-view/JsonView";
 import { ExternalLink } from "../links/ExternalLink";
 import { Callout } from "../callout/Callout";
 import { SizedBox } from "../sized-box/SizedBox";
+import { CadenceEditor } from "../cadence-editor/CadenceEditor";
+import { LineSeparator } from "../line-separator/LineSeparator";
 
 type ScriptErrorProps = {
   cadenceSource: string;
@@ -75,10 +77,22 @@ function UnsupportedImportSyntaxNotice(
                 inline
               >
                 the latest import syntax
-              </ExternalLink>{" "}
-              {/* eslint-disable-next-line react/no-unescaped-entities */}
-              syntax, which isn't supported within Flowser yet.
+              </ExternalLink>
+              {/* eslint-disable-next-line react/no-unescaped-entities */},
+              which isn't supported within Flowser yet.
             </p>
+            <SizedBox height={10} />
+            <p>
+              Try refactoring your code to use the{" "}
+              <ExternalLink
+                inline
+                href="https://developers.flow.com/cadence/language/imports#docusaurus_skipToContent_fallback"
+              >
+                standard Cadence syntax
+              </ExternalLink>{" "}
+              instead.
+            </p>
+            <SizedBox height={10} />
             <p>
               For more details, see:{" "}
               <ExternalLink
