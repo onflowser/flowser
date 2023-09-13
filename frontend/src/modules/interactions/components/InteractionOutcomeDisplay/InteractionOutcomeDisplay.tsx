@@ -104,6 +104,9 @@ function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
 
   return (
     <TransactionDetailsTabs
+      // Re-mount this component when different transaction is used.
+      // This is mainly to reset the initial focused tab.
+      key={data.transaction.id}
       label="Transaction"
       includeOverviewTab={true}
       includeScriptTab={false}
