@@ -97,7 +97,7 @@ function BlockItem(props: BlockItemProps) {
       <MenuItem onClick={() => onForkAsTemplate()}>
         <FlowserIcon.Share width={menuIconSize} height={menuIconSize} />
         <SizedBox width={10} />
-        Open
+        View transaction
       </MenuItem>
       <MenuItem onClick={() => checkoutBlock(block.id)}>
         <FlowserIcon.CircleArrowLeft
@@ -105,7 +105,7 @@ function BlockItem(props: BlockItemProps) {
           height={menuIconSize}
         />
         <SizedBox width={10} />
-        Rollback
+        Rollback to block
       </MenuItem>
     </FlowserMenu>
   );
