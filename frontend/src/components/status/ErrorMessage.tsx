@@ -5,8 +5,6 @@ import { JsonView } from "../json-view/JsonView";
 import { ExternalLink } from "../links/ExternalLink";
 import { Callout } from "../callout/Callout";
 import { SizedBox } from "../sized-box/SizedBox";
-import { CadenceEditor } from "../cadence-editor/CadenceEditor";
-import { LineSeparator } from "../line-separator/LineSeparator";
 
 type ScriptErrorProps = {
   cadenceSource: string;
