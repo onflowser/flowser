@@ -117,8 +117,9 @@ function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
 
 function ScriptOutcomeDisplay(props: { outcome: ScriptOutcome }) {
   const { result, error } = props.outcome;
+  const { definition } = useInteractionDefinitionManager();
   const resultTabId = "result";
-  const errorTabId = "result";
+  const errorTabId = "error";
   const [currentTabId, setCurrentTabId] = useState(resultTabId);
 
   useEffect(() => {
@@ -133,7 +134,9 @@ function ScriptOutcomeDisplay(props: { outcome: ScriptOutcome }) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: <ScriptError errorMessage={error} />,
+      content: (
+        <ScriptError errorMessage={error} cadenceSource={definition.code} />
+      ),
     });
   } else {
     tabs.push({
