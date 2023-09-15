@@ -1,23 +1,20 @@
 import React, { ReactElement } from "react";
 import { InteractionIcon } from "../InteractionIcon/InteractionIcon";
 import { SizedBox } from "../../../../components/sized-box/SizedBox";
-import { CoreInteractionDefinition } from "../../contexts/interaction-registry.context";
 import { useGetParsedInteraction } from "../../../../hooks/use-api";
 import { Spinner } from "../../../../components/spinner/Spinner";
 import classes from "./InteractionLabel.module.scss";
 import { InteractionKind } from "@flowser/shared";
+import { InteractionDefinition } from "modules/interactions/core/core-types";
 
 type InteractionLabelProps = {
-  interaction: CoreInteractionDefinition;
+  interaction: InteractionDefinition;
 };
 
 export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   const { interaction } = props;
 
-  const { data } = useGetParsedInteraction({
-    id: interaction.id,
-    sourceCode: interaction.code,
-  });
+  const { data } = useGetParsedInteraction(interaction);
 
   return (
     <div className={classes.root}>

@@ -61,8 +61,7 @@ function BlockItem(props: BlockItemProps) {
     if (!firstTransaction?.proposalKey) {
       return;
     }
-    create({
-      id: block.id,
+    const createdInteraction = create({
       name: transactionName ?? `Tx from block #${block.height}`,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
@@ -82,7 +81,7 @@ function BlockItem(props: BlockItemProps) {
         authorizerAddresses: firstTransaction.authorizers,
       },
     });
-    setFocused(block.id);
+    setFocused(createdInteraction.id);
   }
 
   return (
@@ -99,7 +98,7 @@ function BlockItem(props: BlockItemProps) {
       <MenuItem onClick={() => onForkAsTemplate()}>
         <FlowserIcon.Share width={menuIconSize} height={menuIconSize} />
         <SizedBox width={10} />
-        Open
+        View transaction
       </MenuItem>
       <MenuItem onClick={() => checkoutBlock(block.id)}>
         <FlowserIcon.CircleArrowLeft
@@ -107,7 +106,7 @@ function BlockItem(props: BlockItemProps) {
           height={menuIconSize}
         />
         <SizedBox width={10} />
-        Rollback
+        Rollback to block
       </MenuItem>
     </FlowserMenu>
   );

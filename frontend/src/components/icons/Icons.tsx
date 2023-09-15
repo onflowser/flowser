@@ -4,7 +4,6 @@ import { ReactComponent as Contract } from "../../assets/icons/contract.svg";
 import { ReactComponent as CursorClick } from "../../assets/icons/cursor_click.svg";
 import { ReactComponent as LogoRound } from "../../assets/icons/logo_round.svg";
 import { ReactComponent as Logo } from "../../assets/icons/logo.svg";
-import { ReactComponent as Back } from "../../assets/icons/back-button.svg";
 import { ReactComponent as Star } from "../../assets/icons/star.svg";
 import { ReactComponent as Transaction } from "../../assets/icons/transaction.svg";
 import { ReactComponent as ArtistPalette } from "../../assets/icons/artist_palette.svg";
@@ -22,6 +21,7 @@ import { ReactComponent as Exit } from "../../assets/icons/exit.svg";
 import { ReactComponent as Restart } from "../../assets/icons/restart.svg";
 import { ReactComponent as Open } from "../../assets/icons/open.svg";
 import { ReactComponent as Share } from "../../assets/icons/share.svg";
+import { ReactComponent as Back } from "../../assets/icons/back-button.svg";
 
 export const FlowserIcon = {
   Logo: Logo,

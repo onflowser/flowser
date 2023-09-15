@@ -1,5 +1,6 @@
 @import "styles/spacings";
 @import "styles/colors";
+@import "styles/scrollbars";
 
 $side-nav-width: 80px;
 
@@ -20,6 +21,8 @@ $side-nav-width: 80px;
     max-height: 100vh;
     overflow-y: scroll;
 
+    @include hiddenScrollbars();
+
     .breadcrumbs {
       position: sticky;
       top: 0;
@@ -34,6 +37,8 @@ $side-nav-width: 80px;
       display: flex;
       flex-direction: column;
       flex: 1;
+
+      @include hiddenScrollbars();
     }
 
     .bodyWithBorderSpacing {

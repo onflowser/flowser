@@ -3,11 +3,7 @@ import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { ScriptError } from "../../../../components/status/ErrorMessage";
 import { JsonView } from "../../../../components/json-view/JsonView";
 import { useGetTransaction } from "../../../../hooks/use-api";
-import classes from "./InteractionOutcome.module.scss";
-import {
-  FlowScriptOutcome,
-  FlowTransactionOutcome,
-} from "modules/interactions/contexts/interaction-registry.context";
+import classes from "./InteractionOutcomeDisplay.module.scss";
 import { TabItem } from "../../../../components/tabs/Tabs";
 import { Callout } from "../../../../components/callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
@@ -17,14 +13,15 @@ import { LineSeparator } from "../../../../components/line-separator/LineSeparat
 import { SpinnerWithLabel } from "../../../../components/spinner/SpinnerWithLabel";
 import { StyledTabs } from "../../../../components/tabs/StyledTabs";
 import { TransactionDetailsTabs } from "../../../transactions/TransactionDetailsTabs/TransactionDetailsTabs";
+import { ScriptOutcome, TransactionOutcome } from "../../core/core-types";
 
-export function InteractionOutcome(): ReactElement {
+export function InteractionOutcomeDisplay(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
   return (
     <div className={classes.root}>
-      {outcome?.script && <ScriptOutcome outcome={outcome.script} />}
+      {outcome?.script && <ScriptOutcomeDisplay outcome={outcome.script} />}
       {outcome?.transaction && (
-        <TransactionOutcome outcome={outcome.transaction} />
+        <TransactionOutcomeDisplay outcome={outcome.transaction} />
       )}
       {!outcome && (
         <div className={classes.emptyStateWrapper}>
@@ -97,13 +94,9 @@ function EmptyState() {
   }
 }
 
-function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
+function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
   const { data } = useGetTransaction(outcome.transactionId);
-
-  if (outcome.error) {
-    return <ScriptError errorMessage={outcome.error} />;
-  }
 
   if (!data?.transaction) {
     return <SpinnerWithLabel label="Executing" />;
@@ -111,6 +104,9 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
 
   return (
     <TransactionDetailsTabs
+      // Re-mount this component when different transaction is used.
+      // This is mainly to reset the initial focused tab.
+      key={data.transaction.id}
       label="Transaction"
       includeOverviewTab={true}
       includeScriptTab={false}
@@ -119,10 +115,11 @@ function TransactionOutcome(props: { outcome: FlowTransactionOutcome }) {
   );
 }
 
-function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
+function ScriptOutcomeDisplay(props: { outcome: ScriptOutcome }) {
   const { result, error } = props.outcome;
+  const { definition } = useInteractionDefinitionManager();
   const resultTabId = "result";
-  const errorTabId = "result";
+  const errorTabId = "error";
   const [currentTabId, setCurrentTabId] = useState(resultTabId);
 
   useEffect(() => {
@@ -137,7 +134,9 @@ function ScriptOutcome(props: { outcome: FlowScriptOutcome }) {
     tabs.push({
       id: errorTabId,
       label: "Error",
-      content: <ScriptError errorMessage={error} />,
+      content: (
+        <ScriptError errorMessage={error} cadenceSource={definition.code} />
+      ),
     });
   } else {
     tabs.push({

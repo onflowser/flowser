@@ -10,7 +10,7 @@ import {
   useParams,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { BackButtonLayout, ProjectLayout } from "./components/layout/Layout";
+import { ProjectLayout } from "./components/layout/ProjectLayout/ProjectLayout";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
@@ -49,6 +49,8 @@ import { ContractsTable } from "./modules/contracts/ContractsTable";
 import { ContractDetails } from "./modules/contracts/ContractDetails/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
 import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";
+import { TemplatesRegistryProvider } from "./modules/interactions/contexts/templates.context";
+import { BasicLayout } from "./components/layout/BasicLayout/BasicLayout";
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
@@ -84,18 +86,16 @@ export const FlowserClientApp = ({
       <TimeoutPollingProvider enabled={enableTimeoutPolling}>
         <ConfirmDialogProvider>
           <PlatformAdapterProvider {...platformAdapter}>
-            <InteractionRegistryProvider>
-              <ConsentAnalytics />
-              <ProjectRequirements />
-              <RouterProvider
-                router={useHashRouter ? hashRouter : browserRouter}
-              />
-              <Toaster
-                position="bottom-center"
-                gutter={8}
-                toastOptions={toastOptions}
-              />
-            </InteractionRegistryProvider>
+            <ConsentAnalytics />
+            <ProjectRequirements />
+            <RouterProvider
+              router={useHashRouter ? hashRouter : browserRouter}
+            />
+            <Toaster
+              position="bottom-center"
+              gutter={8}
+              toastOptions={toastOptions}
+            />
           </PlatformAdapterProvider>
         </ConfirmDialogProvider>
       </TimeoutPollingProvider>
@@ -117,6 +117,9 @@ const routes: RouteObject[] = [
         </BrowserRouterEvents>
       </ProjectProvider>
     ),
+    handle: createCrumbHandle({
+      crumbName: "Projects",
+    }),
     children: [
       {
         index: true,
@@ -125,16 +128,23 @@ const routes: RouteObject[] = [
       {
         path: "create",
         element: (
-          <BackButtonLayout>
+          <BasicLayout>
             <ProjectSettingsPage />
-          </BackButtonLayout>
+          </BasicLayout>
         ),
+        handle: createCrumbHandle({
+          crumbName: "Create",
+        }),
       },
       {
         path: ":projectId",
         element: (
           <ProjectLayout>
-            <Outlet />
+            <InteractionRegistryProvider>
+              <TemplatesRegistryProvider>
+                <Outlet />
+              </TemplatesRegistryProvider>
+            </InteractionRegistryProvider>
           </ProjectLayout>
         ),
         children: [
