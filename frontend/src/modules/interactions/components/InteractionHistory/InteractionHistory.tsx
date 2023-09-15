@@ -16,9 +16,10 @@ import { FlowserMenu } from "../../../../components/menus/Menu";
 import { GrcpStatusIcon } from "../../../../components/status/GrcpStatus";
 
 export function InteractionHistory(): ReactElement {
-  const { data: blocks, firstFetch } = useGetPollingBlocks();
+  const { data: blocks } = useGetPollingBlocks();
 
-  if (firstFetch) {
+  // There should always be at least one (initial) block.
+  if (blocks.length === 0) {
     return (
       <div className={classes.loadingRoot}>
         <Spinner size={30} />
