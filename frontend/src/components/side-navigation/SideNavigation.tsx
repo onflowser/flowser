@@ -18,7 +18,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
   return (
     <div className={classNames(classes.root, props.className)}>
       <div>
-        <FlowserLogo />
+        <FlowserIcon.Logo width={50} height={50} />
         <SizedBox height={50} />
         <Link
           to="/interactions"
@@ -46,11 +46,6 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
       </div>
     </div>
   );
-}
-
-function FlowserLogo() {
-  const size = 50;
-  return <FlowserIcon.LogoRound width={size} height={size} />;
 }
 
 function Link(props: {
