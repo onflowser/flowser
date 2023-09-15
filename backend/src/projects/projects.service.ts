@@ -28,7 +28,7 @@ import * as fs from "fs";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
 import { WalletService } from "../wallet/wallet.service";
 import { FlowSnapshotService } from "../flow/services/snapshot.service";
-import { FlowTemplatesService } from '../flow/services/templates.service';
+import { FlowTemplatesService } from "../flow/services/templates.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -58,7 +58,7 @@ export class ProjectsService {
       this.flowSnapshotsService,
       // Wallet service also depends on the gateway service (needs to initialize fcl).
       this.walletService,
-      this.flowTemplatesService
+      this.flowTemplatesService,
     ];
 
   constructor(
@@ -235,13 +235,21 @@ export class ProjectsService {
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     const currentProject = this.getCurrentProject();
+    const currentPersistedProject = await this.projectRepository.findOneBy({
+      id,
+    });
+
     const project = ProjectEntity.create(updateProjectDto);
     project.markUpdated();
 
     // Project can be persisted only in-memory
-    if (currentProject?.id === id) {
+    if (currentProject && currentProject.id === id) {
       this.currentProject = project;
-      return this.currentProject;
+
+      // If this is an in-memory project, don't execute update to avoid http error.
+      if (!currentPersistedProject) {
+        return this.currentProject;
+      }
     }
 
     await this.projectRepository.update(
@@ -249,6 +257,7 @@ export class ProjectsService {
       // Prevent overwriting existing created date
       { ...project, createdAt: undefined }
     );
+
     return project;
   }
 

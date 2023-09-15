@@ -12,7 +12,7 @@ const columnsHelper = createColumnHelper<SignableObject>();
 
 const columns = [
   columnsHelper.accessor("address", {
-    header: () => <Label variant="medium">ACCOUNT ADDRESS</Label>,
+    header: () => <Label variant="medium">ADDRESS</Label>,
     cell: (info) => (
       <Value>
         <ProjectLink to={`/accounts/${info.getValue()}`}>

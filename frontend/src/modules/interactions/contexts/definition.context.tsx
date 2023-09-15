@@ -4,12 +4,10 @@ import React, {
   ReactNode,
   useContext,
 } from "react";
-import {
-  InteractionDefinition,
-  useInteractionRegistry,
-} from "./interaction-registry.context";
+import { useInteractionRegistry } from "./interaction-registry.context";
 import { useGetParsedInteraction } from "../../../hooks/use-api";
 import { FclValue, Interaction } from "@flowser/shared";
+import { InteractionDefinition } from "../core/core-types";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
@@ -34,10 +32,7 @@ export function InteractionDefinitionManagerProvider(props: {
 }): ReactElement {
   const { definition } = props;
   const { update } = useInteractionRegistry();
-  const { data, isLoading } = useGetParsedInteraction({
-    id: definition.id,
-    sourceCode: definition.code,
-  });
+  const { data, isLoading } = useGetParsedInteraction(definition);
   const fclValuesByIdentifier = definition.fclValuesByIdentifier;
 
   function partialUpdate(newDefinition: Partial<InteractionDefinition>) {

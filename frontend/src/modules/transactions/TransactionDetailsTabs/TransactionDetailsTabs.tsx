@@ -33,7 +33,10 @@ export function TransactionDetailsTabs(
       id: "error",
       label: "Error",
       content: (
-        <TransactionError errorMessage={transaction.status.errorMessage} />
+        <TransactionError
+          errorMessage={transaction.status.errorMessage}
+          cadenceSource={transaction.script}
+        />
       ),
     });
   }
@@ -50,12 +53,7 @@ export function TransactionDetailsTabs(
     tabs.push({
       id: "script",
       label: "Script",
-      content: (
-        <TransactionSource
-          code={transaction.script}
-          arguments={transaction.arguments}
-        />
-      ),
+      content: <TransactionSource transaction={transaction} />,
     });
   }
 

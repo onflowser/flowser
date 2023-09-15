@@ -299,6 +299,18 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
             </Card>
             <Card className={classes.card}>
               <EmulatorToggleField
+                label="REST API debug"
+                path="enableRestDebug"
+                description="Enable REST API debugging output (not recommended as it slows down the app)"
+                formik={formik}
+              />
+              <EmulatorToggleField
+                label="GRPC API debug"
+                path="enableGrpcDebug"
+                description="enable gRPC server reflection for debugging with grpc_cli"
+                formik={formik}
+              />
+              <EmulatorToggleField
                 label="Verbose"
                 path="verboseLogging"
                 description="Enable verbose logging"
@@ -307,13 +319,13 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
               <EmulatorToggleField
                 label="Persist"
                 path="persist"
-                description="Enable persistence of the state between restarts"
+                description="Persist emaulator blockchain state between restarts"
                 formik={formik}
               />
               <EmulatorToggleField
-                label="Snapshot"
+                label="Snapshots"
                 path="snapshot"
-                description="Enable snapshot support (this option automatically enables persistence)"
+                description="Enable blockchain state snapshots (this option automatically enables persistence)"
                 formik={formik}
               />
               <EmulatorToggleField

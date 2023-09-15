@@ -1,4 +1,9 @@
-import React, { createContext, ReactElement, useContext } from "react";
+import React, {
+  createContext,
+  ReactElement,
+  ReactNode,
+  useContext,
+} from "react";
 import { MonitoringServiceInt } from "../services/monitoring.service";
 
 export type PlatformAdapterState = {
@@ -11,7 +16,7 @@ const PlatformAdapterContext = createContext<PlatformAdapterState>(
 );
 
 export type PlatformAdapterProviderProps = PlatformAdapterState & {
-  children: ReactElement;
+  children: ReactNode;
 };
 
 export function PlatformAdapterProvider({

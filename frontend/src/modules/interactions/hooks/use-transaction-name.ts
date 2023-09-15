@@ -1,6 +1,8 @@
 import { useInteractionRegistry } from "../contexts/interaction-registry.context";
 import { useMemo } from "react";
 import { Transaction } from "@flowser/shared";
+import { useTemplatesRegistry } from "../contexts/templates.context";
+import { InteractionUtils } from "../core/core-utils";
 
 type UseInteractionNameProps = {
   transaction: Transaction | undefined;
@@ -52,25 +54,32 @@ const hardcodedTemplates: [string, TransactionKind][] = [
 ];
 
 const transactionKindBySource = new Map<string, TransactionKind>(
-  hardcodedTemplates.map((entry) => [sanitizeCadenceSource(entry[0]), entry[1]])
+  hardcodedTemplates.map((entry) => [
+    InteractionUtils.normalizeCadenceCode(entry[0]),
+    entry[1],
+  ])
 );
 
 export function useTransactionName(
   props: UseInteractionNameProps
 ): string | undefined {
   const { transaction } = props;
-  const { templates, definitions } = useInteractionRegistry();
+  const { templates } = useTemplatesRegistry();
+  const { definitions } = useInteractionRegistry();
 
   return useMemo(() => {
     if (!transaction?.script) {
       return undefined;
     }
 
-    const sanitizedTargetCode = sanitizeCadenceSource(transaction.script);
+    const sanitizedTargetCode = InteractionUtils.normalizeCadenceCode(
+      transaction.script
+    );
     const matchingTemplateName = [...templates, ...definitions].find(
       (template) =>
         template.code &&
-        sanitizeCadenceSource(template.code) === sanitizedTargetCode
+        InteractionUtils.normalizeCadenceCode(template.code) ===
+          sanitizedTargetCode
     )?.name;
 
     return matchingTemplateName ?? getDynamicName(transaction);
@@ -79,7 +88,7 @@ export function useTransactionName(
 
 function getDynamicName(transaction: Transaction) {
   const kind = transactionKindBySource.get(
-    sanitizeCadenceSource(transaction.script)
+    InteractionUtils.normalizeCadenceCode(transaction.script)
   );
 
   switch (kind) {
@@ -103,17 +112,4 @@ function getArgumentValueById(transaction: Transaction, id: string) {
     transaction.arguments.find((argument) => argument.identifier === id)
       ?.valueAsJson ?? ""
   );
-}
-
-function sanitizeCadenceSource(code: string) {
-  // Ignore imports for comparison,
-  // since those can differ due to address replacement.
-  // See: https://developers.flow.com/tooling/fcl-js/api#address-replacement
-  const strippedImports = code
-    .split("\n")
-    .filter((line) => !line.startsWith("import"))
-    .join("\n");
-
-  // Replace all whitespace and newlines
-  return strippedImports.replaceAll(/[\n\t ]/g, "");
 }

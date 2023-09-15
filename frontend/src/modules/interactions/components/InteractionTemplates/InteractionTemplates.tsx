@@ -8,6 +8,8 @@ import { SearchInput } from "../../../../components/inputs/search-input/SearchIn
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
+import { useTemplatesRegistry } from "../../contexts/templates.context";
+import { InteractionUtils } from "../../core/core-utils";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -21,8 +23,8 @@ export function InteractionTemplates(): ReactElement {
 function StoredTemplates() {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
-  const { templates, forkTemplate, removeTemplate, focusedDefinition } =
-    useInteractionRegistry();
+  const { create, focusedDefinition, setFocused } = useInteractionRegistry();
+  const { templates, removeTemplate } = useTemplatesRegistry();
   const filteredTemplates = useMemo(() => {
     if (searchTerm === "") {
       return templates;
@@ -50,7 +52,10 @@ function StoredTemplates() {
         {filteredAndSortedTemplates.map((template) => (
           <div
             key={template.id}
-            onClick={() => forkTemplate(template)}
+            onClick={() => {
+              const createdInteraction = create(template);
+              setFocused(createdInteraction.id);
+            }}
             className={classNames(classes.item, {
               [classes.focusedItem]: focusedDefinition?.id === template.id,
             })}
@@ -84,9 +89,18 @@ function StoredTemplates() {
 }
 
 function FocusedDefinitionSettings() {
-  const { focusedDefinition, update, persist } = useInteractionRegistry();
+  const { focusedDefinition, update } = useInteractionRegistry();
+  const { templates, saveTemplate } = useTemplatesRegistry();
 
   if (!focusedDefinition) {
+    return null;
+  }
+
+  const correspondingTemplate = templates.find(
+    (template) => template.id === focusedDefinition.id
+  );
+
+  if (correspondingTemplate && !correspondingTemplate.isMutable) {
     return null;
   }
 
@@ -97,7 +111,7 @@ function FocusedDefinitionSettings() {
         value={focusedDefinition.name}
         onChange={(e) => update({ ...focusedDefinition, name: e.target.value })}
       />
-      <PrimaryButton onClick={() => persist(focusedDefinition.id)}>
+      <PrimaryButton onClick={() => saveTemplate(focusedDefinition)}>
         Save
       </PrimaryButton>
     </div>

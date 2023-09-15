@@ -36,9 +36,7 @@ export function Tabs(props: TabsProps): ReactElement {
     onAddNew,
   } = props;
 
-  const [fallbackCurrentTabId, setFallbackCurrentTabId] = useState(
-    props.tabs[0]?.id
-  );
+  const [fallbackCurrentTabId, setFallbackCurrentTabId] = useState(tabs[0]?.id);
   const currentTabId = props.currentTabId ?? fallbackCurrentTabId;
 
   function onChangeTab(tab: TabItem) {

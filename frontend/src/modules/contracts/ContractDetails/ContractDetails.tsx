@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import { NavLink } from "react-router-dom";
 import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
 import classes from "./ContractDetails.module.scss";
@@ -10,6 +9,7 @@ import {
 import { SizedBox } from "../../../components/sized-box/SizedBox";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
+import { ProjectLink } from "../../../components/links/ProjectLink";
 
 type ContractDetailsProps = {
   contractId: string;
@@ -35,9 +35,9 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
       {
         label: "Account",
         value: (
-          <NavLink to={`/accounts/details/${contract.accountAddress}`}>
+          <ProjectLink to={`/accounts/${contract.accountAddress}`}>
             {contract.accountAddress}
-          </NavLink>
+          </ProjectLink>
         ),
       },
       {
