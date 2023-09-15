@@ -56,7 +56,11 @@ function TopContent() {
     return <EmptyInteractionHelp />;
   }
 
-  if (parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN) {
+  if (
+    // Parsed interaction isn't defined if parsing fails.
+    !parsedInteraction ||
+    parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN
+  ) {
     return <UnknownInteractionHelp />;
   }
 
@@ -248,7 +252,6 @@ function SigningSettings() {
   );
 }
 
-// TODO(feature-interact-screen): Validate that unique addresses are chosen
 function AuthorizerSettings() {
   const { definition, parsedInteraction, partialUpdate } =
     useInteractionDefinitionManager();
@@ -296,7 +299,9 @@ function AuthorizerSettings() {
           <ParamBuilder
             key={index}
             parameter={Parameter.fromPartial({
-              identifier: `Authorizer ${index + 1}`,
+              identifier: `Authorizer ${
+                authorizerAddresses.length > 1 ? index + 1 : ""
+              }`,
               type: {
                 kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
               },

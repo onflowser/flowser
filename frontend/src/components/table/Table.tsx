@@ -49,7 +49,7 @@ function Table<TData>({
   headerRowClass,
   bodyRowClass,
   className,
-  enableIntroAnimations = true,
+  enableIntroAnimations = false,
 }: TableProps<TData>): ReactElement {
   const table = useReactTable<TableData<TData>>({
     data,
