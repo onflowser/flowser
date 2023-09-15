@@ -56,7 +56,11 @@ function TopContent() {
     return <EmptyInteractionHelp />;
   }
 
-  if (parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN) {
+  if (
+    // Parsed interaction isn't defined if parsing fails.
+    !parsedInteraction ||
+    parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN
+  ) {
     return <UnknownInteractionHelp />;
   }
 
