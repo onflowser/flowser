@@ -11,7 +11,6 @@ import {
 import { Transaction } from "@flowser/shared";
 import { useGetPollingEventsByTransaction } from "../../../hooks/use-api";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
-import { useInteractionDefinitionManager } from "../../interactions/contexts/definition.context";
 
 type TransactionDetailsTabsProps = Omit<StyledTabsProps, "tabs"> & {
   transaction: Transaction;
@@ -25,8 +24,6 @@ export function TransactionDetailsTabs(
   const { transaction, includeOverviewTab, includeScriptTab, ...tabProps } =
     props;
 
-  const { definition } = useInteractionDefinitionManager();
-
   const { data: events } = useGetPollingEventsByTransaction(transaction.id);
 
   const tabs: TabItem[] = [];
@@ -38,7 +35,7 @@ export function TransactionDetailsTabs(
       content: (
         <TransactionError
           errorMessage={transaction.status.errorMessage}
-          cadenceSource={definition.code}
+          cadenceSource={transaction.script}
         />
       ),
     });
