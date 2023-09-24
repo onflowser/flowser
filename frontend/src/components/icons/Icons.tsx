@@ -22,6 +22,8 @@ import { ReactComponent as Restart } from "../../assets/icons/restart.svg";
 import { ReactComponent as Open } from "../../assets/icons/open.svg";
 import { ReactComponent as Share } from "../../assets/icons/share.svg";
 import { ReactComponent as Back } from "../../assets/icons/back-button.svg";
+import { TbBrandVscode } from "react-icons/tb";
+import { SiWebstorm, SiIntellijidea } from "react-icons/si";
 
 export const FlowserIcon = {
   Logo: Logo,
@@ -48,4 +50,7 @@ export const FlowserIcon = {
   Link: Link,
   Open: Open,
   Share: Share,
+  WebStorm: SiWebstorm,
+  VsCode: TbBrandVscode,
+  IntellijIdea: SiIntellijidea
 };

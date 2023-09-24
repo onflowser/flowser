@@ -80,6 +80,13 @@ export type FlowAbstractAccountConfig = {
   privateKey: string | undefined;
 };
 
+export type FlowAbstractContractConfig = {
+  name: string;
+  // Path relative to the project root dir.
+  relativePath: string;
+  absolutePath: string;
+};
+
 @Injectable()
 export class FlowConfigService implements ProjectContextLifecycle {
   private logger = new Logger(FlowConfigService.name);
@@ -134,6 +141,37 @@ export class FlowConfigService implements ProjectContextLifecycle {
         };
       }
     );
+  }
+
+  public getContracts(): FlowAbstractContractConfig[] {
+    if (!this.config?.contracts) {
+      throw new Error("Contracts config not loaded");
+    }
+    const contractNamesAndPaths = Object.keys(this.config.contracts ?? {}).map(
+      (nameKey) => ({
+        name: nameKey,
+        filePath: this.getContractFilePath(nameKey),
+      })
+    );
+
+    return contractNamesAndPaths
+      .filter((contract) => Boolean(contract.filePath))
+      .map(
+        (contract): FlowAbstractContractConfig => ({
+          name: contract.name,
+          relativePath: contract.filePath,
+          absolutePath: this.buildProjectPath(contract.filePath),
+        })
+      );
+  }
+
+  private getContractFilePath(contractNameKey: string) {
+    if (!this.config?.contracts) {
+      throw new Error("Contracts config not loaded");
+    }
+    const contractConfig = this.config.contracts[contractNameKey];
+    const isSimpleFormat = typeof contractConfig === "string";
+    return isSimpleFormat ? contractConfig : contractConfig?.source;
   }
 
   public async updateAccounts(

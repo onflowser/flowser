@@ -10,7 +10,6 @@ message Account {
   string code = 3;
   repeated AccountKey keys = 4;
   repeated AccountStorageItem storage = 5;
-  repeated AccountContract contracts = 6;
   repeated Transaction transactions = 7;
   repeated AccountTag tags = 10;
   string created_at = 8;
@@ -65,4 +64,10 @@ message AccountContract {
     string code = 4;
     string created_at = 8;
     string updated_at = 9;
+    LocalContractConfig local_config = 10;
+}
+
+message LocalContractConfig {
+  string relative_path = 2;
+  string absolute_path = 3;
 }

@@ -59,5 +59,10 @@
     padding-top: $spacing-base;
     background: $gray-100;
     bottom: 0;
+
+    .actionButtons {
+      display: flex;
+      column-gap: $spacing-base;
+    }
   }
 }

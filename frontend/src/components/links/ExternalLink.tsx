@@ -1,17 +1,19 @@
-import React, { ReactChild, ReactElement } from "react";
+import React, { ReactNode, ReactElement, CSSProperties } from "react";
 import { FlowserIcon } from "../icons/Icons";
 import classes from "./ExternalLink.module.scss";
 
 export type ExternalLinkProps = {
-  children?: ReactChild;
+  children?: ReactNode;
   href: string;
   inline?: boolean;
+  style?: CSSProperties;
 };
 
 export function ExternalLink({
   href,
   children,
   inline,
+  style,
 }: ExternalLinkProps): ReactElement {
   return (
     <a
@@ -19,7 +21,7 @@ export function ExternalLink({
       rel="noreferrer"
       href={href}
       className={classes.root}
-      style={{ display: inline ? "inline" : "flex" }}
+      style={{ display: inline ? "inline" : "flex", ...style }}
     >
       {!inline && <FlowserIcon.Link className={classes.icon} />}
       {children ?? <span className={classes.url}>{prettifyUrl(href)}</span>}

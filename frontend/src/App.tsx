@@ -45,7 +45,7 @@ import { BlocksTable } from "./modules/blocks/BlocksTable/BlocksTable";
 import { AccountDetails } from "./modules/accounts/AccountDetails/AccountDetails";
 import { AccountsTable } from "./modules/accounts/AccountsTable/AccountsTable";
 import { ProjectListPage } from "./modules/projects/ProjectListPage/ProjectListPage";
-import { ContractsTable } from "./modules/contracts/ContractsTable";
+import { ContractsTable } from "./modules/contracts/ContractsTable/ContractsTable";
 import { ContractDetails } from "./modules/contracts/ContractDetails/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
 import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";

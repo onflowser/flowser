@@ -11,7 +11,11 @@ type InteractionTemplatesRegistry = {
 };
 
 export type InteractionDefinitionTemplate = InteractionDefinition & {
-  isMutable: boolean;
+  // Specified for project-based interaction templates.
+  // These templates can't be updated,
+  // since that would require making changes to the file system,
+  // which is not implemented yet.
+  filePath: string | undefined;
 };
 
 // Internal structure that's persisted in local storage.
@@ -54,7 +58,7 @@ export function TemplatesRegistryProvider(props: {
           fclValuesByIdentifier: new Map(
             Object.entries(template.fclValuesByIdentifier)
           ),
-          isMutable: true,
+          filePath: undefined,
         })
       ),
       ...(projectTemplatesData?.templates?.map(
@@ -67,7 +71,7 @@ export function TemplatesRegistryProvider(props: {
           fclValuesByIdentifier: new Map(),
           createdDate: new Date(template.createdDate),
           updatedDate: new Date(template.updatedDate),
-          isMutable: false,
+          filePath: template.source?.filePath,
         })
       ) ?? []),
     ],
