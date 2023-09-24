@@ -18,6 +18,7 @@ export function Tooltip(props: TooltipProps): ReactElement {
       closeOnDocumentClick
       on="hover"
     >
+      {/* @ts-ignore */}
       {props.content}
     </Popup>
   );
