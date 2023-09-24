@@ -9,7 +9,6 @@ import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
-import { InteractionUtils } from "../../core/core-utils";
 import { IdeLink } from "../../../../components/links/IdeLink";
 
 export function InteractionTemplates(): ReactElement {
