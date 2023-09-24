@@ -15,17 +15,23 @@ import {
   GetAllContractsResponse,
   GetPollingContractsRequest,
   GetPollingContractsByAccountRequest,
+  AccountContract,
 } from "@flowser/shared";
+import { AccountContractEntity } from "../entities/contract.entity";
+import { FlowConfigService } from "../../flow/services/config.service";
 
 @Controller()
 export class ContractsController {
-  constructor(private readonly contractsService: ContractsService) {}
+  constructor(
+    private readonly contractsService: ContractsService,
+    private readonly flowConfigService: FlowConfigService
+  ) {}
 
   @Get("contracts")
   async findAll() {
     const contracts = await this.contractsService.findAll();
     return GetAllContractsResponse.toJSON({
-      contracts: contracts.map((contract) => contract.toProto()),
+      contracts: contracts.map((contract) => this.toProto(contract)),
     });
   }
 
@@ -36,7 +42,7 @@ export class ContractsController {
     const contracts = await this.contractsService.findAllNewerThanTimestamp(
       new Date(request.timestamp)
     );
-    return contracts.map((contract) => contract.toProto());
+    return contracts.map((contract) => this.toProto(contract));
   }
 
   @ApiParam({ name: "id", type: String })
@@ -52,7 +58,7 @@ export class ContractsController {
         accountAddress,
         new Date(request.timestamp)
       );
-    return contracts.map((transaction) => transaction.toProto());
+    return contracts.map((contract) => this.toProto(contract));
   }
 
   @ApiParam({ name: "id", type: String })
@@ -60,7 +66,28 @@ export class ContractsController {
   async findOne(@Param("id") id: string) {
     const contract = await this.contractsService.findOne(id);
     return GetSingleContractResponse.toJSON({
-      contract: contract.toProto(),
+      contract: this.toProto(contract),
     });
+  }
+
+  private toProto(contract: AccountContractEntity): AccountContract {
+    const localContractConfig = this.flowConfigService
+      .getContracts()
+      .find((localContract) => localContract.name === contract.name);
+
+    return {
+      id: contract.id,
+      accountAddress: contract.accountAddress,
+      name: contract.name,
+      code: contract.code,
+      createdAt: contract.createdAt.toISOString(),
+      updatedAt: contract.updatedAt.toISOString(),
+      localConfig: localContractConfig
+        ? {
+            absolutePath: localContractConfig.absolutePath,
+            relativePath: localContractConfig.relativePath,
+          }
+        : undefined,
+    };
   }
 }

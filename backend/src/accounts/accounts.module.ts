@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from '@nestjs/common';
 import { AccountsService } from "./services/accounts.service";
 import { AccountsController } from "./controllers/accounts.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -11,9 +11,11 @@ import { AccountKeyEntity } from "./entities/key.entity";
 import { AccountStorageItemEntity } from "./entities/storage-item.entity";
 import { KeysService } from "./services/keys.service";
 import { AccountStorageService } from "./services/storage.service";
+import { FlowModule } from '../flow/flow.module';
 
 @Module({
   imports: [
+    forwardRef(() => FlowModule),
     TypeOrmModule.forFeature([
       AccountEntity,
       AccountContractEntity,

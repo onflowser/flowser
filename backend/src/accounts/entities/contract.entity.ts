@@ -2,7 +2,6 @@ import { PollingEntity } from "../../core/entities/polling.entity";
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { AccountEntity } from "./account.entity";
 import { BadRequestException } from "@nestjs/common";
-import { AccountContract } from "@flowser/shared";
 import { BlockContextEntity } from "../../blocks/entities/block-context.entity";
 import { PollingEntityInitArguments } from "../../utils/type-utils";
 
@@ -41,17 +40,6 @@ export class AccountContractEntity
     this.blockId = args?.blockId ?? "";
     this.code = args?.code ?? "";
     this.account = args?.account ?? null;
-  }
-
-  toProto(): AccountContract {
-    return {
-      id: this.id,
-      accountAddress: this.accountAddress,
-      name: this.name,
-      code: this.code,
-      createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt.toISOString(),
-    };
   }
 
   get id() {

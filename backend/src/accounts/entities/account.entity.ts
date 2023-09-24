@@ -121,7 +121,6 @@ export class AccountEntity extends PollingEntity implements BlockContextEntity {
       code: this.code,
       storage: this.storage?.map((storage) => storage.toProto()) ?? [],
       keys: this.keys?.map((key) => key.toProto()) ?? [],
-      contracts: this.contracts?.map((contract) => contract.toProto()) ?? [],
       transactions:
         this.transactions?.map((transaction) => transaction.toProto()) ?? [],
       tags,
