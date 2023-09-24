@@ -1,13 +1,16 @@
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../contexts/timeout-polling.context";
+import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountContract } from "@flowser/shared";
-import Label from "../../components/label/Label";
-import Value from "../../components/value/Value";
-import { AccountLink } from "../accounts/AccountLink/AccountLink";
+import Label from "../../../components/label/Label";
+import Value from "../../../components/value/Value";
+import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import ReactTimeago from "react-timeago";
 import React, { ReactElement, useMemo } from "react";
-import Table from "../../components/table/Table";
-import { ProjectLink } from "../../components/links/ProjectLink";
+import Table from "../../../components/table/Table";
+import { ProjectLink } from "../../../components/links/ProjectLink";
+import { Tooltip } from "../../../components/tooltips/Tooltip";
+import { Badge } from "../../../components/badge/Badge";
+import classes from "./ContractsTable.module.scss";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();
@@ -31,6 +34,11 @@ const columns = [
       </Value>
     ),
   }),
+  columnHelper.display({
+    id: "tags",
+    header: () => "",
+    cell: (info) => <ContractTags contract={info.row.original} />,
+  }),
   columnHelper.accessor("updatedAt", {
     header: () => <Label variant="medium">UPDATED</Label>,
     cell: (info) => (
@@ -48,6 +56,23 @@ const columns = [
     ),
   }),
 ];
+
+function ContractTags(props: { contract: AccountContract }) {
+  const { contract } = props;
+
+  if (contract.localConfig) {
+    return (
+      <Tooltip
+        content="This contract is located in your local project."
+        position="right center"
+      >
+        <Badge className={classes.tag}>Project contract</Badge>
+      </Tooltip>
+    );
+  } else {
+    return null;
+  }
+}
 
 type ContractsTableProps = {
   contracts: DecoratedPollingEntity<AccountContract>[];

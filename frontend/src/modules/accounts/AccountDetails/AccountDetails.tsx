@@ -17,7 +17,7 @@ import { AccountName } from "../AccountName/AccountName";
 import { StyledTabs } from "../../../components/tabs/StyledTabs";
 import { AccountStorage } from "../AccountStorage/AccountStorage";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
-import { ContractsTable } from "../../contracts/ContractsTable";
+import { ContractsTable } from "../../contracts/ContractsTable/ContractsTable";
 import { AccountKeysTable } from "../AccountKeysTable/AccountKeysTable";
 import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
 import { TabItem } from "../../../components/tabs/Tabs";
