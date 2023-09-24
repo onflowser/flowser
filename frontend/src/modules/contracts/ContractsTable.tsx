@@ -5,7 +5,7 @@ import Label from "../../components/label/Label";
 import Value from "../../components/value/Value";
 import { AccountLink } from "../accounts/AccountLink/AccountLink";
 import ReactTimeago from "react-timeago";
-import React, { ReactElement } from "react";
+import React, { ReactElement, useMemo } from "react";
 import Table from "../../components/table/Table";
 import { ProjectLink } from "../../components/links/ProjectLink";
 
@@ -54,10 +54,16 @@ type ContractsTableProps = {
 };
 
 export function ContractsTable(props: ContractsTableProps): ReactElement {
+  const sortedContracts = useMemo(
+    // Local project contracts should be shown first.
+    () => props.contracts.sort((contract) => (contract.localConfig ? -1 : 1)),
+    [props.contracts]
+  );
+
   return (
     <Table<DecoratedPollingEntity<AccountContract>>
       columns={columns}
-      data={props.contracts}
+      data={sortedContracts}
     />
   );
 }
