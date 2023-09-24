@@ -205,16 +205,6 @@ export class FlowEmulatorService
       return value ? `--${name}=${value}` : undefined;
     };
 
-    // TODO: I think windows support for snapshots was fixed, so we can remove this check
-    const isWindows = process.platform === "win32";
-    const isSnapshotFeatureDisabled = emulator.snapshot && isWindows;
-    if (isSnapshotFeatureDisabled) {
-      throw new InternalServerErrorException(
-        "Snapshot emulator flag is not yet supported on windows, " +
-          "see https://github.com/onflow/flow-emulator/issues/208"
-      );
-    }
-
     // keep those parameters up to date with the currently used flow-cli version
     // https://github.com/onflow/flow-emulator#configuration
     return [
