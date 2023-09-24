@@ -10,12 +10,13 @@ import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
 import { InteractionUtils } from "../../core/core-utils";
+import { IdeLink } from "../../../../components/links/IdeLink";
 
 export function InteractionTemplates(): ReactElement {
   return (
     <div className={classes.root}>
       <StoredTemplates />
-      <FocusedDefinitionSettings />
+      <FocusedTemplateSettings />
     </div>
   );
 }
@@ -61,7 +62,7 @@ function StoredTemplates() {
             })}
           >
             <InteractionLabel interaction={template} />
-            {template.isMutable && (
+            {!template.filePath && (
               <FlowserIcon.Trash
                 className={classes.trash}
                 onClick={(e) => {
@@ -88,7 +89,7 @@ function StoredTemplates() {
   );
 }
 
-function FocusedDefinitionSettings() {
+function FocusedTemplateSettings() {
   const { focusedDefinition, update } = useInteractionRegistry();
   const { templates, saveTemplate } = useTemplatesRegistry();
 
@@ -100,8 +101,17 @@ function FocusedDefinitionSettings() {
     (template) => template.id === focusedDefinition.id
   );
 
-  if (correspondingTemplate && !correspondingTemplate.isMutable) {
-    return null;
+  if (correspondingTemplate && correspondingTemplate.filePath) {
+    return (
+      <div className={classes.focusedTemplate}>
+        Open in:
+        <div className={classes.actionButtons}>
+          <IdeLink.VsCode filePath={correspondingTemplate.filePath} />
+          <IdeLink.WebStorm filePath={correspondingTemplate.filePath} />
+          <IdeLink.IntellijIdea filePath={correspondingTemplate.filePath} />
+        </div>
+      </div>
+    );
   }
 
   return (
