@@ -15,6 +15,17 @@ import { JsonView } from "../../../components/json-view/JsonView";
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
 const columns = [
+  columnHelper.accessor("type", {
+    header: () => <Label variant="medium">TYPE</Label>,
+    meta: {
+      className: classes.eventTypeColumn,
+    },
+    cell: (info) => (
+      <Value style={{ width: "100%" }}>
+        <Ellipsis elementName="pre">{info.getValue()}</Ellipsis>
+      </Value>
+    ),
+  }),
   columnHelper.accessor("blockId", {
     header: () => <Label variant="medium">BLOCK</Label>,
     cell: (info) => (
@@ -39,25 +50,6 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("type", {
-    header: () => <Label variant="medium">TYPE</Label>,
-    meta: {
-      className: classes.eventTypeColumn,
-    },
-    cell: (info) => (
-      <Value style={{ width: "100%" }}>
-        <Ellipsis elementName="pre">{info.getValue()}</Ellipsis>
-      </Value>
-    ),
-  }),
-  columnHelper.accessor("createdAt", {
-    header: () => <Label variant="medium">CREATED</Label>,
-    cell: (info) => (
-      <Value>
-        <ReactTimeago date={info.getValue()} />
-      </Value>
-    ),
-  }),
   columnHelper.accessor("data", {
     meta: {
       className: classes.dataColumn,
@@ -70,6 +62,14 @@ const columns = [
           collapseAtDepth={0}
           data={info.getValue() as Record<string, unknown>}
         />
+      </Value>
+    ),
+  }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">CREATED</Label>,
+    cell: (info) => (
+      <Value>
+        <ReactTimeago date={info.getValue()} />
       </Value>
     ),
   }),
