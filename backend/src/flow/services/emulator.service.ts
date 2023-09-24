@@ -123,7 +123,7 @@ export class FlowEmulatorService
   public static getDefaultFlags(): Emulator {
     // Some default values vary from the ones used in Flow CLI.
     return {
-      verboseLogging: true,
+      verboseLogging: false,
       enableRestDebug: false,
       restServerPort: 8888,
       enableGrpcDebug: false,
