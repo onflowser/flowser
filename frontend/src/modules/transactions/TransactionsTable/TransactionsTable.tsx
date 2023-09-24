@@ -29,14 +29,6 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("payer", {
-    header: () => <Label variant="medium">PAYER</Label>,
-    cell: (info) => (
-      <Value>
-        <AccountLink address={info.getValue()} />
-      </Value>
-    ),
-  }),
   columnHelper.display({
     id: "description",
     header: () => <Label variant="medium">DESCRIPTION</Label>,
@@ -55,6 +47,14 @@ const columns = [
       <div>
         <GrcpStatus status={info.row.original.status} />
       </div>
+    ),
+  }),
+  columnHelper.accessor("proposalKey.address", {
+    header: () => <Label variant="medium">PROPOSER</Label>,
+    cell: (info) => (
+      <Value>
+        <AccountLink address={info.getValue()} />
+      </Value>
     ),
   }),
   columnHelper.accessor("createdAt", {

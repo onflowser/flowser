@@ -81,7 +81,7 @@ export class GoBindingsService {
     // - https://github.com/electron/electron/issues/6262#issuecomment-273312942
     return path
       .join(__dirname, "bin", this.getExecutableName())
-      .replace("app.asar/", "app.asar.unpacked/");
+      .replace(`app.asar${path.sep}`, `app.asar.unpacked${path.sep}`);
   }
 
   private getExecutableName(): string {

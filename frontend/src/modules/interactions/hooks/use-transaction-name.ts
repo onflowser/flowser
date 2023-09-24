@@ -72,21 +72,29 @@ export function useTransactionName(
       return undefined;
     }
 
+    const standardInteractionName = getStandardInteractionName(transaction);
+
+    // Standard interaction names should take precedence,
+    // otherwise the stored/active interactions would overwrite the standard interaction names.
+    if (standardInteractionName) {
+      return standardInteractionName;
+    }
+
     const sanitizedTargetCode = InteractionUtils.normalizeCadenceCode(
       transaction.script
     );
-    const matchingTemplateName = [...templates, ...definitions].find(
+    return [...templates, ...definitions].find(
       (template) =>
         template.code &&
         InteractionUtils.normalizeCadenceCode(template.code) ===
           sanitizedTargetCode
     )?.name;
-
-    return matchingTemplateName ?? getDynamicName(transaction);
-  }, [transaction, templates]);
+  }, [transaction, templates, definitions]);
 }
 
-function getDynamicName(transaction: Transaction) {
+function getStandardInteractionName(
+  transaction: Transaction
+): string | undefined {
   const kind = transactionKindBySource.get(
     InteractionUtils.normalizeCadenceCode(transaction.script)
   );
