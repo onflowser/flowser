@@ -45,7 +45,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
 
   if (contract.localConfig) {
     rows.push({
-      label: "Local path",
+      label: "Project path",
       value: <span>{contract.localConfig.relativePath}</span>,
     });
   }
