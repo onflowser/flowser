@@ -20,6 +20,36 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
   const { setFocused, create } = useInteractionRegistry();
   const transactionName = useTransactionName({ transaction });
 
+  function onOpenInteraction() {
+    const createdInteraction = create(
+      {
+        name: transactionName ?? "Unknown",
+        code: transaction.script,
+        fclValuesByIdentifier: new Map(
+          transaction.arguments.map((arg) => [
+            arg.identifier,
+            JSON.parse(arg.valueAsJson),
+          ])
+        ),
+        initialOutcome: {
+          transaction: {
+            transactionId: transaction.id,
+            error: transaction.status?.errorMessage,
+          },
+        },
+        transactionOptions: {
+          authorizerAddresses: transaction.authorizers,
+          payerAddress: transaction.payer,
+          proposerAddress: transaction.proposalKey!.address,
+        },
+      },
+      {
+        deduplicateBySourceCodeSemantics: true,
+      }
+    );
+    setFocused(createdInteraction.id);
+  }
+
   return (
     <Card className={classes.root}>
       {transaction.arguments.length > 0 && (
@@ -45,35 +75,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
       <ProjectLink
         className={classes.interactLink}
         to="/interactions"
-        onClick={() => {
-          const createdInteraction = create(
-            {
-              name: transactionName ?? "Unknown",
-              code: transaction.script,
-              fclValuesByIdentifier: new Map(
-                transaction.arguments.map((arg) => [
-                  arg.identifier,
-                  JSON.parse(arg.valueAsJson),
-                ])
-              ),
-              initialOutcome: {
-                transaction: {
-                  transactionId: transaction.id,
-                  error: transaction.status?.errorMessage,
-                },
-              },
-              transactionOptions: {
-                authorizerAddresses: transaction.authorizers,
-                payerAddress: transaction.payer,
-                proposerAddress: transaction.proposalKey!.address,
-              },
-            },
-            {
-              deduplicateBySourceCodeSemantics: true,
-            }
-          );
-          setFocused(createdInteraction.id);
-        }}
+        onClick={() => onOpenInteraction()}
       >
         <FlowserIcon.CursorClick /> Interact
       </ProjectLink>

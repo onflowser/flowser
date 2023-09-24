@@ -1,9 +1,9 @@
-import React, { ReactChild, ReactElement } from "react";
+import React, { ReactNode, ReactElement } from "react";
 import { FlowserIcon } from "../icons/Icons";
 import classes from "./ExternalLink.module.scss";
 
 export type ExternalLinkProps = {
-  children?: ReactChild;
+  children?: ReactNode;
   href: string;
   inline?: boolean;
 };
