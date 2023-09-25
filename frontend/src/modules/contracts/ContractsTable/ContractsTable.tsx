@@ -1,16 +1,16 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountContract } from "@flowser/shared";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "../../../components/misc/Label/Label";
+import Value from "../../../components/misc/Value/Value";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
-import ReactTimeago from "react-timeago";
 import React, { ReactElement, useMemo } from "react";
-import Table from "../../../components/table/Table";
+import { BaseTable } from "../../../components/misc/BaseTable/BaseTable";
 import { ProjectLink } from "../../../components/links/ProjectLink";
-import { Tooltip } from "../../../components/tooltips/Tooltip";
-import { Badge } from "../../../components/badge/Badge";
+import { Tooltip } from "../../../components/overlays/Tooltip/Tooltip";
+import { BaseBadge } from "../../../components/misc/BaseBadge/BaseBadge";
 import classes from "./ContractsTable.module.scss";
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();
@@ -43,7 +43,7 @@ const columns = [
     header: () => <Label variant="medium">UPDATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),
@@ -51,7 +51,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),
@@ -66,7 +66,7 @@ function ContractTags(props: { contract: AccountContract }) {
         content="This contract is located in your local project."
         position="right center"
       >
-        <Badge className={classes.tag}>Project contract</Badge>
+        <BaseBadge className={classes.tag}>Project contract</BaseBadge>
       </Tooltip>
     );
   } else {
@@ -86,7 +86,7 @@ export function ContractsTable(props: ContractsTableProps): ReactElement {
   );
 
   return (
-    <Table<DecoratedPollingEntity<AccountContract>>
+    <BaseTable<DecoratedPollingEntity<AccountContract>>
       columns={columns}
       data={sortedContracts}
     />

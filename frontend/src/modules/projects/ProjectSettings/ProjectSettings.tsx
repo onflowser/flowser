@@ -2,9 +2,9 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import classes from "./ProjectSettings.module.scss";
-import Card from "../../../components/card/Card";
-import Button from "../../../components/buttons/button/Button";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import { BaseCard } from "../../../components/cards/BaseCard/BaseCard";
+import Button from "../../../components/buttons/Button/Button";
+import FullScreenLoading from "../../../components/loaders/FullScreenLoading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { useGetFlowCliInfo } from "../../../hooks/use-api";
@@ -169,7 +169,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
         <main>
           <SettingsSection title="General" className={classes.section}>
-            <Card className={classes.card}>
+            <BaseCard className={classes.card}>
               <TextField
                 label="Project name"
                 description="Give your project a cool name"
@@ -188,7 +188,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                 }}
                 formik={formik}
               />
-            </Card>
+            </BaseCard>
           </SettingsSection>
           <SettingsSection
             title="Emulator"
@@ -196,7 +196,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
             collapseChildren
             className={classes.section}
           >
-            <Card className={classes.card}>
+            <BaseCard className={classes.card}>
               <EmulatorTextField
                 label="RPC Port"
                 path="grpcServerPort"
@@ -269,8 +269,8 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                 description="Specify gas limit for script execution"
                 formik={formik}
               />
-            </Card>
-            <Card className={classNames(classes.card, classes.radioCard)}>
+            </BaseCard>
+            <BaseCard className={classNames(classes.card, classes.radioCard)}>
               <EmulatorRadioField
                 className={classes.radioField}
                 label="Service Signature Algorithm"
@@ -296,8 +296,8 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                   HashAlgorithm.KECCAK_256,
                 ])}
               />
-            </Card>
-            <Card className={classes.card}>
+            </BaseCard>
+            <BaseCard className={classes.card}>
               <EmulatorToggleField
                 label="REST API debug"
                 path="enableRestDebug"
@@ -352,7 +352,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                 description="Start with contracts like FUSD, NFT and an NFT Marketplace, when the emulator starts"
                 formik={formik}
               />
-            </Card>
+            </BaseCard>
           </SettingsSection>
         </main>
 

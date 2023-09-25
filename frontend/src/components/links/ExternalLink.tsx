@@ -1,5 +1,5 @@
 import React, { ReactNode, ReactElement, CSSProperties } from "react";
-import { FlowserIcon } from "../icons/Icons";
+import { FlowserIcon } from "../icons/FlowserIcon";
 import classes from "./ExternalLink.module.scss";
 
 export type ExternalLinkProps = {

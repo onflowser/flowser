@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect } from "react";
-import { SizedBox } from "../../../../components/sized-box/SizedBox";
+import { SizedBox } from "../../../../components/misc/SizedBox/SizedBox";
 import { ParamBuilder, ParamListBuilder } from "../ParamBuilder/ParamBuilder";
 import {
   CadenceTypeKind,
@@ -9,10 +9,10 @@ import {
   Parameter,
 } from "@flowser/shared";
 import classes from "./ExecutionSettings.module.scss";
-import { LoaderButton } from "../../../../components/buttons/loader-button/LoaderButton";
+import { LoaderButton } from "../../../../components/buttons/LoaderButton/LoaderButton";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
-import { Callout } from "../../../../components/callout/Callout";
+import { Callout } from "../../../../components/misc/Callout/Callout";
 import { ExternalLink } from "../../../../components/links/ExternalLink";
 import { TransactionOptions } from "modules/interactions/core/core-types";
 

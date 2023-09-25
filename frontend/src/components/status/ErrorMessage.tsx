@@ -1,10 +1,10 @@
 import React, { ReactElement } from "react";
 import { FlowUtils } from "../../utils/flow-utils";
 import classes from "./ErrorMessage.module.scss";
-import { JsonView } from "../json-view/JsonView";
+import { JsonView } from "../code/JsonView/JsonView";
 import { ExternalLink } from "../links/ExternalLink";
-import { Callout } from "../callout/Callout";
-import { SizedBox } from "../sized-box/SizedBox";
+import { Callout } from "../misc/Callout/Callout";
+import { SizedBox } from "../misc/SizedBox/SizedBox";
 
 type ScriptErrorProps = {
   cadenceSource: string;

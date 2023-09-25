@@ -1,6 +1,6 @@
 import React, { FunctionComponent, ReactElement, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import IconButton from "../../../components/buttons/icon-button/IconButton";
+import IconButton from "../../../components/buttons/IconButton/IconButton";
 import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
 import classes from "./ProjectListPage.module.scss";
@@ -9,14 +9,13 @@ import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import moment from "moment";
 import { useProjectActions } from "../../../contexts/project.context";
-import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
+import { SimpleButton } from "../../../components/buttons/SimpleButton/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
-import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
-import { ConsentDialog } from "../../../components/dialogs/consent/ConsentDialog";
-import { useAnalyticsConsent } from "../../../hooks/use-analytics-consent";
-import { FlowserIcon } from "../../../components/icons/Icons";
+import { ConsentDialog } from "../../../components/overlays/dialogs/consent/ConsentDialog";
+import { useAnalytics } from "../../../hooks/use-analytics";
+import { FlowserIcon } from "../../../components/icons/FlowserIcon";
 
 type ProjectTab = {
   id: string;
@@ -148,7 +147,7 @@ function ProjectsListContent() {
 
 function AboutContent() {
   const [showAnalyticSettings, setShowAnalyticSettings] = useState(false);
-  const { isConsented, setIsConsented } = useAnalyticsConsent();
+  const { isConsented, setIsConsented } = useAnalytics();
   return (
     <div className={classes.bodyCenter}>
       {showAnalyticSettings && (

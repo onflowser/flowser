@@ -1,14 +1,14 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { DecoratedPollingEntity } from "../../../contexts/timeout-polling.context";
 import { AccountKey } from "@flowser/shared";
-import Label from "../../../components/label/Label";
+import Label from "../../../components/misc/Label/Label";
 import classes from "./AccountKeysTable.module.scss";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
-import CopyButton from "../../../components/buttons/copy-button/CopyButton";
-import { Badge } from "../../../components/badge/Badge";
+import CopyButton from "../../../components/buttons/CopyButton/CopyButton";
+import { BaseBadge } from "../../../components/misc/BaseBadge/BaseBadge";
 import { FlowUtils } from "../../../utils/flow-utils";
 import React, { ReactElement } from "react";
-import Table from "../../../components/table/Table";
+import { BaseTable } from "../../../components/misc/BaseTable/BaseTable";
 
 const columnsHelper = createColumnHelper<DecoratedPollingEntity<AccountKey>>();
 
@@ -24,17 +24,19 @@ const columns = [
           <CopyButton value={info.row.original.publicKey} />
         </div>
         <div className={classes.badges}>
-          <Badge>WEIGHT: {info.row.original.weight}</Badge>
-          <Badge>SEQ. NUMBER: {info.row.original.sequenceNumber}</Badge>
-          <Badge>INDEX: {info.row.original.index}</Badge>
-          <Badge>
+          <BaseBadge>WEIGHT: {info.row.original.weight}</BaseBadge>
+          <BaseBadge>SEQ. NUMBER: {info.row.original.sequenceNumber}</BaseBadge>
+          <BaseBadge>INDEX: {info.row.original.index}</BaseBadge>
+          <BaseBadge>
             SIGN CURVE:{" "}
             {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo)}
-          </Badge>
-          <Badge>
+          </BaseBadge>
+          <BaseBadge>
             HASH ALGO.: {FlowUtils.getHashAlgoName(info.row.original.hashAlgo)}
-          </Badge>
-          <Badge>REVOKED: {info.row.original.revoked ? "YES" : "NO"}</Badge>
+          </BaseBadge>
+          <BaseBadge>
+            REVOKED: {info.row.original.revoked ? "YES" : "NO"}
+          </BaseBadge>
         </div>
       </div>
     ),
@@ -47,7 +49,7 @@ type KeysTableProps = {
 
 export function AccountKeysTable(props: KeysTableProps): ReactElement {
   return (
-    <Table<DecoratedPollingEntity<AccountKey>>
+    <BaseTable<DecoratedPollingEntity<AccountKey>>
       columns={columns}
       data={props.keys}
     />

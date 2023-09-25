@@ -4,8 +4,8 @@ import { ReactElement, useEffect } from "react";
 import { CadenceValueBuilder } from "../interface";
 import SelectInput, {
   SelectInputOption,
-} from "../../../../../components/inputs/select-input/SelectInput";
-import Input from "../../../../../components/inputs/input/Input";
+} from "../../../../../components/inputs/SelectInput/SelectInput";
+import { Input } from "../../../../../components/inputs/Input/Input";
 
 export function PathBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;

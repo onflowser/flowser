@@ -1,13 +1,13 @@
 import React, { FunctionComponent } from "react";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "../../../components/loaders/FullScreenLoading/FullScreenLoading";
 import { useGetContract } from "../../../hooks/use-api";
 import classes from "./ContractDetails.module.scss";
 import {
   DetailsCard,
   DetailsCardColumn,
-} from "components/details-card/DetailsCard";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
-import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
+} from "components/cards/DetailsCard/DetailsCard";
+import { SizedBox } from "../../../components/misc/SizedBox/SizedBox";
+import { CadenceEditor } from "../../../components/code/CadenceEditor/CadenceEditor";
 import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { IdeLink } from "../../../components/links/IdeLink";

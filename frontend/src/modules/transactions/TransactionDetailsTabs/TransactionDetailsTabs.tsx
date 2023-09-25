@@ -1,4 +1,4 @@
-import { TabItem } from "../../../components/tabs/Tabs";
+import { BaseTabItem } from "../../../components/tabs/BaseTabs/BaseTabs";
 import { TransactionError } from "../../../components/status/ErrorMessage";
 import { TransactionSource } from "../TransactionSource/TransactionSource";
 import { EventsTable } from "../../events/EventsTable/EventsTable";
@@ -7,7 +7,7 @@ import React, { ReactElement } from "react";
 import {
   StyledTabs,
   StyledTabsProps,
-} from "../../../components/tabs/StyledTabs";
+} from "../../../components/tabs/StyledTabs/StyledTabs";
 import { Transaction } from "@flowser/shared";
 import { useGetPollingEventsByTransaction } from "../../../hooks/use-api";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
@@ -26,7 +26,7 @@ export function TransactionDetailsTabs(
 
   const { data: events } = useGetPollingEventsByTransaction(transaction.id);
 
-  const tabs: TabItem[] = [];
+  const tabs: BaseTabItem[] = [];
 
   if (transaction.status?.errorMessage) {
     tabs.push({

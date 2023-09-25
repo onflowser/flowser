@@ -1,4 +1,4 @@
-import { Spinner } from "components/spinner/Spinner";
+import { Spinner } from "components/loaders/Spinner/Spinner";
 import React, { ReactElement } from "react";
 import classes from "./Loader.module.scss";
 

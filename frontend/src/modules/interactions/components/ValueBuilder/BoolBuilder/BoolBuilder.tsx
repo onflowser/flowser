@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from "react";
 import { CadenceValueBuilder } from "../interface";
 import { FclValues } from "@flowser/shared";
-import SelectInput from "../../../../../components/inputs/select-input/SelectInput";
+import SelectInput from "../../../../../components/inputs/SelectInput/SelectInput";
 
 export function BoolBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue } = props;

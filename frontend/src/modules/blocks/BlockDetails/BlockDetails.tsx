@@ -1,14 +1,14 @@
 import React, { FunctionComponent } from "react";
 import classes from "./BlockDetails.module.scss";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "../../../components/loaders/FullScreenLoading/FullScreenLoading";
 import { useGetBlock, useGetTransactionsByBlock } from "../../../hooks/use-api";
 import { FlowUtils } from "../../../utils/flow-utils";
 import {
   DetailsCard,
   DetailsCardColumn,
-} from "components/details-card/DetailsCard";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
-import { StyledTabs } from "../../../components/tabs/StyledTabs";
+} from "components/cards/DetailsCard/DetailsCard";
+import { SizedBox } from "../../../components/misc/SizedBox/SizedBox";
+import { StyledTabs } from "../../../components/tabs/StyledTabs/StyledTabs";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { DateDisplay } from "components/time/DateDisplay/DateDisplay";

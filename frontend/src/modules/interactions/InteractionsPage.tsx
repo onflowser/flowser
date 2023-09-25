@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from "react";
 import classes from "./InteractionsPage.module.scss";
-import { Tabs, TabItem } from "../../components/tabs/Tabs";
+import { BaseTabs, BaseTabItem } from "../../components/tabs/BaseTabs/BaseTabs";
 import { useInteractionRegistry } from "./contexts/interaction-registry.context";
 import { InteractionOutcomeManagerProvider } from "./contexts/outcome.context";
 import { InteractionHistory } from "./components/InteractionHistory/InteractionHistory";
@@ -10,16 +10,16 @@ import {
 } from "./contexts/definition.context";
 import { InteractionTemplates } from "./components/InteractionTemplates/InteractionTemplates";
 import { ExecutionSettings } from "./components/ExecutionSettings/ExecutionSettings";
-import { CadenceEditor } from "../../components/cadence-editor/CadenceEditor";
+import { CadenceEditor } from "../../components/code/CadenceEditor/CadenceEditor";
 import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDisplay/InteractionOutcomeDisplay";
-import { SpinnerWithLabel } from "../../components/spinner/SpinnerWithLabel";
+import { SpinnerWithLabel } from "../../components/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 
 export function InteractionsPage(): ReactElement {
   const { definitions, focusedDefinition, remove, setFocused, create } =
     useInteractionRegistry();
 
-  const sideMenuTabs: TabItem[] = [
+  const sideMenuTabs: BaseTabItem[] = [
     {
       id: "history",
       label: "History",
@@ -35,7 +35,7 @@ export function InteractionsPage(): ReactElement {
     sideMenuTabs[0].id
   );
 
-  const openEditorTabs: TabItem[] = [...definitions]
+  const openEditorTabs: BaseTabItem[] = [...definitions]
     .reverse()
     .map((definition) => ({
       id: definition.id,
@@ -51,14 +51,14 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
-      <Tabs
+      <BaseTabs
         className={classes.leftSideMenu}
         contentClassName={classes.content}
         currentTabId={currentSideMenuTabId}
         onChangeTab={(tab) => setCurrentSideMenuTabId(tab.id)}
         tabs={sideMenuTabs}
       />
-      <Tabs
+      <BaseTabs
         className={classes.mainContent}
         tabWrapperClassName={classes.interactionsTabWrapper}
         tabClassName={classes.interactionTab}

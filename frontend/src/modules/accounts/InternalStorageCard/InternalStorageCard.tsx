@@ -3,9 +3,9 @@ import classes from "./InternalStorageCard.module.scss";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
-import { SimpleButton } from "../../../components/buttons/simple-button/SimpleButton";
+import { SimpleButton } from "../../../components/buttons/SimpleButton/SimpleButton";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
-import { JsonView } from "../../../components/json-view/JsonView";
+import { JsonView } from "../../../components/code/JsonView/JsonView";
 
 type ExtendableStorageCardProps = {
   storageItem: DecoratedPollingEntity<AccountStorageItem>;

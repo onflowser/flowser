@@ -9,7 +9,7 @@ import { enableDetailsIntroAnimation } from "../../../config/common";
 import { InternalStorageCard } from "../InternalStorageCard/InternalStorageCard";
 import classNames from "classnames";
 import classes from "./AccountStorage.module.scss";
-import { scrollableElementId } from "../../../components/layout/ProjectLayout/ProjectLayout";
+import { scrollableElementId } from "../../../components/layouts/ProjectLayout/ProjectLayout";
 
 type AccountStorageProps = {
   account: Account;

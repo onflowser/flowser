@@ -1,16 +1,16 @@
 import React, { FunctionComponent } from "react";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
-import Table from "../../../components/table/Table";
+import Label from "../../../components/misc/Label/Label";
+import Value from "../../../components/misc/Value/Value";
+import { BaseTable } from "../../../components/misc/BaseTable/BaseTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
 import { TextUtils } from "../../../utils/text-utils";
-import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { AccountLink } from "../AccountLink/AccountLink";
-import { Badge } from "../../../components/badge/Badge";
+import { BaseBadge } from "../../../components/misc/BaseBadge/BaseBadge";
 import classes from "./AccountsTable.module.scss";
-import { Tooltip } from "../../../components/tooltips/Tooltip";
+import { Tooltip } from "../../../components/overlays/Tooltip/Tooltip";
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -33,7 +33,7 @@ const columns = [
             content={tag.description}
             position="right center"
           >
-            <Badge className={classes.tag}>{tag.name}</Badge>
+            <BaseBadge className={classes.tag}>{tag.name}</BaseBadge>
           </Tooltip>
         ))}
       </Value>
@@ -57,7 +57,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),
@@ -69,7 +69,7 @@ type AccountsTableProps = {
 
 export const AccountsTable: FunctionComponent<AccountsTableProps> = (props) => {
   return (
-    <Table<DecoratedPollingEntity<Account>>
+    <BaseTable<DecoratedPollingEntity<Account>>
       columns={columns}
       data={props.accounts}
     />

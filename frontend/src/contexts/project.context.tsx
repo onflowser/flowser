@@ -23,7 +23,7 @@ import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
 import * as fcl from "@onflow/fcl";
-import { SnapshotDialog } from "components/dialogs/snapshot/SnapshotDialog";
+import { SnapshotDialog } from "components/overlays/dialogs/snapshot/SnapshotDialog";
 import { useNavigate } from "react-router-dom";
 
 export type ProjectActionsContextState = {

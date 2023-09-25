@@ -1,10 +1,10 @@
 import React, { ReactElement, useMemo, useState } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
-import { FlowserIcon } from "../../../../components/icons/Icons";
-import { PrimaryButton } from "../../../../components/buttons/primary-button/PrimaryButton";
-import Input from "../../../../components/inputs/input/Input";
-import { SearchInput } from "../../../../components/inputs/search-input/SearchInput";
+import { FlowserIcon } from "../../../../components/icons/FlowserIcon";
+import { PrimaryButton } from "../../../../components/buttons/PrimaryButton/PrimaryButton";
+import { Input } from "../../../../components/inputs/Input/Input";
+import { SearchInput } from "../../../../components/inputs/SearchInput/SearchInput";
 import { useConfirmDialog } from "../../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";

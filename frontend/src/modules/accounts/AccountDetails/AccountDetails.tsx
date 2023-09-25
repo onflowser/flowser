@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import classes from "./AccountDetails.module.scss";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "../../../components/loaders/FullScreenLoading/FullScreenLoading";
 import {
   useGetAccount,
   useGetPollingContractsByAccount,
@@ -10,17 +10,17 @@ import {
 import {
   DetailsCard,
   DetailsCardColumn,
-} from "components/details-card/DetailsCard";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
+} from "components/cards/DetailsCard/DetailsCard";
+import { SizedBox } from "../../../components/misc/SizedBox/SizedBox";
 import { AccountAvatar } from "../AccountAvatar/AccountAvatar";
 import { AccountName } from "../AccountName/AccountName";
-import { StyledTabs } from "../../../components/tabs/StyledTabs";
+import { StyledTabs } from "../../../components/tabs/StyledTabs/StyledTabs";
 import { AccountStorage } from "../AccountStorage/AccountStorage";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
 import { ContractsTable } from "../../contracts/ContractsTable/ContractsTable";
 import { AccountKeysTable } from "../AccountKeysTable/AccountKeysTable";
-import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
-import { TabItem } from "../../../components/tabs/Tabs";
+import { CadenceEditor } from "../../../components/code/CadenceEditor/CadenceEditor";
+import { BaseTabItem } from "../../../components/tabs/BaseTabs/BaseTabs";
 import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
 
 type AccountDetailsProps = {
@@ -69,7 +69,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
     ],
   ];
 
-  const tabs: TabItem[] = [
+  const tabs: BaseTabItem[] = [
     {
       id: "storage",
       label: "Storage",

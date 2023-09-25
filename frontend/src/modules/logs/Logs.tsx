@@ -10,18 +10,18 @@ import classes from "./Logs.module.scss";
 import { ReactComponent as ExpandIcon } from "../../assets/icons/expand.svg";
 import { ReactComponent as ShrinkIcon } from "../../assets/icons/shrink.svg";
 import { ReactComponent as LogsIcon } from "../../assets/icons/logs.svg";
-import CaretIcon from "../../components/caret-icon/CaretIcon";
+import { CaretIcon } from "../../components/icons/CaretIcon/CaretIcon";
 import { useFilterData } from "../../hooks/use-filter-data";
 import { useMouseMove } from "../../hooks/use-mouse-move";
 import { useGetPollingOutputs } from "../../hooks/use-api";
 import { ManagedProcessOutput, ProcessOutputSource } from "@flowser/shared";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
-import { SimpleButton } from "../../components/buttons/simple-button/SimpleButton";
+import { SimpleButton } from "../../components/buttons/SimpleButton/SimpleButton";
 import { TextUtils } from "../../utils/text-utils";
-import { Callout } from "../../components/callout/Callout";
+import { Callout } from "../../components/misc/Callout/Callout";
 import { CommonUtils } from "../../utils/common-utils";
-import { SearchInput } from "../../components/inputs/search-input/SearchInput";
+import { SearchInput } from "../../components/inputs/SearchInput/SearchInput";
 
 type LogsProps = {
   className?: string;
