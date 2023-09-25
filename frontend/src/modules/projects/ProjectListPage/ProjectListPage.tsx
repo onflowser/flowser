@@ -12,10 +12,9 @@ import { useProjectActions } from "../../../contexts/project.context";
 import { SimpleButton } from "../../../components/buttons/SimpleButton/SimpleButton";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
-import { useAnalytics } from "../../../hooks/use-analytics";
 import { AnalyticEvent } from "../../../services/analytics.service";
 import { ConsentDialog } from "../../../components/overlays/dialogs/consent/ConsentDialog";
-import { useAnalyticsConsent } from "../../../hooks/use-analytics-consent";
+import { useAnalytics } from "../../../hooks/use-analytics";
 import { FlowserIcon } from "../../../components/icons/FlowserIcon";
 
 type ProjectTab = {
@@ -148,7 +147,7 @@ function ProjectsListContent() {
 
 function AboutContent() {
   const [showAnalyticSettings, setShowAnalyticSettings] = useState(false);
-  const { isConsented, setIsConsented } = useAnalyticsConsent();
+  const { isConsented, setIsConsented } = useAnalytics();
   return (
     <div className={classes.bodyCenter}>
       {showAnalyticSettings && (

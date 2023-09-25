@@ -25,7 +25,7 @@ import {
 } from "./contexts/platform-adapter.context";
 import { queryClient } from "./config/react-query";
 import { ConsentDialog } from "./components/overlays/dialogs/consent/ConsentDialog";
-import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
+import { useAnalytics } from "./hooks/use-analytics";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
 import { InteractionsPage } from "./modules/interactions/InteractionsPage";
@@ -271,7 +271,7 @@ const browserRouter = createBrowserRouter(routes);
 const hashRouter = createHashRouter(routes);
 
 function ConsentAnalytics() {
-  const { isConsented, setIsConsented } = useAnalyticsConsent();
+  const { isConsented, setIsConsented } = useAnalytics();
   if (isConsented !== undefined) {
     return null;
   }
