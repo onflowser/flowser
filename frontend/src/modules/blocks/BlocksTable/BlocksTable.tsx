@@ -6,9 +6,9 @@ import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import Table from "../../../components/table/Table";
 import { Block } from "@flowser/shared";
-import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { ProjectLink } from "../../../components/links/ProjectLink";
+import { TimeAgo } from '../../../components/time/TimeAgo/TimeAgo';
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -50,7 +50,7 @@ export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
         },
         cell: (info) => (
           <Value>
-            <ReactTimeago date={info.getValue()} />
+            <TimeAgo date={info.getValue()} />
           </Value>
         ),
       }),

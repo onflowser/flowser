@@ -4,13 +4,13 @@ import { AccountContract } from "@flowser/shared";
 import Label from "../../../components/label/Label";
 import Value from "../../../components/value/Value";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
-import ReactTimeago from "react-timeago";
 import React, { ReactElement, useMemo } from "react";
 import Table from "../../../components/table/Table";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { Tooltip } from "../../../components/tooltips/Tooltip";
 import { Badge } from "../../../components/badge/Badge";
 import classes from "./ContractsTable.module.scss";
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper =
   createColumnHelper<DecoratedPollingEntity<AccountContract>>();
@@ -43,7 +43,7 @@ const columns = [
     header: () => <Label variant="medium">UPDATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),
@@ -51,7 +51,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),

@@ -6,11 +6,11 @@ import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";
 import Table from "../../../components/table/Table";
-import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
@@ -63,7 +63,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),

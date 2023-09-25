@@ -7,12 +7,12 @@ import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionsTable.module.scss";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import { GrcpStatus } from "../../../components/status/GrcpStatus";
-import ReactTimeago from "react-timeago";
 import React, { ReactElement } from "react";
 import Table from "../../../components/table/Table";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 import { Ellipsis } from "../../../components/ellipsis/Ellipsis";
 import { ProjectLink } from "../../../components/links/ProjectLink";
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Transaction>>();
 
@@ -61,7 +61,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),

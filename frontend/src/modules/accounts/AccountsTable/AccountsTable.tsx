@@ -5,12 +5,12 @@ import Table from "../../../components/table/Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Account } from "@flowser/shared";
 import { TextUtils } from "../../../utils/text-utils";
-import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { AccountLink } from "../AccountLink/AccountLink";
 import { Badge } from "../../../components/badge/Badge";
 import classes from "./AccountsTable.module.scss";
 import { Tooltip } from "../../../components/tooltips/Tooltip";
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
 
@@ -57,7 +57,7 @@ const columns = [
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
       <Value>
-        <ReactTimeago date={info.getValue()} />
+        <TimeAgo date={info.getValue()} />
       </Value>
     ),
   }),
