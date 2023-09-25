@@ -20,8 +20,8 @@ export function JsonView(props: JsonViewProps): ReactElement {
         theme="ashes"
         collapsed={props.collapseAtDepth ?? 4}
         src={props.data}
-        displayObjectSize={false}
-        enableClipboard={false}
+        displayObjectSize={true}
+        enableClipboard={true}
         displayDataTypes={false}
       />
     </div>

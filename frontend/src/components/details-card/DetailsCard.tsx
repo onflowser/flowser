@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import Label from "components/label/Label";
 import Value from "components/value/Value";
-import React, { CSSProperties, FC, ReactElement } from "react";
+import React, { FC, ReactElement } from "react";
 import Card from "../card/Card";
 import classes from "./DetailsCard.module.scss";
 import { SizedBox } from "../sized-box/SizedBox";

@@ -51,6 +51,7 @@ import { EventsTable } from "./modules/events/EventsTable/EventsTable";
 import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";
 import { TemplatesRegistryProvider } from "./modules/interactions/contexts/templates.context";
 import { BasicLayout } from "./components/layout/BasicLayout/BasicLayout";
+import { EventDetails } from "./modules/events/EventDetails/EventDetails";
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
@@ -242,6 +243,13 @@ const routes: RouteObject[] = [
                 index: true,
                 element: <EventsTablePage />,
               },
+              {
+                path: ":eventId",
+                element: <EventDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: "Details",
+                }),
+              },
             ],
           },
           {
@@ -330,4 +338,10 @@ function EventsTablePage() {
   const { data } = useGetPollingEvents();
 
   return <EventsTable events={data} />;
+}
+
+function EventDetailsPage() {
+  const { eventId } = useParams();
+
+  return <EventDetails eventId={eventId!} />;
 }

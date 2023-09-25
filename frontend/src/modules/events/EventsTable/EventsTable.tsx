@@ -9,12 +9,24 @@ import Table from "../../../components/table/Table";
 import ReactTimeago from "react-timeago";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { ProjectLink } from "../../../components/links/ProjectLink";
-import { JsonView } from "../../../components/json-view/JsonView";
-import { ExternalLink } from "../../../components/links/ExternalLink";
+import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
+import { EventUtils } from "../utils";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
 
 const columns = [
+  columnHelper.accessor("id", {
+    header: () => <Label variant="medium">IDENTIFIER</Label>,
+    cell: (info) => (
+      <Value>
+        <ProjectLink to={`/events/${info.getValue()}`}>
+          <MiddleEllipsis className={classes.hashEvents}>
+            {info.getValue()}
+          </MiddleEllipsis>
+        </ProjectLink>
+      </Value>
+    ),
+  }),
   columnHelper.display({
     id: "origin",
     header: () => <Label variant="medium">ORIGIN</Label>,
@@ -29,19 +41,9 @@ const columns = [
     header: () => <Label variant="medium">TYPE</Label>,
     cell: (info) => (
       <Value style={{ width: "100%" }}>
-        <EventType event={info.row.original} />
-      </Value>
-    ),
-  }),
-  columnHelper.accessor("blockId", {
-    header: () => <Label variant="medium">BLOCK</Label>,
-    cell: (info) => (
-      <Value>
-        <ProjectLink to={`/blocks/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hashEvents}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </ProjectLink>
+        <div>
+          {EventUtils.parseFullEventType(info.row.original.type).eventType}
+        </div>
       </Value>
     ),
   }),
@@ -57,21 +59,6 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("data", {
-    meta: {
-      className: classes.dataColumn,
-    },
-    header: () => <Label variant="medium">DATA</Label>,
-    cell: (info) => (
-      <Value>
-        <JsonView
-          name="data"
-          collapseAtDepth={0}
-          data={info.getValue() as Record<string, unknown>}
-        />
-      </Value>
-    ),
-  }),
   columnHelper.accessor("createdAt", {
     header: () => <Label variant="medium">CREATED</Label>,
     cell: (info) => (
@@ -81,64 +68,6 @@ const columns = [
     ),
   }),
 ];
-
-function EventOriginLink(props: { event: Event }) {
-  const { type } = props.event;
-
-  const { contractName, contractAddress } = parseEventId(type);
-
-  // Core flow events are emitted from the Flow Virtual Machine.
-  if (contractName && contractAddress) {
-    return (
-      <ProjectLink to={`/contracts/0x${contractAddress}.${contractName}`}>
-        A.{contractAddress}.{contractName}
-      </ProjectLink>
-    );
-  } else {
-    return (
-      <ExternalLink
-        inline
-        href="https://developers.flow.com/cadence/language/core-events"
-      >
-        FVM
-      </ExternalLink>
-    );
-  }
-}
-
-function EventType(props: { event: Event }) {
-  const { type } = props.event;
-
-  const { eventType } = parseEventId(type);
-
-  return <div>{eventType}</div>;
-}
-
-type ParsedEventId = {
-  // Value is `undefined` if event is a core flow event.
-  // https://developers.flow.com/cadence/language/core-events
-  contractAddress: undefined | string;
-  contractName: undefined | string;
-  eventType: string;
-};
-
-function parseEventId(eventId: string): ParsedEventId {
-  const parts = eventId.split(".");
-
-  if (eventId.startsWith("flow.")) {
-    return {
-      contractAddress: undefined,
-      contractName: undefined,
-      eventType: parts[1],
-    };
-  } else {
-    return {
-      contractAddress: parts[1],
-      contractName: parts[2],
-      eventType: parts[3],
-    };
-  }
-}
 
 type EventsTableProps = {
   events: DecoratedPollingEntity<Event>[];
