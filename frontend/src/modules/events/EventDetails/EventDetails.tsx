@@ -1,20 +1,20 @@
 import React, { FunctionComponent } from "react";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "../../../components/loaders/FullScreenLoading/FullScreenLoading";
 import { useGetPollingEvents } from "../../../hooks/use-api";
 import classes from "./EventDetails.module.scss";
 import {
   DetailsCard,
   DetailsCardColumn,
-} from "components/details-card/DetailsCard";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
+} from "components/cards/DetailsCard/DetailsCard";
+import { SizedBox } from "../../../components/misc/SizedBox/SizedBox";
 import { DateDisplay } from "../../../components/time/DateDisplay/DateDisplay";
-import { JsonView } from "../../../components/json-view/JsonView";
+import { JsonView } from "../../../components/code/JsonView/JsonView";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
-import Value from "../../../components/value/Value";
+import Value from "../../../components/misc/Value/Value";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
-import Card from "../../../components/card/Card";
+import { BaseCard } from "../../../components/cards/BaseCard/BaseCard";
 
 type EventDetailsProps = {
   eventId: string;
@@ -82,13 +82,13 @@ export const EventDetails: FunctionComponent<EventDetailsProps> = (props) => {
     <div className={classes.root}>
       <DetailsCard columns={[rows]} />
       <SizedBox height={30} />
-      <Card className={classes.dataCard}>
+      <BaseCard className={classes.dataCard}>
         <JsonView
           name="data"
           collapseAtDepth={1}
           data={event.data as Record<string, unknown>}
         />
-      </Card>
+      </BaseCard>
     </div>
   );
 };

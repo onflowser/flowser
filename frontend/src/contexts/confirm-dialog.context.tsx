@@ -4,7 +4,7 @@ import React, {
   useContext,
   useState,
 } from "react";
-import { ConfirmationDialog } from "../components/dialogs/confirmation/ConfirmationDialog";
+import { ConfirmationDialog } from "../components/overlays/dialogs/confirmation/ConfirmationDialog";
 
 export type ConfirmDialogContextState = {
   showDialog: (props: OpenConfirmDialogProps) => void;

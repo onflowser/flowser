@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import {
   DetailsCard,
   DetailsCardColumn,
-} from "../../../components/details-card/DetailsCard";
+} from "../../../components/cards/DetailsCard/DetailsCard";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./TransactionOverview.module.scss";
 import { ExecutionStatusBadge } from "../../../components/status/ExecutionStatusBadge";

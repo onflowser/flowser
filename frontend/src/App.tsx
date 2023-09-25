@@ -10,21 +10,21 @@ import {
   useParams,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { ProjectLayout } from "./components/layout/ProjectLayout/ProjectLayout";
+import { ProjectLayout } from "./components/layouts/ProjectLayout/ProjectLayout";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
 import { ProjectProvider } from "./contexts/project.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
-import { ProjectRequirements } from "./components/requirements/ProjectRequirements";
+import { ProjectRequirements } from "./components/misc/ProjectRequirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
 import {
   PlatformAdapterProvider,
   PlatformAdapterState,
 } from "./contexts/platform-adapter.context";
 import { queryClient } from "./config/react-query";
-import { ConsentDialog } from "./components/dialogs/consent/ConsentDialog";
+import { ConsentDialog } from "./components/overlays/dialogs/consent/ConsentDialog";
 import { useAnalyticsConsent } from "./hooks/use-analytics-consent";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
@@ -48,9 +48,9 @@ import { ProjectListPage } from "./modules/projects/ProjectListPage/ProjectListP
 import { ContractsTable } from "./modules/contracts/ContractsTable/ContractsTable";
 import { ContractDetails } from "./modules/contracts/ContractDetails/ContractDetails";
 import { EventsTable } from "./modules/events/EventsTable/EventsTable";
-import { createCrumbHandle } from "./components/breadcrumbs/Breadcrumbs";
+import { createCrumbHandle } from "./components/misc/Breadcrumbs/Breadcrumbs";
 import { TemplatesRegistryProvider } from "./modules/interactions/contexts/templates.context";
-import { BasicLayout } from "./components/layout/BasicLayout/BasicLayout";
+import { BasicLayout } from "./components/layouts/BasicLayout/BasicLayout";
 import { EventDetails } from "./modules/events/EventDetails/EventDetails";
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {

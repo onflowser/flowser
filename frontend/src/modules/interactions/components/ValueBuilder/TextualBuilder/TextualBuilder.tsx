@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from "react";
 import { CadenceValueBuilder } from "../interface";
-import Input from "../../../../../components/inputs/input/Input";
+import { Input } from "../../../../../components/inputs/Input/Input";
 
 export function TextualBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue } = props;

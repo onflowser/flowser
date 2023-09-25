@@ -1,8 +1,8 @@
 import React, { ReactElement } from "react";
 import { InteractionIcon } from "../InteractionIcon/InteractionIcon";
-import { SizedBox } from "../../../../components/sized-box/SizedBox";
+import { SizedBox } from "../../../../components/misc/SizedBox/SizedBox";
 import { useGetParsedInteraction } from "../../../../hooks/use-api";
-import { Spinner } from "../../../../components/spinner/Spinner";
+import { Spinner } from "../../../../components/loaders/Spinner/Spinner";
 import classes from "./InteractionLabel.module.scss";
 import { InteractionKind } from "@flowser/shared";
 import { InteractionDefinition } from "modules/interactions/core/core-types";

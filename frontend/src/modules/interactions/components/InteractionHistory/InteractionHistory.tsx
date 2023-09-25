@@ -6,13 +6,13 @@ import {
 } from "../../../../hooks/use-api";
 import { Block, Transaction } from "@flowser/shared";
 import { useProjectActions } from "../../../../contexts/project.context";
-import { FlowserIcon } from "../../../../components/icons/Icons";
-import { SizedBox } from "../../../../components/sized-box/SizedBox";
-import { Spinner } from "../../../../components/spinner/Spinner";
+import { FlowserIcon } from "../../../../components/icons/FlowserIcon";
+import { SizedBox } from "../../../../components/misc/SizedBox/SizedBox";
+import { Spinner } from "../../../../components/loaders/Spinner/Spinner";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
-import { FlowserMenu } from "../../../../components/menus/Menu";
+import { FlowserMenu } from "../../../../components/overlays/menus/Menu";
 import { GrcpStatusIcon } from "../../../../components/status/GrcpStatus";
 
 export function InteractionHistory(): ReactElement {

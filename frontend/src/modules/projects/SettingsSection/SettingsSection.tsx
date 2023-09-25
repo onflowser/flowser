@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import classes from "./SettingsSection.module.scss";
 import classNames from "classnames";
-import { FlowserIcon } from "../../../components/icons/Icons";
+import { FlowserIcon } from "../../../components/icons/FlowserIcon";
 
 export type ConfigurationSectionProps = {
   title: string;

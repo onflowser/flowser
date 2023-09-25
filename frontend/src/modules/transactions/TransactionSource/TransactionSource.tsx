@@ -1,12 +1,12 @@
 import React, { FC } from "react";
-import Card from "../../../components/card/Card";
+import { BaseCard } from "../../../components/cards/BaseCard/BaseCard";
 import classes from "./TransactionSource.module.scss";
 import { Transaction } from "@flowser/shared";
-import { CadenceEditor } from "../../../components/cadence-editor/CadenceEditor";
+import { CadenceEditor } from "../../../components/code/CadenceEditor/CadenceEditor";
 import { ParamBuilder } from "../../interactions/components/ParamBuilder/ParamBuilder";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { SizedBox } from "../../../components/misc/SizedBox/SizedBox";
 import { ProjectLink } from "../../../components/links/ProjectLink";
-import { FlowserIcon } from "../../../components/icons/Icons";
+import { FlowserIcon } from "../../../components/icons/FlowserIcon";
 import { useInteractionRegistry } from "../../interactions/contexts/interaction-registry.context";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 
@@ -51,7 +51,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
   }
 
   return (
-    <Card className={classes.root}>
+    <BaseCard className={classes.root}>
       {transaction.arguments.length > 0 && (
         <div className={classes.left}>
           <h3>Arguments</h3>
@@ -79,6 +79,6 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
       >
         <FlowserIcon.CursorClick /> Interact
       </ProjectLink>
-    </Card>
+    </BaseCard>
   );
 };

@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
 import classes from "./TransactionDetails.module.scss";
-import FullScreenLoading from "../../../components/fullscreen-loading/FullScreenLoading";
+import FullScreenLoading from "../../../components/loaders/FullScreenLoading/FullScreenLoading";
 import { useGetTransaction } from "../../../hooks/use-api";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
-import { SizedBox } from "../../../components/sized-box/SizedBox";
+import { SizedBox } from "../../../components/misc/SizedBox/SizedBox";
 import { TransactionDetailsTabs } from "../TransactionDetailsTabs/TransactionDetailsTabs";
 
 type TransactionDetailsProps = {

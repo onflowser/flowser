@@ -1,11 +1,11 @@
 import React, { ReactElement } from "react";
 import classes from "./EventsTable.module.scss";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "../../../components/misc/Label/Label";
+import Value from "../../../components/misc/Value/Value";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import { Event } from "@flowser/shared";
-import Table from "../../../components/table/Table";
+import { BaseTable } from "../../../components/misc/BaseTable/BaseTable";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
@@ -75,7 +75,7 @@ type EventsTableProps = {
 
 export function EventsTable(props: EventsTableProps): ReactElement {
   return (
-    <Table<DecoratedPollingEntity<Event>>
+    <BaseTable<DecoratedPollingEntity<Event>>
       data={props.events}
       columns={columns}
     />

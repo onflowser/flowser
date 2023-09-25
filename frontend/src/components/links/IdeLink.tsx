@@ -1,5 +1,5 @@
 import { ExternalLink, ExternalLinkProps } from "./ExternalLink";
-import { FlowserIcon } from "../icons/Icons";
+import { FlowserIcon } from "../icons/FlowserIcon";
 import React, { ReactElement } from "react";
 
 type IdeLinkProps = {

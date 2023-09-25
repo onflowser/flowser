@@ -1,11 +1,11 @@
 import { createColumnHelper } from "@tanstack/table-core";
 import { SignableObject } from "@flowser/shared";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "../../../components/misc/Label/Label";
+import Value from "../../../components/misc/Value/Value";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import classes from "./SignaturesTable.module.scss";
 import React, { ReactElement } from "react";
-import Table from "../../../components/table/Table";
+import { BaseTable } from "../../../components/misc/BaseTable/BaseTable";
 import { ProjectLink } from "../../../components/links/ProjectLink";
 
 const columnsHelper = createColumnHelper<SignableObject>();
@@ -42,5 +42,7 @@ type SignaturesTableProps = {
 };
 
 export function SignaturesTable(props: SignaturesTableProps): ReactElement {
-  return <Table<SignableObject> data={props.signatures} columns={columns} />;
+  return (
+    <BaseTable<SignableObject> data={props.signatures} columns={columns} />
+  );
 }

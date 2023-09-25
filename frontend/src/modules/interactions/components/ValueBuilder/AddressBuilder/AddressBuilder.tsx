@@ -4,11 +4,11 @@ import { CadenceValueBuilder } from "../interface";
 import { useGetPollingAccounts } from "../../../../../hooks/use-api";
 import { AccountAvatar } from "../../../../accounts/AccountAvatar/AccountAvatar";
 import { AccountName } from "../../../../accounts/AccountName/AccountName";
-import { FlowserIcon } from "../../../../../components/icons/Icons";
+import { FlowserIcon } from "../../../../../components/icons/FlowserIcon";
 import classNames from "classnames";
 import { ServiceRegistry } from "../../../../../services/service-registry";
 import { Account, FclValues } from "@flowser/shared";
-import { Spinner } from "../../../../../components/spinner/Spinner";
+import { Spinner } from "../../../../../components/loaders/Spinner/Spinner";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;

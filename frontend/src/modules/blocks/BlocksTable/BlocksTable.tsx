@@ -1,14 +1,14 @@
 import React, { FunctionComponent, useMemo } from "react";
-import Label from "../../../components/label/Label";
-import Value from "../../../components/value/Value";
+import Label from "../../../components/misc/Label/Label";
+import Value from "../../../components/misc/Value/Value";
 import classes from "./BlocksTable.module.scss";
 import { MiddleEllipsis } from "../../../components/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
-import Table from "../../../components/table/Table";
+import { BaseTable } from "../../../components/misc/BaseTable/BaseTable";
 import { Block } from "@flowser/shared";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { ProjectLink } from "../../../components/links/ProjectLink";
-import { TimeAgo } from '../../../components/time/TimeAgo/TimeAgo';
+import { TimeAgo } from "../../../components/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
 
@@ -59,7 +59,7 @@ export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
   );
 
   return (
-    <Table<DecoratedPollingEntity<Block>>
+    <BaseTable<DecoratedPollingEntity<Block>>
       data={blocks}
       columns={columns}
       headerRowClass={classes.tableRow}
