@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import classes from "./ProjectSettings.module.scss";
 import { BaseCard } from "../../../components/cards/BaseCard/BaseCard";
@@ -19,7 +18,7 @@ import { FlowUtils } from "../../../utils/flow-utils";
 import * as yup from "yup";
 import { ServiceRegistry } from "../../../services/service-registry";
 import { useErrorHandler } from "../../../hooks/use-error-handler";
-import { useProjectActions } from "../../../contexts/project.context";
+import { useProjectManager } from "../../../contexts/projects.context";
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 import {
   RadioField,
@@ -50,10 +49,9 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
   const { track } = useAnalytics();
   const { onPickProjectPath } = usePlatformAdapter();
-  const { removeProject } = useProjectActions();
+  const { startProject, removeProject } = useProjectManager();
   const { data: flowCliInfo } = useGetFlowCliInfo();
   const { handleError } = useErrorHandler(ProjectSettings.name);
-  const navigate = useNavigate();
   const isExistingProject = Boolean(projectId);
 
   const formik = useFormik({
@@ -65,7 +63,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
       gateway: Gateway.fromPartial({}),
     }),
     onSubmit: async () => {
-      toast.promise(runProject(), {
+      toast.promise(saveAndStartProject(), {
         loading: "Running project",
         success: "Project started",
         error: "Failed to projects project",
@@ -73,7 +71,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
     },
   });
 
-  async function runProject() {
+  async function saveAndStartProject() {
     if (!isExistingProject) {
       track(AnalyticEvent.PROJECT_CREATED);
     }
@@ -93,18 +91,9 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
     if (!project) {
       throw new Error("Expected project in response");
     }
-    try {
-      await projectService.useProject(project.id);
-      navigate(`/projects/${project.id}`, {
-        replace: true,
-      });
-    } catch (e) {
-      navigate(`/projects/${project.id}/settings`, {
-        replace: true,
-      });
-      handleError(e);
-      throw e;
-    }
+    await startProject(project, {
+      replaceCurrentPage: true,
+    });
   }
 
   useEffect(() => {

@@ -14,7 +14,7 @@ import { ProjectLayout } from "./components/layouts/ProjectLayout/ProjectLayout"
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
-import { ProjectProvider } from "./contexts/project.context";
+import { ProjectsManagerProvider } from "./contexts/projects.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
 import { ProjectRequirements } from "./components/misc/ProjectRequirements/ProjectRequirements";
@@ -52,6 +52,8 @@ import { createCrumbHandle } from "./components/misc/Breadcrumbs/Breadcrumbs";
 import { TemplatesRegistryProvider } from "./modules/interactions/contexts/templates.context";
 import { BasicLayout } from "./components/layouts/BasicLayout/BasicLayout";
 import { EventDetails } from "./modules/events/EventDetails/EventDetails";
+import { FlowConfigProvider } from "./contexts/flow.context";
+import { SnapshotsManagerProvider } from "./contexts/snapshots.context";
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
@@ -112,11 +114,15 @@ const routes: RouteObject[] = [
   {
     path: "projects",
     element: (
-      <ProjectProvider>
-        <BrowserRouterEvents>
-          <Outlet />
-        </BrowserRouterEvents>
-      </ProjectProvider>
+      <ProjectsManagerProvider>
+        <FlowConfigProvider>
+          <SnapshotsManagerProvider>
+            <BrowserRouterEvents>
+              <Outlet />
+            </BrowserRouterEvents>
+          </SnapshotsManagerProvider>
+        </FlowConfigProvider>
+      </ProjectsManagerProvider>
     ),
     handle: createCrumbHandle({
       crumbName: "Projects",
