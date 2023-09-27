@@ -35,19 +35,17 @@ export function InteractionsPage(): ReactElement {
     sideMenuTabs[0].id
   );
 
-  const openEditorTabs: BaseTabItem[] = [...definitions]
-    .reverse()
-    .map((definition) => ({
-      id: definition.id,
-      label: <InteractionLabel interaction={definition} />,
-      content: (
-        <InteractionDefinitionManagerProvider definition={definition}>
-          <InteractionOutcomeManagerProvider>
-            <InteractionBody />
-          </InteractionOutcomeManagerProvider>
-        </InteractionDefinitionManagerProvider>
-      ),
-    }));
+  const openEditorTabs: BaseTabItem[] = definitions.map((definition) => ({
+    id: definition.id,
+    label: <InteractionLabel interaction={definition} />,
+    content: (
+      <InteractionDefinitionManagerProvider definition={definition}>
+        <InteractionOutcomeManagerProvider>
+          <InteractionBody />
+        </InteractionOutcomeManagerProvider>
+      </InteractionDefinitionManagerProvider>
+    ),
+  }));
 
   return (
     <div className={classes.pageRoot}>
