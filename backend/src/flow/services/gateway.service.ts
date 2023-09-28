@@ -126,6 +126,11 @@ type SendFlowTransactionOptions = {
   arguments: FclArgumentWithMetadata[];
 };
 
+type ExecuteFlowScriptOptions = {
+  cadence: string;
+  arguments: FclArgumentWithMetadata[];
+};
+
 type FlowTxUnsubscribe = () => void;
 
 type FlowTxStatusCallback = (status: FlowTransactionStatus) => void;
@@ -167,6 +172,18 @@ export class FlowGatewayService implements ProjectContextLifecycle {
   }
   onExitProjectContext(): void {
     this.projectContext = undefined;
+  }
+
+  public async executeScript(options: ExecuteFlowScriptOptions) {
+    return await fcl.query({
+      cadence: options.cadence,
+      args: (arg: FclArgBuilder, t: FclTypeLookup) => {
+        const argumentFunction = FclValues.getArgumentFunction(
+          options.arguments
+        );
+        return argumentFunction(arg, t);
+      },
+    });
   }
 
   /**

@@ -1,9 +1,12 @@
-import { Injectable, HttpException } from "@nestjs/common";
-import axios from "axios";
-import { FlowAccount } from "./gateway.service";
+import { Injectable } from "@nestjs/common";
+import { FlowGatewayService } from "./gateway.service";
 import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
 import { ensurePrefixedAddress } from "../../utils/common-utils";
-import { AccountStorageDomain } from "@flowser/shared";
+import {
+  AccountStorageDomain,
+  CadenceType,
+  CadenceTypeKind,
+} from "@flowser/shared";
 
 /**
  * For more info on the account storage model and API, see:
@@ -14,122 +17,182 @@ import { AccountStorageDomain } from "@flowser/shared";
  * https://github.com/onflow/flow-emulator/blob/3fbe8ad9dc841abdc13056e20e7b15fc0e32a749/server/backend/backend.go#L584-L590
  */
 
-// TODO(milestone-3): Defining shared for all possible cadence shared would be quite difficult.
-// We could define just some of the most common shared like Resource, Path, Dictionary,.. to save time
-// ... or we could define all shared and put them in a shared (npm) library?
-// Object that is stored under /private or /public domains.
-// https://github.com/onflow/cadence/blob/master/values.go
-export type FlowCadenceValue = unknown;
+type CapabilityPathItem = {
+  address: string;
+  path: string;
+  targetPath: string;
+  type: Record<string, unknown>;
+};
 
-// Identifier that is used in account storage path (e.g. /private/<identifier>).
-export type FlowStorageIdentifier = string;
+type StoragePathItem = {
+  address: string;
+  path: string;
+  type: Record<string, unknown>;
+};
 
-export type FlowStorageItem = Record<FlowStorageIdentifier, FlowCadenceValue>;
-
-export type FlowAccountStorageDomain = "Private" | "Public" | "Storage";
-
-export type FlowAccountStorage = {
-  Address: string;
-  Private: FlowStorageItem;
-  Public: FlowStorageItem;
-  Storage: FlowStorageItem;
-  Account: FlowAccount;
+type StorageTraversalResult = {
+  capabilityPathItems: CapabilityPathItem[];
+  storagePathItems: StoragePathItem[];
 };
 
 @Injectable()
 export class FlowAccountStorageService {
-  public async getAccountStorage(address: string) {
+  constructor(private readonly flowGatewayService: FlowGatewayService) {}
+
+  public async getAccountStorageItems(
+    address: string
+  ): Promise<AccountStorageItemEntity[]> {
     const flowAccountStorage = await this.fetchStorageByAddress(address);
 
-    const privateStorageIdentifiers = Object.keys(
-      flowAccountStorage.Private ?? {}
-    );
-    const publicStorageIdentifiers = Object.keys(
-      flowAccountStorage.Public ?? {}
-    );
-    const storageIdentifiers = Object.keys(flowAccountStorage.Storage ?? {});
-
-    const privateItems = privateStorageIdentifiers.map(
-      (flowStorageIdentifier) =>
-        this.createStorageEntity({
-          flowStorageDomain: "Private",
-          flowStorageIdentifier,
-          flowAccountStorage,
-        })
-    );
-    const publicItems = publicStorageIdentifiers.map((flowStorageIdentifier) =>
-      this.createStorageEntity({
-        flowStorageDomain: "Public",
-        flowStorageIdentifier,
-        flowAccountStorage,
-      })
-    );
-    const storageItems = storageIdentifiers.map((flowStorageIdentifier) =>
-      this.createStorageEntity({
-        flowStorageDomain: "Storage",
-        flowStorageIdentifier,
-        flowAccountStorage,
-      })
-    );
-
-    return { privateItems, publicItems, storageItems };
+    return [
+      ...flowAccountStorage.capabilityPathItems.map(
+        (item) =>
+          new AccountStorageItemEntity({
+            account: undefined,
+            accountAddress: ensurePrefixedAddress(item.address),
+            data: {},
+            pathDomain: this.getStorageDomainFromPath(item.path),
+            pathIdentifier: item.path,
+          })
+      ),
+      ...flowAccountStorage.storagePathItems.map(
+        (item) =>
+          new AccountStorageItemEntity({
+            account: undefined,
+            accountAddress: ensurePrefixedAddress(item.address),
+            data: {},
+            pathDomain: this.getStorageDomainFromPath(item.path),
+            pathIdentifier: item.path,
+          })
+      ),
+    ];
   }
 
-  private async fetchStorageByAddress(address: string) {
-    // TODO(milestone-3): use value from emulator config object
-    const response = await axios.get(
-      `http://localhost:8080/emulator/storages/${address}`
-    );
-
-    if (response.status !== 200) {
-      throw new HttpException(response.statusText, response.status);
-    }
-
-    return response.data as FlowAccountStorage;
-  }
-
-  private createStorageEntity(options: {
-    flowStorageDomain: FlowAccountStorageDomain;
-    flowStorageIdentifier: FlowStorageIdentifier;
-    flowAccountStorage: FlowAccountStorage;
-  }) {
-    const { flowAccountStorage, flowStorageIdentifier, flowStorageDomain } =
-      options;
-    const storageData =
-      flowAccountStorage[flowStorageDomain][flowStorageIdentifier];
-
-    function getStorageData() {
-      // TODO(milestone-x): For now we will just show plain (unparsed) storage data
-      // But in the future we will want to parse it so that we can extract info
-      // This will be possible after storage API implements proper deserialization of storage data
-      if (typeof storageData !== "object") {
-        // In case the data is a simple value (string, number, boolean,...)
-        // we need to store it in object form (e.g. under "value" key).
-        // Otherwise, it won't get properly encoded/decoded by protocol buffers.
-        return { value: storageData };
-      } else {
-        return storageData;
+  private async fetchStorageByAddress(
+    address: string
+  ): Promise<StorageTraversalResult> {
+    const cadence = `
+      pub struct CapabilityPathItem {
+        pub let address: Address
+        pub let path: String
+        pub let type: Type
+        pub let targetPath: String?
+      
+        init(
+          address: Address,
+          path: String,
+          type: Type,
+          targetPath: String?
+        ) {
+          self.address = address
+          self.path = path
+          self.type = type
+          self.targetPath = targetPath
+        }
       }
-    }
+      
+      pub struct StoragePathItem {
+        pub let address: Address
+        pub let path: String
+        pub let type: Type
+      
+        init(
+          address: Address,
+          path: String,
+          type: Type,
+        ) {
+          self.address = address
+          self.path = path
+          self.type = type
+        }
+      }
+      
+      pub struct StorageTraversalResult {
+        pub let capabilityPathItems: [CapabilityPathItem]
+        pub let storagePathItems: [StoragePathItem]
+      
+        init(
+          capabilityPathItems: [CapabilityPathItem],
+          storagePathItems: [StoragePathItem]
+        ) {
+          self.capabilityPathItems = capabilityPathItems
+          self.storagePathItems = storagePathItems
+        }
+      }
+      
+      pub fun main(address: Address): StorageTraversalResult {
+      
+        let account = getAuthAccount(address)
+        let capabilityPathItems: [CapabilityPathItem] = []
+        let storagePathItems: [StoragePathItem] = []
+      
+        account.forEachPrivate(fun (path: PrivatePath, type: Type): Bool {
+          capabilityPathItems.append(buildCapabilityPathItem(account: account, path: path, type: type))
+          return true
+        })
+      
+        account.forEachPublic(fun (path: PublicPath, type: Type): Bool {
+          capabilityPathItems.append(buildCapabilityPathItem(account: account, path: path, type: type))
+          return true
+        })
+      
+        account.forEachStored(fun (path: StoragePath, type: Type): Bool {
+          storagePathItems.append(buildStoragePathItem(account: account, path: path, type: type))
+          return true
+        })
+        
+        return StorageTraversalResult(
+          capabilityPathItems: capabilityPathItems,
+          storagePathItems: storagePathItems
+        )
+      }
+      
+      priv fun buildCapabilityPathItem(account: AuthAccount, path: CapabilityPath, type: Type): CapabilityPathItem {
+         var targetPath: String? = nil
+          if let target = account.getLinkTarget(path) {
+            targetPath = target.toString()
+          }
+        return CapabilityPathItem(
+            address: account.address,
+            path: path.toString(),
+            type: type,
+            targetPath: targetPath
+          )
+      }
+      
+      priv fun buildStoragePathItem(account: AuthAccount, path: StoragePath, type: Type): StoragePathItem {
+      
+        return StoragePathItem(
+            address: account.address,
+            path: path.toString(),
+            type: type,
+          )
+      }
+    `;
 
-    return new AccountStorageItemEntity({
-      account: undefined,
-      accountAddress: ensurePrefixedAddress(flowAccountStorage.Address),
-      data: getStorageData(),
-      pathDomain: this.flowStorageDomainToEnum(flowStorageDomain),
-      pathIdentifier: flowStorageIdentifier,
+    return await this.flowGatewayService.executeScript({
+      cadence,
+      arguments: [
+        {
+          value: address,
+          type: CadenceType.fromPartial({
+            rawType: "Address",
+            kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
+          }),
+          identifier: "address",
+        },
+      ],
     });
   }
 
-  private flowStorageDomainToEnum(
-    flowStorageDomain: FlowAccountStorageDomain
-  ): AccountStorageDomain {
-    switch (flowStorageDomain) {
-      case "Public":
+  private getStorageDomainFromPath(path: string): AccountStorageDomain {
+    const rawDomain = path.split("/")[1];
+    switch (rawDomain) {
+      case "public":
         return AccountStorageDomain.STORAGE_DOMAIN_PUBLIC;
-      case "Private":
+      case "private":
         return AccountStorageDomain.STORAGE_DOMAIN_PRIVATE;
-      case "Storage":
+      case "storage":
         return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
       default:
         return AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
