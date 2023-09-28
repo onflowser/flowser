@@ -42,7 +42,7 @@ export function InternalStorageCard({
         </div>
       </SimpleButton>
       <div className={classes.body}>
-        <div className={classes.title}>{storageItem.pathIdentifier}</div>
+        <div className={classes.title}>{storageItem.path}</div>
         {isExpanded ? (
           <JsonView
             name="data"

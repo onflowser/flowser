@@ -52,7 +52,8 @@ export class FlowAccountStorageService {
             accountAddress: ensurePrefixedAddress(item.address),
             data: {},
             pathDomain: this.getStorageDomainFromPath(item.path),
-            pathIdentifier: item.path,
+            path: item.path,
+            targetPath: item.targetPath,
           })
       ),
       ...flowAccountStorage.storagePathItems.map(
@@ -62,7 +63,8 @@ export class FlowAccountStorageService {
             accountAddress: ensurePrefixedAddress(item.address),
             data: {},
             pathDomain: this.getStorageDomainFromPath(item.path),
-            pathIdentifier: item.path,
+            path: item.path,
+            targetPath: "",
           })
       ),
     ];
