@@ -5,7 +5,6 @@ import {
   useGetTransactionsByBlock,
 } from "../../../../hooks/use-api";
 import { Block, Transaction } from "@flowser/shared";
-import { useProjectActions } from "../../../../contexts/project.context";
 import { FlowserIcon } from "../../../../components/icons/FlowserIcon";
 import { SizedBox } from "../../../../components/misc/SizedBox/SizedBox";
 import { Spinner } from "../../../../components/loaders/Spinner/Spinner";
@@ -14,6 +13,7 @@ import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../../components/overlays/menus/Menu";
 import { GrcpStatusIcon } from "../../../../components/status/GrcpStatus";
+import { useSnapshotsManager } from "../../../../contexts/snapshots.context";
 
 export function InteractionHistory(): ReactElement {
   const { data: blocks } = useGetPollingBlocks();
@@ -44,7 +44,7 @@ function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const menuIconSize = 15;
 
-  const { checkoutBlock } = useProjectActions();
+  const { checkoutBlock } = useSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
   const { data } = useGetTransactionsByBlock(block.id, {
     // Assume that every transaction is packaged into a separate block.

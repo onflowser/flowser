@@ -5,14 +5,10 @@ import longLogo from "../../../assets/images/long_logo.png";
 import trash from "../../../assets/icons/trash.svg";
 import classes from "./ProjectListPage.module.scss";
 import { useGetAllProjects } from "../../../hooks/use-api";
-import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import moment from "moment";
-import { useProjectActions } from "../../../contexts/project.context";
+import { useProjectManager } from "../../../contexts/projects.context";
 import { SimpleButton } from "../../../components/buttons/SimpleButton/SimpleButton";
-import { ServiceRegistry } from "../../../services/service-registry";
-import { useErrorHandler } from "../../../hooks/use-error-handler";
-import { AnalyticEvent } from "../../../services/analytics.service";
 import { ConsentDialog } from "../../../components/overlays/dialogs/consent/ConsentDialog";
 import { useAnalytics } from "../../../hooks/use-analytics";
 import { FlowserIcon } from "../../../components/icons/FlowserIcon";
@@ -90,25 +86,8 @@ export const ProjectListPage: FunctionComponent = () => {
 
 function ProjectsListContent() {
   const { data: projects } = useGetAllProjects();
-  const { removeProject } = useProjectActions();
-  const { handleError } = useErrorHandler(ProjectsListContent.name);
-  const navigate = useNavigate();
-  const { track } = useAnalytics();
-  const projectService = ServiceRegistry.getInstance().projectsService;
+  const { startProject, removeProject } = useProjectManager();
   const showProjectList = projects && projects.length > 0;
-
-  const runProject = async (project: Project) => {
-    try {
-      await projectService.useProject(project.id);
-      track(AnalyticEvent.PROJECT_STARTED);
-      navigate(`/projects/${project.id}`);
-    } catch (e: unknown) {
-      handleError(e);
-      navigate(`/projects/${project.id}/settings`, {
-        replace: true,
-      });
-    }
-  };
 
   if (!showProjectList) {
     return (
@@ -125,7 +104,7 @@ function ProjectsListContent() {
           <li key={project.id} className={classes.projectItem}>
             <span
               className={classes.projectName}
-              onClick={() => runProject(project)}
+              onClick={() => startProject(project)}
             >
               {project.name}
             </span>

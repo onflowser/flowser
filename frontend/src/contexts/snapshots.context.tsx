@@ -5,59 +5,42 @@ import React, {
   useContext,
   useState,
   useMemo,
-  useEffect,
 } from "react";
 import toast from "react-hot-toast";
-import { Block, EmulatorSnapshot, Project } from "@flowser/shared";
+import { Block, EmulatorSnapshot } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { ServiceRegistry } from "../services/service-registry";
 import {
-  useGetCurrentProject,
-  useGetFlowConfig,
   useGetPollingBlocks,
   useGetPollingEmulatorSnapshots,
 } from "../hooks/use-api";
 import { useErrorHandler } from "../hooks/use-error-handler";
-import { useQueryClient } from "react-query";
 import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
-import * as fcl from "@onflow/fcl";
 import { SnapshotDialog } from "components/overlays/dialogs/snapshot/SnapshotDialog";
-import { useNavigate } from "react-router-dom";
+import { useProjectManager } from "./projects.context";
 
-export type ProjectActionsContextState = {
-  switchProject: () => Promise<void>;
-
+export type SnapshotsManager = {
   createSnapshot: () => void;
   checkoutBlock: (blockId: string) => void;
-
-  removeProject: (project: Project) => void;
 };
 
-const ProjectContext = createContext<ProjectActionsContextState>(
-  {} as ProjectActionsContextState
+const SnapshotsManagerContext = createContext<SnapshotsManager>(
+  {} as SnapshotsManager
 );
 
-export function useProjectActions(): ProjectActionsContextState {
-  return useContext(ProjectContext);
-}
-
-export function ProjectProvider({
+export function SnapshotsManagerProvider({
   children,
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { projectsService, snapshotService } = ServiceRegistry.getInstance();
+  const { snapshotService } = ServiceRegistry.getInstance();
 
   const { track } = useAnalytics();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { handleError } = useErrorHandler(ProjectProvider.name);
-  const { showDialog, hideDialog } = useConfirmDialog();
-  const { data: currentProject, refetch: refetchCurrentProject } =
-    useGetCurrentProject();
-  const { data: flowConfigData } = useGetFlowConfig();
+  const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
+  const { showDialog } = useConfirmDialog();
+  const { currentProject } = useProjectManager();
   const { data: blocks, refresh } = useGetPollingBlocks();
   const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
   const snapshotLookupByBlockId = useMemo(
@@ -69,79 +52,10 @@ export function ProjectProvider({
   );
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
 
-  useEffect(() => {
-    if (currentProject?.project && flowConfigData?.flowJson) {
-      const accessNodePort =
-        currentProject.project.emulator?.restServerPort ?? 8888;
-      fcl
-        .config({
-          "app.detail.icon": `http://localhost:6061/icon.png`,
-          "app.detail.title": "Flowser",
-          "accessNode.api": `http://localhost:${accessNodePort}`,
-          "flow.network": "local",
-        })
-        .load({
-          flowJSON: JSON.parse(flowConfigData.flowJson),
-        });
-    }
-  }, [currentProject, flowConfigData]);
-
-  const confirmProjectRemove = async (project: Project) => {
-    track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
-
-    try {
-      await toast.promise(projectsService.removeProject(project.id), {
-        loading: "Deleting project",
-        error: `Failed to delete project "${project.name}"`,
-        success: `Project "${project.name}" deleted!`,
-      });
-      navigate("/projects", {
-        replace: true,
-      });
-    } catch (e) {
-      toast.error("Something went wrong: can not delete custom emulator");
-    } finally {
-      hideDialog();
-    }
-  };
-
-  function removeProject(project: Project) {
-    showDialog({
-      title: "Delete project",
-      body: <span>Are you sure you want to delete this project?</span>,
-      onConfirm: () => confirmProjectRemove(project),
-      confirmButtonLabel: "DELETE",
-      cancelButtonLabel: "CANCEL",
-    });
-  }
-
-  async function switchProject() {
-    const execute = async () => {
-      try {
-        await projectsService.unUseCurrentProject();
-        refetchCurrentProject();
-      } catch (e) {
-        // nothing critical happened, ignore the error
-        console.warn("Couldn't stop the emulator: ", e);
-      }
-      // Clear the entire cache,
-      // so that previous data isn't there when using another project
-      queryClient.clear();
-      navigate("/projects", {
-        replace: true,
-      });
-    };
-    await toast.promise(execute(), {
-      loading: "Closing project...",
-      success: "Project closed!",
-      error: "Something went wrong, try again!",
-    });
-  }
-
   function createSnapshot() {
     track(AnalyticEvent.CREATE_SNAPSHOT);
 
-    const { snapshot } = currentProject?.project?.emulator ?? {};
+    const { snapshot } = currentProject?.emulator ?? {};
     if (!snapshot) {
       toast(
         "Snapshots can only be created when enabling the 'snapshot' option in settings",
@@ -155,7 +69,7 @@ export function ProjectProvider({
   }
 
   function checkoutSnapshot(snapshot: EmulatorSnapshot) {
-    const isSnapshotEnabled = currentProject?.project?.emulator?.snapshot;
+    const isSnapshotEnabled = currentProject?.emulator?.snapshot;
     if (!isSnapshotEnabled) {
       toast.error(
         "Can't jump to block, because 'snapshot' option is not enabled in project settings"
@@ -173,14 +87,14 @@ export function ProjectProvider({
     const onConfirm = async () => {
       track(AnalyticEvent.CHECKOUT_SNAPSHOT);
 
-      if (!currentProject?.project) {
+      if (!currentProject) {
         throw new Error("Expected project to be defined");
       }
 
       try {
         await snapshotService.checkoutBlock({
           blockId: snapshot.blockId,
-          projectId: currentProject.project.id,
+          projectId: currentProject.id,
         });
         refresh();
         toast.success(
@@ -215,7 +129,7 @@ export function ProjectProvider({
         toast("Blockchain state is already at this block, doing nothing.");
         return;
       }
-      if (!currentProject?.project) {
+      if (!currentProject) {
         throw new Error("Expected project to be defined");
       }
 
@@ -268,16 +182,18 @@ export function ProjectProvider({
   );
 
   return (
-    <ProjectContext.Provider
+    <SnapshotsManagerContext.Provider
       value={{
-        switchProject,
         createSnapshot,
         checkoutBlock,
-        removeProject,
       }}
     >
       <SnapshotDialog show={showSnapshotModal} setShow={setShowSnapshotModal} />
       {children}
-    </ProjectContext.Provider>
+    </SnapshotsManagerContext.Provider>
   );
+}
+
+export function useSnapshotsManager(): SnapshotsManager {
+  return useContext(SnapshotsManagerContext);
 }

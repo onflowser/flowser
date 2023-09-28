@@ -4,7 +4,7 @@ import { useMatches } from "react-router-dom";
 import { FlowserIcon } from "components/icons/FlowserIcon";
 import { SizedBox } from "../SizedBox/SizedBox";
 import classNames from "classnames";
-import { useProjectActions } from "../../../contexts/project.context";
+import { useProjectManager } from "../../../contexts/projects.context";
 import { buildProjectUrl, ProjectLink } from "../../links/ProjectLink";
 import { useCurrentProjectId } from "hooks/use-current-project-id";
 
@@ -13,7 +13,7 @@ type SideNavigationProps = {
 };
 
 export function SideNavigation(props: SideNavigationProps): ReactElement {
-  const { switchProject } = useProjectActions();
+  const { switchProject } = useProjectManager();
 
   return (
     <div className={classNames(classes.root, props.className)}>

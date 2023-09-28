@@ -17,12 +17,10 @@ const columns = [
     header: () => <Label variant="medium">KEY</Label>,
     cell: (info) => (
       <div className={classes.cellRoot}>
-        <div className={classes.keyWrapper}>
-          <MiddleEllipsis maxLength={100}>
-            {info.row.original.publicKey}
-          </MiddleEllipsis>
-          <CopyButton value={info.row.original.publicKey} />
-        </div>
+        <KeyDisplay label="Public" keyValue={info.row.original.publicKey} />
+        {info.row.original.privateKey && (
+          <KeyDisplay label="Private" keyValue={info.row.original.privateKey} />
+        )}
         <div className={classes.badges}>
           <BaseBadge>WEIGHT: {info.row.original.weight}</BaseBadge>
           <BaseBadge>SEQ. NUMBER: {info.row.original.sequenceNumber}</BaseBadge>
@@ -42,6 +40,16 @@ const columns = [
     ),
   }),
 ];
+
+function KeyDisplay(props: { label: string; keyValue: string }) {
+  return (
+    <div className={classes.keyWrapper}>
+      <b>{props.label}:</b>
+      <MiddleEllipsis maxLength={100}>{props.keyValue}</MiddleEllipsis>
+      <CopyButton value={props.keyValue} />
+    </div>
+  );
+}
 
 type KeysTableProps = {
   keys: DecoratedPollingEntity<AccountKey>[];

@@ -13,15 +13,11 @@ import { Spinner } from "../../../../../components/loaders/Spinner/Spinner";
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;
   const { data, refresh } = useGetPollingAccounts();
-  const managedAccounts = useMemo(
-    () =>
-      addressBuilderOptions?.showManagedAccountsOnly
-        ? data.filter((account) =>
-            account.keys.some((key) => key.privateKey !== "")
-          )
-        : data,
-    [data]
-  );
+  const managedAccounts = addressBuilderOptions?.showManagedAccountsOnly
+    ? data.filter((account) =>
+        account.keys.some((key) => key.privateKey !== "")
+      )
+    : data;
 
   // TODO(polish): Don't trigger this hook on every rerender
   //  See: https://www.notion.so/flowser/Looks-like-polling-data-isn-t-properly-mutated-and-doesn-t-retrigger-the-useEffect-call-fb84a35b33fb4e6e8518c11cb30bd14d?pvs=4
