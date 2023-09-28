@@ -59,31 +59,12 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    margin: 20px 20px 0;
+    margin: $spacing-base;
+    row-gap: $spacing-base;
 
     .title {
       display: inline-block;
       font-weight: bold;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      overflow: hidden;
-      margin-top: 20px;
-      margin-bottom: 10px;
-
-      .badge {
-        margin-right: $spacing-s;
-        margin-bottom: 8px;
-        width: fit-content;
-        border: 0.5px solid $purple;
-        color: $gray-10;
-        border-radius: 10px;
-        padding: 2px 10px 2px 10px;
-        font-size: 13px;
-        transition: 0.3s;
-      }
     }
   }
 }

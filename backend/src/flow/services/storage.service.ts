@@ -50,7 +50,10 @@ export class FlowAccountStorageService {
           new AccountStorageItemEntity({
             account: undefined,
             accountAddress: ensurePrefixedAddress(item.address),
-            data: {},
+            // Temporarily store the data type in untyped field, refactor later.
+            data: {
+              type: item.type,
+            },
             pathDomain: this.getStorageDomainFromPath(item.path),
             path: item.path,
             targetPath: item.targetPath,
@@ -61,7 +64,10 @@ export class FlowAccountStorageService {
           new AccountStorageItemEntity({
             account: undefined,
             accountAddress: ensurePrefixedAddress(item.address),
-            data: {},
+            // Temporarily store the data type in untyped field, refactor later.
+            data: {
+              type: item.type,
+            },
             pathDomain: this.getStorageDomainFromPath(item.path),
             path: item.path,
             targetPath: "",

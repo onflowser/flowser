@@ -1,11 +1,12 @@
 import React, { ReactElement } from "react";
 import classes from "./InternalStorageCard.module.scss";
-import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
+import { AccountStorageItem } from "@flowser/shared";
 import { FlowUtils } from "utils/flow-utils";
 import classNames from "classnames";
 import { SimpleButton } from "../../../components/buttons/SimpleButton/SimpleButton";
 import { DecoratedPollingEntity } from "contexts/timeout-polling.context";
 import { JsonView } from "../../../components/code/JsonView/JsonView";
+import { StorageDataTypes } from "../StorageDataTypes/StorageDataTypes";
 
 type ExtendableStorageCardProps = {
   storageItem: DecoratedPollingEntity<AccountStorageItem>;
@@ -29,7 +30,7 @@ export function InternalStorageCard({
       enableIntroAnimation && (storageItem.isNew || storageItem.isUpdated),
   });
 
-  const storageDataPaths = getDataTypeKeysInStorageData(storageItem.data);
+  const pathIdentifier = storageItem.path.split("/").reverse()[0];
 
   return (
     <div id={storageItem.id} className={extendClass}>
@@ -42,7 +43,7 @@ export function InternalStorageCard({
         </div>
       </SimpleButton>
       <div className={classes.body}>
-        <div className={classes.title}>{storageItem.path}</div>
+        <div className={classes.title}>{pathIdentifier}</div>
         {isExpanded ? (
           <JsonView
             name="data"
@@ -50,58 +51,9 @@ export function InternalStorageCard({
             data={storageItem.data as Record<string, unknown>}
           />
         ) : (
-          <div className={classes.tags}>
-            {storageDataPaths.map((path) => (
-              <div key={path} className={classes.badge}>
-                {path}
-              </div>
-            ))}
-          </div>
+          <StorageDataTypes storageItem={storageItem} />
         )}
       </div>
     </div>
   );
-}
-
-function getDataTypeKeysInStorageData(
-  storageData: Record<string, unknown> | undefined
-): string[] {
-  const nestedObjectsKeys = Object.keys(storageData ?? {});
-  const uniqueDataTypes = new Set<string>();
-  const addAll = (values: string[]) =>
-    values.forEach((value) => uniqueDataTypes.add(value));
-
-  addAll(getDataTypeKeysAtCurrentDepth(storageData));
-
-  // Find all data type keys that are stored in nested objects
-  for (const key of nestedObjectsKeys) {
-    const nestedObjectCandidate = storageData?.[key] as
-      | Record<string, unknown>
-      | undefined;
-    const isValidCandidate =
-      typeof nestedObjectCandidate === "object" &&
-      nestedObjectCandidate !== null;
-    if (isValidCandidate) {
-      const nestedDataTypeKeys = getDataTypeKeysInStorageData(
-        nestedObjectCandidate
-      );
-      addAll(nestedDataTypeKeys);
-    }
-  }
-  return [...uniqueDataTypes];
-}
-
-function getDataTypeKeysAtCurrentDepth(
-  storageData: Record<string, unknown> | undefined
-): string[] {
-  const compositeDataTypeKeyPattern = /[a-zA-Z]+Type/;
-  const keys = Object.keys(storageData ?? {});
-  const compositeDataTypes = keys.filter((key) =>
-    compositeDataTypeKeyPattern.test(key)
-  );
-  const simpleDataTypes =
-    storageData !== undefined && "value" in storageData
-      ? [typeof storageData.value]
-      : [];
-  return [...compositeDataTypes, ...simpleDataTypes];
 }

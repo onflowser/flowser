@@ -21,11 +21,12 @@ export function PublicPrivateStorageCard({
   currentAccountAddress,
   enableIntroAnimation = true,
 }: StorageCardProps): ReactElement {
-  const borrowType = storageItem.data?.BorrowType ?? "-";
   const targetStorageCardUrl = getTargetStorageCardUrl({
     currentAccountAddress,
     storageItem,
   });
+
+  const pathIdentifier = storageItem.path.split("/").reverse()[0];
 
   return (
     <div
@@ -36,15 +37,14 @@ export function PublicPrivateStorageCard({
     >
       <img className={classes.background} src={gradient} alt="" />
       <div className={classes.content}>
-        <StorageDomainBadge pathDomain={storageItem.pathDomain} />
-        <div className={classes.identifier}>{storageItem.path}</div>
+        <div className={classes.domainBadgeWrapper}>
+          <StorageDomainBadge pathDomain={storageItem.pathDomain} />
+        </div>
+        <div className={classes.identifier}>{pathIdentifier}</div>
         <ProjectLink className={classes.link} to={targetStorageCardUrl} replace>
           <LinkIcon />
           <div className={classes.linkText}>{storageItem.targetPath}</div>
         </ProjectLink>
-        <span title={borrowType} className={classes.bottomText}>
-          {borrowType}
-        </span>
       </div>
     </div>
   );
