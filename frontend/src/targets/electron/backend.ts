@@ -67,7 +67,7 @@ export class FlowserBackend {
     const defaultProjectProto = projectService.getDefaultProject();
 
     const temporaryProject = ProjectEntity.create({
-      id: crypto.randomBytes(20).toString("utf-8"),
+      id: crypto.randomBytes(20).toString("base64url"),
       name: "Flow CLI project",
       filesystemPath: options.filesystemPath,
       gateway: defaultProjectProto.gateway,
