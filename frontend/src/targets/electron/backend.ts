@@ -7,6 +7,7 @@ import {
 } from "@flowser/backend";
 import { INestApplication } from "@nestjs/common";
 import { Logger } from "./services/logger.service";
+import crypto from "crypto";
 
 export class FlowserBackend {
   private static instance: FlowserBackend;
@@ -55,20 +56,25 @@ export class FlowserBackend {
     this.app?.close();
   }
 
-  public getDefaultProject(): ProjectEntity {
+  public async startTemporaryProject(options: {
+    filesystemPath: string;
+  }): Promise<ProjectEntity> {
     const projectService = this.app?.get(ProjectsService);
     if (!projectService) {
       throw new Error("App not initialized");
     }
-    const defaultProjectProto = projectService?.getDefaultProject();
-    return ProjectEntity.create(defaultProjectProto);
-  }
 
-  public async startTemporaryProject(project: ProjectEntity): Promise<void> {
-    const projectService = this.app?.get(ProjectsService);
-    if (!projectService) {
-      throw new Error("App not initialized");
-    }
-    await projectService?.useProject(project);
+    const defaultProjectProto = projectService.getDefaultProject();
+
+    const temporaryProject = ProjectEntity.create({
+      id: crypto.randomBytes(20).toString("utf-8"),
+      name: "Flow CLI project",
+      filesystemPath: options.filesystemPath,
+      gateway: defaultProjectProto.gateway,
+      emulator: defaultProjectProto.emulator,
+      startBlockHeight: 0,
+    });
+
+    return projectService.useProject(temporaryProject);
   }
 }
