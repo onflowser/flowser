@@ -5,6 +5,7 @@ import { SentryMainService } from "./services/sentry-main.service";
 import { setupMenu } from "./menu";
 import { ServiceRegistry } from "./services/service-registry";
 import { FlowserBackend } from "./backend";
+import { ProjectEntity } from "@flowser/backend";
 
 fixPath();
 
@@ -43,7 +44,15 @@ async function createWindow() {
 
   win.loadURL(getClientAppUrl());
 
-  await handleBackendStart();
+  await startBackend();
+
+  const temporaryProject = await maybeStartTemporaryProject();
+
+  if (temporaryProject !== undefined) {
+    // Our react-router instance is configured to use hash-based navigation:
+    // https://reactrouter.com/en/main/routers/create-hash-router.
+    win.loadURL(`${getClientAppUrl()}#/projects/${temporaryProject.id}`);
+  }
 }
 
 app.on("ready", () => {
@@ -103,7 +112,7 @@ app.on("before-quit", async function (e) {
   }
 });
 
-async function handleBackendStart() {
+async function startBackend() {
   const backend = FlowserBackend.getInstance();
 
   try {
@@ -115,31 +124,28 @@ async function handleBackendStart() {
     await handleBackendError({
       error,
       window: win,
-      onRestart: handleBackendStart,
+      onRestart: startBackend,
       onQuit: app.quit,
     });
   }
+}
+
+async function maybeStartTemporaryProject(): Promise<
+  ProjectEntity | undefined
+> {
+  const backend = FlowserBackend.getInstance();
 
   try {
     const { hasSwitch, getSwitchValue } = app.commandLine;
 
-    const temporaryProjectFlags = {
-      projectPath: "project-path",
-    };
+    const temporaryProjectPathFlag = "project-path";
 
-    const shouldStartTemporaryProject = hasSwitch(
-      temporaryProjectFlags.projectPath
-    );
+    const shouldStartTemporaryProject = hasSwitch(temporaryProjectPathFlag);
 
     if (shouldStartTemporaryProject) {
-      const project = backend.getDefaultProject();
-
-      project.name = "Flow CLI project";
-      project.filesystemPath = getSwitchValue(
-        temporaryProjectFlags.projectPath
-      );
-
-      await backend.startTemporaryProject(project);
+      return backend.startTemporaryProject({
+        filesystemPath: getSwitchValue(temporaryProjectPathFlag),
+      });
     }
   } catch (e: unknown) {
     const result = await dialog.showMessageBox(win, {
@@ -153,6 +159,8 @@ async function handleBackendStart() {
       app.exit(1);
     }
   }
+
+  return undefined;
 }
 
 async function showDirectoryPicker() {
