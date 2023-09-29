@@ -14,11 +14,14 @@ import { useErrorHandler } from "hooks/use-error-handler";
 export type ProjectsManager = {
   currentProject: Project | undefined;
   switchProject: () => Promise<void>;
-  startProject: (project: Project, options?: StartProjectOptions) => Promise<void>;
+  startProject: (
+    project: Project,
+    options?: StartProjectOptions
+  ) => Promise<void>;
   removeProject: (project: Project) => void;
 };
 
-type StartProjectOptions = {replaceCurrentPage: boolean;}
+type StartProjectOptions = { replaceCurrentPage: boolean };
 
 const ProjectsManagerContext = createContext<ProjectsManager>(
   {} as ProjectsManager
@@ -88,17 +91,21 @@ export function ProjectsManagerProvider({
     await toast.promise(execute(), {
       loading: "Closing project...",
       success: "Project closed!",
-      error: "Something went wrong, try again!",
+      error: "Something went wrong, please try again!",
     });
   }
 
   async function startProject(project: Project, options?: StartProjectOptions) {
     try {
-      await projectsService.useProject(project.id);
+      await toast.promise(projectsService.useProject(project.id), {
+        loading: "Starting project...",
+        success: "Project started!",
+        error: "Something went wrong, please try again!",
+      });
       refetchCurrentProject();
       track(AnalyticEvent.PROJECT_STARTED);
       navigate(`/projects/${project.id}`, {
-        replace: options?.replaceCurrentPage
+        replace: options?.replaceCurrentPage,
       });
     } catch (e: unknown) {
       handleError(e);
