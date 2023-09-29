@@ -4,10 +4,8 @@
 	<br />
 </div>
 
-> **News:** Our app is currently in beta, and we'd love to hear your feedback! Follow us on [Twitter](https://twitter.com/onflowser) or join our [Discord server](https://discord.gg/2gx7ZsRUkD) for updates and feedback.
 
-
-Flowser is first-of-its-kind development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing blockchain emulator, inspecting the current state, interacting with the network and much more!
+Flowser is a user-friendly GUI development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing blockchain emulator, indexing the blockchain, executing interactions and much more!
 
 ## Get started
 
@@ -18,14 +16,13 @@ flow flowser
 
 ## Key Features
 
-- **Blockchain state**: See the whole state of your local Flow blockchain in real-time
-- **State snapshots**: Create and jump to [blockchain state snapshots](https://github.com/onflow/flow-emulator#managing-emulator-state) - similar to how Git works
-- **Account storage inspection**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
+- **Interactions**: dynamic UI for executing scripts or transactions
+- **State inspection**: all blockchain state (accounts, blocks, transactions, events,...) at your fingertips
+- **Blockchain snapshots**: Rollback current state to any previous block
+- **Account storage**: Visual [account storage](https://developers.flow.com/cadence/language/accounts#account-storage) inspection 
 
 
 If you encounter any issues with the app, [open a new Github issue](https://github.com/onflowser/flowser/issues) or reach to us on [Discord](https://discord.gg/2gx7ZsRUkD)!
-
-For more info, visit [docs.flowser.dev](https://docs.flowser.dev).
 
 ## License
 
