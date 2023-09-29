@@ -40,7 +40,7 @@ export class AccountStorageService {
   ) {
     const oldStorageItems = await this.findStorageByAccount(address);
     const entitiesDiff = computeEntitiesDiff<AccountStorageItemEntity>({
-      primaryKey: ["pathIdentifier", "pathDomain", "accountAddress"],
+      primaryKey: ["path", "pathDomain", "accountAddress"],
       newEntities: newStorageItems,
       oldEntities: oldStorageItems,
       deepCompare: true,
@@ -61,7 +61,7 @@ export class AccountStorageService {
     accountStorage.markUpdated();
     return this.storageRepository.update(
       {
-        pathIdentifier: accountStorage.pathIdentifier,
+        path: accountStorage.path,
         pathDomain: accountStorage.pathDomain,
         accountAddress: accountStorage.accountAddress,
       },
@@ -72,7 +72,7 @@ export class AccountStorageService {
 
   async delete(accountStorage: AccountStorageItemEntity) {
     return this.storageRepository.delete({
-      pathIdentifier: accountStorage.pathIdentifier,
+      path: accountStorage.path,
       pathDomain: accountStorage.pathDomain,
       accountAddress: accountStorage.accountAddress,
     });

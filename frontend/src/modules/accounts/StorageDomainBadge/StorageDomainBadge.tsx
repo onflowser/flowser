@@ -12,9 +12,7 @@ export function StorageDomainBadge({
 }: StorageBadgeProps): ReactElement {
   return (
     <div className={classes.root}>
-      <div className={classes.badge}>
-        {FlowUtils.getLowerCasedPathDomain(pathDomain)}
-      </div>
+      {FlowUtils.getLowerCasedPathDomain(pathDomain)}
     </div>
   );
 }

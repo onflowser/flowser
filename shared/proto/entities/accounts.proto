@@ -50,11 +50,12 @@ enum AccountStorageDomain {
 // https://github.com/onflow/flow-emulator/blob/master/accountStorage.go
 message AccountStorageItem {
   string id = 1;
-  string pathIdentifier = 2;
-  AccountStorageDomain pathDomain = 3;
-  google.protobuf.Struct data = 4;
-  string created_at = 5;
-  string updated_at = 6;
+  string path = 2;
+  string target_path = 3;
+  AccountStorageDomain path_domain = 4;
+  google.protobuf.Struct data = 5;
+  string created_at = 6;
+  string updated_at = 7;
 }
 
 message AccountContract {

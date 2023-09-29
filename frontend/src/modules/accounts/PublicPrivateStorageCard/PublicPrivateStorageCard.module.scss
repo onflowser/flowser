@@ -8,7 +8,6 @@
   flex-direction: column;
   width: 100%;
   border-radius: 10px;
-  height: 196px;
   overflow: hidden;
   position: relative;
 
@@ -28,13 +27,19 @@
 
   .content {
     z-index: 1;
-    margin-left: 19px;
-    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-s;
+    padding: $spacing-base;
+
+    .domainBadgeWrapper {
+      display: flex;
+      justify-content: end;
+    }
 
     .identifier {
       font-size: $font-size-large;
       color: $gray-10;
-      margin-bottom: 6px;
     }
 
     .link {

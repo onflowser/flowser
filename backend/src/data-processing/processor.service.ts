@@ -32,7 +32,6 @@ import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
 import {
   FlowAccountStorageService,
-  FlowCadenceValue,
 } from "../flow/services/storage.service";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
@@ -600,13 +599,10 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private async processAccountStorage(address: string) {
-    const { privateItems, publicItems, storageItems } =
-      await this.flowStorageService.getAccountStorage(address);
-    return this.accountStorageService.updateAccountStorage(address, [
-      ...privateItems,
-      ...publicItems,
-      ...storageItems,
-    ]);
+    return this.accountStorageService.updateAccountStorage(
+      address,
+      await this.flowStorageService.getAccountStorageItems(address)
+    );
   }
 
   private async isServiceAccountProcessed(options?: WellKnownAddressesOptions) {
@@ -804,7 +800,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     // our own system of representing types with `CadenceType` message.
     function fromTypeAnnotatedFclArguments(
       object: FlowTypeAnnotatedValue
-    ): FlowCadenceValue {
+    ): unknown {
       const { type, value } = object;
       // Available type values are listed here:
       // https://developers.flow.com/tooling/fcl-js/api#ftype

@@ -16,14 +16,17 @@ export class AccountStorageItemEntity extends PollingEntity {
   @PrimaryColumn({ name: "id" })
   _id: string = "";
 
-  @PrimaryColumn()
-  pathIdentifier: string;
+  @PrimaryColumn({ name: "pathIdentifier" })
+  path: string;
 
   @PrimaryColumn()
   pathDomain: AccountStorageDomain;
 
   @PrimaryColumn()
   accountAddress: string;
+
+  @Column({ type: "text", nullable: true })
+  targetPath: string | null;
 
   @Column("simple-json")
   data: any;
@@ -33,9 +36,10 @@ export class AccountStorageItemEntity extends PollingEntity {
 
   // Entities are also automatically initialized by TypeORM.
   // In those cases no constructor arguments are provided.
-  constructor(args: AccountStorageItemEntityInitArgs | undefined) {
+  constructor(args: AccountStorageItemEntityInitArgs) {
     super();
-    this.pathIdentifier = args?.pathIdentifier ?? "";
+    this.path = args?.path ?? "";
+    this.targetPath = args?.targetPath ?? "";
     this.pathDomain =
       args?.pathDomain ?? AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
     this.accountAddress = args?.accountAddress ?? "";
@@ -47,15 +51,16 @@ export class AccountStorageItemEntity extends PollingEntity {
 
   get id() {
     return `${this.accountAddress}/${this.getLowerCasedPathDomain()}/${
-      this.pathIdentifier
+      this.path
     }`;
   }
 
   toProto(): AccountStorageItem {
     return {
       id: this.id,
-      pathIdentifier: this.pathIdentifier,
+      path: this.path,
       pathDomain: this.pathDomain,
+      targetPath: this.targetPath ?? "",
       data: this.data,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),

@@ -3,19 +3,13 @@
 @import "styles/typography";
 
 .root {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-
-  .badge {
-    margin-right: 30px;
-    border-radius: 8px;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-weight: 600;
-    background: $gradient-1;
-    color: $violet-100;
-    font-size: $font-size-normal;
-    text-transform: uppercase;
-  }
+  border-radius: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-weight: 600;
+  background: $gradient-1;
+  color: $violet-100;
+  font-size: $font-size-normal;
+  text-transform: uppercase;
+  width: fit-content;
 }
