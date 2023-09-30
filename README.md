@@ -1,5 +1,5 @@
 <div align="center">
-	<img alt="Flowser banner" src="https://user-images.githubusercontent.com/36109955/196263054-b42ecb52-340f-4982-bd62-404acb161d71.gif" />
+	<img alt="Flowser banner" src="https://github.com/onflowser/flowser/assets/36109955/6491c717-4a75-4d4d-ac24-bf4d7cd094ae" />
 	<br />
 	<br />
 </div>
