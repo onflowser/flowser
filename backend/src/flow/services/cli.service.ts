@@ -7,7 +7,7 @@ import { ProjectContextLifecycle } from "../utils/project-context";
 import { ProjectEntity } from "../../projects/project.entity";
 import { ManagedProcessEntity } from "../../processes/managed-process.entity";
 import { ProcessOutputSource } from "@flowser/shared";
-import { FlowConfigService } from "./config.service";
+import { FlowConfigService } from "../../../../packages/core/src/flow/flow-config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import {
   HashAlgorithm,

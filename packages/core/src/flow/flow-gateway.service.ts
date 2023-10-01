@@ -1,21 +1,13 @@
-import {
-  Injectable,
-  Logger,
-  PreconditionFailedException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import * as http from "http";
-import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/project.entity";
 import {
   FclArgBuilder,
   FclArgumentWithMetadata,
   FclTypeLookup,
   FclValues,
-  Gateway,
-  ServiceStatus,
-} from "@flowser/shared";
+} from "./fcl-values";
 import * as fcl from "@onflow/fcl";
-import { FlowConfigService } from "./config.service";
+import { FlowConfigService } from "./flow-config.service";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -145,33 +137,28 @@ type FlowTxStatusSubscription = {
   onceSealed: () => Promise<void>;
 };
 
-@Injectable()
-export class FlowGatewayService implements ProjectContextLifecycle {
-  private static readonly logger = new Logger(FlowGatewayService.name);
-  private projectContext: ProjectEntity | undefined;
+export type FlowGatewayConfig = {
+  restServerAddress: string;
+};
 
+enum ServiceStatus {
+  SERVICE_STATUS_ONLINE = 1,
+  SERVICE_STATUS_OFFLINE = 2,
+}
+
+@Injectable()
+export class FlowGatewayService {
   constructor(private readonly flowConfigService: FlowConfigService) {}
 
-  onEnterProjectContext(project: ProjectEntity): void {
-    this.projectContext = project;
-    const { restServerAddress } = this.projectContext.gateway ?? {};
-    if (!restServerAddress) {
-      throw new PreconditionFailedException("HTTP Access API address unset");
-    }
-    FlowGatewayService.logger.debug(
-      `@onflow/fcl listening on ${restServerAddress}`
-    );
+  configure(config: FlowGatewayConfig): void {
     fcl
       .config({
-        "accessNode.api": restServerAddress,
+        "accessNode.api": config.restServerAddress,
         "flow.network": "emulator",
       })
       .load({
         flowJSON: this.flowConfigService.getRawConfig(),
       });
-  }
-  onExitProjectContext(): void {
-    this.projectContext = undefined;
   }
 
   public async executeScript(options: ExecuteFlowScriptOptions) {
@@ -254,7 +241,9 @@ export class FlowGatewayService implements ProjectContextLifecycle {
     return { ...account, balance: account.balance / Math.pow(10, 8), address };
   }
 
-  static async getApiStatus(gateway: Gateway): Promise<ServiceStatus> {
+  static async getApiStatus(
+    gateway: FlowGatewayConfig
+  ): Promise<ServiceStatus> {
     const { hostname, port } = new URL(gateway.restServerAddress);
     return new Promise((resolve) => {
       const req = http

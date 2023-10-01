@@ -1,5 +1,5 @@
 import { FlowCliService } from "../services/cli.service";
-import { FlowConfigService } from "../services/config.service";
+import { FlowConfigService } from "../../../../packages/core/src/flow/flow-config.service";
 import { ProcessManagerService } from "../../processes/process-manager.service";
 import { ProjectEntity } from "../../projects/project.entity";
 import { Emulator, Gateway } from "@flowser/shared";

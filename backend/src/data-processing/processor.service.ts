@@ -10,7 +10,7 @@ import {
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
-} from "../flow/services/gateway.service";
+} from "../../../packages/core/src/flow/flow-gateway.service";
 import { BlocksService } from "../blocks/blocks.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { AccountsService } from "../accounts/services/accounts.service";
@@ -30,9 +30,7 @@ import {
 import { getDataSourceInstance } from "../database";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
-import {
-  FlowAccountStorageService,
-} from "../flow/services/storage.service";
+import { FlowAccountStorageService } from "../flow/services/storage.service";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   FlowCoreEventType,
@@ -56,7 +54,7 @@ import {
   FlowEmulatorEvent,
   FlowEmulatorService,
   WellKnownAddressesOptions,
-} from "../flow/services/emulator.service";
+} from "../../../packages/core/src/flow/flow-emulator.service";
 import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
 import { GoBindingsService } from "../go-bindings/go-bindings.service";
 

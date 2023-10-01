@@ -18,14 +18,14 @@ import { KeysService } from "../accounts/services/keys.service";
 import {
   FlowAuthorizationFunction,
   FlowGatewayService,
-} from "../flow/services/gateway.service";
+} from "../../../packages/core/src/flow/flow-gateway.service";
 import {
   FclArgumentWithMetadata,
   FclValues,
   SendTransactionRequest,
   SendTransactionResponse,
 } from "@flowser/shared";
-import { FlowConfigService } from "../flow/services/config.service";
+import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "src/projects/project.entity";
 const fcl = require("@onflow/fcl");

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { FlowGatewayService } from "./gateway.service";
+import { FlowGatewayService } from "../../../../packages/core/src/flow/flow-gateway.service";
 import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
 import { ensurePrefixedAddress } from "../../utils/common-utils";
 import {

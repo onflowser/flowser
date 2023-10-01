@@ -1,19 +1,11 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { ProcessOutputSource } from "@flowser/shared";
+import { ProcessManagerService } from "../../../../backend/src/processes/process-manager.service";
+import { ManagedProcessEntity } from "../../../../backend/src/processes/managed-process.entity";
 import {
-  ServiceStatus,
-  hashAlgorithmToJSON,
-  signatureAlgorithmToJSON,
-  Emulator,
-  SignatureAlgorithm,
-  HashAlgorithm,
-  ProcessOutputSource,
-} from "@flowser/shared";
-import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/project.entity";
-import { ProcessManagerService } from "../../processes/process-manager.service";
-import { ManagedProcessEntity } from "../../processes/managed-process.entity";
-import { FlowGatewayService } from "./gateway.service";
-import { isDefined, waitForMs } from "../../utils/common-utils";
+  isDefined,
+  waitForMs,
+} from "../../../../backend/src/utils/common-utils";
 import { EventEmitter } from "node:events";
 
 type FlowWellKnownAddresses = {
@@ -32,31 +24,65 @@ export enum FlowEmulatorEvent {
   APIS_STARTED = "APIS_STARTED",
 }
 
+export type FlowEmulatorConfig = {
+  workingDirectoryPath: string;
+  verboseLogging: boolean;
+  logFormat: string;
+  restServerPort: number;
+  grpcServerPort: number;
+  adminServerPort: number;
+  blockTime: number;
+  servicePrivateKey: string;
+  databasePath: string;
+  tokenSupply: number;
+  transactionExpiry: number;
+  storagePerFlow: number;
+  minAccountBalance: number;
+  transactionMaxGasLimit: number;
+  scriptGasLimit: number;
+  serviceSignatureAlgorithm: SignatureAlgorithm;
+  serviceHashAlgorithm: HashAlgorithm;
+  storageLimit: boolean;
+  transactionFees: boolean;
+  persist: boolean;
+  withContracts: boolean;
+  enableGrpcDebug: boolean;
+  enableRestDebug: boolean;
+  useSimpleAddresses: boolean;
+  snapshot: boolean;
+};
+
+// https://docs.onflow.org/cadence/language/crypto/#hashing
+export enum SignatureAlgorithm {
+  // Enum values must be kept unchanged.
+  ECDSA_P256 = "ECDSA_P256",
+  ECDSA_secp256k1 = "ECDSA_secp256k1",
+  BLS_BLS12_381 = "BLS_BLS12_381",
+}
+
+// https://docs.onflow.org/cadence/language/crypto/#hashing
+export enum HashAlgorithm {
+  // Enum values must be kept unchanged.
+  SHA2_256 = "SHA2_256",
+  SHA2_384 = "SHA2_384",
+  SHA3_256 = "SHA3_256",
+  SHA3_384 = "SHA3_384",
+  KMAC128_BLS_BLS12_381 = "KMAC128_BLS_BLS12_381",
+  KECCAK_256 = "KECCAK_256",
+}
+
 @Injectable()
-export class FlowEmulatorService
-  extends EventEmitter
-  implements ProjectContextLifecycle
-{
+export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";
-  private projectContext: ProjectEntity | undefined;
   private process: ManagedProcessEntity | undefined;
+  private config: FlowEmulatorConfig;
 
   constructor(private processManagerService: ProcessManagerService) {
     super();
+    this.config = this.getDefaultConfig();
   }
 
-  async onEnterProjectContext(project: ProjectEntity) {
-    this.projectContext = project;
-    const accessNodeStatus = await FlowGatewayService.getApiStatus(
-      this.projectContext.gateway
-    );
-    if (accessNodeStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
-      await this.start();
-    }
-  }
-
-  async onExitProjectContext() {
-    this.projectContext = undefined;
+  async stopAndCleanup() {
     await this.processManagerService.remove(FlowEmulatorService.processId);
     this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
@@ -72,15 +98,11 @@ export class FlowEmulatorService
   public getWellKnownAddresses(
     options?: WellKnownAddressesOptions
   ): FlowWellKnownAddresses {
-    if (!this.projectContext?.emulator) {
-      throw new Error("Emulator settings not found on project context");
-    }
     // When "simple-addresses" flag is provided,
     // a monotonic address generation mechanism is used:
     // https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/blockchain.go#L336-L342
     const useMonotonicAddresses =
-      options?.overrideUseMonotonicAddresses ??
-      this.projectContext.emulator.useSimpleAddresses;
+      options?.overrideUseMonotonicAddresses ?? this.config.useSimpleAddresses;
     return {
       serviceAccountAddress: useMonotonicAddresses
         ? "0x0000000000000001"
@@ -97,18 +119,15 @@ export class FlowEmulatorService
     };
   }
 
-  async start() {
-    if (!this.projectContext) {
-      throw new Error("Project context not found");
-    }
+  async start(config: FlowEmulatorConfig) {
     this.process = new ManagedProcessEntity({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
       command: {
         name: "flow",
-        args: ["emulator", ...this.getAppliedFlags()],
+        args: ["emulator", ...this.getProcessFlags(config)],
         options: {
-          cwd: this.projectContext.filesystemPath,
+          cwd: config.workingDirectoryPath,
         },
       },
     });
@@ -120,9 +139,11 @@ export class FlowEmulatorService
     this.emit(FlowEmulatorEvent.APIS_STARTED);
   }
 
-  public static getDefaultFlags(): Emulator {
+  public getDefaultConfig(): FlowEmulatorConfig {
     // Some default values vary from the ones used in Flow CLI.
     return {
+      // TODO(restructure): Would it make sense to store dir path in a separate struct?
+      workingDirectoryPath: "",
       verboseLogging: false,
       enableRestDebug: false,
       restServerPort: 8888,
@@ -192,13 +213,7 @@ export class FlowEmulatorService
     }
   }
 
-  private getAppliedFlags(): string[] {
-    const { emulator } = this.projectContext ?? {};
-
-    if (!emulator) {
-      throw new Error("Emulator not found in project context");
-    }
-
+  private getProcessFlags(config: FlowEmulatorConfig): string[] {
     const toFixedPoint = (tokenSupply: number) => tokenSupply.toFixed(1);
     const flag = (name: string, userValue: any, defaultValue?: any) => {
       const value = userValue || defaultValue;
@@ -208,36 +223,30 @@ export class FlowEmulatorService
     // keep those parameters up to date with the currently used flow-cli version
     // https://github.com/onflow/flow-emulator#configuration
     return [
-      flag("port", emulator.grpcServerPort),
-      flag("rest-port", emulator.restServerPort),
-      flag("admin-port", emulator.adminServerPort),
-      flag("verbose", emulator.verboseLogging),
-      flag("log-format", emulator.logFormat),
-      flag("block-time", emulator.blockTime),
-      flag("contracts", emulator.withContracts),
-      flag("service-priv-key", emulator.servicePrivateKey),
-      flag(
-        "service-sig-algo",
-        signatureAlgorithmToJSON(emulator.serviceSignatureAlgorithm)
-      ),
-      flag(
-        "service-hash-algo",
-        hashAlgorithmToJSON(emulator.serviceHashAlgorithm)
-      ),
-      flag("rest-debug", emulator.enableRestDebug),
-      flag("grpc-debug", emulator.enableGrpcDebug),
-      flag("persist", emulator.persist),
-      flag("snapshot", emulator.snapshot),
-      flag("dbpath", emulator.databasePath),
-      flag("simple-addresses", emulator.useSimpleAddresses),
-      flag("token-supply", toFixedPoint(emulator.tokenSupply)),
-      flag("transaction-expiry", emulator.transactionExpiry),
-      flag("storage-limit", emulator.storageLimit),
-      flag("storage-per-flow", toFixedPoint(emulator.storagePerFlow)),
-      flag("min-account-balance", emulator.minAccountBalance),
-      flag("transaction-fees", emulator.transactionFees),
-      flag("transaction-max-gas-limit", emulator.transactionMaxGasLimit),
-      flag("script-gas-limit", emulator.scriptGasLimit),
+      flag("port", config.grpcServerPort),
+      flag("rest-port", config.restServerPort),
+      flag("admin-port", config.adminServerPort),
+      flag("verbose", config.verboseLogging),
+      flag("log-format", config.logFormat),
+      flag("block-time", config.blockTime),
+      flag("contracts", config.withContracts),
+      flag("service-priv-key", config.servicePrivateKey),
+      flag("service-sig-algo", config.serviceSignatureAlgorithm),
+      flag("service-hash-algo", config.serviceHashAlgorithm),
+      flag("rest-debug", config.enableRestDebug),
+      flag("grpc-debug", config.enableGrpcDebug),
+      flag("persist", config.persist),
+      flag("snapshot", config.snapshot),
+      flag("dbpath", config.databasePath),
+      flag("simple-addresses", config.useSimpleAddresses),
+      flag("token-supply", toFixedPoint(config.tokenSupply)),
+      flag("transaction-expiry", config.transactionExpiry),
+      flag("storage-limit", config.storageLimit),
+      flag("storage-per-flow", toFixedPoint(config.storagePerFlow)),
+      flag("min-account-balance", config.minAccountBalance),
+      flag("transaction-fees", config.transactionFees),
+      flag("transaction-max-gas-limit", config.transactionMaxGasLimit),
+      flag("script-gas-limit", config.scriptGasLimit),
     ].filter(isDefined);
   }
 }

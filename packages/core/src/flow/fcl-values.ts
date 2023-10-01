@@ -1,7 +1,32 @@
-import {
-  CadenceType,
-  CadenceTypeKind,
-} from "../generated/entities/interactions";
+export enum CadenceTypeKind {
+  CADENCE_TYPE_UNKNOWN = 0,
+  CADENCE_TYPE_FIXED_POINT_NUMBER = 1,
+  CADENCE_TYPE_INTEGER_NUMBER = 2,
+  CADENCE_TYPE_TEXTUAL = 3,
+  CADENCE_TYPE_BOOLEAN = 4,
+  CADENCE_TYPE_ADDRESS = 5,
+  CADENCE_TYPE_ARRAY = 6,
+  CADENCE_TYPE_DICTIONARY = 7,
+  CADENCE_TYPE_PATH = 8,
+}
+
+export interface CadenceType {
+  kind: CadenceTypeKind;
+  rawType: string;
+  optional: boolean;
+  array: CadenceType_Array | undefined;
+  dictionary: CadenceType_Dictionary | undefined;
+}
+
+export interface CadenceType_Array {
+  element: CadenceType | undefined;
+  size: number;
+}
+
+export interface CadenceType_Dictionary {
+  key: CadenceType | undefined;
+  value: CadenceType | undefined;
+}
 
 // https://developers.flow.com/tooling/fcl-js/api#argumentfunction
 export type FclArgBuilder = (value: FclValue, type: unknown) => void;

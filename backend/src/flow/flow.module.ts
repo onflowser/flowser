@@ -1,18 +1,18 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { FlowGatewayService } from "./services/gateway.service";
+import { FlowGatewayService } from "../../../packages/core/src/flow/flow-gateway.service";
 import { FlowController } from "./flow.controller";
-import { FlowEmulatorService } from "./services/emulator.service";
+import { FlowEmulatorService } from "../../../packages/core/src/flow/flow-emulator.service";
 import { FlowCliService } from "./services/cli.service";
-import { FlowConfigService } from "./services/config.service";
+import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
 import { FlowAccountStorageService } from "./services/storage.service";
 import { SnapshotEntity } from "./entities/snapshot.entity";
 import { FlowSnapshotService } from "./services/snapshot.service";
 import { ProcessesModule } from "../processes/processes.module";
 import { CoreModule } from "../core/core.module";
 import { BlocksModule } from "../blocks/blocks.module";
-import { FlowTemplatesService } from './services/templates.service';
-import { GoBindingsModule } from '../go-bindings/go-bindings.module';
+import { FlowTemplatesService } from "./services/templates.service";
+import { GoBindingsModule } from "../go-bindings/go-bindings.module";
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { GoBindingsModule } from '../go-bindings/go-bindings.module';
     // to access data removal service from snapshots service.
     // Otherwise, this module shouldn't depend on many other modules.
     CoreModule,
-    GoBindingsModule
+    GoBindingsModule,
   ],
   controllers: [FlowController],
   providers: [

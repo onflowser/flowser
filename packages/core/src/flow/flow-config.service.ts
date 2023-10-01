@@ -6,11 +6,9 @@ import {
 } from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
-import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/project.entity";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../../utils/common-utils";
+import { isObject } from "../../../../backend/src/utils/common-utils";
 
 type FlowAddress = string;
 
@@ -87,21 +85,25 @@ export type FlowAbstractContractConfig = {
   absolutePath: string;
 };
 
+type FlowConfigServiceConfig = {
+  workingDirectoryPath: string;
+};
+
 @Injectable()
-export class FlowConfigService implements ProjectContextLifecycle {
+export class FlowConfigService {
   private logger = new Logger(FlowConfigService.name);
   private fileListenerController: AbortController | undefined;
   private config: FlowCliConfig | undefined;
   private configFileName = "flow.json";
-  private projectContext: ProjectEntity | undefined;
+  private workingDirectoryPath: string | undefined;
 
-  public async onEnterProjectContext(project: ProjectEntity) {
-    this.projectContext = project;
+  public async configure(config: FlowConfigServiceConfig) {
+    this.workingDirectoryPath = config.workingDirectoryPath;
     await this.reload();
   }
 
   public onExitProjectContext() {
-    this.projectContext = undefined;
+    this.workingDirectoryPath = undefined;
     this.detachListeners();
   }
 
@@ -256,11 +258,10 @@ export class FlowConfigService implements ProjectContextLifecycle {
     if (!pathPostfix) {
       throw new InternalServerErrorException("Postfix path not provided");
     }
-    if (!this.projectContext) {
-      throw new Error("Project context not found");
+    if (!this.workingDirectoryPath) {
+      throw new Error("FlowConfigService not configured");
     }
-    // TODO(milestone-3): Detect if pathPostfix is absolute or relative and use it accordingly
-    return path.join(this.projectContext.filesystemPath, pathPostfix);
+    return path.join(this.workingDirectoryPath, pathPostfix);
   }
 
   private missingConfigError(path: string) {

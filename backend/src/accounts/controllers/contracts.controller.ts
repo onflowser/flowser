@@ -18,7 +18,7 @@ import {
   AccountContract,
 } from "@flowser/shared";
 import { AccountContractEntity } from "../entities/contract.entity";
-import { FlowConfigService } from "../../flow/services/config.service";
+import { FlowConfigService } from "../../../../packages/core/src/flow/flow-config.service";
 
 @Controller()
 export class ContractsController {

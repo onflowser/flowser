@@ -10,11 +10,11 @@ import { UpdateProjectDto } from "./dto/update-project.dto";
 import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FlowGatewayService } from "../flow/services/gateway.service";
+import { FlowGatewayService } from "../../../packages/core/src/flow/flow-gateway.service";
 import { ProcessorService } from "../data-processing/processor.service";
-import { FlowEmulatorService } from "../flow/services/emulator.service";
+import { FlowEmulatorService } from "../../../packages/core/src/flow/flow-emulator.service";
 import { FlowCliService } from "../flow/services/cli.service";
-import { FlowConfigService } from "../flow/services/config.service";
+import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import {
   Gateway,
@@ -269,7 +269,7 @@ export class ProjectsService {
   }
 
   getDefaultProject() {
-    const defaultEmulator = FlowEmulatorService.getDefaultFlags();
+    const defaultEmulator = FlowEmulatorService.getDefaultConfig();
 
     return Project.fromPartial({
       name: "New Project",

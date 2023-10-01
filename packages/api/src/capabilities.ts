@@ -1,6 +1,9 @@
+import { IdentifiableResource } from "./resources";
+
 export interface IResourceIndexReader<Resource> {
   fetchAll(): Promise<Resource[]>;
-  search(): Promise<Resource[]>;
+  // TODO(restructure): Add searching capabilities
+  // search(): Promise<Resource[]>;
 }
 
 export interface IResourceIndexWriter<Resource> {
@@ -9,7 +12,7 @@ export interface IResourceIndexWriter<Resource> {
   delete(resource: Resource): Promise<void>;
 }
 
-// TODO: Consider defining resource-specific interfaces for fetchers
+// TODO(restructure): Consider defining resource-specific interfaces for fetchers
 export interface IResourceFetcher<Resource> {
   fetchById(id: string): Promise<Resource>;
 }

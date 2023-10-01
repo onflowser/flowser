@@ -22,7 +22,7 @@ import {
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 import { FlowTemplatesService } from "./services/templates.service";
-import { FlowConfigService } from "./services/config.service";
+import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
 
 @Controller("flow")
 export class FlowController {
