@@ -11,7 +11,7 @@ import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../../../packages/core/src/flow/flow-gateway.service";
-import { ProcessorService } from "@onflowser/indexer/src/processor.service";
+import { IndexerService } from "@onflowser/indexer/src/indexer.service";
 import { FlowEmulatorService } from "../../../packages/core/src/flow/flow-emulator.service";
 import { FlowCliService } from "../../../packages/core/src/flow/flow-cli.service";
 import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
@@ -65,7 +65,7 @@ export class ProjectsService {
     @InjectRepository(ProjectEntity)
     private projectRepository: Repository<ProjectEntity>,
     private flowGatewayService: FlowGatewayService,
-    private processorService: ProcessorService,
+    private processorService: IndexerService,
     private flowEmulatorService: FlowEmulatorService,
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,

@@ -50,6 +50,8 @@ export interface BlockScopedResource {
 }
 
 export interface FlowAccount {
+  // ID is equal to the address.
+  id: string;
   address: string;
   blockId: string;
   balance: number;
@@ -82,14 +84,16 @@ export interface FlowAccountKey {
   blockId: string;
   publicKey: string;
   privateKey: string;
-  signAlgo: SignatureAlgorithm;
-  hashAlgo: HashAlgorithm;
+  signAlgo: SignatureAlgorithm | undefined;
+  hashAlgo: HashAlgorithm | undefined;
   weight: number;
   sequenceNumber: number;
   revoked: boolean;
 }
 
 export interface FlowContract {
+  // ID is the combination of `address` and `name`.
+  id: string;
   address: string;
   name: string;
   blockId: string;
@@ -104,13 +108,14 @@ export interface FlowAccountCapability {
 }
 
 export interface FlowAccountStorage {
+  id: string;
   address: string;
   path: string;
   type: unknown;
 }
 
 export interface FlowBlock {
-  blockId: string;
+  id: string;
   parentId: string;
   blockHeight: number;
   timestamp: Date;
@@ -137,8 +142,8 @@ export interface FlowTransaction {
   authorizers: string[];
   envelopeSignatures: SignableObject[];
   payloadSignatures: SignableObject[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface TransactionProposalKey {
@@ -209,6 +214,8 @@ export enum ExecutionStatusCode {
 }
 
 export interface FlowEvent {
+  // ID is the combination of `transactionId` and `eventIndex`.
+  id: string;
   transactionId: string;
   blockId: string;
   eventIndex: number;

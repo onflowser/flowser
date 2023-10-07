@@ -1,8 +1,8 @@
 import {
   IdentifiableResource,
   IResourceIndexReader,
-  IResourceIndexWriter,
-} from "@onflowser/api";
+  IResourceIndexWriter, RequireOnly
+} from '@onflowser/api';
 
 export class InMemoryIndex<Resource extends IdentifiableResource>
   implements IResourceIndexReader<Resource>, IResourceIndexWriter<Resource>
@@ -21,21 +21,24 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
     }
   }
 
-  async delete(resource: Resource): Promise<void> {
+  async delete(resource: RequireOnly<Resource, "id">): Promise<void> {
     if (!this.lookup.has(resource.id)) {
       throw new Error("Resource not found");
     }
     this.lookup.delete(resource.id);
   }
 
-  async update(resource: Resource): Promise<void> {
+  async update(resource: RequireOnly<Resource, "id">): Promise<void> {
     if (!this.lookup.has(resource.id)) {
       throw new Error("Resource not found");
     }
-    this.lookup.set(resource.id, resource);
+    this.lookup.set(resource.id, {
+      ...this.lookup.get(resource.id),
+      ...resource,
+    });
   }
 
-  async fetchAll(): Promise<Resource[]> {
+  async findAll(): Promise<Resource[]> {
     return Array.from(this.lookup.values());
   }
 }

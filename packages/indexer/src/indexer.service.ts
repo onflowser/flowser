@@ -1,43 +1,17 @@
 import { Injectable, Logger } from "@nestjs/common";
-import {
-  FlowAccount,
-  FlowBlock,
-  FlowTypeAnnotatedValue,
-  FlowCollection,
-  FlowEvent,
-  FlowGatewayService,
-  FlowKey,
-  FlowSignableObject,
-  FlowTransaction,
-  FlowTransactionStatus,
-} from "@onflowser/core/src/flow/flow-gateway.service";
-import { BlocksService } from "../../../backend/src/blocks/blocks.service";
-import { TransactionsService } from "../../../backend/src/transactions/transactions.service";
-import { AccountsService } from "../../../backend/src/accounts/services/accounts.service";
-import { ContractsService } from "../../../backend/src/accounts/services/contracts.service";
-import { EventsService } from "../../../backend/src/events/events.service";
-import { AccountEntity } from "../../../backend/src/accounts/entities/account.entity";
-import { EventEntity } from "../../../backend/src/events/event.entity";
-import { TransactionEntity } from "../../../backend/src/transactions/transaction.entity";
-import { BlockEntity } from "../../../backend/src/blocks/entities/block.entity";
-import { AccountContractEntity } from "../../../backend/src/accounts/entities/contract.entity";
-import { KeysService } from "../../../backend/src/accounts/services/keys.service";
-import { AccountKeyEntity } from "../../../backend/src/accounts/entities/key.entity";
+import { FlowGatewayService } from "@onflowser/core/src/flow/flow-gateway.service";
+import * as flowResource from "@onflowser/core/src/flow/flow-gateway.service";
+import * as flowserResource from "@onflowser/api/src/resources";
 import {
   ensureNonPrefixedAddress,
   ensurePrefixedAddress,
 } from "../../../backend/src/utils/common-utils";
 import { getDataSourceInstance } from "../../../backend/src/database";
-import { FlowAccountStorageService } from "@onflowser/core/src/flow/flow-storage.service";
-import { AccountStorageService } from "../../../backend/src/accounts/services/storage.service";
 import {
   FlowCoreEventType,
-  GetParsedInteractionResponse,
   ManagedProcessState,
   ServiceStatus,
   SignableObject,
-  TransactionArgument,
-  TransactionStatus,
 } from "@flowser/shared";
 import {
   ProcessManagerEvent,
@@ -55,12 +29,21 @@ import {
 } from "@onflowser/core/src/flow/flow-emulator.service";
 import { AsyncIntervalScheduler } from "./async-interval-scheduler";
 import { FlowGatewayConfig } from "@onflowser/core/src/flow/flow-gateway.service";
-import { GoBindingsService } from "@onflowser/core/src/flow/go-bindings.service";
+import {
+  GetParsedInteractionResponse,
+  GoBindingsService,
+} from "@onflowser/core/src/flow/go-bindings.service";
+import { IResourceIndex } from "@flowser/packages/api";
+import {
+  HashAlgorithm,
+  SignatureAlgorithm,
+} from "@onflowser/api/src/resources";
+import { FlowAccountStorageService } from "@onflowser/core/src/flow/flow-storage.service";
 
 type BlockData = {
-  block: FlowBlock;
+  block: flowResource.FlowBlock;
   transactions: FlowTransactionWithStatus[];
-  collections: FlowCollection[];
+  collections: flowResource.FlowCollection[];
   events: ExtendedFlowEvent[];
 };
 
@@ -69,31 +52,31 @@ type UnprocessedBlockInfo = {
   latestUnprocessedBlockHeight: number;
 };
 
-type FlowTransactionWithStatus = FlowTransaction & {
-  status: FlowTransactionStatus;
+type FlowTransactionWithStatus = flowResource.FlowTransaction & {
+  status: flowResource.FlowTransactionStatus;
 };
 
-export type ExtendedFlowEvent = FlowEvent & {
+export type ExtendedFlowEvent = flowResource.FlowEvent & {
   blockId: string;
   transactionId: string;
 };
 
 @Injectable()
-export class ProcessorService {
+export class IndexerService {
   private emulatorProcess: ManagedProcess | undefined;
-  private readonly logger = new Logger(ProcessorService.name);
+  private readonly logger = new Logger(IndexerService.name);
   private readonly pollingDelay = 500;
   private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
-    gatewayConfig: FlowGatewayConfig,
-    private blockService: BlocksService,
-    private transactionService: TransactionsService,
-    private accountService: AccountsService,
-    private accountStorageService: AccountStorageService,
-    private accountKeysService: KeysService,
-    private contractService: ContractsService,
-    private eventService: EventsService,
+    private gatewayConfig: FlowGatewayConfig,
+    private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
+    private accountIndex: IResourceIndex<flowserResource.FlowAccount>,
+    private accountKeyIndex: IResourceIndex<flowserResource.FlowAccountKey>,
+    private blockIndex: IResourceIndex<flowserResource.FlowBlock>,
+    private eventIndex: IResourceIndex<flowserResource.FlowEvent>,
+    private contractIndex: IResourceIndex<flowserResource.FlowContract>,
+    private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
     private processManagerService: ProcessManagerService,
@@ -104,7 +87,7 @@ export class ProcessorService {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
       pollingIntervalInMs: this.pollingDelay,
-      functionToExecute: this.processBlockchainData.bind(this),
+      functionToExecute: () => this.processBlockchainData(gatewayConfig),
     });
   }
 
@@ -217,12 +200,13 @@ export class ProcessorService {
   }
 
   private async getUnprocessedBlocksInfo(): Promise<UnprocessedBlockInfo> {
-    const [lastStoredBlock, latestBlock] = await Promise.all([
-      this.blockService.findLastBlock(),
+    const [allBlocks, latestBlock] = await Promise.all([
+      this.blockIndex.findAll(),
       this.flowGatewayService.getLatestBlock(),
     ]);
-    const nextBlockHeightToProcess = lastStoredBlock
-      ? lastStoredBlock.blockHeight + 1
+    const lastIndexedBlock = this.findLatestBlock(allBlocks);
+    const nextBlockHeightToProcess = lastIndexedBlock
+      ? lastIndexedBlock.blockHeight + 1
       : latestBlock.height;
     const latestUnprocessedBlockHeight = latestBlock.height;
 
@@ -230,6 +214,16 @@ export class ProcessorService {
       nextBlockHeightToProcess,
       latestUnprocessedBlockHeight,
     };
+  }
+
+  private findLatestBlock(blocks: flowserResource.FlowBlock[]) {
+    let latestBlock: flowserResource.FlowBlock = blocks[0];
+    for (const block of blocks) {
+      if (block.blockHeight > latestBlock.blockHeight) {
+        latestBlock = block;
+      }
+    }
+    return latestBlock;
   }
 
   private async processBlockWithHeight(height: number) {
@@ -240,15 +234,15 @@ export class ProcessorService {
 
     // Process events first, so that transactions can reference created users.
     await this.processNewEvents({
-      flowEvents: blockData.events,
-      flowBlock: blockData.block,
+      events: blockData.events,
+      block: blockData.block,
     });
 
     try {
       await queryRunner.startTransaction();
 
       await this.storeBlockData(blockData);
-      await this.reProcessStorageForAllAccounts();
+      await this.reIndexAllAccountStorage();
 
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -274,14 +268,14 @@ export class ProcessorService {
     const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
       .subscribe((newStatus) =>
-        this.transactionService.updateStatus(
-          transactionId,
-          TransactionStatus.fromJSON({
+        this.transactionIndex.update({
+          id: transactionId,
+          status: {
             errorMessage: newStatus.errorMessage,
             grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
             executionStatus: newStatus.status,
-          })
-        )
+          },
+        })
       );
     try {
       await this.flowGatewayService
@@ -296,31 +290,31 @@ export class ProcessorService {
   }
 
   private async storeBlockData(data: BlockData) {
-    const blockPromise = this.blockService
-      .create(this.createBlockEntity({ flowBlock: data.block }))
-      .catch((e) =>
+    const blockPromise = this.blockIndex
+      .add(this.createBlockEntity({ block: data.block }))
+      .catch((e: any) =>
         this.logger.error(`block save error: ${e.message}`, e.stack)
       );
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
         this.processNewTransaction({
-          flowBlock: data.block,
-          flowTransaction: transaction,
-          flowTransactionStatus: transaction.status,
-        }).catch((e) =>
+          block: data.block,
+          transaction: transaction,
+          transactionStatus: transaction.status,
+        }).catch((e: any) =>
           this.logger.error(`transaction save error: ${e.message}`, e.stack)
         )
       )
     );
     const eventPromises = Promise.all(
       data.events.map((flowEvent) =>
-        this.eventService
-          .create(
+        this.eventIndex
+          .add(
             this.createEventEntity({
-              flowEvent,
+              event: flowEvent,
             })
           )
-          .catch((e) =>
+          .catch((e: any) =>
             this.logger.error(`event save error: ${e.message}`, e.stack)
           )
       )
@@ -380,20 +374,20 @@ export class ProcessorService {
   }
 
   private async processNewEvents(options: {
-    flowEvents: FlowEvent[];
-    flowBlock: FlowBlock;
+    events: flowResource.FlowEvent[];
+    block: flowResource.FlowBlock;
   }) {
-    const { flowEvents, flowBlock } = options;
+    const { events, block } = options;
     // Process new accounts first, so other events can reference them.
-    const accountCreatedEvents = flowEvents.filter(
+    const accountCreatedEvents = events.filter(
       (event) => event.type === FlowCoreEventType.ACCOUNT_CREATED
     );
-    const restEvents = flowEvents.filter(
+    const restEvents = events.filter(
       (event) => event.type !== FlowCoreEventType.ACCOUNT_CREATED
     );
     await Promise.all(
       accountCreatedEvents.map((flowEvent) =>
-        this.processStandardEvents({ flowEvent, flowBlock }).catch((e) => {
+        this.processStandardEvents({ event: flowEvent, block }).catch((e) => {
           this.logger.error(
             `flow.AccountCreated event handling error: ${
               e.message
@@ -405,25 +399,27 @@ export class ProcessorService {
     );
     await Promise.all(
       restEvents.map((flowEvent) =>
-        this.processStandardEvents({ flowEvent, flowBlock }).catch((e) => {
-          this.logger.error(
-            `${flowEvent.type} event handling error: ${
-              e.message
-            } (${JSON.stringify(flowEvent)})`,
-            e.stack
-          );
-        })
+        this.processStandardEvents({ event: flowEvent, block: block }).catch(
+          (e) => {
+            this.logger.error(
+              `${flowEvent.type} event handling error: ${
+                e.message
+              } (${JSON.stringify(flowEvent)})`,
+              e.stack
+            );
+          }
+        )
       )
     );
   }
 
   private async processStandardEvents(options: {
-    flowEvent: FlowEvent;
-    flowBlock: FlowBlock;
+    event: flowResource.FlowEvent;
+    block: flowResource.FlowBlock;
   }) {
-    const { flowEvent, flowBlock } = options;
+    const { event, block } = options;
     this.logger.debug(
-      `handling event: ${flowEvent.type} ${JSON.stringify(flowEvent.data)}`
+      `handling event: ${event.type} ${JSON.stringify(event.data)}`
     );
 
     const monotonicAddresses = this.flowEmulatorService.getWellKnownAddresses({
@@ -439,18 +435,21 @@ export class ProcessorService {
     const buildFlowTokensDepositedEvent = (address: string) =>
       `A.${ensureNonPrefixedAddress(address)}.FlowToken.TokensDeposited`;
 
-    const address = ensurePrefixedAddress(flowEvent.data.address);
-    switch (flowEvent.type) {
+    const address = ensurePrefixedAddress(event.data.address);
+    switch (event.type) {
       case FlowCoreEventType.ACCOUNT_CREATED:
-        return this.storeNewAccountWithContractsAndKeys({ address, flowBlock });
+        return this.reIndexAccount({
+          address,
+          block: block,
+        });
       case FlowCoreEventType.ACCOUNT_KEY_ADDED:
       case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
-        return this.updateStoredAccountKeys({ address, flowBlock });
+        return this.reIndexAccount({ address, block: block });
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
-        return this.updateStoredAccountContracts({ address, flowBlock });
+        return this.reIndexAccount({ address, block: block });
       // For now keep listening for monotonic and non-monotonic addresses,
       // although I think only non-monotonic ones are used for contract deployment.
       // See: https://github.com/onflow/flow-emulator/issues/421#issuecomment-1596844610
@@ -460,136 +459,94 @@ export class ProcessorService {
       ):
         // New emulator accounts are initialized
         // with a default Flow balance coming from null address.
-        return flowEvent.data.from
-          ? this.reprocessAccountFlowBalance(flowEvent.data.from)
+        return event.data.from
+          ? this.reIndexAccount(event.data.from)
           : undefined;
       case buildFlowTokensDepositedEvent(monotonicAddresses.flowTokenAddress):
       case buildFlowTokensDepositedEvent(
         nonMonotonicAddresses.flowTokenAddress
       ):
-        return this.reprocessAccountFlowBalance(flowEvent.data.to);
+        return this.reIndexAccount(event.data.to);
       default:
         return null; // not a standard event, ignore it
     }
   }
 
-  private async reprocessAccountFlowBalance(address: string) {
-    const flowAccount = await this.flowGatewayService.getAccount(address);
-    await this.accountService.upsert({
-      address: flowAccount.address,
-      balance: flowAccount.balance,
-    });
-  }
-
   private async processNewTransaction(options: {
-    flowBlock: FlowBlock;
-    flowTransaction: FlowTransaction;
-    flowTransactionStatus: FlowTransactionStatus;
+    block: flowResource.FlowBlock;
+    transaction: flowResource.FlowTransaction;
+    transactionStatus: flowResource.FlowTransactionStatus;
   }) {
     const parsedInteraction = await this.goBindings.getParsedInteraction({
-      sourceCode: options.flowTransaction.script,
+      sourceCode: options.transaction.script,
     });
     if (parsedInteraction.error) {
       this.logger.error(
         `Unexpected interaction parsing error: ${parsedInteraction.error}`
       );
     }
-    this.transactionService.createOrUpdate(
+    return this.transactionIndex.add(
       this.createTransactionEntity({ ...options, parsedInteraction })
     );
   }
 
-  private async storeNewAccountWithContractsAndKeys(options: {
+  private async reIndexAccount(options: {
     address: string;
-    flowBlock: FlowBlock;
+    block: flowResource.FlowBlock;
   }) {
-    const { address, flowBlock } = options;
+    const { address, block } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const unSerializedAccount = this.createAccountEntity({
-      flowAccount,
-      flowBlock,
+    const flowserAccount = this.createAccountEntity({
+      account: flowAccount,
+      block: block,
     });
-    const allPossibleWellKnownAddresses = [
-      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: true }),
-      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: false }),
-    ].flat();
-    if (allPossibleWellKnownAddresses.includes(unSerializedAccount.address)) {
-      unSerializedAccount.isDefaultAccount = true;
-    }
-    const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      this.createContractEntity({
-        flowAccount,
-        flowBlock,
-        name,
-        code: flowAccount.contracts[name],
-      })
-    );
 
-    await this.accountService.upsert(unSerializedAccount);
     await Promise.all([
-      this.accountKeysService.updateAccountKeys(
-        address,
-        unSerializedAccount.keys ?? []
+      this.accountIndex.add(flowserAccount),
+      Promise.all(
+        flowAccount.keys.map((key) =>
+          this.accountKeyIndex.add(
+            this.createKeyEntity({
+              account: flowAccount,
+              key,
+              block: block,
+            })
+          )
+        )
       ),
-      this.contractService.updateAccountContracts(
-        unSerializedAccount.address,
-        newContracts
-      ),
-    ]);
-  }
-
-  private async updateStoredAccountKeys(options: {
-    address: string;
-    flowBlock: FlowBlock;
-  }) {
-    const { address, flowBlock } = options;
-    const flowAccount = await this.flowGatewayService.getAccount(address);
-    await Promise.all([
-      this.accountService.markUpdated(address),
-      this.accountKeysService.updateAccountKeys(
-        address,
-        flowAccount.keys.map((flowKey) =>
-          this.createKeyEntity({ flowAccount, flowKey, flowBlock })
+      Promise.all(
+        Object.keys(flowAccount.contracts).map((name) =>
+          this.contractIndex.add(
+            this.createContractEntity({
+              account: flowAccount,
+              block: block,
+              name,
+              code: flowAccount.contracts[name],
+            })
+          )
         )
       ),
     ]);
   }
 
-  private async updateStoredAccountContracts(options: {
-    address: string;
-    flowBlock: FlowBlock;
-  }) {
-    const { address, flowBlock } = options;
-    const flowAccount = await this.flowGatewayService.getAccount(address);
-    const newContracts = Object.keys(flowAccount.contracts).map((name) =>
-      this.createContractEntity({
-        flowAccount,
-        flowBlock,
-        name,
-        code: flowAccount.contracts[name],
-      })
-    );
-
-    await Promise.all([
-      this.accountService.markUpdated(address),
-      this.contractService.updateAccountContracts(address, newContracts),
-    ]);
-  }
-
-  private async reProcessStorageForAllAccounts() {
-    const allAddresses = await this.accountService.findAllAddresses();
+  private async reIndexAllAccountStorage() {
+    const allAccounts = await this.accountIndex.findAll();
     this.logger.debug(
-      `Processing storages for accounts: ${allAddresses.join(", ")}`
+      `Processing storages for accounts: ${allAccounts.join(", ")}`
     );
     await Promise.all(
-      allAddresses.map((address) => this.processAccountStorage(address))
+      allAccounts.map((account: flowserResource.FlowAccount) =>
+        this.reIndexAccountStorage(account.address)
+      )
     );
   }
 
-  private async processAccountStorage(address: string) {
-    return this.accountStorageService.updateAccountStorage(
-      address,
-      await this.flowStorageService.getAccountStorageItems(address)
+  private async reIndexAccountStorage(address: string) {
+    const storages = await this.flowStorageService.getAccountStorageItems(
+      address
+    );
+    return Promise.all(
+      storages.map((storage) => this.accountStorageIndex.add(storage))
     );
   }
 
@@ -597,7 +554,7 @@ export class ProcessorService {
     const { serviceAccountAddress } =
       this.flowEmulatorService.getWellKnownAddresses(options);
     try {
-      const serviceAccount = await this.accountService.findOneByAddress(
+      const serviceAccount = await this.accountIndex.findOneById(
         serviceAccountAddress
       );
 
@@ -635,14 +592,11 @@ export class ProcessorService {
       return;
     }
 
-    const dataSource = await getDataSourceInstance();
-    const queryRunner = dataSource.createQueryRunner();
-
     // Afaik these well-known default accounts are
     // bootstrapped in a "meta-transaction",
     // which is hidden from the public blockchain.
     // See: https://github.com/onflow/flow-go/blob/master/fvm/bootstrap.go
-    const nonExistingBlock: FlowBlock = {
+    const nonExistingBlock: flowResource.FlowBlock = {
       id: "NULL",
       blockSeals: [],
       collectionGuarantees: [],
@@ -652,23 +606,14 @@ export class ProcessorService {
       timestamp: 0,
     };
 
-    await queryRunner.startTransaction();
-    try {
-      await Promise.all(
-        this.getAllWellKnownAddresses(options).map((address) =>
-          this.storeNewAccountWithContractsAndKeys({
-            address,
-            flowBlock: nonExistingBlock,
-          })
-        )
-      );
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      this.logger.error("Default account processing failed", error);
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
+    await Promise.all(
+      this.getAllWellKnownAddresses(options).map((address) =>
+        this.reIndexAccount({
+          address,
+          block: nonExistingBlock,
+        })
+      )
+    );
   }
 
   private getAllWellKnownAddresses(options?: WellKnownAddressesOptions) {
@@ -685,109 +630,128 @@ export class ProcessorService {
   }
 
   private createAccountEntity(options: {
-    flowAccount: FlowAccount;
-    flowBlock: FlowBlock;
-  }): AccountEntity {
-    const { flowAccount, flowBlock } = options;
-    return new AccountEntity({
-      balance: flowAccount.balance,
-      address: ensurePrefixedAddress(flowAccount.address),
-      blockId: flowBlock.id,
-      isDefaultAccount: false,
-      contracts: [],
-      storage: [],
-      transactions: [],
-      code: flowAccount.code,
-      keys: flowAccount.keys.map((flowKey) =>
-        this.createKeyEntity({ flowAccount, flowKey, flowBlock })
-      ),
-    });
+    account: flowResource.FlowAccount;
+    block: flowResource.FlowBlock;
+  }): flowserResource.FlowAccount {
+    const { account, block } = options;
+
+    const allPossibleWellKnownAddresses = [
+      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: true }),
+      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: false }),
+    ].flat();
+
+    const address = ensurePrefixedAddress(account.address);
+
+    return {
+      id: address,
+      balance: account.balance,
+      address,
+      blockId: block.id,
+      isDefaultAccount: allPossibleWellKnownAddresses.includes(address),
+      code: account.code,
+      // keys: account.keys.map((flowKey) =>
+      //   this.createKeyEntity({
+      //     account: account,
+      //     key: flowKey,
+      //     block: block,
+      //   })
+      // ),
+    };
   }
 
   private createKeyEntity(options: {
-    flowAccount: FlowAccount;
-    flowKey: FlowKey;
-    flowBlock: FlowBlock;
-  }) {
-    const { flowAccount, flowKey, flowBlock } = options;
-    return new AccountKeyEntity({
-      index: flowKey.index,
-      accountAddress: ensurePrefixedAddress(flowAccount.address),
-      publicKey: flowKey.publicKey,
-      signAlgo: flowKey.signAlgo,
-      hashAlgo: flowKey.hashAlgo,
-      weight: flowKey.weight,
-      sequenceNumber: flowKey.sequenceNumber,
-      revoked: flowKey.revoked,
-      blockId: flowBlock.id,
+    account: flowResource.FlowAccount;
+    key: flowResource.FlowKey;
+    block: flowResource.FlowBlock;
+  }): flowserResource.FlowAccountKey {
+    const { account, key, block } = options;
+
+    const signAlgoLookup = new Map([
+      [0, SignatureAlgorithm.ECDSA_P256],
+      [1, SignatureAlgorithm.ECDSA_secp256k1],
+    ]);
+
+    const hashAlgoLookup = new Map([
+      [0, HashAlgorithm.SHA2_256],
+      [1, HashAlgorithm.SHA3_256],
+    ]);
+
+    return {
+      index: key.index,
+      accountAddress: ensurePrefixedAddress(account.address),
+      publicKey: key.publicKey,
+      signAlgo: signAlgoLookup.get(key.signAlgo),
+      hashAlgo: hashAlgoLookup.get(key.hashAlgo),
+      weight: key.weight,
+      sequenceNumber: key.sequenceNumber,
+      revoked: key.revoked,
+      blockId: block.id,
       privateKey: "",
-      account: undefined,
-    });
+    };
   }
 
   private createEventEntity(options: {
-    flowEvent: ExtendedFlowEvent;
-  }): EventEntity {
-    const { flowEvent } = options;
-    return new EventEntity({
-      type: flowEvent.type,
-      transactionIndex: flowEvent.transactionIndex,
-      transactionId: flowEvent.transactionId,
-      blockId: flowEvent.blockId,
-      eventIndex: flowEvent.eventIndex,
-      data: flowEvent.data,
-    });
+    event: ExtendedFlowEvent;
+  }): flowserResource.FlowEvent {
+    const { event } = options;
+    return {
+      id: `${event.transactionId}.${event.eventIndex}`,
+      type: event.type,
+      transactionIndex: event.transactionIndex,
+      transactionId: event.transactionId,
+      blockId: event.blockId,
+      eventIndex: event.eventIndex,
+      data: event.data,
+    };
   }
 
-  private createBlockEntity(options: { flowBlock: FlowBlock }): BlockEntity {
-    const { flowBlock } = options;
-    return new BlockEntity({
-      blockId: flowBlock.id,
-      collectionGuarantees: flowBlock.collectionGuarantees,
-      blockSeals: flowBlock.blockSeals,
+  private createBlockEntity(options: {
+    block: flowResource.FlowBlock;
+  }): flowserResource.FlowBlock {
+    const { block } = options;
+    return {
+      id: block.id,
+      collectionGuarantees: block.collectionGuarantees,
+      blockSeals: block.blockSeals,
       // TODO(milestone-x): "signatures" field is not present in block response
       // https://github.com/onflow/fcl-js/issues/1355
-      signatures: flowBlock.signatures ?? [],
-      timestamp: new Date(flowBlock.timestamp),
-      blockHeight: flowBlock.height,
-      parentId: flowBlock.parentId,
-    });
+      signatures: block.signatures ?? [],
+      timestamp: new Date(block.timestamp),
+      blockHeight: block.height,
+      parentId: block.parentId,
+    };
   }
 
   private createContractEntity(options: {
-    flowBlock: FlowBlock;
-    flowAccount: FlowAccount;
+    block: flowResource.FlowBlock;
+    account: flowResource.FlowAccount;
     name: string;
     code: string;
-  }) {
-    const { flowAccount, flowBlock, name, code } = options;
-    return new AccountContractEntity({
-      blockId: flowBlock.id,
-      accountAddress: ensurePrefixedAddress(flowAccount.address),
+  }): flowserResource.FlowContract {
+    const { account, block, name, code } = options;
+    return {
+      id: `${account.address}.${name}`,
+      blockId: block.id,
+      address: ensurePrefixedAddress(account.address),
       name: name,
       code: code,
-      account: null,
-    });
+    };
   }
 
   private createTransactionEntity(options: {
-    flowBlock: FlowBlock;
-    flowTransaction: FlowTransaction;
-    flowTransactionStatus: FlowTransactionStatus;
+    block: flowResource.FlowBlock;
+    transaction: flowResource.FlowTransaction;
+    transactionStatus: flowResource.FlowTransactionStatus;
     parsedInteraction: GetParsedInteractionResponse;
-  }): TransactionEntity {
-    const {
-      flowBlock,
-      flowTransaction,
-      flowTransactionStatus,
-      parsedInteraction,
-    } = options;
+  }): flowserResource.FlowTransaction {
+    const { block, transaction, transactionStatus, parsedInteraction } =
+      options;
 
     // FCL-JS returns type-annotated argument values.
     // But we don't need the type info since we already have
     // our own system of representing types with `CadenceType` message.
     function fromTypeAnnotatedFclArguments(
-      object: FlowTypeAnnotatedValue
+      object: flowResource.FlowTypeAnnotatedValue
     ): unknown {
       const { type, value } = object;
       // Available type values are listed here:
@@ -812,43 +776,44 @@ export class ProcessorService {
       }
     }
 
-    return new TransactionEntity({
-      id: flowTransaction.id,
-      script: flowTransaction.script,
-      payerAddress: ensurePrefixedAddress(flowTransaction.payer),
-      blockId: flowBlock.id,
-      referenceBlockId: flowTransaction.referenceBlockId,
-      gasLimit: flowTransaction.gasLimit,
-      authorizers: flowTransaction.authorizers.map((address) =>
+    return {
+      id: transaction.id,
+      script: transaction.script,
+      payer: ensurePrefixedAddress(transaction.payer),
+      blockId: block.id,
+      referenceBlockId: transaction.referenceBlockId,
+      gasLimit: transaction.gasLimit,
+      authorizers: transaction.authorizers.map((address) =>
         ensurePrefixedAddress(address)
       ),
-      args:
+      arguments:
         parsedInteraction.interaction?.parameters.map(
-          (parameter, index): TransactionArgument => ({
+          (parameter, index): flowserResource.FlowTransactionArgument => ({
             identifier: parameter.identifier,
             type: parameter.type,
             valueAsJson: JSON.stringify(
-              fromTypeAnnotatedFclArguments(flowTransaction.args[index])
+              fromTypeAnnotatedFclArguments(transaction.args[index])
             ),
           })
         ) ?? [],
       proposalKey: {
-        ...flowTransaction.proposalKey,
-        address: ensurePrefixedAddress(flowTransaction.proposalKey.address),
+        ...transaction.proposalKey,
+        address: ensurePrefixedAddress(transaction.proposalKey.address),
       },
       envelopeSignatures: this.deserializeSignableObjects(
-        flowTransaction.envelopeSignatures
+        transaction.envelopeSignatures
       ),
       payloadSignatures: this.deserializeSignableObjects(
-        flowTransaction.payloadSignatures
+        transaction.payloadSignatures
       ),
-      status: TransactionStatus.fromJSON({
-        errorMessage: flowTransactionStatus.errorMessage,
-        grcpStatus: this.reMapGrcpStatus(flowTransactionStatus.statusCode),
-        executionStatus: flowTransactionStatus.status,
-      }),
-      payer: undefined,
-    });
+      status: {
+        errorMessage: transactionStatus.errorMessage,
+        grcpStatus: this.reMapGrcpStatus(transactionStatus.statusCode),
+        executionStatus: transactionStatus.status,
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   }
 
   private reMapGrcpStatus(statusCode: number) {
@@ -857,7 +822,9 @@ export class ProcessorService {
     return [0, 1].includes(statusCode) ? statusCode : 1;
   }
 
-  private deserializeSignableObjects(signableObjects: FlowSignableObject[]) {
+  private deserializeSignableObjects(
+    signableObjects: flowResource.FlowSignableObject[]
+  ) {
     return signableObjects.map((signable) =>
       SignableObject.fromJSON({
         ...signable,

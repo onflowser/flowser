@@ -1,0 +1,19 @@
+{
+  "name": "@onflowser/demo-app",
+  "version": "1.0.0",
+  "description": "",
+  "types": "./src/index.ts",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@onflowser/config": "*",
+    "@onflowser/indexer": "*",
+    "@onflowser/core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "typescript": "^4.3.5"
+  }
+}

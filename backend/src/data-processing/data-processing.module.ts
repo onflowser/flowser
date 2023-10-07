@@ -4,7 +4,7 @@ import { AccountsModule } from "../accounts/accounts.module";
 import { EventsModule } from "../events/events.module";
 import { TransactionsModule } from "../transactions/transactions.module";
 import { CoreModule } from "../core/core.module";
-import { ProcessorService } from "@onflowser/indexer/src/processor.service";
+import { IndexerService } from "@onflowser/indexer/src/indexer.service";
 import { FlowModule } from "../flow/flow.module";
 import { ProcessesModule } from "../processes/processes.module";
 import { WalletModule } from "../wallet/wallet.module";
@@ -23,7 +23,7 @@ import { GoBindingsModule } from "../go-bindings/go-bindings.module";
     WalletModule,
     GoBindingsModule,
   ],
-  providers: [ProcessorService],
-  exports: [ProcessorService],
+  providers: [IndexerService],
+  exports: [IndexerService],
 })
 export class DataProcessingModule {}
