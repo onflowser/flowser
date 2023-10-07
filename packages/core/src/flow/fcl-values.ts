@@ -1,4 +1,4 @@
-import { CadenceType, CadenceTypeKind } from "./common";
+import { CadenceType, CadenceTypeKind } from "@onflowser/api";
 
 // https://developers.flow.com/tooling/fcl-js/api#argumentfunction
 export type FclArgBuilder = (value: FclValue, type: unknown) => void;

@@ -9,34 +9,50 @@ import { SHA3 } from "sha3";
 import {
   FlowCliService,
   KeyWithWeight,
-} from "../../../packages/core/src/flow/flow-cli.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { AccountEntity } from "../accounts/entities/account.entity";
-import { ensurePrefixedAddress } from "../utils/common-utils";
+} from "@onflowser/core/src/flow/flow-cli.service";
+import { AccountsService } from "../../../backend/src/accounts/services/accounts.service";
+import { AccountEntity } from "../../../backend/src/accounts/entities/account.entity";
+import { ensurePrefixedAddress } from "../../../backend/src/utils/common-utils";
 import {
   AccountKeyEntity,
-  defaultKeyWeight,
-} from "../accounts/entities/key.entity";
-import { KeysService } from "../accounts/services/keys.service";
+} from "../../../backend/src/accounts/entities/key.entity";
+import { KeysService } from "../../../backend/src/accounts/services/keys.service";
 import {
   FlowAuthorizationFunction,
   FlowGatewayService,
-} from "../../../packages/core/src/flow/flow-gateway.service";
+} from "@onflowser/core/src/flow/flow-gateway.service";
+import { FlowConfigService } from "@onflowser/core/src/flow/flow-config.service";
+import { FlowTransactionArgument } from "@flowser/packages/api";
 import {
   FclArgumentWithMetadata,
   FclValues,
-  SendTransactionRequest,
-  SendTransactionResponse,
-} from "@flowser/shared";
-import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
-import { ProjectContextLifecycle } from "../flow/utils/project-context";
-import { ProjectEntity } from "src/projects/project.entity";
+} from "@onflowser/core/src/flow/fcl-values";
 const fcl = require("@onflow/fcl");
+
+export interface SendTransactionRequest {
+  cadence: string;
+  /** Signer roles: https://developers.flow.com/concepts/start-here/transaction-signing#signer-roles */
+  proposerAddress: string;
+  payerAddress: string;
+  authorizerAddresses: string[];
+  arguments: FlowTransactionArgument[];
+}
+
+export interface SendTransactionResponse {
+  transactionId: string;
+}
+
+type CreateAccountRequest = {
+  projectRootPath: string;
+};
 
 const ec: EC = new EC("p256");
 
+// https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
+const defaultKeyWeight = 1000;
+
 @Injectable()
-export class WalletService implements ProjectContextLifecycle {
+export class WalletService {
   private readonly logger = new Logger(WalletService.name);
 
   constructor(
@@ -46,16 +62,6 @@ export class WalletService implements ProjectContextLifecycle {
     private readonly accountsService: AccountsService,
     private readonly keysService: KeysService
   ) {}
-
-  async onEnterProjectContext(project: ProjectEntity): Promise<void> {
-    // TODO(snapshots-revamp): Re-import accounts when flow.json is updated
-    //  (it could be the case that user is manually adding new managed accounts with `flow accounts create` command).
-    await this.importAccountsFromConfig();
-  }
-
-  async onExitProjectContext(): Promise<void> {
-    // Nothing to do here
-  }
 
   public async sendTransaction(
     request: SendTransactionRequest
@@ -178,7 +184,7 @@ export class WalletService implements ProjectContextLifecycle {
     return authn;
   }
 
-  private async importAccountsFromConfig() {
+  public async importAccountsFromConfig() {
     const accountsConfig = this.flowConfig.getAccounts();
     await Promise.all(
       accountsConfig.map(async (accountConfig) => {
@@ -225,14 +231,19 @@ export class WalletService implements ProjectContextLifecycle {
     );
   }
 
-  public async createAccount(): Promise<AccountEntity> {
+  public async createAccount(
+    options: CreateAccountRequest
+  ): Promise<AccountEntity> {
     // For now, we only support a single key per account,
     // but we could as well add support for attaching
     // multiple keys with (possibly) different weights.
     const generatedKeyPairs = await Promise.all([
-      this.cliService.generateKey(),
+      this.cliService.generateKey({
+        projectRootPath: options.projectRootPath,
+      }),
     ]);
     const generatedAccount = await this.cliService.createAccount({
+      projectRootPath: options.projectRootPath,
       keys: generatedKeyPairs.map(
         (key): KeyWithWeight => ({
           weight: defaultKeyWeight,

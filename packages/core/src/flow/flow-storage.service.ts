@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { FlowGatewayService } from "./flow-gateway.service";
 import { AccountStorageItemEntity } from "../../../../backend/src/accounts/entities/storage-item.entity";
 import { ensurePrefixedAddress } from "../../../../backend/src/utils/common-utils";
-import { CadenceTypeKind } from "./common";
+import { CadenceTypeKind } from "@onflowser/api";
 
 /**
  * For more info on the account storage model and API, see:

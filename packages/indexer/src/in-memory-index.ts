@@ -2,7 +2,7 @@ import {
   IdentifiableResource,
   IResourceIndexReader,
   IResourceIndexWriter,
-} from "api";
+} from "@onflowser/api";
 
 export class InMemoryIndex<Resource extends IdentifiableResource>
   implements IResourceIndexReader<Resource>, IResourceIndexWriter<Resource>

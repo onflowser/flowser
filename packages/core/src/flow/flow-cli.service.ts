@@ -5,7 +5,7 @@ import {
 } from "../processes/managed-process";
 import { ProcessManagerService } from "../processes/process-manager.service";
 import { randomUUID } from "crypto";
-import { HashAlgorithm, SignatureAlgorithm } from "./common";
+import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";
 
 export type GeneratedKey = {
   derivationPath: string;

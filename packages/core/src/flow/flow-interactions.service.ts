@@ -3,7 +3,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { GoBindingsService } from "./go-bindings.service";
 import { isDefined } from "../../../../backend/src/utils/common-utils";
-import { InteractionKind } from "./common";
+import { InteractionKind } from "@onflowser/api";
 
 export interface InteractionTemplate {
   id: string;

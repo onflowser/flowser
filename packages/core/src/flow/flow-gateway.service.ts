@@ -242,7 +242,7 @@ export class FlowGatewayService {
     return { ...account, balance: account.balance / Math.pow(10, 8), address };
   }
 
-  static async getApiStatus(
+  public async getApiStatus(
     gateway: FlowGatewayConfig
   ): Promise<ServiceStatus> {
     const { hostname, port } = new URL(gateway.restServerAddress);

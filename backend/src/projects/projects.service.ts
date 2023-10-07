@@ -11,7 +11,7 @@ import { MoreThan, Repository } from "typeorm";
 import { ProjectEntity } from "./project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../../../packages/core/src/flow/flow-gateway.service";
-import { ProcessorService } from "../data-processing/processor.service";
+import { ProcessorService } from "@onflowser/indexer/src/processor.service";
 import { FlowEmulatorService } from "../../../packages/core/src/flow/flow-emulator.service";
 import { FlowCliService } from "../../../packages/core/src/flow/flow-cli.service";
 import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
@@ -26,7 +26,7 @@ import {
 } from "@flowser/shared";
 import * as fs from "fs";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
-import { WalletService } from "../wallet/wallet.service";
+import { WalletService } from "../../../packages/wallet/src/wallet.service";
 import { FlowSnapshotsService } from "../../../packages/core/src/flow/flow-snapshots.service";
 import { FlowInteractionsService } from "../../../packages/core/src/flow/flow-interactions.service";
 

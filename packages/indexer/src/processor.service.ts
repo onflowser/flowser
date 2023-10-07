@@ -10,28 +10,26 @@ import {
   FlowSignableObject,
   FlowTransaction,
   FlowTransactionStatus,
-} from "../../../packages/core/src/flow/flow-gateway.service";
-import { BlocksService } from "../blocks/blocks.service";
-import { TransactionsService } from "../transactions/transactions.service";
-import { AccountsService } from "../accounts/services/accounts.service";
-import { ContractsService } from "../accounts/services/contracts.service";
-import { EventsService } from "../events/events.service";
-import { AccountEntity } from "../accounts/entities/account.entity";
-import { EventEntity } from "../events/event.entity";
-import { TransactionEntity } from "../transactions/transaction.entity";
-import { BlockEntity } from "../blocks/entities/block.entity";
-import { AccountContractEntity } from "../accounts/entities/contract.entity";
-import { KeysService } from "../accounts/services/keys.service";
-import { AccountKeyEntity } from "../accounts/entities/key.entity";
+} from "@onflowser/core/src/flow/flow-gateway.service";
+import { BlocksService } from "../../../backend/src/blocks/blocks.service";
+import { TransactionsService } from "../../../backend/src/transactions/transactions.service";
+import { AccountsService } from "../../../backend/src/accounts/services/accounts.service";
+import { ContractsService } from "../../../backend/src/accounts/services/contracts.service";
+import { EventsService } from "../../../backend/src/events/events.service";
+import { AccountEntity } from "../../../backend/src/accounts/entities/account.entity";
+import { EventEntity } from "../../../backend/src/events/event.entity";
+import { TransactionEntity } from "../../../backend/src/transactions/transaction.entity";
+import { BlockEntity } from "../../../backend/src/blocks/entities/block.entity";
+import { AccountContractEntity } from "../../../backend/src/accounts/entities/contract.entity";
+import { KeysService } from "../../../backend/src/accounts/services/keys.service";
+import { AccountKeyEntity } from "../../../backend/src/accounts/entities/key.entity";
 import {
   ensureNonPrefixedAddress,
   ensurePrefixedAddress,
-} from "../utils/common-utils";
-import { getDataSourceInstance } from "../database";
-import { ProjectContextLifecycle } from "../flow/utils/project-context";
-import { ProjectEntity } from "../projects/project.entity";
-import { FlowAccountStorageService } from "../../../packages/core/src/flow/flow-storage.service";
-import { AccountStorageService } from "../accounts/services/storage.service";
+} from "../../../backend/src/utils/common-utils";
+import { getDataSourceInstance } from "../../../backend/src/database";
+import { FlowAccountStorageService } from "@onflowser/core/src/flow/flow-storage.service";
+import { AccountStorageService } from "../../../backend/src/accounts/services/storage.service";
 import {
   FlowCoreEventType,
   GetParsedInteractionResponse,
@@ -44,19 +42,20 @@ import {
 import {
   ProcessManagerEvent,
   ProcessManagerService,
-} from "../../../packages/core/src/processes/process-manager.service";
+} from "@onflowser/core/src/processes/process-manager.service";
 import {
   ManagedProcess,
   ManagedProcessEvent,
-} from "../../../packages/core/src/processes/managed-process";
-import { CacheRemovalService } from "../core/services/cache-removal.service";
+} from "@onflowser/core/src/processes/managed-process";
+import { CacheRemovalService } from "../../../backend/src/core/services/cache-removal.service";
 import {
   FlowEmulatorEvent,
   FlowEmulatorService,
   WellKnownAddressesOptions,
-} from "../../../packages/core/src/flow/flow-emulator.service";
-import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
-import { GoBindingsService } from "services/src/flow/go-bindings.service";
+} from "@onflowser/core/src/flow/flow-emulator.service";
+import { AsyncIntervalScheduler } from "./async-interval-scheduler";
+import { FlowGatewayConfig } from "@onflowser/core/src/flow/flow-gateway.service";
+import { GoBindingsService } from "@onflowser/core/src/flow/go-bindings.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -80,14 +79,14 @@ export type ExtendedFlowEvent = FlowEvent & {
 };
 
 @Injectable()
-export class ProcessorService implements ProjectContextLifecycle {
-  private projectContext: ProjectEntity | undefined;
+export class ProcessorService {
   private emulatorProcess: ManagedProcess | undefined;
   private readonly logger = new Logger(ProcessorService.name);
   private readonly pollingDelay = 500;
   private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
+    gatewayConfig: FlowGatewayConfig,
     private blockService: BlocksService,
     private transactionService: TransactionsService,
     private accountService: AccountsService,
@@ -100,7 +99,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     private processManagerService: ProcessManagerService,
     private commonService: CacheRemovalService,
     private flowEmulatorService: FlowEmulatorService,
-    private interactionService: GoBindingsService
+    private goBindings: GoBindingsService
   ) {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
@@ -109,9 +108,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     });
   }
 
-  onEnterProjectContext(project: ProjectEntity): void {
+  start(): void {
     this.processingScheduler?.start();
-    this.projectContext = project;
     this.emulatorProcess = this.processManagerService.get(
       FlowEmulatorService.processId
     );
@@ -129,9 +127,8 @@ export class ProcessorService implements ProjectContextLifecycle {
     );
   }
 
-  onExitProjectContext(): void {
+  stop(): void {
     this.processingScheduler?.stop();
-    this.projectContext = undefined;
     this.processManagerService.removeListener(
       ProcessManagerEvent.PROCESS_ADDED,
       this.onProcessAddedOrUpdated.bind(this)
@@ -179,12 +176,9 @@ export class ProcessorService implements ProjectContextLifecycle {
     return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
   }
 
-  async processBlockchainData(): Promise<void> {
-    if (!this.projectContext) {
-      return;
-    }
-    const gatewayStatus = await FlowGatewayService.getApiStatus(
-      this.projectContext.gateway
+  async processBlockchainData(gatewayConfig: FlowGatewayConfig): Promise<void> {
+    const gatewayStatus = await this.flowGatewayService.getApiStatus(
+      gatewayConfig
     );
     if (gatewayStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
       this.logger.debug("Gateway offline, pausing processing.");
@@ -223,16 +217,13 @@ export class ProcessorService implements ProjectContextLifecycle {
   }
 
   private async getUnprocessedBlocksInfo(): Promise<UnprocessedBlockInfo> {
-    if (!this.projectContext) {
-      throw new Error("Project context not found");
-    }
     const [lastStoredBlock, latestBlock] = await Promise.all([
       this.blockService.findLastBlock(),
       this.flowGatewayService.getLatestBlock(),
     ]);
     const nextBlockHeightToProcess = lastStoredBlock
       ? lastStoredBlock.blockHeight + 1
-      : this.projectContext.startBlockHeight ?? latestBlock.height;
+      : latestBlock.height;
     const latestUnprocessedBlockHeight = latestBlock.height;
 
     return {
@@ -495,10 +486,9 @@ export class ProcessorService implements ProjectContextLifecycle {
     flowTransaction: FlowTransaction;
     flowTransactionStatus: FlowTransactionStatus;
   }) {
-    const parsedInteraction =
-      await this.interactionService.getParsedInteraction({
-        sourceCode: options.flowTransaction.script,
-      });
+    const parsedInteraction = await this.goBindings.getParsedInteraction({
+      sourceCode: options.flowTransaction.script,
+    });
     if (parsedInteraction.error) {
       this.logger.error(
         `Unexpected interaction parsing error: ${parsedInteraction.error}`

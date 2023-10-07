@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { spawn } from "node:child_process";
 import * as path from "path";
 import * as os from "os";
-import { CadenceInteraction } from './common';
+import { CadenceInteraction } from '@onflowser/api';
 
 export interface GetParsedInteractionRequest {
   sourceCode: string;

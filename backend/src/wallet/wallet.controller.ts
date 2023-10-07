@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from "@nestjs/common";
-import { WalletService } from "./wallet.service";
+import { WalletService } from "../../../packages/wallet/src/wallet.service";
 import {
   SendTransactionRequest,
   SendTransactionResponse,

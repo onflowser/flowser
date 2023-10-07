@@ -6,14 +6,14 @@ import {
   Post,
   UseInterceptors,
 } from "@nestjs/common";
-import { ProcessManagerService } from "../../../packages/core/src/processes/process-manager.service";
+import { ProcessManagerService } from "@onflowser/core/src/processes/process-manager.service";
 import {
   GetPollingOutputsResponse,
   GetAllManagedProcessesResponse,
   GetPollingManagedProcessesResponse,
   GetPollingManagedProcessesRequest,
   GetPollingOutputsRequest,
-} from "../../../shared/src";
+} from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 
 @Controller("processes")
@@ -50,14 +50,14 @@ export class ProcessManagerController {
       this.processManagerService.findAllProcessesNewerThanTimestamp(
         new Date(request.timestamp)
       );
-    return processes.map((process) => process.toProto());
+    return processes.map((process) => process);
   }
 
   @Get()
   async getAllProcesses() {
     const processes = this.processManagerService.getAll();
     return GetAllManagedProcessesResponse.toJSON({
-      processes: processes.map((process) => process.toProto()),
+      processes: processes,
     });
   }
 

@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { GoBindingsService } from "services/src/flow/go-bindings.service";
+import { GoBindingsService } from "@onflowser/core/src/flow/go-bindings.service";
 import { GoBindingsController } from "./go-bindings.controller";
 
 @Module({

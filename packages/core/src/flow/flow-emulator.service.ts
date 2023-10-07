@@ -7,7 +7,7 @@ import {
   waitForMs,
 } from "../../../../backend/src/utils/common-utils";
 import { EventEmitter } from "node:events";
-import { HashAlgorithm, SignatureAlgorithm } from "./common";
+import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;
