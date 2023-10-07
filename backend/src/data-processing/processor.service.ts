@@ -30,7 +30,7 @@ import {
 import { getDataSourceInstance } from "../database";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import { ProjectEntity } from "../projects/project.entity";
-import { FlowAccountStorageService } from "../flow/services/storage.service";
+import { FlowAccountStorageService } from "../../../packages/core/src/flow/flow-storage.service";
 import { AccountStorageService } from "../accounts/services/storage.service";
 import {
   FlowCoreEventType,
@@ -44,11 +44,11 @@ import {
 import {
   ProcessManagerEvent,
   ProcessManagerService,
-} from "../processes/process-manager.service";
+} from "../../../packages/core/src/processes/process-manager.service";
 import {
-  ManagedProcessEntity,
+  ManagedProcess,
   ManagedProcessEvent,
-} from "../processes/managed-process.entity";
+} from "../../../packages/core/src/processes/managed-process";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
 import {
   FlowEmulatorEvent,
@@ -56,7 +56,7 @@ import {
   WellKnownAddressesOptions,
 } from "../../../packages/core/src/flow/flow-emulator.service";
 import { AsyncIntervalScheduler } from "../core/async-interval-scheduler";
-import { GoBindingsService } from "../go-bindings/go-bindings.service";
+import { GoBindingsService } from "services/src/flow/go-bindings.service";
 
 type BlockData = {
   block: FlowBlock;
@@ -82,7 +82,7 @@ export type ExtendedFlowEvent = FlowEvent & {
 @Injectable()
 export class ProcessorService implements ProjectContextLifecycle {
   private projectContext: ProjectEntity | undefined;
-  private emulatorProcess: ManagedProcessEntity | undefined;
+  private emulatorProcess: ManagedProcess | undefined;
   private readonly logger = new Logger(ProcessorService.name);
   private readonly pollingDelay = 500;
   private processingScheduler: AsyncIntervalScheduler;
@@ -146,7 +146,7 @@ export class ProcessorService implements ProjectContextLifecycle {
     );
   }
 
-  private onProcessAddedOrUpdated(process: ManagedProcessEntity) {
+  private onProcessAddedOrUpdated(process: ManagedProcess) {
     const isEmulatorProcess = process.id === FlowEmulatorService.processId;
     if (isEmulatorProcess) {
       this.logger.debug(`Emulator was started or updated`);

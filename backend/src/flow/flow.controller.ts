@@ -6,8 +6,8 @@ import {
   Put,
   UseInterceptors,
 } from "@nestjs/common";
-import { FlowCliService } from "./services/cli.service";
-import { FlowSnapshotService } from "./services/snapshot.service";
+import { FlowCliService } from "../../../packages/core/src/flow/flow-cli.service";
+import { FlowSnapshotsService } from "../../../packages/core/src/flow/flow-snapshots.service";
 import {
   GetFlowCliInfoResponse,
   GetPollingEmulatorSnapshotsResponse,
@@ -21,7 +21,7 @@ import {
   GetFlowConfigResponse,
 } from "@flowser/shared";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
-import { FlowTemplatesService } from "./services/templates.service";
+import { FlowInteractionsService } from "../../../packages/core/src/flow/flow-interactions.service";
 import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
 
 @Controller("flow")
@@ -29,8 +29,8 @@ export class FlowController {
   constructor(
     private flowCliService: FlowCliService,
     private flowConfigService: FlowConfigService,
-    private flowSnapshotService: FlowSnapshotService,
-    private flowTemplatesService: FlowTemplatesService
+    private flowSnapshotService: FlowSnapshotsService,
+    private flowTemplatesService: FlowInteractionsService
   ) {}
 
   @Get("config")
@@ -49,7 +49,7 @@ export class FlowController {
 
   @Get("templates")
   async getInteractionTemplates() {
-    const templates = await this.flowTemplatesService.getLocalTemplates();
+    const templates = await this.flowTemplatesService.getInteractionTemplates();
     return GetFlowInteractionTemplatesResponse.toJSON({
       templates,
     });

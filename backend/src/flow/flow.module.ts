@@ -3,20 +3,20 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../../../packages/core/src/flow/flow-gateway.service";
 import { FlowController } from "./flow.controller";
 import { FlowEmulatorService } from "../../../packages/core/src/flow/flow-emulator.service";
-import { FlowCliService } from "./services/cli.service";
+import { FlowCliService } from "../../../packages/core/src/flow/flow-cli.service";
 import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
-import { FlowAccountStorageService } from "./services/storage.service";
-import { SnapshotEntity } from "./entities/snapshot.entity";
-import { FlowSnapshotService } from "./services/snapshot.service";
+import { FlowAccountStorageService } from "../../../packages/core/src/flow/flow-storage.service";
+import { FlowSnapshot } from "../../../packages/core/src/flow/flow-snapshot";
+import { FlowSnapshotsService } from "../../../packages/core/src/flow/flow-snapshots.service";
 import { ProcessesModule } from "../processes/processes.module";
 import { CoreModule } from "../core/core.module";
 import { BlocksModule } from "../blocks/blocks.module";
-import { FlowTemplatesService } from "./services/templates.service";
+import { FlowInteractionsService } from "../../../packages/core/src/flow/flow-interactions.service";
 import { GoBindingsModule } from "../go-bindings/go-bindings.module";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SnapshotEntity]),
+    TypeOrmModule.forFeature([FlowSnapshot]),
     ProcessesModule,
     // We need this to perform blockchain cache removal in snapshot service.
     BlocksModule,
@@ -28,22 +28,22 @@ import { GoBindingsModule } from "../go-bindings/go-bindings.module";
   ],
   controllers: [FlowController],
   providers: [
-    FlowTemplatesService,
+    FlowInteractionsService,
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,
     FlowConfigService,
     FlowAccountStorageService,
-    FlowSnapshotService,
+    FlowSnapshotsService,
   ],
   exports: [
-    FlowTemplatesService,
+    FlowInteractionsService,
     FlowGatewayService,
     FlowEmulatorService,
     FlowCliService,
     FlowConfigService,
     FlowAccountStorageService,
-    FlowSnapshotService,
+    FlowSnapshotsService,
   ],
 })
 export class FlowModule {}

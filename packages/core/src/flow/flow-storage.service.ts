@@ -1,12 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { FlowGatewayService } from "../../../../packages/core/src/flow/flow-gateway.service";
-import { AccountStorageItemEntity } from "../../accounts/entities/storage-item.entity";
-import { ensurePrefixedAddress } from "../../utils/common-utils";
-import {
-  AccountStorageDomain,
-  CadenceType,
-  CadenceTypeKind,
-} from "@flowser/shared";
+import { FlowGatewayService } from "./flow-gateway.service";
+import { AccountStorageItemEntity } from "../../../../backend/src/accounts/entities/storage-item.entity";
+import { ensurePrefixedAddress } from "../../../../backend/src/utils/common-utils";
+import { CadenceTypeKind } from "./common";
 
 /**
  * For more info on the account storage model and API, see:
@@ -16,6 +12,17 @@ import {
  * Also see the account storage retrieval implementation:
  * https://github.com/onflow/flow-emulator/blob/3fbe8ad9dc841abdc13056e20e7b15fc0e32a749/server/backend/backend.go#L584-L590
  */
+
+/**
+ * Every account storage path consists of a domain and identifier: /<domain>/<identifier>
+ * See official docs: https://developers.flow.com/cadence/language/accounts#paths
+ */
+enum AccountStorageDomain {
+  STORAGE_DOMAIN_UNKNOWN = 0,
+  STORAGE_DOMAIN_PRIVATE = 1,
+  STORAGE_DOMAIN_PUBLIC = 2,
+  STORAGE_DOMAIN_STORAGE = 3,
+}
 
 type CapabilityPathItem = {
   address: string;
@@ -183,10 +190,13 @@ export class FlowAccountStorageService {
       arguments: [
         {
           value: address,
-          type: CadenceType.fromPartial({
+          type: {
             rawType: "Address",
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
-          }),
+            optional: false,
+            array: undefined,
+            dictionary: undefined,
+          },
           identifier: "address",
         },
       ],

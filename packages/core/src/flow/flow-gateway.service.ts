@@ -150,6 +150,7 @@ enum ServiceStatus {
 export class FlowGatewayService {
   constructor(private readonly flowConfigService: FlowConfigService) {}
 
+  // TODO(restructure): Pass this config to constructor instead?
   configure(config: FlowGatewayConfig): void {
     fcl
       .config({

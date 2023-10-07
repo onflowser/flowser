@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { ManagedProcessEntity } from "./managed-process.entity";
-import { ProcessOutputSource, ManagedProcessOutput } from "@flowser/shared";
+import {
+  ManagedProcess,
+  ProcessOutputSource,
+  ManagedProcessOutput,
+} from "./managed-process";
 import { EventEmitter } from "node:events";
 
 export enum ProcessManagerEvent {
@@ -10,7 +13,7 @@ export enum ProcessManagerEvent {
 
 @Injectable()
 export class ProcessManagerService extends EventEmitter {
-  private readonly processLookupById: Map<string, ManagedProcessEntity>;
+  private readonly processLookupById: Map<string, ManagedProcess>;
 
   constructor() {
     super();
@@ -26,7 +29,7 @@ export class ProcessManagerService extends EventEmitter {
     process.exit(0);
   }
 
-  findAllProcessesNewerThanTimestamp(timestamp: Date): ManagedProcessEntity[] {
+  findAllProcessesNewerThanTimestamp(timestamp: Date): ManagedProcess[] {
     return this.getAll().filter((process) => {
       const isUpdatedLater = process.updatedAt.getTime() > timestamp.getTime();
       const isCreatedLater = process.createdAt.getTime() > timestamp.getTime();
@@ -71,7 +74,7 @@ export class ProcessManagerService extends EventEmitter {
     return this.processLookupById.get(processId);
   }
 
-  async start(process: ManagedProcessEntity) {
+  async start(process: ManagedProcess) {
     const isExisting = this.processLookupById.has(process.id);
     if (isExisting) {
       await this.startExisting(process.id);
@@ -80,7 +83,7 @@ export class ProcessManagerService extends EventEmitter {
     }
   }
 
-  async startNew(process: ManagedProcessEntity) {
+  async startNew(process: ManagedProcess) {
     this.processLookupById.set(process.id, process);
     this.emit(ProcessManagerEvent.PROCESS_ADDED, process);
     await process.start();
@@ -103,7 +106,7 @@ export class ProcessManagerService extends EventEmitter {
    * If process exists with non-zero exit code, an error is thrown.
    */
   async runUntilTermination(
-    process: ManagedProcessEntity
+    process: ManagedProcess
   ): Promise<ManagedProcessOutput[]> {
     await this.start(process);
     await process.waitOnExit();

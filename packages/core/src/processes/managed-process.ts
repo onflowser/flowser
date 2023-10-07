@@ -3,13 +3,6 @@ import {
   spawn,
   SpawnOptionsWithoutStdio,
 } from "child_process";
-import {
-  ProcessOutputSource,
-  ManagedProcess,
-  ManagedProcessOutput,
-  ManagedProcessState,
-  managedProcessStateToJSON,
-} from "@flowser/shared";
 import { randomUUID } from "crypto";
 import { Logger } from "@nestjs/common";
 import { EventEmitter } from "node:events";
@@ -24,12 +17,32 @@ export type ManagedProcessOptions = {
   };
 };
 
+export enum ProcessOutputSource {
+  OUTPUT_SOURCE_STDOUT = 1,
+  OUTPUT_SOURCE_STDERR = 2,
+}
+
+export enum ManagedProcessState {
+  MANAGED_PROCESS_STATE_NOT_RUNNING = "not_running",
+  MANAGED_PROCESS_STATE_RUNNING = "running",
+  MANAGED_PROCESS_STATE_ERROR = "error",
+}
+
+export interface ManagedProcessOutput {
+  id: string;
+  processId: string;
+  data: string;
+  source: ProcessOutputSource;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export enum ManagedProcessEvent {
   STATE_CHANGE = "state_change",
 }
 
-export class ManagedProcessEntity extends EventEmitter {
-  private readonly logger = new Logger(ManagedProcessEntity.name);
+export class ManagedProcess extends EventEmitter {
+  private readonly logger = new Logger(ManagedProcess.name);
   public readonly id: string;
   private readonly name: string;
   public options: ManagedProcessOptions;
@@ -116,19 +129,6 @@ export class ManagedProcessEntity extends EventEmitter {
     this.output = [];
   }
 
-  public toProto(): ManagedProcess {
-    const { name, args } = this.options.command;
-    return {
-      id: this.id,
-      name: this.name,
-      command: { name, args: args ?? [] },
-      state: this.state,
-      output: this.output,
-      updatedAt: this.updatedAt.toISOString(),
-      createdAt: this.createdAt.toISOString(),
-    };
-  }
-
   private attachEventListeners() {
     if (!this.childProcess) {
       return;
@@ -183,15 +183,13 @@ export class ManagedProcessEntity extends EventEmitter {
     this.output.push(...logs);
   }
 
-  private setState(state: ManagedProcessState) {
+  private setState(newState: ManagedProcessState) {
     this.logger.debug(
-      `Process ${this.id} state changed from ${managedProcessStateToJSON(
-        this.state
-      )} to ${managedProcessStateToJSON(state)}`
+      `Process ${this.id} state changed from ${this.state} to ${newState}`
     );
     this.updatedAt = new Date();
-    this.state = state;
-    this.emit(ManagedProcessEvent.STATE_CHANGE, state);
+    this.state = newState;
+    this.emit(ManagedProcessEvent.STATE_CHANGE, newState);
   }
 
   public isRunning() {

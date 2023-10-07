@@ -6,7 +6,10 @@ import {
 } from "@nestjs/common";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
-import { FlowCliService, KeyWithWeight } from "../flow/services/cli.service";
+import {
+  FlowCliService,
+  KeyWithWeight,
+} from "../../../packages/core/src/flow/flow-cli.service";
 import { AccountsService } from "../accounts/services/accounts.service";
 import { AccountEntity } from "../accounts/entities/account.entity";
 import { ensurePrefixedAddress } from "../utils/common-utils";

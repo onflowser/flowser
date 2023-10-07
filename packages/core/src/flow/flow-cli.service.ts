@@ -1,27 +1,11 @@
+import { Injectable, NotFoundException } from "@nestjs/common";
 import {
-  Injectable,
-  NotFoundException,
-  PreconditionFailedException,
-} from "@nestjs/common";
-import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/project.entity";
-import { ManagedProcessEntity } from "../../processes/managed-process.entity";
-import { ProcessOutputSource } from "@flowser/shared";
-import { FlowConfigService } from "../../../../packages/core/src/flow/flow-config.service";
-import { ProcessManagerService } from "../../processes/process-manager.service";
-import {
-  HashAlgorithm,
-  hashAlgorithmToJSON,
-  SignatureAlgorithm,
-  signatureAlgorithmToJSON,
-} from "@flowser/shared/dist/src/generated/entities/common";
+  ManagedProcess,
+  ProcessOutputSource,
+} from "../processes/managed-process";
+import { ProcessManagerService } from "../processes/process-manager.service";
 import { randomUUID } from "crypto";
-
-export type GenerateKeyOptions = {
-  derivationPath?: string;
-  mnemonicSeed?: string;
-  signatureAlgorithm?: SignatureAlgorithm;
-};
+import { HashAlgorithm, SignatureAlgorithm } from "./common";
 
 export type GeneratedKey = {
   derivationPath: string;
@@ -33,14 +17,6 @@ export type GeneratedKey = {
 export type KeyWithWeight = {
   weight: number;
   publicKey: string;
-};
-
-type CreateAccountOptions = {
-  keys: KeyWithWeight[];
-  // Account name from configuration used to sign the transaction (default "emulator-account")
-  signer?: string;
-  hashAlgorithm?: HashAlgorithm;
-  signatureAlgorithm?: SignatureAlgorithm;
 };
 
 export type CreatedAccount = {
@@ -69,52 +45,52 @@ type RunCliCommandOptions = {
   // Every command should have a unique human-readable name.
   name: string;
   // Should this command be run in the project folder.
-  useProjectAsCwd: boolean;
+  cwd?: string;
   flowFlags: FlowCliFlag[];
 };
 
+type InitOptions = {
+  projectRootPath: string;
+};
+
+type GenerateKeyOptions = {
+  derivationPath?: string;
+  mnemonicSeed?: string;
+  signatureAlgorithm?: SignatureAlgorithm;
+  projectRootPath: string;
+};
+
+type CreateAccountOptions = {
+  keys: KeyWithWeight[];
+  // Account name from configuration used to sign the transaction (default "emulator-account")
+  signer?: string;
+  hashAlgorithm?: HashAlgorithm;
+  signatureAlgorithm?: SignatureAlgorithm;
+  projectRootPath: string;
+};
+
 @Injectable()
-export class FlowCliService implements ProjectContextLifecycle {
+export class FlowCliService {
   static readonly processId = "flow-init-config";
-  private projectContext: ProjectEntity | undefined;
 
-  constructor(
-    private configService: FlowConfigService,
-    private processManagerService: ProcessManagerService
-  ) {}
+  constructor(private processManagerService: ProcessManagerService) {}
 
-  async onEnterProjectContext(project: ProjectEntity) {
-    this.projectContext = project;
-    if (!this.configService.hasConfigFile()) {
-      await this.initConfig();
-      await this.configService.reload();
-    }
-  }
-
-  async onExitProjectContext() {
-    this.processManagerService.get(FlowCliService.processId)?.clearLogs();
-    this.projectContext = undefined;
-  }
-
-  async initConfig() {
-    if (!this.projectContext) {
-      throw new Error("Project context not found");
-    }
-    const childProcess = new ManagedProcessEntity({
+  async init(options: InitOptions) {
+    const childProcess = new ManagedProcess({
       id: FlowCliService.processId,
       name: "Flow init",
       command: {
         name: "flow",
         args: ["init"],
         options: {
-          cwd: this.projectContext.filesystemPath,
+          cwd: options.projectRootPath,
         },
       },
     });
     await this.processManagerService.runUntilTermination(childProcess);
   }
 
-  async generateKey(options?: GenerateKeyOptions): Promise<GeneratedKey> {
+  async generateKey(options: GenerateKeyOptions): Promise<GeneratedKey> {
     return this.runAndGetJsonOutput<GeneratedKey>({
       name: "Flow generate key",
       flowFlags: [
@@ -130,12 +106,10 @@ export class FlowCliService implements ProjectContextLifecycle {
         },
         {
           key: "--sig-algo",
-          value: options?.signatureAlgorithm
-            ? signatureAlgorithmToJSON(options?.signatureAlgorithm)
-            : undefined,
+          value: options?.signatureAlgorithm,
         },
       ],
-      useProjectAsCwd: true,
+      cwd: options.projectRootPath,
     });
   }
 
@@ -151,15 +125,11 @@ export class FlowCliService implements ProjectContextLifecycle {
         },
         {
           key: "--hash-algo",
-          value: options.hashAlgorithm
-            ? hashAlgorithmToJSON(options.hashAlgorithm)
-            : undefined,
+          value: options.hashAlgorithm,
         },
         {
           key: "--sig-algo",
-          value: options?.signatureAlgorithm
-            ? signatureAlgorithmToJSON(options?.signatureAlgorithm)
-            : undefined,
+          value: options?.signatureAlgorithm,
         },
         ...options.keys
           .map((key): FlowCliFlag[] => [
@@ -168,7 +138,7 @@ export class FlowCliService implements ProjectContextLifecycle {
           ])
           .flat(),
       ],
-      useProjectAsCwd: true,
+      cwd: options.projectRootPath,
     });
   }
 
@@ -176,7 +146,6 @@ export class FlowCliService implements ProjectContextLifecycle {
     const output = await this.runAndGetOutput({
       name: "Flow version",
       flowFlags: ["version"],
-      useProjectAsCwd: false,
     });
     const stdout = output.filter(
       (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT
@@ -211,17 +180,13 @@ export class FlowCliService implements ProjectContextLifecycle {
   }
 
   private async runAndGetOutput(options: RunCliCommandOptions) {
-    const childProcess = new ManagedProcessEntity({
+    const childProcess = new ManagedProcess({
       id: randomUUID(),
       name: options.name,
       command: {
         name: "flow",
         args: options.flowFlags.map((flag) => this.buildFlag(flag)).flat(),
-        options: options.useProjectAsCwd
-          ? {
-              cwd: this.getRequiredProjectCwd(),
-            }
-          : undefined,
+        options: options.cwd ? { cwd: options.cwd } : undefined,
       },
     });
     return this.processManagerService.runUntilTermination(childProcess);
@@ -241,15 +206,5 @@ export class FlowCliService implements ProjectContextLifecycle {
     }
 
     return [];
-  }
-
-  private getRequiredProjectCwd() {
-    if (!this.projectContext) {
-      throw new PreconditionFailedException(
-        "Project context not set",
-        "Missing project context when retrieving project path"
-      );
-    }
-    return this.projectContext.filesystemPath;
   }
 }

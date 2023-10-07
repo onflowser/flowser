@@ -6,14 +6,14 @@ import {
   Post,
   UseInterceptors,
 } from "@nestjs/common";
-import { ProcessManagerService } from "./process-manager.service";
+import { ProcessManagerService } from "../../../packages/core/src/processes/process-manager.service";
 import {
   GetPollingOutputsResponse,
   GetAllManagedProcessesResponse,
   GetPollingManagedProcessesResponse,
   GetPollingManagedProcessesRequest,
   GetPollingOutputsRequest,
-} from "@flowser/shared";
+} from "../../../shared/src";
 import { PollingResponseInterceptor } from "../core/interceptors/polling-response.interceptor";
 
 @Controller("processes")

@@ -102,7 +102,7 @@ export class FlowConfigService {
     await this.reload();
   }
 
-  public onExitProjectContext() {
+  public cleanup() {
     this.workingDirectoryPath = undefined;
     this.detachListeners();
   }

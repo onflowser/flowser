@@ -5,7 +5,7 @@ import {
   GetAddressIndexResponse,
 } from "@flowser/shared";
 import { Body, Controller, Post } from "@nestjs/common";
-import { GoBindingsService } from "./go-bindings.service";
+import { GoBindingsService } from "services/src/flow/go-bindings.service";
 
 @Controller("go-bindings")
 export class GoBindingsController {

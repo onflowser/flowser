@@ -13,7 +13,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FlowGatewayService } from "../../../packages/core/src/flow/flow-gateway.service";
 import { ProcessorService } from "../data-processing/processor.service";
 import { FlowEmulatorService } from "../../../packages/core/src/flow/flow-emulator.service";
-import { FlowCliService } from "../flow/services/cli.service";
+import { FlowCliService } from "../../../packages/core/src/flow/flow-cli.service";
 import { FlowConfigService } from "../../../packages/core/src/flow/flow-config.service";
 import { ProjectContextLifecycle } from "../flow/utils/project-context";
 import {
@@ -27,8 +27,8 @@ import {
 import * as fs from "fs";
 import { CacheRemovalService } from "../core/services/cache-removal.service";
 import { WalletService } from "../wallet/wallet.service";
-import { FlowSnapshotService } from "../flow/services/snapshot.service";
-import { FlowTemplatesService } from "../flow/services/templates.service";
+import { FlowSnapshotsService } from "../../../packages/core/src/flow/flow-snapshots.service";
+import { FlowInteractionsService } from "../../../packages/core/src/flow/flow-interactions.service";
 
 const commandExists = require("command-exists");
 const semver = require("semver");
@@ -71,8 +71,8 @@ export class ProjectsService {
     private flowConfigService: FlowConfigService,
     private commonService: CacheRemovalService,
     private walletService: WalletService,
-    private flowSnapshotsService: FlowSnapshotService,
-    private flowTemplatesService: FlowTemplatesService
+    private flowSnapshotsService: FlowSnapshotsService,
+    private flowTemplatesService: FlowInteractionsService
   ) {}
 
   getCurrentProject(): ProjectEntity | undefined {

@@ -1,32 +1,36 @@
-import { InteractionKind, InteractionTemplate } from "@flowser/shared";
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { ProjectContextLifecycle } from "../utils/project-context";
-import { ProjectEntity } from "../../projects/project.entity";
+import { Injectable } from "@nestjs/common";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { GoBindingsService } from "../../go-bindings/go-bindings.service";
-import { isDefined } from "../../utils/common-utils";
+import { GoBindingsService } from "./go-bindings.service";
+import { isDefined } from "../../../../backend/src/utils/common-utils";
+import { InteractionKind } from "./common";
+
+export interface InteractionTemplate {
+  id: string;
+  name: string;
+  code: string;
+  source: InteractionTemplate_Source | undefined;
+  createdDate: string;
+  updatedDate: string;
+}
+
+interface InteractionTemplate_Source {
+  filePath: string;
+}
+
+type GetInteractionTemplatesOptions = {
+  projectRootPath: string;
+};
 
 @Injectable()
-export class FlowTemplatesService implements ProjectContextLifecycle {
-  private projectContext: ProjectEntity | undefined;
-
+export class FlowInteractionsService {
   constructor(private readonly goBindings: GoBindingsService) {}
 
-  public async onEnterProjectContext(project: ProjectEntity) {
-    this.projectContext = project;
-  }
-
-  public onExitProjectContext() {
-    this.projectContext = undefined;
-  }
-
-  public async getLocalTemplates(): Promise<InteractionTemplate[]> {
-    if (!this.projectContext) {
-      throw new InternalServerErrorException("Project context not found");
-    }
+  public async getInteractionTemplates(
+    options: GetInteractionTemplatesOptions
+  ): Promise<InteractionTemplate[]> {
     const potentialCadenceFilePaths = await this.findAllCadenceFiles(
-      this.projectContext.filesystemPath
+      options.projectRootPath
     );
     const templates = await Promise.all(
       potentialCadenceFilePaths.map((potentialCadenceFilePath) =>

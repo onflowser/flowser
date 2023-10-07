@@ -8,7 +8,7 @@ import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./core/filters/http-exception.filter";
 import { Config, ConfigService } from "./core/services/config.service";
 
-export { ProcessManagerService } from "./processes/process-manager.service";
+export { ProcessManagerService } from "../../packages/core/src/processes/process-manager.service";
 export { ProjectsService } from "./projects/projects.service";
 export { ProjectEntity } from "./projects/project.entity";
 

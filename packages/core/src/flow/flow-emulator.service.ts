@@ -1,12 +1,13 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ProcessOutputSource } from "@flowser/shared";
-import { ProcessManagerService } from "../../../../backend/src/processes/process-manager.service";
-import { ManagedProcessEntity } from "../../../../backend/src/processes/managed-process.entity";
+import { ProcessManagerService } from "../processes/process-manager.service";
+import { ManagedProcess } from "../processes/managed-process";
 import {
   isDefined,
   waitForMs,
 } from "../../../../backend/src/utils/common-utils";
 import { EventEmitter } from "node:events";
+import { HashAlgorithm, SignatureAlgorithm } from "./common";
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;
@@ -52,29 +53,10 @@ export type FlowEmulatorConfig = {
   snapshot: boolean;
 };
 
-// https://docs.onflow.org/cadence/language/crypto/#hashing
-export enum SignatureAlgorithm {
-  // Enum values must be kept unchanged.
-  ECDSA_P256 = "ECDSA_P256",
-  ECDSA_secp256k1 = "ECDSA_secp256k1",
-  BLS_BLS12_381 = "BLS_BLS12_381",
-}
-
-// https://docs.onflow.org/cadence/language/crypto/#hashing
-export enum HashAlgorithm {
-  // Enum values must be kept unchanged.
-  SHA2_256 = "SHA2_256",
-  SHA2_384 = "SHA2_384",
-  SHA3_256 = "SHA3_256",
-  SHA3_384 = "SHA3_384",
-  KMAC128_BLS_BLS12_381 = "KMAC128_BLS_BLS12_381",
-  KECCAK_256 = "KECCAK_256",
-}
-
 @Injectable()
 export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";
-  private process: ManagedProcessEntity | undefined;
+  private process: ManagedProcess | undefined;
   private config: FlowEmulatorConfig;
 
   constructor(private processManagerService: ProcessManagerService) {
@@ -120,7 +102,7 @@ export class FlowEmulatorService extends EventEmitter {
   }
 
   async start(config: FlowEmulatorConfig) {
-    this.process = new ManagedProcessEntity({
+    this.process = new ManagedProcess({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
       command: {

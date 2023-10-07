@@ -1,13 +1,27 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import {
-  GetParsedInteractionRequest,
-  GetParsedInteractionResponse,
-  GetAddressIndexRequest,
-  GetAddressIndexResponse,
-} from "@flowser/shared";
 import { spawn } from "node:child_process";
 import * as path from "path";
 import * as os from "os";
+import { CadenceInteraction } from './common';
+
+export interface GetParsedInteractionRequest {
+  sourceCode: string;
+}
+
+export interface GetParsedInteractionResponse {
+  interaction: CadenceInteraction | undefined;
+  program: { [key: string]: any } | undefined;
+  error: string;
+}
+
+export interface GetAddressIndexRequest {
+  chainId: string;
+  hexAddress: string;
+}
+
+export interface GetAddressIndexResponse {
+  index: number;
+}
 
 type ExecuteGoBinRequest = {
   command: string;
@@ -30,7 +44,7 @@ export class GoBindingsService {
       stdIn: request.sourceCode,
     });
 
-    return GetParsedInteractionResponse.fromJSON(JSON.parse(response.raw));
+    return JSON.parse(response.raw);
   }
 
   public async getAddressIndex(

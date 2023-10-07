@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { GoBindingsService } from "./go-bindings.service";
+import { GoBindingsService } from "services/src/flow/go-bindings.service";
 
 describe("InteractionsService", () => {
   let service: GoBindingsService;
