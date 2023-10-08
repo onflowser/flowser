@@ -24,9 +24,9 @@ mkdir ../release/build/@flowser
 mkdir -p $APP_ICON_PATH
 
 # Generate app icons
-../node_modules/.bin/electron-icon-maker --input=../src/icon.png --output=$APP_ICON_PATH
+../node_modules/.bin/electron-icon-maker --input=../buildResources/icon.png --output=$APP_ICON_PATH
 
 # Copy MacOS installation background image
-cp ../static/macos-background.tiff $STATIC_ASSETS_PATH
+cp ../buildResources/macos-background.tiff $STATIC_ASSETS_PATH
 
 yarn run "build-${PLATFORM_ARG}"

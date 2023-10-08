@@ -1,0 +1,42 @@
+{
+  "name": "flowser",
+  "description": "Supercharged development on Flow blockchain ⚡",
+  "version": "3.0.0",
+  "homepage": "https://flowser.dev",
+  "author": {
+    "email": "bartolomej.kozorog@gmail.com",
+    "name": "Flowser"
+  },
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "build:electron-main": "tsc --project tsconfig.electron.json",
+    "prebuild:electron": "cp src/targets/electron/index.tsx src/index.tsx",
+    "electron:serve": "yarn run prebuild:electron && yarn run build:electron-main && concurrently -k \"cross-env BROWSER=none yarn start:react\" \"yarn electron:start\"",
+    "electron:build": "yarn run prebuild:electron && yarn build:react && yarn run build:electron-main && echo \"Run app/scripts/build.sh to build the actuall electron app.\"",
+    "electron:start": "wait-on tcp:6060 && electron .",
+    "build": "yarn run electron:build",
+
+    "build-electron": "electron-builder -c.extraMetadata.main=build/electron/targets/electron/main.js",
+    "build-mac": "yarn run build-electron --mac",
+    "build-win": "yarn run build-electron --win",
+    "build-linux": "yarn run build-electron --linux",
+    "build-all": "yarn run build-electron --linux --mac --win"
+  },
+  "dependencies": {
+    "@onflowser/config": "*",
+    "@onflowser/indexer": "*",
+    "@onflowser/core": "*",
+    "@onflowser/api": "*",
+    "@sentry/electron": "^4.0.2",
+    "electron-is-dev": "^2.0.0",
+    "electron-log": "^4.4.8",
+    "electron-updater": "^5.3.0"
+  },
+  "devDependencies": {
+    "electron-notarize": "^1.2.1",
+    "electron-icon-maker": "^0.0.5",
+    "dotenv": "^16.0.2",
+    "electron": "20.1.0",
+    "electron-builder": "^23.3.3"
+  }
+}
