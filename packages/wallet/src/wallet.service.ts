@@ -12,10 +12,8 @@ import {
 } from "@onflowser/core/src/flow/flow-cli.service";
 import { AccountsService } from "../../../backend/src/accounts/services/accounts.service";
 import { AccountEntity } from "../../../backend/src/accounts/entities/account.entity";
-import { ensurePrefixedAddress } from "../../../backend/src/utils/common-utils";
-import {
-  AccountKeyEntity,
-} from "../../../backend/src/accounts/entities/key.entity";
+import { ensurePrefixedAddress } from "../../core/src/utils";
+import { AccountKeyEntity } from "../../../backend/src/accounts/entities/key.entity";
 import { KeysService } from "../../../backend/src/accounts/services/keys.service";
 import {
   FlowAuthorizationFunction,

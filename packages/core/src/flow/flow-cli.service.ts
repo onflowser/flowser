@@ -1,4 +1,3 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
 import {
   ManagedProcess,
   ProcessOutputSource,
@@ -69,7 +68,6 @@ type CreateAccountOptions = {
   projectRootPath: string;
 };
 
-@Injectable()
 export class FlowCliService {
   static readonly processId = "flow-init-config";
 
@@ -155,7 +153,7 @@ export class FlowCliService {
     // but let's handle it anyway just in case
     const unknownVersionMessage = "Version information unknown!";
     if (!versionLog || versionLog.data === unknownVersionMessage) {
-      throw new NotFoundException("Flow CLI version not found");
+      throw new Error("Flow CLI version not found");
     }
     const [_, version] = versionLog?.data?.split(/: /) ?? [];
     return {

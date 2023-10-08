@@ -9,3 +9,6 @@ flow.json
 .envrc
 server/certbot
 .envrc
+dist
+.turbo
+*.tsbuildinfo

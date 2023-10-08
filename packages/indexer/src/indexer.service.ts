@@ -2,30 +2,23 @@ import { Injectable, Logger } from "@nestjs/common";
 import {
   FlowApiStatus,
   FlowGatewayService,
-} from "@onflowser/core/src/flow/flow-gateway.service";
-import * as flowResource from "@onflowser/core/src/flow/flow-gateway.service";
-import * as flowserResource from "@onflowser/api/src/resources";
-import {
-  ensureNonPrefixedAddress,
-  ensurePrefixedAddress,
-} from "../../../backend/src/utils/common-utils";
-import { ManagedProcess } from "@onflowser/core/src/processes/managed-process";
-import {
+  GetParsedInteractionResponse,
   FlowEmulatorService,
   WellKnownAddressesOptions,
-} from "@onflowser/core/src/flow/flow-emulator.service";
-import { AsyncIntervalScheduler } from "./async-interval-scheduler";
-import { FlowGatewayConfig } from "@onflowser/core/src/flow/flow-gateway.service";
-import {
-  GetParsedInteractionResponse,
+  ManagedProcess,
+  ensureNonPrefixedAddress,
+  ensurePrefixedAddress,
+  FlowAccountStorageService,
   GoBindingsService,
-} from "@onflowser/core/src/flow/go-bindings.service";
-import { IResourceIndex } from "@onflowser/api";
+} from "@onflowser/core";
+import * as flowResource from "@onflowser/core";
+import * as flowserResource from "@onflowser/api";
+import { AsyncIntervalScheduler } from "./async-interval-scheduler";
 import {
+  IResourceIndex,
   HashAlgorithm,
   SignatureAlgorithm,
-} from "@onflowser/api/src/resources";
-import { FlowAccountStorageService } from "@onflowser/core/src/flow/flow-storage.service";
+} from "@onflowser/api";
 
 // See https://developers.flow.com/cadence/language/core-events
 enum FlowCoreEventType {
@@ -66,7 +59,6 @@ export class IndexerService {
   private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
-    gatewayConfig: FlowGatewayConfig,
     private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
     private accountIndex: IResourceIndex<flowserResource.FlowAccount>,
     private blockIndex: IResourceIndex<flowserResource.FlowBlock>,
@@ -81,7 +73,7 @@ export class IndexerService {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: "Blockchain processing",
       pollingIntervalInMs: this.pollingDelay,
-      functionToExecute: () => this.processBlockchainData(gatewayConfig),
+      functionToExecute: this.processBlockchainData.bind(this),
     });
   }
 
@@ -100,10 +92,8 @@ export class IndexerService {
     return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
   }
 
-  async processBlockchainData(gatewayConfig: FlowGatewayConfig): Promise<void> {
-    const gatewayStatus = await this.flowGatewayService.getApiStatus(
-      gatewayConfig
-    );
+  async processBlockchainData(): Promise<void> {
+    const gatewayStatus = await this.flowGatewayService.getApiStatus();
     if (gatewayStatus !== FlowApiStatus.SERVICE_STATUS_ONLINE) {
       this.logger.debug("Gateway offline, pausing processing.");
       return;

@@ -1,4 +1,3 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
 import {
   ManagedProcess,
   ProcessOutputSource,
@@ -11,7 +10,6 @@ export enum ProcessManagerEvent {
   PROCESS_UPDATED = "process_updated",
 }
 
-@Injectable()
 export class ProcessManagerService extends EventEmitter {
   private readonly processLookupById: Map<string, ManagedProcess>;
 
@@ -92,7 +90,7 @@ export class ProcessManagerService extends EventEmitter {
   async startExisting(processId: string) {
     const existingProcess = this.processLookupById.get(processId);
     if (!existingProcess) {
-      throw new NotFoundException(`Existing process not found: ${processId}`);
+      throw new Error(`Existing process not found: ${processId}`);
     }
     await existingProcess.stop();
     this.emit(ProcessManagerEvent.PROCESS_UPDATED, process);
@@ -154,7 +152,7 @@ export class ProcessManagerService extends EventEmitter {
   async restart(processId: string) {
     const process = this.processLookupById.get(processId);
     if (!process) {
-      throw new NotFoundException("Process not found");
+      throw new Error("Process not found");
     }
     await process.stop();
     await process.start();

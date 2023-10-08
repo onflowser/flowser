@@ -1,11 +1,10 @@
-import { Injectable } from "@nestjs/common";
 import { FlowGatewayService } from "./flow-gateway.service";
-import { ensurePrefixedAddress } from "../../../../backend/src/utils/common-utils";
+import { ensurePrefixedAddress } from "../utils";
 import {
   AccountStorageDomain,
   CadenceTypeKind,
-  FlowAccountStorage
-} from '@onflowser/api';
+  FlowAccountStorage,
+} from "@onflowser/api";
 
 /**
  * For more info on the account storage model and API, see:
@@ -34,7 +33,6 @@ type StorageTraversalResult = {
   storagePathItems: StoragePathItem[];
 };
 
-@Injectable()
 export class FlowAccountStorageService {
   constructor(private readonly flowGatewayService: FlowGatewayService) {}
 
@@ -44,28 +42,32 @@ export class FlowAccountStorageService {
     const flowAccountStorage = await this.fetchStorageByAddress(address);
 
     return [
-      ...flowAccountStorage.capabilityPathItems.map((item): FlowAccountStorage => ({
-        id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
-        address: ensurePrefixedAddress(item.address),
-        // Temporarily store the data type in untyped field, refactor later.
-        data: {
-          type: item.type,
-        },
-        domain: this.getStorageDomainFromPath(item.path),
-        path: item.path,
-        targetPath: item.targetPath,
-      })),
-      ...flowAccountStorage.storagePathItems.map((item): FlowAccountStorage => ({
-        id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
-        address: ensurePrefixedAddress(item.address),
-        // Temporarily store the data type in untyped field, refactor later.
-        data: {
-          type: item.type,
-        },
-        domain: this.getStorageDomainFromPath(item.path),
-        path: item.path,
-        targetPath: "",
-      })),
+      ...flowAccountStorage.capabilityPathItems.map(
+        (item): FlowAccountStorage => ({
+          id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
+          address: ensurePrefixedAddress(item.address),
+          // Temporarily store the data type in untyped field, refactor later.
+          data: {
+            type: item.type,
+          },
+          domain: this.getStorageDomainFromPath(item.path),
+          path: item.path,
+          targetPath: item.targetPath,
+        })
+      ),
+      ...flowAccountStorage.storagePathItems.map(
+        (item): FlowAccountStorage => ({
+          id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
+          address: ensurePrefixedAddress(item.address),
+          // Temporarily store the data type in untyped field, refactor later.
+          data: {
+            type: item.type,
+          },
+          domain: this.getStorageDomainFromPath(item.path),
+          path: item.path,
+          targetPath: "",
+        })
+      ),
     ];
   }
 
@@ -199,7 +201,7 @@ export class FlowAccountStorageService {
       case "storage":
         return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
       default:
-        throw new Error(`Unknown domain: ${rawDomain}`)
+        throw new Error(`Unknown domain: ${rawDomain}`);
     }
   }
 }

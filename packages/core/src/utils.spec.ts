@@ -1,4 +1,4 @@
-import { computeEntitiesDiff } from "./common-utils";
+import { computeEntitiesDiff } from "./utils";
 
 describe("Utils", function () {
   it("should compute entities diff using deep compare", function () {

@@ -1,8 +1,3 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from "@nestjs/common";
 import axios, { Method } from "axios";
 
 type CreateSnapshotRequest = {
@@ -27,7 +22,6 @@ type SnapshotInfoResponse = {
   height: number;
 };
 
-@Injectable()
 export class FlowSnapshotsService {
   constructor() {}
 
@@ -61,7 +55,7 @@ export class FlowSnapshotsService {
     });
 
     if (response.status !== 200) {
-      throw new InternalServerErrorException("Failed creating snapshot");
+      throw new Error("Failed creating snapshot");
     }
 
     return response.data;
@@ -75,7 +69,7 @@ export class FlowSnapshotsService {
     });
 
     if (response.status !== 200) {
-      throw new InternalServerErrorException("Failed to jump to height");
+      throw new Error("Failed to jump to height");
     }
   }
 
@@ -89,11 +83,11 @@ export class FlowSnapshotsService {
     });
 
     if (response.status === 404) {
-      throw new NotFoundException("Snapshot not found");
+      throw new Error("Snapshot not found");
     }
 
     if (response.status !== 200) {
-      throw new InternalServerErrorException("Failed to jump to snapshot");
+      throw new Error("Failed to jump to snapshot");
     }
 
     return response.data;
@@ -107,7 +101,7 @@ export class FlowSnapshotsService {
     });
 
     if (response.status !== 200) {
-      throw new InternalServerErrorException("Failed to list snapshots");
+      throw new Error("Failed to list snapshots");
     }
 
     const emptyResponse: ListSnapshotsResponse = {

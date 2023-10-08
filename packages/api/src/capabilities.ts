@@ -4,7 +4,7 @@ export type RequireOnly<Resource, Key extends keyof Resource> = Pick<
   Resource,
   Key
 > &
-  Partial<Resource>;
+  Partial<Omit<Resource, Key>>;
 
 export interface IResourceIndexReader<Resource> {
   findOneById(id: string): Promise<Resource | undefined>;

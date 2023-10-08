@@ -1,8 +1,9 @@
 import {
   IdentifiableResource,
   IResourceIndexReader,
-  IResourceIndexWriter, RequireOnly
-} from '@onflowser/api';
+  IResourceIndexWriter,
+  RequireOnly,
+} from "@onflowser/api";
 
 export class InMemoryIndex<Resource extends IdentifiableResource>
   implements IResourceIndexReader<Resource>, IResourceIndexWriter<Resource>
@@ -29,16 +30,21 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
   }
 
   async update(resource: RequireOnly<Resource, "id">): Promise<void> {
-    if (!this.lookup.has(resource.id)) {
+    const existingResource = this.lookup.get(resource.id);
+    if (!existingResource) {
       throw new Error("Resource not found");
     }
     this.lookup.set(resource.id, {
-      ...this.lookup.get(resource.id),
+      ...existingResource,
       ...resource,
     });
   }
 
   async findAll(): Promise<Resource[]> {
     return Array.from(this.lookup.values());
+  }
+
+  async findOneById(id: string): Promise<Resource | undefined> {
+    return this.lookup.get(id);
   }
 }

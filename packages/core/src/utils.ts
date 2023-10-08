@@ -1,6 +1,3 @@
-import { rm } from "fs/promises";
-import { ProtobufLikeObject } from "@flowser/shared";
-
 export function isDefined<Value>(
   value: Value | null | undefined
 ): value is Value {
@@ -13,35 +10,6 @@ export function waitForMs(ms: number) {
 
 export function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
-}
-
-export function isArray(value: unknown): value is unknown[] {
-  return typeof value === "object" && value !== null && "map" in value;
-}
-
-export async function rmdir(path: string) {
-  return rm(path, { force: true, recursive: true });
-}
-
-export function typeOrmProtobufTransformer(protobuf: ProtobufLikeObject) {
-  return {
-    from: (value: any | null) => {
-      if (value === null) {
-        return null;
-      }
-      return value?.["map"] !== undefined
-        ? value.map(protobuf.fromJSON)
-        : protobuf.fromJSON(value);
-    },
-    to: (value: any | null) => {
-      if (value === null) {
-        return null;
-      }
-      return value?.["map"] !== undefined
-        ? value.map(protobuf.toJSON)
-        : protobuf.toJSON(value);
-    },
-  };
 }
 
 export function ensurePrefixedAddress(address: string | null | undefined) {

@@ -1,14 +1,8 @@
-import {
-  Injectable,
-  Logger,
-  InternalServerErrorException,
-  PreconditionFailedException,
-} from "@nestjs/common";
 import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../../../../backend/src/utils/common-utils";
+import { isObject } from "../utils";
 
 type FlowAddress = string;
 
@@ -89,9 +83,7 @@ type FlowConfigServiceConfig = {
   workingDirectoryPath: string;
 };
 
-@Injectable()
 export class FlowConfigService {
-  private logger = new Logger(FlowConfigService.name);
   private fileListenerController: AbortController | undefined;
   private config: FlowCliConfig | undefined;
   private configFileName = "flow.json";
@@ -112,7 +104,6 @@ export class FlowConfigService {
   }
 
   public async reload() {
-    this.logger.debug("Reloading flow.json config");
     this.detachListeners();
     await this.load();
     this.attachListeners();
@@ -214,7 +205,6 @@ export class FlowConfigService {
         await this.load();
       }
     } catch (error) {
-      this.logger.debug("watch error", error);
       if (isObject(error) && error["name"] !== "AbortError") {
         throw error;
       }
@@ -230,7 +220,7 @@ export class FlowConfigService {
       const data = await this.readProjectFile(this.configFileName);
       this.config = JSON.parse(data);
     } catch (e) {
-      this.logger.debug("Config read error", e);
+      console.error("Config read error", e);
     }
   }
 
@@ -256,7 +246,7 @@ export class FlowConfigService {
 
   private buildProjectPath(pathPostfix: string) {
     if (!pathPostfix) {
-      throw new InternalServerErrorException("Postfix path not provided");
+      throw new Error("Postfix path not provided");
     }
     if (!this.workingDirectoryPath) {
       throw new Error("FlowConfigService not configured");
@@ -265,8 +255,6 @@ export class FlowConfigService {
   }
 
   private missingConfigError(path: string) {
-    return new PreconditionFailedException(
-      `Missing flow.json configuration key: ${path}`
-    );
+    return new Error(`Missing flow.json configuration key: ${path}`);
   }
 }

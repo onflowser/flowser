@@ -4,7 +4,6 @@ import {
   SpawnOptionsWithoutStdio,
 } from "child_process";
 import { randomUUID } from "crypto";
-import { Logger } from "@nestjs/common";
 import { EventEmitter } from "node:events";
 
 export type ManagedProcessOptions = {
@@ -42,7 +41,6 @@ export enum ManagedProcessEvent {
 }
 
 export class ManagedProcess extends EventEmitter {
-  private readonly logger = new Logger(ManagedProcess.name);
   public readonly id: string;
   private readonly name: string;
   public options: ManagedProcessOptions;
@@ -77,7 +75,8 @@ export class ManagedProcess extends EventEmitter {
       throw new Error("Process is already running");
     }
 
-    this.logger.debug(
+    // TODO(restructure): Inject logger provider
+    console.debug(
       `Starting ${this.name} with command: ${command.name} ${command.args?.join(
         " "
       )}`
@@ -134,11 +133,11 @@ export class ManagedProcess extends EventEmitter {
       return;
     }
     this.childProcess.once("spawn", () => {
-      this.logger.debug(`Process ${this.id} started`);
+      console.debug(`Process ${this.id} started`);
       this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
     });
     this.childProcess.once("exit", (code, signal) => {
-      this.logger.debug(
+      console.debug(
         `Process ${this.id} exited (code=${code}, signal=${signal})`
       );
       this.setState(
@@ -184,7 +183,7 @@ export class ManagedProcess extends EventEmitter {
   }
 
   private setState(newState: ManagedProcessState) {
-    this.logger.debug(
+    console.debug(
       `Process ${this.id} state changed from ${this.state} to ${newState}`
     );
     this.updatedAt = new Date();

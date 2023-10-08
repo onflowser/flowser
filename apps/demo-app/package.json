@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "types": "./src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@onflowser/config": "*",
     "@onflowser/indexer": "*",
-    "@onflowser/core": "*"
+    "@onflowser/core": "*",
+    "@onflowser/api": "*"
   },
   "devDependencies": {
     "@types/node": "^16.11.6",

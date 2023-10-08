@@ -2,9 +2,11 @@
   "name": "@onflowser/indexer",
   "version": "1.0.0",
   "description": "",
-  "main": "../indexer/index.ts",
-  "types": "./src/index.ts",
-  "scripts": {},
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

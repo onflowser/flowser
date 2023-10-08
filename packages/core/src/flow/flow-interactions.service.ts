@@ -1,8 +1,7 @@
-import { Injectable } from "@nestjs/common";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { GoBindingsService } from "./go-bindings.service";
-import { isDefined } from "../../../../backend/src/utils/common-utils";
+import { isDefined } from "../utils";
 import { InteractionKind } from "@onflowser/api";
 
 export interface InteractionTemplate {
@@ -22,7 +21,6 @@ type GetInteractionTemplatesOptions = {
   projectRootPath: string;
 };
 
-@Injectable()
 export class FlowInteractionsService {
   constructor(private readonly goBindings: GoBindingsService) {}
 

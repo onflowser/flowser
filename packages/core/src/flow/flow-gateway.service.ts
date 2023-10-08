@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import * as http from "http";
 import {
   FclArgBuilder,
@@ -7,7 +6,6 @@ import {
   FclValues,
 } from "./fcl-values";
 import * as fcl from "@onflow/fcl";
-import { FlowConfigService } from "./flow-config.service";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -137,8 +135,9 @@ type FlowTxStatusSubscription = {
   onceSealed: () => Promise<void>;
 };
 
-export type FlowGatewayConfig = {
+type FlowGatewayConfig = {
   restServerAddress: string;
+  flowJSON: unknown;
 };
 
 export enum FlowApiStatus {
@@ -146,19 +145,15 @@ export enum FlowApiStatus {
   SERVICE_STATUS_OFFLINE = 2,
 }
 
-@Injectable()
 export class FlowGatewayService {
-  constructor(private readonly flowConfigService: FlowConfigService) {}
-
-  // TODO(restructure): Pass this config to constructor instead?
-  configure(config: FlowGatewayConfig): void {
+  public configure(config: FlowGatewayConfig): void {
     fcl
       .config({
         "accessNode.api": config.restServerAddress,
         "flow.network": "emulator",
       })
       .load({
-        flowJSON: this.flowConfigService.getRawConfig(),
+        flowJSON: config.flowJSON,
       });
   }
 
@@ -243,9 +238,14 @@ export class FlowGatewayService {
   }
 
   public async getApiStatus(
-    gateway: FlowGatewayConfig
   ): Promise<FlowApiStatus> {
-    const { hostname, port } = new URL(gateway.restServerAddress);
+    const restServerAddress = await fcl.config.get("accessNode.api");
+
+    if (!restServerAddress) {
+      throw new Error("accessNode.api not configured")
+    }
+
+    const { hostname, port } = new URL(restServerAddress);
     return new Promise((resolve) => {
       const req = http
         .get(

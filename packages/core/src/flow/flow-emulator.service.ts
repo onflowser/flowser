@@ -1,13 +1,12 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { ProcessOutputSource } from "@flowser/shared";
 import { ProcessManagerService } from "../processes/process-manager.service";
 import { ManagedProcess } from "../processes/managed-process";
-import {
-  isDefined,
-  waitForMs,
-} from "../../../../backend/src/utils/common-utils";
+import { isDefined, waitForMs } from "../utils";
 import { EventEmitter } from "node:events";
-import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";
+import {
+  HashAlgorithm,
+  ProcessOutputSource,
+  SignatureAlgorithm,
+} from "@onflowser/api";
 
 type FlowWellKnownAddresses = {
   serviceAccountAddress: string;
@@ -53,7 +52,6 @@ export type FlowEmulatorConfig = {
   snapshot: boolean;
 };
 
-@Injectable()
 export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";
   private process: ManagedProcess | undefined;
@@ -187,10 +185,7 @@ export class FlowEmulatorService extends EventEmitter {
     while (retries >= 0) {
       const error = getErrorOutput();
       if (error) {
-        throw new InternalServerErrorException(
-          "Emulator failed to start",
-          error.data
-        );
+        throw new Error("Emulator failed to start: " + error.data);
       }
       await waitForMs(100);
       retries--;

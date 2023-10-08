@@ -1,8 +1,7 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { spawn } from "node:child_process";
 import * as path from "path";
 import * as os from "os";
-import { CadenceInteraction } from '@onflowser/api';
+import { CadenceInteraction } from "@onflowser/api";
 
 export interface GetParsedInteractionRequest {
   sourceCode: string;
@@ -33,7 +32,6 @@ type ExecuteGoBinResponse = {
   raw: string;
 };
 
-@Injectable()
 export class GoBindingsService {
   public async getParsedInteraction(
     request: GetParsedInteractionRequest
@@ -107,9 +105,7 @@ export class GoBindingsService {
       case "win32":
         return "internal-amd64.exe";
       default:
-        throw new InternalServerErrorException(
-          `Unsupported platform: ${os.platform()}`
-        );
+        throw new Error(`Unsupported platform: ${os.platform()}`);
     }
   }
 }
