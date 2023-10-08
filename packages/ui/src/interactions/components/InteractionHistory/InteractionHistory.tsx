@@ -1,9 +1,8 @@
 import React, { ReactElement } from "react";
 import classes from "./InteractionHistory.module.scss";
 import {
-  useGetPollingBlocks,
-  useGetTransactionsByBlock,
-} from "../../../../../../frontend/src/hooks/use-api";
+  useFlowserHooksApi,
+} from "../../../contexts/flowser-api.context";
 import { Block, Transaction } from "@flowser/shared";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
@@ -13,13 +12,14 @@ import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
-import { useSnapshotsManager } from "../../../../../../frontend/src/contexts/snapshots.context";
+import { useSnapshotsManager } from "../../../contexts/snapshots.context";
 
 export function InteractionHistory(): ReactElement {
-  const { data: blocks } = useGetPollingBlocks();
+  const api = useFlowserHooksApi();
+  const { data: blocks } = api.useGetBlocks();
 
   // There should always be at least one (initial) block.
-  if (blocks.length === 0) {
+  if (!blocks || blocks.length === 0) {
     return (
       <div className={classes.loadingRoot}>
         <Spinner size={30} />
@@ -44,13 +44,17 @@ function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const menuIconSize = 15;
 
+  const api = useFlowserHooksApi();
   const { checkoutBlock } = useSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
-  const { data } = useGetTransactionsByBlock(block.id, {
-    // Assume that every transaction is packaged into a separate block.
-    // So once a block exists, no transactions can be appended to it.
-    pollingInterval: 0,
-  });
+  const { data } = api.useGetTransactionsByAccount(block.id,
+  // TODO(restructure): Add this option
+  //   {
+  //   // Assume that every transaction is packaged into a separate block.
+  //   // So once a block exists, no transactions can be appended to it.
+  //   pollingInterval: 0,
+  // }
+  );
   const firstTransaction = data[0];
 
   const transactionName = useTransactionName({

@@ -7,19 +7,18 @@ import React, {
   useMemo,
 } from "react";
 import toast from "react-hot-toast";
-import { Block, EmulatorSnapshot } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { ServiceRegistry } from "../services/service-registry";
+import { ServiceRegistry } from "../../../../frontend/src/services/service-registry";
 import {
-  useGetPollingBlocks,
-  useGetPollingEmulatorSnapshots,
-} from "../hooks/use-api";
+  useFlowserHooksApi,
+} from "./flowser-api.context";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useAnalytics } from "../hooks/use-analytics";
-import { AnalyticEvent } from "../services/analytics.service";
-import { FlowUtils } from "../../../packages/ui/src/utils/flow-utils";
-import { SnapshotDialog } from "../../../packages/ui/src/common/overlays/dialogs/snapshot/SnapshotDialog";
+import { AnalyticEvent } from "../../../../frontend/src/services/analytics.service";
+import { FlowUtils } from "../utils/flow-utils";
+import { SnapshotDialog } from "../common/overlays/dialogs/snapshot/SnapshotDialog";
 import { useProjectManager } from "./projects.context";
+import { FlowBlock, FlowStateSnapshot } from '@onflowser/api';
 
 export type SnapshotsManager = {
   createSnapshot: () => void;
@@ -41,14 +40,13 @@ export function SnapshotsManagerProvider({
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
   const { showDialog } = useConfirmDialog();
   const { currentProject } = useProjectManager();
-  const { data: blocks, refresh } = useGetPollingBlocks();
-  const { data: emulatorSnapshots } = useGetPollingEmulatorSnapshots();
+  const api = useFlowserHooksApi();
+  const { data: blocks, mutate } = api.useGetBlocks();
+  const { data: stateSnapshots } = api.useGetStateSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
-      new Map(
-        emulatorSnapshots.map((snapshot) => [snapshot.blockId, snapshot])
-      ),
-    [emulatorSnapshots]
+      new Map(stateSnapshots?.map((snapshot) => [snapshot.blockId, snapshot])),
+    [stateSnapshots]
   );
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
 
@@ -68,13 +66,17 @@ export function SnapshotsManagerProvider({
     }
   }
 
-  function checkoutSnapshot(snapshot: EmulatorSnapshot) {
+  function checkoutSnapshot(snapshot: FlowStateSnapshot) {
     const isSnapshotEnabled = currentProject?.emulator?.snapshot;
     if (!isSnapshotEnabled) {
       toast.error(
         "Can't jump to block, because 'snapshot' option is not enabled in project settings"
       );
       return;
+    }
+
+    if (blocks === undefined) {
+      throw new Error("No blocks found");
     }
 
     const latestBlock = blocks[0];
@@ -96,7 +98,7 @@ export function SnapshotsManagerProvider({
           blockId: snapshot.blockId,
           projectId: currentProject.id,
         });
-        refresh();
+        mutate();
         toast.success(
           `Moved to block: ${FlowUtils.getShortedBlockId(snapshot.blockId)}`
         );
@@ -119,9 +121,13 @@ export function SnapshotsManagerProvider({
     });
   }
 
-  function rollbackToBlock(targetBlock: Block) {
+  function rollbackToBlock(targetBlock: FlowBlock) {
     const onConfirm = async () => {
       track(AnalyticEvent.CHECKOUT_SNAPSHOT);
+
+      if (blocks === undefined) {
+        throw new Error("No blocks found");
+      }
 
       const latestBlock = blocks[0];
 
@@ -137,7 +143,7 @@ export function SnapshotsManagerProvider({
         await snapshotService.rollback({
           blockHeight: targetBlock.height,
         });
-        refresh();
+        mutate();
         toast.success(
           `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock.id)}`
         );
@@ -168,6 +174,10 @@ export function SnapshotsManagerProvider({
 
       if (snapshot) {
         return checkoutSnapshot(snapshot);
+      }
+
+      if (blocks === undefined) {
+        throw new Error("No blocks found");
       }
 
       const targetBlock = blocks.find((block) => block.id === targetBlockId);

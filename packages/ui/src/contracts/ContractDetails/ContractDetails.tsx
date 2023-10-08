@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useGetContract } from "../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import classes from "./ContractDetails.module.scss";
 import {
   DetailsCard,
@@ -20,8 +20,8 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   props
 ) => {
   const { contractId } = props;
-  const { isLoading, data } = useGetContract(contractId);
-  const { contract } = data ?? {};
+  const api = useFlowserHooksApi();
+  const { isLoading, data: contract } = api.useGetContract(contractId);
 
   if (isLoading || !contract) {
     return <FullScreenLoading />;
@@ -35,8 +35,8 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     {
       label: "Account",
       value: (
-        <ProjectLink to={`/accounts/${contract.accountAddress}`}>
-          {contract.accountAddress}
+        <ProjectLink to={`/accounts/${contract.address}`}>
+          {contract.address}
         </ProjectLink>
       ),
     },
@@ -52,11 +52,11 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   rows.push(
     {
       label: "Updated date",
-      value: <DateDisplay date={contract.updatedAt} />,
+      value: <DateDisplay date={contract.updatedAt.toISOString()} />,
     },
     {
       label: "Created date",
-      value: <DateDisplay date={contract.createdAt} />,
+      value: <DateDisplay date={contract.createdAt.toISOString()} />,
     }
   );
 

@@ -1,14 +1,16 @@
 import React from "react";
 import { ActionDialog } from "../../overlays/dialogs/action/ActionDialog";
-import { useGetProjectRequirements } from "../../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../../contexts/flowser-api.context";
 import { ReactElement } from "react";
-import { ProjectRequirement, ProjectRequirementType } from "@flowser/shared";
-import classes from "./ProjectRequirements.module.scss";
+import classes from "./FlowserUsageRequirements.module.scss";
+import {
+  FlowserUsageRequirement,
+  FlowserUsageRequirementType,
+} from "@onflowser/api";
 
-// TODO(restructure): Move this to app folder
-export function ProjectRequirements(): ReactElement | null {
-  const { data } = useGetProjectRequirements();
-  const { missingRequirements } = data ?? { missingRequirements: [] };
+export function FlowserUsageRequirements(): ReactElement | null {
+  const api = useFlowserHooksApi();
+  const { data: missingRequirements } = api.useGetFlowserUsageRequirements();
   const showModal = missingRequirements.length > 0;
 
   if (!showModal) {
@@ -32,7 +34,7 @@ export function ProjectRequirements(): ReactElement | null {
 function MissingRequirementItem({
   requirement,
 }: {
-  requirement: ProjectRequirement;
+  requirement: FlowserUsageRequirement;
 }) {
   return (
     <div className={classes.missingRequirementItem}>
@@ -42,21 +44,21 @@ function MissingRequirementItem({
   );
 }
 
-function getTitle(requirement: ProjectRequirement) {
+function getTitle(requirement: FlowserUsageRequirement) {
   switch (requirement.type) {
-    case ProjectRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION:
+    case FlowserUsageRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION:
       return "Unsupported flow-cli version";
-    case ProjectRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI:
+    case FlowserUsageRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI:
       return "Missing flow-cli";
     default:
       return "Unknown";
   }
 }
 
-function getDescription(requirement: ProjectRequirement) {
+function getDescription(requirement: FlowserUsageRequirement) {
   const { missingVersionRequirement, type } = requirement;
   switch (type) {
-    case ProjectRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION:
+    case FlowserUsageRequirementType.PROJECT_REQUIREMENT_UNSUPPORTED_FLOW_CLI_VERSION:
       return (
         <>
           <p className={classes.description}>
@@ -82,7 +84,7 @@ function getDescription(requirement: ProjectRequirement) {
           </p>
         </>
       );
-    case ProjectRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI:
+    case FlowserUsageRequirementType.PROJECT_REQUIREMENT_MISSING_FLOW_CLI:
       return (
         <>
           <p className={classes.description}>

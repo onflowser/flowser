@@ -15,7 +15,13 @@ export enum InteractionKind {
   INTERACTION_TRANSACTION = 2,
 }
 
-export interface CadenceInteraction {
+export interface ParsedInteractionOrError {
+  interaction: ParsedInteraction | undefined;
+  program: { [key: string]: any } | undefined;
+  error: string;
+}
+
+export interface ParsedInteraction {
   kind: InteractionKind;
   parameters: CadenceParameter[];
   transaction: CadenceInteraction_Transaction | undefined;
@@ -34,7 +40,7 @@ export interface CadenceParameter {
   type: CadenceType | undefined;
 }
 
-export interface PollingResource {
+export interface TimestampedResource {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | undefined;
@@ -48,7 +54,7 @@ export interface BlockScopedResource {
   blockId: string;
 }
 
-export interface FlowAccount {
+export interface FlowAccount extends TimestampedResource {
   // ID is equal to the address.
   id: string;
   address: string;
@@ -56,7 +62,13 @@ export interface FlowAccount {
   balance: number;
   code: string;
   isDefaultAccount: boolean;
+  tags: FlowAccountTag[];
   keys: FlowAccountKey[];
+}
+
+export interface FlowAccountTag {
+  name: string;
+  description: string;
 }
 
 // https://docs.onflow.org/cadence/language/crypto/#hashing
@@ -92,13 +104,19 @@ export interface FlowAccountKey {
   revoked: boolean;
 }
 
-export interface FlowContract {
+export interface FlowContract extends TimestampedResource {
   // ID is the combination of `address` and `name`.
   id: string;
   address: string;
   name: string;
   blockId: string;
   code: string;
+  localConfig: FlowContractLocalConfig | undefined;
+}
+
+export interface FlowContractLocalConfig {
+  relativePath: string;
+  absolutePath: string;
 }
 
 export interface FlowAccountCapability {
@@ -112,7 +130,7 @@ export interface FlowAccountCapability {
  * Every account storage path consists of a domain and identifier: /<domain>/<identifier>
  * See official docs: https://developers.flow.com/cadence/language/accounts#paths
  */
-export enum AccountStorageDomain {
+export enum FlowStorageDomain {
   STORAGE_DOMAIN_PRIVATE = 1,
   STORAGE_DOMAIN_PUBLIC = 2,
   STORAGE_DOMAIN_STORAGE = 3,
@@ -121,15 +139,16 @@ export enum AccountStorageDomain {
 export interface FlowAccountStorage {
   id: string;
   address: string;
-  domain: AccountStorageDomain;
+  domain: FlowStorageDomain;
   // TODO(restructure): Split data into multiple type-specific fields
   data: any;
   path: string;
   targetPath: string;
 }
 
-export interface FlowBlock {
+export interface FlowBlock extends TimestampedResource {
   id: string;
+  height: number;
   parentId: string;
   blockHeight: number;
   timestamp: Date;
@@ -143,7 +162,7 @@ export interface CollectionGuarantee {
   signatures: string[];
 }
 
-export interface FlowTransaction {
+export interface FlowTransaction extends TimestampedResource {
   id: string;
   script: string;
   blockId: string;
@@ -156,8 +175,6 @@ export interface FlowTransaction {
   authorizers: string[];
   envelopeSignatures: SignableObject[];
   payloadSignatures: SignableObject[];
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface TransactionProposalKey {
@@ -227,7 +244,7 @@ export enum ExecutionStatusCode {
   EXECUTION_STATUS_EXPIRED = 5,
 }
 
-export interface FlowEvent {
+export interface FlowEvent extends TimestampedResource {
   // ID is the combination of `transactionId` and `eventIndex`.
   id: string;
   transactionId: string;
@@ -282,4 +299,33 @@ export enum ProcessOutputSource {
   OUTPUT_SOURCE_STDOUT = 1,
   OUTPUT_SOURCE_STDERR = 2,
   UNRECOGNIZED = -1,
+}
+
+export interface FlowserProject extends TimestampedResource {
+  id: string;
+  name: string;
+}
+
+export enum FlowserUsageRequirementType {
+  UNSUPPORTED_CLI_VERSION,
+  MISSING_FLOW_CLI
+}
+
+export interface FlowserUsageRequirement {
+  title: string;
+  description: string;
+  type: FlowserUsageRequirementType;
+}
+
+export interface InteractionTemplate  extends TimestampedResource {
+  id: string;
+  name: string;
+  code: string;
+  source: {
+    filePath?: string;
+  };
+}
+
+export interface FlowCliInfo {
+  version: string;
 }

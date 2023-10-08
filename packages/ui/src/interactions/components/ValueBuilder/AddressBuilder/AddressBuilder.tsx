@@ -1,18 +1,20 @@
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import classes from "./AddressBuilder.module.scss";
 import { CadenceValueBuilder } from "../interface";
-import { useGetPollingAccounts } from "../../../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../../../contexts/flowser-api.context";
 import { AccountAvatar } from "../../../../accounts/AccountAvatar/AccountAvatar";
 import { AccountName } from "../../../../accounts/AccountName/AccountName";
 import { FlowserIcon } from "../../../../common/icons/FlowserIcon";
 import classNames from "classnames";
 import { ServiceRegistry } from "../../../../../../../frontend/src/services/service-registry";
-import { Account, FclValues } from "@flowser/shared";
 import { Spinner } from "../../../../common/loaders/Spinner/Spinner";
+import { FclValues } from "@onflowser/core";
+import { FlowAccount } from "@onflowser/api";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;
-  const { data, refresh } = useGetPollingAccounts();
+  const { useGetAccounts } = useFlowserHooksApi();
+  const { data, mutate } = useGetAccounts();
   const managedAccounts = addressBuilderOptions?.showManagedAccountsOnly
     ? data.filter((account) =>
         account.keys.some((key) => key.privateKey !== "")
@@ -34,7 +36,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   async function createNewAccount() {
     const { walletService } = ServiceRegistry.getInstance();
     await walletService.createAccount();
-    await refresh();
+    await mutate();
   }
 
   return (
@@ -60,7 +62,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
 type AccountButtonProps = {
   isSelected: boolean;
   onSelect: () => void;
-  account: Account;
+  account: FlowAccount;
   disabled?: boolean;
 };
 

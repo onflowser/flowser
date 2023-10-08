@@ -1,4 +1,4 @@
-import { CommonUtils } from "../../../../../frontend/src/utils/common-utils";
+import { CommonUtils } from "../../utils/common-utils";
 import RadioButton from "../../common/buttons/RadioButton/RadioButton";
 import React, { ReactElement } from "react";
 import { Input, InputProps } from "../../common/inputs/Input/Input";

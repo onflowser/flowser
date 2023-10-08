@@ -1,12 +1,12 @@
 import React, { ReactElement } from "react";
 import classes from "./PublicPrivateStorageCard.module.scss";
 import { StorageDomainBadge } from "../StorageDomainBadge/StorageDomainBadge";
-import { ReactComponent as LinkIcon } from "../../common/icons/assets/link.svg";
 import { AccountStorageItem } from "@flowser/shared/dist/src/generated/entities/accounts";
 import { DecoratedPollingEntity } from "frontend/src/contexts/timeout-polling.context";
-import gradient from "../../../../../frontend/src/assets/images/gradient.png";
+import gradient from "./gradient.png";
 import classNames from "classnames";
 import { ProjectLink } from "../../common/links/ProjectLink";
+import { FlowserIcon } from "../../common/icons/FlowserIcon";
 
 type StorageCardProps = {
   currentAccountAddress: string;
@@ -42,7 +42,7 @@ export function PublicPrivateStorageCard({
         </div>
         <div className={classes.identifier}>{pathIdentifier}</div>
         <ProjectLink className={classes.link} to={targetStorageCardUrl} replace>
-          <LinkIcon />
+          <FlowserIcon.Link />
           <div className={classes.linkText}>{storageItem.targetPath}</div>
         </ProjectLink>
       </div>

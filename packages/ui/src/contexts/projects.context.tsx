@@ -1,24 +1,24 @@
 import React, { createContext, ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
-import { Project } from "@flowser/shared";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { ServiceRegistry } from "../services/service-registry";
-import { useGetCurrentProject } from "../hooks/use-api";
-import { useQueryClient } from "react-query";
+import { ServiceRegistry } from "../../../../frontend/src/services/service-registry";
+import { useFlowserHooksApi } from "./flowser-api.context";
 import { useAnalytics } from "../hooks/use-analytics";
-import { AnalyticEvent } from "../services/analytics.service";
+import { AnalyticEvent } from "../../../../frontend/src/services/analytics.service";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { useErrorHandler } from "hooks/use-error-handler";
+import { useErrorHandler } from "../hooks/use-error-handler";
+import { useCurrentProjectId } from "../hooks/use-current-project-id";
+import { FlowserProject } from "@onflowser/api";
 
 export type ProjectsManager = {
-  currentProject: Project | undefined;
+  currentProject: FlowserProject | undefined;
   switchProject: () => Promise<void>;
   startProject: (
-    project: Project,
+    project: FlowserProject,
     options?: StartProjectOptions
   ) => Promise<void>;
-  removeProject: (project: Project) => void;
+  removeProject: (project: FlowserProject) => void;
 };
 
 type StartProjectOptions = { replaceCurrentPage: boolean };
@@ -35,14 +35,15 @@ export function ProjectsManagerProvider({
   const { projectsService } = ServiceRegistry.getInstance();
 
   const { track } = useAnalytics();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { handleError } = useErrorHandler(ProjectsManagerProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
-  const { data: currentProject, refetch: refetchCurrentProject } =
-    useGetCurrentProject();
+  const api = useFlowserHooksApi();
+  const currentProjectId = useCurrentProjectId();
+  const { data: currentProject, mutate: refetchCurrentProject } =
+    api.useGetFlowserProject(currentProjectId);
 
-  const confirmProjectRemove = async (project: Project) => {
+  const confirmProjectRemove = async (project: FlowserProject) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
 
     try {
@@ -62,7 +63,7 @@ export function ProjectsManagerProvider({
     }
   };
 
-  function removeProject(project: Project) {
+  function removeProject(project: FlowserProject) {
     showDialog({
       title: "Delete project",
       body: <span>Are you sure you want to delete this project?</span>,
@@ -81,9 +82,7 @@ export function ProjectsManagerProvider({
         // nothing critical happened, ignore the error
         console.warn("Couldn't stop the emulator: ", e);
       }
-      // Clear the entire cache,
-      // so that previous data isn't there when using another project
-      queryClient.clear();
+      // TODO(restructure): Do we need to clear the local cache?
       navigate("/projects", {
         replace: true,
       });
@@ -95,7 +94,10 @@ export function ProjectsManagerProvider({
     });
   }
 
-  async function startProject(project: Project, options?: StartProjectOptions) {
+  async function startProject(
+    project: FlowserProject,
+    options?: StartProjectOptions
+  ) {
     try {
       await toast.promise(projectsService.useProject(project.id), {
         loading: "Starting project...",

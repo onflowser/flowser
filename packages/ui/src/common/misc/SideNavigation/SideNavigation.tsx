@@ -4,7 +4,7 @@ import { useMatches } from "react-router-dom";
 import { FlowserIcon } from "packages/ui/src/components/icons/FlowserIcon";
 import { SizedBox } from "../SizedBox/SizedBox";
 import classNames from "classnames";
-import { useProjectManager } from "../../../../../../frontend/src/contexts/projects.context";
+import { useProjectManager } from "../../../contexts/projects.context";
 import { buildProjectUrl, ProjectLink } from "../../links/ProjectLink";
 import { useCurrentProjectId } from "frontend/src/hooks/use-current-project-id";
 

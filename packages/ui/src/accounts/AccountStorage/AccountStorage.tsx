@@ -1,26 +1,26 @@
-import { Account, AccountStorageDomain } from "@flowser/shared";
-import { useAnalytics } from "../../../../../frontend/src/hooks/use-analytics";
-import { useUrlQuery } from "../../../../../frontend/src/hooks/use-url-query";
-import { useGetPollingStorageByAccount } from "../../../../../frontend/src/hooks/use-api";
+import { useAnalytics } from "../../hooks/use-analytics";
+import { useUrlQuery } from "../../hooks/use-url-query";
 import React, { ReactElement, useEffect, useState } from "react";
 import { AnalyticEvent } from "../../../../../frontend/src/services/analytics.service";
 import { PublicPrivateStorageCard } from "../PublicPrivateStorageCard/PublicPrivateStorageCard";
-import { enableDetailsIntroAnimation } from "../../../../../frontend/src/config/common";
 import { InternalStorageCard } from "../InternalStorageCard/InternalStorageCard";
 import classNames from "classnames";
 import classes from "./AccountStorage.module.scss";
 import { scrollableElementId } from "../../common/layouts/ProjectLayout/ProjectLayout";
+import {
+  FlowStorageDomain,
+  FlowAccountStorage
+} from '@onflowser/api';
 
 type AccountStorageProps = {
-  account: Account;
+  storageItems:  FlowAccountStorage[];
 };
 
 export function AccountStorage(props: AccountStorageProps): ReactElement {
-  const { account } = props;
+  const {storageItems} = props;
   const { track } = useAnalytics();
   const urlQueryParams = useUrlQuery();
   const focusedStorageId = urlQueryParams.get("focusedStorageId");
-  const { data: storageItems } = useGetPollingStorageByAccount(account.address);
   const [expandedCardIds, setExpandedCardIds] = useState(
     new Set<string>(focusedStorageId ? [focusedStorageId] : [])
   );
@@ -64,13 +64,13 @@ export function AccountStorage(props: AccountStorageProps): ReactElement {
   };
 
   const privateStorageItems = storageItems.filter(
-    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PRIVATE
+    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_PRIVATE
   );
   const publicStorageItems = storageItems.filter(
-    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_PUBLIC
+    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_PUBLIC
   );
   const internalStorageItems = storageItems.filter(
-    (item) => item.pathDomain === AccountStorageDomain.STORAGE_DOMAIN_STORAGE
+    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_STORAGE
   );
 
   const privateAndPublicStorageItems = [
@@ -83,8 +83,8 @@ export function AccountStorage(props: AccountStorageProps): ReactElement {
         {privateAndPublicStorageItems.map((item) => (
           <PublicPrivateStorageCard
             key={item.id}
-            enableIntroAnimation={enableDetailsIntroAnimation}
-            currentAccountAddress={account.address}
+            enableIntroAnimation={false}
+            currentAccountAddress={item.address}
             storageItem={item}
           />
         ))}
@@ -94,7 +94,6 @@ export function AccountStorage(props: AccountStorageProps): ReactElement {
           <InternalStorageCard
             key={item.id}
             storageItem={item}
-            enableIntroAnimation={enableDetailsIntroAnimation}
             onToggleExpand={() => toggleCardExpand(item.id)}
             isExpanded={expandedCardIds.has(item.id)}
             className={classNames({

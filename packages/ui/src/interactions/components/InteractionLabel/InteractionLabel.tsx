@@ -1,11 +1,10 @@
 import React, { ReactElement } from "react";
 import { InteractionIcon } from "../InteractionIcon/InteractionIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
-import { useGetParsedInteraction } from "../../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../../contexts/flowser-api.context";
 import { Spinner } from "../../../common/loaders/Spinner/Spinner";
 import classes from "./InteractionLabel.module.scss";
-import { InteractionKind } from "@flowser/shared";
-import { InteractionDefinition } from "packages/ui/src/interactions/core/core-types";
+import { InteractionDefinition } from "../../core/core-types";
 
 type InteractionLabelProps = {
   interaction: InteractionDefinition;
@@ -13,18 +12,14 @@ type InteractionLabelProps = {
 
 export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   const { interaction } = props;
-
-  const { data } = useGetParsedInteraction(interaction);
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetParsedInteraction(interaction);
 
   return (
     <div className={classes.root}>
       <div className={classes.iconWrapper}>
         {data ? (
-          <InteractionIcon
-            interactionKind={
-              data.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN
-            }
-          />
+          <InteractionIcon interactionKind={data.interaction.kind} />
         ) : (
           <Spinner size={15} />
         )}

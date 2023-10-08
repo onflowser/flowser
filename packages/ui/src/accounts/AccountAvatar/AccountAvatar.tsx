@@ -18,8 +18,8 @@ import avatar13 from "./avatars/13.jpg";
 import avatar14 from "./avatars/14.jpg";
 import avatar15 from "./avatars/15.jpg";
 import avatar16 from "./avatars/16.jpg";
-import { useGetAddressIndex } from "../../../../../frontend/src/hooks/use-api";
 import { Spinner } from "../../common/loaders/Spinner/Spinner";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 
 const avatarUrls = [
   avatar1,
@@ -51,8 +51,9 @@ export function AccountAvatar({
   address,
   className,
 }: AccountAvatarProps): ReactElement | null {
-  const { data } = useGetAddressIndex({
-    hexAddress: address,
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetAddressIndex({
+    address,
     chainId: "flow-emulator",
   });
 

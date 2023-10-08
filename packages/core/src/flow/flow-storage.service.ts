@@ -1,7 +1,7 @@
 import { FlowGatewayService } from "./flow-gateway.service";
 import { ensurePrefixedAddress } from "../utils";
 import {
-  AccountStorageDomain,
+  FlowStorageDomain,
   CadenceTypeKind,
   FlowAccountStorage,
 } from "@onflowser/api";
@@ -191,15 +191,15 @@ export class FlowAccountStorageService {
     });
   }
 
-  private getStorageDomainFromPath(path: string): AccountStorageDomain {
+  private getStorageDomainFromPath(path: string): FlowStorageDomain {
     const rawDomain = path.split("/")[1];
     switch (rawDomain) {
       case "public":
-        return AccountStorageDomain.STORAGE_DOMAIN_PUBLIC;
+        return FlowStorageDomain.STORAGE_DOMAIN_PUBLIC;
       case "private":
-        return AccountStorageDomain.STORAGE_DOMAIN_PRIVATE;
+        return FlowStorageDomain.STORAGE_DOMAIN_PRIVATE;
       case "storage":
-        return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
+        return FlowStorageDomain.STORAGE_DOMAIN_STORAGE;
       default:
         throw new Error(`Unknown domain: ${rawDomain}`);
     }

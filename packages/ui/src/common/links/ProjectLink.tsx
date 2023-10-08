@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, NavLinkProps, To } from "react-router-dom";
 import { ReactElement } from "react";
-import { useCurrentProjectId } from "../../../../../frontend/src/hooks/use-current-project-id";
+import { useCurrentProjectId } from "../../hooks/use-current-project-id";
 
 type ProjectLinkProps = NavLinkProps;
 

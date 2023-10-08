@@ -1,19 +1,17 @@
 import React, { ReactElement } from "react";
 import classes from "./InternalStorageCard.module.scss";
-import { AccountStorageItem } from "@flowser/shared";
-import { FlowUtils } from "frontend/src/utils/flow-utils";
 import classNames from "classnames";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
-import { DecoratedPollingEntity } from "frontend/src/contexts/timeout-polling.context";
 import { JsonView } from "../../common/code/JsonView/JsonView";
 import { StorageDataTypes } from "../StorageDataTypes/StorageDataTypes";
+import { FlowUtils } from "../../utils/flow-utils";
+import { FlowAccountStorage } from '@onflowser/api';
 
 type ExtendableStorageCardProps = {
-  storageItem: DecoratedPollingEntity<AccountStorageItem>;
+  storageItem: FlowAccountStorage;
   onToggleExpand: () => void;
   isExpanded: boolean;
   className?: string;
-  enableIntroAnimation?: boolean;
 };
 
 export function InternalStorageCard({
@@ -21,13 +19,11 @@ export function InternalStorageCard({
   onToggleExpand,
   isExpanded,
   className,
-  enableIntroAnimation = true,
 }: ExtendableStorageCardProps): ReactElement {
   const extendClass = classNames(className, {
     [classes.root]: true,
     [classes.gridItemExtended]: isExpanded,
-    [classes.introAnimation]:
-      enableIntroAnimation && (storageItem.isNew || storageItem.isUpdated),
+    [classes.introAnimation]: false
   });
 
   const pathIdentifier = storageItem.path.split("/").reverse()[0];
@@ -36,7 +32,7 @@ export function InternalStorageCard({
     <div id={storageItem.id} className={extendClass}>
       <SimpleButton className={classes.header} onClick={() => onToggleExpand()}>
         <div className={classes.type}>
-          {FlowUtils.getLowerCasedPathDomain(storageItem.pathDomain)}
+          {FlowUtils.getLowerCasedPathDomain(storageItem.domain)}
         </div>
         <div className={classes.circle}>
           <div className={classes.icon}>{isExpanded ? "-" : "+"}</div>

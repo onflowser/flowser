@@ -1,11 +1,10 @@
 import React, { FunctionComponent } from "react";
-import { FlowserError } from "@flowser/shared";
-import { CommonUtils } from "../../../../../frontend/src/utils/common-utils";
+import { CommonUtils } from "../../utils/common-utils";
 import { Message } from "./Message";
 
 export type ErrorMessageProps = {
   className?: string;
-  error: Error | FlowserError | string;
+  error: Error | string;
 };
 
 export const ErrorMessage: FunctionComponent<ErrorMessageProps> = ({
@@ -23,13 +22,7 @@ type ErrorInfo = {
   description?: string;
 };
 
-function getErrorInfo(error: Error | FlowserError | string): ErrorInfo {
-  if (CommonUtils.isFlowserError(error)) {
-    return {
-      title: error.message,
-      description: error.description,
-    };
-  }
+function getErrorInfo(error: Error | string): ErrorInfo {
   if (CommonUtils.isStandardError(error)) {
     return {
       title: error.message,

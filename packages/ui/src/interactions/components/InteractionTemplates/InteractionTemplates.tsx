@@ -5,7 +5,7 @@ import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { PrimaryButton } from "../../../common/buttons/PrimaryButton/PrimaryButton";
 import { Input } from "../../../common/inputs/Input/Input";
 import { SearchInput } from "../../../common/inputs/SearchInput/SearchInput";
-import { useConfirmDialog } from "../../../../../../frontend/src/contexts/confirm-dialog.context";
+import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 import { useTemplatesRegistry } from "../../contexts/templates.context";

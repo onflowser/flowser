@@ -27,10 +27,16 @@ import Caret from "./assets/caret.svg";
 import CircleCross from "./assets/circle-cross.svg";
 import CircleCheck from "./assets/circle-check.svg";
 import CircleQuestionMark from "./assets/circle-question-mark.svg";
+import Expand from "./assets/expand.svg";
+import Shrink from "./assets/shrink.svg";
+import Logs from "./assets/logs.svg";
 import { TbBrandVscode } from "react-icons/tb";
 import { SiWebstorm, SiIntellijidea } from "react-icons/si";
 
 export const FlowserIcon = {
+  Logs: Logs,
+  Expand: Expand,
+  Shrink: Shrink,
   CircleCross: CircleCross,
   CircleCheck: CircleCheck,
   CircleQuestionMark: CircleQuestionMark,

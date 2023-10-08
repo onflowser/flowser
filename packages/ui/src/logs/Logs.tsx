@@ -7,21 +7,18 @@ import React, {
   useState,
 } from "react";
 import classes from "./Logs.module.scss";
-import { ReactComponent as ExpandIcon } from "../common/icons/assets/expand.svg";
-import { ReactComponent as ShrinkIcon } from "../common/icons/assets/shrink.svg";
-import { ReactComponent as LogsIcon } from "../common/icons/assets/logs.svg";
 import { CaretIcon } from "../common/icons/CaretIcon/CaretIcon";
-import { useFilterData } from "../../../../frontend/src/hooks/use-filter-data";
-import { useMouseMove } from "../../../../frontend/src/hooks/use-mouse-move";
-import { useGetPollingOutputs } from "../../../../frontend/src/hooks/use-api";
-import { ManagedProcessOutput, ProcessOutputSource } from "@flowser/shared";
+import { useFilterData } from "../hooks/use-filter-data";
+import { useMouseMove } from "../hooks/use-mouse-move";
+import { useFlowserHooksApi } from "../contexts/flowser-api.context";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../common/buttons/SimpleButton/SimpleButton";
-import { TextUtils } from "../utils/text-utils";
 import { Callout } from "../common/misc/Callout/Callout";
-import { CommonUtils } from "../../../../frontend/src/utils/common-utils";
 import { SearchInput } from "../common/inputs/SearchInput/SearchInput";
+import { ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
+import AnsiHtmlConvert from "ansi-to-html";
+import { FlowserIcon } from '../common/icons/FlowserIcon';
 
 type LogsProps = {
   className?: string;
@@ -75,9 +72,9 @@ export function Logs(props: LogsProps): ReactElement {
   }, [logDrawerSize, shouldScrollToBottom]);
 
   useEffect(() => {
-    const hasErrorLogs = logs
-      .filter((log) => log.isNew)
-      .some((log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR);
+    const hasErrorLogs = logs.some(
+      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR
+    );
     if (hasErrorLogs) {
       toast.error("Some process encountered errors", {
         duration: 4000,
@@ -143,7 +140,7 @@ export function Logs(props: LogsProps): ReactElement {
         })}
       >
         <SimpleButton className={classes.logsButton}>
-          <LogsIcon />
+          <FlowserIcon.Logs />
           <span>LOGS</span>
         </SimpleButton>
 
@@ -174,13 +171,13 @@ export function Logs(props: LogsProps): ReactElement {
               />
             )}
             {logDrawerSize === "small" && (
-              <ExpandIcon
+              <FlowserIcon.Expand
                 className={classes.control}
                 onClick={() => changeLogDrawerSize("big")}
               />
             )}
             {logDrawerSize === "big" && (
-              <ShrinkIcon
+              <FlowserIcon.Shrink
                 className={classes.control}
                 onClick={() => changeLogDrawerSize("small")}
               />
@@ -253,14 +250,10 @@ function useRelevantLogs(options: {
   searchTerm: string | undefined;
   tailSize: number;
 }) {
-  const { data: allLogs } = useGetPollingOutputs();
-  const emulatorOrWalletLogs = useMemo(
-    () =>
-      allLogs.filter((log) => CommonUtils.isEmulatorProcessId(log.processId)),
-    [allLogs]
-  );
+  const api = useFlowserHooksApi();
+  const { data: emulatorLogs } = api.useGetOutputsByProcess(emulatorProcessId);
   const { filteredData: logs } = useFilterData(
-    emulatorOrWalletLogs,
+    emulatorLogs ?? [],
     options.searchTerm
   );
   const tailLogs = useMemo(
@@ -301,3 +294,5 @@ const VerticalDragLine = ({
     />
   );
 };
+
+const emulatorProcessId = "emulator";

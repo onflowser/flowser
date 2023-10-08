@@ -1,10 +1,10 @@
-import { AccountStorageItem } from "@flowser/shared";
 import React, { ReactElement } from "react";
 import classes from "./StorageDataTypes.module.scss";
 import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
+import { FlowAccountStorage } from "@onflowser/api";
 
 type StorageDataTypesProps = {
-  storageItem: AccountStorageItem;
+  storageItem: FlowAccountStorage;
 };
 
 export function StorageDataTypes(props: StorageDataTypesProps): ReactElement {

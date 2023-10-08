@@ -2,7 +2,9 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { ScriptError } from "../../../common/status/ErrorMessage";
 import { JsonView } from "../../../common/code/JsonView/JsonView";
-import { useGetTransaction } from "../../../../../../frontend/src/hooks/use-api";
+import {
+  useFlowserHooksApi,
+} from '../../../contexts/flowser-api.context';
 import classes from "./InteractionOutcomeDisplay.module.scss";
 import { BaseTabItem } from "../../../common/tabs/BaseTabs/BaseTabs";
 import { Callout } from "../../../common/misc/Callout/Callout";
@@ -96,9 +98,10 @@ function EmptyState() {
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
-  const { data } = useGetTransaction(outcome.transactionId);
+  const api = useFlowserHooksApi()
+  const { data: transaction } = api.useGetTransaction(outcome.transactionId!);
 
-  if (!data?.transaction) {
+  if (!transaction) {
     return <SpinnerWithLabel label="Executing" />;
   }
 
@@ -106,11 +109,11 @@ function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
     <TransactionDetailsTabs
       // Re-mount this component when different transaction is used.
       // This is mainly to reset the initial focused tab.
-      key={data.transaction.id}
+      key={transaction.id}
       label="Transaction"
       includeOverviewTab={true}
       includeScriptTab={false}
-      transaction={data.transaction}
+      transaction={transaction}
     />
   );
 }

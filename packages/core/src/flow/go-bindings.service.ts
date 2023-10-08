@@ -1,16 +1,10 @@
 import { spawn } from "node:child_process";
 import * as path from "path";
 import * as os from "os";
-import { CadenceInteraction } from "@onflowser/api";
+import { ParsedInteractionOrError } from "@onflowser/api";
 
 export interface GetParsedInteractionRequest {
   sourceCode: string;
-}
-
-export interface GetParsedInteractionResponse {
-  interaction: CadenceInteraction | undefined;
-  program: { [key: string]: any } | undefined;
-  error: string;
 }
 
 export interface GetAddressIndexRequest {
@@ -35,7 +29,7 @@ type ExecuteGoBinResponse = {
 export class GoBindingsService {
   public async getParsedInteraction(
     request: GetParsedInteractionRequest
-  ): Promise<GetParsedInteractionResponse> {
+  ): Promise<ParsedInteractionOrError> {
     const response = await this.execute({
       command: "get-parsed-interaction",
       arguments: [],

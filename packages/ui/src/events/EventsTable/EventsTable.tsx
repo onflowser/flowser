@@ -11,8 +11,9 @@ import { ProjectLink } from "../../common/links/ProjectLink";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
+import { FlowEvent } from '@onflowser/api';
 
-const columnHelper = createColumnHelper<DecoratedPollingEntity<Event>>();
+const columnHelper = createColumnHelper<FlowEvent>();
 
 const columns = [
   columnHelper.accessor("id", {
@@ -70,12 +71,12 @@ const columns = [
 ];
 
 type EventsTableProps = {
-  events: DecoratedPollingEntity<Event>[];
+  events: FlowEvent[];
 };
 
 export function EventsTable(props: EventsTableProps): ReactElement {
   return (
-    <BaseTable<DecoratedPollingEntity<Event>>
+    <BaseTable<FlowEvent>
       data={props.events}
       columns={columns}
     />

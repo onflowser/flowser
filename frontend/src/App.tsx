@@ -12,32 +12,23 @@ import {
 import { Toaster } from "react-hot-toast";
 import { ProjectLayout } from "../../packages/ui/src/common/layouts/ProjectLayout/ProjectLayout";
 import "./App.scss";
-import { toastOptions } from "./config/toast";
-
-import { ProjectsManagerProvider } from "./contexts/projects.context";
-import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
+import { ProjectsManagerProvider } from "../../packages/ui/src/contexts/projects.context";
+import { ConfirmDialogProvider } from "../../packages/ui/src/contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
-import { ProjectRequirements } from "../../packages/ui/src/common/misc/ProjectRequirements/ProjectRequirements";
-import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
+import { FlowserUsageRequirements } from "../../packages/ui/src/common/misc/FlowserUsageRequirements/FlowserUsageRequirements";
+import { TimeoutPollingProvider } from "../../packages/ui/src/contexts/timeout-polling.context";
 import {
   PlatformAdapterProvider,
   PlatformAdapterState,
-} from "./contexts/platform-adapter.context";
-import { queryClient } from "./config/react-query";
+} from "../../packages/ui/src/contexts/platform-adapter.context";
 import { ConsentDialog } from "../../packages/ui/src/common/overlays/dialogs/consent/ConsentDialog";
-import { useAnalytics } from "./hooks/use-analytics";
+import { useAnalytics } from "../../packages/ui/src/hooks/use-analytics";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
 import { InteractionsPage } from "../../packages/ui/src/interactions/InteractionsPage";
 import { InteractionRegistryProvider } from "../../packages/ui/src/interactions/contexts/interaction-registry.context";
 import { ProjectSettings } from "../../packages/ui/src/projects/ProjectSettings/ProjectSettings";
-import {
-  useGetPollingAccounts,
-  useGetPollingBlocks,
-  useGetPollingContracts,
-  useGetEvents,
-  useGetPollingTransactions,
-} from "./hooks/use-api";
+import { useFlowserHooksApi } from "../../packages/ui/src/contexts/flowser-api.context";
 import { TransactionsTable } from "../../packages/ui/src/transactions/TransactionsTable/TransactionsTable";
 import { TransactionDetails } from "../../packages/ui/src/transactions/TransactionDetails/TransactionDetails";
 import { BlockDetails } from "../../packages/ui/src/blocks/BlockDetails/BlockDetails";
@@ -52,8 +43,9 @@ import { createCrumbHandle } from "../../packages/ui/src/common/misc/Breadcrumbs
 import { TemplatesRegistryProvider } from "../../packages/ui/src/interactions/contexts/templates.context";
 import { BasicLayout } from "../../packages/ui/src/common/layouts/BasicLayout/BasicLayout";
 import { EventDetails } from "../../packages/ui/src/events/EventDetails/EventDetails";
-import { FlowConfigProvider } from "./contexts/flow.context";
-import { SnapshotsManagerProvider } from "./contexts/snapshots.context";
+import { FlowConfigProvider } from "../../packages/ui/src/contexts/flow.context";
+import { SnapshotsManagerProvider } from "../../packages/ui/src/contexts/snapshots.context";
+import FullScreenLoading from "../../packages/ui/src/common/loaders/FullScreenLoading/FullScreenLoading";
 
 const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
   const location = useLocation();
@@ -79,6 +71,8 @@ export type FlowserClientAppProps = {
   enableTimeoutPolling?: boolean;
 };
 
+export const queryClient = new QueryClient();
+
 export const FlowserClientApp = ({
   useHashRouter,
   platformAdapter,
@@ -90,14 +84,24 @@ export const FlowserClientApp = ({
         <ConfirmDialogProvider>
           <PlatformAdapterProvider {...platformAdapter}>
             <ConsentAnalytics />
-            <ProjectRequirements />
+            <FlowserUsageRequirements />
             <RouterProvider
               router={useHashRouter ? hashRouter : browserRouter}
             />
             <Toaster
               position="bottom-center"
               gutter={8}
-              toastOptions={toastOptions}
+              toastOptions={{
+                className: "",
+                style: {
+                  background: "#9BDEFA", // $blue
+                  color: "#363F53", // $table-line-background
+                  padding: "12px", // $spacing-base
+                  maxWidth: "400px",
+                  maxHeight: "200px",
+                  textOverflow: "ellipsis",
+                },
+              }}
             />
           </PlatformAdapterProvider>
         </ConfirmDialogProvider>
@@ -293,7 +297,12 @@ function ProjectSettingsPage() {
 }
 
 function TransactionsTablePage() {
-  const { data } = useGetPollingTransactions();
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetTransactions();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
 
   return <TransactionsTable transactions={data} />;
 }
@@ -305,7 +314,12 @@ function TransactionDetailsPage() {
 }
 
 function BlocksTablePage() {
-  const { data } = useGetPollingBlocks();
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetBlocks();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
 
   return <BlocksTable blocks={data} />;
 }
@@ -317,7 +331,12 @@ function BlockDetailsPage() {
 }
 
 function AccountsTablePage() {
-  const { data } = useGetPollingAccounts();
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetAccounts();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
 
   return <AccountsTable accounts={data} />;
 }
@@ -329,7 +348,12 @@ function AccountDetailsPage() {
 }
 
 function ContractsTablePage() {
-  const { data } = useGetPollingContracts();
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetContracts();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
 
   return <ContractsTable contracts={data} />;
 }
@@ -341,7 +365,12 @@ function ContractDetailsPage() {
 }
 
 function EventsTablePage() {
-  const { data } = useGetEvents();
+  const api = useFlowserHooksApi();
+  const { data } = api.useGetEvents();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
 
   return <EventsTable events={data} />;
 }

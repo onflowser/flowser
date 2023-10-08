@@ -3,7 +3,7 @@ import { NavLink, useMatches, useNavigate } from "react-router-dom";
 import classes from "./Breadcrumbs.module.scss";
 import classNames from "classnames";
 import { FlowserIcon } from "../../icons/FlowserIcon";
-import { useCurrentProjectId } from "../../../../../../frontend/src/hooks/use-current-project-id";
+import { useCurrentProjectId } from "../../../hooks/use-current-project-id";
 
 type BreadcrumbsProps = {
   className?: string;

@@ -6,7 +6,7 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import { CommonUtils } from "../../../../../frontend/src/utils/common-utils";
+import { CommonUtils } from "../../utils/common-utils";
 import * as fcl from "@onflow/fcl";
 import {
   InteractionKind,

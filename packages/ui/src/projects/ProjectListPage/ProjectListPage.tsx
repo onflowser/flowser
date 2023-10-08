@@ -1,17 +1,17 @@
 import React, { FunctionComponent, ReactElement, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import IconButton from "../../common/buttons/IconButton/IconButton";
-import longLogo from "../../../../../frontend/src/assets/images/long_logo.png";
+import longLogo from "../../assets/long_logo.png";
 import trash from "../../common/icons/assets/trash.svg";
 import classes from "./ProjectListPage.module.scss";
-import { useGetAllProjects } from "../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import classNames from "classnames";
-import moment from "moment";
-import { useProjectManager } from "../../../../../frontend/src/contexts/projects.context";
+import { useProjectManager } from "../../contexts/projects.context";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
 import { ConsentDialog } from "../../common/overlays/dialogs/consent/ConsentDialog";
-import { useAnalytics } from "../../../../../frontend/src/hooks/use-analytics";
+import { useAnalytics } from "../../hooks/use-analytics";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
+import { TextUtils } from "../../utils/text-utils";
 
 type ProjectTab = {
   id: string;
@@ -85,7 +85,8 @@ export const ProjectListPage: FunctionComponent = () => {
 };
 
 function ProjectsListContent() {
-  const { data: projects } = useGetAllProjects();
+  const api = useFlowserHooksApi();
+  const { data: projects } = api.useGetFlowserProjects();
   const { startProject, removeProject } = useProjectManager();
   const showProjectList = projects && projects.length > 0;
 
@@ -109,7 +110,7 @@ function ProjectsListContent() {
               {project.name}
             </span>
             <span className={classes.projectLastOpened}>
-              last opened on {moment(project.updatedAt).format("DD-MM-YYYY")}
+              last opened on {TextUtils.longDate(project.updatedAt)}
             </span>
             <SimpleButton
               className={classes.projectTrashcan}

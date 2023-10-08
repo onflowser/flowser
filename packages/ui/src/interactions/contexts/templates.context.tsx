@@ -1,8 +1,9 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
-import { useGetPollingFlowInteractionTemplates } from "../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import * as crypto from "crypto";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -39,8 +40,8 @@ const Context = createContext<InteractionTemplatesRegistry>(undefined as never);
 export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const { data: projectTemplatesData } =
-    useGetPollingFlowInteractionTemplates();
+  const api = useFlowserHooksApi();
+  const { data: projectTemplatesData } = api.useGetInteractionTemplates();
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
@@ -61,7 +62,7 @@ export function TemplatesRegistryProvider(props: {
           filePath: undefined,
         })
       ),
-      ...(projectTemplatesData?.templates?.map(
+      ...(projectTemplatesData?.map(
         (template): InteractionDefinitionTemplate => ({
           id: crypto.randomUUID(),
           name: template.name,

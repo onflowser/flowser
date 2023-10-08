@@ -1,7 +1,4 @@
 import mixpanel, { Dict } from "mixpanel-browser";
-import { queryClient } from "../config/react-query";
-import { getCurrentProjectKey } from "../hooks/use-api";
-import { GetSingleProjectResponse } from "@flowser/shared";
 import { FingerprintService } from "./fingerprint.service";
 
 export enum AnalyticEvent {
@@ -58,19 +55,8 @@ export class AnalyticsService {
       return;
     }
 
-    const { project } =
-      queryClient.getQueryData<GetSingleProjectResponse>(
-        getCurrentProjectKey
-      ) ?? {};
-
-    const staticProperties = {
-      projectName: project?.name,
-    };
     try {
-      mixpanel.track(event, {
-        ...staticProperties,
-        ...properties,
-      });
+      mixpanel.track(event, properties);
     } catch (e) {
       console.error("Mixpanel error:", e);
     }

@@ -5,15 +5,14 @@ import classes from "./BlocksTable.module.scss";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
-import { Block } from "@flowser/shared";
-import { DecoratedPollingEntity } from "frontend/src/contexts/timeout-polling.context";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
+import { FlowBlock } from "@onflowser/api";
 
-const columnHelper = createColumnHelper<DecoratedPollingEntity<Block>>();
+const columnHelper = createColumnHelper<FlowBlock>();
 
 type BlocksTableProps = {
-  blocks: DecoratedPollingEntity<Block>[];
+  blocks: FlowBlock[];
 };
 
 export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
@@ -59,7 +58,7 @@ export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
   );
 
   return (
-    <BaseTable<DecoratedPollingEntity<Block>>
+    <BaseTable<FlowBlock>
       data={blocks}
       columns={columns}
       headerRowClass={classes.tableRow}

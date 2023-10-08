@@ -1,5 +1,5 @@
 import React, { createContext, ReactElement, useEffect } from "react";
-import { useGetFlowConfig } from "../hooks/use-api";
+import { useFlowserHooksApi } from './flowser-api.context';
 import * as fcl from "@onflow/fcl";
 import { useProjectManager } from "./projects.context";
 
@@ -13,11 +13,12 @@ export function FlowConfigProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
+  const api = useFlowserHooksApi()
   const { currentProject } = useProjectManager();
-  const { data: flowConfigData } = useGetFlowConfig();
+  const { data: flowJSON } = api.useGetFlowJson();
 
   useEffect(() => {
-    if (currentProject && flowConfigData?.flowJson) {
+    if (currentProject && flowJSON) {
       const accessNodePort = currentProject.emulator?.restServerPort ?? 8888;
       fcl
         .config({
@@ -27,10 +28,10 @@ export function FlowConfigProvider({
           "flow.network": "local",
         })
         .load({
-          flowJSON: JSON.parse(flowConfigData.flowJson),
+          flowJSON: JSON.parse(flowJSON),
         });
     }
-  }, [currentProject, flowConfigData]);
+  }, [currentProject, flowJSON]);
 
   return (
     <FlowConfigContext.Provider value={{}}>

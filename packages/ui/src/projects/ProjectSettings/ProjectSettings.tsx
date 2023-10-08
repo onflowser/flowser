@@ -6,19 +6,18 @@ import Button from "../../common/buttons/Button/Button";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
-import { useGetFlowCliInfo } from "../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import {
   Emulator,
   Gateway,
   Project,
   UpdateProjectResponse,
 } from "@flowser/shared";
-import { HashAlgorithm, SignatureAlgorithm } from "@flowser/shared";
 import { FlowUtils } from "../../utils/flow-utils";
 import * as yup from "yup";
 import { ServiceRegistry } from "../../../../../frontend/src/services/service-registry";
-import { useErrorHandler } from "../../../../../frontend/src/hooks/use-error-handler";
-import { useProjectManager } from "../../../../../frontend/src/contexts/projects.context";
+import { useErrorHandler } from "../../hooks/use-error-handler";
+import { useProjectManager } from "../../contexts/projects.context";
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 import {
   RadioField,
@@ -27,9 +26,10 @@ import {
   FieldProps,
   ToggleField,
 } from "../FormFields/FormFields";
-import { usePlatformAdapter } from "../../../../../frontend/src/contexts/platform-adapter.context";
+import { usePlatformAdapter } from "../../contexts/platform-adapter.context";
 import { AnalyticEvent } from "../../../../../frontend/src/services/analytics.service";
-import { useAnalytics } from "../../../../../frontend/src/hooks/use-analytics";
+import { useAnalytics } from "../../hooks/use-analytics";
+import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -47,10 +47,11 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
   const projectService = ServiceRegistry.getInstance().projectsService;
   const [isLoading, setIsLoading] = useState(true);
 
+  const api = useFlowserHooksApi();
   const { track } = useAnalytics();
   const { onPickProjectPath } = usePlatformAdapter();
   const { startProject, removeProject } = useProjectManager();
-  const { data: flowCliInfo } = useGetFlowCliInfo();
+  const { data: flowCliInfo } = api.useGetFlowCliInfo();
   const { handleError } = useErrorHandler(ProjectSettings.name);
   const isExistingProject = Boolean(projectId);
 

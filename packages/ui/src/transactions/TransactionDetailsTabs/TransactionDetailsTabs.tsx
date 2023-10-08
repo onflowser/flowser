@@ -8,13 +8,13 @@ import {
   StyledTabs,
   StyledTabsProps,
 } from "../../common/tabs/StyledTabs/StyledTabs";
-import { useGetEventsByTransactionId } from "../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
-import { FlowEvent, FlowTransaction } from '@onflowser/api';
+import { FlowTransaction } from "@onflowser/api";
+import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
 
 type TransactionDetailsTabsProps = Omit<StyledTabsProps, "tabs"> & {
   transaction: FlowTransaction;
-  events: FlowEvent[];
   includeOverviewTab: boolean;
   includeScriptTab: boolean;
 };
@@ -24,8 +24,8 @@ export function TransactionDetailsTabs(
 ): ReactElement {
   const { transaction, includeOverviewTab, includeScriptTab, ...tabProps } =
     props;
-
-  const { data: events } = useGetEventsByTransactionId(transaction.id);
+  const api = useFlowserHooksApi();
+  const { data: events } = api.useGetEventsByTransaction(transaction.id);
 
   const tabs: BaseTabItem[] = [];
 
@@ -63,7 +63,11 @@ export function TransactionDetailsTabs(
       {
         id: "events",
         label: "Events",
-        content: <EventsTable events={events} />,
+        content: events ? (
+          <EventsTable events={events} />
+        ) : (
+          <FullScreenLoading />
+        ),
       },
       {
         id: "envelope-signatures",

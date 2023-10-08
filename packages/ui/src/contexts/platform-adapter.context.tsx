@@ -4,7 +4,7 @@ import React, {
   ReactNode,
   useContext,
 } from "react";
-import { MonitoringServiceInt } from "../services/monitoring.service";
+import { MonitoringServiceInt } from "../../../../frontend/src/services/monitoring.service";
 
 export type PlatformAdapterState = {
   onPickProjectPath?: () => Promise<string | undefined>;

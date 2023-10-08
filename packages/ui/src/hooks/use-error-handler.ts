@@ -11,14 +11,10 @@ export function useErrorHandler(componentName: string): ErrorHandlerState {
 
   function handleError(error: unknown) {
     console.error(`[${componentName}] handling error:`, error);
-    if (!CommonUtils.isFlowserError(error)) {
-      toast.error("Unknown error");
-      return;
-    }
-    if (error.description !== "") {
-      toast.error(`${error.message}: ${error.description}`);
-    } else {
+    if (CommonUtils.isStandardError(error)) {
       toast.error(error.message);
+    } else {
+      toast.error("Unknown error");
     }
 
     if (monitoringService) {

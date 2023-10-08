@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from "react";
 import { BaseDialog } from "../base/BaseDialog";
 import classes from "./ConsentDialog.module.scss";
-import logo from "../../../../../../../frontend/src/assets/images/logo-foreground.svg";
+import logo from "../../../../assets/logo-foreground.svg";
 import ToggleButton, {
   ToggleButtonProps,
 } from "../../../buttons/ToggleButton/ToggleButton";

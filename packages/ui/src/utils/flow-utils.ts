@@ -1,11 +1,11 @@
-import { isDefined } from "./misc";
 import {
-  AccountStorageDomain,
+  FlowStorageDomain,
   ExecutionStatusCode,
   GrcpStatusCode,
   HashAlgorithm,
   SignatureAlgorithm,
 } from "@onflowser/api";
+import { CommonUtils } from "./common-utils";
 
 type FlowScriptError = {
   hostname: string;
@@ -64,7 +64,7 @@ export class FlowUtils {
       .split(/\n[ +]/)
       .map((line) => line.trim().replace("\n", " "))
       .map((line) => parseKeyValueEntry(line))
-      .filter(isDefined);
+      .filter(CommonUtils.isDefined);
 
     // If no structured entries are found, fallback to raw error message.
     if (structuredEntries.length === 0) {
@@ -85,13 +85,13 @@ export class FlowUtils {
     return `${blockId}`.replaceAll("0", "").length === 0;
   }
 
-  static getLowerCasedPathDomain(pathDomain: AccountStorageDomain): string {
+  static getLowerCasedPathDomain(pathDomain: FlowStorageDomain): string {
     switch (pathDomain) {
-      case AccountStorageDomain.STORAGE_DOMAIN_PUBLIC:
+      case FlowStorageDomain.STORAGE_DOMAIN_PUBLIC:
         return "public";
-      case AccountStorageDomain.STORAGE_DOMAIN_PRIVATE:
+      case FlowStorageDomain.STORAGE_DOMAIN_PRIVATE:
         return "private";
-      case AccountStorageDomain.STORAGE_DOMAIN_STORAGE:
+      case FlowStorageDomain.STORAGE_DOMAIN_STORAGE:
         return "storage";
       default:
         return "unknown";

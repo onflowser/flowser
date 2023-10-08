@@ -3,16 +3,14 @@ import Label from "../../common/misc/Label/Label";
 import Value from "../../common/misc/Value/Value";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Account } from "@flowser/shared";
 import { TextUtils } from "../../utils/text-utils";
-import { DecoratedPollingEntity } from "frontend/src/contexts/timeout-polling.context";
 import { AccountLink } from "../AccountLink/AccountLink";
 import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import classes from "./AccountsTable.module.scss";
 import { Tooltip } from "../../common/overlays/Tooltip/Tooltip";
-import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
+import { FlowAccount } from "@onflowser/api";
 
-const columnHelper = createColumnHelper<DecoratedPollingEntity<Account>>();
+const columnHelper = createColumnHelper<FlowAccount>();
 
 const columns = [
   columnHelper.accessor("address", {
@@ -49,29 +47,25 @@ const columns = [
     header: () => <Label variant="medium">KEY COUNT</Label>,
     cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
   }),
-  columnHelper.accessor("transactions", {
-    header: () => <Label variant="medium">TX COUNT</Label>,
-    cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
-  }),
-  columnHelper.accessor("createdAt", {
-    header: () => <Label variant="medium">CREATED</Label>,
-    cell: (info) => (
-      <Value>
-        <TimeAgo date={info.getValue()} />
-      </Value>
-    ),
-  }),
+  // TODO(restructure): Provide this info
+  // columnHelper.accessor("transactions", {
+  //   header: () => <Label variant="medium">TX COUNT</Label>,
+  //   cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
+  // }),
+  // columnHelper.accessor("createdAt", {
+  //   header: () => <Label variant="medium">CREATED</Label>,
+  //   cell: (info) => (
+  //     <Value>
+  //       <TimeAgo date={info.getValue()} />
+  //     </Value>
+  //   ),
+  // }),
 ];
 
 type AccountsTableProps = {
-  accounts: DecoratedPollingEntity<Account>[];
+  accounts: FlowAccount[];
 };
 
 export const AccountsTable: FunctionComponent<AccountsTableProps> = (props) => {
-  return (
-    <BaseTable<DecoratedPollingEntity<Account>>
-      columns={columns}
-      data={props.accounts}
-    />
-  );
+  return <BaseTable<FlowAccount> columns={columns} data={props.accounts} />;
 };

@@ -1,6 +1,4 @@
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../../../frontend/src/contexts/timeout-polling.context";
-import { AccountContract } from "@flowser/shared";
 import Label from "../../common/misc/Label/Label";
 import Value from "../../common/misc/Value/Value";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
@@ -11,9 +9,9 @@ import { Tooltip } from "../../common/overlays/Tooltip/Tooltip";
 import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import classes from "./ContractsTable.module.scss";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
+import { FlowContract } from "@onflowser/api";
 
-const columnHelper =
-  createColumnHelper<DecoratedPollingEntity<AccountContract>>();
+const columnHelper = createColumnHelper<FlowContract>();
 
 const columns = [
   columnHelper.accessor("name", {
@@ -26,7 +24,7 @@ const columns = [
       </Value>
     ),
   }),
-  columnHelper.accessor("accountAddress", {
+  columnHelper.accessor("address", {
     header: () => <Label variant="medium">DEPLOYED ON</Label>,
     cell: (info) => (
       <Value>
@@ -57,7 +55,7 @@ const columns = [
   }),
 ];
 
-function ContractTags(props: { contract: AccountContract }) {
+function ContractTags(props: { contract: FlowContract }) {
   const { contract } = props;
 
   if (contract.localConfig) {
@@ -75,7 +73,7 @@ function ContractTags(props: { contract: AccountContract }) {
 }
 
 type ContractsTableProps = {
-  contracts: DecoratedPollingEntity<AccountContract>[];
+  contracts: FlowContract[];
 };
 
 export function ContractsTable(props: ContractsTableProps): ReactElement {
@@ -85,10 +83,5 @@ export function ContractsTable(props: ContractsTableProps): ReactElement {
     [props.contracts]
   );
 
-  return (
-    <BaseTable<DecoratedPollingEntity<AccountContract>>
-      columns={columns}
-      data={sortedContracts}
-    />
-  );
+  return <BaseTable<FlowContract> columns={columns} data={sortedContracts} />;
 }

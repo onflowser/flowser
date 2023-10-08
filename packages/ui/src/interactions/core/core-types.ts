@@ -1,4 +1,4 @@
-import { FclValue } from "@flowser/shared";
+import { FclValue } from '@onflowser/core';
 
 export type InteractionDefinition = {
   id: string;

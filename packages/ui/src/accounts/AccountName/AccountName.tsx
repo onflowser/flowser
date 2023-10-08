@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { shortenText } from "../../utils/misc";
+import { TextUtils } from "../../utils/text-utils";
 
 type AccountNameProps = {
   address: string;
@@ -10,6 +10,8 @@ type AccountNameProps = {
 export function AccountName(props: AccountNameProps): ReactElement {
   const { address, short, className } = props;
   return (
-    <div className={className}>{short ? shortenText(address, 6) : address}</div>
+    <div className={className}>
+      {short ? TextUtils.shorten(address, 6) : address}
+    </div>
   );
 }

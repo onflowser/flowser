@@ -2,7 +2,9 @@
   "name": "@onflowser/ui",
   "version": "0.0.0",
   "main": "./dist/flowser.umd.js",
-  "files": ["./dist/*"],
+  "files": [
+    "./dist/*"
+  ],
   "types": "./dist/flowser",
   "scripts": {
     "build": "vite build"
@@ -28,11 +30,14 @@
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^2.30.0",
     "dateformat": "^5.0.3",
+    "mixpanel-browser": "^2.47.0",
     "react": "^18.0.0",
+    "react-helmet": "^6.1.0",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.11.0",
     "react-json-view": "^1.21.3",
     "react-router-dom": "6.15.0",
-    "react-timeago": "^7.2.0"
+    "react-timeago": "^7.2.0",
+    "swr": "^2.2.4"
   }
 }

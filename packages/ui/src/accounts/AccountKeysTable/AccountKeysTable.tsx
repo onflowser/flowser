@@ -1,6 +1,4 @@
 import { createColumnHelper } from "@tanstack/table-core";
-import { DecoratedPollingEntity } from "../../../../../frontend/src/contexts/timeout-polling.context";
-import { AccountKey } from "@flowser/shared";
 import Label from "../../common/misc/Label/Label";
 import classes from "./AccountKeysTable.module.scss";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
@@ -9,8 +7,9 @@ import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import { FlowUtils } from "../../utils/flow-utils";
 import React, { ReactElement } from "react";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
+import { FlowAccountKey } from "@onflowser/api";
 
-const columnsHelper = createColumnHelper<DecoratedPollingEntity<AccountKey>>();
+const columnsHelper = createColumnHelper<FlowAccountKey>();
 
 const columns = [
   columnsHelper.accessor("accountAddress", {
@@ -27,10 +26,10 @@ const columns = [
           <BaseBadge>INDEX: {info.row.original.index}</BaseBadge>
           <BaseBadge>
             SIGN CURVE:{" "}
-            {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo)}
+            {FlowUtils.getSignatureAlgoName(info.row.original.signAlgo!)}
           </BaseBadge>
           <BaseBadge>
-            HASH ALGO.: {FlowUtils.getHashAlgoName(info.row.original.hashAlgo)}
+            HASH ALGO.: {FlowUtils.getHashAlgoName(info.row.original.hashAlgo!)}
           </BaseBadge>
           <BaseBadge>
             REVOKED: {info.row.original.revoked ? "YES" : "NO"}
@@ -52,14 +51,9 @@ function KeyDisplay(props: { label: string; keyValue: string }) {
 }
 
 type KeysTableProps = {
-  keys: DecoratedPollingEntity<AccountKey>[];
+  keys: FlowAccountKey[];
 };
 
 export function AccountKeysTable(props: KeysTableProps): ReactElement {
-  return (
-    <BaseTable<DecoratedPollingEntity<AccountKey>>
-      columns={columns}
-      data={props.keys}
-    />
-  );
+  return <BaseTable<FlowAccountKey> columns={columns} data={props.keys} />;
 }

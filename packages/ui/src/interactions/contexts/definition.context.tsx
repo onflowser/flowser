@@ -5,14 +5,15 @@ import React, {
   useContext,
 } from "react";
 import { useInteractionRegistry } from "./interaction-registry.context";
-import { useGetParsedInteraction } from "../../../../../frontend/src/hooks/use-api";
-import { FclValue, Interaction } from "@flowser/shared";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import { InteractionDefinition } from "../core/core-types";
+import { ParsedInteraction } from "@onflowser/api";
+import { FclValue } from "@onflowser/core";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
   parseError: string | undefined;
-  parsedInteraction: Interaction | undefined;
+  parsedInteraction: ParsedInteraction | undefined;
   definition: InteractionDefinition;
   partialUpdate: (definition: Partial<InteractionDefinition>) => void;
 };
@@ -32,7 +33,8 @@ export function InteractionDefinitionManagerProvider(props: {
 }): ReactElement {
   const { definition } = props;
   const { update } = useInteractionRegistry();
-  const { data, isLoading } = useGetParsedInteraction(definition);
+  const api = useFlowserHooksApi();
+  const { data, isLoading } = api.useGetParsedInteraction(definition);
   const fclValuesByIdentifier = definition.fclValuesByIdentifier;
 
   function partialUpdate(newDefinition: Partial<InteractionDefinition>) {

@@ -1,12 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./AccountDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import {
-  useGetAccount,
-  useGetPollingContractsByAccount,
-  useGetPollingKeysByAccount,
-  useGetPollingTransactionsByAccount,
-} from "../../../../../frontend/src/hooks/use-api";
+import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import {
   DetailsCard,
   DetailsCardColumn,
@@ -31,11 +26,12 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
   props
 ) => {
   const { accountId } = props;
-  const { data, isLoading } = useGetAccount(accountId);
-  const { data: transactions } = useGetPollingTransactionsByAccount(accountId);
-  const { data: contracts } = useGetPollingContractsByAccount(accountId);
-  const { data: keys } = useGetPollingKeysByAccount(accountId);
-  const { account } = data ?? {};
+  const api = useFlowserHooksApi();
+  const { data: account, isLoading } = api.useGetAccount(accountId);
+  const { data: transactions } = api.useGetTransactionsByAccount(accountId);
+  const { data: contracts } = api.useGetContractsByAccount(accountId);
+  const { data: keys } = api.useGetKeysByAccount(accountId);
+  const { data: storageItems } = api.useGetStoragesByAccount(accountId);
 
   if (isLoading || !account) {
     return <FullScreenLoading />;
@@ -64,7 +60,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
       },
       {
         label: "Created date",
-        value: <DateDisplay date={account.createdAt} />,
+        value: <DateDisplay date={account.createdAt.toISOString()} />,
       },
     ],
   ];
@@ -73,22 +69,34 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
     {
       id: "storage",
       label: "Storage",
-      content: <AccountStorage account={account} />,
+      content: storageItems ? (
+        <AccountStorage storageItems={storageItems} />
+      ) : (
+        <FullScreenLoading />
+      ),
     },
     {
       id: "transactions",
       label: "Transactions",
-      content: <TransactionsTable transactions={transactions} />,
+      content: transactions ? (
+        <TransactionsTable transactions={transactions} />
+      ) : (
+        <FullScreenLoading />
+      ),
     },
     {
       id: "contracts",
       label: "Contracts",
-      content: <ContractsTable contracts={contracts} />,
+      content: contracts ? (
+        <ContractsTable contracts={contracts} />
+      ) : (
+        <FullScreenLoading />
+      ),
     },
     {
       id: "keys",
       label: "Keys",
-      content: <AccountKeysTable keys={keys} />,
+      content: keys ? <AccountKeysTable keys={keys} /> : <FullScreenLoading />,
     },
   ];
 
