@@ -1,0 +1,38 @@
+@import '../../../styles/rules';
+@import '../../../styles/colors';
+@import '../../../styles/typography';
+@import '../../../styles/spacings';
+
+.root {
+  border: 1px solid transparent;
+  border-radius: $border-radius-input;
+  background: $gray-80;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+
+  &:focus-within {
+    border-color: $gray-10;
+  }
+
+  & > select {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: $spacing-base;
+    outline: none;
+    color: $color-grey;
+    font-size: $font-size-small;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  &::after {
+    content: "▼";
+    font-size: $font-size-xsmall;
+    top: 6px;
+    right: 10px;
+    position: absolute;
+  }
+}

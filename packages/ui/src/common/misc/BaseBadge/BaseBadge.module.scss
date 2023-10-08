@@ -1,0 +1,9 @@
+@import '../../../styles/colors';
+@import '../../../styles/spacings';
+
+.root {
+  border: 1px solid $gray-10;
+  color: $gray-10;
+  border-radius: 12px;
+  padding: 2px $spacing-s;
+}

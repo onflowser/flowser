@@ -1,0 +1,19 @@
+@import '../../../styles/colors';
+@import '../../../styles/rules';
+@import '../../../styles/spacings';
+@import '../../../styles/animations';
+@import '../../../styles/scrollbars';
+
+.root {
+  border-radius: $border-radius-card;
+  padding: $spacing-l;
+  border: 1px solid transparent;
+  position: relative;
+
+  @include hiddenScrollbars();
+
+  &.introAnimation {
+    @include addNewContentAnimation(.4s);
+  }
+
+}

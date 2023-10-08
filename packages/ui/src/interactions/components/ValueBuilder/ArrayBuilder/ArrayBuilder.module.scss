@@ -1,0 +1,18 @@
+@import "../../../../styles/spacings";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-base;
+  flex: 1;
+
+  .arrayElement {
+    display: flex;
+    flex-direction: row;
+    .indexDisplay  {
+      display: flex;
+      align-items: center;
+      margin-right: $spacing-s;
+    }
+  }
+}

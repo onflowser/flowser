@@ -1,0 +1,21 @@
+@import "../../styles/spacings";
+@import "../../styles/colors";
+
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  row-gap: $spacing-s;
+  column-gap: $spacing-s;
+
+  .badge {
+    margin-bottom: 8px;
+    width: fit-content;
+    border: 0.5px solid $purple;
+    color: $gray-10;
+    border-radius: 10px;
+    padding: 2px 10px 2px 10px;
+    font-size: 13px;
+    transition: 0.3s;
+  }
+}

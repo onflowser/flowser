@@ -1,0 +1,30 @@
+@import '../../../styles/rules';
+@import '../../../styles/colors';
+@import '../../../styles/typography';
+@import '../../../styles/spacings';
+
+.root {
+  border: 1px solid transparent;
+  border-radius: $border-radius-input;
+  background: $gray-80;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: $gray-10;
+  }
+
+  & > input {
+    &[disabled] {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    flex: 1;
+    border: none;
+    background: none;
+    padding: $spacing-base;
+    outline: none;
+    color: $color-grey;
+    font-size: $font-size-small;
+  }
+}

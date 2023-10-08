@@ -1,0 +1,40 @@
+@import '../../../styles/animations';
+@import '../../../styles/colors';
+
+.root {
+  display: flex;
+
+  & > div {
+    position: relative;
+    cursor: pointer;
+    width: 38px;
+    height: 23px;
+    background-color: #2E364B;
+
+    border-radius: 38%;
+
+    & > span {
+      display: block;
+      height: 23px;
+      width: 23px;
+      background-color: #fff;
+      border-radius: 50%;
+      position: absolute;
+
+      &.active {
+        transform: translateX(15px);
+        transition: all 100ms;
+      }
+
+      &.inactive {
+        transform: translateX(0);
+        transition: all 100ms;
+        background-color: $gray-30;
+      }
+
+      &.disabled {
+        background-color: $gray-50;
+      }
+    }
+  }
+}

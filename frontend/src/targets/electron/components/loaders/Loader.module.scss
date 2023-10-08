@@ -1,7 +1,7 @@
-@import "styles/colors";
-@import "styles/spacings";
-@import 'styles/animations';
-@import "styles/typography";
+@import "../../../../../../packages/ui/src/styles/colors";
+@import "../../../../../../packages/ui/src/styles/spacings";
+@import '../../../../../../packages/ui/src/styles/animations';
+@import "../../../../../../packages/ui/src/styles/typography";
 
 .background {
   @include fadeInAnimation(0.4s);

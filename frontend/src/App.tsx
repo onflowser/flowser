@@ -10,48 +10,48 @@ import {
   useParams,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { ProjectLayout } from "./components/layouts/ProjectLayout/ProjectLayout";
+import { ProjectLayout } from "../../packages/ui/src/common/layouts/ProjectLayout/ProjectLayout";
 import "./App.scss";
 import { toastOptions } from "./config/toast";
 
 import { ProjectsManagerProvider } from "./contexts/projects.context";
 import { ConfirmDialogProvider } from "./contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
-import { ProjectRequirements } from "./components/misc/ProjectRequirements/ProjectRequirements";
+import { ProjectRequirements } from "../../packages/ui/src/common/misc/ProjectRequirements/ProjectRequirements";
 import { TimeoutPollingProvider } from "./contexts/timeout-polling.context";
 import {
   PlatformAdapterProvider,
   PlatformAdapterState,
 } from "./contexts/platform-adapter.context";
 import { queryClient } from "./config/react-query";
-import { ConsentDialog } from "./components/overlays/dialogs/consent/ConsentDialog";
+import { ConsentDialog } from "../../packages/ui/src/common/overlays/dialogs/consent/ConsentDialog";
 import { useAnalytics } from "./hooks/use-analytics";
 import { ServiceRegistry } from "./services/service-registry";
 import { AnalyticEvent } from "./services/analytics.service";
-import { InteractionsPage } from "./modules/interactions/InteractionsPage";
-import { InteractionRegistryProvider } from "modules/interactions/contexts/interaction-registry.context";
-import { ProjectSettings } from "./modules/projects/ProjectSettings/ProjectSettings";
+import { InteractionsPage } from "../../packages/ui/src/interactions/InteractionsPage";
+import { InteractionRegistryProvider } from "../../packages/ui/src/interactions/contexts/interaction-registry.context";
+import { ProjectSettings } from "../../packages/ui/src/projects/ProjectSettings/ProjectSettings";
 import {
   useGetPollingAccounts,
   useGetPollingBlocks,
   useGetPollingContracts,
-  useGetPollingEvents,
+  useGetEvents,
   useGetPollingTransactions,
 } from "./hooks/use-api";
-import { TransactionsTable } from "./modules/transactions/TransactionsTable/TransactionsTable";
-import { TransactionDetails } from "./modules/transactions/TransactionDetails/TransactionDetails";
-import { BlockDetails } from "./modules/blocks/BlockDetails/BlockDetails";
-import { BlocksTable } from "./modules/blocks/BlocksTable/BlocksTable";
-import { AccountDetails } from "./modules/accounts/AccountDetails/AccountDetails";
-import { AccountsTable } from "./modules/accounts/AccountsTable/AccountsTable";
-import { ProjectListPage } from "./modules/projects/ProjectListPage/ProjectListPage";
-import { ContractsTable } from "./modules/contracts/ContractsTable/ContractsTable";
-import { ContractDetails } from "./modules/contracts/ContractDetails/ContractDetails";
-import { EventsTable } from "./modules/events/EventsTable/EventsTable";
-import { createCrumbHandle } from "./components/misc/Breadcrumbs/Breadcrumbs";
-import { TemplatesRegistryProvider } from "./modules/interactions/contexts/templates.context";
-import { BasicLayout } from "./components/layouts/BasicLayout/BasicLayout";
-import { EventDetails } from "./modules/events/EventDetails/EventDetails";
+import { TransactionsTable } from "../../packages/ui/src/transactions/TransactionsTable/TransactionsTable";
+import { TransactionDetails } from "../../packages/ui/src/transactions/TransactionDetails/TransactionDetails";
+import { BlockDetails } from "../../packages/ui/src/blocks/BlockDetails/BlockDetails";
+import { BlocksTable } from "../../packages/ui/src/blocks/BlocksTable/BlocksTable";
+import { AccountDetails } from "../../packages/ui/src/accounts/AccountDetails/AccountDetails";
+import { AccountsTable } from "../../packages/ui/src/accounts/AccountsTable/AccountsTable";
+import { ProjectListPage } from "../../packages/ui/src/projects/ProjectListPage/ProjectListPage";
+import { ContractsTable } from "../../packages/ui/src/contracts/ContractsTable/ContractsTable";
+import { ContractDetails } from "../../packages/ui/src/contracts/ContractDetails/ContractDetails";
+import { EventsTable } from "../../packages/ui/src/events/EventsTable/EventsTable";
+import { createCrumbHandle } from "../../packages/ui/src/common/misc/Breadcrumbs/Breadcrumbs";
+import { TemplatesRegistryProvider } from "../../packages/ui/src/interactions/contexts/templates.context";
+import { BasicLayout } from "../../packages/ui/src/common/layouts/BasicLayout/BasicLayout";
+import { EventDetails } from "../../packages/ui/src/events/EventDetails/EventDetails";
 import { FlowConfigProvider } from "./contexts/flow.context";
 import { SnapshotsManagerProvider } from "./contexts/snapshots.context";
 
@@ -341,7 +341,7 @@ function ContractDetailsPage() {
 }
 
 function EventsTablePage() {
-  const { data } = useGetPollingEvents();
+  const { data } = useGetEvents();
 
   return <EventsTable events={data} />;
 }

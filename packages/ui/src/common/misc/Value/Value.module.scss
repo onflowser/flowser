@@ -1,0 +1,28 @@
+@import "../../../styles/colors";
+@import "../../../styles/typography";
+
+.root {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-normal;
+
+  a {
+    text-decoration: none;
+    color: $blue !important;
+  }
+  &.small {
+    font-size: $font-size-small;
+  }
+
+  &.medium {
+    font-size: $font-size-large;
+  }
+
+  &.large {
+    font-size: $font-size-big;
+
+    a {
+      font-size: $font-size-big;
+    }
+  }
+}

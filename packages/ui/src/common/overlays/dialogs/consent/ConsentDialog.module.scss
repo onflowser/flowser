@@ -1,0 +1,56 @@
+@import "../../../../styles/colors";
+@import "../../../../styles/spacings";
+
+.modal {
+  width: 800px !important;
+}
+
+.root {
+  padding: $spacing-xl;
+  color: white;
+
+  .header {
+    display: flex;
+    align-items: center;
+    .logo {
+      border-radius: 50%;
+      object-fit: scale-down;
+      width: 50px;
+      height: 50px;
+      margin-right: $spacing-l;
+    }
+  }
+  .body {
+    display: flex;
+    margin: $spacing-xl 0;
+    .leftSide {
+      text-align: left;
+      flex: 2;
+      margin-right: $spacing-base;
+      p:not(:first-child) {
+        margin-top: $spacing-base;
+      }
+    }
+    .rightSide {
+      color: $gray-20;
+      flex: 1;
+      text-align: end;
+      li {
+        list-style-type: none;
+        margin-top: $spacing-base;
+      }
+    }
+  }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.toggleAnalytics {
+  display: flex;
+  .toggleButton {
+    margin-right: $spacing-base;
+  }
+}

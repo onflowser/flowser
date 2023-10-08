@@ -47,7 +47,7 @@ import {
 } from "contexts/timeout-polling.context";
 import { useEffect, useState } from "react";
 import { useCurrentProjectId } from "./use-current-project-id";
-import { InteractionDefinition } from "../modules/interactions/core/core-types";
+import { InteractionDefinition } from "../../../packages/ui/src/interactions/core/core-types";
 
 const {
   projectsService,
@@ -167,14 +167,14 @@ export function useGetBlock(blockId: string) {
   );
 }
 
-export function useGetPollingEvents(): TimeoutPollingHook<Event> {
+export function useGetEvents(): TimeoutPollingHook<Event> {
   return useProjectTimeoutPolling<Event, GetPollingEventsResponse>({
     resourceKey: "/events/polling",
     fetcher: ({ timestamp }) => eventsService.getAllWithPolling({ timestamp }),
   });
 }
 
-export function useGetPollingEventsByTransaction(
+export function useGetEventsByTransactionId(
   transactionId: string
 ): TimeoutPollingHook<Event> {
   return useTimeoutPolling<Event, GetPollingEventsResponse>({
@@ -192,27 +192,6 @@ export function useGetPollingOutputs(): TimeoutPollingHook<ManagedProcessOutput>
     resourceKey: "/processes/outputs/polling",
     fetcher: ({ timestamp }) =>
       processesService.getAllOutputsWithPolling({ timestamp }),
-  });
-}
-
-export function useGetPollingLogsByProcess(
-  processId: string
-): TimeoutPollingHook<ManagedProcessOutput> {
-  return useTimeoutPolling<ManagedProcessOutput, GetPollingOutputsResponse>({
-    resourceKey: `/processes/${processId}/outputs/polling`,
-    fetcher: ({ timestamp }) =>
-      processesService.getAllOutputsByProcessWithPolling({
-        timestamp,
-        processId,
-      }),
-  });
-}
-
-export function useGetPollingProcesses(): TimeoutPollingHook<ManagedProcess> {
-  return useTimeoutPolling<ManagedProcess, GetPollingManagedProcessesResponse>({
-    resourceKey: `/processes`,
-    fetcher: ({ timestamp }) =>
-      processesService.getAllProcessesWithPolling({ timestamp }),
   });
 }
 
@@ -279,47 +258,6 @@ export function useGetProjectRequirements() {
   );
 }
 
-export function useGatewayStatus(): {
-  isInitialLoad: boolean;
-  error: FlowserError | undefined;
-} {
-  const [error, setError] = useState<FlowserError | undefined>();
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const { data } = useGetPollingProjectStatus();
-
-  useEffect(() => {
-    if (isInitialLoad) {
-      setIsInitialLoad(data?.totalBlocksToProcess !== 0);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (data?.flowApiStatus === ServiceStatus.SERVICE_STATUS_OFFLINE) {
-      setError({
-        name: "Service Unreachable",
-        message: "Flow API offline",
-        description:
-          "Can't reach Flow access node. Make sure Flow emulator is running without errors.",
-      });
-    } else {
-      setError(undefined);
-    }
-  }, [data]);
-
-  return {
-    error,
-    isInitialLoad,
-  };
-}
-
-export function useGetPollingProjectStatus() {
-  return useQuery<GetProjectStatusResponse>(
-    `/projects/status`,
-    () => projectsService.getStatus(),
-    { refetchInterval: 1000 }
-  );
-}
-
 export function useGetPollingFlowInteractionTemplates() {
   return useQuery<GetFlowInteractionTemplatesResponse>(
     `/projects/templates`,
@@ -342,12 +280,6 @@ export function useGetAllProjects() {
     fetcher: ({ timestamp }) =>
       projectsService.getAllWithPolling({ timestamp }),
   });
-}
-
-export function useGetFlowserVersion() {
-  return useQuery<GetFlowserVersionResponse>("/version", () =>
-    commonService.getFlowserVersion()
-  );
 }
 
 export function useGetParsedInteraction(request: InteractionDefinition) {

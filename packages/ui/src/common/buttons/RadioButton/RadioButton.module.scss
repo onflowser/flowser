@@ -1,0 +1,37 @@
+@import '../../../styles/colors';
+
+.root {
+
+  width: 16px;
+  height: 16px;
+  border: 2px solid $gray-30;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.unchecked {
+    & > span {
+      visibility: hidden;
+    }
+  }
+
+  &.checked {
+    & > span {
+      display: block;
+      visibility: visible;
+      background-color: $gray-10;
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  &.disabled {
+    & > span {
+      background-color: $color-grey;
+    }
+  }
+
+}

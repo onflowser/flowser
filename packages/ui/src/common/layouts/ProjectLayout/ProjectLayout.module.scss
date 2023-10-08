@@ -1,0 +1,54 @@
+@import "../../../styles/spacings";
+@import "../../../styles/colors";
+@import "../../../styles/scrollbars";
+
+$side-nav-width: 80px;
+
+.root {
+  display: flex;
+
+  .sideNavigation {
+    width: $side-nav-width;
+  }
+
+  .mainContent {
+    flex: 1;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    min-height: 100vh;
+    width: calc(100vw - $side-nav-width);
+    max-height: 100vh;
+    overflow-y: scroll;
+
+    @include hiddenScrollbars();
+
+    .breadcrumbs {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: $gray-110;
+    }
+
+    .body {
+      height: 100%;
+      overflow: scroll;
+      color: $gray-10;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      @include hiddenScrollbars();
+    }
+
+    .bodyWithBorderSpacing {
+      padding: 0 $spacing-l;
+    }
+
+    .logs {
+      position: sticky;
+      bottom: 0;
+    }
+  }
+
+}

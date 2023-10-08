@@ -17,8 +17,8 @@ import {
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useAnalytics } from "../hooks/use-analytics";
 import { AnalyticEvent } from "../services/analytics.service";
-import { FlowUtils } from "../utils/flow-utils";
-import { SnapshotDialog } from "components/overlays/dialogs/snapshot/SnapshotDialog";
+import { FlowUtils } from "../../../packages/ui/src/utils/flow-utils";
+import { SnapshotDialog } from "../../../packages/ui/src/common/overlays/dialogs/snapshot/SnapshotDialog";
 import { useProjectManager } from "./projects.context";
 
 export type SnapshotsManager = {

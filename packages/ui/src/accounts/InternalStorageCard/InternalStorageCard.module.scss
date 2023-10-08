@@ -1,0 +1,79 @@
+@import "../../styles/spacings";
+@import "../../styles/colors";
+@import "../../styles/typography";
+@import "../../styles/animations";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 10px;
+  background-color: transparentize($gray-110, 0.5);
+
+  &.introAnimation {
+    @include addNewContentAnimation(.4s);
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $gradient-1;
+    border-radius: 10px 10px 0 0;
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+      filter: brightness(1.4);
+    }
+
+    .type {
+      margin: $spacing-s;
+      margin-left: $spacing-l;
+      font-size: $font-size-xsmall;
+      font-weight: 600;
+      color: $gray-80;
+      text-transform: uppercase;
+    }
+
+    .circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: $spacing-s;
+      margin-right: $spacing-l;
+      border-radius: 50%;
+      border-style: none;
+      height: 20px;
+      width: 20px;
+      background-color: $gray-80;
+      transition: 0.3s;
+
+      .icon {
+        font-size: $font-size-large;
+        color: $purple;
+      }
+    }
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: $spacing-base;
+    row-gap: $spacing-base;
+
+    .title {
+      display: inline-block;
+      font-weight: bold;
+    }
+  }
+}
+
+.gridItemExtended {
+  height: 550px;
+}
+
+.jsonViewer {
+  max-height: 500px;
+  min-width: 60vw;
+}

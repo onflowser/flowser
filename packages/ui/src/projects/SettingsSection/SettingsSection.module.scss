@@ -1,0 +1,70 @@
+@import "../../styles/spacings";
+@import "../../styles/colors";
+@import "../../styles/typography";
+
+.root {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $spacing-base;
+    .leftSection {
+      display: flex;
+      .title {
+        color: $gray-10;
+        font-size: $font-size-big;
+      }
+      .description {
+        color: $color-grey;
+        margin-left: $spacing-base;
+      }
+      .toggleWrapper {
+        display: flex;
+        margin-left: $spacing-base;
+        span {
+          color: $gray-10;
+          font-size: $font-size-normal;
+          margin-right: $spacing-base;
+        }
+      }
+    }
+    .rightSection {
+      display: flex;
+      align-items: center;
+      .title {
+        color: $color-grey;
+        margin-right: $spacing-base;
+        &:first-letter {
+          text-transform: uppercase;
+        }
+      }
+      .toggleOpenButton {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        .openIcon, .closeIcon {
+          width: 20px;
+          height: 20px;
+        }
+        .openIcon {
+          path {
+            fill: $color-grey;
+          }
+        }
+        .closeIcon {
+          path {
+            fill: $color-light-gray;
+          }
+        }
+      }
+    }
+  }
+  .separatorLine {
+    width: 100%;
+    height: 1px;
+    background: $gray-10;
+    opacity: 0.2;
+  }
+  .body {
+    margin-top: $spacing-base;
+  }
+}

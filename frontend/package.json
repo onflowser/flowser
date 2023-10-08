@@ -72,7 +72,7 @@
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "cd ../ && husky install ./frontend/.husky",
-    "prebuild:web": "cp src/targets/web/index.tsx src/index.tsx",
+    "prebuild:web": "cp src/targets/web/index.tsx src/index.tsx"
   },
   "eslintConfig": {
     "extends": [
