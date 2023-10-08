@@ -10,7 +10,6 @@ export enum CadenceTypeKind {
   CADENCE_TYPE_PATH = 8,
 }
 
-
 export enum InteractionKind {
   INTERACTION_SCRIPT = 1,
   INTERACTION_TRANSACTION = 2,
@@ -57,6 +56,7 @@ export interface FlowAccount {
   balance: number;
   code: string;
   isDefaultAccount: boolean;
+  keys: FlowAccountKey[];
 }
 
 // https://docs.onflow.org/cadence/language/crypto/#hashing
@@ -79,6 +79,7 @@ export enum HashAlgorithm {
 }
 
 export interface FlowAccountKey {
+  id: string;
   index: number;
   accountAddress: string;
   blockId: string;
@@ -107,11 +108,24 @@ export interface FlowAccountCapability {
   targetPath: string;
 }
 
+/**
+ * Every account storage path consists of a domain and identifier: /<domain>/<identifier>
+ * See official docs: https://developers.flow.com/cadence/language/accounts#paths
+ */
+export enum AccountStorageDomain {
+  STORAGE_DOMAIN_PRIVATE = 1,
+  STORAGE_DOMAIN_PUBLIC = 2,
+  STORAGE_DOMAIN_STORAGE = 3,
+}
+
 export interface FlowAccountStorage {
   id: string;
   address: string;
+  domain: AccountStorageDomain;
+  // TODO(restructure): Split data into multiple type-specific fields
+  data: any;
   path: string;
-  type: unknown;
+  targetPath: string;
 }
 
 export interface FlowBlock {

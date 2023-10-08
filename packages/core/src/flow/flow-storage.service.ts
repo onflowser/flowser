@@ -1,8 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { FlowGatewayService } from "./flow-gateway.service";
-import { AccountStorageItemEntity } from "../../../../backend/src/accounts/entities/storage-item.entity";
 import { ensurePrefixedAddress } from "../../../../backend/src/utils/common-utils";
-import { CadenceTypeKind } from "@onflowser/api";
+import {
+  AccountStorageDomain,
+  CadenceTypeKind,
+  FlowAccountStorage
+} from '@onflowser/api';
 
 /**
  * For more info on the account storage model and API, see:
@@ -12,17 +15,6 @@ import { CadenceTypeKind } from "@onflowser/api";
  * Also see the account storage retrieval implementation:
  * https://github.com/onflow/flow-emulator/blob/3fbe8ad9dc841abdc13056e20e7b15fc0e32a749/server/backend/backend.go#L584-L590
  */
-
-/**
- * Every account storage path consists of a domain and identifier: /<domain>/<identifier>
- * See official docs: https://developers.flow.com/cadence/language/accounts#paths
- */
-enum AccountStorageDomain {
-  STORAGE_DOMAIN_UNKNOWN = 0,
-  STORAGE_DOMAIN_PRIVATE = 1,
-  STORAGE_DOMAIN_PUBLIC = 2,
-  STORAGE_DOMAIN_STORAGE = 3,
-}
 
 type CapabilityPathItem = {
   address: string;
@@ -48,38 +40,32 @@ export class FlowAccountStorageService {
 
   public async getAccountStorageItems(
     address: string
-  ): Promise<AccountStorageItemEntity[]> {
+  ): Promise<FlowAccountStorage[]> {
     const flowAccountStorage = await this.fetchStorageByAddress(address);
 
     return [
-      ...flowAccountStorage.capabilityPathItems.map(
-        (item) =>
-          new AccountStorageItemEntity({
-            account: undefined,
-            accountAddress: ensurePrefixedAddress(item.address),
-            // Temporarily store the data type in untyped field, refactor later.
-            data: {
-              type: item.type,
-            },
-            pathDomain: this.getStorageDomainFromPath(item.path),
-            path: item.path,
-            targetPath: item.targetPath,
-          })
-      ),
-      ...flowAccountStorage.storagePathItems.map(
-        (item) =>
-          new AccountStorageItemEntity({
-            account: undefined,
-            accountAddress: ensurePrefixedAddress(item.address),
-            // Temporarily store the data type in untyped field, refactor later.
-            data: {
-              type: item.type,
-            },
-            pathDomain: this.getStorageDomainFromPath(item.path),
-            path: item.path,
-            targetPath: "",
-          })
-      ),
+      ...flowAccountStorage.capabilityPathItems.map((item): FlowAccountStorage => ({
+        id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
+        address: ensurePrefixedAddress(item.address),
+        // Temporarily store the data type in untyped field, refactor later.
+        data: {
+          type: item.type,
+        },
+        domain: this.getStorageDomainFromPath(item.path),
+        path: item.path,
+        targetPath: item.targetPath,
+      })),
+      ...flowAccountStorage.storagePathItems.map((item): FlowAccountStorage => ({
+        id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
+        address: ensurePrefixedAddress(item.address),
+        // Temporarily store the data type in untyped field, refactor later.
+        data: {
+          type: item.type,
+        },
+        domain: this.getStorageDomainFromPath(item.path),
+        path: item.path,
+        targetPath: "",
+      })),
     ];
   }
 
@@ -213,7 +199,7 @@ export class FlowAccountStorageService {
       case "storage":
         return AccountStorageDomain.STORAGE_DOMAIN_STORAGE;
       default:
-        return AccountStorageDomain.STORAGE_DOMAIN_UNKNOWN;
+        throw new Error(`Unknown domain: ${rawDomain}`)
     }
   }
 }

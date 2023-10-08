@@ -9,7 +9,6 @@ import {
   ensureNonPrefixedAddress,
   ensurePrefixedAddress,
 } from "../../../backend/src/utils/common-utils";
-import { getDataSourceInstance } from "../../../backend/src/database";
 import { ManagedProcess } from "@onflowser/core/src/processes/managed-process";
 import {
   FlowEmulatorService,
@@ -21,7 +20,7 @@ import {
   GetParsedInteractionResponse,
   GoBindingsService,
 } from "@onflowser/core/src/flow/go-bindings.service";
-import { IResourceIndex } from "@flowser/packages/api";
+import { IResourceIndex } from "@onflowser/api";
 import {
   HashAlgorithm,
   SignatureAlgorithm,
@@ -70,7 +69,6 @@ export class IndexerService {
     gatewayConfig: FlowGatewayConfig,
     private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
     private accountIndex: IResourceIndex<flowserResource.FlowAccount>,
-    private accountKeyIndex: IResourceIndex<flowserResource.FlowAccountKey>,
     private blockIndex: IResourceIndex<flowserResource.FlowBlock>,
     private eventIndex: IResourceIndex<flowserResource.FlowEvent>,
     private contractIndex: IResourceIndex<flowserResource.FlowContract>,
@@ -88,11 +86,11 @@ export class IndexerService {
   }
 
   start(): void {
-    this.processingScheduler?.start();
+    this.processingScheduler.start();
   }
 
   stop(): void {
-    this.processingScheduler?.stop();
+    this.processingScheduler.stop();
   }
 
   async getTotalBlocksToProcess() {
@@ -170,9 +168,6 @@ export class IndexerService {
   }
 
   private async processBlockWithHeight(height: number) {
-    const dataSource = await getDataSourceInstance();
-    const queryRunner = dataSource.createQueryRunner();
-
     const blockData = await this.getBlockData(height);
 
     // Process events first, so that transactions can reference created users.
@@ -182,18 +177,10 @@ export class IndexerService {
     });
 
     try {
-      await queryRunner.startTransaction();
-
       await this.storeBlockData(blockData);
       await this.reIndexAllAccountStorage();
-
-      await queryRunner.commitTransaction();
     } catch (e) {
-      await queryRunner.rollbackTransaction();
-
-      this.logger.error(`Failed to store latest data`, e);
-    } finally {
-      await queryRunner.release();
+      this.logger.error(`Failed to store block (#${height}) data`, e);
     }
 
     try {
@@ -446,17 +433,7 @@ export class IndexerService {
 
     await Promise.all([
       this.accountIndex.add(flowserAccount),
-      Promise.all(
-        flowAccount.keys.map((key) =>
-          this.accountKeyIndex.add(
-            this.createKeyEntity({
-              account: flowAccount,
-              key,
-              block: block,
-            })
-          )
-        )
-      ),
+      // TODO(restructure): Should we store keys/contracts within the account index or a separate one?
       Promise.all(
         Object.keys(flowAccount.contracts).map((name) =>
           this.contractIndex.add(
@@ -505,7 +482,7 @@ export class IndexerService {
       // but that service doesn't set the public key.
       // So if public key isn't present,
       // we know that we haven't processed this account yet.
-      return Boolean(serviceAccount.keys?.[0]?.publicKey);
+      return Boolean(serviceAccount?.keys?.[0]?.publicKey);
     } catch (e) {
       // Service account not found
       return false;
@@ -592,13 +569,13 @@ export class IndexerService {
       blockId: block.id,
       isDefaultAccount: allPossibleWellKnownAddresses.includes(address),
       code: account.code,
-      // keys: account.keys.map((flowKey) =>
-      //   this.createKeyEntity({
-      //     account: account,
-      //     key: flowKey,
-      //     block: block,
-      //   })
-      // ),
+      keys: account.keys.map((flowKey) =>
+        this.createKeyEntity({
+          account: account,
+          key: flowKey,
+          block: block,
+        })
+      ),
     };
   }
 
@@ -619,9 +596,12 @@ export class IndexerService {
       [1, HashAlgorithm.SHA3_256],
     ]);
 
+    const accountAddress = ensurePrefixedAddress(account.address);
+
     return {
+      id: `${accountAddress}.${key.index}`,
       index: key.index,
-      accountAddress: ensurePrefixedAddress(account.address),
+      accountAddress,
       publicKey: key.publicKey,
       signAlgo: signAlgoLookup.get(key.signAlgo),
       hashAlgo: hashAlgoLookup.get(key.hashAlgo),
@@ -767,12 +747,10 @@ export class IndexerService {
 
   private deserializeSignableObjects(
     signableObjects: flowResource.FlowSignableObject[]
-  ) {
-    return signableObjects.map((signable) =>
-      SignableObject.fromJSON({
-        ...signable,
-        address: ensurePrefixedAddress(signable.address),
-      })
-    );
+  ): flowserResource.SignableObject[] {
+    return signableObjects.map((signable) => ({
+      ...signable,
+      address: ensurePrefixedAddress(signable.address),
+    }));
   }
 }
