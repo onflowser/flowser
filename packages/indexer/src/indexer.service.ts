@@ -85,13 +85,6 @@ export class IndexerService {
     this.processingScheduler.stop();
   }
 
-  async getTotalBlocksToProcess() {
-    const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
-      await this.getUnprocessedBlocksInfo();
-
-    return latestUnprocessedBlockHeight - (nextBlockHeightToProcess - 1);
-  }
-
   async processBlockchainData(): Promise<void> {
     const gatewayStatus = await this.flowGatewayService.getApiStatus();
     if (gatewayStatus !== FlowApiStatus.SERVICE_STATUS_ONLINE) {
@@ -484,14 +477,19 @@ export class IndexerService {
     // we don't know if the blockchain uses monotonic or non-monotonic addresses,
     // so we need to try processing well-known accounts with both options.
     const isManagedEmulator = this.emulatorProcess?.isRunning();
-    if (!isManagedEmulator) {
-      await this.processWellKnownAccounts({
-        overrideUseMonotonicAddresses: true,
-      });
-      await this.processWellKnownAccounts({
-        overrideUseMonotonicAddresses: false,
-      });
+    if (isManagedEmulator) {
+      return;
     }
+
+    // Ignore errors that any of the functions throw
+    await Promise.allSettled([
+      this.processWellKnownAccounts({
+        overrideUseMonotonicAddresses: true,
+      }),
+      this.processWellKnownAccounts({
+        overrideUseMonotonicAddresses: false,
+      }),
+    ]);
   }
 
   private async processWellKnownAccounts(options?: WellKnownAddressesOptions) {
