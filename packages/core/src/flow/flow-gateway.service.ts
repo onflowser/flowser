@@ -141,7 +141,7 @@ export type FlowGatewayConfig = {
   restServerAddress: string;
 };
 
-enum ServiceStatus {
+export enum FlowApiStatus {
   SERVICE_STATUS_ONLINE = 1,
   SERVICE_STATUS_OFFLINE = 2,
 }
@@ -244,7 +244,7 @@ export class FlowGatewayService {
 
   public async getApiStatus(
     gateway: FlowGatewayConfig
-  ): Promise<ServiceStatus> {
+  ): Promise<FlowApiStatus> {
     const { hostname, port } = new URL(gateway.restServerAddress);
     return new Promise((resolve) => {
       const req = http
@@ -260,12 +260,12 @@ export class FlowGatewayService {
             // Ideally we should send a ping request to access API
             // but that endpoint isn't implemented on emulator side (afaik)
             // https://github.com/onflow/flow/blob/master/protobuf/flow/access/access.proto#L20
-            return resolve(ServiceStatus.SERVICE_STATUS_ONLINE);
+            return resolve(FlowApiStatus.SERVICE_STATUS_ONLINE);
           }
         )
         .on("error", (err) => {
           req.end();
-          return resolve(ServiceStatus.SERVICE_STATUS_OFFLINE);
+          return resolve(FlowApiStatus.SERVICE_STATUS_OFFLINE);
         });
     });
   }

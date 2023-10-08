@@ -119,6 +119,8 @@ export class FlowEmulatorService extends EventEmitter {
     await Promise.race([this.waitUntilApisStarted(), this.throwIfErrored()]);
 
     this.emit(FlowEmulatorEvent.APIS_STARTED);
+
+    // TODO(restructure): Re-index all state
   }
 
   public getDefaultConfig(): FlowEmulatorConfig {

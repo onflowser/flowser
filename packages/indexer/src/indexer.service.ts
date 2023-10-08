@@ -1,5 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { FlowGatewayService } from "@onflowser/core/src/flow/flow-gateway.service";
+import {
+  FlowApiStatus,
+  FlowGatewayService,
+} from "@onflowser/core/src/flow/flow-gateway.service";
 import * as flowResource from "@onflowser/core/src/flow/flow-gateway.service";
 import * as flowserResource from "@onflowser/api/src/resources";
 import {
@@ -7,23 +10,8 @@ import {
   ensurePrefixedAddress,
 } from "../../../backend/src/utils/common-utils";
 import { getDataSourceInstance } from "../../../backend/src/database";
+import { ManagedProcess } from "@onflowser/core/src/processes/managed-process";
 import {
-  FlowCoreEventType,
-  ManagedProcessState,
-  ServiceStatus,
-  SignableObject,
-} from "@flowser/shared";
-import {
-  ProcessManagerEvent,
-  ProcessManagerService,
-} from "@onflowser/core/src/processes/process-manager.service";
-import {
-  ManagedProcess,
-  ManagedProcessEvent,
-} from "@onflowser/core/src/processes/managed-process";
-import { CacheRemovalService } from "../../../backend/src/core/services/cache-removal.service";
-import {
-  FlowEmulatorEvent,
   FlowEmulatorService,
   WellKnownAddressesOptions,
 } from "@onflowser/core/src/flow/flow-emulator.service";
@@ -39,6 +27,16 @@ import {
   SignatureAlgorithm,
 } from "@onflowser/api/src/resources";
 import { FlowAccountStorageService } from "@onflowser/core/src/flow/flow-storage.service";
+
+// See https://developers.flow.com/cadence/language/core-events
+enum FlowCoreEventType {
+  ACCOUNT_CREATED = "flow.AccountCreated",
+  ACCOUNT_KEY_ADDED = "flow.AccountKeyAdded",
+  ACCOUNT_KEY_REMOVED = "flow.AccountKeyRemoved",
+  ACCOUNT_CONTRACT_ADDED = "flow.AccountContractAdded",
+  ACCOUNT_CONTRACT_UPDATED = "flow.AccountContractUpdated",
+  ACCOUNT_CONTRACT_REMOVED = "flow.AccountContractRemoved",
+}
 
 type BlockData = {
   block: flowResource.FlowBlock;
@@ -69,7 +67,7 @@ export class IndexerService {
   private processingScheduler: AsyncIntervalScheduler;
 
   constructor(
-    private gatewayConfig: FlowGatewayConfig,
+    gatewayConfig: FlowGatewayConfig,
     private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
     private accountIndex: IResourceIndex<flowserResource.FlowAccount>,
     private accountKeyIndex: IResourceIndex<flowserResource.FlowAccountKey>,
@@ -79,8 +77,6 @@ export class IndexerService {
     private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private processManagerService: ProcessManagerService,
-    private commonService: CacheRemovalService,
     private flowEmulatorService: FlowEmulatorService,
     private goBindings: GoBindingsService
   ) {
@@ -93,63 +89,10 @@ export class IndexerService {
 
   start(): void {
     this.processingScheduler?.start();
-    this.emulatorProcess = this.processManagerService.get(
-      FlowEmulatorService.processId
-    );
-    this.processManagerService.on(
-      ProcessManagerEvent.PROCESS_ADDED,
-      this.onProcessAddedOrUpdated.bind(this)
-    );
-    this.processManagerService.on(
-      ProcessManagerEvent.PROCESS_UPDATED,
-      this.onProcessAddedOrUpdated.bind(this)
-    );
-    this.flowEmulatorService.on(
-      FlowEmulatorEvent.APIS_STARTED,
-      this.processWellKnownAccounts.bind(this)
-    );
   }
 
   stop(): void {
     this.processingScheduler?.stop();
-    this.processManagerService.removeListener(
-      ProcessManagerEvent.PROCESS_ADDED,
-      this.onProcessAddedOrUpdated.bind(this)
-    );
-    this.processManagerService.removeListener(
-      ProcessManagerEvent.PROCESS_UPDATED,
-      this.onProcessAddedOrUpdated.bind(this)
-    );
-    this.emulatorProcess?.removeListener(
-      ManagedProcessEvent.STATE_CHANGE,
-      this.onProcessStateChange.bind(this)
-    );
-  }
-
-  private onProcessAddedOrUpdated(process: ManagedProcess) {
-    const isEmulatorProcess = process.id === FlowEmulatorService.processId;
-    if (isEmulatorProcess) {
-      this.logger.debug(`Emulator was started or updated`);
-      // Remove any previous listeners
-      this.emulatorProcess?.removeListener(
-        ManagedProcessEvent.STATE_CHANGE,
-        this.onProcessStateChange.bind(this)
-      );
-      // Update internal process instance & reattach listener
-      this.emulatorProcess = process;
-      this.emulatorProcess.on(
-        ManagedProcessEvent.STATE_CHANGE,
-        this.onProcessStateChange.bind(this)
-      );
-    }
-  }
-
-  private async onProcessStateChange(state: ManagedProcessState) {
-    if (state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING) {
-      this.logger.debug("Emulator process was started, reindexing");
-      // Reindex all blockchain data when the emulator is started (restarted)
-      await this.commonService.removeAll();
-    }
   }
 
   async getTotalBlocksToProcess() {
@@ -163,7 +106,7 @@ export class IndexerService {
     const gatewayStatus = await this.flowGatewayService.getApiStatus(
       gatewayConfig
     );
-    if (gatewayStatus !== ServiceStatus.SERVICE_STATUS_ONLINE) {
+    if (gatewayStatus !== FlowApiStatus.SERVICE_STATUS_ONLINE) {
       this.logger.debug("Gateway offline, pausing processing.");
       return;
     }
