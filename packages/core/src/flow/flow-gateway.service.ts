@@ -1,4 +1,3 @@
-import * as http from "http";
 import {
   FclArgBuilder,
   FclArgumentWithMetadata,
@@ -6,6 +5,7 @@ import {
   FclValues,
 } from "./fcl-values";
 import * as fcl from "@onflow/fcl";
+import axios from "axios";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -237,36 +237,28 @@ export class FlowGatewayService {
     return { ...account, balance: account.balance / Math.pow(10, 8), address };
   }
 
-  public async getApiStatus(
-  ): Promise<FlowApiStatus> {
-    const restServerAddress = await fcl.config.get("accessNode.api");
+  public async getApiStatus(): Promise<FlowApiStatus> {
+    const restServerUrl = await fcl.config.get("accessNode.api");
 
-    if (!restServerAddress) {
-      throw new Error("accessNode.api not configured")
+    if (!restServerUrl) {
+      throw new Error("accessNode.api not configured");
     }
 
-    const { hostname, port } = new URL(restServerAddress);
-    return new Promise((resolve) => {
-      const req = http
-        .get(
-          {
-            host: hostname,
-            path: "/live",
-            port,
-          },
-          () => {
-            req.end();
-            // Assume that if response is received, server is online
-            // Ideally we should send a ping request to access API
-            // but that endpoint isn't implemented on emulator side (afaik)
-            // https://github.com/onflow/flow/blob/master/protobuf/flow/access/access.proto#L20
-            return resolve(FlowApiStatus.SERVICE_STATUS_ONLINE);
-          }
-        )
-        .on("error", (err) => {
-          req.end();
-          return resolve(FlowApiStatus.SERVICE_STATUS_OFFLINE);
-        });
-    });
+    try {
+      await axios.request({
+        method: "GET",
+        url: restServerUrl,
+        // Prevent axios from throwing on certain http response codes
+        // https://github.com/axios/axios/issues/41
+        validateStatus: () => true,
+      });
+      // Assume that if response is received, server is online
+      // Ideally we should send a ping request to access API
+      // but that endpoint isn't implemented on emulator side (afaik)
+      // https://github.com/onflow/flow/blob/master/protobuf/flow/access/access.proto#L20
+      return FlowApiStatus.SERVICE_STATUS_ONLINE;
+    } catch (error) {
+      return FlowApiStatus.SERVICE_STATUS_OFFLINE;
+    }
   }
 }
