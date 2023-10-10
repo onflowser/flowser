@@ -1,8 +1,8 @@
-import { ProcessManagerService } from "../processes/process-manager.service";
-import { ManagedProcess } from "../processes/managed-process";
+import { ProcessManagerService, ManagedProcess } from "../processes";
 import { isDefined, waitForMs } from "../utils";
 import { EventEmitter } from "node:events";
 import {
+  FlowEmulatorConfig,
   HashAlgorithm,
   ProcessOutputSource,
   SignatureAlgorithm,
@@ -23,34 +23,6 @@ export type WellKnownAddressesOptions = {
 export enum FlowEmulatorEvent {
   APIS_STARTED = "APIS_STARTED",
 }
-
-export type FlowEmulatorConfig = {
-  workingDirectoryPath: string;
-  verboseLogging: boolean;
-  logFormat: string;
-  restServerPort: number;
-  grpcServerPort: number;
-  adminServerPort: number;
-  blockTime: number;
-  servicePrivateKey: string;
-  databasePath: string;
-  tokenSupply: number;
-  transactionExpiry: number;
-  storagePerFlow: number;
-  minAccountBalance: number;
-  transactionMaxGasLimit: number;
-  scriptGasLimit: number;
-  serviceSignatureAlgorithm: SignatureAlgorithm;
-  serviceHashAlgorithm: HashAlgorithm;
-  storageLimit: boolean;
-  transactionFees: boolean;
-  persist: boolean;
-  withContracts: boolean;
-  enableGrpcDebug: boolean;
-  enableRestDebug: boolean;
-  useSimpleAddresses: boolean;
-  snapshot: boolean;
-};
 
 export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";

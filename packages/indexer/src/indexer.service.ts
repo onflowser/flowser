@@ -2,7 +2,6 @@ import { Injectable, Logger } from "@nestjs/common";
 import {
   FlowApiStatus,
   FlowGatewayService,
-  GetParsedInteractionResponse,
   FlowEmulatorService,
   WellKnownAddressesOptions,
   ManagedProcess,
@@ -18,6 +17,7 @@ import {
   IResourceIndex,
   HashAlgorithm,
   SignatureAlgorithm,
+  ParsedInteractionOrError,
 } from "@onflowser/api";
 
 // See https://developers.flow.com/cadence/language/core-events
@@ -555,6 +555,7 @@ export class IndexerService {
       balance: account.balance,
       address,
       blockId: block.id,
+      tags: [],
       isDefaultAccount: allPossibleWellKnownAddresses.includes(address),
       code: account.code,
       keys: account.keys.map((flowKey) =>
@@ -564,6 +565,10 @@ export class IndexerService {
           block: block,
         })
       ),
+      // TODO(restructure): Maybe the index should be the one dealing with these dates
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: undefined,
     };
   }
 
@@ -613,6 +618,9 @@ export class IndexerService {
       blockId: event.blockId,
       eventIndex: event.eventIndex,
       data: event.data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: undefined,
     };
   }
 
@@ -622,6 +630,7 @@ export class IndexerService {
     const { block } = options;
     return {
       id: block.id,
+      height: block.height,
       collectionGuarantees: block.collectionGuarantees,
       blockSeals: block.blockSeals,
       // TODO(milestone-x): "signatures" field is not present in block response
@@ -630,6 +639,9 @@ export class IndexerService {
       timestamp: new Date(block.timestamp),
       blockHeight: block.height,
       parentId: block.parentId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: undefined,
     };
   }
 
@@ -644,8 +656,13 @@ export class IndexerService {
       id: `${account.address}.${name}`,
       blockId: block.id,
       address: ensurePrefixedAddress(account.address),
+      // TODO(restructure): Populate local config if applicable
+      localConfig: undefined,
       name: name,
       code: code,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: undefined,
     };
   }
 
@@ -653,7 +670,7 @@ export class IndexerService {
     block: flowResource.FlowBlock;
     transaction: flowResource.FlowTransaction;
     transactionStatus: flowResource.FlowTransactionStatus;
-    parsedInteraction: GetParsedInteractionResponse;
+    parsedInteraction: ParsedInteractionOrError;
   }): flowserResource.FlowTransaction {
     const { block, transaction, transactionStatus, parsedInteraction } =
       options;
@@ -724,6 +741,7 @@ export class IndexerService {
       },
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: undefined,
     };
   }
 

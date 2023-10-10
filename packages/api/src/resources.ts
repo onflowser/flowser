@@ -119,6 +119,7 @@ export interface FlowContractLocalConfig {
   absolutePath: string;
 }
 
+// TODO(restructure): Refactor FlowAccountStorage
 export interface FlowAccountCapability {
   address: string;
   path: string;
@@ -304,11 +305,40 @@ export enum ProcessOutputSource {
 export interface FlowserProject extends TimestampedResource {
   id: string;
   name: string;
+  emulator: FlowEmulatorConfig | undefined;
+}
+
+export interface FlowEmulatorConfig {
+  workingDirectoryPath: string;
+  verboseLogging: boolean;
+  logFormat: string;
+  restServerPort: number;
+  grpcServerPort: number;
+  adminServerPort: number;
+  blockTime: number;
+  servicePrivateKey: string;
+  databasePath: string;
+  tokenSupply: number;
+  transactionExpiry: number;
+  storagePerFlow: number;
+  minAccountBalance: number;
+  transactionMaxGasLimit: number;
+  scriptGasLimit: number;
+  serviceSignatureAlgorithm: SignatureAlgorithm;
+  serviceHashAlgorithm: HashAlgorithm;
+  storageLimit: boolean;
+  transactionFees: boolean;
+  persist: boolean;
+  withContracts: boolean;
+  enableGrpcDebug: boolean;
+  enableRestDebug: boolean;
+  useSimpleAddresses: boolean;
+  snapshot: boolean;
 }
 
 export enum FlowserUsageRequirementType {
   UNSUPPORTED_CLI_VERSION,
-  MISSING_FLOW_CLI
+  MISSING_FLOW_CLI,
 }
 
 export interface FlowserUsageRequirement {
@@ -317,7 +347,7 @@ export interface FlowserUsageRequirement {
   type: FlowserUsageRequirementType;
 }
 
-export interface InteractionTemplate  extends TimestampedResource {
+export interface InteractionTemplate extends TimestampedResource {
   id: string;
   name: string;
   code: string;
