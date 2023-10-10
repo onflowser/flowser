@@ -1,5 +1,5 @@
 import { FlowGatewayService } from "./flow-gateway.service";
-import { ensurePrefixedAddress } from "../utils";
+import { ensurePrefixedAddress } from "./utils";
 import {
   FlowStorageDomain,
   CadenceTypeKind,

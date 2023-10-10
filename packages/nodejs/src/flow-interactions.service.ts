@@ -1,8 +1,9 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { GoBindingsService } from "./go-bindings.service";
-import { isDefined } from "../utils";
-import { InteractionKind } from "@onflowser/api";
+import { isDefined } from "@onflowser/core/dist/utils";
+import { InteractionKind, ParsedInteractionOrError } from "@onflowser/api";
+import { IFlowInteractions } from "@onflowser/core/dist/flow-interactions.service";
 
 export interface InteractionTemplate {
   id: string;
@@ -21,8 +22,12 @@ type GetInteractionTemplatesOptions = {
   projectRootPath: string;
 };
 
-export class FlowInteractionsService {
+export class FlowInteractionsService implements IFlowInteractions {
   constructor(private readonly goBindings: GoBindingsService) {}
+
+  parse(sourceCode: string): Promise<ParsedInteractionOrError> {
+    return this.goBindings.getParsedInteraction({ sourceCode });
+  }
 
   public async getInteractionTemplates(
     options: GetInteractionTemplatesOptions

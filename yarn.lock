@@ -1839,12 +1839,13 @@
     "@onflowser/core" "*"
     "@onflowser/indexer" "*"
 
-"@onflowser/indexer@*", "@onflowser/indexer@file:/Users/bartkozorog/Projects/flowser/packages/indexer":
-  "resolved" "file:packages/indexer"
+"@onflowser/nodejs@*", "@onflowser/nodejs@file:/Users/bartkozorog/Projects/flowser/packages/nodejs":
+  "resolved" "file:packages/nodejs"
   "version" "1.0.0"
   dependencies:
+    "@onflow/fcl" "^1.6.0"
     "@onflowser/config" "*"
-    "@onflowser/core" "*"
+    "elliptic" "^6.5.4"
 
 "@onflowser/ui@*", "@onflowser/ui@file:/Users/bartkozorog/Projects/flowser/packages/ui":
   "resolved" "file:packages/ui"
@@ -1874,14 +1875,6 @@
     "react-timeago" "^7.2.0"
     "swr" "^2.2.4"
     "yup" "^0.32.11"
-
-"@onflowser/wallet@file:/Users/bartkozorog/Projects/flowser/packages/wallet":
-  "resolved" "file:packages/wallet"
-  "version" "1.0.0"
-  dependencies:
-    "@onflow/fcl" "^1.6.0"
-    "@onflowser/config" "*"
-    "elliptic" "^6.5.4"
 
 "@pkgjs/parseargs@^0.11.0":
   "integrity" "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="

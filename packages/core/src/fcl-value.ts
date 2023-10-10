@@ -142,7 +142,7 @@ export class FclValueUtils {
   static isFclOptionalValue(arg: unknown): arg is FclOptionalValue {
     return arg === undefined || this.isFclRequiredValue(arg);
   }
-  static isFclValue(arg: unknown): arg is FclValueUtils {
+  static isFclValue(arg: unknown): arg is FclValue {
     return this.isFclOptionalValue(arg) || this.isFclRequiredValue(arg);
   }
 }

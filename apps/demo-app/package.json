@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@onflowser/config": "*",
-    "@onflowser/indexer": "*",
+    "@onflowser/nodejs": "*",
     "@onflowser/core": "*",
     "@onflowser/api": "*"
   },

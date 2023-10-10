@@ -1,7 +1,3 @@
-import { Logger } from "@nestjs/common";
-
-const logger = new Logger("Utils");
-
 export type ExecutableCallback = () => Promise<void>;
 
 export type AsyncIntervalOptions = {
@@ -44,7 +40,7 @@ export class AsyncIntervalScheduler {
       try {
         await functionToExecute();
       } catch (e) {
-        logger.error(`${name} failed`, e);
+        console.error(`${name} failed`, e);
       }
       const endTime = new Date();
       const runTimeInMs = endTime.getTime() - startTime.getTime();
@@ -60,7 +56,7 @@ export class AsyncIntervalScheduler {
       } else {
         // Runtime exceeded polling time.
         // Processing could be taking longer than expected.
-        logger.debug(`${name} took ${runTimeInMs}ms`);
+        console.debug(`${name} took ${runTimeInMs}ms`);
       }
     }
   }

@@ -1,13 +1,16 @@
-import { IndexerService, InMemoryIndex } from "@onflowser/indexer";
 import {
+  FlowIndexerService,
+  InMemoryIndex,
   FlowGatewayService,
   FlowAccountStorageService,
-  FlowEmulatorService,
-  ProcessManagerService,
-  GoBindingsService,
   waitForMs,
 } from "@onflowser/core";
 import * as flowserResource from "@onflowser/api";
+import {
+  AsyncIntervalScheduler,
+  FlowInteractionsService,
+  GoBindingsService,
+} from "@onflowser/nodejs";
 
 const flowGatewayService = new FlowGatewayService();
 
@@ -81,9 +84,8 @@ flowGatewayService.configure({
 const flowAccountStorageService = new FlowAccountStorageService(
   flowGatewayService
 );
-const processManagerService = new ProcessManagerService();
-const flowEmulatorService = new FlowEmulatorService(processManagerService);
 const goBindingsService = new GoBindingsService();
+const flowInteractionsService = new FlowInteractionsService(goBindingsService);
 
 const indexes = {
   transaction: new InMemoryIndex<flowserResource.FlowTransaction>(),
@@ -94,7 +96,7 @@ const indexes = {
   accountStorage: new InMemoryIndex<flowserResource.FlowAccountStorage>(),
 };
 
-const indexer = new IndexerService(
+const indexer = new FlowIndexerService(
   indexes.transaction,
   indexes.account,
   indexes.block,
@@ -103,11 +105,16 @@ const indexer = new IndexerService(
   indexes.accountStorage,
   flowAccountStorageService,
   flowGatewayService,
-  flowEmulatorService,
-  goBindingsService
+  flowInteractionsService
 );
 
-indexer.start();
+const scheduler = new AsyncIntervalScheduler({
+  name: "Blockchain processing",
+  pollingIntervalInMs: 500,
+  functionToExecute: () => indexer.processBlockchainData(),
+});
+
+scheduler.start();
 
 (async function () {
   while (true) {

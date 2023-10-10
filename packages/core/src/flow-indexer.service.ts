@@ -1,24 +1,16 @@
 import { Injectable, Logger } from "@nestjs/common";
-import {
-  FlowApiStatus,
-  FlowGatewayService,
-  FlowEmulatorService,
-  WellKnownAddressesOptions,
-  ManagedProcess,
-  ensureNonPrefixedAddress,
-  ensurePrefixedAddress,
-  FlowAccountStorageService,
-  GoBindingsService,
-} from "@onflowser/core";
-import * as flowResource from "@onflowser/core";
+import * as flowResource from "./flow-gateway.service";
 import * as flowserResource from "@onflowser/api";
-import { AsyncIntervalScheduler } from "./async-interval-scheduler";
 import {
   IResourceIndex,
   HashAlgorithm,
   SignatureAlgorithm,
   ParsedInteractionOrError,
 } from "@onflowser/api";
+import { IFlowInteractions } from "./flow-interactions.service";
+import { FlowAccountStorageService } from "./flow-storage.service";
+import { FlowApiStatus, FlowGatewayService } from "./flow-gateway.service";
+import { ensurePrefixedAddress } from "./utils";
 
 // See https://developers.flow.com/cadence/language/core-events
 enum FlowCoreEventType {
@@ -52,11 +44,8 @@ export type ExtendedFlowEvent = flowResource.FlowEvent & {
 };
 
 @Injectable()
-export class IndexerService {
-  private emulatorProcess: ManagedProcess | undefined;
-  private readonly logger = new Logger(IndexerService.name);
-  private readonly pollingDelay = 500;
-  private processingScheduler: AsyncIntervalScheduler;
+export class FlowIndexerService {
+  private readonly logger = new Logger(FlowIndexerService.name);
 
   constructor(
     private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
@@ -67,23 +56,8 @@ export class IndexerService {
     private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private flowEmulatorService: FlowEmulatorService,
-    private goBindings: GoBindingsService
-  ) {
-    this.processingScheduler = new AsyncIntervalScheduler({
-      name: "Blockchain processing",
-      pollingIntervalInMs: this.pollingDelay,
-      functionToExecute: this.processBlockchainData.bind(this),
-    });
-  }
-
-  start(): void {
-    this.processingScheduler.start();
-  }
-
-  stop(): void {
-    this.processingScheduler.stop();
-  }
+    private flowInteractionsService: IFlowInteractions
+  ) {}
 
   async processBlockchainData(): Promise<void> {
     const gatewayStatus = await this.flowGatewayService.getApiStatus();
@@ -94,7 +68,7 @@ export class IndexerService {
 
     const [unprocessedBlockInfo] = await Promise.all([
       this.getUnprocessedBlocksInfo(),
-      this.processWellKnownAccountsForNonManagedEmulator(),
+      this.processWellKnownAccounts(),
     ]);
 
     const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
@@ -335,18 +309,10 @@ export class IndexerService {
       `handling event: ${event.type} ${JSON.stringify(event.data)}`
     );
 
-    const monotonicAddresses = this.flowEmulatorService.getWellKnownAddresses({
-      overrideUseMonotonicAddresses: true,
-    });
-    const nonMonotonicAddresses =
-      this.flowEmulatorService.getWellKnownAddresses({
-        overrideUseMonotonicAddresses: false,
-      });
-
-    const buildFlowTokensWithdrawnEvent = (address: string) =>
-      `A.${ensureNonPrefixedAddress(address)}.FlowToken.TokensWithdrawn`;
-    const buildFlowTokensDepositedEvent = (address: string) =>
-      `A.${ensureNonPrefixedAddress(address)}.FlowToken.TokensDeposited`;
+    const isTokenWithdrawnEvent = (eventId: string) =>
+      /A\..*\.FlowToken\.TokensWithdrawn/.test(eventId);
+    const isTokenDepositedEvent = (eventId: string) =>
+      /A\..*\.FlowToken\.TokensDeposited/.test(eventId);
 
     const address = ensurePrefixedAddress(event.data.address);
     switch (event.type) {
@@ -363,25 +329,17 @@ export class IndexerService {
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
         return this.reIndexAccount({ address, block: block });
-      // For now keep listening for monotonic and non-monotonic addresses,
-      // although I think only non-monotonic ones are used for contract deployment.
-      // See: https://github.com/onflow/flow-emulator/issues/421#issuecomment-1596844610
-      case buildFlowTokensWithdrawnEvent(monotonicAddresses.flowTokenAddress):
-      case buildFlowTokensWithdrawnEvent(
-        nonMonotonicAddresses.flowTokenAddress
-      ):
+    }
+
+    switch (true) {
+      case isTokenWithdrawnEvent(event.type):
         // New emulator accounts are initialized
         // with a default Flow balance coming from null address.
         return event.data.from
           ? this.reIndexAccount(event.data.from)
           : undefined;
-      case buildFlowTokensDepositedEvent(monotonicAddresses.flowTokenAddress):
-      case buildFlowTokensDepositedEvent(
-        nonMonotonicAddresses.flowTokenAddress
-      ):
+      case isTokenDepositedEvent(event.type):
         return this.reIndexAccount(event.data.to);
-      default:
-        return null; // not a standard event, ignore it
     }
   }
 
@@ -390,9 +348,9 @@ export class IndexerService {
     transaction: flowResource.FlowTransaction;
     transactionStatus: flowResource.FlowTransactionStatus;
   }) {
-    const parsedInteraction = await this.goBindings.getParsedInteraction({
-      sourceCode: options.transaction.script,
-    });
+    const parsedInteraction = await this.flowInteractionsService.parse(
+      options.transaction.script
+    );
     if (parsedInteraction.error) {
       this.logger.error(
         `Unexpected interaction parsing error: ${parsedInteraction.error}`
@@ -453,52 +411,8 @@ export class IndexerService {
     );
   }
 
-  private async isServiceAccountProcessed(options?: WellKnownAddressesOptions) {
-    const { serviceAccountAddress } =
-      this.flowEmulatorService.getWellKnownAddresses(options);
-    try {
-      const serviceAccount = await this.accountIndex.findOneById(
-        serviceAccountAddress
-      );
-
-      // Service account is already created by the wallet service,
-      // but that service doesn't set the public key.
-      // So if public key isn't present,
-      // we know that we haven't processed this account yet.
-      return Boolean(serviceAccount?.keys?.[0]?.publicKey);
-    } catch (e) {
-      // Service account not found
-      return false;
-    }
-  }
-
-  private async processWellKnownAccountsForNonManagedEmulator() {
-    // When using non-managed emulator,
-    // we don't know if the blockchain uses monotonic or non-monotonic addresses,
-    // so we need to try processing well-known accounts with both options.
-    const isManagedEmulator = this.emulatorProcess?.isRunning();
-    if (isManagedEmulator) {
-      return;
-    }
-
-    // Ignore errors that any of the functions throw
-    await Promise.allSettled([
-      this.processWellKnownAccounts({
-        overrideUseMonotonicAddresses: true,
-      }),
-      this.processWellKnownAccounts({
-        overrideUseMonotonicAddresses: false,
-      }),
-    ]);
-  }
-
-  private async processWellKnownAccounts(options?: WellKnownAddressesOptions) {
-    const isAlreadyProcessed = await this.isServiceAccountProcessed(options);
-
-    if (isAlreadyProcessed) {
-      // Assume all other accounts are also processed (we batch process them together).
-      return;
-    }
+  private async processWellKnownAccounts() {
+    // TODO(restructure): Early exit if accounts already processed?
 
     // Afaik these well-known default accounts are
     // bootstrapped in a "meta-transaction",
@@ -515,7 +429,7 @@ export class IndexerService {
     };
 
     await Promise.all(
-      this.getAllWellKnownAddresses(options).map((address) =>
+      this.getAllWellKnownAddresses().map((address) =>
         this.reIndexAccount({
           address,
           block: nonExistingBlock,
@@ -524,16 +438,32 @@ export class IndexerService {
     );
   }
 
-  private getAllWellKnownAddresses(options?: WellKnownAddressesOptions) {
-    // TODO(snapshots-revamp): Try processing monotonic and normal addresses
-    //  as we don't know which setting is used if non-managed emulator is used.
-    const wellKnownAddresses =
-      this.flowEmulatorService.getWellKnownAddresses(options);
+  /**
+   * Well known addresses have predefined roles
+   * and are used to deploy common/core flow contracts.
+   *
+   * For more info, see source code:
+   * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/server/server.go#L163-L169
+   * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/contracts.go#L17-L60
+   */
+  private getAllWellKnownAddresses() {
+    // When "simple-addresses" flag is provided,
+    // a monotonic address generation mechanism is used:
+    // https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/blockchain.go#L336-L342
+
     return [
-      wellKnownAddresses.serviceAccountAddress,
-      wellKnownAddresses.fungibleTokenAddress,
-      wellKnownAddresses.flowFeesAddress,
-      wellKnownAddresses.flowTokenAddress,
+      // Service account address
+      "0x0000000000000001",
+      "0xf8d6e0586b0a20c7",
+      // Fungible token address
+      "0x0000000000000002",
+      "0xee82856bf20e2aa6",
+      // Flow token address
+      "0x0000000000000003",
+      "0x0ae53cb6e3f42a79",
+      // Flow fees address
+      "0x0000000000000004",
+      "0xe5a8b7f23e8b548f",
     ];
   }
 
@@ -543,11 +473,6 @@ export class IndexerService {
   }): flowserResource.FlowAccount {
     const { account, block } = options;
 
-    const allPossibleWellKnownAddresses = [
-      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: true }),
-      this.getAllWellKnownAddresses({ overrideUseMonotonicAddresses: false }),
-    ].flat();
-
     const address = ensurePrefixedAddress(account.address);
 
     return {
@@ -555,8 +480,10 @@ export class IndexerService {
       balance: account.balance,
       address,
       blockId: block.id,
+      // TODO(restructure): Add logic for generating tags
+      // https://github.com/onflowser/flowser/pull/197/files#diff-de96e521dbe8391acff7b4c46768d9f51d90d5e30378600a41a57d14bb173f75L97-L116
       tags: [],
-      isDefaultAccount: allPossibleWellKnownAddresses.includes(address),
+      isDefaultAccount: this.getAllWellKnownAddresses().includes(address),
       code: account.code,
       keys: account.keys.map((flowKey) =>
         this.createKeyEntity({

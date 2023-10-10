@@ -1,5 +1,5 @@
-import { ProcessManagerService, ManagedProcess } from "../processes";
-import { isDefined, waitForMs } from "../utils";
+import { ManagedProcess } from "./processes/managed-process";
+import { isDefined, waitForMs } from "@onflowser/core/dist/utils";
 import { EventEmitter } from "node:events";
 import {
   FlowEmulatorConfig,
@@ -7,18 +7,7 @@ import {
   ProcessOutputSource,
   SignatureAlgorithm,
 } from "@onflowser/api";
-
-type FlowWellKnownAddresses = {
-  serviceAccountAddress: string;
-  flowTokenAddress: string;
-  fungibleTokenAddress: string;
-  flowFeesAddress: string;
-};
-
-export type WellKnownAddressesOptions = {
-  // If not specifies, uses the setting from current emulator settings.
-  overrideUseMonotonicAddresses?: boolean;
-};
+import { ProcessManagerService } from "./processes/process-manager.service";
 
 export enum FlowEmulatorEvent {
   APIS_STARTED = "APIS_STARTED",
@@ -37,38 +26,6 @@ export class FlowEmulatorService extends EventEmitter {
   async stopAndCleanup() {
     await this.processManagerService.remove(FlowEmulatorService.processId);
     this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
-  }
-
-  /**
-   * Well known addresses have predefined roles
-   * and are used to deploy common/core flow contracts.
-   *
-   * For more info, see source code:
-   * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/server/server.go#L163-L169
-   * - https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/contracts.go#L17-L60
-   */
-  public getWellKnownAddresses(
-    options?: WellKnownAddressesOptions
-  ): FlowWellKnownAddresses {
-    // When "simple-addresses" flag is provided,
-    // a monotonic address generation mechanism is used:
-    // https://github.com/onflow/flow-emulator/blob/ebb90a8e721344861bb7e44b58b934b9065235f9/emulator/blockchain.go#L336-L342
-    const useMonotonicAddresses =
-      options?.overrideUseMonotonicAddresses ?? this.config.useSimpleAddresses;
-    return {
-      serviceAccountAddress: useMonotonicAddresses
-        ? "0x0000000000000001"
-        : "0xf8d6e0586b0a20c7",
-      fungibleTokenAddress: useMonotonicAddresses
-        ? "0x0000000000000002"
-        : "0xee82856bf20e2aa6",
-      flowTokenAddress: useMonotonicAddresses
-        ? "0x0000000000000003"
-        : "0x0ae53cb6e3f42a79",
-      flowFeesAddress: useMonotonicAddresses
-        ? "0x0000000000000004"
-        : "0xe5a8b7f23e8b548f",
-    };
   }
 
   async start(config: FlowEmulatorConfig) {

@@ -1,30 +1,29 @@
 import {
   Injectable,
-  PreconditionFailedException,
-  NotFoundException,
   Logger,
+  PreconditionFailedException,
 } from "@nestjs/common";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
-import {
-  FlowCliService,
-  KeyWithWeight,
-} from "@onflowser/core/src/flow/flow-cli.service";
-import { AccountsService } from "../../../backend/src/accounts/services/accounts.service";
-import { AccountEntity } from "../../../backend/src/accounts/entities/account.entity";
+import { FlowCliService, KeyWithWeight } from "./flow-cli.service";
 import { ensurePrefixedAddress } from "../../core/src/utils";
-import { AccountKeyEntity } from "../../../backend/src/accounts/entities/key.entity";
-import { KeysService } from "../../../backend/src/accounts/services/keys.service";
-import {
-  FlowAuthorizationFunction,
-  FlowGatewayService,
-} from "@onflowser/core/src/flow/flow-gateway.service";
-import { FlowConfigService } from "@onflowser/core/src/flow/flow-config.service";
-import { FlowTransactionArgument } from "@flowser/packages/api";
 import {
   FclArgumentWithMetadata,
   FclValueUtils,
-} from "packages/core/src/flow/fcl-value-utils";
+  FlowAuthorizationFunction,
+  FlowGatewayService,
+} from "@onflowser/core";
+import * as flowserResource from "@onflowser/api";
+import {
+  FlowAccountKey,
+  FlowAccount,
+  FlowTransactionArgument,
+  HashAlgorithm,
+  IResourceIndex,
+  SignatureAlgorithm,
+} from "@onflowser/api";
+import { FlowConfigService } from "./flow-config.service";
+
 const fcl = require("@onflow/fcl");
 
 export interface SendTransactionRequest {
@@ -57,8 +56,7 @@ export class WalletService {
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
     private readonly flowConfig: FlowConfigService,
-    private readonly accountsService: AccountsService,
-    private readonly keysService: KeysService
+    private accountIndex: IResourceIndex<flowserResource.FlowAccount>
   ) {}
 
   public async sendTransaction(
@@ -128,16 +126,7 @@ export class WalletService {
   private async withAuthorization(
     address: string
   ): Promise<FlowAuthorizationFunction> {
-    let storedAccount;
-
-    try {
-      storedAccount = await this.accountsService.findOneWithRelationsByAddress(
-        address
-      );
-    } catch (e) {
-      console.error(e);
-      throw new NotFoundException(`Account not found '${address}'`);
-    }
+    const storedAccount = await this.accountIndex.findOneById(address);
 
     if (!storedAccount.keys) {
       throw new Error("Keys not loaded for account");
@@ -188,18 +177,26 @@ export class WalletService {
       accountsConfig.map(async (accountConfig) => {
         const accountAddress = ensurePrefixedAddress(accountConfig.address);
 
-        const keyEntity = AccountKeyEntity.createDefault();
-        keyEntity.index = 0;
-        keyEntity.accountAddress = accountAddress;
-        // Public key is not stored in flow.json,
-        // so just use empty value for now.
-        // This should be updated by the aggregator service once it's picked up.
-        keyEntity.publicKey = "";
-        keyEntity.privateKey = accountConfig.privateKey ?? "";
+        const key: FlowAccountKey = {
+          ...this.createDefaultKey(accountAddress),
+          privateKey: accountConfig.privateKey,
+        };
 
-        const accountEntity = AccountEntity.createDefault();
-        accountEntity.address = accountAddress;
-        accountEntity.keys = [keyEntity];
+        const account: FlowAccount = {
+          balance: 0,
+          blockId: "",
+          code: "",
+          createdAt: undefined,
+          deletedAt: undefined,
+          isDefaultAccount: false,
+          tags: [],
+          updatedAt: undefined,
+          id: accountAddress,
+          address: accountAddress,
+          // TODO(restructure): Add logic for generating tags
+          // https://github.com/onflowser/flowser/pull/197/files#diff-de96e521dbe8391acff7b4c46768d9f51d90d5e30378600a41a57d14bb173f75L97-L116
+          keys: [key],
+        };
 
         try {
           const isOnNetwork = await this.isAccountCreatedOnNetwork(
@@ -216,11 +213,7 @@ export class WalletService {
             return;
           }
 
-          await this.accountsService.upsert(accountEntity);
-          await this.keysService.updateAccountKeys(
-            accountEntity.address,
-            accountEntity.keys
-          );
+          await this.accountIndex.add(account);
         } catch (e) {
           // Ignore
           this.logger.debug("Managed account import failed", e);
@@ -229,9 +222,7 @@ export class WalletService {
     );
   }
 
-  public async createAccount(
-    options: CreateAccountRequest
-  ): Promise<AccountEntity> {
+  public async createAccount(options: CreateAccountRequest): Promise<void> {
     // For now, we only support a single key per account,
     // but we could as well add support for attaching
     // multiple keys with (possibly) different weights.
@@ -249,44 +240,35 @@ export class WalletService {
         })
       ),
     });
-    const accountEntity = AccountEntity.createDefault();
-    accountEntity.address = ensurePrefixedAddress(generatedAccount.address);
-    accountEntity.keys = generatedKeyPairs.map((generatedKey) => {
-      const key = AccountKeyEntity.createDefault();
-      key.accountAddress = accountEntity.address;
-      key.index = generatedAccount.keys.findIndex(
-        (key) => key === generatedKey.public
-      );
-      key.publicKey = generatedKey.public;
-      key.privateKey = generatedKey.private;
-      return key;
+    const accountAddress = ensurePrefixedAddress(generatedAccount.address);
+
+    await this.accountIndex.update({
+      id: accountAddress,
+      keys: generatedKeyPairs.map((generatedKey) => {
+        return {
+          ...this.createDefaultKey(accountAddress),
+          index: generatedAccount.keys.findIndex(
+            (key) => key === generatedKey.public
+          ),
+          publicKey: generatedKey.public,
+          privateKey: generatedKey.private,
+        };
+      }),
     });
 
-    await this.accountsService.upsert(accountEntity);
-    await this.keysService.updateAccountKeys(
-      accountEntity.address,
-      accountEntity.keys
-    );
-
-    // Assume only a single key per account for now
-    const singlePrivateKey = accountEntity.keys[0].privateKey;
-    if (!singlePrivateKey) {
-      throw new Error("Private key not found");
-    }
-
+    // TODO(restructure): Update flow.json and regenerate accounts on next run?
+    //   I don't think, so we can instead persist these accounts with snapshots.
     // For now, we just write new accounts to flow.json,
     // but they don't get recreated on the next emulator run.
     // See: https://github.com/onflow/flow-emulator/issues/405
-    await this.flowConfig.updateAccounts([
-      {
-        // TODO(custom-wallet): Come up with a human-readable name generation
-        name: accountEntity.address,
-        address: accountEntity.address,
-        privateKey: singlePrivateKey,
-      },
-    ]);
-
-    return accountEntity;
+    // await this.flowConfig.updateAccounts([
+    //   {
+    //     // TODO(custom-wallet): Come up with a human-readable name generation
+    //     name: accountEntity.address,
+    //     address: accountEntity.address,
+    //     privateKey: singlePrivateKey,
+    //   },
+    // ]);
   }
 
   // Returns whether the account exists on the current blockchain.
@@ -321,5 +303,42 @@ export class WalletService {
     const sha = new SHA3(256);
     sha.update(Buffer.from(msg, "hex"));
     return sha.digest();
+  }
+
+  private createDefaultKey(accountAddress: string): FlowAccountKey {
+    const keyIndex = 0;
+    return {
+      // TODO(restructure): Define util functions for generating IDs / initializing resources?
+      id: `${accountAddress}.${keyIndex}`,
+      index: 0,
+      accountAddress,
+      blockId: "NULL",
+      // Public key is not stored in flow.json,
+      // so just use empty value for now.
+      // This should be updated by the aggregator service once it's picked up.
+      publicKey: "",
+      privateKey: "",
+      signAlgo: SignatureAlgorithm.ECDSA_P256,
+      hashAlgo: HashAlgorithm.SHA2_256,
+      weight: 1000,
+      sequenceNumber: 0,
+      revoked: false,
+    };
+  }
+
+  private createDefaultAccount(): FlowAccount {
+    return {
+      address: "",
+      balance: 0,
+      blockId: "",
+      code: "",
+      createdAt: undefined,
+      deletedAt: undefined,
+      id: "",
+      isDefaultAccount: false,
+      keys: [],
+      tags: [],
+      updatedAt: undefined,
+    };
   }
 }

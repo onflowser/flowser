@@ -1,1 +1,1 @@
-export * from "../../../packages/core/src/flow/fcl-value";
+export * from "../../../packages/core/src/fcl-value";

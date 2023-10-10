@@ -2,7 +2,7 @@ import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "../utils";
+import { isObject } from "@onflowser/core/dist/utils";
 
 type FlowAddress = string;
 
