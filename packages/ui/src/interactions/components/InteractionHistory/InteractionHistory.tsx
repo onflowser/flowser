@@ -3,7 +3,6 @@ import classes from "./InteractionHistory.module.scss";
 import {
   useFlowserHooksApi,
 } from "../../../contexts/flowser-api.context";
-import { Block, Transaction } from "@flowser/shared";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { Spinner } from "../../../common/loaders/Spinner/Spinner";
@@ -13,6 +12,7 @@ import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
 import { useSnapshotsManager } from "../../../contexts/snapshots.context";
+import { FlowBlock, FlowTransaction } from '@onflowser/api';
 
 export function InteractionHistory(): ReactElement {
   const api = useFlowserHooksApi();
@@ -37,7 +37,7 @@ export function InteractionHistory(): ReactElement {
 }
 
 type BlockItemProps = {
-  block: Block;
+  block: FlowBlock;
 };
 
 function BlockItem(props: BlockItemProps) {
@@ -117,8 +117,8 @@ function BlockItem(props: BlockItemProps) {
 }
 
 type BlockItemContentProps = {
-  block: Block;
-  transaction: Transaction | undefined;
+  block: FlowBlock;
+  transaction: FlowTransaction | undefined;
 };
 
 function BlockItemContent(props: BlockItemContentProps) {

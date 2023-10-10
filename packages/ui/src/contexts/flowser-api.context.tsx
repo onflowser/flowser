@@ -14,8 +14,8 @@ import {
   FlowStateSnapshot,
   FlowTransaction,
   InteractionTemplate,
-  ManagedProcessOutput,
-} from "@onflowser/api";
+  ManagedProcessOutput, ParsedInteractionOrError
+} from '@onflowser/api';
 
 type FlowserHooksApi = {
   useGetAccounts(): SWRResponse<FlowAccount[]>;
@@ -47,7 +47,7 @@ type FlowserHooksApi = {
   // by undefined parsed interaction every time the source code changes.
   useGetParsedInteraction(
     request: InteractionDefinition
-  ): SWRResponse<InteractionTemplate>;
+  ): SWRResponse<ParsedInteractionOrError>;
   useGetFlowCliInfo(): SWRResponse<FlowCliInfo>;
   useGetAddressIndex(options: {
     address: string;

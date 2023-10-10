@@ -6,7 +6,10 @@ import React, {
 } from "react";
 import { useInteractionRegistry } from "./interaction-registry.context";
 import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
-import { InteractionDefinition } from "../core/core-types";
+import {
+  FclValueLookupByIdentifier,
+  InteractionDefinition,
+} from "../core/core-types";
 import { ParsedInteraction } from "@onflowser/api";
 import { FclValue } from "@onflowser/core";
 
@@ -17,8 +20,6 @@ type InteractionDefinitionManager = InteractionParameterBuilder & {
   definition: InteractionDefinition;
   partialUpdate: (definition: Partial<InteractionDefinition>) => void;
 };
-
-export type FclValueLookupByIdentifier = Map<string, FclValue>;
 
 export type InteractionParameterBuilder = {
   fclValuesByIdentifier: FclValueLookupByIdentifier;

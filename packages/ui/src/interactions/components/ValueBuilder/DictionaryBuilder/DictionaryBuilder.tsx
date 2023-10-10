@@ -1,12 +1,12 @@
 import React, { ReactElement, useEffect, useRef } from "react";
 import { CadenceValueBuilder } from "../interface";
 import { ValueBuilder } from "../ValueBuilder";
-import { FclDictionaryEntry, FclValue, FclValues } from "@flowser/shared";
-import { MultiMap } from "frontend/src/utils/multi-map";
 import toast from "react-hot-toast";
 import classes from "./DictionaryBuilder.module.scss";
 import { SimpleButton } from "../../../../common/buttons/SimpleButton/SimpleButton";
 import { SizedBox } from "../../../../common/misc/SizedBox/SizedBox";
+import { MultiMap } from '../../../../utils/multi-map';
+import { FclDictionaryEntry, FclValue, FclValueUtils } from '@onflowser/core';
 
 export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;
@@ -23,7 +23,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
     throw new Error("Expected dictionary field");
   }
 
-  const isInitialized = FclValues.isFclDictionaryValue(value);
+  const isInitialized = FclValueUtils.isFclDictionaryValue(value);
 
   // TODO(polish): Don't trigger this hook on every rerender
   //  See: https://www.notion.so/flowser/Sometimes-arguments-don-t-get-initialized-properly-80c34018155646d08e4da0bc6c977ed9?pvs=4

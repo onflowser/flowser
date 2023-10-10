@@ -1,4 +1,4 @@
-export * from "./fcl-values";
+export * from "./fcl-value";
 export * from "./flow-cli.service";
 export * from "./flow-config.service";
 export * from "./flow-gateway.service";

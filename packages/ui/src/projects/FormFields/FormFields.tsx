@@ -2,11 +2,11 @@ import { CommonUtils } from "../../utils/common-utils";
 import RadioButton from "../../common/buttons/RadioButton/RadioButton";
 import React, { ReactElement } from "react";
 import { Input, InputProps } from "../../common/inputs/Input/Input";
-import { Project } from "@flowser/shared";
 import classNames from "classnames";
 import classes from "./FormFields.module.scss";
 import ToggleButton from "../../common/buttons/ToggleButton/ToggleButton";
 import { FormikErrors } from "formik";
+import { FlowserProject } from '@onflowser/api';
 
 export type FieldProps = InputProps & {
   label?: string;
@@ -15,8 +15,8 @@ export type FieldProps = InputProps & {
   className?: string;
   formik: {
     handleChange: (e: React.ChangeEvent) => void;
-    values: Project;
-    errors: FormikErrors<Project>;
+    values: FlowserProject;
+    errors: FormikErrors<FlowserProject>;
     setFieldValue: (
       field: string,
       value: unknown,

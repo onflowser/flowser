@@ -1,5 +1,5 @@
 import mixpanel, { Dict } from "mixpanel-browser";
-import { FingerprintService } from "./fingerprint.service";
+import { FingerprintService } from "../../../../frontend/src/services/fingerprint.service";
 
 export enum AnalyticEvent {
   PAGE_VIEW = "page_view",

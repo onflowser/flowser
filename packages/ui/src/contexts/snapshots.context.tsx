@@ -8,17 +8,15 @@ import React, {
 } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { ServiceRegistry } from "../../../../frontend/src/services/service-registry";
-import {
-  useFlowserHooksApi,
-} from "./flowser-api.context";
+import { useFlowserHooksApi } from "./flowser-api.context";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useAnalytics } from "../hooks/use-analytics";
-import { AnalyticEvent } from "../../../../frontend/src/services/analytics.service";
+import { AnalyticEvent } from "./analytics.service";
 import { FlowUtils } from "../utils/flow-utils";
 import { SnapshotDialog } from "../common/overlays/dialogs/snapshot/SnapshotDialog";
 import { useProjectManager } from "./projects.context";
-import { FlowBlock, FlowStateSnapshot } from '@onflowser/api';
+import { FlowBlock, FlowStateSnapshot } from "@onflowser/api";
+import { useServiceRegistry } from "./service-registry.context";
 
 export type SnapshotsManager = {
   createSnapshot: () => void;
@@ -34,7 +32,7 @@ export function SnapshotsManagerProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { snapshotService } = ServiceRegistry.getInstance();
+  const { snapshotService } = useServiceRegistry();
 
   const { track } = useAnalytics();
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);

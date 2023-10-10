@@ -1,7 +1,7 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import { InteractionDefinition } from "../core/core-types";
-import { FclValue } from "@onflowser/core";
+import { FclValueUtils } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import * as crypto from "crypto";
 
@@ -23,7 +23,7 @@ export type InteractionDefinitionTemplate = InteractionDefinition & {
 type RawInteractionDefinitionTemplate = {
   name: string;
   code: string;
-  fclValuesByIdentifier: Record<string, FclValue>;
+  fclValuesByIdentifier: Record<string, FclValueUtils>;
   transactionOptions: TransactionOptions | undefined;
   createdDate: string;
   updatedDate: string;

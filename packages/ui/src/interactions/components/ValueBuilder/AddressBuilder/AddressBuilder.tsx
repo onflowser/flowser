@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import classes from "./AddressBuilder.module.scss";
 import { CadenceValueBuilder } from "../interface";
 import { useFlowserHooksApi } from "../../../../contexts/flowser-api.context";
@@ -6,17 +6,18 @@ import { AccountAvatar } from "../../../../accounts/AccountAvatar/AccountAvatar"
 import { AccountName } from "../../../../accounts/AccountName/AccountName";
 import { FlowserIcon } from "../../../../common/icons/FlowserIcon";
 import classNames from "classnames";
-import { ServiceRegistry } from "../../../../../../../frontend/src/services/service-registry";
 import { Spinner } from "../../../../common/loaders/Spinner/Spinner";
-import { FclValues } from "@onflowser/core";
+import { FclValueUtils } from "@onflowser/core";
 import { FlowAccount } from "@onflowser/api";
+import { useServiceRegistry } from "../../../../contexts/service-registry.context";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;
   const { useGetAccounts } = useFlowserHooksApi();
   const { data, mutate } = useGetAccounts();
+  const { walletService } = useServiceRegistry();
   const managedAccounts = addressBuilderOptions?.showManagedAccountsOnly
-    ? data.filter((account) =>
+    ? data?.filter((account) =>
         account.keys.some((key) => key.privateKey !== "")
       )
     : data;
@@ -26,15 +27,14 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   useEffect(() => {
     const serviceAddress = "0xf8d6e0586b0a20c7";
     const defaultAccount =
-      managedAccounts.find((account) => account.address === serviceAddress) ??
-      managedAccounts[0];
-    if (!FclValues.isFclAddressValue(value) && defaultAccount) {
+      managedAccounts?.find((account) => account.address === serviceAddress) ??
+      managedAccounts?.[0];
+    if (!FclValueUtils.isFclAddressValue(value) && defaultAccount) {
       setValue(defaultAccount.address);
     }
   });
 
   async function createNewAccount() {
-    const { walletService } = ServiceRegistry.getInstance();
     await walletService.createAccount();
     await mutate();
   }
@@ -42,7 +42,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   return (
     <div className={classes.root}>
       <div className={classes.innerWrapper}>
-        {managedAccounts.map((account) => (
+        {managedAccounts?.map((account) => (
           <AccountButton
             key={account.address}
             disabled={disabled}

@@ -4,6 +4,14 @@
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "outDir": "./dist",
-    "jsx": "react"
+    "module": "esnext",
+    "target": "es5",
+    "lib": [
+      "es6",
+      "dom",
+      "ES2021"
+    ],
+    "jsx": "react-jsx",
+    "baseUrl": "src",
   }
 }

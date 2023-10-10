@@ -1,5 +1,4 @@
 import React, { ReactElement } from "react";
-import { ExecutionStatusCode, TransactionStatus } from "@flowser/shared";
 import { FlowUtils } from "../../utils/flow-utils";
 import classes from "./Status.module.scss";
 import { ReactComponent as ExpiredIcon } from "../icons/assets/circle-cross.svg";
@@ -8,6 +7,7 @@ import { ReactComponent as UnknownIcon } from "../icons/assets/circle-question-m
 import { ReactComponent as PendingIcon } from "../icons/assets/pending-tx-icon.svg";
 import { ReactComponent as FinalizedIcon } from "../icons/assets/finalised-tx-icon.svg";
 import { ReactComponent as ExecutedIcon } from "../icons/assets/executed-tx-icon.svg";
+import { ExecutionStatusCode, TransactionStatus } from '@onflowser/api';
 
 export type ExecutionStatusProps = {
   status: TransactionStatus | undefined;

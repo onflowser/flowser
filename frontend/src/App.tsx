@@ -16,7 +16,6 @@ import { ProjectsManagerProvider } from "../../packages/ui/src/contexts/projects
 import { ConfirmDialogProvider } from "../../packages/ui/src/contexts/confirm-dialog.context";
 import { QueryClientProvider } from "react-query";
 import { FlowserUsageRequirements } from "../../packages/ui/src/common/misc/FlowserUsageRequirements/FlowserUsageRequirements";
-import { TimeoutPollingProvider } from "../../packages/ui/src/contexts/timeout-polling.context";
 import {
   PlatformAdapterProvider,
   PlatformAdapterState,
@@ -24,7 +23,7 @@ import {
 import { ConsentDialog } from "../../packages/ui/src/common/overlays/dialogs/consent/ConsentDialog";
 import { useAnalytics } from "../../packages/ui/src/hooks/use-analytics";
 import { ServiceRegistry } from "./services/service-registry";
-import { AnalyticEvent } from "./services/analytics.service";
+import { AnalyticEvent } from "../../packages/ui/src/contexts/analytics.service";
 import { InteractionsPage } from "../../packages/ui/src/interactions/InteractionsPage";
 import { InteractionRegistryProvider } from "../../packages/ui/src/interactions/contexts/interaction-registry.context";
 import { ProjectSettings } from "../../packages/ui/src/projects/ProjectSettings/ProjectSettings";
@@ -68,7 +67,6 @@ const BrowserRouterEvents = (props: { children: ReactNode }): ReactElement => {
 export type FlowserClientAppProps = {
   useHashRouter?: boolean;
   platformAdapter: PlatformAdapterState;
-  enableTimeoutPolling?: boolean;
 };
 
 export const queryClient = new QueryClient();
@@ -76,36 +74,31 @@ export const queryClient = new QueryClient();
 export const FlowserClientApp = ({
   useHashRouter,
   platformAdapter,
-  enableTimeoutPolling = true,
 }: FlowserClientAppProps): ReactElement => {
   return (
     <QueryClientProvider client={queryClient}>
-      <TimeoutPollingProvider enabled={enableTimeoutPolling}>
-        <ConfirmDialogProvider>
-          <PlatformAdapterProvider {...platformAdapter}>
-            <ConsentAnalytics />
-            <FlowserUsageRequirements />
-            <RouterProvider
-              router={useHashRouter ? hashRouter : browserRouter}
-            />
-            <Toaster
-              position="bottom-center"
-              gutter={8}
-              toastOptions={{
-                className: "",
-                style: {
-                  background: "#9BDEFA", // $blue
-                  color: "#363F53", // $table-line-background
-                  padding: "12px", // $spacing-base
-                  maxWidth: "400px",
-                  maxHeight: "200px",
-                  textOverflow: "ellipsis",
-                },
-              }}
-            />
-          </PlatformAdapterProvider>
-        </ConfirmDialogProvider>
-      </TimeoutPollingProvider>
+      <ConfirmDialogProvider>
+        <PlatformAdapterProvider {...platformAdapter}>
+          <ConsentAnalytics />
+          <FlowserUsageRequirements />
+          <RouterProvider router={useHashRouter ? hashRouter : browserRouter} />
+          <Toaster
+            position="bottom-center"
+            gutter={8}
+            toastOptions={{
+              className: "",
+              style: {
+                background: "#9BDEFA", // $blue
+                color: "#363F53", // $table-line-background
+                padding: "12px", // $spacing-base
+                maxWidth: "400px",
+                maxHeight: "200px",
+                textOverflow: "ellipsis",
+              },
+            }}
+          />
+        </PlatformAdapterProvider>
+      </ConfirmDialogProvider>
     </QueryClientProvider>
   );
 };

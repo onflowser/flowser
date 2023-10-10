@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { ServiceRegistry } from "../../../../frontend/src/services/service-registry";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { AnalyticEvent } from "../../../../frontend/src/services/analytics.service";
+import { AnalyticEvent } from "../contexts/analytics.service";
 import { Dict } from "mixpanel-browser";
 import { useFlowserHooksApi } from "../contexts/flowser-api.context";
 import { useCurrentProjectId } from "./use-current-project-id";
+import { useServiceRegistry } from "../contexts/service-registry.context";
 
 type Analytics = {
   setIsConsented: (isConsented: boolean) => void;
@@ -13,7 +13,7 @@ type Analytics = {
 };
 
 export function useAnalytics(): Analytics {
-  const { analyticsService } = ServiceRegistry.getInstance();
+  const { analyticsService } = useServiceRegistry();
   const [isConsented, setIsConsented] = useLocalStorage<boolean | undefined>(
     "consent-analytics",
     undefined
@@ -33,7 +33,7 @@ export function useAnalytics(): Analytics {
   function track(event: AnalyticEvent, properties?: Dict) {
     return analyticsService.track(event, {
       ...properties,
-      projectName: currentProject.name,
+      projectName: currentProject?.name,
     });
   }
 

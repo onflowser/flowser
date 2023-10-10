@@ -1,4 +1,3 @@
-import { ServiceRegistry } from "../../../../../frontend/src/services/service-registry";
 import React, {
   createContext,
   ReactElement,
@@ -8,18 +7,17 @@ import React, {
 } from "react";
 import { CommonUtils } from "../../utils/common-utils";
 import * as fcl from "@onflow/fcl";
-import {
-  InteractionKind,
-  FclValues,
-  FclArgBuilder,
-  FclTypeLookup,
-  FclArgumentWithMetadata,
-  TransactionArgument,
-} from "@flowser/shared";
 import { useInteractionDefinitionManager } from "./definition.context";
 import toast from "react-hot-toast";
 import { useQuery } from "react-query";
 import { InteractionDefinition, InteractionOutcome } from "../core/core-types";
+import { FlowTransactionArgument, InteractionKind } from '@onflowser/api';
+import {
+  FclArgBuilder,
+  FclArgumentWithMetadata,
+  FclTypeLookup, FclValueUtils
+} from '@onflowser/core';
+import { useServiceRegistry } from '../../contexts/service-registry.context';
 
 type InteractionOutcomeManager = {
   outcome: InteractionOutcome | undefined;
@@ -33,7 +31,7 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
-  const { walletService } = ServiceRegistry.getInstance();
+  const { walletService } = useServiceRegistry();
   const { data, refetch } = useQuery(
     `/interactions/execute/${JSON.stringify(definition)}`,
     async () => {
@@ -111,7 +109,7 @@ export function InteractionOutcomeManagerProvider(props: {
         proposerAddress: transactionOptions.proposerAddress,
         payerAddress: transactionOptions.payerAddress,
         arguments: parsedInteraction.parameters.map(
-          (parameter): TransactionArgument => {
+          (parameter): FlowTransactionArgument => {
             if (!parameter.type) {
               throw new Error("Expecting parameter type");
             }
@@ -162,7 +160,7 @@ export function InteractionOutcomeManagerProvider(props: {
               };
             }
           );
-          const argumentFunction = FclValues.getArgumentFunction(fclArguments);
+          const argumentFunction = FclValueUtils.getArgumentFunction(fclArguments);
           return argumentFunction(arg, t);
         },
       });

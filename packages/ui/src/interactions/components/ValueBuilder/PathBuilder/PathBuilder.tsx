@@ -1,16 +1,16 @@
 import React from "react";
-import { CadenceType, FclPathDomain, FclValues } from "@flowser/shared";
 import { ReactElement, useEffect } from "react";
 import { CadenceValueBuilder } from "../interface";
 import SelectInput, {
   SelectInputOption,
 } from "../../../../common/inputs/SelectInput/SelectInput";
 import { Input } from "../../../../common/inputs/Input/Input";
+import { FclPathDomain, FclValueUtils } from '@onflowser/core';
 
 export function PathBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;
 
-  const isInitialized = FclValues.isFclPathValue(value);
+  const isInitialized = FclValueUtils.isFclPathValue(value);
   const specifiedDomain = getPredefinedDomain(type);
 
   // TODO(polish): Don't trigger this hook on every rerender

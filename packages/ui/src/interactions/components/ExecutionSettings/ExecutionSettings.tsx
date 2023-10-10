@@ -1,20 +1,15 @@
 import React, { ReactElement, useEffect } from "react";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { ParamBuilder, ParamListBuilder } from "../ParamBuilder/ParamBuilder";
-import {
-  CadenceTypeKind,
-  FclValue,
-  FclValues,
-  InteractionKind,
-  Parameter,
-} from "@flowser/shared";
 import classes from "./ExecutionSettings.module.scss";
 import { LoaderButton } from "../../../common/buttons/LoaderButton/LoaderButton";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
 import { Callout } from "../../../common/misc/Callout/Callout";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
-import { TransactionOptions } from "packages/ui/src/interactions/core/core-types";
+import { CadenceType, CadenceTypeKind, InteractionKind } from "@onflowser/api";
+import { TransactionOptions } from "../../core/core-types";
+import { FclValue, FclValueUtils } from "@onflowser/core";
 
 export function ExecutionSettings(): ReactElement {
   return (
@@ -198,6 +193,14 @@ const initialTransactionOptions: TransactionOptions = {
   payerAddress: "",
 };
 
+const defaultCadenceType: CadenceType = {
+  rawType: "",
+  optional: false,
+  array: undefined,
+  dictionary: undefined,
+  kind: CadenceTypeKind.CADENCE_TYPE_UNKNOWN,
+};
+
 function SigningSettings() {
   const { definition, partialUpdate } = useInteractionDefinitionManager();
 
@@ -215,12 +218,13 @@ function SigningSettings() {
       <h2>Signing</h2>
       <SizedBox height={20} />
       <ParamBuilder
-        parameter={Parameter.fromPartial({
+        parameter={{
           identifier: "Proposer",
           type: {
+            ...defaultCadenceType,
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
           },
-        })}
+        }}
         value={definition.transactionOptions?.proposerAddress}
         setValue={(proposerAddress: FclValue) =>
           setTransactionOptions({
@@ -233,12 +237,13 @@ function SigningSettings() {
       />
       <SizedBox height={12} />
       <ParamBuilder
-        parameter={Parameter.fromPartial({
+        parameter={{
           identifier: "Payer",
           type: {
+            ...defaultCadenceType,
             kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
           },
-        })}
+        }}
         value={definition.transactionOptions?.payerAddress}
         setValue={(payerAddress: FclValue) =>
           setTransactionOptions({ payerAddress: payerAddress as string })
@@ -281,7 +286,7 @@ function AuthorizerSettings() {
   }, [expectedAuthorizerCount, authorizerAddresses]);
 
   function setProposerByIndex(address: FclValue, index: number) {
-    if (!FclValues.isFclAddressValue(address)) {
+    if (!FclValueUtils.isFclAddressValue(address)) {
       throw new Error("Expected address value");
     }
     const newAuthorizers = [...authorizerAddresses];
@@ -298,14 +303,15 @@ function AuthorizerSettings() {
           <SizedBox height={12} />
           <ParamBuilder
             key={index}
-            parameter={Parameter.fromPartial({
+            parameter={{
               identifier: `Authorizer ${
                 authorizerAddresses.length > 1 ? index + 1 : ""
               }`,
               type: {
+                ...defaultCadenceType,
                 kind: CadenceTypeKind.CADENCE_TYPE_ADDRESS,
               },
-            })}
+            }}
             value={proposer}
             setValue={(payerAddress) => setProposerByIndex(payerAddress, index)}
             addressBuilderOptions={{

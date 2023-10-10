@@ -2,8 +2,8 @@ import {
   FclArgBuilder,
   FclArgumentWithMetadata,
   FclTypeLookup,
-  FclValues,
-} from "./fcl-values";
+  FclValueUtils,
+} from "./fcl-value";
 import * as fcl from "@onflow/fcl";
 import axios from "axios";
 
@@ -161,7 +161,7 @@ export class FlowGatewayService {
     return await fcl.query({
       cadence: options.cadence,
       args: (arg: FclArgBuilder, t: FclTypeLookup) => {
-        const argumentFunction = FclValues.getArgumentFunction(
+        const argumentFunction = FclValueUtils.getArgumentFunction(
           options.arguments
         );
         return argumentFunction(arg, t);
@@ -180,7 +180,7 @@ export class FlowGatewayService {
     const transactionId = await fcl.mutate({
       cadence: options.cadence,
       args: (arg: FclArgBuilder, t: FclTypeLookup) => {
-        const argumentFunction = FclValues.getArgumentFunction(
+        const argumentFunction = FclValueUtils.getArgumentFunction(
           options.arguments
         );
         return argumentFunction(arg, t);

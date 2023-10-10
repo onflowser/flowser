@@ -23,8 +23,8 @@ import { FlowConfigService } from "@onflowser/core/src/flow/flow-config.service"
 import { FlowTransactionArgument } from "@flowser/packages/api";
 import {
   FclArgumentWithMetadata,
-  FclValues,
-} from "@onflowser/core/src/flow/fcl-values";
+  FclValueUtils,
+} from "packages/core/src/flow/fcl-value-utils";
 const fcl = require("@onflow/fcl");
 
 export interface SendTransactionRequest {
@@ -101,7 +101,7 @@ export class WalletService {
         const value =
           parsedValue === "" && type.optional ? undefined : parsedValue;
 
-        if (!FclValues.isFclValue(value)) {
+        if (!FclValueUtils.isFclValue(value)) {
           throw new Error("Value not a fcl value");
         }
 

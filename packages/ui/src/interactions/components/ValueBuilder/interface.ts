@@ -1,4 +1,5 @@
-import { CadenceType, FclValue } from "@flowser/shared";
+import { CadenceType } from "@onflowser/api";
+import { FclValue } from "@onflowser/core";
 
 export type CadenceValueBuilder = {
   disabled?: boolean;

@@ -1,15 +1,15 @@
 import React, { createContext, ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { ServiceRegistry } from "../../../../frontend/src/services/service-registry";
 import { useFlowserHooksApi } from "./flowser-api.context";
 import { useAnalytics } from "../hooks/use-analytics";
-import { AnalyticEvent } from "../../../../frontend/src/services/analytics.service";
+import { AnalyticEvent } from "./analytics.service";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useCurrentProjectId } from "../hooks/use-current-project-id";
 import { FlowserProject } from "@onflowser/api";
+import { useServiceRegistry } from "./service-registry.context";
 
 export type ProjectsManager = {
   currentProject: FlowserProject | undefined;
@@ -19,6 +19,8 @@ export type ProjectsManager = {
     options?: StartProjectOptions
   ) => Promise<void>;
   removeProject: (project: FlowserProject) => void;
+  updateProject: (project: FlowserProject) => Promise<FlowserProject>;
+  createProject: (project: FlowserProject) => Promise<FlowserProject>;
 };
 
 type StartProjectOptions = { replaceCurrentPage: boolean };
@@ -32,7 +34,7 @@ export function ProjectsManagerProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { projectsService } = ServiceRegistry.getInstance();
+  const { projectsService } = useServiceRegistry();
 
   const { track } = useAnalytics();
   const navigate = useNavigate();
@@ -47,7 +49,7 @@ export function ProjectsManagerProvider({
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
 
     try {
-      await toast.promise(projectsService.removeProject(project.id), {
+      await toast.promise(projectsService.remove(project.id), {
         loading: "Deleting project",
         error: `Failed to delete project "${project.name}"`,
         success: `Project "${project.name}" deleted!`,
@@ -117,10 +119,26 @@ export function ProjectsManagerProvider({
     }
   }
 
+  async function createProject(
+    project: FlowserProject
+  ): Promise<FlowserProject> {
+    // TODO(restructure): Implement
+    return project;
+  }
+
+  async function updateProject(
+    project: FlowserProject
+  ): Promise<FlowserProject> {
+    // TODO(restructure): Implement
+    return project;
+  }
+
   return (
     <ProjectsManagerContext.Provider
       value={{
-        currentProject: currentProject?.project,
+        currentProject,
+        createProject,
+        updateProject,
         switchProject,
         startProject,
         removeProject,
@@ -128,9 +146,7 @@ export function ProjectsManagerProvider({
     >
       <Helmet>
         <title>
-          {currentProject?.project
-            ? `Flowser - ${currentProject?.project?.name}`
-            : "Flowser"}
+          {currentProject ? `Flowser - ${currentProject?.name}` : "Flowser"}
         </title>
       </Helmet>
       {children}

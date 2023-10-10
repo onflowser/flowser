@@ -19,6 +19,9 @@
     "@types/react-helmet": "^6.1.7"
   },
   "dependencies": {
+    "yup": "^0.32.11",
+    "@szhsin/react-menu": "4.0.3",
+    "formik": "^2.2.9",
     "@codemirror/legacy-modes": "^6.1.0",
     "@onflowser/api": "*",
     "@tanstack/react-table": "^8.5.11",

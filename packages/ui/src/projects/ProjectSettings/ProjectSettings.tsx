@@ -7,15 +7,8 @@ import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreen
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
-import {
-  Emulator,
-  Gateway,
-  Project,
-  UpdateProjectResponse,
-} from "@flowser/shared";
 import { FlowUtils } from "../../utils/flow-utils";
 import * as yup from "yup";
-import { ServiceRegistry } from "../../../../../frontend/src/services/service-registry";
 import { useErrorHandler } from "../../hooks/use-error-handler";
 import { useProjectManager } from "../../contexts/projects.context";
 import { SettingsSection } from "../SettingsSection/SettingsSection";
@@ -27,9 +20,15 @@ import {
   ToggleField,
 } from "../FormFields/FormFields";
 import { usePlatformAdapter } from "../../contexts/platform-adapter.context";
-import { AnalyticEvent } from "../../../../../frontend/src/services/analytics.service";
+import { AnalyticEvent } from "../../contexts/analytics.service";
 import { useAnalytics } from "../../hooks/use-analytics";
-import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";
+import {
+  FlowEmulatorConfig,
+  FlowserProject,
+  HashAlgorithm,
+  SignatureAlgorithm,
+} from "@onflowser/api";
+import { useServiceRegistry } from "../../contexts/service-registry.context";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -44,25 +43,23 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
   props
 ) => {
   const { projectId } = props;
-  const projectService = ServiceRegistry.getInstance().projectsService;
+  const { projectsService } = useServiceRegistry();
   const [isLoading, setIsLoading] = useState(true);
 
   const api = useFlowserHooksApi();
   const { track } = useAnalytics();
   const { onPickProjectPath } = usePlatformAdapter();
-  const { startProject, removeProject } = useProjectManager();
+  const { startProject, removeProject, createProject, updateProject } =
+    useProjectManager();
   const { data: flowCliInfo } = api.useGetFlowCliInfo();
   const { handleError } = useErrorHandler(ProjectSettings.name);
   const isExistingProject = Boolean(projectId);
 
-  const formik = useFormik({
+  const formik = useFormik<FlowserProject>({
     validationSchema: projectSchema,
     validateOnChange: false,
-    initialValues: Project.fromPartial({
-      filesystemPath: "",
-      emulator: Emulator.fromPartial({}),
-      gateway: Gateway.fromPartial({}),
-    }),
+    // Initial value is set in a hook bellow.
+    initialValues: {} as FlowserProject,
     onSubmit: async () => {
       toast.promise(saveAndStartProject(), {
         loading: "Running project",
@@ -77,22 +74,18 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
       track(AnalyticEvent.PROJECT_CREATED);
     }
 
-    let response: UpdateProjectResponse;
+    let updatedProject: FlowserProject;
     try {
-      response = isExistingProject
-        ? await projectService.updateProject(formik.values)
-        : await projectService.createProject(formik.values);
+      updatedProject = isExistingProject
+        ? await updateProject(formik.values)
+        : await createProject(formik.values);
     } catch (e) {
       handleError(e);
       window.scrollTo(0, 0);
       throw e;
     }
 
-    const { project } = response;
-    if (!project) {
-      throw new Error("Expected project in response");
-    }
-    await startProject(project, {
+    await startProject(updatedProject, {
       replaceCurrentPage: true,
     });
   }
@@ -119,8 +112,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
   async function loadExistingProject(id: string) {
     try {
-      const existingProjectData = await projectService.getSingle(id);
-      const existingProject = existingProjectData.project;
+      const existingProject = await projectsService.getSingle(id);
       if (existingProject) {
         formik.setValues(existingProject, false);
       }
@@ -134,8 +126,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
   async function loadDefaultProject() {
     try {
-      const defaultProjectData = await projectService.getDefaultProjectInfo();
-      const defaultProject = defaultProjectData.project;
+      const defaultProject = await projectsService.getDefaultProjectInfo();
       if (defaultProject) {
         formik.setValues(defaultProject, false);
       }
@@ -400,20 +391,20 @@ function getSignatureAlgorithmRadioOptions(
 function EmulatorTextField({
   path,
   ...restProps
-}: FieldProps & { path: keyof Emulator }) {
+}: FieldProps & { path: keyof FlowEmulatorConfig }) {
   return <TextField path={`emulator.${path}`} {...restProps} />;
 }
 
 function EmulatorRadioField({
   path,
   ...restProps
-}: RadioFieldProps & { path: keyof Emulator }) {
+}: RadioFieldProps & { path: keyof FlowEmulatorConfig }) {
   return <RadioField path={`emulator.${path}`} {...restProps} />;
 }
 
 function EmulatorToggleField({
   path,
   ...restProps
-}: FieldProps & { path: keyof Emulator }) {
+}: FieldProps & { path: keyof FlowEmulatorConfig }) {
   return <ToggleField path={`emulator.${path}`} {...restProps} />;
 }

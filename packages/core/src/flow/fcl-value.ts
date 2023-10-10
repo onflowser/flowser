@@ -37,7 +37,7 @@ export type FclArgumentWithMetadata = {
   type: CadenceType;
 };
 
-export class FclValues {
+export class FclValueUtils {
   private static readonly decimalNumberPattern = /[0-9]+\.[0-9]+/;
 
   // Builds a list of fcl encoded parameters.
@@ -142,7 +142,7 @@ export class FclValues {
   static isFclOptionalValue(arg: unknown): arg is FclOptionalValue {
     return arg === undefined || this.isFclRequiredValue(arg);
   }
-  static isFclValue(arg: unknown): arg is FclValue {
+  static isFclValue(arg: unknown): arg is FclValueUtils {
     return this.isFclOptionalValue(arg) || this.isFclRequiredValue(arg);
   }
 }

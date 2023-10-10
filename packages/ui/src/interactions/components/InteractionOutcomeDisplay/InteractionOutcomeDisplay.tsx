@@ -2,20 +2,18 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { ScriptError } from "../../../common/status/ErrorMessage";
 import { JsonView } from "../../../common/code/JsonView/JsonView";
-import {
-  useFlowserHooksApi,
-} from '../../../contexts/flowser-api.context';
+import { useFlowserHooksApi } from "../../../contexts/flowser-api.context";
 import classes from "./InteractionOutcomeDisplay.module.scss";
 import { BaseTabItem } from "../../../common/tabs/BaseTabs/BaseTabs";
 import { Callout } from "../../../common/misc/Callout/Callout";
 import { useInteractionDefinitionManager } from "../../contexts/definition.context";
-import { InteractionKind } from "@flowser/shared";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
 import { LineSeparator } from "../../../common/misc/LineSeparator/LineSeparator";
 import { SpinnerWithLabel } from "../../../common/loaders/Spinner/SpinnerWithLabel";
 import { StyledTabs } from "../../../common/tabs/StyledTabs/StyledTabs";
 import { TransactionDetailsTabs } from "../../../transactions/TransactionDetailsTabs/TransactionDetailsTabs";
 import { ScriptOutcome, TransactionOutcome } from "../../core/core-types";
+import { InteractionKind } from "@onflowser/api";
 
 export function InteractionOutcomeDisplay(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -98,7 +96,7 @@ function EmptyState() {
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
-  const api = useFlowserHooksApi()
+  const api = useFlowserHooksApi();
   const { data: transaction } = api.useGetTransaction(outcome.transactionId!);
 
   if (!transaction) {

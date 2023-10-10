@@ -11,6 +11,7 @@ export enum CadenceTypeKind {
 }
 
 export enum InteractionKind {
+  INTERACTION_UNKNOWN = 1,
   INTERACTION_SCRIPT = 1,
   INTERACTION_TRANSACTION = 2,
 }
@@ -306,6 +307,11 @@ export interface FlowserProject extends TimestampedResource {
   id: string;
   name: string;
   emulator: FlowEmulatorConfig | undefined;
+  gateway: FlowGatewayConfig | undefined;
+}
+
+export interface FlowGatewayConfig {
+
 }
 
 export interface FlowEmulatorConfig {

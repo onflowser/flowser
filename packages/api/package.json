@@ -1,12 +1,9 @@
 {
   "name": "@onflowser/api",
   "version": "1.0.0",
-  "files": ["dist"],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsc"
-  },
+  "files": ["src"],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "keywords": [],
   "author": "",
   "license": "ISC",

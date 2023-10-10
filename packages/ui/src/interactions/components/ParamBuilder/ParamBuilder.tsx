@@ -1,13 +1,13 @@
 import React from "react";
-import { Parameter } from "@flowser/shared";
 import { ReactElement } from "react";
 import { ValueBuilder } from "../ValueBuilder/ValueBuilder";
 import { InteractionParameterBuilder } from "../../contexts/definition.context";
 import classes from "./ParamBuilder.module.scss";
 import { CadenceValueBuilder } from "../ValueBuilder/interface";
+import { CadenceParameter } from "@onflowser/api";
 
 export type ParameterListBuilderProps = InteractionParameterBuilder & {
-  parameters: Parameter[];
+  parameters: CadenceParameter[];
 };
 
 export function ParamListBuilder(
@@ -29,7 +29,7 @@ export function ParamListBuilder(
 }
 
 export type ParameterBuilderProps = Omit<CadenceValueBuilder, "type"> & {
-  parameter: Parameter;
+  parameter: CadenceParameter;
 };
 
 export function ParamBuilder(props: ParameterBuilderProps): ReactElement {
