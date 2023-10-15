@@ -6,7 +6,7 @@ import {
   ProjectEntity,
 } from "@flowser/backend";
 import { INestApplication } from "@nestjs/common";
-import { Logger } from "./services/logger.service";
+import { Logger } from "../../../../apps/electron/src/services/logger.service";
 import crypto from "crypto";
 
 export class FlowserBackend {

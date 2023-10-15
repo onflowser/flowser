@@ -1,12 +1,12 @@
 import React, { ReactElement } from "react";
 import classes from "./SideNavigation.module.scss";
 import { useMatches } from "react-router-dom";
-import { FlowserIcon } from "packages/ui/src/components/icons/FlowserIcon";
 import { SizedBox } from "../SizedBox/SizedBox";
 import classNames from "classnames";
 import { useProjectManager } from "../../../contexts/projects.context";
 import { buildProjectUrl, ProjectLink } from "../../links/ProjectLink";
-import { useCurrentProjectId } from "frontend/src/hooks/use-current-project-id";
+import { FlowserIcon } from "../../icons/FlowserIcon";
+import { useCurrentProjectId } from "../../../hooks/use-current-project-id";
 
 type SideNavigationProps = {
   className?: string;

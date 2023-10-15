@@ -4,25 +4,23 @@ import React, {
   ReactNode,
   useContext,
 } from "react";
-import { MonitoringServiceInt } from "../../../../frontend/src/services/monitoring.service";
 
-export type PlatformAdapterState = {
-  onPickProjectPath?: () => Promise<string | undefined>;
-  monitoringService?: MonitoringServiceInt;
+export type FilePicker = {
+  pickDirectory?: () => Promise<string | undefined>;
 };
 
-const PlatformAdapterContext = createContext<PlatformAdapterState>(
+const PlatformAdapterContext = createContext<FilePicker>(
   undefined as never
 );
 
-export type PlatformAdapterProviderProps = PlatformAdapterState & {
+export type FilePickerProviderProps = FilePicker & {
   children: ReactNode;
 };
 
-export function PlatformAdapterProvider({
+export function FilePickerProvider({
   children,
   ...values
-}: PlatformAdapterProviderProps): ReactElement {
+}: FilePickerProviderProps): ReactElement {
   return (
     <PlatformAdapterContext.Provider value={values}>
       {children}
@@ -30,7 +28,7 @@ export function PlatformAdapterProvider({
   );
 }
 
-export function usePlatformAdapter(): PlatformAdapterState {
+export function useFilePicker(): FilePicker {
   const context = useContext(PlatformAdapterContext);
   if (!context) {
     throw new Error("Platform adapter context not found");

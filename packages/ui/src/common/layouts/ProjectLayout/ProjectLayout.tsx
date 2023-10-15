@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { ReactNode } from "react";
 import classes from "./ProjectLayout.module.scss";
 import { Logs } from "../../../logs/Logs";
 import { useLocation } from "react-router-dom";
@@ -6,10 +6,14 @@ import classNames from "classnames";
 import { Breadcrumbs } from "../../misc/Breadcrumbs/Breadcrumbs";
 import { SideNavigation } from "../../misc/SideNavigation/SideNavigation";
 
+type ProjectLayoutProps = {
+  children: ReactNode;
+};
+
 export const scrollableElementId = "flowser-scroll";
 
 // TODO(restructure): Move this to app folder
-export const ProjectLayout: FunctionComponent = ({ children }) => {
+export function ProjectLayout(props: ProjectLayoutProps) {
   const location = useLocation();
   const showMargin = !location.pathname.endsWith("interactions");
 
@@ -24,10 +28,10 @@ export const ProjectLayout: FunctionComponent = ({ children }) => {
             [classes.bodyWithBorderSpacing]: showMargin,
           })}
         >
-          {children}
+          {props.children}
         </div>
         <Logs className={classes.logs} />
       </div>
     </div>
   );
-};
+}

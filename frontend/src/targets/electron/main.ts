@@ -1,9 +1,7 @@
 import * as path from "path";
 import { app, BrowserWindow, shell, dialog, ipcMain } from "electron";
 import fixPath from "fix-path";
-import { SentryMainService } from "./services/sentry-main.service";
-import { setupMenu } from "./menu";
-import { ServiceRegistry } from "./services/service-registry";
+import { SentryMainService } from "../../../../apps/electron/src/services/sentry-main.service";
 import { FlowserBackend } from "./backend";
 import { ProjectEntity } from "@flowser/backend";
 
@@ -56,7 +54,7 @@ async function createWindow() {
 }
 
 app.on("ready", () => {
-  setupMenu(win);
+  // setupMenu(win);
   createWindow();
   appUpdateService.checkForUpdatesAndNotify({
     silent: true,

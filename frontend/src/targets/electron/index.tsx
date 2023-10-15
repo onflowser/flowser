@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import "App.scss";
-import { FlowserClientApp } from "App";
+import "apps/electron/src/renderer/App.scss";
+import { FlowserClientApp } from "apps/electron/src/renderer/router";
 import reportWebVitals from "reportWebVitals";
 // Note that imports paths must be relative to project root
 // because this file is copied to src/index.tsx before build
-import { ExitLoader } from "targets/electron/components/loaders/ExitLoader";
-import { UpdateLoader } from "targets/electron/components/loaders/UpdateLoader";
-import { SentryRendererService } from "targets/electron/services/sentry-renderer.service";
+import { ExitLoader } from "../../../../apps/electron/src/renderer/components/loaders/ExitLoader";
+import { UpdateLoader } from "../../../../apps/electron/src/renderer/components/loaders/UpdateLoader";
+import { SentryRendererService } from "../../../../apps/electron/src/services/sentry-renderer.service";
 
 declare global {
   interface Window {
@@ -56,7 +56,6 @@ function Root() {
       <FlowserClientApp
         // https://github.com/remix-run/react-router/issues/8331
         useHashRouter
-        enableTimeoutPolling={!isExiting}
         platformAdapter={{
           monitoringService: sentryService,
           onPickProjectPath: window.platformAdapter.showDirectoryPicker,

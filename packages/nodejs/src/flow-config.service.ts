@@ -2,7 +2,7 @@ import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { isObject } from "@onflowser/core/dist/utils";
+import { IFlowserLogger, isObject } from '@onflowser/core';
 
 type FlowAddress = string;
 
@@ -88,6 +88,9 @@ export class FlowConfigService {
   private config: FlowCliConfig | undefined;
   private configFileName = "flow.json";
   private workingDirectoryPath: string | undefined;
+
+  constructor (private readonly logger: IFlowserLogger) {
+  }
 
   public async configure(config: FlowConfigServiceConfig) {
     this.workingDirectoryPath = config.workingDirectoryPath;
@@ -220,7 +223,7 @@ export class FlowConfigService {
       const data = await this.readProjectFile(this.configFileName);
       this.config = JSON.parse(data);
     } catch (e) {
-      console.error("Config read error", e);
+      this.logger.error("Config read error", e);
     }
   }
 

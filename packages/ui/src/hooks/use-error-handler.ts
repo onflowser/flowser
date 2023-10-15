@@ -1,13 +1,13 @@
 import { CommonUtils } from "../utils/common-utils";
 import toast from "react-hot-toast";
-import { usePlatformAdapter } from "../contexts/platform-adapter.context";
+import { useServiceRegistry } from '../contexts/service-registry.context';
 
 export type ErrorHandlerState = {
   handleError: (error: unknown) => void;
 };
 
 export function useErrorHandler(componentName: string): ErrorHandlerState {
-  const { monitoringService } = usePlatformAdapter();
+  const { monitoringService } = useServiceRegistry();
 
   function handleError(error: unknown) {
     console.error(`[${componentName}] handling error:`, error);

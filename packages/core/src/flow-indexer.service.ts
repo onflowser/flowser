@@ -1,4 +1,3 @@
-import { Injectable, Logger } from "@nestjs/common";
 import * as flowResource from "./flow-gateway.service";
 import * as flowserResource from "@onflowser/api";
 import {
@@ -11,6 +10,7 @@ import { IFlowInteractions } from "./flow-interactions.service";
 import { FlowAccountStorageService } from "./flow-storage.service";
 import { FlowApiStatus, FlowGatewayService } from "./flow-gateway.service";
 import { ensurePrefixedAddress } from "./utils";
+import { IFlowserLogger } from './logger';
 
 // See https://developers.flow.com/cadence/language/core-events
 enum FlowCoreEventType {
@@ -43,11 +43,9 @@ export type ExtendedFlowEvent = flowResource.FlowEvent & {
   transactionId: string;
 };
 
-@Injectable()
 export class FlowIndexerService {
-  private readonly logger = new Logger(FlowIndexerService.name);
-
   constructor(
+    private readonly logger: IFlowserLogger,
     private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
     private accountIndex: IResourceIndex<flowserResource.FlowAccount>,
     private blockIndex: IResourceIndex<flowserResource.FlowBlock>,
@@ -56,7 +54,7 @@ export class FlowIndexerService {
     private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private flowInteractionsService: IFlowInteractions
+    private flowInteractionsService: IFlowInteractions,
   ) {}
 
   async processBlockchainData(): Promise<void> {
@@ -168,8 +166,8 @@ export class FlowIndexerService {
       await this.flowGatewayService
         .getTxStatusSubscription(transactionId)
         .onceSealed();
-    } catch (e) {
-      this.logger.debug(`Failed to wait on sealed transaction:`, e);
+    } catch (e: unknown) {
+      this.logger.error("Failed to wait on sealed transaction", e);
     } finally {
       // Once transaction is sealed, status won't change anymore.
       unsubscribe();
@@ -179,8 +177,8 @@ export class FlowIndexerService {
   private async storeBlockData(data: BlockData) {
     const blockPromise = this.blockIndex
       .add(this.createBlockEntity({ block: data.block }))
-      .catch((e: any) =>
-        this.logger.error(`block save error: ${e.message}`, e.stack)
+      .catch((e: unknown) =>
+        this.logger.error("block save error", e)
       );
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>

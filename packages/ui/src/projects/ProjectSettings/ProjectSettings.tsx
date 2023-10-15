@@ -19,9 +19,8 @@ import {
   FieldProps,
   ToggleField,
 } from "../FormFields/FormFields";
-import { usePlatformAdapter } from "../../contexts/platform-adapter.context";
-import { AnalyticEvent } from "../../contexts/analytics.service";
-import { useAnalytics } from "../../hooks/use-analytics";
+import { useFilePicker } from "../../contexts/platform-adapter.context";
+import { AnalyticEvent, useAnalytics } from "../../hooks/use-analytics";
 import {
   FlowEmulatorConfig,
   FlowserProject,
@@ -48,7 +47,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
   const api = useFlowserHooksApi();
   const { track } = useAnalytics();
-  const { onPickProjectPath } = usePlatformAdapter();
+  const { pickDirectory } = useFilePicker();
   const { startProject, removeProject, createProject, updateProject } =
     useProjectManager();
   const { data: flowCliInfo } = api.useGetFlowCliInfo();
@@ -162,7 +161,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
                 description="Specify the path to your project (where flow.json is located)"
                 path="filesystemPath"
                 onClick={async () => {
-                  const path = await onPickProjectPath?.();
+                  const path = await pickDirectory?.();
                   if (path) {
                     formik.setFieldValue("filesystemPath", path);
                   }

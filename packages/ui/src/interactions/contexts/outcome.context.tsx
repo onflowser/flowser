@@ -9,15 +9,16 @@ import { CommonUtils } from "../../utils/common-utils";
 import * as fcl from "@onflow/fcl";
 import { useInteractionDefinitionManager } from "./definition.context";
 import toast from "react-hot-toast";
-import { useQuery } from "react-query";
 import { InteractionDefinition, InteractionOutcome } from "../core/core-types";
-import { FlowTransactionArgument, InteractionKind } from '@onflowser/api';
+import { FlowTransactionArgument, InteractionKind } from "@onflowser/api";
 import {
   FclArgBuilder,
   FclArgumentWithMetadata,
-  FclTypeLookup, FclValueUtils
-} from '@onflowser/core';
-import { useServiceRegistry } from '../../contexts/service-registry.context';
+  FclTypeLookup,
+  FclValueUtils,
+} from "@onflowser/core";
+import { useServiceRegistry } from "../../contexts/service-registry.context";
+import useSWR from "swr";
 
 type InteractionOutcomeManager = {
   outcome: InteractionOutcome | undefined;
@@ -32,7 +33,7 @@ export function InteractionOutcomeManagerProvider(props: {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
   const { walletService } = useServiceRegistry();
-  const { data, refetch } = useQuery(
+  const { data, mutate } = useSWR(
     `/interactions/execute/${JSON.stringify(definition)}`,
     async () => {
       if (!definition) {
@@ -52,11 +53,6 @@ export function InteractionOutcomeManagerProvider(props: {
             `Can't execute interaction: ${parsedInteraction.kind}`
           );
       }
-    },
-    {
-      // Prevent automatic fetching when cache key changes.
-      // https://tanstack.com/query/v4/docs/react/guides/disabling-queries
-      enabled: false,
     }
   );
 
@@ -66,7 +62,7 @@ export function InteractionOutcomeManagerProvider(props: {
   );
 
   async function execute() {
-    await refetch();
+    await mutate();
   }
 
   async function executeTransaction(
@@ -160,7 +156,8 @@ export function InteractionOutcomeManagerProvider(props: {
               };
             }
           );
-          const argumentFunction = FclValueUtils.getArgumentFunction(fclArguments);
+          const argumentFunction =
+            FclValueUtils.getArgumentFunction(fclArguments);
           return argumentFunction(arg, t);
         },
       });

@@ -1,9 +1,8 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
 import { InteractionDefinition } from "../core/core-types";
-import { FclValueUtils } from "@onflowser/core";
+import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import * as crypto from "crypto";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -23,7 +22,7 @@ export type InteractionDefinitionTemplate = InteractionDefinition & {
 type RawInteractionDefinitionTemplate = {
   name: string;
   code: string;
-  fclValuesByIdentifier: Record<string, FclValueUtils>;
+  fclValuesByIdentifier: Record<string, FclValue>;
   transactionOptions: TransactionOptions | undefined;
   createdDate: string;
   updatedDate: string;
@@ -45,11 +44,14 @@ export function TemplatesRegistryProvider(props: {
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
+
+  const randomId = () => String(Math.random() * 1000000);
+
   const templates = useMemo<InteractionDefinitionTemplate[]>(
     () => [
       ...customTemplates.map(
         (template): InteractionDefinitionTemplate => ({
-          id: crypto.randomUUID(),
+          id: randomId(),
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
@@ -64,14 +66,14 @@ export function TemplatesRegistryProvider(props: {
       ),
       ...(projectTemplatesData?.map(
         (template): InteractionDefinitionTemplate => ({
-          id: crypto.randomUUID(),
+          id: randomId(),
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
           initialOutcome: undefined,
           fclValuesByIdentifier: new Map(),
-          createdDate: new Date(template.createdDate),
-          updatedDate: new Date(template.updatedDate),
+          createdDate: new Date(template.createdAt),
+          updatedDate: new Date(template.updatedAt),
           filePath: template.source?.filePath,
         })
       ) ?? []),

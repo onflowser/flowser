@@ -1,5 +1,5 @@
 import { ManagedProcess } from "./processes/managed-process";
-import { isDefined, waitForMs } from "@onflowser/core/dist/utils";
+import { isDefined, waitForMs } from "@onflowser/core";
 import { EventEmitter } from "node:events";
 import {
   FlowEmulatorConfig,

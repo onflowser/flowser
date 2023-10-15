@@ -1,12 +1,7 @@
-import {
-  Injectable,
-  Logger,
-  PreconditionFailedException,
-} from "@nestjs/common";
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import { FlowCliService, KeyWithWeight } from "./flow-cli.service";
-import { ensurePrefixedAddress } from "../../core/src/utils";
+import { ensurePrefixedAddress, IFlowserLogger } from "@onflowser/core";
 import {
   FclArgumentWithMetadata,
   FclValueUtils,
@@ -48,11 +43,10 @@ const ec: EC = new EC("p256");
 // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
 const defaultKeyWeight = 1000;
 
-@Injectable()
 export class WalletService {
-  private readonly logger = new Logger(WalletService.name);
 
   constructor(
+    private readonly logger: IFlowserLogger,
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
     private readonly flowConfig: FlowConfigService,
@@ -79,7 +73,7 @@ export class WalletService {
     function getAuthFunction(address: string) {
       const authFunction = authorizationFunctionsByAddress.get(address);
       if (authFunction === undefined) {
-        throw new PreconditionFailedException(
+        throw new Error(
           `Authorization function not found for: ${address}`
         );
       }
@@ -138,9 +132,8 @@ export class WalletService {
     const isManagedAccount = credentialsWithPrivateKeys.length > 0;
 
     if (!isManagedAccount) {
-      throw new PreconditionFailedException(
-        `Authorizer account ${address} isn't managed by Flowser.`,
-        "Flowser doesn't store private keys of the provided account."
+      throw new Error(
+        `Authorizer account ${address} isn't managed by Flowser.`
       );
     }
 
@@ -214,9 +207,8 @@ export class WalletService {
           }
 
           await this.accountIndex.add(account);
-        } catch (e) {
-          // Ignore
-          this.logger.debug("Managed account import failed", e);
+        } catch (e: unknown) {
+          this.logger.error("Managed account import failed", e);
         }
       })
     );

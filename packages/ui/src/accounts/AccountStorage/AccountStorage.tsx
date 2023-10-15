@@ -1,7 +1,6 @@
-import { useAnalytics } from "../../hooks/use-analytics";
+import { AnalyticEvent, useAnalytics } from "../../hooks/use-analytics";
 import { useUrlQuery } from "../../hooks/use-url-query";
 import React, { ReactElement, useEffect, useState } from "react";
-import { AnalyticEvent } from "../../contexts/analytics.service";
 import { PublicPrivateStorageCard } from "../PublicPrivateStorageCard/PublicPrivateStorageCard";
 import { InternalStorageCard } from "../InternalStorageCard/InternalStorageCard";
 import classNames from "classnames";

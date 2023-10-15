@@ -1,9 +1,9 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { GoBindingsService } from "./go-bindings.service";
-import { isDefined } from "@onflowser/core/dist/utils";
+import { isDefined } from "@onflowser/core";
 import { InteractionKind, ParsedInteractionOrError } from "@onflowser/api";
-import { IFlowInteractions } from "@onflowser/core/dist/flow-interactions.service";
+import { IFlowInteractions } from "@onflowser/core";
 
 export interface InteractionTemplate {
   id: string;

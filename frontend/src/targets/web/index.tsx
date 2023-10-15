@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "App.scss";
-import { FlowserClientApp } from "App";
+import "apps/electron/src/renderer/App.scss";
+import { FlowserClientApp } from "apps/electron/src/renderer/router";
 import reportWebVitals from "reportWebVitals";
 
 async function renderApp() {

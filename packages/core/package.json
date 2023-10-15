@@ -13,7 +13,6 @@
   "dependencies": {
     "@onflowser/config": "*",
     "@onflowser/api": "*",
-    "@nestjs/common": "^8.0.0",
     "@onflow/fcl": "^1.6.0",
     "axios": "^0.21.4",
     "node-abort-controller": "^3.0.1"
