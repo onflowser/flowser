@@ -1,5 +1,9 @@
-import { createContext, useContext } from "react";
-import { FlowserProject } from "@onflowser/api";
+import { createContext, ReactNode, useContext } from "react";
+import {
+  FlowAccount,
+  FlowserProject,
+  IResourceIndexReader
+} from '@onflowser/api';
 
 interface IWalletService {
   // TODO(restructure): Provide request/response type
@@ -39,11 +43,25 @@ type ServiceRegistry = {
   projectsService: IProjectService;
   analyticsService: IAnalyticsService;
   monitoringService: IMonitoringService;
+  accountIndex: IResourceIndexReader<FlowAccount>;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(
   undefined as never
 );
+
+type ServiceRegistryProviderProps = {
+  children: ReactNode;
+  services: ServiceRegistry;
+};
+
+export function ServiceRegistryProvider(props: ServiceRegistryProviderProps) {
+  return (
+    <ServiceRegistryContext.Provider value={props.services}>
+      {props.children}
+    </ServiceRegistryContext.Provider>
+  );
+}
 
 export function useServiceRegistry() {
   const context = useContext(ServiceRegistryContext);

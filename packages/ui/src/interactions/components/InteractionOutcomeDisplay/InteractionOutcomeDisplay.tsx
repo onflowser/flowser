@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { ScriptError } from "../../../common/status/ErrorMessage";
 import { JsonView } from "../../../common/code/JsonView/JsonView";
-import { useFlowserHooksApi } from "../../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import classes from "./InteractionOutcomeDisplay.module.scss";
 import { BaseTabItem } from "../../../common/tabs/BaseTabs/BaseTabs";
 import { Callout } from "../../../common/misc/Callout/Callout";

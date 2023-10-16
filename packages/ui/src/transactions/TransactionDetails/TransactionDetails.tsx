@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./TransactionDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
 import { SizedBox } from "../../common/misc/SizedBox/SizedBox";
 import { TransactionDetailsTabs } from "../TransactionDetailsTabs/TransactionDetailsTabs";

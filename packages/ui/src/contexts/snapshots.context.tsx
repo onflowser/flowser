@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { useFlowserHooksApi } from "./flowser-api.context";
+import { useFlowserHooksApi } from "./api-hooks.context";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { FlowUtils } from "../utils/flow-utils";

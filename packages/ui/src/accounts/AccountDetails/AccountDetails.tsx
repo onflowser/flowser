@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./AccountDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import {
   DetailsCard,
   DetailsCardColumn,

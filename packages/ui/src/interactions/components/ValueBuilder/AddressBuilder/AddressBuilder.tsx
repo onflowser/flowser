@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import classes from "./AddressBuilder.module.scss";
 import { CadenceValueBuilder } from "../interface";
-import { useFlowserHooksApi } from "../../../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../../../contexts/api-hooks.context";
 import { AccountAvatar } from "../../../../accounts/AccountAvatar/AccountAvatar";
 import { AccountName } from "../../../../accounts/AccountName/AccountName";
 import { FlowserIcon } from "../../../../common/icons/FlowserIcon";

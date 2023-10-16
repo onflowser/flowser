@@ -1,7 +1,7 @@
 import React, { createContext, ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { useFlowserHooksApi } from "./flowser-api.context";
+import { useFlowserHooksApi } from "./api-hooks.context";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";

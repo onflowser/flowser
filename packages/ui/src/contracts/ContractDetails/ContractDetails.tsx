@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import classes from "./ContractDetails.module.scss";
 import {
   DetailsCard,

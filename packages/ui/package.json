@@ -15,7 +15,10 @@
   },
   "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "6.15.0",
+    "swr": "^2.2.4",
+    "react-hot-toast": "^2.4.1"
   },
   "dependencies": {
     "yup": "^0.32.11",
@@ -35,12 +38,9 @@
     "dateformat": "^5.0.3",
     "mixpanel-browser": "^2.47.0",
     "react-helmet": "^6.1.0",
-    "react-hot-toast": "^2.4.1",
     "react-icons": "^4.11.0",
     "react-json-view": "^1.21.3",
-    "react-router-dom": "6.15.0",
     "react-timeago": "^7.2.0",
-    "swr": "^2.2.4",
     "reactjs-popup": "2.0.5"
   }
 }

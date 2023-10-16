@@ -1,9 +1,7 @@
 import React, { FunctionComponent } from "react";
 import classes from "./BlockDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import {
-  useFlowserHooksApi,
-} from '../../contexts/flowser-api.context';
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { FlowUtils } from "../../utils/flow-utils";
 import {
   DetailsCard,
@@ -20,7 +18,7 @@ type BlockDetailsProps = {
 };
 
 export const BlockDetails: FunctionComponent<BlockDetailsProps> = (props) => {
-  const api = useFlowserHooksApi()
+  const api = useFlowserHooksApi();
   const { isLoading, data: block } = api.useGetBlock(props.blockId);
   const { data: transactions } = api.useGetTransactionsByBlock(props.blockId);
 

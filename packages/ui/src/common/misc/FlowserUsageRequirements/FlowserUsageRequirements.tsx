@@ -1,6 +1,6 @@
 import React from "react";
 import { ActionDialog } from "../../overlays/dialogs/action/ActionDialog";
-import { useFlowserHooksApi } from "../../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import { ReactElement } from "react";
 import classes from "./FlowserUsageRequirements.module.scss";
 import {

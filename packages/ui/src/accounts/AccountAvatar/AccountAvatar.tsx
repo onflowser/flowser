@@ -19,7 +19,7 @@ import avatar14 from "./avatars/14.jpg";
 import avatar15 from "./avatars/15.jpg";
 import avatar16 from "./avatars/16.jpg";
 import { Spinner } from "../../common/loaders/Spinner/Spinner";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useGetAddressIndex } from "../api";
 
 const avatarUrls = [
   avatar1,
@@ -51,8 +51,7 @@ export function AccountAvatar({
   address,
   className,
 }: AccountAvatarProps): ReactElement | null {
-  const api = useFlowserHooksApi();
-  const { data } = api.useGetAddressIndex({
+  const { data: addressIndex } = useGetAddressIndex({
     address,
     chainId: "flow-emulator",
   });
@@ -67,12 +66,12 @@ export function AccountAvatar({
       return service;
     }
 
-    if (!data) {
+    if (addressIndex === undefined) {
       return undefined;
     }
 
-    return avatarUrls[data.index % avatarUrls.length];
-  }, [data]);
+    return avatarUrls[addressIndex % avatarUrls.length];
+  }, [addressIndex]);
 
   if (avatarUrl === undefined) {
     return <Spinner size={size} />;

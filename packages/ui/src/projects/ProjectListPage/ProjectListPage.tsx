@@ -4,7 +4,7 @@ import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
 import trash from "../../common/icons/assets/trash.svg";
 import classes from "./ProjectListPage.module.scss";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import classNames from "classnames";
 import { useProjectManager } from "../../contexts/projects.context";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";

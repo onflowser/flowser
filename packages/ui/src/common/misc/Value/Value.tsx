@@ -1,4 +1,4 @@
-import React, { CSSProperties, FunctionComponent } from "react";
+import React, { CSSProperties, ReactNode } from "react";
 import classes from "./Value.module.scss";
 import classNames from "classnames";
 
@@ -8,14 +8,10 @@ type ValueProps = {
   className?: string;
   style?: CSSProperties;
   variant?: ValueVariant;
+  children: ReactNode;
 };
 
-const Value: FunctionComponent<ValueProps> = ({
-  children,
-  className,
-  style,
-  variant = "normal",
-}) => {
+function Value({ children, className, style, variant = "normal" }: ValueProps) {
   return (
     <span
       style={style}
@@ -28,7 +24,7 @@ const Value: FunctionComponent<ValueProps> = ({
       {children}
     </span>
   );
-};
+}
 
 function getClassForVariant(variant: ValueVariant) {
   switch (variant) {

@@ -6,7 +6,7 @@ import Button from "../../common/buttons/Button/Button";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { FlowUtils } from "../../utils/flow-utils";
 import * as yup from "yup";
 import { useErrorHandler } from "../../hooks/use-error-handler";

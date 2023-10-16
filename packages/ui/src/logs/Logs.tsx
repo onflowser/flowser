@@ -10,7 +10,7 @@ import classes from "./Logs.module.scss";
 import { CaretIcon } from "../common/icons/CaretIcon/CaretIcon";
 import { useFilterData } from "../hooks/use-filter-data";
 import { useMouseMove } from "../hooks/use-mouse-move";
-import { useFlowserHooksApi } from "../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../contexts/api-hooks.context";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../common/buttons/SimpleButton/SimpleButton";
@@ -18,7 +18,7 @@ import { Callout } from "../common/misc/Callout/Callout";
 import { SearchInput } from "../common/inputs/SearchInput/SearchInput";
 import { ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
 import AnsiHtmlConvert from "ansi-to-html";
-import { FlowserIcon } from '../common/icons/FlowserIcon';
+import { FlowserIcon } from "../common/icons/FlowserIcon";
 
 type LogsProps = {
   className?: string;

@@ -1,8 +1,6 @@
 import React, { ReactElement } from "react";
 import classes from "./InteractionHistory.module.scss";
-import {
-  useFlowserHooksApi,
-} from "../../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { Spinner } from "../../../common/loaders/Spinner/Spinner";
@@ -12,7 +10,7 @@ import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
 import { useSnapshotsManager } from "../../../contexts/snapshots.context";
-import { FlowBlock, FlowTransaction } from '@onflowser/api';
+import { FlowBlock, FlowTransaction } from "@onflowser/api";
 
 export function InteractionHistory(): ReactElement {
   const api = useFlowserHooksApi();
@@ -47,13 +45,14 @@ function BlockItem(props: BlockItemProps) {
   const api = useFlowserHooksApi();
   const { checkoutBlock } = useSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
-  const { data } = api.useGetTransactionsByAccount(block.id,
-  // TODO(restructure): Add this option
-  //   {
-  //   // Assume that every transaction is packaged into a separate block.
-  //   // So once a block exists, no transactions can be appended to it.
-  //   pollingInterval: 0,
-  // }
+  const { data } = api.useGetTransactionsByAccount(
+    block.id
+    // TODO(restructure): Add this option
+    //   {
+    //   // Assume that every transaction is packaged into a separate block.
+    //   // So once a block exists, no transactions can be appended to it.
+    //   pollingInterval: 0,
+    // }
   );
   const firstTransaction = data[0];
 

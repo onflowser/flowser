@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactNode } from "react";
 import classes from "./Label.module.scss";
 import classNames from "classnames";
 
@@ -6,6 +6,7 @@ type LabelProps = {
   className?: string;
   variant?: "small" | "normal" | "medium" | "large" | "xlarge";
   title?: string;
+  children: ReactNode;
 };
 
 const Label: FunctionComponent<LabelProps> = ({

@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { InteractionDefinition } from "../interactions/core/core-types";
 import { SWRResponse } from "swr";
 import {
@@ -14,8 +14,9 @@ import {
   FlowStateSnapshot,
   FlowTransaction,
   InteractionTemplate,
-  ManagedProcessOutput, ParsedInteractionOrError
-} from '@onflowser/api';
+  ManagedProcessOutput,
+  ParsedInteractionOrError,
+} from "@onflowser/api";
 
 type FlowserHooksApi = {
   useGetAccounts(): SWRResponse<FlowAccount[]>;
@@ -49,16 +50,25 @@ type FlowserHooksApi = {
     request: InteractionDefinition
   ): SWRResponse<ParsedInteractionOrError>;
   useGetFlowCliInfo(): SWRResponse<FlowCliInfo>;
-  useGetAddressIndex(options: {
-    address: string;
-    chainId: "flow-emulator";
-  }): SWRResponse<number>;
   useGetFlowJson(): SWRResponse<string>;
 };
 
 const FlowserHooksApiContext = createContext<FlowserHooksApi>(
   undefined as never
 );
+
+type FlowserHooksApiProviderProps = {
+  children: ReactNode;
+  hooks: FlowserHooksApi;
+};
+
+export function FlowserHooksApiProvider(props: FlowserHooksApiProviderProps) {
+  return (
+    <FlowserHooksApiContext.Provider value={props.hooks}>
+      {props.children}
+    </FlowserHooksApiContext.Provider>
+  );
+}
 
 export function useFlowserHooksApi() {
   const context = useContext(FlowserHooksApiContext);

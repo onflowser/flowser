@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import { InteractionIcon } from "../InteractionIcon/InteractionIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
-import { useFlowserHooksApi } from "../../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import { Spinner } from "../../../common/loaders/Spinner/Spinner";
 import classes from "./InteractionLabel.module.scss";
 import { InteractionDefinition } from "../../core/core-types";

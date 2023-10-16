@@ -8,7 +8,7 @@ import {
   StyledTabs,
   StyledTabsProps,
 } from "../../common/tabs/StyledTabs/StyledTabs";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
 import { FlowTransaction } from "@onflowser/api";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";

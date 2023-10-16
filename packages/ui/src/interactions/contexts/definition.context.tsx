@@ -5,7 +5,7 @@ import React, {
   useContext,
 } from "react";
 import { useInteractionRegistry } from "./interaction-registry.context";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import {
   FclValueLookupByIdentifier,
   InteractionDefinition,

@@ -1,5 +1,5 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
-import { useFlowserHooksApi } from "../../contexts/flowser-api.context";
+import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
