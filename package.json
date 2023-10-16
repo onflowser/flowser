@@ -38,9 +38,13 @@
     "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
-  "packageManager": "npm@8.5.5",
+  "packageManager": "yarn@1.22.19",
   "workspaces": [
     "packages/*",
     "apps/*"
-  ]
+  ],
+  "resolutions": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }

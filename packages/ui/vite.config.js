@@ -25,13 +25,10 @@ export default defineConfig({
     },
     rollupOptions: {
       // Ensure to add external dependencies to avoid bundling them in your library
-      external: ["react", "react-dom"],
+      external: ["react"],
       output: {
-        // Provide global variables to use in the UMD build
-        // for externalized deps
         globals: {
           react: "React",
-          "react-dom": "ReactDOM",
         },
       },
     },

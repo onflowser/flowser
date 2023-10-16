@@ -1,5 +1,5 @@
 {
-  "npmClient": "npm",
+  "npmClient": "yarn",
   "pipeline": {
     "build": {
       "cache": false,
