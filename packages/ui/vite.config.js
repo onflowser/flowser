@@ -25,7 +25,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // Ensure to add external dependencies to avoid bundling them in your library
-      external: ["react"],
+      external: ["react", "react-router-dom"],
       output: {
         globals: {
           react: "React",
