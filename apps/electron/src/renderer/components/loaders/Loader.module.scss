@@ -1,0 +1,40 @@
+@import "../../../../../../packages/ui/src/styles/colors";
+@import "../../../../../../packages/ui/src/styles/spacings";
+@import '../../../../../../packages/ui/src/styles/animations';
+@import "../../../../../../packages/ui/src/styles/typography";
+
+.background {
+  @include fadeInAnimation(0.4s);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $gray-110;
+  opacity: 0.5;
+}
+
+.root {
+  @include fadeInAnimation(0.4s);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+  z-index: 100;
+
+  .loader {
+    @include pulse(1s)
+  }
+
+  .title {
+    color: $color-light-gray;
+    font-size: $font-size-large;
+    margin-top: $spacing-base;
+  }
+}

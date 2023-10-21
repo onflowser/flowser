@@ -2,10 +2,25 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'ipc-example';
+export type Channels = 'index:get-all';
 
 const electronHandler = {
+  platformAdapter: {
+    showDirectoryPicker: () => ipcRenderer.invoke('showDirectoryPicker'),
+    handleExit: (callback: () => void) => ipcRenderer.on('exit', callback),
+    handleUpdateDownloadStart: (callback: () => void) =>
+      ipcRenderer.on('update-download-start', callback),
+    handleUpdateDownloadEnd: (callback: () => void) =>
+      ipcRenderer.on('update-download-end', callback),
+    handleUpdateDownloadProgress: (callback: (percentage: number) => void) =>
+      ipcRenderer.on('update-download-progress', (event, value) =>
+        callback(value as unknown as number)
+      ),
+  },
   ipcRenderer: {
+    invoke(channel: Channels, ...args: unknown[]) {
+      return ipcRenderer.invoke(channel, ...args);
+    },
     sendMessage(channel: Channels, ...args: unknown[]) {
       ipcRenderer.send(channel, ...args);
     },

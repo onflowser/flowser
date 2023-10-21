@@ -32,8 +32,8 @@ if (
 ) {
   console.log(
     chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"',
-    ),
+      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
+    )
   );
   execSync('npm run postinstall');
 }
@@ -94,23 +94,17 @@ const configuration: webpack.Configuration = {
         type: 'asset/resource',
       },
       // SVG
+      // https://react-svgr.com/docs/webpack/#use-svgr-and-asset-svg-in-the-same-project
       {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: '@svgr/webpack',
-            options: {
-              prettier: false,
-              svgo: false,
-              svgoConfig: {
-                plugins: [{ removeViewBox: false }],
-              },
-              titleProp: true,
-              ref: true,
-            },
-          },
-          'file-loader',
-        ],
+        test: /\.svg$/i,
+        type: 'asset',
+        resourceQuery: /url/, // *.svg?url
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        resourceQuery: { not: [/url/] }, // exclude react component if *.svg?url
+        use: ['@svgr/webpack'],
       },
     ],
   },
@@ -193,7 +187,7 @@ const configuration: webpack.Configuration = {
       let args = ['run', 'start:main'];
       if (process.env.MAIN_ARGS) {
         args = args.concat(
-          ['--', ...process.env.MAIN_ARGS.matchAll(/"[^"]+"|[^\s"]+/g)].flat(),
+          ['--', ...process.env.MAIN_ARGS.matchAll(/"[^"]+"|[^\s"]+/g)].flat()
         );
       }
       spawn('npm', args, {

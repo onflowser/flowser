@@ -9,11 +9,19 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  dialog,
+  IpcMainInvokeEvent,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { Flowser, FlowserIndexes } from './flowser';
 
 class AppUpdater {
   constructor() {
@@ -25,11 +33,38 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
+ipcMain.handle('showDirectoryPicker', showDirectoryPicker);
+ipcMain.handle('index:get-all', getAllFromIndex);
+
+Flowser.create().configure();
+Flowser.create().startProcessing();
+
+async function getAllFromIndex(event: IpcMainInvokeEvent, ...args: any[]) {
+  console.log('Received event', event, args);
+  const [indexName] = args;
+
+  const indexes = Flowser.create().getIndexes();
+
+  if (typeof indexName !== 'string') {
+    throw new Error('Invalid argument');
+  }
+
+  if (indexName in indexes) {
+    return await indexes[indexName as keyof FlowserIndexes].findAll();
+  } else {
+    throw new Error('Index not found: ' + indexName);
+  }
+}
+
+async function showDirectoryPicker() {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory', 'createDirectory'],
+  });
+  if (result.canceled) {
+    return undefined;
+  }
+  return result.filePaths[0];
+}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -51,7 +86,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload,
+      forceDownload
     )
     .catch(console.log);
 };
@@ -110,6 +145,8 @@ const createWindow = async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+
+  // TODO(restructure): Start and navigate to temporary project
 };
 
 /**

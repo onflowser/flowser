@@ -5,17 +5,21 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
 } from 'electron';
+import { AppUpdateService } from '../services/app-update.service';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
+// TODO(restructure): Add option to open a file/project from menu
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
+  private appUpdateService: AppUpdateService;
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+    this.appUpdateService = new AppUpdateService();
   }
 
   buildMenu(): Menu {
@@ -54,27 +58,13 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Electron',
+      label: 'Flowser',
       submenu: [
         {
-          label: 'About ElectronReact',
+          label: 'About Flowser',
           selector: 'orderFrontStandardAboutPanel:',
         },
-        { type: 'separator' },
-        { label: 'Services', submenu: [] },
-        { type: 'separator' },
-        {
-          label: 'Hide ElectronReact',
-          accelerator: 'Command+H',
-          selector: 'hide:',
-        },
-        {
-          label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
-          selector: 'hideOtherApplications:',
-        },
-        { label: 'Show All', selector: 'unhideAllApplications:' },
-        { type: 'separator' },
+        this.checkForUpdatesMenuItem(),
         {
           label: 'Quit',
           accelerator: 'Command+Q',
@@ -87,17 +77,9 @@ export default class MenuBuilder {
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
-        { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-        { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
-        { type: 'separator' },
         { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
         { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
         { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-        {
-          label: 'Select All',
-          accelerator: 'Command+A',
-          selector: 'selectAll:',
-        },
       ],
     };
     const subMenuViewDev: MenuItemConstructorOptions = {
@@ -151,65 +133,23 @@ export default class MenuBuilder {
         { label: 'Bring All to Front', selector: 'arrangeInFront:' },
       ],
     };
-    const subMenuHelp: MenuItemConstructorOptions = {
-      label: 'Help',
-      submenu: [
-        {
-          label: 'Learn More',
-          click() {
-            shell.openExternal('https://electronjs.org');
-          },
-        },
-        {
-          label: 'Documentation',
-          click() {
-            shell.openExternal(
-              'https://github.com/electron/electron/tree/main/docs#readme',
-            );
-          },
-        },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
-          },
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
-          },
-        },
-      ],
-    };
-
     const subMenuView =
       process.env.NODE_ENV === 'development' ||
       process.env.DEBUG_PROD === 'true'
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [
+      subMenuAbout,
+      subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      this.learnMoreMenuItem(),
+    ];
   }
 
   buildDefaultTemplate() {
     const templateDefault = [
-      {
-        label: '&File',
-        submenu: [
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
-            click: () => {
-              this.mainWindow.close();
-            },
-          },
-        ],
-      },
       {
         label: '&View',
         submenu:
@@ -228,7 +168,7 @@ export default class MenuBuilder {
                   accelerator: 'F11',
                   click: () => {
                     this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen(),
+                      !this.mainWindow.isFullScreen()
                     );
                   },
                 },
@@ -246,45 +186,57 @@ export default class MenuBuilder {
                   accelerator: 'F11',
                   click: () => {
                     this.mainWindow.setFullScreen(
-                      !this.mainWindow.isFullScreen(),
+                      !this.mainWindow.isFullScreen()
                     );
                   },
                 },
               ],
       },
+      this.learnMoreMenuItem(),
       {
-        label: 'Help',
-        submenu: [
-          {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('https://electronjs.org');
-            },
-          },
-          {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme',
-              );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
-            },
-          },
-        ],
+        label: 'Updates',
+        submenu: [this.checkForUpdatesMenuItem()],
       },
     ];
 
     return templateDefault;
+  }
+
+  learnMoreMenuItem(): MenuItemConstructorOptions {
+    return {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Github',
+          click: () =>
+            shell.openExternal('https://github.com/onflowser/flowser'),
+        },
+        {
+          label: 'Website',
+          click: () => shell.openExternal('https://flowser.dev'),
+        },
+        {
+          label: 'Discord',
+          click: () => shell.openExternal('https://discord.gg/JAnzkV2J'),
+        },
+      ],
+    };
+  }
+
+  checkForUpdatesMenuItem(): MenuItemConstructorOptions {
+    return {
+      label: 'Check for updates',
+      click: async (menuItem) => {
+        menuItem.enabled = false;
+        try {
+          await this.appUpdateService.checkForUpdatesAndNotify({
+            silent: false,
+            targetWindow: this.mainWindow,
+          });
+        } finally {
+          menuItem.enabled = true;
+        }
+      },
+    };
   }
 }

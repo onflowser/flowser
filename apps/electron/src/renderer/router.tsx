@@ -1,0 +1,319 @@
+import React, { ReactElement, ReactNode, useEffect } from 'react';
+import {
+  createHashRouter,
+  Navigate,
+  Outlet,
+  RouteObject,
+  RouterProvider,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
+import { ProjectLayout } from '@onflowser/ui/src/common/layouts/ProjectLayout/ProjectLayout';
+import { ProjectsManagerProvider } from '@onflowser/ui/src/contexts/projects.context';
+import { InteractionsPage } from '@onflowser/ui/src/interactions/InteractionsPage';
+import { InteractionRegistryProvider } from '@onflowser/ui/src/interactions/contexts/interaction-registry.context';
+import { ProjectSettings } from '@onflowser/ui/src/projects/ProjectSettings/ProjectSettings';
+import { TransactionsTable } from '@onflowser/ui/src/transactions/TransactionsTable/TransactionsTable';
+import { TransactionDetails } from '@onflowser/ui/src/transactions/TransactionDetails/TransactionDetails';
+import { BlockDetails } from '@onflowser/ui/src/blocks/BlockDetails/BlockDetails';
+import { BlocksTable } from '@onflowser/ui/src/blocks/BlocksTable/BlocksTable';
+import { AccountDetails } from '@onflowser/ui/src/accounts/AccountDetails/AccountDetails';
+import { AccountsTable } from '@onflowser/ui/src/accounts/AccountsTable/AccountsTable';
+import { ProjectListPage } from '@onflowser/ui/src/projects/ProjectListPage/ProjectListPage';
+import { ContractsTable } from '@onflowser/ui/src/contracts/ContractsTable/ContractsTable';
+import { ContractDetails } from '@onflowser/ui/src/contracts/ContractDetails/ContractDetails';
+import { EventsTable } from '@onflowser/ui/src/events/EventsTable/EventsTable';
+import { createCrumbHandle } from '@onflowser/ui/src/common/misc/Breadcrumbs/Breadcrumbs';
+import { TemplatesRegistryProvider } from '@onflowser/ui/src/interactions/contexts/templates.context';
+import { BasicLayout } from '@onflowser/ui/src/common/layouts/BasicLayout/BasicLayout';
+import { EventDetails } from '@onflowser/ui/src/events/EventDetails/EventDetails';
+import { FlowConfigProvider } from '@onflowser/ui/src/contexts/flow.context';
+import { SnapshotsManagerProvider } from '@onflowser/ui/src/contexts/snapshots.context';
+import FullScreenLoading from '@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading';
+import { useServiceRegistry } from '@onflowser/ui/src/contexts/service-registry.context';
+import { AnalyticEvent } from '@onflowser/ui/src/hooks/use-analytics';
+import './App.scss';
+import {
+  useGetAccounts,
+  useGetBlocks,
+  useGetContracts,
+  useGetEvents,
+  useGetTransactions,
+} from '@onflowser/ui/src/api';
+
+function BrowserRouterEvents(props: { children: ReactNode }): ReactElement {
+  const location = useLocation();
+  const { analyticsService } = useServiceRegistry();
+
+  useEffect(() => {
+    analyticsService.track(AnalyticEvent.PAGE_VIEW, {
+      location,
+    });
+  }, [location]);
+
+  useEffect(() => {
+    // scroll to the top on every route change
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  return <>{props.children}</>;
+}
+
+function ProjectSettingsPage() {
+  const { projectId } = useParams();
+
+  return <ProjectSettings projectId={projectId!} />;
+}
+
+function TransactionsTablePage() {
+  const { data } = useGetTransactions();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
+
+  return <TransactionsTable transactions={data} />;
+}
+
+function TransactionDetailsPage() {
+  const { transactionId } = useParams();
+
+  return <TransactionDetails transactionId={transactionId!} />;
+}
+
+function BlocksTablePage() {
+  const { data } = useGetBlocks();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
+
+  return <BlocksTable blocks={data} />;
+}
+
+function BlockDetailsPage() {
+  const { blockId } = useParams();
+
+  return <BlockDetails blockId={blockId!} />;
+}
+
+export function AccountsTablePage() {
+  const { data } = useGetAccounts();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
+
+  return <AccountsTable accounts={data} />;
+}
+
+function AccountDetailsPage() {
+  const { accountId } = useParams();
+
+  return <AccountDetails accountId={accountId!} />;
+}
+
+function ContractsTablePage() {
+  const { data } = useGetContracts();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
+
+  return <ContractsTable contracts={data} />;
+}
+
+function ContractDetailsPage() {
+  const { contractId } = useParams();
+
+  return <ContractDetails contractId={contractId!} />;
+}
+
+function EventsTablePage() {
+  const { data } = useGetEvents();
+
+  if (!data) {
+    return <FullScreenLoading />;
+  }
+
+  return <EventsTable events={data} />;
+}
+
+function EventDetailsPage() {
+  const { eventId } = useParams();
+
+  return <EventDetails eventId={eventId!} />;
+}
+
+const routes: RouteObject[] = [
+  {
+    index: true,
+    element: <Navigate to="projects" replace />,
+  },
+  {
+    path: 'projects',
+    element: (
+      <ProjectsManagerProvider>
+        <FlowConfigProvider>
+          <SnapshotsManagerProvider>
+            <BrowserRouterEvents>
+              <Outlet />
+            </BrowserRouterEvents>
+          </SnapshotsManagerProvider>
+        </FlowConfigProvider>
+      </ProjectsManagerProvider>
+    ),
+    handle: createCrumbHandle({
+      crumbName: 'Projects',
+    }),
+    children: [
+      {
+        index: true,
+        element: <ProjectListPage />,
+      },
+      {
+        path: 'create',
+        element: (
+          <BasicLayout>
+            <ProjectSettingsPage />
+          </BasicLayout>
+        ),
+        handle: createCrumbHandle({
+          crumbName: 'Create',
+        }),
+      },
+      {
+        path: ':projectId',
+        element: (
+          <ProjectLayout>
+            <InteractionRegistryProvider>
+              <TemplatesRegistryProvider>
+                <Outlet />
+              </TemplatesRegistryProvider>
+            </InteractionRegistryProvider>
+          </ProjectLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <Navigate to="interactions" replace />,
+          },
+          {
+            path: 'settings',
+            element: <ProjectSettingsPage />,
+          },
+          {
+            path: 'accounts',
+            handle: createCrumbHandle({
+              crumbName: 'Accounts',
+            }),
+            children: [
+              {
+                index: true,
+                element: <AccountsTablePage />,
+              },
+              {
+                path: ':accountId',
+                element: <AccountDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: 'Details',
+                }),
+              },
+            ],
+          },
+          {
+            path: 'blocks',
+            handle: createCrumbHandle({
+              crumbName: 'Blocks',
+            }),
+            children: [
+              {
+                index: true,
+                element: <BlocksTablePage />,
+              },
+              {
+                path: ':blockId',
+                element: <BlockDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: 'Details',
+                }),
+              },
+            ],
+          },
+          {
+            path: 'transactions',
+            handle: createCrumbHandle({
+              crumbName: 'Transactions',
+            }),
+            children: [
+              {
+                index: true,
+                element: <TransactionsTablePage />,
+              },
+              {
+                path: ':transactionId',
+                element: <TransactionDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: 'Details',
+                }),
+              },
+            ],
+          },
+          {
+            path: 'contracts',
+            handle: createCrumbHandle({
+              crumbName: 'Contracts',
+            }),
+            children: [
+              {
+                index: true,
+                element: <ContractsTablePage />,
+              },
+              {
+                path: ':contractId',
+                element: <ContractDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: 'Details',
+                }),
+              },
+            ],
+          },
+          {
+            path: 'events',
+            handle: createCrumbHandle({
+              crumbName: 'Events',
+            }),
+            children: [
+              {
+                index: true,
+                element: <EventsTablePage />,
+              },
+              {
+                path: ':eventId',
+                element: <EventDetailsPage />,
+                handle: createCrumbHandle({
+                  crumbName: 'Details',
+                }),
+              },
+            ],
+          },
+          {
+            path: 'interactions',
+            children: [
+              {
+                index: true,
+                element: <InteractionsPage />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+const hashRouter = createHashRouter(routes);
+
+export function FlowserRouter(): ReactElement {
+  return <RouterProvider router={hashRouter} />;
+}

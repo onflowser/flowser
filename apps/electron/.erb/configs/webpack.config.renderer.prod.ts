@@ -70,23 +70,17 @@ const configuration: webpack.Configuration = {
         type: 'asset/resource',
       },
       // SVG
+      // https://react-svgr.com/docs/webpack/#use-svgr-and-asset-svg-in-the-same-project
       {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: '@svgr/webpack',
-            options: {
-              prettier: false,
-              svgo: false,
-              svgoConfig: {
-                plugins: [{ removeViewBox: false }],
-              },
-              titleProp: true,
-              ref: true,
-            },
-          },
-          'file-loader',
-        ],
+        test: /\.svg$/i,
+        type: 'asset',
+        resourceQuery: /url/, // *.svg?url
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        resourceQuery: { not: [/url/] }, // exclude react component if *.svg?url
+        use: ['@svgr/webpack'],
       },
     ],
   },
