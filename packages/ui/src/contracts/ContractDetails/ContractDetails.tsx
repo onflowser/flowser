@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import classes from "./ContractDetails.module.scss";
 import {
   DetailsCard,
@@ -11,6 +10,7 @@ import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { IdeLink } from "../../common/links/IdeLink";
+import { useGetContract } from "../../api";
 
 type ContractDetailsProps = {
   contractId: string;
@@ -20,8 +20,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   props
 ) => {
   const { contractId } = props;
-  const api = useFlowserHooksApi();
-  const { isLoading, data: contract } = api.useGetContract(contractId);
+  const { isLoading, data: contract } = useGetContract(contractId);
 
   if (isLoading || !contract) {
     return <FullScreenLoading />;

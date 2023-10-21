@@ -1,10 +1,10 @@
 import React, { FunctionComponent } from "react";
 import classes from "./TransactionDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
 import { SizedBox } from "../../common/misc/SizedBox/SizedBox";
 import { TransactionDetailsTabs } from "../TransactionDetailsTabs/TransactionDetailsTabs";
+import { useGetTransaction } from "../../api";
 
 type TransactionDetailsProps = {
   transactionId: string;
@@ -14,8 +14,7 @@ export const TransactionDetails: FunctionComponent<TransactionDetailsProps> = (
   props
 ) => {
   const { transactionId } = props;
-  const api = useFlowserHooksApi();
-  const { data: transaction, isLoading } = api.useGetTransaction(transactionId);
+  const { data: transaction, isLoading } = useGetTransaction(transactionId);
 
   if (isLoading || !transaction) {
     return <FullScreenLoading />;

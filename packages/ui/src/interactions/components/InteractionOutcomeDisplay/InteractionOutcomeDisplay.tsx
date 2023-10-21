@@ -2,7 +2,6 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { useInteractionOutcomeManager } from "../../contexts/outcome.context";
 import { ScriptError } from "../../../common/status/ErrorMessage";
 import { JsonView } from "../../../common/code/JsonView/JsonView";
-import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import classes from "./InteractionOutcomeDisplay.module.scss";
 import { BaseTabItem } from "../../../common/tabs/BaseTabs/BaseTabs";
 import { Callout } from "../../../common/misc/Callout/Callout";
@@ -14,6 +13,7 @@ import { StyledTabs } from "../../../common/tabs/StyledTabs/StyledTabs";
 import { TransactionDetailsTabs } from "../../../transactions/TransactionDetailsTabs/TransactionDetailsTabs";
 import { ScriptOutcome, TransactionOutcome } from "../../core/core-types";
 import { InteractionKind } from "@onflowser/api";
+import { useGetTransaction } from "../../../api";
 
 export function InteractionOutcomeDisplay(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -96,8 +96,7 @@ function EmptyState() {
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
-  const api = useFlowserHooksApi();
-  const { data: transaction } = api.useGetTransaction(outcome.transactionId!);
+  const { data: transaction } = useGetTransaction(outcome.transactionId!);
 
   if (!transaction) {
     return <SpinnerWithLabel label="Executing" />;

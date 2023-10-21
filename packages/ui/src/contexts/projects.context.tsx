@@ -1,7 +1,6 @@
 import React, { createContext, ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { useFlowserHooksApi } from "./api-hooks.context";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -9,6 +8,7 @@ import { useErrorHandler } from "../hooks/use-error-handler";
 import { useCurrentProjectId } from "../hooks/use-current-project-id";
 import { FlowserProject } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
+import { useGetFlowserProject } from "../api";
 
 export type ProjectsManager = {
   currentProject: FlowserProject | undefined;
@@ -39,10 +39,9 @@ export function ProjectsManagerProvider({
   const navigate = useNavigate();
   const { handleError } = useErrorHandler(ProjectsManagerProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
-  const api = useFlowserHooksApi();
   const currentProjectId = useCurrentProjectId();
   const { data: currentProject, mutate: refetchCurrentProject } =
-    api.useGetFlowserProject(currentProjectId);
+    useGetFlowserProject(currentProjectId);
 
   const confirmProjectRemove = async (project: FlowserProject) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });

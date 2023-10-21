@@ -1,6 +1,5 @@
 import React, { ReactElement } from "react";
 import classes from "./InteractionHistory.module.scss";
-import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { Spinner } from "../../../common/loaders/Spinner/Spinner";
@@ -11,10 +10,10 @@ import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
 import { useSnapshotsManager } from "../../../contexts/snapshots.context";
 import { FlowBlock, FlowTransaction } from "@onflowser/api";
+import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 
 export function InteractionHistory(): ReactElement {
-  const api = useFlowserHooksApi();
-  const { data: blocks } = api.useGetBlocks();
+  const { data: blocks } = useGetBlocks();
 
   // There should always be at least one (initial) block.
   if (!blocks || blocks.length === 0) {
@@ -42,10 +41,9 @@ function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const menuIconSize = 15;
 
-  const api = useFlowserHooksApi();
   const { checkoutBlock } = useSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
-  const { data } = api.useGetTransactionsByAccount(
+  const { data } = useGetTransactionsByBlock(
     block.id
     // TODO(restructure): Add this option
     //   {
@@ -54,7 +52,7 @@ function BlockItem(props: BlockItemProps) {
     //   pollingInterval: 0,
     // }
   );
-  const firstTransaction = data[0];
+  const firstTransaction = data?.[0];
 
   const transactionName = useTransactionName({
     transaction: firstTransaction,

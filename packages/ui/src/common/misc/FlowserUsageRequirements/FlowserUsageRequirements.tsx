@@ -1,17 +1,16 @@
 import React from "react";
 import { ActionDialog } from "../../overlays/dialogs/action/ActionDialog";
-import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import { ReactElement } from "react";
 import classes from "./FlowserUsageRequirements.module.scss";
 import {
   FlowserUsageRequirement,
   FlowserUsageRequirementType,
 } from "@onflowser/api";
+import { useGetFlowserUsageRequirements } from "../../../api";
 
 export function FlowserUsageRequirements(): ReactElement | null {
-  const api = useFlowserHooksApi();
-  const { data: missingRequirements } = api.useGetFlowserUsageRequirements();
-  const showModal = missingRequirements.length > 0;
+  const { data: missingRequirements } = useGetFlowserUsageRequirements();
+  const showModal = missingRequirements && missingRequirements.length > 0;
 
   if (!showModal) {
     return null;

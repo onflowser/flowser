@@ -4,7 +4,6 @@ import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
 import trash from "../../common/icons/assets/trash.svg";
 import classes from "./ProjectListPage.module.scss";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import classNames from "classnames";
 import { useProjectManager } from "../../contexts/projects.context";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
@@ -12,6 +11,7 @@ import { ConsentDialog } from "../../common/overlays/dialogs/consent/ConsentDial
 import { useAnalytics } from "../../hooks/use-analytics";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { TextUtils } from "../../utils/text-utils";
+import { useGetFlowserProjects } from "../../api";
 
 type ProjectTab = {
   id: string;
@@ -85,8 +85,7 @@ export const ProjectListPage: FunctionComponent = () => {
 };
 
 function ProjectsListContent() {
-  const api = useFlowserHooksApi();
-  const { data: projects } = api.useGetFlowserProjects();
+  const { data: projects } = useGetFlowserProjects();
   const { startProject, removeProject } = useProjectManager();
   const showProjectList = projects && projects.length > 0;
 

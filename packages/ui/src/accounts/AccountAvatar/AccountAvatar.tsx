@@ -19,7 +19,7 @@ import avatar14 from "./avatars/14.jpg";
 import avatar15 from "./avatars/15.jpg";
 import avatar16 from "./avatars/16.jpg";
 import { Spinner } from "../../common/loaders/Spinner/Spinner";
-import { useGetAddressIndex } from "../api";
+import { useGetAddressIndex } from "../../api";
 
 const avatarUrls = [
   avatar1,

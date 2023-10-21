@@ -10,15 +10,15 @@ import classes from "./Logs.module.scss";
 import { CaretIcon } from "../common/icons/CaretIcon/CaretIcon";
 import { useFilterData } from "../hooks/use-filter-data";
 import { useMouseMove } from "../hooks/use-mouse-move";
-import { useFlowserHooksApi } from "../contexts/api-hooks.context";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
 import { SimpleButton } from "../common/buttons/SimpleButton/SimpleButton";
 import { Callout } from "../common/misc/Callout/Callout";
-import { SearchInput } from "../common/inputs/SearchInput/SearchInput";
+import { SearchInput } from "../common/inputs";
 import { ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
 import AnsiHtmlConvert from "ansi-to-html";
 import { FlowserIcon } from "../common/icons/FlowserIcon";
+import { useGetOutputsByProcess } from "../api";
 
 type LogsProps = {
   className?: string;
@@ -84,11 +84,11 @@ export function Logs(props: LogsProps): ReactElement {
     scrollToBottom();
   }, [logs]);
 
-  const onCaretChange = useCallback((isExpanded) => {
-    if (isExpanded === false) {
-      changeLogDrawerSize("small");
-    } else {
+  const onCaretChange = useCallback((isExpanded: boolean) => {
+    if (isExpanded) {
       changeLogDrawerSize("tiny");
+    } else {
+      changeLogDrawerSize("small");
     }
   }, []);
 
@@ -250,8 +250,7 @@ function useRelevantLogs(options: {
   searchTerm: string | undefined;
   tailSize: number;
 }) {
-  const api = useFlowserHooksApi();
-  const { data: emulatorLogs } = api.useGetOutputsByProcess(emulatorProcessId);
+  const { data: emulatorLogs } = useGetOutputsByProcess(emulatorProcessId);
   const { filteredData: logs } = useFilterData(
     emulatorLogs ?? [],
     options.searchTerm

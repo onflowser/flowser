@@ -8,10 +8,10 @@ import {
   StyledTabs,
   StyledTabsProps,
 } from "../../common/tabs/StyledTabs/StyledTabs";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { TransactionOverview } from "../TransactionOverview/TransactionOverview";
 import { FlowTransaction } from "@onflowser/api";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
+import { useGetEventsByTransaction } from "../../api";
 
 type TransactionDetailsTabsProps = Omit<StyledTabsProps, "tabs"> & {
   transaction: FlowTransaction;
@@ -24,8 +24,7 @@ export function TransactionDetailsTabs(
 ): ReactElement {
   const { transaction, includeOverviewTab, includeScriptTab, ...tabProps } =
     props;
-  const api = useFlowserHooksApi();
-  const { data: events } = api.useGetEventsByTransaction(transaction.id);
+  const { data: events } = useGetEventsByTransaction(transaction.id);
 
   const tabs: BaseTabItem[] = [];
 

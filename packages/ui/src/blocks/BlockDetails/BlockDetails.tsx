@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from "react";
 import classes from "./BlockDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { FlowUtils } from "../../utils/flow-utils";
 import {
   DetailsCard,
@@ -12,15 +11,15 @@ import { StyledTabs } from "../../common/tabs/StyledTabs/StyledTabs";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
+import { useGetBlock, useGetTransactionsByBlock } from "../../api";
 
 type BlockDetailsProps = {
   blockId: string;
 };
 
 export const BlockDetails: FunctionComponent<BlockDetailsProps> = (props) => {
-  const api = useFlowserHooksApi();
-  const { isLoading, data: block } = api.useGetBlock(props.blockId);
-  const { data: transactions } = api.useGetTransactionsByBlock(props.blockId);
+  const { isLoading, data: block } = useGetBlock(props.blockId);
+  const { data: transactions } = useGetTransactionsByBlock(props.blockId);
 
   if (isLoading || !block) {
     return <FullScreenLoading />;

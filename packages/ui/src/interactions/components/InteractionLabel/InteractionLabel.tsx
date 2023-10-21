@@ -1,10 +1,10 @@
 import React, { ReactElement } from "react";
 import { InteractionIcon } from "../InteractionIcon/InteractionIcon";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
-import { useFlowserHooksApi } from "../../../contexts/api-hooks.context";
 import { Spinner } from "../../../common/loaders/Spinner/Spinner";
 import classes from "./InteractionLabel.module.scss";
 import { InteractionDefinition } from "../../core/core-types";
+import { useGetParsedInteraction } from "../../../api";
 
 type InteractionLabelProps = {
   interaction: InteractionDefinition;
@@ -12,8 +12,7 @@ type InteractionLabelProps = {
 
 export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   const { interaction } = props;
-  const api = useFlowserHooksApi();
-  const { data } = api.useGetParsedInteraction(interaction);
+  const { data } = useGetParsedInteraction(interaction);
 
   return (
     <div className={classes.root}>

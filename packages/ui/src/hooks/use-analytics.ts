@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useFlowserHooksApi } from "../contexts/api-hooks.context";
 import { useCurrentProjectId } from "./use-current-project-id";
 import { useServiceRegistry } from "../contexts/service-registry.context";
+import { useGetFlowserProject } from "../api";
 
 export enum AnalyticEvent {
   PAGE_VIEW = "page_view",
@@ -35,9 +35,8 @@ export function useAnalytics(): Analytics {
     "consent-analytics",
     undefined
   );
-  const api = useFlowserHooksApi();
   const currentProjectId = useCurrentProjectId();
-  const { data: currentProject } = api.useGetFlowserProject(currentProjectId);
+  const { data: currentProject } = useGetFlowserProject(currentProjectId);
 
   useEffect(() => {
     if (isConsented) {

@@ -1,8 +1,8 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { useGetInteractionTemplates } from "../../api";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -39,8 +39,7 @@ const Context = createContext<InteractionTemplatesRegistry>(undefined as never);
 export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const api = useFlowserHooksApi();
-  const { data: projectTemplatesData } = api.useGetInteractionTemplates();
+  const { data: projectTemplatesData } = useGetInteractionTemplates();
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);

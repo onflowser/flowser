@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
-import { useFlowserHooksApi } from "./api-hooks.context";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { FlowUtils } from "../utils/flow-utils";
@@ -16,6 +15,7 @@ import { SnapshotDialog } from "../common/overlays/dialogs/snapshot/SnapshotDial
 import { useProjectManager } from "./projects.context";
 import { FlowBlock, FlowStateSnapshot } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
+import { useGetBlocks, useGetStateSnapshots } from "../api";
 
 export type SnapshotsManager = {
   createSnapshot: () => void;
@@ -37,9 +37,8 @@ export function SnapshotsManagerProvider({
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
   const { showDialog } = useConfirmDialog();
   const { currentProject } = useProjectManager();
-  const api = useFlowserHooksApi();
-  const { data: blocks, mutate } = api.useGetBlocks();
-  const { data: stateSnapshots } = api.useGetStateSnapshots();
+  const { data: blocks, mutate } = useGetBlocks();
+  const { data: stateSnapshots } = useGetStateSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
       new Map(stateSnapshots?.map((snapshot) => [snapshot.blockId, snapshot])),

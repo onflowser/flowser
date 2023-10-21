@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from "react";
 import classes from "./AccountDetails.module.scss";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import {
   DetailsCard,
   DetailsCardColumn,
@@ -17,6 +16,13 @@ import { AccountKeysTable } from "../AccountKeysTable/AccountKeysTable";
 import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { BaseTabItem } from "../../common/tabs/BaseTabs/BaseTabs";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
+import {
+  useGetAccount,
+  useGetContractsByAccount,
+  useGetKeysByAccount,
+  useGetStoragesByAccount,
+  useGetTransactionsByAccount,
+} from "../../api";
 
 type AccountDetailsProps = {
   accountId: string;
@@ -26,12 +32,11 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
   props
 ) => {
   const { accountId } = props;
-  const api = useFlowserHooksApi();
-  const { data: account, isLoading } = api.useGetAccount(accountId);
-  const { data: transactions } = api.useGetTransactionsByAccount(accountId);
-  const { data: contracts } = api.useGetContractsByAccount(accountId);
-  const { data: keys } = api.useGetKeysByAccount(accountId);
-  const { data: storageItems } = api.useGetStoragesByAccount(accountId);
+  const { data: account, isLoading } = useGetAccount(accountId);
+  const { data: transactions } = useGetTransactionsByAccount(accountId);
+  const { data: contracts } = useGetContractsByAccount(accountId);
+  const { data: keys } = useGetKeysByAccount(accountId);
+  const { data: storageItems } = useGetStoragesByAccount(accountId);
 
   if (isLoading || !account) {
     return <FullScreenLoading />;

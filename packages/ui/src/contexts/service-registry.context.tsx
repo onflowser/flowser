@@ -1,8 +1,14 @@
 import { createContext, ReactNode, useContext } from "react";
 import {
   FlowAccount,
+  FlowAccountStorage,
+  FlowBlock,
+  FlowContract,
+  FlowEvent,
   FlowserProject,
-  IResourceIndexReader
+  FlowStateSnapshot,
+  FlowTransaction,
+  IResourceIndexReader, ManagedProcessOutput
 } from '@onflowser/api';
 
 interface IWalletService {
@@ -11,7 +17,7 @@ interface IWalletService {
   createAccount(): Promise<void>;
 }
 
-interface ISnapshotService {
+interface ISnapshotService extends IResourceIndexReader<FlowStateSnapshot> {
   // TODO(restructure): Provide request/response type
   create(request: any): Promise<void>;
   checkoutBlock(request: any): Promise<void>;
@@ -44,6 +50,12 @@ type ServiceRegistry = {
   analyticsService: IAnalyticsService;
   monitoringService: IMonitoringService;
   accountIndex: IResourceIndexReader<FlowAccount>;
+  accountStorageIndex: IResourceIndexReader<FlowAccountStorage>;
+  contractIndex: IResourceIndexReader<FlowContract>;
+  transactionsIndex: IResourceIndexReader<FlowTransaction>;
+  blocksIndex: IResourceIndexReader<FlowBlock>;
+  eventsIndex: IResourceIndexReader<FlowEvent>;
+  processOutputIndex: IResourceIndexReader<ManagedProcessOutput>;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(

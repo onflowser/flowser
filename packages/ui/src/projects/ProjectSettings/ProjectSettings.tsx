@@ -6,7 +6,6 @@ import Button from "../../common/buttons/Button/Button";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
 import { toast } from "react-hot-toast";
 import classNames from "classnames";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import { FlowUtils } from "../../utils/flow-utils";
 import * as yup from "yup";
 import { useErrorHandler } from "../../hooks/use-error-handler";
@@ -28,6 +27,7 @@ import {
   SignatureAlgorithm,
 } from "@onflowser/api";
 import { useServiceRegistry } from "../../contexts/service-registry.context";
+import { useGetFlowCliInfo } from "../../api";
 
 const projectSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -45,12 +45,11 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
   const { projectsService } = useServiceRegistry();
   const [isLoading, setIsLoading] = useState(true);
 
-  const api = useFlowserHooksApi();
   const { track } = useAnalytics();
   const { pickDirectory } = useFilePicker();
   const { startProject, removeProject, createProject, updateProject } =
     useProjectManager();
-  const { data: flowCliInfo } = api.useGetFlowCliInfo();
+  const { data: flowCliInfo } = useGetFlowCliInfo();
   const { handleError } = useErrorHandler(ProjectSettings.name);
   const isExistingProject = Boolean(projectId);
 

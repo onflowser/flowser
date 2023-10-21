@@ -1,7 +1,7 @@
 import React, { createContext, ReactElement, useEffect } from "react";
-import { useFlowserHooksApi } from "./api-hooks.context";
 import * as fcl from "@onflow/fcl";
 import { useProjectManager } from "./projects.context";
+import { useGetFlowJson } from "../api";
 
 const FlowConfigContext = createContext({});
 
@@ -13,9 +13,8 @@ export function FlowConfigProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const api = useFlowserHooksApi();
   const { currentProject } = useProjectManager();
-  const { data: flowJSON } = api.useGetFlowJson();
+  const { data: flowJSON } = useGetFlowJson();
 
   useEffect(() => {
     if (currentProject && flowJSON) {

@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
-import { useFlowserHooksApi } from "../../contexts/api-hooks.context";
 import classes from "./EventDetails.module.scss";
 import {
   DetailsCard,
@@ -15,6 +14,7 @@ import Value from "../../common/misc/Value/Value";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
 import { BaseCard } from "../../common/cards/BaseCard/BaseCard";
+import { useGetEvent } from "../../api";
 
 type EventDetailsProps = {
   eventId: string;
@@ -22,8 +22,7 @@ type EventDetailsProps = {
 
 export const EventDetails: FunctionComponent<EventDetailsProps> = (props) => {
   const { eventId } = props;
-  const api = useFlowserHooksApi();
-  const { data: event } = api.useGetEvent(eventId);
+  const { data: event } = useGetEvent(eventId);
 
   if (!event) {
     return <FullScreenLoading />;
