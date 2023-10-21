@@ -2,7 +2,6 @@ import React, { FunctionComponent, ReactElement, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
-import trash from "../../common/icons/assets/trash.svg";
 import classes from "./ProjectListPage.module.scss";
 import classNames from "classnames";
 import { useProjectManager } from "../../contexts/projects.context";
@@ -115,7 +114,7 @@ function ProjectsListContent() {
               className={classes.projectTrashcan}
               onClick={() => removeProject(project)}
             >
-              <img src={trash} alt="trash icon" />
+              <FlowserIcon.Trash />
             </SimpleButton>
           </li>
         ))}
