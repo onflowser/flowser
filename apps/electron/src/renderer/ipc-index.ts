@@ -3,7 +3,7 @@ import { InMemoryIndex } from '@onflowser/core';
 import { FlowserIndexes } from '../services/flowser-app.service';
 
 export class IpcIndex<
-  Resource extends IdentifiableResource
+  Resource extends IdentifiableResource,
 > extends InMemoryIndex<Resource> {
   constructor(private readonly indexName: keyof FlowserIndexes) {
     super();
@@ -17,13 +17,10 @@ export class IpcIndex<
   }
 
   async sync() {
-    const resources = await window.electron.ipcRenderer.invoke(
-      'index:get-all',
-      this.indexName
-    );
+    const resources = await window.electron.indexes.getAll(this.indexName);
 
     await Promise.allSettled(
-      resources.map((resource: Resource) => this.add(resource))
+      resources.map((resource: Resource) => this.add(resource)),
     );
   }
 }

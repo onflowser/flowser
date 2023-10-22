@@ -1,10 +1,13 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
 import { FlowserIpcEvent } from './events';
-import { FlowserAppService } from '../../services/flowser-app.service';
+import {
+  FlowserAppService,
+  FlowserIndexes,
+} from '../../services/flowser-app.service';
 
 export function registerHandlers(flowserAppService: FlowserAppService) {
-  const { workspaceService } = flowserAppService;
+  const { workspaceService, indexes } = flowserAppService;
 
   ipcMain.handle(FlowserIpcEvent.WORKSPACES_LIST, () =>
     workspaceService.list(),
@@ -38,5 +41,11 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
   ipcMain.handle(
     FlowserIpcEvent.WORKSPACES_DEFAULT_SETTINGS,
     (e: IpcMainInvokeEvent) => workspaceService.getDefaultSettings(),
+  );
+
+  ipcMain.handle(
+    FlowserIpcEvent.INDEX_GET_ALL,
+    (event: IpcMainInvokeEvent, indexName: keyof FlowserIndexes) =>
+      indexes[indexName].findAll(),
   );
 }

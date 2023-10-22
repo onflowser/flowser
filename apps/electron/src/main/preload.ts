@@ -1,63 +1,6 @@
-// Disable no-unused-vars, broken for spread args
-/* eslint no-unused-vars: off */
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { FlowserWorkspace } from '@onflowser/api';
-import { FlowserIpcEvent } from './ipc/events';
+import { contextBridge } from 'electron';
+import { electronInvokers } from './ipc/invokers';
 
-export type Channels = 'index:get-all';
+contextBridge.exposeInMainWorld('electron', electronInvokers);
 
-const electronHandler = {
-  platformAdapter: {
-    showDirectoryPicker: () => ipcRenderer.invoke('showDirectoryPicker'),
-    handleExit: (callback: () => void) => ipcRenderer.on('exit', callback),
-    handleUpdateDownloadStart: (callback: () => void) =>
-      ipcRenderer.on('update-download-start', callback),
-    handleUpdateDownloadEnd: (callback: () => void) =>
-      ipcRenderer.on('update-download-end', callback),
-    handleUpdateDownloadProgress: (callback: (percentage: number) => void) =>
-      ipcRenderer.on('update-download-progress', (event, value) =>
-        callback(value as unknown as number),
-      ),
-  },
-  ipcRenderer: {
-    invoke(channel: Channels, ...args: unknown[]) {
-      return ipcRenderer.invoke(channel, ...args);
-    },
-    sendMessage(channel: Channels, ...args: unknown[]) {
-      ipcRenderer.send(channel, ...args);
-    },
-    on(channel: Channels, func: (...args: unknown[]) => void) {
-      const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
-        func(...args);
-      ipcRenderer.on(channel, subscription);
-
-      return () => {
-        ipcRenderer.removeListener(channel, subscription);
-      };
-    },
-    once(channel: Channels, func: (...args: unknown[]) => void) {
-      ipcRenderer.once(channel, (_event, ...args) => func(...args));
-    },
-  },
-  workspaces: {
-    open: (id: string) =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_OPEN, id),
-    close: (id: string) =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_CLOSE, id),
-    list: () => ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_LIST),
-    create: (createdWorkspace: FlowserWorkspace) =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_CREATE, createdWorkspace),
-    update: (updatedWorkspace: FlowserWorkspace) =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_UPDATE, updatedWorkspace),
-    findById: (id: string) =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_FIND_BY_ID, id),
-    remove: (id: string) =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_REMOVE, id),
-    getDefaultSettings: () =>
-      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_DEFAULT_SETTINGS),
-  },
-};
-
-contextBridge.exposeInMainWorld('electron', electronHandler);
-
-export type ElectronHandler = typeof electronHandler;
+export type ElectronInvokers = typeof electronInvokers;
