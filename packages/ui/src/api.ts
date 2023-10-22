@@ -13,6 +13,7 @@ import {
 } from '@onflowser/api';
 import { useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from './interactions/core/core-types';
+import { useEffect } from "react";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -234,10 +235,12 @@ export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
   return useSWR("workspaces", () =>workspaceService.list());
 }
 
-export function useGetFlowserProject(
+export function useGetWorkspace(
   id: string
 ): SWRResponse<FlowserWorkspace | undefined> {
-  return useSWR(`projects/${id}`, () => undefined);
+  const { workspaceService } = useServiceRegistry();
+
+  return useSWR(`projects/${id}`, () => workspaceService.findById(id));
 }
 
 export function useGetFlowJson(): SWRResponse<string> {
@@ -245,23 +248,35 @@ export function useGetFlowJson(): SWRResponse<string> {
 }
 
 export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
-  return useSWR(`flow-cli`, () => ({}));
+  const { flowService } = useServiceRegistry();
+
+  return useSWR(`flow-cli`, () => flowService.getFlowCliInfo());
 }
 
 export function useGetParsedInteraction(
   request: InteractionDefinition
 ): SWRResponse<ParsedInteractionOrError> {
+  const { interactionsService } = useServiceRegistry();
+
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
-  return useSWR(`parsed-interaction`, () => ({}));
+  const state = useSWR(`parsed-interaction/${request.id}`, () => (interactionsService.parse(request.code)));
 
+  useEffect(() => {
+    state.mutate();
+  }, [request.code]);
+
+  return state;
 }
 
 export function useGetInteractionTemplates(): SWRResponse<InteractionTemplate[]> {
-  return useSWR(`interaction-templates`, () => ([]));
+  const { interactionsService } = useServiceRegistry();
+
+  return useSWR(`interaction-templates`, () => (interactionsService.getTemplates()));
 }
 
 export function useGetFlowserUsageRequirements(): SWRResponse<FlowserUsageRequirement[]> {
+  // TODO(restructure): Implement and move to electron dir only
   return useSWR(`usage-requirements`, () => ([]));
 }

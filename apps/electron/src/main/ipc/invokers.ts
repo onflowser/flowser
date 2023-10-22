@@ -16,6 +16,12 @@ export const electronInvokers = {
         callback(value as unknown as number),
       ),
   },
+  interactions: {
+    parse: (sourceCode: string) =>
+      ipcRenderer.invoke(FlowserIpcEvent.INTERACTIONS_PARSE, sourceCode),
+    getTemplates: () =>
+      ipcRenderer.invoke(FlowserIpcEvent.INTERACTIONS_LIST_TEMPLATES),
+  },
   workspaces: {
     open: (id: string) =>
       ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_OPEN, id),

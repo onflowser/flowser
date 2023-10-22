@@ -19,7 +19,7 @@ interface InteractionTemplate_Source {
 }
 
 type GetInteractionTemplatesOptions = {
-  projectRootPath: string;
+  workspacePath: string;
 };
 
 export class FlowInteractionsService implements IFlowInteractions {
@@ -29,11 +29,11 @@ export class FlowInteractionsService implements IFlowInteractions {
     return this.goBindings.getParsedInteraction({ sourceCode });
   }
 
-  public async getInteractionTemplates(
+  public async getTemplates(
     options: GetInteractionTemplatesOptions
   ): Promise<InteractionTemplate[]> {
     const potentialCadenceFilePaths = await this.findAllCadenceFiles(
-      options.projectRootPath
+      options.workspacePath
     );
     const templates = await Promise.all(
       potentialCadenceFilePaths.map((potentialCadenceFilePath) =>

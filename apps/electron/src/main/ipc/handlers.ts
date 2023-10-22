@@ -7,8 +7,10 @@ import {
 } from '../../services/flowser-app.service';
 
 export function registerHandlers(flowserAppService: FlowserAppService) {
-  const { workspaceService, indexes } = flowserAppService;
+  const { workspaceService, indexes, flowInteractionsService } =
+    flowserAppService;
 
+  // Workspaces
   ipcMain.handle(FlowserIpcEvent.WORKSPACES_LIST, () =>
     workspaceService.list(),
   );
@@ -43,9 +45,30 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
     (e: IpcMainInvokeEvent) => workspaceService.getDefaultSettings(),
   );
 
+  // Indexes
   ipcMain.handle(
     FlowserIpcEvent.INDEX_GET_ALL,
     (event: IpcMainInvokeEvent, indexName: keyof FlowserIndexes) =>
       indexes[indexName].findAll(),
   );
+
+  // Interactions
+  ipcMain.handle(
+    FlowserIpcEvent.INTERACTIONS_PARSE,
+    (event: IpcMainInvokeEvent, sourceCode: string) =>
+      flowInteractionsService.parse(sourceCode),
+  );
+  ipcMain.handle(
+    FlowserIpcEvent.INTERACTIONS_LIST_TEMPLATES,
+    async (event: IpcMainInvokeEvent) => {
+      // There will be only 1 open workspace for now.
+      // TODO(restructure): Handle this differently
+      const openWorkspaces = await workspaceService.getOpenWorkspaces();
+      return flowInteractionsService.getTemplates({
+        // TODO(restructure): Move `workingDirectoryPath` to top-level
+        workspacePath: openWorkspaces[0].emulator!.workingDirectoryPath,
+      });
+    },
+  );
+
 }

@@ -8,7 +8,7 @@ import { useErrorHandler } from "../hooks/use-error-handler";
 import { useCurrentWorkspaceId } from "../hooks/use-current-project-id";
 import { FlowserWorkspace } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
-import { useGetFlowserProject } from "../api";
+import { useGetWorkspace } from "../api";
 
 export type WorkspaceManager = {
   currentWorkspace: FlowserWorkspace | undefined;
@@ -41,7 +41,7 @@ export function WorkspaceManagerProvider({
   const { showDialog, hideDialog } = useConfirmDialog();
   const currentWorkspaceId = useCurrentWorkspaceId();
   const { data: currentWorkspace, mutate: refetchCurrentWorkspace } =
-    useGetFlowserProject(currentWorkspaceId);
+    useGetWorkspace(currentWorkspaceId);
 
   const confirmProjectRemove = async (project: FlowserWorkspace) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });

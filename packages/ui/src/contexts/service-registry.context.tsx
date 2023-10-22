@@ -2,14 +2,14 @@ import { createContext, ReactNode, useContext } from "react";
 import {
   FlowAccount,
   FlowAccountStorage,
-  FlowBlock,
+  FlowBlock, FlowCliInfo,
   FlowContract,
   FlowEvent,
   FlowserWorkspace,
   FlowStateSnapshot,
-  FlowTransaction,
-  IResourceIndexReader, ManagedProcessOutput
-} from '@onflowser/api';
+  FlowTransaction, InteractionTemplate,
+  IResourceIndexReader, ManagedProcessOutput, ParsedInteractionOrError
+} from "@onflowser/api";
 
 interface IWalletService {
   // TODO(restructure): Provide request/response type
@@ -35,6 +35,16 @@ interface IWorkspaceService {
   getDefaultSettings(): Promise<FlowserWorkspace>;
 }
 
+interface IInteractionService {
+  parse(sourceCode: string): Promise<ParsedInteractionOrError>;
+  getTemplates(): Promise<InteractionTemplate[]>;
+}
+
+interface IFlowService {
+  getIndexOfAddress(address: string): Promise<number>;
+  getFlowCliInfo(): Promise<FlowCliInfo>;
+}
+
 interface IAnalyticsService {
   disable(): void;
   enable(): void;
@@ -46,6 +56,8 @@ interface IMonitoringService {
 }
 
 type ServiceRegistry = {
+  interactionsService: IInteractionService;
+  flowService: IFlowService;
   walletService: IWalletService;
   snapshotService: ISnapshotService;
   workspaceService: IWorkspaceService;

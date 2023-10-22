@@ -36,10 +36,18 @@ export class GoBindingsService {
       stdIn: request.sourceCode,
     });
 
-    return JSON.parse(response.raw);
+    const parsedResponse = JSON.parse(response.raw);
+
+    // Go code encodes the parameters as null when there is a parsing error.
+    // Default to an empty array to match the expected structure.
+    if (parsedResponse.interaction && parsedResponse.interaction.parameters === null) {
+      parsedResponse.interaction.parameters = [];
+    }
+
+    return parsedResponse;
   }
 
-  public async getAddressIndex(
+  public async getIndexOfAddress(
     request: GetAddressIndexRequest
   ): Promise<GetAddressIndexResponse> {
     const response = await this.execute({
@@ -86,7 +94,7 @@ export class GoBindingsService {
     // - https://github.com/epsitec-sa/hazardous#what-is-the-real-purpose-of-asarunpacked
     // - https://github.com/electron/electron/issues/6262#issuecomment-273312942
     return path
-      .join(__dirname, "bin", this.getExecutableName())
+      .join(__dirname, "..", "bin", this.getExecutableName())
       .replace(`app.asar${path.sep}`, `app.asar.unpacked${path.sep}`);
   }
 

@@ -1,5 +1,5 @@
-EXEC_PATH=dist/go-bindings/bin/internal
-SOURCE_PATH=./internal/main.go
+EXEC_PATH=bin/internal
+SOURCE_PATH=../../internal/main.go
 
 # Technically, only 64bit architectures are supported, since
 # Cadence can't be built for 32bit arch due to constant overflows:

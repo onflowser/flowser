@@ -63,6 +63,8 @@ export function App() {
 
       <ServiceRegistryProvider
         services={{
+          flowService: {} as never,
+          interactionsService: window.electron.interactions,
           accountIndex: indexes.account,
           accountStorageIndex: indexes.accountStorage,
           contractIndex: indexes.contract,

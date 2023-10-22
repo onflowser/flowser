@@ -14,14 +14,18 @@ export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   const { interaction } = props;
   const { data } = useGetParsedInteraction(interaction);
 
+  if (!data) {
+      return <Spinner size={15} />;
+  }
+
+  if (!data.interaction) {
+      return <pre>{data.error}</pre>
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.iconWrapper}>
-        {data ? (
-          <InteractionIcon interactionKind={data.interaction.kind} />
-        ) : (
-          <Spinner size={15} />
-        )}
+        <InteractionIcon interactionKind={data.interaction.kind} />
       </div>
       <SizedBox width={10} inline />
       <span className={classes.label}>{interaction.name}</span>

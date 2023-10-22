@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useCurrentWorkspaceId } from "./use-current-project-id";
 import { useServiceRegistry } from "../contexts/service-registry.context";
-import { useGetFlowserProject } from "../api";
+import { useGetWorkspace } from "../api";
 
 export enum AnalyticEvent {
   PAGE_VIEW = "page_view",
@@ -36,7 +36,7 @@ export function useAnalytics(): Analytics {
     undefined
   );
   const currentProjectId = useCurrentWorkspaceId();
-  const { data: currentProject } = useGetFlowserProject(currentProjectId);
+  const { data: currentProject } = useGetWorkspace(currentProjectId);
 
   useEffect(() => {
     if (isConsented) {

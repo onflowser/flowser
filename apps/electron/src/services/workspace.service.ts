@@ -3,13 +3,17 @@ import { FlowEmulatorService } from '@onflowser/nodejs';
 import { app } from 'electron';
 import path from 'path';
 import fs from 'fs/promises';
-import { randomUUID } from "crypto";
+import { randomUUID } from 'crypto';
 
 export class WorkspaceService {
   private readonly openWorkspaces: Map<string, FlowserWorkspace>;
 
   constructor(private readonly flowEmulatorService: FlowEmulatorService) {
     this.openWorkspaces = new Map();
+  }
+
+  async getOpenWorkspaces(): Promise<FlowserWorkspace[]> {
+    return Array.from(this.openWorkspaces.values());
   }
 
   async close(id: string): Promise<void> {

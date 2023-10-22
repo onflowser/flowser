@@ -393,7 +393,7 @@ export class FlowIndexerService {
   private async reIndexAllAccountStorage() {
     const allAccounts = await this.accountIndex.findAll();
     this.logger.debug(
-      `Processing storages for accounts: ${allAccounts.join(", ")}`
+      `Processing storages for accounts: ${allAccounts.map(e => e.address).join(", ")}`
     );
     await Promise.all(
       allAccounts.map((account: flowserResource.FlowAccount) =>
