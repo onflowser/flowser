@@ -12,10 +12,6 @@ export interface GetAddressIndexRequest {
   hexAddress: string;
 }
 
-export interface GetAddressIndexResponse {
-  index: number;
-}
-
 type ExecuteGoBinRequest = {
   command: string;
   arguments: string[];

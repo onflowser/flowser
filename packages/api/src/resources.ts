@@ -306,6 +306,7 @@ export enum ProcessOutputSource {
 export interface FlowserWorkspace extends TimestampedResource {
   id: string;
   name: string;
+  filesystemPath: string;
   emulator: FlowEmulatorConfig | undefined;
   gateway: FlowGatewayConfig | undefined;
 }
@@ -315,7 +316,6 @@ export interface FlowGatewayConfig {
 }
 
 export interface FlowEmulatorConfig {
-  workingDirectoryPath: string;
   verboseLogging: boolean;
   logFormat: string;
   restServerPort: number;

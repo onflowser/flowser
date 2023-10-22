@@ -70,8 +70,7 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
       // TODO(restructure): Handle this differently
       const openWorkspaces = await workspaceService.getOpenWorkspaces();
       return flowInteractionsService.getTemplates({
-        // TODO(restructure): Move `workingDirectoryPath` to top-level
-        workspacePath: openWorkspaces[0].emulator!.workingDirectoryPath,
+        workspacePath: openWorkspaces[0].filesystemPath,
       });
     },
   );

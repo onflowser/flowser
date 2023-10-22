@@ -13,14 +13,17 @@ export enum FlowEmulatorEvent {
   APIS_STARTED = "APIS_STARTED",
 }
 
+type StartEmulatorRequest = {
+  workspacePath: string;
+  config: FlowEmulatorConfig;
+}
+
 export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";
   private process: ManagedProcess | undefined;
-  private config: FlowEmulatorConfig;
 
   constructor(private processManagerService: ProcessManagerService) {
     super();
-    this.config = this.getDefaultConfig();
   }
 
   async stopAndCleanup() {
@@ -28,15 +31,15 @@ export class FlowEmulatorService extends EventEmitter {
     this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
-  async start(config: FlowEmulatorConfig) {
+  async start(request: StartEmulatorRequest) {
     this.process = new ManagedProcess({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
       command: {
         name: "flow",
-        args: ["emulator", ...this.getProcessFlags(config)],
+        args: ["emulator", ...this.getProcessFlags(request.config)],
         options: {
-          cwd: config.workingDirectoryPath,
+          cwd: request.workspacePath,
         },
       },
     });
@@ -53,8 +56,6 @@ export class FlowEmulatorService extends EventEmitter {
   public getDefaultConfig(): FlowEmulatorConfig {
     // Some default values vary from the ones used in Flow CLI.
     return {
-      // TODO(restructure): Would it make sense to store dir path in a separate struct?
-      workingDirectoryPath: "",
       verboseLogging: false,
       enableRestDebug: false,
       restServerPort: 8888,
