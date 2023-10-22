@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { useFormik } from "formik";
-import classes from "./ProjectSettings.module.scss";
+import classes from "./WorkspaceSettings.module.scss";
 import { BaseCard } from "../../common/cards/BaseCard/BaseCard";
 import Button from "../../common/buttons/Button/Button";
 import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
@@ -35,13 +35,13 @@ const projectSchema = yup.object().shape({
 });
 
 type ProjectSettingsProps = {
-  projectId: string;
+  workspaceId: string;
 };
 
-export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
+export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
   props
 ) => {
-  const { projectId } = props;
+  const { workspaceId } = props;
   const { workspaceService } = useServiceRegistry();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -50,8 +50,8 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
   const { openWorkspace, removeWorkspace, createWorkspace, updateWorkspace } =
     useProjectManager();
   const { data: flowCliInfo } = useGetFlowCliInfo();
-  const { handleError } = useErrorHandler(ProjectSettings.name);
-  const isExistingProject = Boolean(projectId);
+  const { handleError } = useErrorHandler(WorkspaceSettings.name);
+  const isExistingProject = Boolean(workspaceId);
 
   const formik = useFormik<FlowserWorkspace>({
     validationSchema: projectSchema,
@@ -101,14 +101,14 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
   useEffect(() => {
     setIsLoading(true);
     (isExistingProject
-      ? loadExistingProject(projectId)
-      : loadDefaultProject()
+      ? loadExistingWorkspace(workspaceId)
+      : loadDefaultWorkspace()
     ).finally(() => {
       setIsLoading(false);
     });
   }, []);
 
-  async function loadExistingProject(id: string) {
+  async function loadExistingWorkspace(id: string) {
     try {
       const existingProject = await workspaceService.findById(id);
       if (existingProject) {
@@ -122,7 +122,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
     }
   }
 
-  async function loadDefaultProject() {
+  async function loadDefaultWorkspace() {
     try {
       const defaultProject = await workspaceService.getDefaultSettings();
       if (defaultProject) {
@@ -342,7 +342,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
               onClick={() => removeWorkspace(formik.values)}
               variant="middle"
               outlined={true}
-              disabled={!projectId}
+              disabled={!workspaceId}
             >
               DELETE
             </Button>

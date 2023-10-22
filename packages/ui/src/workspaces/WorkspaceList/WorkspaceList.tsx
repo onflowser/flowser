@@ -2,7 +2,7 @@ import React, { FunctionComponent, ReactElement, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
-import classes from "./ProjectListPage.module.scss";
+import classes from "./WorkspaceList.module.scss";
 import classNames from "classnames";
 import { useProjectManager } from "../../contexts/workspace.context";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
@@ -24,7 +24,7 @@ const tabs: ProjectTab[] = [
     id: "projects",
     label: "Projects",
     isDefault: true,
-    content: <ProjectsListContent />,
+    content: <WorkspaceListContent />,
   },
   {
     id: "about",
@@ -33,7 +33,7 @@ const tabs: ProjectTab[] = [
   },
 ];
 
-export const ProjectListPage: FunctionComponent = () => {
+export const WorkspaceList: FunctionComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -83,7 +83,7 @@ export const ProjectListPage: FunctionComponent = () => {
   );
 };
 
-function ProjectsListContent() {
+function WorkspaceListContent() {
   const { data: projects, error } = useGetWorkspaces();
   const { openWorkspace, removeWorkspace } = useProjectManager();
   const showProjectList = projects && projects.length > 0;

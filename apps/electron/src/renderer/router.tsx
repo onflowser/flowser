@@ -12,14 +12,12 @@ import { WorkspaceLayout } from '@onflowser/ui/src/common/layouts/ProjectLayout/
 import { WorkspaceManagerProvider } from '@onflowser/ui/src/contexts/workspace.context';
 import { InteractionsPage } from '@onflowser/ui/src/interactions/InteractionsPage';
 import { InteractionRegistryProvider } from '@onflowser/ui/src/interactions/contexts/interaction-registry.context';
-import { ProjectSettings } from '@onflowser/ui/src/projects/ProjectSettings/ProjectSettings';
 import { TransactionsTable } from '@onflowser/ui/src/transactions/TransactionsTable/TransactionsTable';
 import { TransactionDetails } from '@onflowser/ui/src/transactions/TransactionDetails/TransactionDetails';
 import { BlockDetails } from '@onflowser/ui/src/blocks/BlockDetails/BlockDetails';
 import { BlocksTable } from '@onflowser/ui/src/blocks/BlocksTable/BlocksTable';
 import { AccountDetails } from '@onflowser/ui/src/accounts/AccountDetails/AccountDetails';
 import { AccountsTable } from '@onflowser/ui/src/accounts/AccountsTable/AccountsTable';
-import { ProjectListPage } from '@onflowser/ui/src/projects/ProjectListPage/ProjectListPage';
 import { ContractsTable } from '@onflowser/ui/src/contracts/ContractsTable/ContractsTable';
 import { ContractDetails } from '@onflowser/ui/src/contracts/ContractDetails/ContractDetails';
 import { EventsTable } from '@onflowser/ui/src/events/EventsTable/EventsTable';
@@ -40,6 +38,8 @@ import {
   useGetEvents,
   useGetTransactions,
 } from '@onflowser/ui/src/api';
+import { WorkspaceList } from "@onflowser/ui/src/workspaces/WorkspaceList/WorkspaceList";
+import { WorkspaceSettings } from "@onflowser/ui/src/workspaces/WorkspaceSettings/WorkspaceSettings";
 
 function BrowserRouterEvents(props: { children: ReactNode }): ReactElement {
   const location = useLocation();
@@ -60,9 +60,9 @@ function BrowserRouterEvents(props: { children: ReactNode }): ReactElement {
 }
 
 function ProjectSettingsPage() {
-  const { projectId } = useParams();
+  const { workspaceId } = useParams();
 
-  return <ProjectSettings projectId={projectId!} />;
+  return <WorkspaceSettings workspaceId={workspaceId!} />;
 }
 
 function TransactionsTablePage() {
@@ -169,7 +169,7 @@ const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <ProjectListPage />,
+        element: <WorkspaceList />,
       },
       {
         path: 'create',
