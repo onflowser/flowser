@@ -125,14 +125,8 @@ export class FlowIndexerService {
   private async processBlockWithHeight(height: number) {
     const blockData = await this.getBlockData(height);
 
-    // Process events first, so that transactions can reference created users.
-    await this.processNewEvents({
-      events: blockData.events,
-      block: blockData.block,
-    });
-
     try {
-      await this.storeBlockData(blockData);
+      await this.processBlockData(blockData);
       await this.reIndexAllAccountStorage();
     } catch (e) {
       this.logger.error(`Failed to store block (#${height}) data`, e);
@@ -174,7 +168,7 @@ export class FlowIndexerService {
     }
   }
 
-  private async storeBlockData(data: BlockData) {
+  private async processBlockData(data: BlockData) {
     const blockPromise = this.blockIndex
       .add(this.createBlockEntity({ block: data.block }))
       .catch((e: unknown) =>
@@ -205,7 +199,15 @@ export class FlowIndexerService {
       )
     );
 
-    return Promise.all([blockPromise, transactionPromises, eventPromises]);
+    return Promise.all([
+      blockPromise,
+      transactionPromises,
+      eventPromises,
+      this.processNewEvents({
+        events: data.events,
+        block: data.block,
+      })
+    ]);
   }
 
   private async getBlockData(height: number): Promise<BlockData> {
@@ -427,12 +429,18 @@ export class FlowIndexerService {
     };
 
     await Promise.all(
-      this.getAllWellKnownAddresses().map((address) =>
-        this.reIndexAccount({
-          address,
-          block: nonExistingBlock,
-        })
-      )
+      this.getAllWellKnownAddresses()
+        .filter(address => this.accountIndex.findOneById(address) !== undefined)
+        .map((address) =>
+          this.reIndexAccount({
+            address,
+            block: nonExistingBlock,
+          }).catch(error => {
+            // Most likely an account not found error monotonic/non-monotonic addresses.
+            // Can be safely ignored.
+            // TODO(restructure): Smarter handling of monotonic/non-monotonic addresses
+          })
+        )
     );
   }
 
