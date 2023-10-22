@@ -19,6 +19,7 @@ import {
   GoBindingsService,
   FlowEmulatorService,
   ProcessManagerService,
+  FlowCliService,
 } from '@onflowser/nodejs';
 import { WorkspaceService } from './workspace.service';
 
@@ -42,6 +43,7 @@ export class FlowserAppService {
   public readonly workspaceService: WorkspaceService;
   public readonly goBindingsService: GoBindingsService;
   public readonly flowInteractionsService: FlowInteractionsService;
+  public readonly flowCliService: FlowCliService;
   public readonly logger: IFlowserLogger;
   public readonly indexes: FlowserIndexes;
   private scheduler: AsyncIntervalScheduler;
@@ -65,6 +67,7 @@ export class FlowserAppService {
       this.goBindingsService,
     );
     this.processManagerService = new ProcessManagerService();
+    this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
     );

@@ -51,10 +51,7 @@ export function AccountAvatar({
   address,
   className,
 }: AccountAvatarProps): ReactElement | null {
-  const { data: addressIndex } = useGetAddressIndex({
-    address,
-    chainId: "flow-emulator",
-  });
+  const { data: addressIndex } = useGetAddressIndex(address);
 
   const avatarUrl = useMemo(() => {
     const isServiceAccount = [

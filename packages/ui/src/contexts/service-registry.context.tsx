@@ -24,7 +24,7 @@ interface ISnapshotService extends IResourceIndexReader<FlowStateSnapshot> {
   rollback(request: any): Promise<void>;
 }
 
-interface IWorkspaceService {
+export interface IWorkspaceService {
   remove(id: string): Promise<void>;
   close(id: string): Promise<void>;
   create(workspace: FlowserWorkspace): Promise<void>;
@@ -35,12 +35,12 @@ interface IWorkspaceService {
   getDefaultSettings(): Promise<FlowserWorkspace>;
 }
 
-interface IInteractionService {
+export interface IInteractionService {
   parse(sourceCode: string): Promise<ParsedInteractionOrError>;
   getTemplates(): Promise<InteractionTemplate[]>;
 }
 
-interface IFlowService {
+export interface IFlowService {
   getIndexOfAddress(address: string): Promise<number>;
   getFlowCliInfo(): Promise<FlowCliInfo>;
 }

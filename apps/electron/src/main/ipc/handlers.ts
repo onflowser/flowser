@@ -7,8 +7,13 @@ import {
 } from '../../services/flowser-app.service';
 
 export function registerHandlers(flowserAppService: FlowserAppService) {
-  const { workspaceService, indexes, flowInteractionsService } =
-    flowserAppService;
+  const {
+    workspaceService,
+    indexes,
+    flowInteractionsService,
+    flowCliService,
+    goBindingsService,
+  } = flowserAppService;
 
   // Workspaces
   ipcMain.handle(FlowserIpcEvent.WORKSPACES_LIST, () =>
@@ -71,4 +76,17 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
     },
   );
 
+  // Flow
+  ipcMain.handle(
+    FlowserIpcEvent.FLOW_GET_INDEX_OF_ADDRESS,
+    (event: IpcMainInvokeEvent, address: string) =>
+      goBindingsService.getIndexOfAddress({
+        hexAddress: address,
+        chainId: 'flow-emulator',
+      }),
+  );
+  ipcMain.handle(
+    FlowserIpcEvent.FLOW_GET_CLI_INFO,
+    (event: IpcMainInvokeEvent) => flowCliService.getVersion(),
+  );
 }

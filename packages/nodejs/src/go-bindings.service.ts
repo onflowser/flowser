@@ -49,13 +49,13 @@ export class GoBindingsService {
 
   public async getIndexOfAddress(
     request: GetAddressIndexRequest
-  ): Promise<GetAddressIndexResponse> {
+  ): Promise<number> {
     const response = await this.execute({
       command: "get-address-index",
       arguments: [request.chainId, request.hexAddress],
     });
 
-    return { index: Number(response.raw) };
+    return Number(response.raw)
   }
 
   private execute(request: ExecuteGoBinRequest): Promise<ExecuteGoBinResponse> {
@@ -78,7 +78,7 @@ export class GoBindingsService {
 
       childProcess.on("close", (code) => {
         if (code !== 0) {
-          reject(`Interaction parser exited with code: ${code}`);
+          reject(`Go executable exited with code: ${code}`);
         } else {
           resolve({ raw: rawResponse });
         }

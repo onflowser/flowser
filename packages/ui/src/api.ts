@@ -221,14 +221,6 @@ export function useGetStateSnapshots(): SWRResponse<FlowStateSnapshot[]> {
   });
 }
 
-export function useGetAddressIndex(options: {
-  address: string;
-  chainId: "flow-emulator";
-}): SWRResponse<number> {
-  // TODO(restructure): Implement
-  return useSWR("account-index", () => 0);
-}
-
 export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
   const { workspaceService } = useServiceRegistry();
 
@@ -251,6 +243,11 @@ export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
   const { flowService } = useServiceRegistry();
 
   return useSWR(`flow-cli`, () => flowService.getFlowCliInfo());
+}
+
+export function useGetAddressIndex(address: string): SWRResponse<number> {
+  const { flowService } = useServiceRegistry();
+  return useSWR(`account-index/${address}`, () => flowService.getIndexOfAddress(address));
 }
 
 export function useGetParsedInteraction(
