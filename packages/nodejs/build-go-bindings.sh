@@ -1,4 +1,5 @@
-EXEC_PATH=bin/internal
+EXEC_PATH=bin
+BIN_PREFIX=flowser-internal
 SOURCE_PATH=../../internal/main.go
 
 # Technically, only 64bit architectures are supported, since
@@ -10,11 +11,11 @@ SOURCE_PATH=../../internal/main.go
 # https://freshman.tech/snippets/go/cross-compile-go-programs
 
 # Windows
-GOOS=windows GOARCH=amd64 go build -o "${EXEC_PATH}-amd64.exe" "${SOURCE_PATH}"
+GOOS=windows GOARCH=amd64 go build -o "${EXEC_PATH}/${BIN_PREFIX}-amd64.exe" "${SOURCE_PATH}"
 
 # MacOS
-GOOS=darwin GOARCH=amd64 go build -o "${EXEC_PATH}-amd64-darwin" "${SOURCE_PATH}"
+GOOS=darwin GOARCH=amd64 go build -o "${EXEC_PATH}/${BIN_PREFIX}-amd64-darwin" "${SOURCE_PATH}"
 
 # Linux
-GOOS=linux GOARCH=amd64 go build -o "${EXEC_PATH}-amd64-linux" "${SOURCE_PATH}"
+GOOS=linux GOARCH=amd64 go build -o "${EXEC_PATH}/${BIN_PREFIX}-amd64-linux" "${SOURCE_PATH}"
 

@@ -22,7 +22,18 @@ type ExecuteGoBinResponse = {
   raw: string;
 };
 
+type GoBindingsConfig = {
+  // Path to the directory, which contains the compiled Go binding file(s).
+  binDirPath: string;
+}
+
 export class GoBindingsService {
+  private config: GoBindingsConfig;
+
+  constructor(config: GoBindingsConfig) {
+    this.config = config;
+  }
+
   public async getParsedInteraction(
     request: GetParsedInteractionRequest
   ): Promise<ParsedInteractionOrError> {
@@ -83,25 +94,17 @@ export class GoBindingsService {
   }
 
   private getExecutablePath(): string {
-    // When running this within electron env,
-    // make sure to reference the executable in unpacked asar folder.
-    // This is a hacky solution, but it's also the simplest one for now.
-    // For more context, see:
-    // - https://github.com/epsitec-sa/hazardous#what-is-the-real-purpose-of-asarunpacked
-    // - https://github.com/electron/electron/issues/6262#issuecomment-273312942
-    return path
-      .join(__dirname, "..", "bin", this.getExecutableName())
-      .replace(`app.asar${path.sep}`, `app.asar.unpacked${path.sep}`);
+    return path.join(this.config.binDirPath, this.getExecutableName())
   }
 
   private getExecutableName(): string {
     switch (os.platform()) {
       case "darwin":
-        return "internal-amd64-darwin";
+        return "flowser-internal-amd64-darwin";
       case "linux":
-        return "internal-amd64-linux";
+        return "flowser-internal-amd64-linux";
       case "win32":
-        return "internal-amd64.exe";
+        return "flowser-internal-amd64.exe";
       default:
         throw new Error(`Unsupported platform: ${os.platform()}`);
     }

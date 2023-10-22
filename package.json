@@ -39,10 +39,13 @@
     "node": ">=14.0.0"
   },
   "packageManager": "yarn@1.22.19",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "apps/*"
+    ],
+    "nohoist": ["apps/electron"]
+  },
   "resolutions": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

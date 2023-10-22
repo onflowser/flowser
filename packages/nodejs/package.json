@@ -9,7 +9,7 @@
     "build-bin": "sh build-go-bindings.sh"
   },
   "keywords": [],
-  "files": ["./bin"],
+  "files": ["bin"],
   "author": "",
   "license": "ISC",
   "dependencies": {

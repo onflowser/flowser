@@ -62,7 +62,10 @@ export class FlowserAppService {
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService,
     );
-    this.goBindingsService = new GoBindingsService();
+    this.goBindingsService = new GoBindingsService({
+      // TODO(restructure): Test if this works on windows/linux
+      binDirPath: process.resourcesPath,
+    });
     this.flowInteractionsService = new FlowInteractionsService(
       this.goBindingsService,
     );

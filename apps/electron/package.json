@@ -1,7 +1,7 @@
 {
   "name": "@onflowser/electron",
   "version": "3.0.0",
-  "description": "A foundation for scalable desktop apps",
+  "description": "Supercharged development on Flow blockchain ⚡",
   "keywords": [
     "electron",
     "boilerplate",
@@ -181,8 +181,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Flowser",
+    "appId": "dev.flowser.app",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -236,16 +236,25 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      {
+        "from": "../../packages/nodejs/bin/flowser-internal-amd64-darwin",
+        "to": "."
+      },
+      {
+        "from": "../../packages/nodejs/bin/flowser-internal-amd64-linux",
+        "to": "."
+      },
+      {
+        "from": "../../packages/nodejs/bin/flowser-internal-amd64.exe",
+        "to": "."
+      }
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "onflowser",
+      "repo": "flowser"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "node": ">=14.x",
