@@ -21,7 +21,11 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { Flowser, FlowserIndexes } from './flowser';
+import {
+  FlowserAppService,
+  FlowserIndexes,
+} from '../services/flowser-app.service';
+import { registerHandlers } from './ipc/handlers';
 
 class AppUpdater {
   constructor() {
@@ -36,14 +40,12 @@ let mainWindow: BrowserWindow | null = null;
 ipcMain.handle('showDirectoryPicker', showDirectoryPicker);
 ipcMain.handle('index:get-all', getAllFromIndex);
 
-Flowser.create().configure();
-Flowser.create().startProcessing();
+const flowserAppService = FlowserAppService.create();
 
 async function getAllFromIndex(event: IpcMainInvokeEvent, ...args: any[]) {
-  console.log('Received event', event, args);
   const [indexName] = args;
 
-  const indexes = Flowser.create().getIndexes();
+  const { indexes } = FlowserAppService.create();
 
   if (typeof indexName !== 'string') {
     throw new Error('Invalid argument');
@@ -51,9 +53,8 @@ async function getAllFromIndex(event: IpcMainInvokeEvent, ...args: any[]) {
 
   if (indexName in indexes) {
     return await indexes[indexName as keyof FlowserIndexes].findAll();
-  } else {
-    throw new Error('Index not found: ' + indexName);
   }
+  throw new Error(`Index not found: ${indexName}`);
 }
 
 async function showDirectoryPicker() {
@@ -86,7 +87,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload
+      forceDownload,
     )
     .catch(console.log);
 };
@@ -165,6 +166,9 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+    registerHandlers(flowserAppService);
+    flowserAppService.configure();
+    flowserAppService.startProcessing();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

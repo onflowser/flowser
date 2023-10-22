@@ -12,7 +12,7 @@ import { useErrorHandler } from "../hooks/use-error-handler";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { FlowUtils } from "../utils/flow-utils";
 import { SnapshotDialog } from "../common/overlays/dialogs/snapshot/SnapshotDialog";
-import { useProjectManager } from "./projects.context";
+import { useProjectManager } from "./workspace.context";
 import { FlowBlock, FlowStateSnapshot } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
 import { useGetBlocks, useGetStateSnapshots } from "../api";
@@ -36,7 +36,7 @@ export function SnapshotsManagerProvider({
   const { track } = useAnalytics();
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
   const { showDialog } = useConfirmDialog();
-  const { currentProject } = useProjectManager();
+  const { currentWorkspace } = useProjectManager();
   const { data: blocks, mutate } = useGetBlocks();
   const { data: stateSnapshots } = useGetStateSnapshots();
   const snapshotLookupByBlockId = useMemo(
@@ -49,7 +49,7 @@ export function SnapshotsManagerProvider({
   function createSnapshot() {
     track(AnalyticEvent.CREATE_SNAPSHOT);
 
-    const { snapshot } = currentProject?.emulator ?? {};
+    const { snapshot } = currentWorkspace?.emulator ?? {};
     if (!snapshot) {
       toast(
         "Snapshots can only be created when enabling the 'snapshot' option in settings",
@@ -63,7 +63,7 @@ export function SnapshotsManagerProvider({
   }
 
   function checkoutSnapshot(snapshot: FlowStateSnapshot) {
-    const isSnapshotEnabled = currentProject?.emulator?.snapshot;
+    const isSnapshotEnabled = currentWorkspace?.emulator?.snapshot;
     if (!isSnapshotEnabled) {
       toast.error(
         "Can't jump to block, because 'snapshot' option is not enabled in project settings"
@@ -85,14 +85,14 @@ export function SnapshotsManagerProvider({
     const onConfirm = async () => {
       track(AnalyticEvent.CHECKOUT_SNAPSHOT);
 
-      if (!currentProject) {
+      if (!currentWorkspace) {
         throw new Error("Expected project to be defined");
       }
 
       try {
         await snapshotService.checkoutBlock({
           blockId: snapshot.blockId,
-          projectId: currentProject.id,
+          projectId: currentWorkspace.id,
         });
         mutate();
         toast.success(
@@ -131,7 +131,7 @@ export function SnapshotsManagerProvider({
         toast("Blockchain state is already at this block, doing nothing.");
         return;
       }
-      if (!currentProject) {
+      if (!currentWorkspace) {
         throw new Error("Expected project to be defined");
       }
 
@@ -184,7 +184,7 @@ export function SnapshotsManagerProvider({
 
       rollbackToBlock(targetBlock);
     },
-    [currentProject, blocks, snapshotLookupByBlockId]
+    [currentWorkspace, blocks, snapshotLookupByBlockId]
   );
 
   return (

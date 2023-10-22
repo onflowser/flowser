@@ -13,7 +13,7 @@ type ProjectLayoutProps = {
 export const scrollableElementId = "flowser-scroll";
 
 // TODO(restructure): Move this to app folder
-export function ProjectLayout(props: ProjectLayoutProps) {
+export function WorkspaceLayout(props: ProjectLayoutProps) {
   const location = useLocation();
   const showMargin = !location.pathname.endsWith("interactions");
 

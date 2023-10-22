@@ -6,7 +6,7 @@ import {
   FlowBlock, FlowCliInfo,
   FlowContract,
   FlowEvent,
-  FlowserProject, FlowserUsageRequirement,
+  FlowserWorkspace, FlowserUsageRequirement,
   FlowStateSnapshot,
   FlowTransaction, InteractionTemplate,
   ManagedProcessOutput, ParsedInteractionOrError
@@ -228,13 +228,15 @@ export function useGetAddressIndex(options: {
   return useSWR("account-index", () => 0);
 }
 
-export function useGetFlowserProjects(): SWRResponse<FlowserProject[]> {
-  return useSWR("projects", () => []);
+export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
+  const { workspaceService } = useServiceRegistry();
+
+  return useSWR("workspaces", () =>workspaceService.list());
 }
 
 export function useGetFlowserProject(
   id: string
-): SWRResponse<FlowserProject | undefined> {
+): SWRResponse<FlowserWorkspace | undefined> {
   return useSWR(`projects/${id}`, () => undefined);
 }
 

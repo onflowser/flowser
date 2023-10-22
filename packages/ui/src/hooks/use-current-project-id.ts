@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 
-export function useCurrentProjectId(): string {
-  const { projectId } = useParams();
+export function useCurrentWorkspaceId(): string {
+  const { workspaceId } = useParams();
 
-  // if (!projectId) {
-  //   throw new Error("Project ID not found in URL");
+  // if (!workspaceId) {
+  //   throw new Error("Workspace ID not found in URL");
   // }
 
-  return projectId ?? "";
+  return workspaceId ?? "";
 }

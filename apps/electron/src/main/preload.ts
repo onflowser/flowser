@@ -1,6 +1,8 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { FlowserWorkspace } from '@onflowser/api';
+import { FlowserIpcEvent } from './ipc/events';
 
 export type Channels = 'index:get-all';
 
@@ -14,7 +16,7 @@ const electronHandler = {
       ipcRenderer.on('update-download-end', callback),
     handleUpdateDownloadProgress: (callback: (percentage: number) => void) =>
       ipcRenderer.on('update-download-progress', (event, value) =>
-        callback(value as unknown as number)
+        callback(value as unknown as number),
       ),
   },
   ipcRenderer: {
@@ -36,6 +38,23 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
+  },
+  workspaces: {
+    open: (id: string) =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_OPEN, id),
+    close: (id: string) =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_CLOSE, id),
+    list: () => ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_LIST),
+    create: (createdWorkspace: FlowserWorkspace) =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_CREATE, createdWorkspace),
+    update: (updatedWorkspace: FlowserWorkspace) =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_UPDATE, updatedWorkspace),
+    findById: (id: string) =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_FIND_BY_ID, id),
+    remove: (id: string) =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_REMOVE, id),
+    getDefaultSettings: () =>
+      ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_DEFAULT_SETTINGS),
   },
 };
 

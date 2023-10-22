@@ -303,7 +303,7 @@ export enum ProcessOutputSource {
   UNRECOGNIZED = -1,
 }
 
-export interface FlowserProject extends TimestampedResource {
+export interface FlowserWorkspace extends TimestampedResource {
   id: string;
   name: string;
   emulator: FlowEmulatorConfig | undefined;

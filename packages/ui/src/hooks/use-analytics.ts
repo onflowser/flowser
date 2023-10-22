@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useCurrentProjectId } from "./use-current-project-id";
+import { useCurrentWorkspaceId } from "./use-current-project-id";
 import { useServiceRegistry } from "../contexts/service-registry.context";
 import { useGetFlowserProject } from "../api";
 
@@ -35,7 +35,7 @@ export function useAnalytics(): Analytics {
     "consent-analytics",
     undefined
   );
-  const currentProjectId = useCurrentProjectId();
+  const currentProjectId = useCurrentWorkspaceId();
   const { data: currentProject } = useGetFlowserProject(currentProjectId);
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import { NavLink, useMatches, useNavigate } from "react-router-dom";
 import classes from "./Breadcrumbs.module.scss";
 import classNames from "classnames";
 import { FlowserIcon } from "../../icons/FlowserIcon";
-import { useCurrentProjectId } from "../../../hooks/use-current-project-id";
+import { useCurrentWorkspaceId } from "../../../hooks/use-current-project-id";
 
 type BreadcrumbsProps = {
   className?: string;
@@ -36,7 +36,7 @@ function isMatchWithCrumb(match: Match): match is MatchWithCrumb {
 
 export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
   const navigate = useNavigate();
-  const projectId = useCurrentProjectId();
+  const projectId = useCurrentWorkspaceId();
 
   function shouldShowMatch(match: Match) {
     // For project pages, only show matches from project-scoped routes.

@@ -1,6 +1,6 @@
 import { IdentifiableResource } from '@onflowser/api';
 import { InMemoryIndex } from '@onflowser/core';
-import { FlowserIndexes } from '../main/flowser';
+import { FlowserIndexes } from '../services/flowser-app.service';
 
 export class IpcIndex<
   Resource extends IdentifiableResource

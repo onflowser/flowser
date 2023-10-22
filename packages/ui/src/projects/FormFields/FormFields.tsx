@@ -6,7 +6,7 @@ import classNames from "classnames";
 import classes from "./FormFields.module.scss";
 import ToggleButton from "../../common/buttons/ToggleButton/ToggleButton";
 import { FormikErrors } from "formik";
-import { FlowserProject } from '@onflowser/api';
+import { FlowserWorkspace } from '@onflowser/api';
 
 export type FieldProps = InputProps & {
   label?: string;
@@ -15,8 +15,8 @@ export type FieldProps = InputProps & {
   className?: string;
   formik: {
     handleChange: (e: React.ChangeEvent) => void;
-    values: FlowserProject;
-    errors: FormikErrors<FlowserProject>;
+    values: FlowserWorkspace;
+    errors: FormikErrors<FlowserWorkspace>;
     setFieldValue: (
       field: string,
       value: unknown,

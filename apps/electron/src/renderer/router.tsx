@@ -8,8 +8,8 @@ import {
   useLocation,
   useParams,
 } from 'react-router-dom';
-import { ProjectLayout } from '@onflowser/ui/src/common/layouts/ProjectLayout/ProjectLayout';
-import { ProjectsManagerProvider } from '@onflowser/ui/src/contexts/projects.context';
+import { WorkspaceLayout } from '@onflowser/ui/src/common/layouts/ProjectLayout/WorkspaceLayout';
+import { WorkspaceManagerProvider } from '@onflowser/ui/src/contexts/workspace.context';
 import { InteractionsPage } from '@onflowser/ui/src/interactions/InteractionsPage';
 import { InteractionRegistryProvider } from '@onflowser/ui/src/interactions/contexts/interaction-registry.context';
 import { ProjectSettings } from '@onflowser/ui/src/projects/ProjectSettings/ProjectSettings';
@@ -153,7 +153,7 @@ const routes: RouteObject[] = [
   {
     path: 'projects',
     element: (
-      <ProjectsManagerProvider>
+      <WorkspaceManagerProvider>
         <FlowConfigProvider>
           <SnapshotsManagerProvider>
             <BrowserRouterEvents>
@@ -161,7 +161,7 @@ const routes: RouteObject[] = [
             </BrowserRouterEvents>
           </SnapshotsManagerProvider>
         </FlowConfigProvider>
-      </ProjectsManagerProvider>
+      </WorkspaceManagerProvider>
     ),
     handle: createCrumbHandle({
       crumbName: 'Projects',
@@ -183,15 +183,15 @@ const routes: RouteObject[] = [
         }),
       },
       {
-        path: ':projectId',
+        path: ':workspaceId',
         element: (
-          <ProjectLayout>
+          <WorkspaceLayout>
             <InteractionRegistryProvider>
               <TemplatesRegistryProvider>
                 <Outlet />
               </TemplatesRegistryProvider>
             </InteractionRegistryProvider>
-          </ProjectLayout>
+          </WorkspaceLayout>
         ),
         children: [
           {

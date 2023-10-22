@@ -17,7 +17,10 @@ import {
   AsyncIntervalScheduler,
   FlowInteractionsService,
   GoBindingsService,
+  FlowEmulatorService,
+  ProcessManagerService,
 } from '@onflowser/nodejs';
+import { WorkspaceService } from './workspace.service';
 
 export type FlowserIndexes = {
   accountStorage: InMemoryIndex<FlowAccountStorage>;
@@ -28,15 +31,19 @@ export type FlowserIndexes = {
   account: InMemoryIndex<FlowAccount>;
 };
 
-export class Flowser {
-  static instance: Flowser;
-  private readonly flowGatewayService: FlowGatewayService;
-  private readonly flowIndexerService: FlowIndexerService;
-  private readonly flowAccountStorageService: FlowAccountStorageService;
-  private readonly goBindingsService: GoBindingsService;
-  private readonly flowInteractionsService: FlowInteractionsService;
-  private readonly logger: IFlowserLogger;
-  private readonly indexes: FlowserIndexes;
+// TODO(restructure): Should this be more like a service registry instead?
+export class FlowserAppService {
+  static instance: FlowserAppService;
+  public readonly flowGatewayService: FlowGatewayService;
+  public readonly flowIndexerService: FlowIndexerService;
+  public readonly flowAccountStorageService: FlowAccountStorageService;
+  public readonly processManagerService: ProcessManagerService;
+  public readonly flowEmulatorService: FlowEmulatorService;
+  public readonly workspaceService: WorkspaceService;
+  public readonly goBindingsService: GoBindingsService;
+  public readonly flowInteractionsService: FlowInteractionsService;
+  public readonly logger: IFlowserLogger;
+  public readonly indexes: FlowserIndexes;
   private scheduler: AsyncIntervalScheduler;
 
   constructor() {
@@ -51,12 +58,17 @@ export class Flowser {
       accountStorage: new InMemoryIndex<FlowAccountStorage>(),
     };
     this.flowAccountStorageService = new FlowAccountStorageService(
-      this.flowGatewayService
+      this.flowGatewayService,
     );
     this.goBindingsService = new GoBindingsService();
     this.flowInteractionsService = new FlowInteractionsService(
-      this.goBindingsService
+      this.goBindingsService,
     );
+    this.processManagerService = new ProcessManagerService();
+    this.flowEmulatorService = new FlowEmulatorService(
+      this.processManagerService,
+    );
+    this.workspaceService = new WorkspaceService(this.flowEmulatorService);
     this.flowIndexerService = new FlowIndexerService(
       this.logger,
       this.indexes.transaction,
@@ -67,7 +79,7 @@ export class Flowser {
       this.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
-      this.flowInteractionsService
+      this.flowInteractionsService,
     );
     this.scheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
@@ -76,15 +88,11 @@ export class Flowser {
     });
   }
 
-  static create(): Flowser {
+  static create(): FlowserAppService {
     if (!this.instance) {
-      this.instance = new Flowser()
+      this.instance = new FlowserAppService();
     }
     return this.instance;
-  }
-
-  getIndexes(): FlowserIndexes {
-    return this.indexes;
   }
 
   startProcessing() {

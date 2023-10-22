@@ -5,54 +5,54 @@ import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useErrorHandler } from "../hooks/use-error-handler";
-import { useCurrentProjectId } from "../hooks/use-current-project-id";
-import { FlowserProject } from "@onflowser/api";
+import { useCurrentWorkspaceId } from "../hooks/use-current-project-id";
+import { FlowserWorkspace } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
 import { useGetFlowserProject } from "../api";
 
-export type ProjectsManager = {
-  currentProject: FlowserProject | undefined;
-  switchProject: () => Promise<void>;
-  startProject: (
-    project: FlowserProject,
-    options?: StartProjectOptions
+export type WorkspaceManager = {
+  currentWorkspace: FlowserWorkspace | undefined;
+  closeWorkspace: () => Promise<void>;
+  openWorkspace: (
+    workspace: FlowserWorkspace,
+    options?: OpenWorkspaceOptions
   ) => Promise<void>;
-  removeProject: (project: FlowserProject) => void;
-  updateProject: (project: FlowserProject) => Promise<FlowserProject>;
-  createProject: (project: FlowserProject) => Promise<FlowserProject>;
+  removeWorkspace: (workspace: FlowserWorkspace) => void;
+  updateWorkspace: (workspace: FlowserWorkspace) => Promise<FlowserWorkspace>;
+  createWorkspace: (workspace: FlowserWorkspace) => Promise<FlowserWorkspace>;
 };
 
-type StartProjectOptions = { replaceCurrentPage: boolean };
+type OpenWorkspaceOptions = { replaceCurrentPage: boolean };
 
-const ProjectsManagerContext = createContext<ProjectsManager>(
-  {} as ProjectsManager
+const WorkspaceManagerContext = createContext<WorkspaceManager>(
+  {} as WorkspaceManager
 );
 
-export function ProjectsManagerProvider({
+export function WorkspaceManagerProvider({
   children,
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { projectsService } = useServiceRegistry();
+  const { workspaceService } = useServiceRegistry();
 
   const { track } = useAnalytics();
   const navigate = useNavigate();
-  const { handleError } = useErrorHandler(ProjectsManagerProvider.name);
+  const { handleError } = useErrorHandler(WorkspaceManagerProvider.name);
   const { showDialog, hideDialog } = useConfirmDialog();
-  const currentProjectId = useCurrentProjectId();
-  const { data: currentProject, mutate: refetchCurrentProject } =
-    useGetFlowserProject(currentProjectId);
+  const currentWorkspaceId = useCurrentWorkspaceId();
+  const { data: currentWorkspace, mutate: refetchCurrentWorkspace } =
+    useGetFlowserProject(currentWorkspaceId);
 
-  const confirmProjectRemove = async (project: FlowserProject) => {
+  const confirmProjectRemove = async (project: FlowserWorkspace) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
 
     try {
-      await toast.promise(projectsService.remove(project.id), {
+      await toast.promise(workspaceService.remove(project.id), {
         loading: "Deleting project",
         error: `Failed to delete project "${project.name}"`,
         success: `Project "${project.name}" deleted!`,
       });
-      refetchCurrentProject();
+      refetchCurrentWorkspace();
       navigate("/projects", {
         replace: true,
       });
@@ -63,7 +63,7 @@ export function ProjectsManagerProvider({
     }
   };
 
-  function removeProject(project: FlowserProject) {
+  function removeWorkspace(project: FlowserWorkspace) {
     showDialog({
       title: "Delete project",
       body: <span>Are you sure you want to delete this project?</span>,
@@ -73,11 +73,11 @@ export function ProjectsManagerProvider({
     });
   }
 
-  async function switchProject() {
+  async function closeWorkspace() {
     const execute = async () => {
       try {
-        await projectsService.unUseCurrentProject();
-        refetchCurrentProject();
+        await workspaceService.close(currentWorkspaceId);
+        refetchCurrentWorkspace();
       } catch (e) {
         // nothing critical happened, ignore the error
         console.warn("Couldn't stop the emulator: ", e);
@@ -94,17 +94,17 @@ export function ProjectsManagerProvider({
     });
   }
 
-  async function startProject(
-    project: FlowserProject,
-    options?: StartProjectOptions
+  async function openWorkspace(
+    project: FlowserWorkspace,
+    options?: OpenWorkspaceOptions
   ) {
     try {
-      await toast.promise(projectsService.useProject(project.id), {
+      await toast.promise(workspaceService.open(project.id), {
         loading: "Starting project...",
         success: "Project started!",
         error: "Something went wrong, please try again!",
       });
-      refetchCurrentProject();
+      refetchCurrentWorkspace();
       track(AnalyticEvent.PROJECT_STARTED);
       navigate(`/projects/${project.id}`, {
         replace: options?.replaceCurrentPage,
@@ -117,41 +117,41 @@ export function ProjectsManagerProvider({
     }
   }
 
-  async function createProject(
-    project: FlowserProject
-  ): Promise<FlowserProject> {
-    // TODO(restructure): Implement
-    return project;
+  async function createWorkspace(
+    workspace: FlowserWorkspace
+  ): Promise<FlowserWorkspace> {
+    await workspaceService.create(workspace)
+    return workspace;
   }
 
-  async function updateProject(
-    project: FlowserProject
-  ): Promise<FlowserProject> {
-    // TODO(restructure): Implement
-    return project;
+  async function updateWorkspace(
+    workspace: FlowserWorkspace
+  ): Promise<FlowserWorkspace> {
+    await workspaceService.update(workspace)
+    return workspace;
   }
 
   return (
-    <ProjectsManagerContext.Provider
+    <WorkspaceManagerContext.Provider
       value={{
-        currentProject,
-        createProject,
-        updateProject,
-        switchProject,
-        startProject,
-        removeProject,
+        currentWorkspace: currentWorkspace,
+        createWorkspace: createWorkspace,
+        updateWorkspace: updateWorkspace,
+        closeWorkspace: closeWorkspace,
+        openWorkspace: openWorkspace,
+        removeWorkspace: removeWorkspace,
       }}
     >
       <Helmet>
         <title>
-          {currentProject ? `Flowser - ${currentProject?.name}` : "Flowser"}
+          {currentWorkspace ? `Flowser - ${currentWorkspace?.name}` : "Flowser"}
         </title>
       </Helmet>
       {children}
-    </ProjectsManagerContext.Provider>
+    </WorkspaceManagerContext.Provider>
   );
 }
 
-export function useProjectManager(): ProjectsManager {
-  return useContext(ProjectsManagerContext);
+export function useProjectManager(): WorkspaceManager {
+  return useContext(WorkspaceManagerContext);
 }

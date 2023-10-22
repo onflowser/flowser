@@ -1,6 +1,6 @@
 import React, { createContext, ReactElement, useEffect } from "react";
 import * as fcl from "@onflow/fcl";
-import { useProjectManager } from "./projects.context";
+import { useProjectManager } from "./workspace.context";
 import { useGetFlowJson } from "../api";
 
 const FlowConfigContext = createContext({});
@@ -13,12 +13,12 @@ export function FlowConfigProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { currentProject } = useProjectManager();
+  const { currentWorkspace } = useProjectManager();
   const { data: flowJSON } = useGetFlowJson();
 
   useEffect(() => {
-    if (currentProject && flowJSON) {
-      const accessNodePort = currentProject.emulator?.restServerPort ?? 8888;
+    if (currentWorkspace && flowJSON) {
+      const accessNodePort = currentWorkspace.emulator?.restServerPort ?? 8888;
       fcl
         .config({
           "app.detail.icon": `http://localhost:6061/icon.png`,
@@ -30,7 +30,7 @@ export function FlowConfigProvider({
           flowJSON: JSON.parse(flowJSON),
         });
     }
-  }, [currentProject, flowJSON]);
+  }, [currentWorkspace, flowJSON]);
 
   return (
     <FlowConfigContext.Provider value={{}}>

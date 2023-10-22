@@ -3,10 +3,10 @@ import classes from "./SideNavigation.module.scss";
 import { useMatches } from "react-router-dom";
 import { SizedBox } from "../SizedBox/SizedBox";
 import classNames from "classnames";
-import { useProjectManager } from "../../../contexts/projects.context";
+import { useProjectManager } from "../../../contexts/workspace.context";
 import { buildProjectUrl, ProjectLink } from "../../links/ProjectLink";
 import { FlowserIcon } from "../../icons/FlowserIcon";
-import { useCurrentProjectId } from "../../../hooks/use-current-project-id";
+import { useCurrentWorkspaceId } from "../../../hooks/use-current-project-id";
 
 type SideNavigationProps = {
   className?: string;
@@ -14,7 +14,7 @@ type SideNavigationProps = {
 
 // TODO(restructure): Move this to app folder
 export function SideNavigation(props: SideNavigationProps): ReactElement {
-  const { switchProject } = useProjectManager();
+  const { closeWorkspace } = useProjectManager();
 
   return (
     <div className={classNames(classes.root, props.className)}>
@@ -42,7 +42,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
           to="/"
           name="Exit"
           icon={FlowserIcon.Exit}
-          onClick={switchProject}
+          onClick={closeWorkspace}
         />
       </div>
     </div>
@@ -55,7 +55,7 @@ function Link(props: {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   onClick?: () => void;
 }) {
-  const projectId = useCurrentProjectId();
+  const projectId = useCurrentWorkspaceId();
   const fullTargetUrl = buildProjectUrl({
     projectId,
     subPath: props.to,

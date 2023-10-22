@@ -5,7 +5,7 @@ import {
   FlowBlock,
   FlowContract,
   FlowEvent,
-  FlowserProject,
+  FlowserWorkspace,
   FlowStateSnapshot,
   FlowTransaction,
   IResourceIndexReader, ManagedProcessOutput
@@ -24,13 +24,15 @@ interface ISnapshotService extends IResourceIndexReader<FlowStateSnapshot> {
   rollback(request: any): Promise<void>;
 }
 
-interface IProjectService {
-  remove(projectId: string): Promise<void>;
-  // TODO(restructure): Can we remove these methods
-  unUseCurrentProject(): Promise<void>;
-  useProject(projectId: string): Promise<void>;
-  getSingle(projectId: string): Promise<FlowserProject>;
-  getDefaultProjectInfo(): Promise<FlowserProject>;
+interface IWorkspaceService {
+  remove(id: string): Promise<void>;
+  close(id: string): Promise<void>;
+  create(workspace: FlowserWorkspace): Promise<void>;
+  update(workspace: FlowserWorkspace): Promise<void>;
+  open(id: string): Promise<void>;
+  list(): Promise<FlowserWorkspace[]>;
+  findById(id: string): Promise<FlowserWorkspace | undefined>;
+  getDefaultSettings(): Promise<FlowserWorkspace>;
 }
 
 interface IAnalyticsService {
@@ -46,7 +48,7 @@ interface IMonitoringService {
 type ServiceRegistry = {
   walletService: IWalletService;
   snapshotService: ISnapshotService;
-  projectsService: IProjectService;
+  workspaceService: IWorkspaceService;
   analyticsService: IAnalyticsService;
   monitoringService: IMonitoringService;
   accountIndex: IResourceIndexReader<FlowAccount>;

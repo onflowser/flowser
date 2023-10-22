@@ -5,7 +5,7 @@ import { PublicPrivateStorageCard } from "../PublicPrivateStorageCard/PublicPriv
 import { InternalStorageCard } from "../InternalStorageCard/InternalStorageCard";
 import classNames from "classnames";
 import classes from "./AccountStorage.module.scss";
-import { scrollableElementId } from "../../common/layouts/ProjectLayout/ProjectLayout";
+import { scrollableElementId } from "../../common/layouts/ProjectLayout/WorkspaceLayout";
 import { FlowStorageDomain, FlowAccountStorage } from "@onflowser/api";
 
 type AccountStorageProps = {

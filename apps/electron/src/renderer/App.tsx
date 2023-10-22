@@ -20,7 +20,7 @@ import { IpcIndex } from './ipc-index';
 import { FlowserRouter } from './router';
 import { UpdateLoader } from './components/loaders/UpdateLoader';
 import { AnalyticsService } from '../services/analytics.service';
-import { FlowserIndexes } from '../main/flowser';
+import { FlowserIndexes } from '../services/flowser-app.service';
 
 const indexes: FlowserIndexes = {
   accountStorage: new IpcIndex<FlowAccountStorage>('accountStorage'),
@@ -72,7 +72,7 @@ export function App() {
           processOutputIndex: undefined as never,
           monitoringService: undefined as never,
           analyticsService,
-          projectsService: undefined as never,
+          workspaceService: window.electron.workspaces,
           snapshotService: undefined as never,
           walletService: undefined as never,
         }}

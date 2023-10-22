@@ -1,13 +1,13 @@
 import React from "react";
 import { NavLink, NavLinkProps, To } from "react-router-dom";
 import { ReactElement } from "react";
-import { useCurrentProjectId } from "../../hooks/use-current-project-id";
+import { useCurrentWorkspaceId } from "../../hooks/use-current-project-id";
 
 type ProjectLinkProps = NavLinkProps;
 
 // TODO(restructure): Move this to app folder?
 export function ProjectLink(props: ProjectLinkProps): ReactElement {
-  const projectId = useCurrentProjectId();
+  const projectId = useCurrentWorkspaceId();
   const { to, ...otherProps } = props;
   return (
     <NavLink

@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { FlowUtils } from "../../utils/flow-utils";
 import * as yup from "yup";
 import { useErrorHandler } from "../../hooks/use-error-handler";
-import { useProjectManager } from "../../contexts/projects.context";
+import { useProjectManager } from "../../contexts/workspace.context";
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 import {
   RadioField,
@@ -22,7 +22,7 @@ import { useFilePicker } from "../../contexts/platform-adapter.context";
 import { AnalyticEvent, useAnalytics } from "../../hooks/use-analytics";
 import {
   FlowEmulatorConfig,
-  FlowserProject,
+  FlowserWorkspace,
   HashAlgorithm,
   SignatureAlgorithm,
 } from "@onflowser/api";
@@ -42,29 +42,29 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
   props
 ) => {
   const { projectId } = props;
-  const { projectsService } = useServiceRegistry();
+  const { workspaceService } = useServiceRegistry();
   const [isLoading, setIsLoading] = useState(true);
 
   const { track } = useAnalytics();
   const { pickDirectory } = useFilePicker();
-  const { startProject, removeProject, createProject, updateProject } =
+  const { openWorkspace, removeWorkspace, createWorkspace, updateWorkspace } =
     useProjectManager();
   const { data: flowCliInfo } = useGetFlowCliInfo();
   const { handleError } = useErrorHandler(ProjectSettings.name);
   const isExistingProject = Boolean(projectId);
 
-  const formik = useFormik<FlowserProject>({
+  const formik = useFormik<FlowserWorkspace>({
     validationSchema: projectSchema,
     validateOnChange: false,
     // Initial value is set in a hook bellow.
-    initialValues: {} as FlowserProject,
-    onSubmit: async () => {
+    initialValues: {} as FlowserWorkspace,
+    onSubmit: () =>
       toast.promise(saveAndStartProject(), {
         loading: "Running project",
         success: "Project started",
         error: "Failed to projects project",
-      });
-    },
+      })
+    ,
   });
 
   async function saveAndStartProject() {
@@ -72,18 +72,18 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
       track(AnalyticEvent.PROJECT_CREATED);
     }
 
-    let updatedProject: FlowserProject;
+    let updatedProject: FlowserWorkspace;
     try {
       updatedProject = isExistingProject
-        ? await updateProject(formik.values)
-        : await createProject(formik.values);
+        ? await updateWorkspace(formik.values)
+        : await createWorkspace(formik.values);
     } catch (e) {
       handleError(e);
       window.scrollTo(0, 0);
       throw e;
     }
 
-    await startProject(updatedProject, {
+    await openWorkspace(updatedProject, {
       replaceCurrentPage: true,
     });
   }
@@ -110,7 +110,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
   async function loadExistingProject(id: string) {
     try {
-      const existingProject = await projectsService.getSingle(id);
+      const existingProject = await workspaceService.findById(id);
       if (existingProject) {
         formik.setValues(existingProject, false);
       }
@@ -124,7 +124,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
 
   async function loadDefaultProject() {
     try {
-      const defaultProject = await projectsService.getDefaultProjectInfo();
+      const defaultProject = await workspaceService.getDefaultSettings();
       if (defaultProject) {
         formik.setValues(defaultProject, false);
       }
@@ -339,7 +339,7 @@ export const ProjectSettings: FunctionComponent<ProjectSettingsProps> = (
           <div>
             <Button
               className={classes.footerButton}
-              onClick={() => removeProject(formik.values)}
+              onClick={() => removeWorkspace(formik.values)}
               variant="middle"
               outlined={true}
               disabled={!projectId}

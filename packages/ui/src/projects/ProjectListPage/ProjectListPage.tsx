@@ -4,13 +4,13 @@ import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
 import classes from "./ProjectListPage.module.scss";
 import classNames from "classnames";
-import { useProjectManager } from "../../contexts/projects.context";
+import { useProjectManager } from "../../contexts/workspace.context";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
 import { ConsentDialog } from "../../common/overlays/dialogs/consent/ConsentDialog";
 import { useAnalytics } from "../../hooks/use-analytics";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { TextUtils } from "../../utils/text-utils";
-import { useGetFlowserProjects } from "../../api";
+import { useGetWorkspaces } from "../../api";
 
 type ProjectTab = {
   id: string;
@@ -84,9 +84,13 @@ export const ProjectListPage: FunctionComponent = () => {
 };
 
 function ProjectsListContent() {
-  const { data: projects } = useGetFlowserProjects();
-  const { startProject, removeProject } = useProjectManager();
+  const { data: projects, error } = useGetWorkspaces();
+  const { openWorkspace, removeWorkspace } = useProjectManager();
   const showProjectList = projects && projects.length > 0;
+
+  if (error) {
+    return <pre>{error.message}</pre>
+  }
 
   if (!showProjectList) {
     return (
@@ -103,7 +107,7 @@ function ProjectsListContent() {
           <li key={project.id} className={classes.projectItem}>
             <span
               className={classes.projectName}
-              onClick={() => startProject(project)}
+              onClick={() => openWorkspace(project)}
             >
               {project.name}
             </span>
@@ -112,7 +116,7 @@ function ProjectsListContent() {
             </span>
             <SimpleButton
               className={classes.projectTrashcan}
-              onClick={() => removeProject(project)}
+              onClick={() => removeWorkspace(project)}
             >
               <FlowserIcon.Trash />
             </SimpleButton>
