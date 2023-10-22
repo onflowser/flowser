@@ -81,7 +81,7 @@ export function App() {
           <FilePickerProvider
             pickDirectory={window.electron.platformAdapter.showDirectoryPicker}
           >
-            {/*<ConsentAnalytics />*/}
+            <ConsentAnalytics />
             <FlowserUsageRequirements />
             <FlowserRouter />
             <Toaster

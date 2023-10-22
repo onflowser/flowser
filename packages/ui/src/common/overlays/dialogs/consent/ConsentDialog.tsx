@@ -1,11 +1,11 @@
 import React, { ReactElement, useState } from "react";
 import { BaseDialog } from "../base/BaseDialog";
 import classes from "./ConsentDialog.module.scss";
-import logo from "../../../../assets/logo-foreground.svg";
 import ToggleButton, {
   ToggleButtonProps,
 } from "../../../buttons/ToggleButton/ToggleButton";
 import Button from "../../../buttons/Button/Button";
+import { FlowserIcon } from "../../../icons/FlowserIcon";
 
 export type ConsentDialogProps = {
   consent: boolean;
@@ -24,7 +24,7 @@ export function ConsentDialog({
     <BaseDialog onClose={onClose} className={classes.modal}>
       <div className={classes.root}>
         <div className={classes.header}>
-          <img alt="Flowser logo" src={logo} className={classes.logo} />
+          <FlowserIcon.Logo />
           <h2>We would appreciate your help!</h2>
         </div>
         <div className={classes.body}>

@@ -9,7 +9,7 @@ export type FilePicker = {
   pickDirectory?: () => Promise<string | undefined>;
 };
 
-const PlatformAdapterContext = createContext<FilePicker>(
+const FilePickerAdapterContext = createContext<FilePicker>(
   undefined as never
 );
 
@@ -22,14 +22,14 @@ export function FilePickerProvider({
   ...values
 }: FilePickerProviderProps): ReactElement {
   return (
-    <PlatformAdapterContext.Provider value={values}>
+    <FilePickerAdapterContext.Provider value={values}>
       {children}
-    </PlatformAdapterContext.Provider>
+    </FilePickerAdapterContext.Provider>
   );
 }
 
 export function useFilePicker(): FilePicker {
-  const context = useContext(PlatformAdapterContext);
+  const context = useContext(FilePickerAdapterContext);
   if (!context) {
     throw new Error("Platform adapter context not found");
   }
