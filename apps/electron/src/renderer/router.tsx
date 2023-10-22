@@ -25,7 +25,6 @@ import { createCrumbHandle } from '@onflowser/ui/src/common/misc/Breadcrumbs/Bre
 import { TemplatesRegistryProvider } from '@onflowser/ui/src/interactions/contexts/templates.context';
 import { BasicLayout } from '@onflowser/ui/src/common/layouts/BasicLayout/BasicLayout';
 import { EventDetails } from '@onflowser/ui/src/events/EventDetails/EventDetails';
-import { FlowConfigProvider } from '@onflowser/ui/src/contexts/flow.context';
 import { SnapshotsManagerProvider } from '@onflowser/ui/src/contexts/snapshots.context';
 import FullScreenLoading from '@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading';
 import { useServiceRegistry } from '@onflowser/ui/src/contexts/service-registry.context';
@@ -38,8 +37,8 @@ import {
   useGetEvents,
   useGetTransactions,
 } from '@onflowser/ui/src/api';
-import { WorkspaceList } from "@onflowser/ui/src/workspaces/WorkspaceList/WorkspaceList";
-import { WorkspaceSettings } from "@onflowser/ui/src/workspaces/WorkspaceSettings/WorkspaceSettings";
+import { WorkspaceList } from '@onflowser/ui/src/workspaces/WorkspaceList/WorkspaceList';
+import { WorkspaceSettings } from '@onflowser/ui/src/workspaces/WorkspaceSettings/WorkspaceSettings';
 
 function BrowserRouterEvents(props: { children: ReactNode }): ReactElement {
   const location = useLocation();
@@ -154,13 +153,11 @@ const routes: RouteObject[] = [
     path: 'projects',
     element: (
       <WorkspaceManagerProvider>
-        <FlowConfigProvider>
-          <SnapshotsManagerProvider>
-            <BrowserRouterEvents>
-              <Outlet />
-            </BrowserRouterEvents>
-          </SnapshotsManagerProvider>
-        </FlowConfigProvider>
+        <SnapshotsManagerProvider>
+          <BrowserRouterEvents>
+            <Outlet />
+          </BrowserRouterEvents>
+        </SnapshotsManagerProvider>
       </WorkspaceManagerProvider>
     ),
     handle: createCrumbHandle({

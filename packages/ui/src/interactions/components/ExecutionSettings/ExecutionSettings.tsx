@@ -287,7 +287,7 @@ function AuthorizerSettings() {
 
   function setProposerByIndex(address: FclValue, index: number) {
     if (!FclValueUtils.isFclAddressValue(address)) {
-      throw new Error("Expected address value");
+      throw new Error(`Expected address value, found: ${address}`);
     }
     const newAuthorizers = [...authorizerAddresses];
     newAuthorizers[index] = address;

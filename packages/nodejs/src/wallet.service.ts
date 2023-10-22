@@ -3,8 +3,6 @@ import { SHA3 } from "sha3";
 import { FlowCliService, KeyWithWeight } from "./flow-cli.service";
 import { ensurePrefixedAddress, IFlowserLogger } from "@onflowser/core";
 import {
-  FclArgumentWithMetadata,
-  FclValueUtils,
   FlowAuthorizationFunction,
   FlowGatewayService,
 } from "@onflowser/core";
@@ -12,10 +10,9 @@ import * as flowserResource from "@onflowser/api";
 import {
   FlowAccountKey,
   FlowAccount,
-  FlowTransactionArgument,
   HashAlgorithm,
   IResourceIndex,
-  SignatureAlgorithm,
+  SignatureAlgorithm, FclArgumentWithMetadata
 } from "@onflowser/api";
 import { FlowConfigService } from "./flow-config.service";
 
@@ -27,7 +24,7 @@ export interface SendTransactionRequest {
   proposerAddress: string;
   payerAddress: string;
   authorizerAddresses: string[];
-  arguments: FlowTransactionArgument[];
+  arguments: FclArgumentWithMetadata[];
 }
 
 export interface SendTransactionResponse {
@@ -35,7 +32,7 @@ export interface SendTransactionResponse {
 }
 
 type CreateAccountRequest = {
-  projectRootPath: string;
+  workspacePath: string;
 };
 
 const ec: EC = new EC("p256");
@@ -81,30 +78,6 @@ export class WalletService {
     }
     const authorizationFunctionsByAddress = new Map(authorizationFunctions);
 
-    const fclArguments = request.arguments.map(
-      (arg): FclArgumentWithMetadata => {
-        const { identifier, type, valueAsJson } = arg;
-
-        if (!type) {
-          throw new Error("Expecting argument type");
-        }
-
-        const parsedValue = JSON.parse(valueAsJson);
-        const value =
-          parsedValue === "" && type.optional ? undefined : parsedValue;
-
-        if (!FclValueUtils.isFclValue(value)) {
-          throw new Error("Value not a fcl value");
-        }
-
-        return {
-          identifier,
-          type,
-          value,
-        };
-      }
-    );
-
     return this.flowGateway.sendTransaction({
       cadence: request.cadence,
       proposer: getAuthFunction(request.proposerAddress),
@@ -112,7 +85,7 @@ export class WalletService {
       authorizations: request.authorizerAddresses.map((address) =>
         getAuthFunction(address)
       ),
-      arguments: fclArguments,
+      arguments: request.arguments,
     });
   }
 
@@ -176,16 +149,7 @@ export class WalletService {
         };
 
         const account: FlowAccount = {
-          balance: 0,
-          blockId: "",
-          code: "",
-          createdAt: undefined,
-          deletedAt: undefined,
-          isDefaultAccount: false,
-          tags: [],
-          updatedAt: undefined,
-          id: accountAddress,
-          address: accountAddress,
+          ...this.createDefaultAccount(accountAddress),
           // TODO(restructure): Add logic for generating tags
           // https://github.com/onflowser/flowser/pull/197/files#diff-de96e521dbe8391acff7b4c46768d9f51d90d5e30378600a41a57d14bb173f75L97-L116
           keys: [key],
@@ -220,11 +184,11 @@ export class WalletService {
     // multiple keys with (possibly) different weights.
     const generatedKeyPairs = await Promise.all([
       this.cliService.generateKey({
-        projectRootPath: options.projectRootPath,
+        projectRootPath: options.workspacePath,
       }),
     ]);
     const generatedAccount = await this.cliService.createAccount({
-      projectRootPath: options.projectRootPath,
+      projectRootPath: options.workspacePath,
       keys: generatedKeyPairs.map(
         (key): KeyWithWeight => ({
           weight: defaultKeyWeight,
@@ -234,8 +198,8 @@ export class WalletService {
     });
     const accountAddress = ensurePrefixedAddress(generatedAccount.address);
 
-    await this.accountIndex.update({
-      id: accountAddress,
+    await this.accountIndex.add({
+      ...this.createDefaultAccount(accountAddress),
       keys: generatedKeyPairs.map((generatedKey) => {
         return {
           ...this.createDefaultKey(accountAddress),
@@ -245,7 +209,7 @@ export class WalletService {
           publicKey: generatedKey.public,
           privateKey: generatedKey.private,
         };
-      }),
+      })
     });
 
     // TODO(restructure): Update flow.json and regenerate accounts on next run?
@@ -318,15 +282,15 @@ export class WalletService {
     };
   }
 
-  private createDefaultAccount(): FlowAccount {
+  private createDefaultAccount(address: string): FlowAccount {
     return {
-      address: "",
+      id: address,
+      address,
       balance: 0,
       blockId: "",
       code: "",
       createdAt: undefined,
       deletedAt: undefined,
-      id: "",
       isDefaultAccount: false,
       keys: [],
       tags: [],

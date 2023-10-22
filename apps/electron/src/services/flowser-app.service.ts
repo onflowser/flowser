@@ -20,6 +20,8 @@ import {
   FlowEmulatorService,
   ProcessManagerService,
   FlowCliService,
+  WalletService,
+  FlowConfigService,
 } from '@onflowser/nodejs';
 import path from 'path';
 import { WorkspaceService } from './workspace.service';
@@ -45,9 +47,11 @@ export class FlowserAppService {
   public readonly goBindingsService: GoBindingsService;
   public readonly flowInteractionsService: FlowInteractionsService;
   public readonly flowCliService: FlowCliService;
+  public readonly walletService: WalletService;
   public readonly logger: IFlowserLogger;
   public readonly indexes: FlowserIndexes;
   private scheduler: AsyncIntervalScheduler;
+  private flowConfigService: FlowConfigService;
 
   constructor() {
     this.flowGatewayService = new FlowGatewayService();
@@ -90,6 +94,14 @@ export class FlowserAppService {
       this.flowAccountStorageService,
       this.flowGatewayService,
       this.flowInteractionsService,
+    );
+    this.flowConfigService = new FlowConfigService(this.logger);
+    this.walletService = new WalletService(
+      this.logger,
+      this.flowCliService,
+      this.flowGatewayService,
+      this.flowConfigService,
+      this.indexes.account,
     );
     this.scheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',

@@ -1,3 +1,5 @@
+import { FclValue } from "@onflowser/core";
+
 export enum CadenceTypeKind {
   CADENCE_TYPE_UNKNOWN = 0,
   CADENCE_TYPE_FIXED_POINT_NUMBER = 1,
@@ -11,7 +13,7 @@ export enum CadenceTypeKind {
 }
 
 export enum InteractionKind {
-  INTERACTION_UNKNOWN = 1,
+  INTERACTION_UNKNOWN = 0,
   INTERACTION_SCRIPT = 1,
   INTERACTION_TRANSACTION = 2,
 }
@@ -38,7 +40,7 @@ export interface CadenceInteraction_Transaction {
 
 export interface CadenceParameter {
   identifier: string;
-  type: CadenceType | undefined;
+  type: CadenceType;
 }
 
 export interface TimestampedResource {
@@ -173,7 +175,7 @@ export interface FlowTransaction extends TimestampedResource {
   payer: string;
   proposalKey: TransactionProposalKey;
   status: TransactionStatus;
-  arguments: FlowTransactionArgument[];
+  arguments: FclArgumentWithMetadata[];
   authorizers: string[];
   envelopeSignatures: SignableObject[];
   payloadSignatures: SignableObject[];
@@ -185,11 +187,11 @@ export interface TransactionProposalKey {
   sequenceNumber: number;
 }
 
-export interface FlowTransactionArgument {
+export interface FclArgumentWithMetadata {
   identifier: string;
-  type: CadenceType | undefined;
-  valueAsJson: string;
-}
+  value: FclValue;
+  type: CadenceType;
+};
 
 export interface CadenceType {
   kind: CadenceTypeKind;

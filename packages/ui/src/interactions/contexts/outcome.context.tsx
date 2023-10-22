@@ -3,22 +3,14 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
-  useMemo,
+  useState
 } from "react";
 import { CommonUtils } from "../../utils/common-utils";
-import * as fcl from "@onflow/fcl";
 import { useInteractionDefinitionManager } from "./definition.context";
 import toast from "react-hot-toast";
 import { InteractionDefinition, InteractionOutcome } from "../core/core-types";
-import { FlowTransactionArgument, InteractionKind } from "@onflowser/api";
-import {
-  FclArgBuilder,
-  FclArgumentWithMetadata,
-  FclTypeLookup,
-  FclValueUtils,
-} from "@onflowser/core";
+import { FclArgumentWithMetadata, InteractionKind } from "@onflowser/api";
 import { useServiceRegistry } from "../../contexts/service-registry.context";
-import useSWR from "swr";
 
 type InteractionOutcomeManager = {
   outcome: InteractionOutcome | undefined;
@@ -32,37 +24,27 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
-  const { walletService } = useServiceRegistry();
-  const { data, mutate } = useSWR(
-    `/interactions/execute/${JSON.stringify(definition)}`,
-    async () => {
-      if (!definition) {
-        throw new Error("Assertion error: Expected interaction value");
-      }
-      if (!parsedInteraction) {
-        throw new Error("Interaction not parsed yet");
-      }
-      switch (parsedInteraction.kind) {
-        case InteractionKind.INTERACTION_SCRIPT:
-          return executeScript(definition);
-        case InteractionKind.INTERACTION_TRANSACTION:
-          return executeTransaction(definition);
-        default:
-          // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
-          throw new Error(
-            `Can't execute interaction: ${parsedInteraction.kind}`
-          );
-      }
-    }
-  );
-
-  const outcome = useMemo(
-    () => data ?? definition.initialOutcome,
-    [definition, data]
-  );
+  const { flowService } = useServiceRegistry();
+  const [outcome, setOutcome] = useState<InteractionOutcome|undefined>();
 
   async function execute() {
-    await mutate();
+    if (!definition) {
+      throw new Error("Assertion error: Expected interaction value");
+    }
+    if (!parsedInteraction) {
+      throw new Error("Interaction not parsed yet");
+    }
+    switch (parsedInteraction.kind) {
+      case InteractionKind.INTERACTION_SCRIPT:
+        return setOutcome(await executeScript(definition));
+      case InteractionKind.INTERACTION_TRANSACTION:
+        return setOutcome(await executeTransaction(definition));
+      default:
+        // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
+        throw new Error(
+          `Can't execute interaction: ${parsedInteraction.kind}`
+        );
+    }
   }
 
   async function executeTransaction(
@@ -71,9 +53,6 @@ export function InteractionOutcomeManagerProvider(props: {
     const { transactionOptions } = definition;
     if (!transactionOptions) {
       throw new Error("Transaction options must be set");
-    }
-    if (!parsedInteraction) {
-      throw new Error("Interaction not parsed yet");
     }
     let hasErrors = false;
     const unspecifiedAuthorizers = transactionOptions.authorizerAddresses
@@ -99,26 +78,12 @@ export function InteractionOutcomeManagerProvider(props: {
       return undefined;
     }
     try {
-      const result = await walletService.sendTransaction({
+      const result = await flowService.sendTransaction({
         cadence: definition.code,
         authorizerAddresses: transactionOptions.authorizerAddresses,
         proposerAddress: transactionOptions.proposerAddress,
         payerAddress: transactionOptions.payerAddress,
-        arguments: parsedInteraction.parameters.map(
-          (parameter): FlowTransactionArgument => {
-            if (!parameter.type) {
-              throw new Error("Expecting parameter type");
-            }
-            return {
-              valueAsJson:
-                JSON.stringify(
-                  fclValuesByIdentifier.get(parameter.identifier)
-                ) ?? "",
-              type: parameter.type,
-              identifier: parameter.identifier,
-            };
-          }
-        ),
+        arguments: serializeParameters(),
       });
       return {
         transaction: {
@@ -136,30 +101,11 @@ export function InteractionOutcomeManagerProvider(props: {
     }
   }
 
-  async function executeScript(definition: InteractionDefinition) {
+  async function executeScript(definition: InteractionDefinition): Promise<InteractionOutcome | undefined> {
     try {
-      const result = await fcl.query({
+      const result = await flowService.executeScript({
         cadence: definition.code,
-        args: (arg: FclArgBuilder, t: FclTypeLookup) => {
-          if (!parsedInteraction) {
-            throw new Error("Interaction not parsed yet");
-          }
-          const fclArguments = parsedInteraction.parameters.map(
-            (parameter): FclArgumentWithMetadata => {
-              if (!parameter.type) {
-                throw new Error("Expecting parameter type");
-              }
-              return {
-                value: fclValuesByIdentifier.get(parameter.identifier),
-                type: parameter.type,
-                identifier: parameter.identifier,
-              };
-            }
-          );
-          const argumentFunction =
-            FclValueUtils.getArgumentFunction(fclArguments);
-          return argumentFunction(arg, t);
-        },
+        arguments: serializeParameters()
       });
       return {
         script: {
@@ -179,6 +125,27 @@ export function InteractionOutcomeManagerProvider(props: {
         return undefined;
       }
     }
+  }
+
+  function serializeParameters(): FclArgumentWithMetadata[] {
+    if (!parsedInteraction) {
+      throw new Error("Interaction not parsed yet");
+    }
+    return parsedInteraction.parameters.map(
+      (parameter): FclArgumentWithMetadata => {
+        if (!parameter.type) {
+          throw new Error("Expecting parameter type");
+        }
+        const value = fclValuesByIdentifier.get(parameter.identifier);
+        const reMappedValue =
+          value === "" && parameter.type.optional ? undefined : value;
+        return {
+          value: reMappedValue,
+          type: parameter.type,
+          identifier: parameter.identifier,
+        };
+      }
+    )
   }
 
   return (

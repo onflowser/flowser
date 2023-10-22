@@ -11,6 +11,7 @@ import { FlowAccountStorageService } from "./flow-storage.service";
 import { FlowApiStatus, FlowGatewayService } from "./flow-gateway.service";
 import { ensurePrefixedAddress } from "./utils";
 import { IFlowserLogger } from './logger';
+import { FclValue } from "./fcl-value";
 
 // See https://developers.flow.com/cadence/language/core-events
 enum FlowCoreEventType {
@@ -613,18 +614,22 @@ export class FlowIndexerService {
     // our own system of representing types with `CadenceType` message.
     function fromTypeAnnotatedFclArguments(
       object: flowResource.FlowTypeAnnotatedValue
-    ): unknown {
+    ): FclValue {
       const { type, value } = object;
       // Available type values are listed here:
       // https://developers.flow.com/tooling/fcl-js/api#ftype
       switch (type) {
         case "Dictionary":
-          return value.map((entry: any) => ({
+          // TODO(restructure): Double check this
+          // @ts-ignore
+          return value?.map((entry: any) => ({
             key: fromTypeAnnotatedFclArguments(entry.key),
             value: fromTypeAnnotatedFclArguments(entry.value),
           }));
         case "Array":
-          return value.map((element: any) =>
+          // TODO(restructure): Double check this
+          // @ts-ignore
+          return value?.map((element: any) =>
             fromTypeAnnotatedFclArguments(element)
           );
         case "Path":
@@ -649,12 +654,10 @@ export class FlowIndexerService {
       ),
       arguments:
         parsedInteraction.interaction?.parameters.map(
-          (parameter, index): flowserResource.FlowTransactionArgument => ({
+          (parameter, index): flowserResource.FclArgumentWithMetadata => ({
             identifier: parameter.identifier,
             type: parameter.type,
-            valueAsJson: JSON.stringify(
-              fromTypeAnnotatedFclArguments(transaction.args[index])
-            ),
+            value:  fromTypeAnnotatedFclArguments(transaction.args[index]),
           })
         ) ?? [],
       proposalKey: {

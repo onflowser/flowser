@@ -1,9 +1,11 @@
 import { ipcRenderer } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
 import {
+  ExecuteScriptRequest,
   IFlowService,
   IInteractionService,
   IWorkspaceService,
+  SendTransactionRequest,
 } from '@onflowser/ui/src/contexts/service-registry.context';
 import { FlowserIpcEvent } from './events';
 import { FlowserIndexes } from '../../services/flowser-app.service';
@@ -12,6 +14,13 @@ const flow: IFlowService = {
   getIndexOfAddress: (address: string) =>
     ipcRenderer.invoke(FlowserIpcEvent.FLOW_GET_INDEX_OF_ADDRESS, address),
   getFlowCliInfo: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_GET_CLI_INFO),
+  sendTransaction: (
+    request: SendTransactionRequest,
+  ): Promise<{ transactionId: string }> =>
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_SEND_TRANSACTION, request),
+  executeScript: (request: ExecuteScriptRequest): Promise<any> =>
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_EXECUTE_SCRIPT, request),
+  createAccount: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_CREATE_ACCOUNT),
 };
 
 const interactions: IInteractionService = {

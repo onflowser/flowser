@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext } from "react";
 import {
+  FclArgumentWithMetadata,
   FlowAccount,
   FlowAccountStorage,
   FlowBlock, FlowCliInfo,
@@ -10,12 +11,7 @@ import {
   FlowTransaction, InteractionTemplate,
   IResourceIndexReader, ManagedProcessOutput, ParsedInteractionOrError
 } from "@onflowser/api";
-
-interface IWalletService {
-  // TODO(restructure): Provide request/response type
-  sendTransaction(request: any): Promise<any>;
-  createAccount(): Promise<void>;
-}
+import { FlowAuthorizationFunction } from "@onflowser/core";
 
 interface ISnapshotService extends IResourceIndexReader<FlowStateSnapshot> {
   // TODO(restructure): Provide request/response type
@@ -40,7 +36,24 @@ export interface IInteractionService {
   getTemplates(): Promise<InteractionTemplate[]>;
 }
 
+export type SendTransactionRequest =  {
+  // TODO(restructure): These should probably be of type FlowAuthorizationFunction when generalizing for web version
+  cadence: string;
+  proposerAddress: string;
+  payerAddress: string;
+  authorizerAddresses: string[];
+  arguments: FclArgumentWithMetadata[];
+};
+
+export type ExecuteScriptRequest = {
+  cadence: string;
+  arguments: FclArgumentWithMetadata[];
+};
+
 export interface IFlowService {
+  sendTransaction(request: SendTransactionRequest): Promise<{ transactionId: string }>;
+  executeScript(request: ExecuteScriptRequest): Promise<any>;
+  createAccount(): Promise<void>;
   getIndexOfAddress(address: string): Promise<number>;
   getFlowCliInfo(): Promise<FlowCliInfo>;
 }
@@ -58,7 +71,6 @@ interface IMonitoringService {
 type ServiceRegistry = {
   interactionsService: IInteractionService;
   flowService: IFlowService;
-  walletService: IWalletService;
   snapshotService: ISnapshotService;
   workspaceService: IWorkspaceService;
   analyticsService: IAnalyticsService;

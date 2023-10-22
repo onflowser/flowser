@@ -5,6 +5,7 @@ import { Spinner } from "../../../common/loaders/Spinner/Spinner";
 import classes from "./InteractionLabel.module.scss";
 import { InteractionDefinition } from "../../core/core-types";
 import { useGetParsedInteraction } from "../../../api";
+import { InteractionKind } from "@onflowser/api";
 
 type InteractionLabelProps = {
   interaction: InteractionDefinition;
@@ -18,14 +19,10 @@ export function InteractionLabel(props: InteractionLabelProps): ReactElement {
       return <Spinner size={15} />;
   }
 
-  if (!data.interaction) {
-      return <pre>{data.error}</pre>
-  }
-
   return (
     <div className={classes.root}>
       <div className={classes.iconWrapper}>
-        <InteractionIcon interactionKind={data.interaction.kind} />
+        <InteractionIcon interactionKind={data.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN} />
       </div>
       <SizedBox width={10} inline />
       <span className={classes.label}>{interaction.name}</span>

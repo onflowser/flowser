@@ -1,11 +1,11 @@
 import {
   FclArgBuilder,
-  FclArgumentWithMetadata,
-  FclTypeLookup,
-  FclValueUtils,
+  FclTypeLookup, FclValue,
+  FclValueUtils
 } from "./fcl-value";
 import * as fcl from "@onflow/fcl";
 import axios from "axios";
+import { FclArgumentWithMetadata } from "@onflowser/api";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -55,7 +55,7 @@ export type FlowCollection = {
 export type FlowTypeAnnotatedValue = {
   // https://developers.flow.com/tooling/fcl-js/api#ftype
   type: string;
-  value: Record<string, any>;
+  value: FclValue;
 };
 
 // https://docs.onflow.org/fcl/reference/api/#proposalkeyobject
@@ -157,7 +157,7 @@ export class FlowGatewayService {
       });
   }
 
-  public async executeScript(options: ExecuteFlowScriptOptions) {
+  public async executeScript<Result>(options: ExecuteFlowScriptOptions): Promise<Result> {
     return await fcl.query({
       cadence: options.cadence,
       args: (arg: FclArgBuilder, t: FclTypeLookup) => {

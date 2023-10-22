@@ -1,4 +1,4 @@
-import { CadenceType, CadenceTypeKind } from "@onflowser/api";
+import { CadenceType, CadenceTypeKind, FclArgumentWithMetadata } from "@onflowser/api";
 
 // https://developers.flow.com/tooling/fcl-js/api#argumentfunction
 export type FclArgBuilder = (value: FclValue, type: unknown) => void;
@@ -30,12 +30,6 @@ export type FclBoolValue = boolean;
 export type FclTextualValue = string;
 export type FclAddressValue = `0x${string}`;
 export type FclOptionalValue = FclRequiredValue | undefined;
-
-export type FclArgumentWithMetadata = {
-  identifier: string;
-  value: FclValue;
-  type: CadenceType;
-};
 
 export class FclValueUtils {
   private static readonly decimalNumberPattern = /[0-9]+\.[0-9]+/;
