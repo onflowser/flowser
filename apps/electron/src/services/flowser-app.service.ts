@@ -21,6 +21,7 @@ import {
   ProcessManagerService,
   FlowCliService,
 } from '@onflowser/nodejs';
+import path from 'path';
 import { WorkspaceService } from './workspace.service';
 
 export type FlowserIndexes = {
@@ -64,7 +65,10 @@ export class FlowserAppService {
     );
     this.goBindingsService = new GoBindingsService({
       // TODO(restructure): Test if this works on windows/linux
-      binDirPath: process.resourcesPath,
+      binDirPath:
+        process.env.NODE_ENV === 'development'
+          ? path.join(__dirname, '../../../../', 'packages', 'nodejs', 'bin')
+          : process.resourcesPath,
     });
     this.flowInteractionsService = new FlowInteractionsService(
       this.goBindingsService,
