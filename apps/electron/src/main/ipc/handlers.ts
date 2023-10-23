@@ -5,10 +5,8 @@ import {
   SendTransactionRequest,
 } from '@onflowser/ui/src/contexts/service-registry.context';
 import { FlowserIpcEvent } from './events';
-import {
-  FlowserAppService,
-  FlowserIndexes,
-} from '../../services/flowser-app.service';
+import { FlowserAppService } from '../../services/flowser-app.service';
+import { BlockchainIndexes } from '../../services/blockchain-index.service';
 
 type EventListener = (
   event: IpcMainInvokeEvent,
@@ -18,7 +16,7 @@ type EventListener = (
 export function registerHandlers(flowserAppService: FlowserAppService) {
   const {
     workspaceService,
-    indexes,
+    blockchainIndexService,
     flowInteractionsService,
     flowCliService,
     goBindingsService,
@@ -39,7 +37,7 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
       e: IpcMainInvokeEvent,
       updatedWorkspace: FlowserWorkspace,
     ) => workspaceService.update(updatedWorkspace),
-    [FlowserIpcEvent.WORKSPACES_LIST]: () => workspaceService.list(),
+    [FlowserIpcEvent.WORKSPACES_LIST]: () => workspaceService.findAll(),
     [FlowserIpcEvent.WORKSPACES_FIND_BY_ID]: (
       e: IpcMainInvokeEvent,
       id: string,
@@ -51,8 +49,8 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
 
     [FlowserIpcEvent.INDEX_GET_ALL]: (
       event: IpcMainInvokeEvent,
-      indexName: keyof FlowserIndexes,
-    ) => indexes[indexName].findAll(),
+      indexName: keyof BlockchainIndexes,
+    ) => blockchainIndexService.indexes[indexName].findAll(),
 
     [FlowserIpcEvent.INTERACTIONS_PARSE]: (
       event: IpcMainInvokeEvent,

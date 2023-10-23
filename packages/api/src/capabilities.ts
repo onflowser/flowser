@@ -17,6 +17,7 @@ export interface IResourceIndexWriter<Resource extends IdentifiableResource> {
   add(resource: Resource): Promise<void>;
   update(resource: RequireOnly<Resource, "id">): Promise<void>;
   delete(resource: RequireOnly<Resource, "id">): Promise<void>;
+  clear(): Promise<void>;
 }
 
 export interface IResourceIndex<Resource extends IdentifiableResource>

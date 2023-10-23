@@ -23,9 +23,10 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import {
   FlowserAppService,
-  FlowserIndexes,
+
 } from '../services/flowser-app.service';
 import { registerHandlers } from './ipc/handlers';
+import { BlockchainIndexes } from "../services/blockchain-index.service";
 
 class AppUpdater {
   constructor() {
@@ -52,7 +53,7 @@ async function getAllFromIndex(event: IpcMainInvokeEvent, ...args: any[]) {
   }
 
   if (indexName in indexes) {
-    return await indexes[indexName as keyof FlowserIndexes].findAll();
+    return await indexes[indexName as keyof BlockchainIndexes].findAll();
   }
   throw new Error(`Index not found: ${indexName}`);
 }

@@ -8,7 +8,8 @@ import {
   SendTransactionRequest,
 } from '@onflowser/ui/src/contexts/service-registry.context';
 import { FlowserIpcEvent } from './events';
-import { FlowserIndexes } from '../../services/flowser-app.service';
+
+import { BlockchainIndexes } from '../../services/blockchain-index.service';
 
 const flow: IFlowService = {
   getIndexOfAddress: (address: string) =>
@@ -63,7 +64,7 @@ export const electronInvokers = {
   interactions,
   workspaces,
   indexes: {
-    getAll: (indexName: keyof FlowserIndexes) =>
+    getAll: (indexName: keyof BlockchainIndexes) =>
       ipcRenderer.invoke(FlowserIpcEvent.INDEX_GET_ALL, indexName),
   },
   flow,

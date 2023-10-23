@@ -20,9 +20,10 @@ import { IpcIndex } from './ipc-index';
 import { FlowserRouter } from './router';
 import { UpdateLoader } from './components/loaders/UpdateLoader';
 import { AnalyticsService } from '../services/analytics.service';
-import { FlowserIndexes } from '../services/flowser-app.service';
 
-const indexes: FlowserIndexes = {
+import { BlockchainIndexes } from "../services/blockchain-index.service";
+
+const indexes: BlockchainIndexes = {
   accountStorage: new IpcIndex<FlowAccountStorage>('accountStorage'),
   contract: new IpcIndex<FlowContract>('contract'),
   transaction: new IpcIndex<FlowTransaction>('transaction'),

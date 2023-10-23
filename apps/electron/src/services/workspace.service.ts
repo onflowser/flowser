@@ -4,20 +4,31 @@ import { app } from 'electron';
 import path from 'path';
 import fs from 'fs/promises';
 import { randomUUID } from 'crypto';
+import EventEmitter from 'events';
 
-export class WorkspaceService {
-  private readonly openWorkspaces: Map<string, FlowserWorkspace>;
+export enum WorkspaceEvent {
+  WORKSPACE_OPEN = 'WORKSPACE_OPEN',
+  WORKSPACE_CLOSE = 'WORKSPACE_CLOSE',
+}
+
+export class WorkspaceService extends EventEmitter {
+  private readonly openWorkspaceIds: Set<string>;
 
   constructor(private readonly flowEmulatorService: FlowEmulatorService) {
-    this.openWorkspaces = new Map();
+    super();
+    this.openWorkspaceIds = new Set();
   }
 
   async getOpenWorkspaces(): Promise<FlowserWorkspace[]> {
-    return Array.from(this.openWorkspaces.values());
+    const allWorkspaces = await this.findAll();
+    return allWorkspaces.filter((workspace) =>
+      this.openWorkspaceIds.has(workspace.id),
+    );
   }
 
   async close(id: string): Promise<void> {
-    this.openWorkspaces.delete(id);
+    this.openWorkspaceIds.delete(id);
+    this.emit(WorkspaceEvent.WORKSPACE_CLOSE, id);
   }
 
   async open(id: string): Promise<void> {
@@ -25,10 +36,11 @@ export class WorkspaceService {
     if (!workspace) {
       throw new Error('Workspace not found');
     }
-    this.openWorkspaces.set(id, workspace);
+    this.openWorkspaceIds.add(workspace.id);
+    this.emit(WorkspaceEvent.WORKSPACE_OPEN, id);
   }
 
-  async list(): Promise<FlowserWorkspace[]> {
+  async findAll(): Promise<FlowserWorkspace[]> {
     try {
       const file = await fs.readFile(this.getStorageFilePath(), {
         encoding: 'utf-8',
@@ -41,13 +53,13 @@ export class WorkspaceService {
   }
 
   async create(createdWorkspace: FlowserWorkspace) {
-    const existingWorkspaces = await this.list();
+    const existingWorkspaces = await this.findAll();
 
     await this.saveWorkspaces([...existingWorkspaces, createdWorkspace]);
   }
 
   async update(updatedWorkspace: FlowserWorkspace) {
-    const existingWorkspaces = await this.list();
+    const existingWorkspaces = await this.findAll();
 
     await this.saveWorkspaces(
       existingWorkspaces.map((existingWorkspace) =>
@@ -59,12 +71,21 @@ export class WorkspaceService {
   }
 
   async findById(id: string): Promise<FlowserWorkspace | undefined> {
-    const existingWorkspaces = await this.list();
+    const existingWorkspaces = await this.findAll();
     return existingWorkspaces.find((e) => e.id === id);
+  }
+
+  async findByIdOrThrow(id: string): Promise<FlowserWorkspace> {
+    const workspace = await this.findById(id);
+    if (!workspace) {
+      throw new Error(`Workspace ${id} not found`);
+    }
+    return workspace;
   }
 
   async getDefaultSettings(): Promise<FlowserWorkspace> {
     return {
+      filesystemPath: '',
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: undefined,
@@ -76,7 +97,7 @@ export class WorkspaceService {
   }
 
   async remove(id: string): Promise<void> {
-    const existingWorkspaces = await this.list();
+    const existingWorkspaces = await this.findAll();
     await this.saveWorkspaces(existingWorkspaces.filter((e) => e.id !== id));
   }
 

@@ -1,12 +1,11 @@
 import {
   IdentifiableResource,
-  IResourceIndexReader,
-  IResourceIndexWriter,
-  RequireOnly,
+  IResourceIndex,
+  RequireOnly
 } from "@onflowser/api";
 
 export class InMemoryIndex<Resource extends IdentifiableResource>
-  implements IResourceIndexReader<Resource>, IResourceIndexWriter<Resource>
+  implements IResourceIndex<Resource>
 {
   private readonly lookup: Map<string, Resource>;
 
@@ -46,5 +45,9 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
 
   async findOneById(id: string): Promise<Resource | undefined> {
     return this.lookup.get(id);
+  }
+
+  async clear(): Promise<void> {
+    this.lookup.clear();
   }
 }

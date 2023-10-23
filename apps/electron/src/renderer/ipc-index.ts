@@ -1,6 +1,7 @@
 import { IdentifiableResource, TimestampedResource } from '@onflowser/api';
 import { InMemoryIndex } from '@onflowser/core';
-import { FlowserIndexes } from '../services/flowser-app.service';
+
+import { BlockchainIndexes } from '../services/blockchain-index.service';
 
 type IdentifiableAndTimestampedResource = IdentifiableResource &
   TimestampedResource;
@@ -8,7 +9,7 @@ type IdentifiableAndTimestampedResource = IdentifiableResource &
 export class IpcIndex<
   Resource extends IdentifiableAndTimestampedResource,
 > extends InMemoryIndex<Resource> {
-  constructor(private readonly indexName: keyof FlowserIndexes) {
+  constructor(private readonly indexName: keyof BlockchainIndexes) {
     super();
 
     // TODO(restructure): Maybe manually handle this from react app instead
@@ -28,6 +29,9 @@ export class IpcIndex<
 
   async sync() {
     const resources = await window.electron.indexes.getAll(this.indexName);
+
+    // Clear in case the other index was also cleared.
+    await this.clear();
 
     await Promise.allSettled(
       resources.map((resource: Resource) => this.add(resource)),

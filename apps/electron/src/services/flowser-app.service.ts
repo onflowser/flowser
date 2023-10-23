@@ -15,25 +15,17 @@ import {
 } from '@onflowser/api';
 import {
   AsyncIntervalScheduler,
+  FlowCliService,
+  FlowConfigService,
+  FlowEmulatorService,
   FlowInteractionsService,
   GoBindingsService,
-  FlowEmulatorService,
   ProcessManagerService,
-  FlowCliService,
   WalletService,
-  FlowConfigService,
 } from '@onflowser/nodejs';
 import path from 'path';
-import { WorkspaceService } from './workspace.service';
-
-export type FlowserIndexes = {
-  accountStorage: InMemoryIndex<FlowAccountStorage>;
-  contract: InMemoryIndex<FlowContract>;
-  block: InMemoryIndex<FlowBlock>;
-  event: InMemoryIndex<FlowEvent>;
-  transaction: InMemoryIndex<FlowTransaction>;
-  account: InMemoryIndex<FlowAccount>;
-};
+import { WorkspaceEvent, WorkspaceService } from './workspace.service';
+import { BlockchainIndexService } from './blockchain-index.service';
 
 // TODO(restructure): Should this be more like a service registry instead?
 export class FlowserAppService {
@@ -49,21 +41,13 @@ export class FlowserAppService {
   public readonly flowCliService: FlowCliService;
   public readonly walletService: WalletService;
   public readonly logger: IFlowserLogger;
-  public readonly indexes: FlowserIndexes;
+  public readonly blockchainIndexService: BlockchainIndexService;
+  private readonly flowConfigService: FlowConfigService;
   private scheduler: AsyncIntervalScheduler;
-  private flowConfigService: FlowConfigService;
 
   constructor() {
     this.flowGatewayService = new FlowGatewayService();
     this.logger = new WebLogger();
-    this.indexes = {
-      transaction: new InMemoryIndex<FlowTransaction>(),
-      block: new InMemoryIndex<FlowBlock>(),
-      account: new InMemoryIndex<FlowAccount>(),
-      event: new InMemoryIndex<FlowEvent>(),
-      contract: new InMemoryIndex<FlowContract>(),
-      accountStorage: new InMemoryIndex<FlowAccountStorage>(),
-    };
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService,
     );
@@ -83,14 +67,22 @@ export class FlowserAppService {
       this.processManagerService,
     );
     this.workspaceService = new WorkspaceService(this.flowEmulatorService);
+    this.blockchainIndexService = new BlockchainIndexService({
+      transaction: new InMemoryIndex<FlowTransaction>(),
+      block: new InMemoryIndex<FlowBlock>(),
+      account: new InMemoryIndex<FlowAccount>(),
+      event: new InMemoryIndex<FlowEvent>(),
+      contract: new InMemoryIndex<FlowContract>(),
+      accountStorage: new InMemoryIndex<FlowAccountStorage>(),
+    });
     this.flowIndexerService = new FlowIndexerService(
       this.logger,
-      this.indexes.transaction,
-      this.indexes.account,
-      this.indexes.block,
-      this.indexes.event,
-      this.indexes.contract,
-      this.indexes.accountStorage,
+      this.blockchainIndexService.indexes.transaction,
+      this.blockchainIndexService.indexes.account,
+      this.blockchainIndexService.indexes.block,
+      this.blockchainIndexService.indexes.event,
+      this.blockchainIndexService.indexes.contract,
+      this.blockchainIndexService.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
       this.flowInteractionsService,
@@ -101,13 +93,14 @@ export class FlowserAppService {
       this.flowCliService,
       this.flowGatewayService,
       this.flowConfigService,
-      this.indexes.account,
+      this.blockchainIndexService.indexes.account,
     );
     this.scheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
       pollingIntervalInMs: 500,
       functionToExecute: () => this.flowIndexerService.processBlockchainData(),
     });
+    this.registerListeners();
   }
 
   static create(): FlowserAppService {
@@ -119,6 +112,26 @@ export class FlowserAppService {
 
   startProcessing() {
     return this.scheduler.start();
+  }
+
+  private registerListeners() {
+    this.workspaceService.on(
+      WorkspaceEvent.WORKSPACE_OPEN,
+      async (workspaceId) => {
+        const workspace =
+          await this.workspaceService.findByIdOrThrow(workspaceId);
+        if (workspace.emulator) {
+          await this.flowEmulatorService.start({
+            workspacePath: workspace.filesystemPath,
+            config: workspace.emulator,
+          });
+        }
+      },
+    );
+    this.workspaceService.on(WorkspaceEvent.WORKSPACE_CLOSE, async () => {
+      await this.flowEmulatorService.stopAndCleanup();
+      this.blockchainIndexService.clear();
+    });
   }
 
   configure() {

@@ -53,11 +53,7 @@ export interface IdentifiableResource {
   id: string;
 }
 
-export interface BlockScopedResource {
-  blockId: string;
-}
-
-export interface FlowAccount extends TimestampedResource {
+export interface FlowAccount extends TimestampedResource, IdentifiableResource {
   // ID is equal to the address.
   id: string;
   address: string;
@@ -107,7 +103,7 @@ export interface FlowAccountKey {
   revoked: boolean;
 }
 
-export interface FlowContract extends TimestampedResource {
+export interface FlowContract extends TimestampedResource, IdentifiableResource {
   // ID is the combination of `address` and `name`.
   id: string;
   address: string;
@@ -140,7 +136,7 @@ export enum FlowStorageDomain {
   STORAGE_DOMAIN_STORAGE = 3,
 }
 
-export interface FlowAccountStorage extends TimestampedResource {
+export interface FlowAccountStorage extends TimestampedResource, IdentifiableResource {
   id: string;
   address: string;
   domain: FlowStorageDomain;
@@ -150,7 +146,7 @@ export interface FlowAccountStorage extends TimestampedResource {
   targetPath: string;
 }
 
-export interface FlowBlock extends TimestampedResource {
+export interface FlowBlock extends TimestampedResource, IdentifiableResource {
   id: string;
   height: number;
   parentId: string;

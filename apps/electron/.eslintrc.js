@@ -18,6 +18,8 @@ module.exports = {
     'lines-between-class-members': 'off',
     'no-use-before-define': 'off',
     'max-classes-per-file': 'off',
+    'no-useless-constructor': 'off',
+    'no-empty-function': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,
