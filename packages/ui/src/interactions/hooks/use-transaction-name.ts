@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useTemplatesRegistry } from "../contexts/templates.context";
 import { InteractionUtils } from "../core/core-utils";
 import { FlowTransaction } from "@onflowser/api";
+import { FclValue } from "@onflowser/core";
 
 type UseInteractionNameProps = {
   transaction: FlowTransaction | undefined;
@@ -115,9 +116,7 @@ function getStandardInteractionName(
   }
 }
 
-function getArgumentValueById(transaction: FlowTransaction, id: string) {
-  return JSON.parse(
-    transaction.arguments.find((argument) => argument.identifier === id)
-      ?.valueAsJson ?? ""
-  );
+function getArgumentValueById(transaction: FlowTransaction, id: string): FclValue {
+  return transaction.arguments.find((argument) => argument.identifier === id)
+    ?.value
 }

@@ -140,7 +140,7 @@ export enum FlowStorageDomain {
   STORAGE_DOMAIN_STORAGE = 3,
 }
 
-export interface FlowAccountStorage {
+export interface FlowAccountStorage extends TimestampedResource {
   id: string;
   address: string;
   domain: FlowStorageDomain;

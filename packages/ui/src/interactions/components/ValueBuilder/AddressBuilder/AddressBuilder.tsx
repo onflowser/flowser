@@ -21,8 +21,6 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
     )
     : data, [addressBuilderOptions?.showManagedAccountsOnly, data]);
 
-  // TODO(polish): Don't trigger this hook on every rerender
-  //  See: https://www.notion.so/flowser/Looks-like-polling-data-isn-t-properly-mutated-and-doesn-t-retrigger-the-useEffect-call-fb84a35b33fb4e6e8518c11cb30bd14d?pvs=4
   useEffect(() => {
     const serviceAddress = "0xf8d6e0586b0a20c7";
     const defaultAccount =

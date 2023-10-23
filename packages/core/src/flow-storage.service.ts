@@ -53,6 +53,9 @@ export class FlowAccountStorageService {
           domain: this.getStorageDomainFromPath(item.path),
           path: item.path,
           targetPath: item.targetPath,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: undefined
         })
       ),
       ...flowAccountStorage.storagePathItems.map(
@@ -66,6 +69,9 @@ export class FlowAccountStorageService {
           domain: this.getStorageDomainFromPath(item.path),
           path: item.path,
           targetPath: "",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: undefined
         })
       ),
     ];
