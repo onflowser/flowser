@@ -58,16 +58,10 @@ export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
     validateOnChange: false,
     // Initial value is set in a hook bellow.
     initialValues: {} as FlowserWorkspace,
-    onSubmit: () =>
-      toast.promise(saveAndStartProject(), {
-        loading: "Running project",
-        success: "Project started",
-        error: "Failed to projects project",
-      })
-    ,
+    onSubmit: () => saveAndOpenWorkspace()
   });
 
-  async function saveAndStartProject() {
+  async function saveAndOpenWorkspace() {
     if (!isExistingProject) {
       track(AnalyticEvent.PROJECT_CREATED);
     }

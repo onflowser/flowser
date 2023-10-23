@@ -43,16 +43,16 @@ export function WorkspaceManagerProvider({
   const { data: currentWorkspace, mutate: refetchCurrentWorkspace } =
     useGetWorkspace(currentWorkspaceId);
 
-  const confirmProjectRemove = async (project: FlowserWorkspace) => {
+  const confirmWorkspaceRemove = async (project: FlowserWorkspace) => {
     track(AnalyticEvent.PROJECT_REMOVED, { projectName: project.name });
 
     try {
       await toast.promise(workspaceService.remove(project.id), {
         loading: "Deleting project",
         error: `Failed to delete project "${project.name}"`,
-        success: `Project "${project.name}" deleted!`,
+        success: `Project "${project.name}" removed!`,
       });
-      refetchCurrentWorkspace();
+      await refetchCurrentWorkspace();
       navigate("/projects", {
         replace: true,
       });
@@ -67,31 +67,23 @@ export function WorkspaceManagerProvider({
     showDialog({
       title: "Delete project",
       body: <span>Are you sure you want to delete this project?</span>,
-      onConfirm: () => confirmProjectRemove(project),
+      onConfirm: () => confirmWorkspaceRemove(project),
       confirmButtonLabel: "DELETE",
       cancelButtonLabel: "CANCEL",
     });
   }
 
   async function closeWorkspace() {
-    const execute = async () => {
-      try {
-        await workspaceService.close(currentWorkspaceId);
-        refetchCurrentWorkspace();
-      } catch (e) {
-        // nothing critical happened, ignore the error
-        console.warn("Couldn't stop the emulator: ", e);
-      }
+    try {
       // TODO(restructure): Do we need to clear the local cache?
+      await workspaceService.close(currentWorkspaceId);
+      await refetchCurrentWorkspace();
       navigate("/projects", {
         replace: true,
       });
-    };
-    await toast.promise(execute(), {
-      loading: "Closing project...",
-      success: "Project closed!",
-      error: "Something went wrong, please try again!",
-    });
+    } catch (e) {
+      handleError(e);
+    }
   }
 
   async function openWorkspace(
@@ -99,12 +91,8 @@ export function WorkspaceManagerProvider({
     options?: OpenWorkspaceOptions
   ) {
     try {
-      await toast.promise(workspaceService.open(project.id), {
-        loading: "Starting project...",
-        success: "Project started!",
-        error: "Something went wrong, please try again!",
-      });
-      refetchCurrentWorkspace();
+      await workspaceService.open(project.id);
+      await refetchCurrentWorkspace();
       track(AnalyticEvent.PROJECT_STARTED);
       navigate(`/projects/${project.id}`, {
         replace: options?.replaceCurrentPage,
