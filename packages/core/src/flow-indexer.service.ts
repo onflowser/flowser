@@ -104,7 +104,7 @@ export class FlowIndexerService {
     const lastIndexedBlock = this.findLatestBlock(allBlocks);
     const nextBlockHeightToProcess = lastIndexedBlock
       ? lastIndexedBlock.blockHeight + 1
-      : latestBlock.height;
+      : 0;
     const latestUnprocessedBlockHeight = latestBlock.height;
 
     return {
