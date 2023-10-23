@@ -21,7 +21,8 @@ import { FlowserRouter } from './router';
 import { UpdateLoader } from './components/loaders/UpdateLoader';
 import { AnalyticsService } from '../services/analytics.service';
 
-import { BlockchainIndexes } from "../services/blockchain-index.service";
+import { BlockchainIndexes } from '../services/blockchain-index.service';
+import { SentryRendererService } from '../services/sentry-renderer.service';
 
 const indexes: BlockchainIndexes = {
   accountStorage: new IpcIndex<FlowAccountStorage>('accountStorage'),
@@ -33,6 +34,7 @@ const indexes: BlockchainIndexes = {
 };
 
 const analyticsService = new AnalyticsService();
+const monitoringService = new SentryRendererService();
 
 export function App() {
   const [isExiting, setIsExiting] = useState(false);
@@ -73,7 +75,7 @@ export function App() {
           blocksIndex: indexes.block,
           transactionsIndex: indexes.transaction,
           processOutputIndex: undefined as never,
-          monitoringService: undefined as never,
+          monitoringService,
           analyticsService,
           workspaceService: window.electron.workspaces,
           snapshotService: undefined as never,

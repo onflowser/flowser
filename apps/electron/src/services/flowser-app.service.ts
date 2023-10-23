@@ -2,6 +2,7 @@ import {
   FlowAccountStorageService,
   FlowGatewayService,
   FlowIndexerService,
+  FlowSnapshotsService,
   IFlowserLogger,
   InMemoryIndex,
 } from '@onflowser/core';
@@ -27,7 +28,6 @@ import path from 'path';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 
-// TODO(restructure): Should this be more like a service registry instead?
 export class FlowserAppService {
   static instance: FlowserAppService;
   public readonly flowGatewayService: FlowGatewayService;
@@ -42,7 +42,8 @@ export class FlowserAppService {
   public readonly walletService: WalletService;
   public readonly logger: IFlowserLogger;
   public readonly blockchainIndexService: BlockchainIndexService;
-  private readonly flowConfigService: FlowConfigService;
+  public readonly flowSnapshotsService: FlowSnapshotsService;
+  public readonly flowConfigService: FlowConfigService;
   private scheduler: AsyncIntervalScheduler;
 
   constructor() {
@@ -66,6 +67,7 @@ export class FlowserAppService {
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
     );
+    this.flowSnapshotsService = new FlowSnapshotsService();
     this.workspaceService = new WorkspaceService(this.flowEmulatorService);
     this.blockchainIndexService = new BlockchainIndexService({
       transaction: new InMemoryIndex<FlowTransaction>(),
@@ -117,90 +119,48 @@ export class FlowserAppService {
   private registerListeners() {
     this.workspaceService.on(
       WorkspaceEvent.WORKSPACE_OPEN,
-      async (workspaceId) => {
-        const workspace =
-          await this.workspaceService.findByIdOrThrow(workspaceId);
-        if (workspace.emulator) {
-          await this.flowEmulatorService.start({
-            workspacePath: workspace.filesystemPath,
-            config: workspace.emulator,
-          });
-        }
-      },
+      this.onWorkspaceOpen.bind(this),
     );
-    this.workspaceService.on(WorkspaceEvent.WORKSPACE_CLOSE, async () => {
-      await this.flowEmulatorService.stopAndCleanup();
-      this.blockchainIndexService.clear();
-    });
+    this.workspaceService.on(
+      WorkspaceEvent.WORKSPACE_CLOSE,
+      this.onWorkspaceClose.bind(this),
+    );
   }
 
-  configure() {
+  private async onWorkspaceOpen(workspaceId: string) {
+    const workspace = await this.workspaceService.findByIdOrThrow(workspaceId);
+
+    await this.flowConfigService.configure({
+      workspacePath: workspace.filesystemPath,
+    });
+
     this.flowGatewayService.configure({
       restServerAddress: 'http://localhost:8888',
-      flowJSON: {
-        contracts: {
-          ExampleNFT: 'cadence/contracts/exampleNFT/ExampleNFT.cdc',
-          FungibleToken: {
-            source: '',
-            aliases: {
-              emulator: 'ee82856bf20e2aa6',
-            },
-          },
-          MetadataViews: {
-            source: '',
-            aliases: {
-              emulator: 'f8d6e0586b0a20c7',
-            },
-          },
-          NonFungibleToken: {
-            source: '',
-            aliases: {
-              emulator: 'f8d6e0586b0a20c7',
-            },
-          },
-          ViewResolver: 'cadence/contracts/standards/ViewResolver.cdc',
-        },
-        networks: {
-          emulator: '127.0.0.1:3569',
-          mainnet: 'access.mainnet.nodes.onflow.org:9000',
-          sandboxnet: 'access.sandboxnet.nodes.onflow.org:9000',
-          testnet: 'access.devnet.nodes.onflow.org:9000',
-        },
-        accounts: {
-          default: {
-            address: 'f669cb8d41ce0c74',
-            key: '2e09fac1b3b8e128c67b2e57ba59ec8506ff8326053812135a954b4d3291096f',
-          },
-          'emulator-account': {
-            address: 'f8d6e0586b0a20c7',
-            key: 'd2c3686da84d61c13627bdf2127866fe358165734f5470be792e6771901d2856',
-          },
-          exampleNFT: {
-            address: '192440c99cb17282',
-            key: '58cfc56dcbbfa8bfb7b9898586793b0710dfebe8a0358774044968abc9acc8c2',
-          },
-          standards: {
-            address: 'fd43f9148d4b725d',
-            key: '28946711cc802634ca4520c0f8b113e065c519dc02306a05ecb204a896ee80ed',
-          },
-          '0x01cf0e2f2f715450': {
-            address: '0x01cf0e2f2f715450',
-            key: '95b367208187ecc83a3e6c9aba61ad0edc00af3e0d678c60b39fe13ccfc5d75b',
-          },
-          '0x179b6b1cb6755e31': {
-            address: '0x179b6b1cb6755e31',
-            key: 'f1f066337d4e853311807fd94bed599739d7cede8c6e6585414703eb0e0345ed',
-          },
-        },
-        deployments: {
-          emulator: {
-            default: [],
-            exampleNFT: ['ExampleNFT'],
-            standards: ['ViewResolver'],
-          },
-        },
-      },
+      flowJSON: this.flowConfigService.getFlowJSON(),
     });
+
+    if (workspace.emulator) {
+      await this.flowEmulatorService.start({
+        workspacePath: workspace.filesystemPath,
+        config: workspace.emulator,
+      });
+    }
+
+    if (workspace.emulator) {
+      this.flowSnapshotsService.configure({
+        adminServerPort: workspace.emulator.adminServerPort,
+      });
+    } else {
+      this.flowSnapshotsService.configure({
+        adminServerPort:
+          this.flowEmulatorService.getDefaultConfig().adminServerPort,
+      });
+    }
+  }
+
+  private async onWorkspaceClose() {
+    await this.flowEmulatorService.stopAndCleanup();
+    this.blockchainIndexService.clear();
   }
 }
 

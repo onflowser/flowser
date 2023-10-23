@@ -55,7 +55,7 @@ type FlowNetworkConfig =
       NetworkKey: string;
     };
 
-type FlowCliConfig = {
+type FlowJSON = {
   contracts?: FlowContractsConfig;
   deployments?: FlowDeploymentsConfig;
   accounts?: FlowAccountsConfig;
@@ -80,12 +80,12 @@ export type FlowAbstractContractConfig = {
 };
 
 type FlowConfigServiceConfig = {
-  workingDirectoryPath: string;
+  workspacePath: string;
 };
 
 export class FlowConfigService {
   private fileListenerController: AbortController | undefined;
-  private config: FlowCliConfig | undefined;
+  private config: FlowJSON | undefined;
   private configFileName = "flow.json";
   private workingDirectoryPath: string | undefined;
 
@@ -93,7 +93,7 @@ export class FlowConfigService {
   }
 
   public async configure(config: FlowConfigServiceConfig) {
-    this.workingDirectoryPath = config.workingDirectoryPath;
+    this.workingDirectoryPath = config.workspacePath;
     await this.reload();
   }
 
@@ -102,7 +102,7 @@ export class FlowConfigService {
     this.detachListeners();
   }
 
-  public getRawConfig(): FlowCliConfig | undefined {
+  public getFlowJSON(): FlowJSON | undefined {
     return this.config;
   }
 

@@ -295,10 +295,8 @@ export interface ManagedProcessOutput {
 }
 
 export enum ProcessOutputSource {
-  OUTPUT_SOURCE_UNSPECIFIED = 0,
   OUTPUT_SOURCE_STDOUT = 1,
   OUTPUT_SOURCE_STDERR = 2,
-  UNRECOGNIZED = -1,
 }
 
 export interface FlowserWorkspace extends TimestampedResource {
