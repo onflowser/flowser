@@ -11,13 +11,12 @@ import {
   FlowTransaction, InteractionTemplate,
   IResourceIndexReader, ManagedProcessOutput, ParsedInteractionOrError
 } from "@onflowser/api";
-import { FlowAuthorizationFunction } from "@onflowser/core";
 
-interface ISnapshotService extends IResourceIndexReader<FlowStateSnapshot> {
-  // TODO(restructure): Provide request/response type
-  create(request: any): Promise<void>;
-  checkoutBlock(request: any): Promise<void>;
-  rollback(request: any): Promise<void>;
+export interface ISnapshotService {
+  list(): Promise<FlowStateSnapshot[]>;
+  create(name: string): Promise<void>;
+  jumpTo(name: string): Promise<void>;
+  rollbackToHeight(height: number): Promise<void>;
 }
 
 export interface IWorkspaceService {
@@ -37,7 +36,7 @@ export interface IInteractionService {
 }
 
 export type SendTransactionRequest =  {
-  // TODO(restructure): These should probably be of type FlowAuthorizationFunction when generalizing for web version
+  // TODO(web): These should probably be of type FlowAuthorizationFunction when generalizing for web version
   cadence: string;
   proposerAddress: string;
   payerAddress: string;
@@ -101,7 +100,7 @@ export function ServiceRegistryProvider(props: ServiceRegistryProviderProps) {
   );
 }
 
-export function useServiceRegistry() {
+export function useServiceRegistry(): ServiceRegistry {
   const context = useContext(ServiceRegistryContext);
 
   if (context === undefined) {

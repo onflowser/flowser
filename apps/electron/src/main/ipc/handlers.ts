@@ -22,6 +22,7 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
     goBindingsService,
     flowGatewayService,
     walletService,
+    flowSnapshotsService,
   } = flowserAppService;
 
   const handlers: Record<FlowserIpcEvent, EventListener> = {
@@ -95,6 +96,21 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
         workspacePath: openWorkspaces[0].filesystemPath,
       });
     },
+
+    [FlowserIpcEvent.SNAPSHOTS_LIST]: (event: IpcMainInvokeEvent) =>
+      flowSnapshotsService.findAll(),
+    [FlowserIpcEvent.SNAPSHOTS_CREATE]: (
+      event: IpcMainInvokeEvent,
+      name: string,
+    ) => flowSnapshotsService.create(name),
+    [FlowserIpcEvent.SNAPSHOTS_JUMP_TO]: (
+      event: IpcMainInvokeEvent,
+      id: string,
+    ) => flowSnapshotsService.jumpTo(id),
+    [FlowserIpcEvent.SNAPSHOTS_ROLLBACK_TO_HEIGHT]: (
+      event: IpcMainInvokeEvent,
+      height: number,
+    ) => flowSnapshotsService.rollbackToHeight(height),
   };
 
   for (const eventName in handlers) {

@@ -4,6 +4,7 @@ import {
   ExecuteScriptRequest,
   IFlowService,
   IInteractionService,
+  ISnapshotService,
   IWorkspaceService,
   SendTransactionRequest,
 } from '@onflowser/ui/src/contexts/service-registry.context';
@@ -48,6 +49,16 @@ const workspaces: IWorkspaceService = {
     ipcRenderer.invoke(FlowserIpcEvent.WORKSPACES_DEFAULT_SETTINGS),
 };
 
+const snapshots: ISnapshotService = {
+  list: () => ipcRenderer.invoke(FlowserIpcEvent.SNAPSHOTS_LIST),
+  create: (name: string) =>
+    ipcRenderer.invoke(FlowserIpcEvent.SNAPSHOTS_CREATE, name),
+  jumpTo: (id: string) =>
+    ipcRenderer.invoke(FlowserIpcEvent.SNAPSHOTS_JUMP_TO, id),
+  rollbackToHeight: (height: number) =>
+    ipcRenderer.invoke(FlowserIpcEvent.SNAPSHOTS_ROLLBACK_TO_HEIGHT, height),
+};
+
 export const electronInvokers = {
   platformAdapter: {
     showDirectoryPicker: () => ipcRenderer.invoke('showDirectoryPicker'),
@@ -63,6 +74,7 @@ export const electronInvokers = {
   },
   interactions,
   workspaces,
+  snapshots,
   indexes: {
     getAll: (indexName: keyof BlockchainIndexes) =>
       ipcRenderer.invoke(FlowserIpcEvent.INDEX_GET_ALL, indexName),

@@ -78,7 +78,7 @@ export function App() {
           monitoringService,
           analyticsService,
           workspaceService: window.electron.workspaces,
-          snapshotService: undefined as never,
+          snapshotService: window.electron.snapshots,
         }}
       >
         <ConfirmDialogProvider>

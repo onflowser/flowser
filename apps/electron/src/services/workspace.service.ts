@@ -1,10 +1,8 @@
 import { FlowserWorkspace } from '@onflowser/api';
 import { FlowEmulatorService } from '@onflowser/nodejs';
-import { app } from 'electron';
-import path from 'path';
-import fs from 'fs/promises';
 import { randomUUID } from 'crypto';
 import EventEmitter from 'events';
+import { PersistentStorage } from '@onflowser/core/src/persistent-storage';
 
 export enum WorkspaceEvent {
   WORKSPACE_OPEN = 'WORKSPACE_OPEN',
@@ -14,7 +12,10 @@ export enum WorkspaceEvent {
 export class WorkspaceService extends EventEmitter {
   private readonly openWorkspaceIds: Set<string>;
 
-  constructor(private readonly flowEmulatorService: FlowEmulatorService) {
+  constructor(
+    private readonly flowEmulatorService: FlowEmulatorService,
+    private readonly storage: PersistentStorage,
+  ) {
     super();
     this.openWorkspaceIds = new Set();
   }
@@ -41,15 +42,9 @@ export class WorkspaceService extends EventEmitter {
   }
 
   async findAll(): Promise<FlowserWorkspace[]> {
-    try {
-      const file = await fs.readFile(this.getStorageFilePath(), {
-        encoding: 'utf-8',
-      });
-      return JSON.parse(file) as FlowserWorkspace[];
-    } catch (e) {
-      // TODO(restructure): Return empty list only in case file is not found
-      return [];
-    }
+    const existing = await this.storage.read();
+
+    return JSON.parse(existing ?? '[]');
   }
 
   async create(createdWorkspace: FlowserWorkspace) {
@@ -102,10 +97,6 @@ export class WorkspaceService extends EventEmitter {
   }
 
   private async saveWorkspaces(workspaces: FlowserWorkspace[]) {
-    await fs.writeFile(this.getStorageFilePath(), JSON.stringify(workspaces));
-  }
-
-  private getStorageFilePath() {
-    return path.join(app.getPath('userData'), 'flowser.json');
+    await this.storage.write(JSON.stringify(workspaces));
   }
 }

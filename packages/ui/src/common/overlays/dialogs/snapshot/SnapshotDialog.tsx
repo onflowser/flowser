@@ -2,7 +2,7 @@ import React, { FC, useState } from "react";
 import Button from "../../../buttons/Button/Button";
 import classes from "./SnapshotDialog.module.scss";
 import toast from "react-hot-toast";
-import { Input } from "../../../inputs/Input/Input";
+import { Input } from "../../../inputs";
 import { ActionDialog } from "../action/ActionDialog";
 import { useErrorHandler } from "../../../../hooks/use-error-handler";
 import { useCurrentWorkspaceId } from "../../../../hooks/use-current-project-id";
@@ -18,7 +18,7 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
   const { handleError } = useErrorHandler(SnapshotDialog.name);
   const { snapshotService } = useServiceRegistry();
   const [loading, setLoading] = useState(false);
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
 
   function onClose() {
     setShow(false);
@@ -30,10 +30,7 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
     }
     setLoading(true);
     try {
-      await snapshotService.create({
-        description,
-        projectId,
-      });
+      await snapshotService.create(name);
       toast.success("Snapshot created");
       onClose();
     } catch (e) {
@@ -73,8 +70,8 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
       </p>
       <Input
         placeholder="Snapshot description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
     </ActionDialog>
   );

@@ -37,7 +37,7 @@ export function SnapshotsManagerProvider({
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
   const { showDialog } = useConfirmDialog();
   const { currentWorkspace } = useProjectManager();
-  const { data: blocks, mutate } = useGetBlocks();
+  const { data: blocks } = useGetBlocks();
   const { data: stateSnapshots } = useGetStateSnapshots();
   const snapshotLookupByBlockId = useMemo(
     () =>
@@ -90,11 +90,7 @@ export function SnapshotsManagerProvider({
       }
 
       try {
-        await snapshotService.checkoutBlock({
-          blockId: snapshot.blockId,
-          projectId: currentWorkspace.id,
-        });
-        mutate();
+        await snapshotService.jumpTo(snapshot.id);
         toast.success(
           `Moved to block: ${FlowUtils.getShortedBlockId(snapshot.blockId)}`
         );
@@ -108,7 +104,7 @@ export function SnapshotsManagerProvider({
       body: (
         <span style={{ textAlign: "center" }}>
           Do you want to move the emulator blockchain state to the snapshot{" "}
-          <code>{snapshot.description}</code>?
+          <code>{snapshot.id}</code>?
         </span>
       ),
       confirmButtonLabel: "JUMP",
@@ -136,10 +132,7 @@ export function SnapshotsManagerProvider({
       }
 
       try {
-        await snapshotService.rollback({
-          blockHeight: targetBlock.height,
-        });
-        mutate();
+        await snapshotService.rollbackToHeight(targetBlock.height);
         toast.success(
           `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock.id)}`
         );

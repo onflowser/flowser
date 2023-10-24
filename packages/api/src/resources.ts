@@ -257,9 +257,8 @@ export interface FlowEvent extends TimestampedResource {
 
 export interface FlowStateSnapshot {
   id: string;
-  description: string;
   blockId: string;
-  projectId: string;
+  blockHeight: number;
 }
 
 export interface ManagedProcess {

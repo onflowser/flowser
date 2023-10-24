@@ -1,5 +1,7 @@
 import axios, { Method } from "axios";
-import { FlowEmulatorConfig } from "@onflowser/api";
+import { FlowEmulatorConfig, FlowStateSnapshot } from "@onflowser/api";
+import { PersistentStorage } from "./persistent-storage";
+import EventEmitter from "events";
 
 type ListSnapshotsResponse = {
   names: string[];
@@ -13,10 +15,16 @@ type SnapshotInfoResponse = {
 
 type FlowSnapshotsConfig = Pick<FlowEmulatorConfig, "adminServerPort">;
 
-export class FlowSnapshotsService {
+export enum FlowSnapshotsEvent {
+  ROLLBACK_TO_HEIGHT = "ROLLBACK_TO_HEIGHT",
+  JUMP_TO = "JUMP_TO"
+}
+
+export class FlowSnapshotsService extends EventEmitter {
   private config: FlowSnapshotsConfig
 
-  constructor() {
+  constructor(private readonly storage: PersistentStorage) {
+    super();
     this.config = {
       adminServerPort: 8080
     }
@@ -39,10 +47,16 @@ export class FlowSnapshotsService {
       throw new Error("Failed creating snapshot");
     }
 
+    await this.persistSingle({
+      id: name,
+      blockId: response.data.blockId,
+      blockHeight: response.data.height
+    })
+
     return response.data;
   }
 
-  public async jumpToHeight(height: number): Promise<void> {
+  public async rollbackToHeight(height: number): Promise<void> {
     // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L118-L136
     const response = await this.emulatorRequest({
       method: "post",
@@ -52,15 +66,17 @@ export class FlowSnapshotsService {
     if (response.status !== 200) {
       throw new Error("Failed to jump to height");
     }
+
+    this.emit(FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT, height)
   }
 
-  public async jumpToSnapshot(
-    name: string
+  public async jumpTo(
+    id: string
   ): Promise<SnapshotInfoResponse> {
     // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L183-L206
     const response = await this.emulatorRequest<SnapshotInfoResponse>({
       method: "put",
-      endpoint: `/snapshots/${name}`,
+      endpoint: `/snapshots/${id}`,
     });
 
     if (response.status === 404) {
@@ -71,10 +87,24 @@ export class FlowSnapshotsService {
       throw new Error("Failed to jump to snapshot");
     }
 
+    this.emit(FlowSnapshotsEvent.JUMP_TO, id)
+
     return response.data;
   }
 
-  public async findAll(): Promise<ListSnapshotsResponse> {
+  public async findAll(): Promise<FlowStateSnapshot[]> {
+    const [persistedSnapshots, emulatorSnapshots] = await Promise.all([
+      this.findAllPersisted(),
+      this.findAllOnEmulator()
+    ]);
+
+    const validSnapshotIdLookup = new Set(emulatorSnapshots.names);
+
+    // Ensure we exclude the ones that were deleted without using Flowser.
+    return persistedSnapshots.filter(snapshot => validSnapshotIdLookup.has(snapshot.id))
+  }
+
+  private async findAllOnEmulator(): Promise<ListSnapshotsResponse> {
     // https://github.com/onflow/flow-emulator/blob/0ca87170b7792b68941da368a839b9b74615d659/server/utils/emulator.go#L138-L156
     const response = await this.emulatorRequest<string[]>({
       method: "get",
@@ -91,6 +121,24 @@ export class FlowSnapshotsService {
 
     // Emulator returns `null` when no snapshots exist.
     return response.data ? { names: response.data } : emptyResponse;
+  }
+
+  private async findAllPersisted(): Promise<FlowStateSnapshot[]> {
+    const rawValue = await this.storage.read();
+    return JSON.parse(rawValue ?? '[]')
+  }
+
+  private async persistSingle(snapshot: FlowStateSnapshot) {
+    const existing = await this.findAllPersisted();
+    // TODO(restructure): Do we need to do some kind of deduplication?
+    await this.persistAll([
+      ...existing,
+      snapshot
+    ])
+  }
+
+  private async persistAll(snapshots: FlowStateSnapshot[]) {
+    await this.storage.write(JSON.stringify(snapshots));
   }
 
   private emulatorRequest<ResponseData>(options: {

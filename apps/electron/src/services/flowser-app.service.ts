@@ -2,6 +2,7 @@ import {
   FlowAccountStorageService,
   FlowGatewayService,
   FlowIndexerService,
+  FlowSnapshotsEvent,
   FlowSnapshotsService,
   IFlowserLogger,
   InMemoryIndex,
@@ -27,6 +28,7 @@ import {
 import path from 'path';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
+import { FileStorageService } from './file-storage.service';
 
 export class FlowserAppService {
   static instance: FlowserAppService;
@@ -45,6 +47,7 @@ export class FlowserAppService {
   public readonly flowSnapshotsService: FlowSnapshotsService;
   public readonly flowConfigService: FlowConfigService;
   private scheduler: AsyncIntervalScheduler;
+  private flowSnapshotsStorageService: FileStorageService;
 
   constructor() {
     this.flowGatewayService = new FlowGatewayService();
@@ -67,8 +70,14 @@ export class FlowserAppService {
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
     );
-    this.flowSnapshotsService = new FlowSnapshotsService();
-    this.workspaceService = new WorkspaceService(this.flowEmulatorService);
+    this.flowSnapshotsStorageService = new FileStorageService();
+    this.flowSnapshotsService = new FlowSnapshotsService(
+      this.flowSnapshotsStorageService,
+    );
+    this.workspaceService = new WorkspaceService(
+      this.flowEmulatorService,
+      new FileStorageService('flowser-workspaces.json'),
+    );
     this.blockchainIndexService = new BlockchainIndexService({
       transaction: new InMemoryIndex<FlowTransaction>(),
       block: new InMemoryIndex<FlowBlock>(),
@@ -125,6 +134,12 @@ export class FlowserAppService {
       WorkspaceEvent.WORKSPACE_CLOSE,
       this.onWorkspaceClose.bind(this),
     );
+    this.flowSnapshotsService.on(FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT, () =>
+      this.blockchainIndexService.clear(),
+    );
+    this.flowSnapshotsService.on(FlowSnapshotsEvent.JUMP_TO, () =>
+      this.blockchainIndexService.clear(),
+    );
   }
 
   private async onWorkspaceOpen(workspaceId: string) {
@@ -145,6 +160,11 @@ export class FlowserAppService {
         config: workspace.emulator,
       });
     }
+
+    // Separately store of each workspaces' data.
+    this.flowSnapshotsStorageService.setFileName(
+      `flowser-snapshots-${workspaceId}.json`,
+    );
 
     if (workspace.emulator) {
       this.flowSnapshotsService.configure({

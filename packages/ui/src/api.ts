@@ -235,10 +235,6 @@ export function useGetWorkspace(
   return useSWR(`projects/${id}`, () => workspaceService.findById(id));
 }
 
-export function useGetFlowJson(): SWRResponse<string> {
-  return useSWR(`flow-json`, () => "");
-}
-
 export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
   const { flowService } = useServiceRegistry();
 
