@@ -30,6 +30,7 @@ import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 import { FileStorageService } from './file-storage.service';
 
+// Root service that ties all the pieces together and orchestrates them.
 export class FlowserAppService {
   static instance: FlowserAppService;
   public readonly flowGatewayService: FlowGatewayService;
@@ -184,6 +185,7 @@ export class FlowserAppService {
   }
 }
 
+// TODO(restructure): Expose flowser logs to the user?
 class WebLogger implements IFlowserLogger {
   debug(message: any): void {
     console.debug(message);
