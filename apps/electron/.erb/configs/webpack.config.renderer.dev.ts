@@ -32,8 +32,8 @@ if (
 ) {
   console.log(
     chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
-    )
+      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"',
+    ),
   );
   execSync('npm run postinstall');
 }
@@ -104,7 +104,19 @@ const configuration: webpack.Configuration = {
         test: /\.svg$/i,
         issuer: /\.[jt]sx?$/,
         resourceQuery: { not: [/url/] }, // exclude react component if *.svg?url
-        use: ['@svgr/webpack'],
+        // https://github.com/gregberge/svgr/issues/142
+        use: [
+          {
+            loader: '@svgr/webpack',
+            options: {
+              // Disable SVGO, since that tool stripes viewBox attribute
+              // and I can't figure out how to disable that.
+              // https://react-svgr.com/docs/options/#svgo
+              // https://github.com/gregberge/svgr/discussions/735
+              svgo: false,
+            },
+          },
+        ],
       },
     ],
   },
@@ -187,7 +199,7 @@ const configuration: webpack.Configuration = {
       let args = ['run', 'start:main'];
       if (process.env.MAIN_ARGS) {
         args = args.concat(
-          ['--', ...process.env.MAIN_ARGS.matchAll(/"[^"]+"|[^\s"]+/g)].flat()
+          ['--', ...process.env.MAIN_ARGS.matchAll(/"[^"]+"|[^\s"]+/g)].flat(),
         );
       }
       spawn('npm', args, {
