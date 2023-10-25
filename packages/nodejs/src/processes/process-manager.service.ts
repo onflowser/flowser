@@ -27,37 +27,14 @@ export class ProcessManagerService extends EventEmitter {
     process.exit(0);
   }
 
-  findAllProcessesNewerThanTimestamp(timestamp: Date): ManagedProcess[] {
-    return this.getAll().filter((process) => {
-      const isUpdatedLater = process.updatedAt.getTime() > timestamp.getTime();
-      const isCreatedLater = process.createdAt.getTime() > timestamp.getTime();
-      return isUpdatedLater || isCreatedLater;
-    });
-  }
-
-  findAllLogsNewerThanTimestamp(timestamp: Date): ManagedProcessOutput[] {
-    const processes = this.getAll();
-    const logsByProcesses = processes.map((process) =>
-      this.findAllLogsByProcessIdNewerThanTimestamp(process.id, timestamp)
-    );
-    const allLogs = logsByProcesses.flat();
-    return allLogs.sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-  }
-
-  findAllLogsByProcessIdNewerThanTimestamp(
+  findAllLogsByProcess(
     processId: string,
-    timestamp: Date
   ): ManagedProcessOutput[] {
     const process = this.processLookupById.get(processId);
     if (!process) {
-      return [];
+      throw new Error("Process not found")
     }
-    return process.output?.filter(
-      (log) => new Date(log.createdAt).getTime() > timestamp.getTime()
-    );
+    return process.output;
   }
 
   getAll() {

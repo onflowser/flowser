@@ -74,7 +74,7 @@ export function App() {
           eventsIndex: indexes.event,
           blocksIndex: indexes.block,
           transactionsIndex: indexes.transaction,
-          processOutputIndex: undefined as never,
+          processManagerService: window.electron.processManagerService,
           monitoringService,
           analyticsService,
           workspaceService: window.electron.workspaces,

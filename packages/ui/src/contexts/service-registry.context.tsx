@@ -67,6 +67,10 @@ interface IMonitoringService {
   captureError(error: unknown, options?: Record<string, unknown>): void;
 }
 
+export interface IProcessManagerService {
+  findAllLogsByProcessId(processId: string): Promise<ManagedProcessOutput[]>;
+}
+
 type ServiceRegistry = {
   interactionsService: IInteractionService;
   flowService: IFlowService;
@@ -74,13 +78,13 @@ type ServiceRegistry = {
   workspaceService: IWorkspaceService;
   analyticsService: IAnalyticsService;
   monitoringService: IMonitoringService;
+  processManagerService: IProcessManagerService;
   accountIndex: IResourceIndexReader<FlowAccount>;
   accountStorageIndex: IResourceIndexReader<FlowAccountStorage>;
   contractIndex: IResourceIndexReader<FlowContract>;
   transactionsIndex: IResourceIndexReader<FlowTransaction>;
   blocksIndex: IResourceIndexReader<FlowBlock>;
   eventsIndex: IResourceIndexReader<FlowEvent>;
-  processOutputIndex: IResourceIndexReader<ManagedProcessOutput>;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(

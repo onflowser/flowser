@@ -4,6 +4,7 @@ import {
   ExecuteScriptRequest,
   IFlowService,
   IInteractionService,
+  IProcessManagerService,
   ISnapshotService,
   IWorkspaceService,
   SendTransactionRequest,
@@ -59,6 +60,11 @@ const snapshots: ISnapshotService = {
     ipcRenderer.invoke(FlowserIpcEvent.SNAPSHOTS_ROLLBACK_TO_HEIGHT, height),
 };
 
+const processManagerService: IProcessManagerService = {
+  findAllLogsByProcessId: (processId: string) =>
+    ipcRenderer.invoke(FlowserIpcEvent.PROCESS_LOGS_LIST, processId),
+};
+
 export const electronInvokers = {
   platformAdapter: {
     showDirectoryPicker: () => ipcRenderer.invoke('showDirectoryPicker'),
@@ -75,6 +81,7 @@ export const electronInvokers = {
   interactions,
   workspaces,
   snapshots,
+  processManagerService,
   indexes: {
     getAll: (indexName: keyof BlockchainIndexes) =>
       ipcRenderer.invoke(FlowserIpcEvent.INDEX_GET_ALL, indexName),

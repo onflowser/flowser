@@ -191,14 +191,13 @@ export function useGetEventsByTransaction(
 export function useGetOutputsByProcess(
   id: string
 ): SWRResponse<ManagedProcessOutput[]> {
-  const { processOutputIndex } = useServiceRegistry();
+  const { processManagerService } = useServiceRegistry();
 
   return useSWR(
     `${id}/outputs`,
     () =>
-      processOutputIndex
-        .findAll()
-        .then((res) => res.filter((e) => e.processId === id)),
+      processManagerService
+        .findAllLogsByProcessId(id),
     {
       refreshInterval: 1000,
     }
@@ -216,7 +215,7 @@ export function useGetEvent(id: string): SWRResponse<FlowEvent | undefined> {
 export function useGetStateSnapshots(): SWRResponse<FlowStateSnapshot[]> {
   const { snapshotService } = useServiceRegistry();
 
-  return useSWR(`snapshots`, () => snapshotService.findAll(), {
+  return useSWR(`snapshots`, () => snapshotService.list(), {
     refreshInterval: 1000,
   });
 }

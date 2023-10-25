@@ -23,6 +23,7 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
     flowGatewayService,
     walletService,
     flowSnapshotsService,
+    processManagerService,
   } = flowserAppService;
 
   const handlers: Record<FlowserIpcEvent, EventListener> = {
@@ -111,6 +112,11 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
       event: IpcMainInvokeEvent,
       height: number,
     ) => flowSnapshotsService.rollbackToHeight(height),
+
+    [FlowserIpcEvent.PROCESS_LOGS_LIST]: (
+      event: IpcMainInvokeEvent,
+      processId: string,
+    ) => processManagerService.findAllLogsByProcess(processId),
   };
 
   for (const eventName in handlers) {
