@@ -28,7 +28,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
         fclValuesByIdentifier: new Map(
           transaction.arguments.map((arg) => [
             arg.identifier,
-            JSON.parse(arg.valueAsJson),
+            arg.value
           ])
         ),
         initialOutcome: {
@@ -61,7 +61,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
               <ParamBuilder
                 key={arg.identifier}
                 disabled
-                value={JSON.parse(arg.valueAsJson)}
+                value={arg.value}
                 setValue={console.log}
                 parameter={arg}
               />

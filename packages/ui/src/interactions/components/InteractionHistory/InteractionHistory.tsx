@@ -68,7 +68,7 @@ function BlockItem(props: BlockItemProps) {
       fclValuesByIdentifier: new Map(
         firstTransaction.arguments.map((arg) => [
           arg.identifier,
-          JSON.parse(arg.valueAsJson),
+          arg.value
         ])
       ),
       initialOutcome: {

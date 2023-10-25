@@ -15,7 +15,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;
   const { data, mutate } = useGetAccounts();
   const { flowService } = useServiceRegistry();
-  const managedAccounts = useMemo(() => addressBuilderOptions?.showManagedAccountsOnly
+  const accountsToShow = useMemo(() => addressBuilderOptions?.showManagedAccountsOnly
     ? data?.filter((account) =>
       account.keys.some((key) => key.privateKey !== "")
     )
@@ -24,12 +24,12 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   useEffect(() => {
     const serviceAddress = "0xf8d6e0586b0a20c7";
     const defaultAccount =
-      managedAccounts?.find((account) => account.address === serviceAddress) ??
-      managedAccounts?.[0];
+      accountsToShow?.find((account) => account.address === serviceAddress) ??
+      accountsToShow?.[0];
     if (!FclValueUtils.isFclAddressValue(value) && defaultAccount) {
       setValue(defaultAccount.address);
     }
-  }, [managedAccounts]);
+  }, [accountsToShow]);
 
   async function createNewAccount() {
     await flowService.createAccount();
@@ -39,7 +39,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   return (
     <div className={classes.root}>
       <div className={classes.innerWrapper}>
-        {managedAccounts?.map((account) => (
+        {accountsToShow?.map((account) => (
           <AccountButton
             key={account.address}
             disabled={disabled}
