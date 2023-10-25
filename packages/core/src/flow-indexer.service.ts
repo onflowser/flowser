@@ -307,7 +307,7 @@ export class FlowIndexerService {
   }) {
     const { event, block } = options;
     this.logger.debug(
-      `handling event: ${event.type} ${JSON.stringify(event.data)}`
+      `Processing event: ${event.type} ${JSON.stringify(event.data)}`
     );
 
     const isTokenWithdrawnEvent = (eventId: string) =>
@@ -320,16 +320,16 @@ export class FlowIndexerService {
       case FlowCoreEventType.ACCOUNT_CREATED:
         return this.reIndexAccount({
           address,
-          block: block,
+          block,
         });
       case FlowCoreEventType.ACCOUNT_KEY_ADDED:
       case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
-        return this.reIndexAccount({ address, block: block });
+        return this.reIndexAccount({ address, block });
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
-        return this.reIndexAccount({ address, block: block });
+        return this.reIndexAccount({ address, block });
     }
 
     switch (true) {
@@ -337,10 +337,10 @@ export class FlowIndexerService {
         // New emulator accounts are initialized
         // with a default Flow balance coming from null address.
         return event.data.from
-          ? this.reIndexAccount(event.data.from)
+          ? this.reIndexAccount({address: event.data.from, block})
           : undefined;
       case isTokenDepositedEvent(event.type):
-        return this.reIndexAccount(event.data.to);
+        return this.reIndexAccount({address: event.data.to, block});
     }
   }
 

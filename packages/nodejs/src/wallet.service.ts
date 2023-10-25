@@ -95,7 +95,11 @@ export class WalletService {
   ): Promise<FlowAuthorizationFunction> {
     const storedAccount = await this.accountIndex.findOneById(address);
 
-    if (!storedAccount.keys) {
+    if (!storedAccount) {
+      throw new Error("Account not found")
+    }
+
+    if (storedAccount.keys.length === 0) {
       throw new Error("Keys not loaded for account");
     }
 
@@ -289,12 +293,12 @@ export class WalletService {
       balance: 0,
       blockId: "",
       code: "",
-      createdAt: undefined,
+      createdAt: new Date(),
       deletedAt: undefined,
       isDefaultAccount: false,
       keys: [],
       tags: [],
-      updatedAt: undefined,
+      updatedAt: new Date(),
     };
   }
 }
