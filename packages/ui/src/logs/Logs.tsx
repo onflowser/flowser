@@ -237,8 +237,7 @@ function NoLogsHelpBanner() {
       description={
         <div>
           <p>
-            To view emulator logs within Flowser, you need to enable managed
-            emulator (started by Flowser itself) in project settings.
+            Flowser can only show logs, when emulator is run by Flowser itself. Make sure you aren't running the <code>flow emulator</code> command yourself.
           </p>
         </div>
       }
