@@ -20,12 +20,13 @@ export class AsyncIntervalScheduler {
     this.isRunning = false;
   }
 
-  async start(): Promise<void> {
+  start(): void {
     if (this.isRunning) {
       return;
     }
     this.isRunning = true;
-    await this.pollIfRunning();
+    // We don't want to await the end of processing.
+    this.pollExecutionIfRunning();
   }
 
   stop(): void {
@@ -33,7 +34,7 @@ export class AsyncIntervalScheduler {
     this.isRunning = false;
   }
 
-  private async pollIfRunning() {
+  private async pollExecutionIfRunning() {
     const { functionToExecute, name, pollingIntervalInMs } = this.options;
     while (this.isRunning) {
       const startTime = new Date();

@@ -47,8 +47,8 @@ export class FlowserAppService {
   public readonly blockchainIndexService: BlockchainIndexService;
   public readonly flowSnapshotsService: FlowSnapshotsService;
   public readonly flowConfigService: FlowConfigService;
-  private scheduler: AsyncIntervalScheduler;
-  private flowSnapshotsStorageService: FileStorageService;
+  private readonly flowSnapshotsStorageService: FileStorageService;
+  private processingScheduler: AsyncIntervalScheduler;
 
   constructor() {
     this.flowGatewayService = new FlowGatewayService();
@@ -107,7 +107,7 @@ export class FlowserAppService {
       this.flowConfigService,
       this.blockchainIndexService.indexes.account,
     );
-    this.scheduler = new AsyncIntervalScheduler({
+    this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
       pollingIntervalInMs: 500,
       functionToExecute: () => this.flowIndexerService.processBlockchainData(),
@@ -120,10 +120,6 @@ export class FlowserAppService {
       this.instance = new FlowserAppService();
     }
     return this.instance;
-  }
-
-  startProcessing() {
-    return this.scheduler.start();
   }
 
   private registerListeners() {
@@ -155,6 +151,8 @@ export class FlowserAppService {
       flowJSON: this.flowConfigService.getFlowJSON(),
     });
 
+    this.processingScheduler.start();
+
     if (workspace.emulator) {
       await this.flowEmulatorService.start({
         workspacePath: workspace.filesystemPath,
@@ -182,6 +180,7 @@ export class FlowserAppService {
   private async onWorkspaceClose() {
     await this.flowEmulatorService.stopAndCleanup();
     this.blockchainIndexService.clear();
+    this.processingScheduler.stop();
   }
 }
 
