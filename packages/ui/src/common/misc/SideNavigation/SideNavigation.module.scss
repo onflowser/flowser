@@ -11,7 +11,6 @@
   align-items: center;
   border-right: 1px solid $gray-80;
   overflow-y: scroll;
-  height: 100%;
 
   @include hiddenScrollbars();
 
