@@ -18,9 +18,9 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
 
   return (
     <div className={classNames(classes.root, props.className)}>
-      <div>
+      <div className={classes.linksWrapper}>
         <FlowserIcon.Logo width={50} height={50} />
-        <SizedBox height={50} />
+        <SizedBox height={30} />
         <Link
           to="/interactions"
           name="Interactions"
@@ -36,7 +36,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
         <Link to="/contracts" name="Contracts" icon={FlowserIcon.Contract} />
         <Link to="/events" name="Events" icon={FlowserIcon.Star} />
       </div>
-      <div>
+      <div className={classes.linksWrapper}>
         <Link to="/settings" name="Settings" icon={FlowserIcon.Settings} />
         <Link
           to="/"

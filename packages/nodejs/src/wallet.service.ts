@@ -215,20 +215,6 @@ export class WalletService {
         };
       })
     });
-
-    // TODO(restructure): Update flow.json and regenerate accounts on next run?
-    //   I don't think, so we can instead persist these accounts with snapshots.
-    // For now, we just write new accounts to flow.json,
-    // but they don't get recreated on the next emulator run.
-    // See: https://github.com/onflow/flow-emulator/issues/405
-    // await this.flowConfig.updateAccounts([
-    //   {
-    //     // TODO(custom-wallet): Come up with a human-readable name generation
-    //     name: accountEntity.address,
-    //     address: accountEntity.address,
-    //     privateKey: singlePrivateKey,
-    //   },
-    // ]);
   }
 
   // Returns whether the account exists on the current blockchain.
