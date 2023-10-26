@@ -1,14 +1,19 @@
 @import "../../../styles/colors";
 @import "../../../styles/spacings";
+@import "../../../styles/scrollbars";
 
 .root {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  row-gap: $spacing-base;
   background: $gray-110;
-  padding: $spacing-base 0;
   align-items: center;
   border-right: 1px solid $gray-80;
+  overflow-y: scroll;
+  height: 100%;
+
+  @include hiddenScrollbars();
 
   .linksWrapper {
     display: flex;

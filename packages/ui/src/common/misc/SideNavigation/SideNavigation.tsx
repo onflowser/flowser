@@ -19,6 +19,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
   return (
     <div className={classNames(classes.root, props.className)}>
       <div className={classes.linksWrapper}>
+        <SizedBox height={0} />
         <FlowserIcon.Logo width={50} height={50} />
         <SizedBox height={30} />
         <Link
@@ -44,6 +45,7 @@ export function SideNavigation(props: SideNavigationProps): ReactElement {
           icon={FlowserIcon.Exit}
           onClick={closeWorkspace}
         />
+        <SizedBox height={0} />
       </div>
     </div>
   );
