@@ -141,18 +141,30 @@ export class FlowSnapshotsService extends EventEmitter {
     await this.storage.write(JSON.stringify(snapshots));
   }
 
-  private emulatorRequest<ResponseData>(options: {
+  private async emulatorRequest<ResponseData>(options: {
     method: Method;
     endpoint: string;
   }) {
     const { adminServerPort } = this.config;
 
-    return axios.request<ResponseData>({
-      method: options.method,
-      url: `http://localhost:${adminServerPort}/emulator${options.endpoint}`,
-      // Prevent axios from throwing on certain http response codes
-      // https://github.com/axios/axios/issues/41
-      validateStatus: () => true,
-    });
+    try {
+      return await axios.request<ResponseData>({
+        method: options.method,
+        url: `http://localhost:${adminServerPort}/emulator${options.endpoint}`,
+        // Prevent axios from throwing on certain http response codes
+        // https://github.com/axios/axios/issues/41
+        validateStatus: () => true,
+      });
+    } catch (error) {
+      if (!axios.isAxiosError(error)) {
+        throw error;
+      }
+
+      if (error.code === "ECONNREFUSED") {
+        throw new Error("Emulator offline")
+      }
+
+      throw error;
+    }
   }
 }
