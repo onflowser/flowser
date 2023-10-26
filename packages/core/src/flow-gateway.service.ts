@@ -114,7 +114,7 @@ export enum FlowCoreEventType {
   //  https://developers.flow.com/cadence/language/core-events#inbox-value-published
 }
 
-type FlowEventInternal<Type extends string, Data> = {
+type FlowEventInternal<Type, Data> = {
   transactionId: string;
   type: Type;
   transactionIndex: number;
@@ -124,7 +124,7 @@ type FlowEventInternal<Type extends string, Data> = {
 
 
 // https://developers.flow.com/cadence/language/core-events#account-key-added
-type FlowKeyEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_KEY_ADDED | FlowCoreEventType.ACCOUNT_KEY_REMOVED, {
+export type FlowAccountKeyEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_KEY_ADDED | FlowCoreEventType.ACCOUNT_KEY_REMOVED, {
   address: string;
   publicKey: {
     // https://developers.flow.com/cadence/language/crypto#publickey
@@ -136,7 +136,7 @@ type FlowKeyEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_KEY_ADDED | Flow
 }>
 
 // https://developers.flow.com/cadence/language/core-events#account-contract-added
-type FlowContractEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED | FlowCoreEventType.ACCOUNT_CONTRACT_ADDED | FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED, {
+export type FlowAccountContractEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED | FlowCoreEventType.ACCOUNT_CONTRACT_ADDED | FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED, {
   address: string;
   codeHash: string[];
   // Contract name
@@ -144,12 +144,12 @@ type FlowContractEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CONTRACT_UP
 }>
 
 // https://developers.flow.com/cadence/language/core-events#account-created
-type FlowAccountEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CREATED, {address: string}>;
+export type FlowAccountEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CREATED, {address: string}>;
 
-type FlowAnyEvent = FlowEventInternal<string, Record<string, any>>
+export type FlowAnyEvent = FlowEventInternal<`A.${string}.${string}.${string}`, Record<string, any>>
 
 // https://docs.onflow.org/fcl/reference/api/#event-object
-export type FlowEvent = FlowAnyEvent | FlowKeyEvent | FlowAccountEvent | FlowContractEvent;
+export type FlowEvent = FlowAnyEvent | FlowAccountKeyEvent | FlowAccountEvent | FlowAccountContractEvent;
 
 // https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
 export type FlowAuthorizationFunction = () => unknown;

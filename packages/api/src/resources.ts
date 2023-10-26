@@ -57,12 +57,10 @@ export interface FlowAccount extends TimestampedResource, IdentifiableResource {
   // ID is equal to the address.
   id: string;
   address: string;
-  blockId: string;
   balance: number;
   code: string;
   isDefaultAccount: boolean;
   tags: FlowAccountTag[];
-  keys: FlowAccountKey[];
 }
 
 export interface FlowAccountTag {
@@ -89,13 +87,12 @@ export enum HashAlgorithm {
   KECCAK_256 = "KECCAK_256",
 }
 
-export interface FlowAccountKey {
+export interface FlowAccountKey extends TimestampedResource, IdentifiableResource {
   id: string;
   index: number;
-  accountAddress: string;
-  blockId: string;
+  address: string;
   publicKey: string;
-  privateKey: string;
+  privateKey?: string;
   signAlgo: SignatureAlgorithm | undefined;
   hashAlgo: HashAlgorithm | undefined;
   weight: number;

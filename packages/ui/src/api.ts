@@ -31,11 +31,28 @@ export function useGetAccount(
   });
 }
 
-export function useGetKeysByAccount(id: string): SWRResponse<FlowAccountKey[]> {
-  const { accountIndex } = useServiceRegistry();
+export function useGetKeysByAccount(
+  address: string
+): SWRResponse<FlowAccountKey[]> {
+  const { accountKeyIndex } = useServiceRegistry();
   return useSWR(
-    `account/${id}`,
-    () => accountIndex.findOneById(id).then((res) => res?.keys ?? []),
+    `${address}/keys`,
+    () =>
+      accountKeyIndex
+        .findAll()
+        .then((res) => res.filter((e) => e.address === address)),
+    {
+      refreshInterval: 1000,
+    }
+  );
+}
+
+export function useGetKeys(): SWRResponse<FlowAccountKey[]> {
+  const { accountKeyIndex } = useServiceRegistry();
+  return useSWR(
+    `keys`,
+    () =>
+      accountKeyIndex.findAll(),
     {
       refreshInterval: 1000,
     }
@@ -63,7 +80,7 @@ export function useGetContractsByAccount(
 ): SWRResponse<FlowContract[]> {
   const { contractIndex } = useServiceRegistry();
   return useSWR(
-    `contracts`,
+    `${address}/contracts`,
     () =>
       contractIndex
         .findAll()

@@ -5,16 +5,7 @@ import {
   FlowSnapshotsEvent,
   FlowSnapshotsService,
   IFlowserLogger,
-  InMemoryIndex,
 } from '@onflowser/core';
-import {
-  FlowAccount,
-  FlowAccountStorage,
-  FlowBlock,
-  FlowContract,
-  FlowEvent,
-  FlowTransaction,
-} from '@onflowser/api';
 import {
   AsyncIntervalScheduler,
   FlowCliService,
@@ -66,7 +57,7 @@ export class FlowserAppService {
     this.flowInteractionsService = new FlowInteractionsService(
       this.goBindingsService,
     );
-    this.processManagerService = new ProcessManagerService();
+    this.processManagerService = new ProcessManagerService(this.logger);
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
@@ -79,14 +70,7 @@ export class FlowserAppService {
       this.flowEmulatorService,
       new FileStorageService('flowser-workspaces.json'),
     );
-    this.blockchainIndexService = new BlockchainIndexService({
-      transaction: new InMemoryIndex<FlowTransaction>(),
-      block: new InMemoryIndex<FlowBlock>(),
-      account: new InMemoryIndex<FlowAccount>(),
-      event: new InMemoryIndex<FlowEvent>(),
-      contract: new InMemoryIndex<FlowContract>(),
-      accountStorage: new InMemoryIndex<FlowAccountStorage>(),
-    });
+    this.blockchainIndexService = new BlockchainIndexService();
     this.flowIndexerService = new FlowIndexerService(
       this.logger,
       this.blockchainIndexService.indexes.transaction,
@@ -94,6 +78,7 @@ export class FlowserAppService {
       this.blockchainIndexService.indexes.block,
       this.blockchainIndexService.indexes.event,
       this.blockchainIndexService.indexes.contract,
+      this.blockchainIndexService.indexes.accountKey,
       this.blockchainIndexService.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
@@ -101,11 +86,9 @@ export class FlowserAppService {
     );
     this.flowConfigService = new FlowConfigService(this.logger);
     this.walletService = new WalletService(
-      this.logger,
       this.flowCliService,
       this.flowGatewayService,
-      this.flowConfigService,
-      this.blockchainIndexService.indexes.account,
+      this.blockchainIndexService.indexes.accountKey,
     );
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',

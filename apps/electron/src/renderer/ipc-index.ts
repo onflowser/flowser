@@ -34,7 +34,7 @@ export class IpcIndex<
     await this.clear();
 
     await Promise.allSettled(
-      resources.map((resource: Resource) => this.add(resource)),
+      resources.map((resource: Resource) => this.create(resource)),
     );
   }
 }

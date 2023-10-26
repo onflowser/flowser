@@ -12,7 +12,7 @@ import { FlowAccountKey } from "@onflowser/api";
 const columnsHelper = createColumnHelper<FlowAccountKey>();
 
 const columns = [
-  columnsHelper.accessor("accountAddress", {
+  columnsHelper.accessor("address", {
     header: () => <Label variant="medium">KEY</Label>,
     cell: (info) => (
       <div className={classes.cellRoot}>

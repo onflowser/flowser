@@ -8,7 +8,7 @@ import {
 } from "@onflowser/api";
 import { IFlowInteractions } from "./flow-interactions.service";
 import { FlowAccountStorageService } from "./flow-storage.service";
-import { FlowApiStatus, FlowGatewayService } from "./flow-gateway.service";
+import { FlowApiStatus, FlowGatewayService, FlowAccountKeyEvent } from "./flow-gateway.service";
 import { ensurePrefixedAddress } from "./utils";
 import { IFlowserLogger } from './logger';
 import { FclValue } from "./fcl-value";
@@ -52,6 +52,7 @@ export class FlowIndexerService {
     private blockIndex: IResourceIndex<flowserResource.FlowBlock>,
     private eventIndex: IResourceIndex<flowserResource.FlowEvent>,
     private contractIndex: IResourceIndex<flowserResource.FlowContract>,
+    private accountKeyIndex: IResourceIndex<flowserResource.FlowAccountKey>,
     private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
@@ -171,7 +172,7 @@ export class FlowIndexerService {
 
   private async processBlockData(data: BlockData) {
     const blockPromise = this.blockIndex
-      .add(this.createBlockEntity({ block: data.block }))
+      .create(this.createBlockEntity({ block: data.block }))
       .catch((e: unknown) =>
         this.logger.error("block save error", e)
       );
@@ -189,7 +190,7 @@ export class FlowIndexerService {
     const eventPromises = Promise.all(
       data.events.map((flowEvent) =>
         this.eventIndex
-          .add(
+          .create(
             this.createEventEntity({
               event: flowEvent,
             })
@@ -204,7 +205,7 @@ export class FlowIndexerService {
       blockPromise,
       transactionPromises,
       eventPromises,
-      this.processNewEvents({
+      this.processEventBatch({
         events: data.events,
         block: data.block,
       })
@@ -261,36 +262,17 @@ export class FlowIndexerService {
     };
   }
 
-  private async processNewEvents(options: {
+  private async processEventBatch(options: {
     events: flowResource.FlowEvent[];
     block: flowResource.FlowBlock;
   }) {
     const { events, block } = options;
-    // Process new accounts first, so other events can reference them.
-    const accountCreatedEvents = events.filter(
-      (event) => event.type === FlowCoreEventType.ACCOUNT_CREATED
-    );
-    const restEvents = events.filter(
-      (event) => event.type !== FlowCoreEventType.ACCOUNT_CREATED
-    );
     await Promise.all(
-      accountCreatedEvents.map((flowEvent) =>
-        this.processStandardEvents({ event: flowEvent, block }).catch((e) => {
-          this.logger.error(
-            `flow.AccountCreated event handling error: ${
-              e.message
-            } (${JSON.stringify(flowEvent)})`,
-            e.stack
-          );
-        })
-      )
-    );
-    await Promise.all(
-      restEvents.map((flowEvent) =>
-        this.processStandardEvents({ event: flowEvent, block: block }).catch(
+      events.map((flowEvent) =>
+        this.processSingleEvent({ event: flowEvent, block: block }).catch(
           (e) => {
             this.logger.error(
-              `${flowEvent.type} event handling error: ${
+              `Event handling error: ${
                 e.message
               } (${JSON.stringify(flowEvent)})`,
               e.stack
@@ -301,47 +283,81 @@ export class FlowIndexerService {
     );
   }
 
-  private async processStandardEvents(options: {
+  private async processSingleEvent(options: {
     event: flowResource.FlowEvent;
     block: flowResource.FlowBlock;
   }) {
     const { event, block } = options;
     this.logger.debug(
-      `Processing event: ${event.type} ${JSON.stringify(event.data)}`
+      `Processing event: ${JSON.stringify(event)}`
     );
 
-    const isTokenWithdrawnEvent = (eventId: string) =>
+    const isFlowTokenWithdrawnEvent = (eventId: string) =>
       /A\..*\.FlowToken\.TokensWithdrawn/.test(eventId);
-    const isTokenDepositedEvent = (eventId: string) =>
+    const isFlowTokenDepositedEvent = (eventId: string) =>
       /A\..*\.FlowToken\.TokensDeposited/.test(eventId);
 
     const address = ensurePrefixedAddress(event.data.address);
     switch (event.type) {
       case FlowCoreEventType.ACCOUNT_CREATED:
-        return this.reIndexAccount({
+        return this.createAccount({
           address,
           block,
         });
       case FlowCoreEventType.ACCOUNT_KEY_ADDED:
+        return this.processAccountKeyAddedEvent(event);
       case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
-        return this.reIndexAccount({ address, block });
+        return this.processAccountKeyRemovedEvent(event);
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
         // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
-        return this.reIndexAccount({ address, block });
+        // return this.createAccount({ address, block });
     }
 
     switch (true) {
-      case isTokenWithdrawnEvent(event.type):
+      case isFlowTokenWithdrawnEvent(event.type):
+        const tokenWithdrawnData = event.data as {from: string; amount: number}
         // New emulator accounts are initialized
         // with a default Flow balance coming from null address.
-        return event.data.from
-          ? this.reIndexAccount({address: event.data.from, block})
+        return tokenWithdrawnData.from
+          ? this.updateAccountBalance(tokenWithdrawnData.from)
           : undefined;
-      case isTokenDepositedEvent(event.type):
-        return this.reIndexAccount({address: event.data.to, block});
+      case isFlowTokenDepositedEvent(event.type):
+        const tokenDepositedData = event.data as {to: string; amount: number}
+        return this.updateAccountBalance(tokenDepositedData.to);
     }
+  }
+
+  private async processAccountKeyAddedEvent(event: FlowAccountKeyEvent) {
+    const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
+    const account = await this.flowGatewayService.getAccount(event.data.address);
+    const key = account.keys.find(key => key.publicKey === publicKey);
+
+    if (key === undefined) {
+      throw new Error("Cannot find key from event")
+    }
+
+    // Use `upsert` instead of `create` because a key
+    // may have already been created by wallet service.
+    // In that case we want to update everything except for the `privateKey field.
+    return this.accountKeyIndex.upsert(this.createKeyEntity({
+      key,
+      address: account.address
+    }))
+  }
+
+  private async processAccountKeyRemovedEvent(event: FlowAccountKeyEvent) {
+    const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
+    const keyId = this.buildKeyId({
+      address: event.data.address,
+      publicKey: publicKey
+    });
+    await this.accountKeyIndex.delete({id: keyId})
+  }
+
+  private decodeUint8PublicKey(encodedKey: string[]) {
+    return Buffer.from(new Uint8Array(encodedKey.map(Number))).toString("hex");
   }
 
   private async processNewTransaction(options: {
@@ -357,28 +373,36 @@ export class FlowIndexerService {
         `Unexpected interaction parsing error: ${parsedInteraction.error}`
       );
     }
-    return this.transactionIndex.add(
+    return this.transactionIndex.create(
       this.createTransactionEntity({ ...options, parsedInteraction })
     );
   }
 
-  private async reIndexAccount(options: {
+  private async updateAccountBalance(address: string) {
+    const flowAccount = await this.flowGatewayService.getAccount(address);
+    // Use `upsert` instead of `create` because we are processing a batch
+    // of events (which may include "account created" event) in parallel.
+    await this.accountIndex.upsert(this.createAccountEntity(flowAccount))
+  }
+
+  private async createAccount(options: {
     address: string;
     block: flowResource.FlowBlock;
   }) {
     const { address, block } = options;
     const flowAccount = await this.flowGatewayService.getAccount(address);
-    const flowserAccount = this.createAccountEntity({
-      account: flowAccount,
-      block: block,
-    });
 
     await Promise.all([
-      this.accountIndex.add(flowserAccount),
-      // TODO(restructure): Should we store keys/contracts within the account index or a separate one?
+      // We need to use `upsert` instead of `create`,
+      // mainly because this account was possibly already created by wallet service.
+      this.accountIndex.upsert(this.createAccountEntity(flowAccount)),
+      Promise.all(flowAccount.keys.map(key => this.accountKeyIndex.create(this.createKeyEntity({
+        address,
+        key
+      })))),
       Promise.all(
         Object.keys(flowAccount.contracts).map((name) =>
-          this.contractIndex.add(
+          this.contractIndex.create(
             this.createContractEntity({
               account: flowAccount,
               block: block,
@@ -408,7 +432,7 @@ export class FlowIndexerService {
       address
     );
     return Promise.all(
-      storages.map((storage) => this.accountStorageIndex.add(storage))
+      storages.map((storage) => this.accountStorageIndex.upsert(storage))
     );
   }
 
@@ -433,7 +457,7 @@ export class FlowIndexerService {
       this.getAllWellKnownAddresses()
         .filter(address => this.accountIndex.findOneById(address) !== undefined)
         .map((address) =>
-          this.reIndexAccount({
+          this.createAccount({
             address,
             block: nonExistingBlock,
           }).catch(error => {
@@ -474,31 +498,18 @@ export class FlowIndexerService {
     ];
   }
 
-  private createAccountEntity(options: {
-    account: flowResource.FlowAccount;
-    block: flowResource.FlowBlock;
-  }): flowserResource.FlowAccount {
-    const { account, block } = options;
-
+  private createAccountEntity(account: flowResource.FlowAccount): flowserResource.FlowAccount {
     const address = ensurePrefixedAddress(account.address);
 
     return {
       id: address,
       balance: account.balance,
       address,
-      blockId: block.id,
       // TODO(restructure): Add logic for generating tags
       // https://github.com/onflowser/flowser/pull/197/files#diff-de96e521dbe8391acff7b4c46768d9f51d90d5e30378600a41a57d14bb173f75L97-L116
       tags: [],
       isDefaultAccount: this.getAllWellKnownAddresses().includes(address),
       code: account.code,
-      keys: account.keys.map((flowKey) =>
-        this.createKeyEntity({
-          account: account,
-          key: flowKey,
-          block: block,
-        })
-      ),
       // TODO(restructure): Maybe the index should be the one dealing with these dates
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -507,11 +518,10 @@ export class FlowIndexerService {
   }
 
   private createKeyEntity(options: {
-    account: flowResource.FlowAccount;
+    address:string;
     key: flowResource.FlowKey;
-    block: flowResource.FlowBlock;
   }): flowserResource.FlowAccountKey {
-    const { account, key, block } = options;
+    const { address, key } = options;
 
     const signAlgoLookup = new Map([
       [0, SignatureAlgorithm.ECDSA_P256],
@@ -523,21 +533,33 @@ export class FlowIndexerService {
       [1, HashAlgorithm.SHA3_256],
     ]);
 
-    const accountAddress = ensurePrefixedAddress(account.address);
-
     return {
-      id: `${accountAddress}.${key.index}`,
+      id: this.buildKeyId({
+        address,
+        publicKey: key.publicKey
+      }),
       index: key.index,
-      accountAddress,
+      address: address,
       publicKey: key.publicKey,
       signAlgo: signAlgoLookup.get(key.signAlgo),
       hashAlgo: hashAlgoLookup.get(key.hashAlgo),
       weight: key.weight,
       sequenceNumber: key.sequenceNumber,
       revoked: key.revoked,
-      blockId: block.id,
-      privateKey: "",
+      // Do not include `privateKey` field here,
+      // otherwise it may override private key that was created by wallet service.
+      createdAt: new Date(),
+      deletedAt: undefined,
+      updatedAt: new Date(),
     };
+  }
+
+  private buildKeyId(options: {
+    address: string;
+    publicKey: string
+  }) {
+    const accountAddress = ensurePrefixedAddress(options.address);
+    return `${accountAddress}.${options.publicKey}`
   }
 
   private createEventEntity(options: {

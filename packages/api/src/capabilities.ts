@@ -14,7 +14,8 @@ export interface IResourceIndexReader<Resource> {
 }
 
 export interface IResourceIndexWriter<Resource extends IdentifiableResource> {
-  add(resource: Resource): Promise<void>;
+  create(resource: Resource): Promise<void>;
+  upsert(resource: Resource): Promise<void>;
   update(resource: RequireOnly<Resource, "id">): Promise<void>;
   delete(resource: RequireOnly<Resource, "id">): Promise<void>;
   clear(): Promise<void>;
@@ -23,8 +24,3 @@ export interface IResourceIndexWriter<Resource extends IdentifiableResource> {
 export interface IResourceIndex<Resource extends IdentifiableResource>
   extends IResourceIndexReader<Resource>,
     IResourceIndexWriter<Resource> {}
-
-// TODO(restructure): Consider defining resource-specific interfaces for fetchers
-export interface IResourceFetcher<Resource> {
-  fetchById(id: string): Promise<Resource>;
-}

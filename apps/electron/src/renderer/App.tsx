@@ -9,6 +9,7 @@ import './App.scss';
 import { ServiceRegistryProvider } from '@onflowser/ui/src/contexts/service-registry.context';
 import {
   FlowAccount,
+  FlowAccountKey,
   FlowAccountStorage,
   FlowBlock,
   FlowContract,
@@ -31,6 +32,7 @@ const indexes: BlockchainIndexes = {
   account: new IpcIndex<FlowAccount>('account'),
   block: new IpcIndex<FlowBlock>('block'),
   event: new IpcIndex<FlowEvent>('event'),
+  accountKey: new IpcIndex<FlowAccountKey>('accountKey'),
 };
 
 const analyticsService = new AnalyticsService();
@@ -73,6 +75,7 @@ export function App() {
           contractIndex: indexes.contract,
           eventsIndex: indexes.event,
           blocksIndex: indexes.block,
+          accountKeyIndex: indexes.accountKey,
           transactionsIndex: indexes.transaction,
           processManagerService: window.electron.processManagerService,
           monitoringService,

@@ -1,6 +1,6 @@
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
-import { FlowCliService, KeyWithWeight } from "./flow-cli.service";
+import { FlowCliService } from "./flow-cli.service";
 import { ensurePrefixedAddress, IFlowserLogger } from "@onflowser/core";
 import {
   FlowAuthorizationFunction,
@@ -8,13 +8,10 @@ import {
 } from "@onflowser/core";
 import * as flowserResource from "@onflowser/api";
 import {
-  FlowAccountKey,
-  FlowAccount,
   HashAlgorithm,
   IResourceIndex,
   SignatureAlgorithm, FclArgumentWithMetadata
 } from "@onflowser/api";
-import { FlowConfigService } from "./flow-config.service";
 
 const fcl = require("@onflow/fcl");
 
@@ -40,14 +37,13 @@ const ec: EC = new EC("p256");
 // https://developers.flow.com/tooling/flow-cli/accounts/create-accounts#key-weight
 const defaultKeyWeight = 1000;
 
+// TODO(restructure): Should we import existing accounts from flow.json?
 export class WalletService {
 
   constructor(
-    private readonly logger: IFlowserLogger,
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
-    private readonly flowConfig: FlowConfigService,
-    private accountIndex: IResourceIndex<flowserResource.FlowAccount>
+    private accountKeysIndex: IResourceIndex<flowserResource.FlowAccountKey>
   ) {}
 
   public async sendTransaction(
@@ -93,28 +89,14 @@ export class WalletService {
   private async withAuthorization(
     address: string
   ): Promise<FlowAuthorizationFunction> {
-    const storedAccount = await this.accountIndex.findOneById(address);
+    const allKeys = await this.accountKeysIndex.findAll();
+    const accountPrivateKeys = allKeys.filter(key => Boolean(key.privateKey));
 
-    if (!storedAccount) {
-      throw new Error("Account not found")
+    if (accountPrivateKeys.length === 0) {
+      throw new Error(`Private keys not found for account: ${address}`);
     }
 
-    if (storedAccount.keys.length === 0) {
-      throw new Error("Keys not loaded for account");
-    }
-
-    const credentialsWithPrivateKeys = storedAccount.keys.filter((key) =>
-      Boolean(key.privateKey)
-    );
-    const isManagedAccount = credentialsWithPrivateKeys.length > 0;
-
-    if (!isManagedAccount) {
-      throw new Error(
-        `Authorizer account ${address} isn't managed by Flowser.`
-      );
-    }
-
-    const credentialToUse = credentialsWithPrivateKeys[0];
+    const credentialToUse = accountPrivateKeys[0];
 
     const authn: FlowAuthorizationFunction = (
       fclAccount: Record<string, unknown> = {}
@@ -141,99 +123,40 @@ export class WalletService {
     return authn;
   }
 
-  public async importAccountsFromConfig() {
-    const accountsConfig = this.flowConfig.getAccounts();
-    await Promise.all(
-      accountsConfig.map(async (accountConfig) => {
-        const accountAddress = ensurePrefixedAddress(accountConfig.address);
-
-        const key: FlowAccountKey = {
-          ...this.createDefaultKey(accountAddress),
-          privateKey: accountConfig.privateKey,
-        };
-
-        const account: FlowAccount = {
-          ...this.createDefaultAccount(accountAddress),
-          // TODO(restructure): Add logic for generating tags
-          // https://github.com/onflowser/flowser/pull/197/files#diff-de96e521dbe8391acff7b4c46768d9f51d90d5e30378600a41a57d14bb173f75L97-L116
-          keys: [key],
-        };
-
-        try {
-          const isOnNetwork = await this.isAccountCreatedOnNetwork(
-            accountAddress
-          );
-
-          if (!isOnNetwork) {
-            // Ideally we could create this account on the blockchain, but:
-            // - we would need to retrieve the public key from the private key we store in flow.json
-            // - seems like flow team doesn't recommend doing this: https://github.com/onflow/flow-emulator/issues/405
-            this.logger.debug(
-              `Account ${accountAddress} is not created on the network, skipping import.`
-            );
-            return;
-          }
-
-          await this.accountIndex.add(account);
-        } catch (e: unknown) {
-          this.logger.error("Managed account import failed", e);
-        }
-      })
-    );
-  }
-
   public async createAccount(options: CreateAccountRequest): Promise<void> {
-    // For now, we only support a single key per account,
-    // but we could as well add support for attaching
-    // multiple keys with (possibly) different weights.
-    const generatedKeyPairs = await Promise.all([
-      this.cliService.generateKey({
-        projectRootPath: options.workspacePath,
-      }),
-    ]);
+    const signatureAlgorithm = SignatureAlgorithm.ECDSA_P256;
+    const hashAlgorithm = HashAlgorithm.SHA2_256;
+    const generatedKeyPair = await this.cliService.generateKey({
+      projectRootPath: options.workspacePath,
+      signatureAlgorithm,
+    });
     const generatedAccount = await this.cliService.createAccount({
       projectRootPath: options.workspacePath,
-      keys: generatedKeyPairs.map(
-        (key): KeyWithWeight => ({
+      keys: [
+        {
           weight: defaultKeyWeight,
-          publicKey: key.public,
-        })
-      ),
+          publicKey: generatedKeyPair.public,
+        }
+      ],
     });
     const accountAddress = ensurePrefixedAddress(generatedAccount.address);
 
-    await this.accountIndex.add({
-      ...this.createDefaultAccount(accountAddress),
-      keys: generatedKeyPairs.map((generatedKey) => {
-        return {
-          ...this.createDefaultKey(accountAddress),
-          index: generatedAccount.keys.findIndex(
-            (key) => key === generatedKey.public
-          ),
-          publicKey: generatedKey.public,
-          privateKey: generatedKey.private,
-        };
-      })
-    });
-  }
-
-  // Returns whether the account exists on the current blockchain.
-  private async isAccountCreatedOnNetwork(address: string): Promise<boolean> {
-    try {
-      // Check if account is found on the blockchain.
-      // Will throw if not found.
-      await this.flowGateway.getAccount(address);
-      return true;
-    } catch (error: unknown) {
-      const isNotFoundError = String(error).includes(
-        "could not find account with address"
-      );
-      if (isNotFoundError) {
-        return false;
-      }
-
-      throw error;
-    }
+    await this.accountKeysIndex.create({
+      address: accountAddress,
+      hashAlgo: hashAlgorithm,
+      // TODO(restructure): Reuse the same function as in indexer service
+      id: `${accountAddress}.${generatedKeyPair.public}`,
+      index: 0,
+      privateKey: generatedKeyPair.private,
+      publicKey: generatedKeyPair.public,
+      revoked: false,
+      sequenceNumber: 0,
+      signAlgo: signatureAlgorithm,
+      updatedAt: new Date(),
+      weight: 1000,
+      createdAt: new Date(),
+      deletedAt: undefined,
+    })
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {
@@ -249,42 +172,5 @@ export class WalletService {
     const sha = new SHA3(256);
     sha.update(Buffer.from(msg, "hex"));
     return sha.digest();
-  }
-
-  private createDefaultKey(accountAddress: string): FlowAccountKey {
-    const keyIndex = 0;
-    return {
-      // TODO(restructure): Define util functions for generating IDs / initializing resources?
-      id: `${accountAddress}.${keyIndex}`,
-      index: 0,
-      accountAddress,
-      blockId: "NULL",
-      // Public key is not stored in flow.json,
-      // so just use empty value for now.
-      // This should be updated by the aggregator service once it's picked up.
-      publicKey: "",
-      privateKey: "",
-      signAlgo: SignatureAlgorithm.ECDSA_P256,
-      hashAlgo: HashAlgorithm.SHA2_256,
-      weight: 1000,
-      sequenceNumber: 0,
-      revoked: false,
-    };
-  }
-
-  private createDefaultAccount(address: string): FlowAccount {
-    return {
-      id: address,
-      address,
-      balance: 0,
-      blockId: "",
-      code: "",
-      createdAt: new Date(),
-      deletedAt: undefined,
-      isDefaultAccount: false,
-      keys: [],
-      tags: [],
-      updatedAt: new Date(),
-    };
   }
 }

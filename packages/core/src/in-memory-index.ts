@@ -13,11 +13,19 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
     this.lookup = new Map();
   }
 
-  async add(resource: Resource): Promise<void> {
+  async create(resource: Resource): Promise<void> {
     if (this.lookup.has(resource.id)) {
       throw new Error("Resource already exists");
     } else {
       this.lookup.set(resource.id, resource);
+    }
+  }
+
+  async upsert(resource: Resource): Promise<void> {
+    if (this.lookup.has(resource.id)) {
+      await this.update(resource);
+    } else {
+      await this.create(resource);
     }
   }
 

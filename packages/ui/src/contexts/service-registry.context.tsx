@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import {
   FclArgumentWithMetadata,
-  FlowAccount,
+  FlowAccount, FlowAccountKey,
   FlowAccountStorage,
   FlowBlock, FlowCliInfo,
   FlowContract,
@@ -85,6 +85,7 @@ type ServiceRegistry = {
   transactionsIndex: IResourceIndexReader<FlowTransaction>;
   blocksIndex: IResourceIndexReader<FlowBlock>;
   eventsIndex: IResourceIndexReader<FlowEvent>;
+  accountKeyIndex: IResourceIndexReader<FlowAccountKey>;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(

@@ -5,6 +5,7 @@ import {
 import { ProcessManagerService } from "./processes/process-manager.service";
 import { randomUUID } from "crypto";
 import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";
+import { IFlowserLogger } from "@onflowser/core";
 
 export type GeneratedKey = {
   derivationPath: string;
@@ -196,10 +197,9 @@ export class FlowCliService {
     }
 
     if (flag.value !== undefined) {
-      const shouldBeWrappedInQuotes = typeof flag.value !== "number";
       return [
         flag.key,
-        shouldBeWrappedInQuotes ? `"${flag.value}"` : String(flag.value),
+        String(flag.value),
       ];
     }
 

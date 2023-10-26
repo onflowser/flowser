@@ -9,16 +9,16 @@ import { Spinner } from "../../../../common/loaders/Spinner/Spinner";
 import { FclValueUtils } from "@onflowser/core";
 import { FlowAccount } from "@onflowser/api";
 import { useServiceRegistry } from "../../../../contexts/service-registry.context";
-import { useGetAccounts } from "../../../../api";
+import { useGetAccounts, useGetKeys } from "../../../../api";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;
   const { data, mutate } = useGetAccounts();
   const { flowService } = useServiceRegistry();
+  const { data: allKeys } = useGetKeys();
+  const accountsWithPrivateKeysLookup = new Set(allKeys?.filter(key => Boolean(key.privateKey)).map(key => key.address));
   const accountsToShow = useMemo(() => addressBuilderOptions?.showManagedAccountsOnly
-    ? data?.filter((account) =>
-      account.keys.some((key) => key.privateKey !== "")
-    )
+    ? data?.filter((account) => accountsWithPrivateKeysLookup.has(account.address))
     : data, [addressBuilderOptions?.showManagedAccountsOnly, data]);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ function AccountButton(props: AccountButtonProps) {
       <div
         className={classNames(classes.avatarWrapper, {
           [classes.selectedAccount]: isSelected,
-          [classes.avatarWrapper__enabled]: !disabled,
+          [classes.avatarWrapper__enabled]: !disabled
         })}
       >
         <AccountAvatar address={account.address} className={classes.avatar} />

@@ -43,10 +43,6 @@ const columns = [
       <Value>{TextUtils.readableNumber(info.getValue())} FLOW</Value>
     ),
   }),
-  columnHelper.accessor("keys", {
-    header: () => <Label variant="medium">KEY COUNT</Label>,
-    cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
-  }),
   // TODO(restructure): Provide this info
   // columnHelper.accessor("transactions", {
   //   header: () => <Label variant="medium">TX COUNT</Label>,

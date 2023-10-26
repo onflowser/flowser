@@ -4,6 +4,7 @@ import {
   ManagedProcessOutput,
 } from "./managed-process";
 import { EventEmitter } from "node:events";
+import { IFlowserLogger } from "@onflowser/core";
 
 export enum ProcessManagerEvent {
   PROCESS_ADDED = "process_added",
@@ -13,7 +14,7 @@ export enum ProcessManagerEvent {
 export class ProcessManagerService extends EventEmitter {
   private readonly processLookupById: Map<string, ManagedProcess>;
 
-  constructor() {
+  constructor(private readonly logger: IFlowserLogger) {
     super();
     this.processLookupById = new Map();
 
@@ -51,6 +52,7 @@ export class ProcessManagerService extends EventEmitter {
 
   async start(process: ManagedProcess) {
     const isExisting = this.processLookupById.has(process.id);
+    this.logger.debug(`Running command '${process.options.command.name} ${process.options.command.args?.join("|")}'`)
     if (isExisting) {
       await this.startExisting(process.id);
     } else {
