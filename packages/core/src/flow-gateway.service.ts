@@ -94,16 +94,62 @@ export type FlowTransaction = {
   payloadSignatures: FlowSignableObject[];
 };
 
-// https://docs.onflow.org/fcl/reference/api/#event-object
-export type FlowEvent = {
+// https://developers.flow.com/cadence/language/crypto#signing-algorithms
+export enum FlowSignatureAlgorithm {
+  // Enum values must be kept unchanged.
+  ECDSA_P256 = "1",
+  ECDSA_secp256k1 = "2",
+  BLS_BLS12_381 = "3",
+}
+
+// https://developers.flow.com/cadence/language/core-events
+export enum FlowCoreEventType {
+  ACCOUNT_CREATED = "flow.AccountCreated",
+  ACCOUNT_KEY_ADDED = "flow.AccountKeyAdded",
+  ACCOUNT_KEY_REMOVED = "flow.AccountKeyRemoved",
+  ACCOUNT_CONTRACT_ADDED = "flow.AccountContractAdded",
+  ACCOUNT_CONTRACT_UPDATED = "flow.AccountContractUpdated",
+  ACCOUNT_CONTRACT_REMOVED = "flow.AccountContractRemoved",
+  // TODO(account-linking): Add account inbox events
+  //  https://developers.flow.com/cadence/language/core-events#inbox-value-published
+}
+
+type FlowEventInternal<Type extends string, Data> = {
   transactionId: string;
-  type: string;
+  type: Type;
   transactionIndex: number;
   eventIndex: number;
-  // Data contains arbitrary key-value pairs emitted from transactions.
-  // Information about cadence types is not returned from fcl-js.
-  data: Record<string, any>;
+  data: Data
 };
+
+
+// https://developers.flow.com/cadence/language/core-events#account-key-added
+type FlowKeyEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_KEY_ADDED | FlowCoreEventType.ACCOUNT_KEY_REMOVED, {
+  address: string;
+  publicKey: {
+    // https://developers.flow.com/cadence/language/crypto#publickey
+    publicKey: string[];
+    signatureAlgorithm: {
+      rawValue: FlowSignatureAlgorithm;
+    }
+  }
+}>
+
+// https://developers.flow.com/cadence/language/core-events#account-contract-added
+type FlowContractEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED | FlowCoreEventType.ACCOUNT_CONTRACT_ADDED | FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED, {
+  address: string;
+  codeHash: string[];
+  // Contract name
+  contract: string;
+}>
+
+// https://developers.flow.com/cadence/language/core-events#account-created
+type FlowAccountEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CREATED, {address: string}>;
+
+type FlowAnyEvent = FlowEventInternal<string, Record<string, any>>
+
+// https://docs.onflow.org/fcl/reference/api/#event-object
+export type FlowEvent = FlowAnyEvent | FlowKeyEvent | FlowAccountEvent | FlowContractEvent;
 
 // https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
 export type FlowAuthorizationFunction = () => unknown;
