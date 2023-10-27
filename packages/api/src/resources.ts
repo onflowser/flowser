@@ -59,7 +59,6 @@ export interface FlowAccount extends TimestampedResource, IdentifiableResource {
   address: string;
   balance: number;
   code: string;
-  isDefaultAccount: boolean;
   tags: FlowAccountTag[];
 }
 

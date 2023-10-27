@@ -9,6 +9,7 @@ import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import classes from "./AccountsTable.module.scss";
 import { Tooltip } from "../../common/overlays/Tooltip/Tooltip";
 import { FlowAccount } from "@onflowser/api";
+import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<FlowAccount>();
 
@@ -43,19 +44,14 @@ const columns = [
       <Value>{TextUtils.readableNumber(info.getValue())} FLOW</Value>
     ),
   }),
-  // TODO(restructure): Provide this info
-  // columnHelper.accessor("transactions", {
-  //   header: () => <Label variant="medium">TX COUNT</Label>,
-  //   cell: (info) => <Value>{info.getValue().length ?? 0}</Value>,
-  // }),
-  // columnHelper.accessor("createdAt", {
-  //   header: () => <Label variant="medium">CREATED</Label>,
-  //   cell: (info) => (
-  //     <Value>
-  //       <TimeAgo date={info.getValue()} />
-  //     </Value>
-  //   ),
-  // }),
+  columnHelper.accessor("createdAt", {
+    header: () => <Label variant="medium">CREATED</Label>,
+    cell: (info) => (
+      <Value>
+        <TimeAgo date={info.getValue()} />
+      </Value>
+    ),
+  }),
 ];
 
 type AccountsTableProps = {

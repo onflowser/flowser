@@ -501,14 +501,36 @@ export class FlowIndexerService {
   private createAccountEntity(account: flowResource.FlowAccount): flowserResource.FlowAccount {
     const address = ensurePrefixedAddress(account.address);
 
+    const tags: flowserResource.FlowAccountTag[] = [];
+
+    const isDefaultAccount = this.getAllWellKnownAddresses().includes(address);
+
+    if (isDefaultAccount) {
+      tags.push({
+        name: "Default",
+        description: "This account was created automatically by the emulator."
+      })
+    }
+
+    const isServiceAccount = [
+      "0xf8d6e0586b0a20c7",
+      "0x0000000000000001", // When using monotonic addresses setting
+    ].includes(address);
+
+    // https://developers.flow.com/concepts/flow-token/concepts#flow-service-account
+    if (isServiceAccount) {
+      tags.push({
+        name: "Service",
+        description:
+          "A special account in Flow that has special permissions to manage system contracts. It is able to mint tokens, set fees, and update network-level contracts.",
+      });
+    }
+
     return {
       id: address,
       balance: account.balance,
       address,
-      // TODO(restructure): Add logic for generating tags
-      // https://github.com/onflowser/flowser/pull/197/files#diff-de96e521dbe8391acff7b4c46768d9f51d90d5e30378600a41a57d14bb173f75L97-L116
-      tags: [],
-      isDefaultAccount: this.getAllWellKnownAddresses().includes(address),
+      tags,
       code: account.code,
       // TODO(restructure): Maybe the index should be the one dealing with these dates
       createdAt: new Date(),
