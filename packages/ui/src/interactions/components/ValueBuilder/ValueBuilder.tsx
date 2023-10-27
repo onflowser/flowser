@@ -43,12 +43,10 @@ function UnknownType() {
   return (
     <Callout
       icon={<FlowserIcon.QuestionMark width={15} height={15} />}
-      title="Unknown data type"
+      title="Unsupported data type"
       description={
         <div>
-          <p>This is either a non-existing type or a user-defined one.</p>
-          <p>Check the official Cadence documentation bellow for more info.</p>
-          <SizedBox height={10} />
+          For now, we only support built-in Cadence data types.
           <ExternalLink href="https://developers.flow.com/cadence/language/values-and-types" />
         </div>
       }
