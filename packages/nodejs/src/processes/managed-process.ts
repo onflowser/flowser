@@ -5,6 +5,7 @@ import {
 } from "child_process";
 import { randomUUID } from "crypto";
 import { EventEmitter } from "node:events";
+import { IFlowserLogger } from "@onflowser/core";
 
 export type ManagedProcessOptions = {
   id?: string;
@@ -51,7 +52,7 @@ export class ManagedProcess extends EventEmitter {
   public createdAt: Date;
   public updatedAt: Date;
 
-  constructor(options: ManagedProcessOptions) {
+  constructor(private readonly logger: IFlowserLogger, options: ManagedProcessOptions) {
     super();
     this.id = options.id ?? randomUUID();
     this.name = options.name;
@@ -75,8 +76,7 @@ export class ManagedProcess extends EventEmitter {
       throw new Error("Process is already running");
     }
 
-    // TODO(restructure): Inject logger provider
-    console.debug(
+    this.logger.debug(
       `Starting ${this.name} with command: ${command.name} ${command.args?.join(
         " "
       )}`

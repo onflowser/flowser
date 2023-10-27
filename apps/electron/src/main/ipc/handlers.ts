@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron';
+import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
 import {
   ExecuteScriptRequest,
@@ -13,7 +13,7 @@ type EventListener = (
   ...args: any[]
 ) => Promise<any> | any;
 
-export function registerHandlers(flowserAppService: FlowserAppService) {
+export function registerHandlers() {
   const {
     workspaceService,
     blockchainIndexService,
@@ -24,9 +24,22 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
     walletService,
     flowSnapshotsService,
     processManagerService,
-  } = flowserAppService;
+  } = FlowserAppService.create();
+
+  async function showDirectoryPicker() {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory', 'createDirectory'],
+    });
+    if (result.canceled) {
+      return undefined;
+    }
+    return result.filePaths[0];
+  }
 
   const handlers: Record<FlowserIpcEvent, EventListener> = {
+    [FlowserIpcEvent.APP_DIRECTORY_PICKER_SHOW]: (e: IpcMainInvokeEvent) =>
+      showDirectoryPicker(),
+
     [FlowserIpcEvent.WORKSPACES_CLOSE]: (e: IpcMainInvokeEvent, id: string) =>
       workspaceService.close(id),
     [FlowserIpcEvent.WORKSPACES_OPEN]: (e: IpcMainInvokeEvent, id: string) =>
@@ -69,7 +82,7 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
       });
     },
 
-    [FlowserIpcEvent.FLOW_GET_INDEX_OF_ADDRESS]: (
+    [FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX]: (
       event: IpcMainInvokeEvent,
       address: string,
     ) =>
@@ -77,17 +90,17 @@ export function registerHandlers(flowserAppService: FlowserAppService) {
         hexAddress: address,
         chainId: 'flow-emulator',
       }),
-    [FlowserIpcEvent.FLOW_GET_CLI_INFO]: (event: IpcMainInvokeEvent) =>
+    [FlowserIpcEvent.FLOW_CLI_GET_INFO]: (event: IpcMainInvokeEvent) =>
       flowCliService.getVersion(),
-    [FlowserIpcEvent.FLOW_SEND_TRANSACTION]: (
+    [FlowserIpcEvent.FLOW_TRANSACTION_SEND]: (
       event: IpcMainInvokeEvent,
       request: SendTransactionRequest,
     ) => walletService.sendTransaction(request),
-    [FlowserIpcEvent.FLOW_EXECUTE_SCRIPT]: (
+    [FlowserIpcEvent.FLOW_SCRIPT_EXECUTE]: (
       event: IpcMainInvokeEvent,
       request: ExecuteScriptRequest,
     ) => flowGatewayService.executeScript(request),
-    [FlowserIpcEvent.FLOW_CREATE_ACCOUNT]: async (
+    [FlowserIpcEvent.FLOW_ACCOUNT_CREATE]: async (
       event: IpcMainInvokeEvent,
     ) => {
       // There will be only 1 open workspace for now.

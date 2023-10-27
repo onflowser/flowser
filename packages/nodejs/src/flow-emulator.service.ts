@@ -32,7 +32,7 @@ export class FlowEmulatorService extends EventEmitter {
   }
 
   async start(request: StartEmulatorRequest) {
-    this.process = new ManagedProcess({
+    this.process = this.processManagerService.initManagedProcess({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
       command: {

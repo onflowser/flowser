@@ -167,7 +167,6 @@ export class FlowserAppService {
   }
 }
 
-// TODO(restructure): Expose flowser logs to the user?
 class WebLogger implements IFlowserLogger {
   debug(message: any): void {
     console.debug(message);

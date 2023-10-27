@@ -9,12 +9,11 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { FlowserAppService } from '../services/flowser-app.service';
 import { registerHandlers } from './ipc/handlers';
 
 class AppUpdater {
@@ -26,21 +25,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-// TODO(restructure): Move to ipc folder
-ipcMain.handle('showDirectoryPicker', showDirectoryPicker);
-
-const flowserAppService = FlowserAppService.create();
-
-async function showDirectoryPicker() {
-  const result = await dialog.showOpenDialog({
-    properties: ['openDirectory', 'createDirectory'],
-  });
-  if (result.canceled) {
-    return undefined;
-  }
-  return result.filePaths[0];
-}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -141,7 +125,7 @@ app
   .whenReady()
   .then(() => {
     createWindow();
-    registerHandlers(flowserAppService);
+    registerHandlers();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

@@ -42,18 +42,18 @@ export function App() {
     useState(0);
   const isUpdating = ![0, 100].includes(appUpdateDownloadPercentage);
 
-  window.electron.platformAdapter.handleExit(() => {
+  window.electron.app.handleExit(() => {
     setIsExiting(true);
   });
 
-  window.electron.platformAdapter.handleUpdateDownloadProgress((percentage) => {
+  window.electron.app.handleUpdateDownloadProgress((percentage) => {
     setAppUpdateDownloadPercentage(percentage);
   });
 
-  window.electron.platformAdapter.handleUpdateDownloadStart(() => {
+  window.electron.app.handleUpdateDownloadStart(() => {
     setAppUpdateDownloadPercentage(0);
   });
-  window.electron.platformAdapter.handleUpdateDownloadEnd(() => {
+  window.electron.app.handleUpdateDownloadEnd(() => {
     setAppUpdateDownloadPercentage(100);
   });
 
@@ -84,7 +84,7 @@ export function App() {
       >
         <ConfirmDialogProvider>
           <FilePickerProvider
-            pickDirectory={window.electron.platformAdapter.showDirectoryPicker}
+            pickDirectory={window.electron.app.showDirectoryPicker}
           >
             <ConsentAnalytics />
             <FlowserUsageRequirements />

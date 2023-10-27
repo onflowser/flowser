@@ -12,7 +12,6 @@ type SideNavigationProps = {
   className?: string;
 };
 
-// TODO(restructure): Move this to app folder
 export function SideNavigation(props: SideNavigationProps): ReactElement {
   const { closeWorkspace } = useProjectManager();
 

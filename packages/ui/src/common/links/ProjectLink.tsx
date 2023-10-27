@@ -5,7 +5,6 @@ import { useCurrentWorkspaceId } from "../../hooks/use-current-project-id";
 
 type ProjectLinkProps = NavLinkProps;
 
-// TODO(restructure): Move this to app folder?
 export function ProjectLink(props: ProjectLinkProps): ReactElement {
   const projectId = useCurrentWorkspaceId();
   const { to, ...otherProps } = props;

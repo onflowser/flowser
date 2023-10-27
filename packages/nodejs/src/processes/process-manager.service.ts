@@ -1,7 +1,7 @@
 import {
   ManagedProcess,
   ProcessOutputSource,
-  ManagedProcessOutput,
+  ManagedProcessOutput, ManagedProcessOptions
 } from "./managed-process";
 import { EventEmitter } from "node:events";
 import { IFlowserLogger } from "@onflowser/core";
@@ -26,6 +26,10 @@ export class ProcessManagerService extends EventEmitter {
   async onTerminate() {
     await this.stopAll();
     process.exit(0);
+  }
+
+  initManagedProcess(options: ManagedProcessOptions) {
+    return new ManagedProcess(this.logger, options);
   }
 
   findAllLogsByProcess(

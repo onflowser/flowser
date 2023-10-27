@@ -74,7 +74,7 @@ export class FlowCliService {
   constructor(private processManagerService: ProcessManagerService) {}
 
   async init(options: InitOptions) {
-    const childProcess = new ManagedProcess({
+    const childProcess = this.processManagerService.initManagedProcess({
       id: FlowCliService.processId,
       name: "Flow init",
       command: {
@@ -178,7 +178,7 @@ export class FlowCliService {
   }
 
   private async runAndGetOutput(options: RunCliCommandOptions) {
-    const childProcess = new ManagedProcess({
+    const childProcess = this.processManagerService.initManagedProcess({
       id: randomUUID(),
       name: options.name,
       command: {

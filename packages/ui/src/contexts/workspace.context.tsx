@@ -75,7 +75,6 @@ export function WorkspaceManagerProvider({
 
   async function closeWorkspace() {
     try {
-      // TODO(restructure): Do we need to clear the local cache?
       await workspaceService.close(currentWorkspaceId);
       await refetchCurrentWorkspace();
       navigate("/projects", {

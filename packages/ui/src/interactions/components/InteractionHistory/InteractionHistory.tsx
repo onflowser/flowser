@@ -45,12 +45,6 @@ function BlockItem(props: BlockItemProps) {
   const { create, setFocused } = useInteractionRegistry();
   const { data } = useGetTransactionsByBlock(
     block.id
-    // TODO(restructure): Add this option
-    //   {
-    //   // Assume that every transaction is packaged into a separate block.
-    //   // So once a block exists, no transactions can be appended to it.
-    //   pollingInterval: 0,
-    // }
   );
   const firstTransaction = data?.[0];
 

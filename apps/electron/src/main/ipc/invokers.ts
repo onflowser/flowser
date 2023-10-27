@@ -15,15 +15,15 @@ import { BlockchainIndexes } from '../../services/blockchain-index.service';
 
 const flow: IFlowService = {
   getIndexOfAddress: (address: string) =>
-    ipcRenderer.invoke(FlowserIpcEvent.FLOW_GET_INDEX_OF_ADDRESS, address),
-  getFlowCliInfo: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_GET_CLI_INFO),
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX, address),
+  getFlowCliInfo: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_CLI_GET_INFO),
   sendTransaction: (
     request: SendTransactionRequest,
   ): Promise<{ transactionId: string }> =>
-    ipcRenderer.invoke(FlowserIpcEvent.FLOW_SEND_TRANSACTION, request),
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_TRANSACTION_SEND, request),
   executeScript: (request: ExecuteScriptRequest): Promise<any> =>
-    ipcRenderer.invoke(FlowserIpcEvent.FLOW_EXECUTE_SCRIPT, request),
-  createAccount: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_CREATE_ACCOUNT),
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_SCRIPT_EXECUTE, request),
+  createAccount: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_ACCOUNT_CREATE),
 };
 
 const interactions: IInteractionService = {
@@ -66,8 +66,9 @@ const processManagerService: IProcessManagerService = {
 };
 
 export const electronInvokers = {
-  platformAdapter: {
-    showDirectoryPicker: () => ipcRenderer.invoke('showDirectoryPicker'),
+  app: {
+    showDirectoryPicker: () =>
+      ipcRenderer.invoke(FlowserIpcEvent.APP_DIRECTORY_PICKER_SHOW),
     handleExit: (callback: () => void) => ipcRenderer.on('exit', callback),
     handleUpdateDownloadStart: (callback: () => void) =>
       ipcRenderer.on('update-download-start', callback),
