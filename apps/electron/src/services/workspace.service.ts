@@ -11,6 +11,7 @@ export enum WorkspaceEvent {
 
 export class WorkspaceService extends EventEmitter {
   private readonly openWorkspaceIds: Set<string>;
+  private readonly temporaryWorkspaceLookup: Map<string, FlowserWorkspace>;
 
   constructor(
     private readonly flowEmulatorService: FlowEmulatorService,
@@ -18,6 +19,7 @@ export class WorkspaceService extends EventEmitter {
   ) {
     super();
     this.openWorkspaceIds = new Set();
+    this.temporaryWorkspaceLookup = new Map();
   }
 
   async getOpenWorkspaces(): Promise<FlowserWorkspace[]> {
@@ -42,21 +44,26 @@ export class WorkspaceService extends EventEmitter {
   }
 
   async findAll(): Promise<FlowserWorkspace[]> {
-    const existing = await this.storage.read();
+    const persisted = await this.readPersisted();
+    const temporary = Array.from(this.temporaryWorkspaceLookup.values());
+    return [...persisted, ...temporary];
+  }
 
-    return JSON.parse(existing ?? '[]');
+  // Temporary workspaces are not persisted to disk.
+  async createTemporary(createdWorkspace: FlowserWorkspace) {
+    this.temporaryWorkspaceLookup.set(createdWorkspace.id, createdWorkspace);
   }
 
   async create(createdWorkspace: FlowserWorkspace) {
     const existingWorkspaces = await this.findAll();
 
-    await this.saveWorkspaces([...existingWorkspaces, createdWorkspace]);
+    await this.saveAll([...existingWorkspaces, createdWorkspace]);
   }
 
   async update(updatedWorkspace: FlowserWorkspace) {
     const existingWorkspaces = await this.findAll();
 
-    await this.saveWorkspaces(
+    await this.saveAll(
       existingWorkspaces.map((existingWorkspace) =>
         existingWorkspace.id === updatedWorkspace.id
           ? updatedWorkspace
@@ -92,10 +99,30 @@ export class WorkspaceService extends EventEmitter {
 
   async remove(id: string): Promise<void> {
     const existingWorkspaces = await this.findAll();
-    await this.saveWorkspaces(existingWorkspaces.filter((e) => e.id !== id));
+    await this.saveAll(existingWorkspaces.filter((e) => e.id !== id));
   }
 
-  private async saveWorkspaces(workspaces: FlowserWorkspace[]) {
+  private async saveAll(workspaces: FlowserWorkspace[]) {
+    const temporary = workspaces.filter((w) =>
+      this.temporaryWorkspaceLookup.has(w.id),
+    );
+
+    temporary.forEach((w) => this.temporaryWorkspaceLookup.set(w.id, w));
+
+    const persistable = workspaces.filter(
+      (w) => !this.temporaryWorkspaceLookup.has(w.id),
+    );
+
+    await this.persist(persistable);
+  }
+
+  private async readPersisted(): Promise<FlowserWorkspace[]> {
+    const existing = await this.storage.read();
+
+    return JSON.parse(existing ?? '[]');
+  }
+
+  private async persist(workspaces: FlowserWorkspace[]) {
     await this.storage.write(JSON.stringify(workspaces));
   }
 }
