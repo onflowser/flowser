@@ -57,7 +57,10 @@ export class FlowserAppService {
     this.flowInteractionsService = new FlowInteractionsService(
       this.goBindingsService,
     );
-    this.processManagerService = new ProcessManagerService(this.logger);
+    this.processManagerService = new ProcessManagerService(this.logger, {
+      // We are manually handling shutdown before the app closes
+      gracefulShutdown: true,
+    });
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
@@ -103,6 +106,15 @@ export class FlowserAppService {
       this.instance = new FlowserAppService();
     }
     return this.instance;
+  }
+
+  public isCleanupComplete(): boolean {
+    return this.processManagerService.isStoppedAll();
+  }
+
+  public async cleanup(): Promise<void> {
+    this.processingScheduler.stop();
+    await this.processManagerService.stopAll();
   }
 
   private registerListeners() {

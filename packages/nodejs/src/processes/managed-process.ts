@@ -107,6 +107,7 @@ export class ManagedProcess extends EventEmitter {
         reject(error);
       });
       if (!isKilledSuccessfully) {
+        this.logger.debug(`Process ${this.name} (${this.id}) didn't shutdown given SIGINT`)
         // If the SIGINT signal doesn't work, force kill with SIGINT
         this.childProcess.kill("SIGKILL");
       }

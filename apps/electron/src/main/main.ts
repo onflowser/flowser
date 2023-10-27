@@ -9,12 +9,13 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, dialog, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { registerHandlers } from './ipc/handlers';
+import { FlowserAppService } from '../services/flowser-app.service';
 
 class AppUpdater {
   constructor() {
@@ -133,3 +134,34 @@ app
     });
   })
   .catch(console.log);
+
+app.on('before-quit', async (e) => {
+  const flowserAppService = FlowserAppService.create();
+
+  // After we call app.quit(), before-quit is fired once more,
+  // so we need to exit early if the cleanup already completed to avoid infinite recursion.
+  if (flowserAppService.isCleanupComplete()) {
+    return;
+  }
+
+  // Prevent app termination before cleanup is done
+  e.preventDefault();
+  try {
+    // On macOS the user could first close the app by clicking on "X"
+    // (which would destroy the window) and later quit the app from app bar.
+    // If we trigger any method on destroyed window, electron throws an error.
+    if (!mainWindow?.isDestroyed()) {
+      // Notify renderer process
+      mainWindow?.webContents.send('exit');
+    }
+
+    await flowserAppService.cleanup();
+  } catch (error: unknown) {
+    await dialog.showMessageBox({
+      message: `Couldn't shutdown successfully: ${String(error)}`,
+      type: 'error',
+    });
+  } finally {
+    app.quit();
+  }
+});

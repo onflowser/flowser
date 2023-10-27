@@ -11,19 +11,30 @@ export enum ProcessManagerEvent {
   PROCESS_UPDATED = "process_updated",
 }
 
+type ProcessManagerOptions = {
+  // False if consumer wants to handle process termination on exit themselves.
+  gracefulShutdown: boolean;
+}
+
 export class ProcessManagerService extends EventEmitter {
   private readonly processLookupById: Map<string, ManagedProcess>;
 
-  constructor(private readonly logger: IFlowserLogger) {
+  constructor(private readonly logger: IFlowserLogger, options: ProcessManagerOptions) {
     super();
     this.processLookupById = new Map();
 
+    if (options.gracefulShutdown) {
+      this.handleGracefullyShutdown();
+    }
+  }
+
+  private handleGracefullyShutdown() {
     // Gracefully shutdown child process in case parent receives a kill signal
     process.once("SIGINT", this.onTerminate.bind(this));
     process.once("SIGTERM", this.onTerminate.bind(this));
   }
 
-  async onTerminate() {
+  private async onTerminate() {
     await this.stopAll();
     process.exit(0);
   }
@@ -116,6 +127,7 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   async stopAll() {
+    this.logger.debug(`Stopping ${this.getAll().length} processes`)
     await Promise.all(this.getAll().map((process) => process.stop()));
   }
 
