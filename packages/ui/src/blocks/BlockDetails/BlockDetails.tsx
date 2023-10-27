@@ -21,7 +21,7 @@ export const BlockDetails: FunctionComponent<BlockDetailsProps> = (props) => {
   const { isLoading, data: block } = useGetBlock(props.blockId);
   const { data: transactions } = useGetTransactionsByBlock(props.blockId);
 
-  if (isLoading || !block) {
+  if (isLoading || !block || !transactions) {
     return <FullScreenLoading />;
   }
 

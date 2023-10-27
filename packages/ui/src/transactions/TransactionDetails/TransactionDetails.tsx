@@ -25,6 +25,7 @@ export const TransactionDetails: FunctionComponent<TransactionDetailsProps> = (
       <TransactionOverview transaction={transaction} />
       <SizedBox height={30} />
       <TransactionDetailsTabs
+        contentClassName={classes.tabContent}
         transaction={transaction}
         includeScriptTab={true}
         includeOverviewTab={false}

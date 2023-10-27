@@ -119,7 +119,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
         <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
       </div>
       <SizedBox height={30} />
-      <StyledTabs tabs={tabs} />
+      <StyledTabs tabs={tabs} contentClassName={classes.tabContent} />
     </div>
   );
 };
