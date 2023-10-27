@@ -83,7 +83,6 @@ export class WorkspaceService extends EventEmitter {
       filesystemPath: '',
       createdAt: new Date(),
       updatedAt: new Date(),
-      deletedAt: undefined,
       emulator: this.flowEmulatorService.getDefaultConfig(),
       gateway: undefined,
       id: randomUUID(),

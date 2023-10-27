@@ -17,22 +17,20 @@ import {
   FlowTransaction,
 } from '@onflowser/api';
 import { FlowserUsageRequirements } from '@onflowser/ui/src/common/misc/FlowserUsageRequirements/FlowserUsageRequirements';
-import { IpcIndex } from './ipc-index';
+import { IpcIndexCache } from './ipc-index-cache';
 import { FlowserRouter } from './router';
 import { UpdateLoader } from './components/loaders/UpdateLoader';
 import { AnalyticsService } from '../services/analytics.service';
-
-import { BlockchainIndexes } from '../services/blockchain-index.service';
 import { SentryRendererService } from '../services/sentry-renderer.service';
 
-const indexes: BlockchainIndexes = {
-  accountStorage: new IpcIndex<FlowAccountStorage>('accountStorage'),
-  contract: new IpcIndex<FlowContract>('contract'),
-  transaction: new IpcIndex<FlowTransaction>('transaction'),
-  account: new IpcIndex<FlowAccount>('account'),
-  block: new IpcIndex<FlowBlock>('block'),
-  event: new IpcIndex<FlowEvent>('event'),
-  accountKey: new IpcIndex<FlowAccountKey>('accountKey'),
+const indexes = {
+  accountStorage: new IpcIndexCache<FlowAccountStorage>('accountStorage'),
+  contract: new IpcIndexCache<FlowContract>('contract'),
+  transaction: new IpcIndexCache<FlowTransaction>('transaction'),
+  account: new IpcIndexCache<FlowAccount>('account'),
+  block: new IpcIndexCache<FlowBlock>('block'),
+  event: new IpcIndexCache<FlowEvent>('event'),
+  accountKey: new IpcIndexCache<FlowAccountKey>('accountKey'),
 };
 
 const analyticsService = new AnalyticsService();

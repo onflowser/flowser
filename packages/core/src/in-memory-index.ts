@@ -1,10 +1,10 @@
 import {
-  IdentifiableResource,
-  IResourceIndex,
+  IndexableResource,
+  IResourceIndex, OmitTimestamps,
   RequireOnly
 } from "@onflowser/api";
 
-export class InMemoryIndex<Resource extends IdentifiableResource>
+export class InMemoryIndex<Resource extends IndexableResource>
   implements IResourceIndex<Resource>
 {
   private readonly lookup: Map<string, Resource>;
@@ -13,15 +13,20 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
     this.lookup = new Map();
   }
 
-  async create(resource: Resource): Promise<void> {
+  async create(resource: OmitTimestamps<Resource>): Promise<void> {
     if (this.lookup.has(resource.id)) {
       throw new Error("Resource already exists");
     } else {
-      this.lookup.set(resource.id, resource);
+      // @ts-ignore Not entirely sure what this type error is about.
+      this.lookup.set(resource.id, {
+        ...resource,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
     }
   }
 
-  async upsert(resource: Resource): Promise<void> {
+  async upsert(resource: OmitTimestamps<Resource>): Promise<void> {
     if (this.lookup.has(resource.id)) {
       await this.update(resource);
     } else {
@@ -29,14 +34,14 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
     }
   }
 
-  async delete(resource: RequireOnly<Resource, "id">): Promise<void> {
+  async delete(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void> {
     if (!this.lookup.has(resource.id)) {
       throw new Error("Resource not found");
     }
     this.lookup.delete(resource.id);
   }
 
-  async update(resource: RequireOnly<Resource, "id">): Promise<void> {
+  async update(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void> {
     const existingResource = this.lookup.get(resource.id);
     if (!existingResource) {
       throw new Error("Resource not found");
@@ -44,6 +49,7 @@ export class InMemoryIndex<Resource extends IdentifiableResource>
     this.lookup.set(resource.id, {
       ...existingResource,
       ...resource,
+      updatedAt: new Date(),
     });
   }
 

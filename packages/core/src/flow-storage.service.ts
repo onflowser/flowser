@@ -3,7 +3,7 @@ import { ensurePrefixedAddress } from "./utils";
 import {
   FlowStorageDomain,
   CadenceTypeKind,
-  FlowAccountStorage,
+  FlowAccountStorage, OmitTimestamps
 } from "@onflowser/api";
 
 /**
@@ -38,12 +38,12 @@ export class FlowAccountStorageService {
 
   public async getAccountStorageItems(
     address: string
-  ): Promise<FlowAccountStorage[]> {
+  ): Promise<OmitTimestamps<FlowAccountStorage>[]> {
     const flowAccountStorage = await this.fetchStorageByAddress(address);
 
     return [
       ...flowAccountStorage.capabilityPathItems.map(
-        (item): FlowAccountStorage => ({
+        (item): OmitTimestamps<FlowAccountStorage> => ({
           id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
           address: ensurePrefixedAddress(item.address),
           // Temporarily store the data type in untyped field, refactor later.
@@ -53,13 +53,10 @@ export class FlowAccountStorageService {
           domain: this.getStorageDomainFromPath(item.path),
           path: item.path,
           targetPath: item.targetPath,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: undefined
         })
       ),
       ...flowAccountStorage.storagePathItems.map(
-        (item): FlowAccountStorage => ({
+        (item): OmitTimestamps<FlowAccountStorage> => ({
           id: `${ensurePrefixedAddress(item.address)}.${item.path}`,
           address: ensurePrefixedAddress(item.address),
           // Temporarily store the data type in untyped field, refactor later.
@@ -69,9 +66,6 @@ export class FlowAccountStorageService {
           domain: this.getStorageDomainFromPath(item.path),
           path: item.path,
           targetPath: "",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: undefined
         })
       ),
     ];

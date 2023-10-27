@@ -1,4 +1,4 @@
-import { IdentifiableResource } from "./resources";
+import { IdentifiableResource, TimestampedResource } from "./resources";
 
 export type RequireOnly<Resource, Key extends keyof Resource> = Pick<
   Resource,
@@ -6,21 +6,27 @@ export type RequireOnly<Resource, Key extends keyof Resource> = Pick<
 > &
   Partial<Omit<Resource, Key>>;
 
-export interface IResourceIndexReader<Resource> {
+export type IndexableResource = IdentifiableResource & TimestampedResource;
+
+export interface IResourceIndexReader<Resource extends TimestampedResource> {
   findOneById(id: string): Promise<Resource | undefined>;
   findAll(): Promise<Resource[]>;
-  // TODO(restructure): Add searching capabilities
+  // TODO(global-search): Add searching capabilities
   // search(): Promise<Resource[]>;
 }
 
-export interface IResourceIndexWriter<Resource extends IdentifiableResource> {
-  create(resource: Resource): Promise<void>;
-  upsert(resource: Resource): Promise<void>;
-  update(resource: RequireOnly<Resource, "id">): Promise<void>;
-  delete(resource: RequireOnly<Resource, "id">): Promise<void>;
+// Index is responsible for managing lifecycle timestamps,
+// so consumers shouldn't be passing in timestamps themselves.
+export type OmitTimestamps<Resource> = Omit<Resource, keyof TimestampedResource>
+
+export interface IResourceIndexWriter<Resource extends IndexableResource> {
+  create(resource: OmitTimestamps<Resource>): Promise<void>;
+  upsert(resource: OmitTimestamps<Resource>): Promise<void>;
+  update(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void>;
+  delete(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void>;
   clear(): Promise<void>;
 }
 
-export interface IResourceIndex<Resource extends IdentifiableResource>
+export interface IResourceIndex<Resource extends IndexableResource>
   extends IResourceIndexReader<Resource>,
     IResourceIndexWriter<Resource> {}

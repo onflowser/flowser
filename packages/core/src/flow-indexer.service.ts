@@ -4,7 +4,7 @@ import {
   IResourceIndex,
   HashAlgorithm,
   SignatureAlgorithm,
-  ParsedInteractionOrError,
+  ParsedInteractionOrError, OmitTimestamps
 } from "@onflowser/api";
 import { IFlowInteractions } from "./flow-interactions.service";
 import { FlowAccountStorageService } from "./flow-storage.service";
@@ -498,7 +498,7 @@ export class FlowIndexerService {
     ];
   }
 
-  private createAccountEntity(account: flowResource.FlowAccount): flowserResource.FlowAccount {
+  private createAccountEntity(account: flowResource.FlowAccount): OmitTimestamps<flowserResource.FlowAccount> {
     const address = ensurePrefixedAddress(account.address);
 
     const tags: flowserResource.FlowAccountTag[] = [];
@@ -532,17 +532,13 @@ export class FlowIndexerService {
       address,
       tags,
       code: account.code,
-      // TODO(restructure): Maybe the index should be the one dealing with these dates
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: undefined,
     };
   }
 
   private createKeyEntity(options: {
     address:string;
     key: flowResource.FlowKey;
-  }): flowserResource.FlowAccountKey {
+  }): OmitTimestamps<flowserResource.FlowAccountKey> {
     const { address, key } = options;
 
     const signAlgoLookup = new Map([
@@ -570,9 +566,6 @@ export class FlowIndexerService {
       revoked: key.revoked,
       // Do not include `privateKey` field here,
       // otherwise it may override private key that was created by wallet service.
-      createdAt: new Date(),
-      deletedAt: undefined,
-      updatedAt: new Date(),
     };
   }
 
@@ -586,7 +579,7 @@ export class FlowIndexerService {
 
   private createEventEntity(options: {
     event: ExtendedFlowEvent;
-  }): flowserResource.FlowEvent {
+  }): OmitTimestamps<flowserResource.FlowEvent> {
     const { event } = options;
     return {
       id: `${event.transactionId}.${event.eventIndex}`,
@@ -596,15 +589,12 @@ export class FlowIndexerService {
       blockId: event.blockId,
       eventIndex: event.eventIndex,
       data: event.data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: undefined,
     };
   }
 
   private createBlockEntity(options: {
     block: flowResource.FlowBlock;
-  }): flowserResource.FlowBlock {
+  }): OmitTimestamps<flowserResource.FlowBlock> {
     const { block } = options;
     return {
       id: block.id,
@@ -617,9 +607,6 @@ export class FlowIndexerService {
       timestamp: new Date(block.timestamp),
       blockHeight: block.height,
       parentId: block.parentId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: undefined,
     };
   }
 
@@ -628,7 +615,7 @@ export class FlowIndexerService {
     account: flowResource.FlowAccount;
     name: string;
     code: string;
-  }): flowserResource.FlowContract {
+  }): OmitTimestamps<flowserResource.FlowContract> {
     const { account, block, name, code } = options;
     return {
       id: `${account.address}.${name}`,
@@ -638,9 +625,6 @@ export class FlowIndexerService {
       localConfig: undefined,
       name: name,
       code: code,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: undefined,
     };
   }
 
@@ -649,7 +633,7 @@ export class FlowIndexerService {
     transaction: flowResource.FlowTransaction;
     transactionStatus: flowResource.FlowTransactionStatus;
     parsedInteraction: ParsedInteractionOrError;
-  }): flowserResource.FlowTransaction {
+  }): OmitTimestamps<flowserResource.FlowTransaction> {
     const { block, transaction, transactionStatus, parsedInteraction } =
       options;
 
@@ -719,9 +703,6 @@ export class FlowIndexerService {
         grcpStatus: this.reMapGrcpStatus(transactionStatus.statusCode),
         executionStatus: transactionStatus.status,
       },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: undefined,
     };
   }
 

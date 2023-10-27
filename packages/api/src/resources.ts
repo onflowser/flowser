@@ -46,7 +46,6 @@ export interface CadenceParameter {
 export interface TimestampedResource {
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | undefined;
 }
 
 export interface IdentifiableResource {

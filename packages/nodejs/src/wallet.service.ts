@@ -1,7 +1,7 @@
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import { FlowCliService } from "./flow-cli.service";
-import { ensurePrefixedAddress, IFlowserLogger } from "@onflowser/core";
+import { ensurePrefixedAddress } from "@onflowser/core";
 import {
   FlowAuthorizationFunction,
   FlowGatewayService,
@@ -152,10 +152,7 @@ export class WalletService {
       revoked: false,
       sequenceNumber: 0,
       signAlgo: signatureAlgorithm,
-      updatedAt: new Date(),
       weight: 1000,
-      createdAt: new Date(),
-      deletedAt: undefined,
     })
   }
 
