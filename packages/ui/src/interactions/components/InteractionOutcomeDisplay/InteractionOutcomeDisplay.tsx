@@ -14,6 +14,7 @@ import { TransactionDetailsTabs } from "../../../transactions/TransactionDetails
 import { ScriptOutcome, TransactionOutcome } from "../../core/core-types";
 import { InteractionKind } from "@onflowser/api";
 import { useGetTransaction } from "../../../api";
+import { ErrorMessage } from "../../../common/errors/ErrorMessage";
 
 export function InteractionOutcomeDisplay(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -96,10 +97,20 @@ function EmptyState() {
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
-  const { data: transaction } = useGetTransaction(outcome.transactionId!);
+  const { isLoading, data: transaction } = useGetTransaction(outcome.transactionId!);
+
+  if (isLoading) {
+    return <SpinnerWithLabel label="Executing" />;
+  }
 
   if (!transaction) {
-    return <SpinnerWithLabel label="Executing" />;
+    // This happens if rollback is performed to a block before this transaction.
+    return (
+      <ErrorMessage
+        className={classes.errorWrapper}
+        error="Transaction not found"
+      />
+    )
   }
 
   return (
