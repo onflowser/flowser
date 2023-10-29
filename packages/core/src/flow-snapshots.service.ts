@@ -43,6 +43,10 @@ export class FlowSnapshotsService extends EventEmitter {
       endpoint: `/snapshots?name=${name}`,
     });
 
+    if (response.status === 409) {
+      throw new Error("Snapshot already exists")
+    }
+
     if (response.status !== 200) {
       throw new Error("Failed creating snapshot");
     }
@@ -92,7 +96,7 @@ export class FlowSnapshotsService extends EventEmitter {
     return response.data;
   }
 
-  public async findAll(): Promise<FlowStateSnapshot[]> {
+  public async synchronizeIndex() {
     const [persistedSnapshots, emulatorSnapshots] = await Promise.all([
       this.findAllPersisted(),
       this.findAllOnEmulator()
@@ -101,7 +105,12 @@ export class FlowSnapshotsService extends EventEmitter {
     const validSnapshotIdLookup = new Set(emulatorSnapshots.names);
 
     // Ensure we exclude the ones that were deleted without using Flowser.
-    return persistedSnapshots.filter(snapshot => validSnapshotIdLookup.has(snapshot.id))
+    await this.persistAll(persistedSnapshots.filter(snapshot => validSnapshotIdLookup.has(snapshot.id)))
+  }
+
+  public async findAll(): Promise<FlowStateSnapshot[]> {
+    // Only valid snapshots (after synchronization) should be persisted.
+    return this.findAllPersisted();
   }
 
   private async findAllOnEmulator(): Promise<ListSnapshotsResponse> {

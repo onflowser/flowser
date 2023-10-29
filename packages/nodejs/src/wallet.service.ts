@@ -133,7 +133,7 @@ export class WalletService {
     return authn;
   }
 
-  public async synchronizeKeys() {
+  public async synchronizeIndex() {
     const managedKeyPairs = await this.listKeyPairs();
     const associatedAccounts = await Promise.allSettled(managedKeyPairs.map(keyPair => this.flowGateway.getAccount(keyPair.address)));
     const validKeyPairLookupByPublicKey = new Set(associatedAccounts.map((account) => {
@@ -192,7 +192,6 @@ export class WalletService {
   }
 
   private async writeKeyPairs(keyPairs: ManagedKeyPair[]) {
-    console.log("Writing keys", keyPairs)
     await this.storageService.write(JSON.stringify(keyPairs));
   }
 }

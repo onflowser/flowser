@@ -140,7 +140,7 @@ export class FlowserAppService {
 
   private async onRollbackToBlockHeight() {
     this.blockchainIndexService.clear();
-    await this.walletService.synchronizeKeys();
+    await this.walletService.synchronizeIndex();
   }
 
   private async onWorkspaceOpen(workspaceId: string) {
@@ -168,8 +168,10 @@ export class FlowserAppService {
     this.flowSnapshotsStorageService.setFileName(
       `flowser-snapshots-${workspaceId}.json`,
     );
+    await this.flowSnapshotsService.synchronizeIndex();
+
     this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);
-    await this.walletService.synchronizeKeys();
+    await this.walletService.synchronizeIndex();
 
     if (workspace.emulator) {
       this.flowSnapshotsService.configure({

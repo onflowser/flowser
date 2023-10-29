@@ -67,7 +67,6 @@ export class ProcessManagerService extends EventEmitter {
 
   async start(process: ManagedProcess) {
     const isExisting = this.processLookupById.has(process.id);
-    this.logger.debug(`Running command '${process.options.command.name} ${process.options.command.args?.join("|")}'`)
     if (isExisting) {
       await this.startExisting(process.id);
     } else {

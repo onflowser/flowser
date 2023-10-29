@@ -140,7 +140,7 @@ export interface FlowAccountStorage extends TimestampedResource, IdentifiableRes
   id: string;
   address: string;
   domain: FlowStorageDomain;
-  // TODO(restructure): Split data into multiple type-specific fields
+  // TODO(restructure-followup): Split data into multiple type-specific fields
   data: any;
   path: string;
   targetPath: string;
