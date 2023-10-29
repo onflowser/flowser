@@ -18,7 +18,7 @@ export function AccountStorage(props: AccountStorageProps): ReactElement {
   const urlQueryParams = useUrlQuery();
   const focusedStorageId = urlQueryParams.get("focusedStorageId");
   const [expandedCardIds, setExpandedCardIds] = useState(
-    new Set<string>(focusedStorageId ? [focusedStorageId] : [])
+    new Set<string>(focusedStorageId ? [focusedStorageId] : []),
   );
 
   useEffect(() => {
@@ -60,13 +60,13 @@ export function AccountStorage(props: AccountStorageProps): ReactElement {
   };
 
   const privateStorageItems = storageItems.filter(
-    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_PRIVATE
+    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_PRIVATE,
   );
   const publicStorageItems = storageItems.filter(
-    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_PUBLIC
+    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_PUBLIC,
   );
   const internalStorageItems = storageItems.filter(
-    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_STORAGE
+    (item) => item.domain === FlowStorageDomain.STORAGE_DOMAIN_STORAGE,
   );
 
   const privateAndPublicStorageItems = [

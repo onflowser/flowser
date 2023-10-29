@@ -39,7 +39,7 @@ type ProjectSettingsProps = {
 };
 
 export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
-  props
+  props,
 ) => {
   const { workspaceId } = props;
   const { workspaceService } = useServiceRegistry();
@@ -58,7 +58,7 @@ export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
     validateOnChange: false,
     // Initial value is set in a hook bellow.
     initialValues: {} as FlowserWorkspace,
-    onSubmit: () => saveAndOpenWorkspace()
+    onSubmit: () => saveAndOpenWorkspace(),
   });
 
   async function saveAndOpenWorkspace() {
@@ -111,7 +111,7 @@ export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
     } catch (e) {
       console.error(e);
       toast.error(
-        `Something went wrong: Can not load emulator settings from server`
+        `Something went wrong: Can not load emulator settings from server`,
       );
     }
   }
@@ -124,7 +124,7 @@ export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
       }
     } catch (e) {
       toast.error(
-        "Something went wrong: Can not fetch default ProjectSettings from server"
+        "Something went wrong: Can not fetch default ProjectSettings from server",
       );
     }
   }
@@ -372,7 +372,7 @@ function getHashAlgorithmRadioOptions(hashAlgorithms: HashAlgorithm[]) {
 }
 
 function getSignatureAlgorithmRadioOptions(
-  sigAlgorithms: SignatureAlgorithm[]
+  sigAlgorithms: SignatureAlgorithm[],
 ) {
   return sigAlgorithms.map((algo) => ({
     label: FlowUtils.getSignatureAlgoName(algo),

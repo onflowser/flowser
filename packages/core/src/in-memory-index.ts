@@ -1,7 +1,8 @@
 import {
   IndexableResource,
-  IResourceIndex, OmitTimestamps,
-  RequireOnly
+  IResourceIndex,
+  OmitTimestamps,
+  RequireOnly,
 } from "@onflowser/api";
 
 export class InMemoryIndex<Resource extends IndexableResource>
@@ -34,14 +35,18 @@ export class InMemoryIndex<Resource extends IndexableResource>
     }
   }
 
-  async delete(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void> {
+  async delete(
+    resource: OmitTimestamps<RequireOnly<Resource, "id">>,
+  ): Promise<void> {
     if (!this.lookup.has(resource.id)) {
       throw new Error("Resource not found");
     }
     this.lookup.delete(resource.id);
   }
 
-  async update(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void> {
+  async update(
+    resource: OmitTimestamps<RequireOnly<Resource, "id">>,
+  ): Promise<void> {
     const existingResource = this.lookup.get(resource.id);
     if (!existingResource) {
       throw new Error("Resource not found");

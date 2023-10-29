@@ -26,10 +26,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
         name: transactionName ?? "Unknown",
         code: transaction.script,
         fclValuesByIdentifier: new Map(
-          transaction.arguments.map((arg) => [
-            arg.identifier,
-            arg.value
-          ])
+          transaction.arguments.map((arg) => [arg.identifier, arg.value]),
         ),
         initialOutcome: {
           transaction: {
@@ -45,7 +42,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
       },
       {
         deduplicateBySourceCodeSemantics: true,
-      }
+      },
     );
     setFocused(createdInteraction.id);
   }

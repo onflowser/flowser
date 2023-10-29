@@ -51,7 +51,7 @@ export class AsyncIntervalScheduler {
         await new Promise((resolve) => {
           this.runningTimeoutId = setTimeout(
             resolve,
-            pollingIntervalInMs - runTimeInMs
+            pollingIntervalInMs - runTimeInMs,
           );
         });
       } else {

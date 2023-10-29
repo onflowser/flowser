@@ -1,7 +1,7 @@
 export * from "./fcl-value";
 export * from "./utils";
 export * from "./in-memory-index";
-export * from "./logger"
+export * from "./logger";
 
 export * from "./flow-gateway.service";
 export * from "./flow-snapshots.service";

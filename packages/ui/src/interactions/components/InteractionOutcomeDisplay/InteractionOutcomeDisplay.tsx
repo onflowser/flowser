@@ -97,7 +97,9 @@ function EmptyState() {
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
-  const { isLoading, data: transaction } = useGetTransaction(outcome.transactionId!);
+  const { isLoading, data: transaction } = useGetTransaction(
+    outcome.transactionId!,
+  );
 
   if (isLoading) {
     return <SpinnerWithLabel label="Executing" />;
@@ -110,7 +112,7 @@ function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
         className={classes.errorWrapper}
         error="Transaction not found"
       />
-    )
+    );
   }
 
   return (

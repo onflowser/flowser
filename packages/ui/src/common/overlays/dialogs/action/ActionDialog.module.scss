@@ -9,7 +9,7 @@
   align-items: center;
   color: $gray-10;
   padding: $spacing-l * 3 $spacing-l * 6;
-  @include fadeInAnimation(.5s);
+  @include fadeInAnimation(0.5s);
 
   h3 {
     margin-top: $spacing-base * 2;

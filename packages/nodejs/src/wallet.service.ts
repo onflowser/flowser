@@ -1,14 +1,9 @@
 import { ec as EC } from "elliptic";
 import { SHA3 } from "sha3";
 import { FlowCliService } from "./flow-cli.service";
-import { ensurePrefixedAddress, FlowKey } from "@onflowser/core";
-import {
-  FlowAuthorizationFunction,
-  FlowGatewayService,
-} from "@onflowser/core";
-import {
-  FclArgumentWithMetadata
-} from "@onflowser/api";
+import { ensurePrefixedAddress } from "@onflowser/core";
+import { FlowAuthorizationFunction, FlowGatewayService } from "@onflowser/core";
+import { FclArgumentWithMetadata } from "@onflowser/api";
 import { PersistentStorage } from "@onflowser/core/src/persistent-storage";
 
 const fcl = require("@onflow/fcl");
@@ -39,11 +34,10 @@ export type ManagedKeyPair = {
   address: string;
   publicKey: string;
   privateKey: string;
-}
+};
 
 // TODO(restructure): Should we import existing accounts from flow.json?
 export class WalletService {
-
   constructor(
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
@@ -51,7 +45,7 @@ export class WalletService {
   ) {}
 
   public async sendTransaction(
-    request: SendTransactionRequest
+    request: SendTransactionRequest,
   ): Promise<SendTransactionResponse> {
     const uniqueRoleAddresses = new Set([
       request.proposerAddress,
@@ -63,16 +57,14 @@ export class WalletService {
         async (address): Promise<[string, FlowAuthorizationFunction]> => [
           address,
           await this.withAuthorization(address),
-        ]
-      )
+        ],
+      ),
     );
 
     function getAuthFunction(address: string) {
       const authFunction = authorizationFunctionsByAddress.get(address);
       if (authFunction === undefined) {
-        throw new Error(
-          `Authorization function not found for: ${address}`
-        );
+        throw new Error(`Authorization function not found for: ${address}`);
       }
       return authFunction;
     }
@@ -83,7 +75,7 @@ export class WalletService {
       proposer: getAuthFunction(request.proposerAddress),
       payer: getAuthFunction(request.payerAddress),
       authorizations: request.authorizerAddresses.map((address) =>
-        getAuthFunction(address)
+        getAuthFunction(address),
       ),
       arguments: request.arguments,
     });
@@ -91,7 +83,7 @@ export class WalletService {
 
   // Returns undefined if provided account doesn't exist.
   private async withAuthorization(
-    address: string
+    address: string,
   ): Promise<FlowAuthorizationFunction> {
     const managedKeyPairs = await this.listKeyPairs();
 
@@ -102,14 +94,18 @@ export class WalletService {
     const managedKeyToUse = managedKeyPairs[0];
 
     const account = await this.flowGateway.getAccount(address);
-    const associatedPublicKey = account.keys.find(key => key.publicKey === managedKeyToUse.publicKey);
+    const associatedPublicKey = account.keys.find(
+      (key) => key.publicKey === managedKeyToUse.publicKey,
+    );
 
     if (!associatedPublicKey) {
-      throw new Error(`Associated public key not found for account: ${account}`)
+      throw new Error(
+        `Associated public key not found for account: ${account}`,
+      );
     }
 
     const authn: FlowAuthorizationFunction = (
-      fclAccount: Record<string, unknown> = {}
+      fclAccount: Record<string, unknown> = {},
     ) => ({
       ...fclAccount,
       tempId: `${address}-${managedKeyToUse.privateKey}`,
@@ -124,7 +120,7 @@ export class WalletService {
           keyId: associatedPublicKey.index,
           signature: this.signWithPrivateKey(
             managedKeyToUse.privateKey,
-            signable.message
+            signable.message,
           ),
         };
       },
@@ -135,15 +131,27 @@ export class WalletService {
 
   public async synchronizeIndex() {
     const managedKeyPairs = await this.listKeyPairs();
-    const associatedAccounts = await Promise.allSettled(managedKeyPairs.map(keyPair => this.flowGateway.getAccount(keyPair.address)));
-    const validKeyPairLookupByPublicKey = new Set(associatedAccounts.map((account) => {
-      if (account.status === "fulfilled") {
-        return account.value.keys.map(key => key.publicKey)
-      } else {
-        return [];
-      }
-    }).flat());
-    await this.writeKeyPairs(managedKeyPairs.filter(keyPair => validKeyPairLookupByPublicKey.has(keyPair.publicKey)))
+    const associatedAccounts = await Promise.allSettled(
+      managedKeyPairs.map((keyPair) =>
+        this.flowGateway.getAccount(keyPair.address),
+      ),
+    );
+    const validKeyPairLookupByPublicKey = new Set(
+      associatedAccounts
+        .map((account) => {
+          if (account.status === "fulfilled") {
+            return account.value.keys.map((key) => key.publicKey);
+          } else {
+            return [];
+          }
+        })
+        .flat(),
+    );
+    await this.writeKeyPairs(
+      managedKeyPairs.filter((keyPair) =>
+        validKeyPairLookupByPublicKey.has(keyPair.publicKey),
+      ),
+    );
   }
 
   public async createAccount(options: CreateAccountRequest): Promise<void> {
@@ -156,7 +164,7 @@ export class WalletService {
         {
           weight: defaultKeyWeight,
           publicKey: generatedKeyPair.public,
-        }
+        },
       ],
     });
 
@@ -166,9 +174,9 @@ export class WalletService {
       {
         address: ensurePrefixedAddress(generatedAccount.address),
         privateKey: generatedKeyPair.private,
-        publicKey: generatedKeyPair.public
-      }
-    ])
+        publicKey: generatedKeyPair.public,
+      },
+    ]);
   }
 
   private signWithPrivateKey(privateKey: string, message: string) {

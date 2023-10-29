@@ -1,10 +1,11 @@
-@import '../../../styles/spacings';
+@import "../../../styles/spacings";
 
 .root {
   position: relative;
   padding: $spacing-s $spacing-base;
 
-  .before, .after {
+  .before,
+  .after {
     display: flex;
     align-items: center;
   }
@@ -22,5 +23,4 @@
     right: $spacing-l;
     top: 40%;
   }
-
 }

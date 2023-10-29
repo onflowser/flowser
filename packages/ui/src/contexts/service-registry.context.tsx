@@ -1,16 +1,21 @@
 import { createContext, ReactNode, useContext } from "react";
 import {
   FclArgumentWithMetadata,
-  FlowAccount, FlowAccountKey,
+  FlowAccount,
+  FlowAccountKey,
   FlowAccountStorage,
-  FlowBlock, FlowCliInfo,
+  FlowBlock,
+  FlowCliInfo,
   FlowContract,
   FlowEvent,
   FlowserWorkspace,
   FlowStateSnapshot,
-  FlowTransaction, InteractionTemplate,
-  IResourceIndexReader, ManagedProcessOutput, ParsedInteractionOrError,
-  ManagedKeyPair
+  FlowTransaction,
+  InteractionTemplate,
+  IResourceIndexReader,
+  ManagedProcessOutput,
+  ParsedInteractionOrError,
+  ManagedKeyPair,
 } from "@onflowser/api";
 
 export interface ISnapshotService {
@@ -36,7 +41,7 @@ export interface IInteractionService {
   getTemplates(): Promise<InteractionTemplate[]>;
 }
 
-export type SendTransactionRequest =  {
+export type SendTransactionRequest = {
   // TODO(web): These should probably be of type FlowAuthorizationFunction when generalizing for web version
   cadence: string;
   proposerAddress: string;
@@ -51,7 +56,9 @@ export type ExecuteScriptRequest = {
 };
 
 export interface IFlowService {
-  sendTransaction(request: SendTransactionRequest): Promise<{ transactionId: string }>;
+  sendTransaction(
+    request: SendTransactionRequest,
+  ): Promise<{ transactionId: string }>;
   executeScript(request: ExecuteScriptRequest): Promise<any>;
   getIndexOfAddress(address: string): Promise<number>;
   getFlowCliInfo(): Promise<FlowCliInfo>;
@@ -95,7 +102,7 @@ type ServiceRegistry = {
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(
-  undefined as never
+  undefined as never,
 );
 
 type ServiceRegistryProviderProps = {

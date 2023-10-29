@@ -1,7 +1,12 @@
 {
   "name": "@onflowser/api",
   "version": "1.0.0",
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "format": "prettier . --write"
+  },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "keywords": [],
@@ -11,6 +16,7 @@
     "@onflowser/config": "*"
   },
   "devDependencies": {
+    "prettier": "3.0.3",
     "typescript": "^4.3.5"
   }
 }

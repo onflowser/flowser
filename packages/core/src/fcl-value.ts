@@ -1,11 +1,15 @@
-import { CadenceType, CadenceTypeKind, FclArgumentWithMetadata } from "@onflowser/api";
+import {
+  CadenceType,
+  CadenceTypeKind,
+  FclArgumentWithMetadata,
+} from "@onflowser/api";
 
 // https://developers.flow.com/tooling/fcl-js/api#argumentfunction
 export type FclArgBuilder = (value: FclValue, type: unknown) => void;
 export type FclTypeLookup = Record<string, (nestedType?: unknown) => unknown>;
 export type FclArgumentFunction = (
   arg: FclArgBuilder,
-  t: FclTypeLookup
+  t: FclTypeLookup,
 ) => unknown[];
 
 export type FclValue = FclRequiredValue | FclOptionalValue;
@@ -50,7 +54,7 @@ export class FclValueUtils {
   // See: https://developers.flow.com/tooling/fcl-js/api#ftype
   private static getFclType(
     t: FclTypeLookup,
-    cadenceType: CadenceType
+    cadenceType: CadenceType,
   ): unknown {
     switch (cadenceType.kind) {
       case CadenceTypeKind.CADENCE_TYPE_FIXED_POINT_NUMBER:
@@ -89,17 +93,21 @@ export class FclValueUtils {
       arg.every((e) => e instanceof Object && "key" in e && "value" in e)
     );
   }
+
   static isFclArrayValue(arg: unknown): arg is FclArrayValue {
     return arg instanceof Array;
   }
+
   static isFclPathValue(arg: unknown): arg is FclPathValue {
     return arg instanceof Object && "domain" in arg && "identifier" in arg;
   }
+
   static isFclBoolValue(arg: unknown): arg is FclBoolValue {
     return typeof arg === "boolean";
   }
+
   static isFclFixedPointNumberValue(
-    arg: unknown
+    arg: unknown,
   ): arg is FclFixedPointNumberValue {
     return (
       typeof arg === "string" &&
@@ -108,6 +116,7 @@ export class FclValueUtils {
       !Number.isNaN(Number(arg))
     );
   }
+
   static isFclIntegerNumberValue(arg: unknown): arg is FclIntegerNumberValue {
     return (
       typeof arg === "string" &&
@@ -116,12 +125,15 @@ export class FclValueUtils {
       !Number.isNaN(Number(arg))
     );
   }
+
   static isFclTextualValue(arg: unknown): arg is FclTextualValue {
     return typeof arg === "string";
   }
+
   static isFclAddressValue(arg: unknown): arg is FclAddressValue {
     return typeof arg === "string" && arg.startsWith("0x");
   }
+
   static isFclRequiredValue(arg: unknown): arg is FclRequiredValue {
     return (
       this.isFclDictionaryValue(arg) ||
@@ -133,9 +145,11 @@ export class FclValueUtils {
       this.isFclAddressValue(arg)
     );
   }
+
   static isFclOptionalValue(arg: unknown): arg is FclOptionalValue {
     return arg === undefined || this.isFclRequiredValue(arg);
   }
+
   static isFclValue(arg: unknown): arg is FclValue {
     return this.isFclOptionalValue(arg) || this.isFclRequiredValue(arg);
   }

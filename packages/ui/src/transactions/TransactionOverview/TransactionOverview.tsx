@@ -18,7 +18,7 @@ type TransactionOverviewProps = {
 };
 
 export function TransactionOverview(
-  props: TransactionOverviewProps
+  props: TransactionOverviewProps,
 ): ReactElement {
   const { transaction } = props;
 

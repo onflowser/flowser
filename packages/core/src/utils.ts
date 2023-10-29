@@ -1,5 +1,5 @@
 export function isDefined<Value>(
-  value: Value | null | undefined
+  value: Value | null | undefined,
 ): value is Value {
   return value !== null && value !== undefined;
 }
@@ -38,13 +38,13 @@ export function computeEntitiesDiff<Entity>(props: {
     props.newEntities.map((entity) => [
       stringifyPrimaryKey(props.primaryKey, entity),
       entity,
-    ])
+    ]),
   );
   const oldEntitiesLookup = new Map(
     props.oldEntities.map((entity) => [
       stringifyPrimaryKey(props.primaryKey, entity),
       entity,
-    ])
+    ]),
   );
 
   const created = [];
@@ -75,7 +75,7 @@ export function computeEntitiesDiff<Entity>(props: {
 
 function stringifyPrimaryKey<Entity>(
   primaryKey: PrimaryKey<Entity>,
-  entity: Entity
+  entity: Entity,
 ): string {
   // Single primary key.
   if (typeof primaryKey === "string") {
@@ -98,7 +98,7 @@ type ProcessEntitiesDiffOptions<T> = {
 };
 
 export async function processEntitiesDiff<T>(
-  opts: ProcessEntitiesDiffOptions<T>
+  opts: ProcessEntitiesDiffOptions<T>,
 ) {
   const promises = [];
   for (const entity of opts.diff.created) {
@@ -115,7 +115,7 @@ export async function processEntitiesDiff<T>(
 
 function areDeepEqualEntities<Entity>(
   firstEntity: Entity,
-  secondEntity: Entity
+  secondEntity: Entity,
 ) {
   // Entities may have createdAt and updatedAt fields (if they are a subclass of PollingEntity)
   // We shouldn't compare those fields, because we are interested only in other attributes

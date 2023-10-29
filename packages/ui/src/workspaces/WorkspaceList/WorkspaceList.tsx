@@ -89,7 +89,7 @@ function WorkspaceListContent() {
   const showProjectList = projects && projects.length > 0;
 
   if (error) {
-    return <pre>{error.message}</pre>
+    return <pre>{error.message}</pre>;
   }
 
   if (!showProjectList) {

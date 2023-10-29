@@ -51,7 +51,7 @@ type UnsupportedImportSyntaxNoticeProps = {
 };
 
 function UnsupportedImportSyntaxNotice(
-  props: UnsupportedImportSyntaxNoticeProps
+  props: UnsupportedImportSyntaxNoticeProps,
 ) {
   const isUnsupportedSyntax = props.cadenceSource
     .split("\n")

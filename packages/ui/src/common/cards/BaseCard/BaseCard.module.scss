@@ -1,8 +1,8 @@
-@import '../../../styles/colors';
-@import '../../../styles/rules';
-@import '../../../styles/spacings';
-@import '../../../styles/animations';
-@import '../../../styles/scrollbars';
+@import "../../../styles/colors";
+@import "../../../styles/rules";
+@import "../../../styles/spacings";
+@import "../../../styles/animations";
+@import "../../../styles/scrollbars";
 
 .root {
   border-radius: $border-radius-card;
@@ -13,7 +13,6 @@
   @include hiddenScrollbars();
 
   &.introAnimation {
-    @include addNewContentAnimation(.4s);
+    @include addNewContentAnimation(0.4s);
   }
-
 }

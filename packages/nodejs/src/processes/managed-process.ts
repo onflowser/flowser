@@ -52,7 +52,10 @@ export class ManagedProcess extends EventEmitter {
   public createdAt: Date;
   public updatedAt: Date;
 
-  constructor(private readonly logger: IFlowserLogger, options: ManagedProcessOptions) {
+  constructor(
+    private readonly logger: IFlowserLogger,
+    options: ManagedProcessOptions,
+  ) {
     super();
     this.id = options.id ?? randomUUID();
     this.name = options.name;
@@ -78,8 +81,8 @@ export class ManagedProcess extends EventEmitter {
 
     this.logger.debug(
       `Starting ${this.name} with command: ${command.name} ${command.args?.join(
-        " "
-      )}`
+        " ",
+      )}`,
     );
 
     return new Promise<void>((resolve, reject) => {
@@ -107,7 +110,9 @@ export class ManagedProcess extends EventEmitter {
         reject(error);
       });
       if (!isKilledSuccessfully) {
-        this.logger.debug(`Process ${this.name} (${this.id}) didn't shutdown given SIGINT`)
+        this.logger.debug(
+          `Process ${this.name} (${this.id}) didn't shutdown given SIGINT`,
+        );
         // If the SIGINT signal doesn't work, force kill with SIGINT
         this.childProcess.kill("SIGKILL");
       }
@@ -118,7 +123,7 @@ export class ManagedProcess extends EventEmitter {
       const rejectionTimeoutSec = 6;
       setTimeout(() => {
         const timeoutError = new Error(
-          `Couldn't kill process ${this.id} (pid=${this.childProcess?.pid}) within ${rejectionTimeoutSec}s timeout`
+          `Couldn't kill process ${this.id} (pid=${this.childProcess?.pid}) within ${rejectionTimeoutSec}s timeout`,
         );
         reject(timeoutError);
       }, rejectionTimeoutSec * 1000);
@@ -139,21 +144,21 @@ export class ManagedProcess extends EventEmitter {
     });
     this.childProcess.once("exit", (code, signal) => {
       console.debug(
-        `Process ${this.id} exited (code=${code}, signal=${signal})`
+        `Process ${this.id} exited (code=${code}, signal=${signal})`,
       );
       this.setState(
         code !== null && code > 0
           ? ManagedProcessState.MANAGED_PROCESS_STATE_ERROR
-          : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING
+          : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING,
       );
       this.detachEventListeners();
     });
 
     this.childProcess.stdout.on("data", (data) =>
-      this.handleData(ProcessOutputSource.OUTPUT_SOURCE_STDOUT, data)
+      this.handleData(ProcessOutputSource.OUTPUT_SOURCE_STDOUT, data),
     );
     this.childProcess.stderr.on("data", (data) =>
-      this.handleData(ProcessOutputSource.OUTPUT_SOURCE_STDERR, data)
+      this.handleData(ProcessOutputSource.OUTPUT_SOURCE_STDERR, data),
     );
   }
 
@@ -177,7 +182,7 @@ export class ManagedProcess extends EventEmitter {
         data: line,
         createdAt,
         updatedAt: createdAt,
-      })
+      }),
     );
 
     this.output.push(...logs);
@@ -185,7 +190,7 @@ export class ManagedProcess extends EventEmitter {
 
   private setState(newState: ManagedProcessState) {
     console.debug(
-      `Process ${this.id} state changed from ${this.state} to ${newState}`
+      `Process ${this.id} state changed from ${this.state} to ${newState}`,
     );
     this.updatedAt = new Date();
     this.state = newState;

@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import classes from "./InteractionIcon.module.scss";
-import { InteractionKind } from '@onflowser/api';
+import { InteractionKind } from "@onflowser/api";
 
 type InteractionIconProps = {
   interactionKind: InteractionKind;

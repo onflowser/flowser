@@ -3,7 +3,8 @@ import { ensurePrefixedAddress } from "./utils";
 import {
   FlowStorageDomain,
   CadenceTypeKind,
-  FlowAccountStorage, OmitTimestamps
+  FlowAccountStorage,
+  OmitTimestamps,
 } from "@onflowser/api";
 
 /**
@@ -37,7 +38,7 @@ export class FlowAccountStorageService {
   constructor(private readonly flowGatewayService: FlowGatewayService) {}
 
   public async getAccountStorageItems(
-    address: string
+    address: string,
   ): Promise<OmitTimestamps<FlowAccountStorage>[]> {
     const flowAccountStorage = await this.fetchStorageByAddress(address);
 
@@ -53,7 +54,7 @@ export class FlowAccountStorageService {
           domain: this.getStorageDomainFromPath(item.path),
           path: item.path,
           targetPath: item.targetPath,
-        })
+        }),
       ),
       ...flowAccountStorage.storagePathItems.map(
         (item): OmitTimestamps<FlowAccountStorage> => ({
@@ -66,13 +67,13 @@ export class FlowAccountStorageService {
           domain: this.getStorageDomainFromPath(item.path),
           path: item.path,
           targetPath: "",
-        })
+        }),
       ),
     ];
   }
 
   private async fetchStorageByAddress(
-    address: string
+    address: string,
   ): Promise<StorageTraversalResult> {
     const cadence = `
       pub struct CapabilityPathItem {

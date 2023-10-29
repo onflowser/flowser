@@ -39,18 +39,20 @@ const columns = [
   }),
 ];
 
-function PrivateKeyDisplay(props: {targetKey: FlowAccountKey}) {
-  const {data: managedKeys} = useGetManagedKeys();
+function PrivateKeyDisplay(props: { targetKey: FlowAccountKey }) {
+  const { data: managedKeys } = useGetManagedKeys();
 
-  const managedKeyPair = managedKeys?.find(key => key.address === props.targetKey.address && key.publicKey === props.targetKey.publicKey);
+  const managedKeyPair = managedKeys?.find(
+    (key) =>
+      key.address === props.targetKey.address &&
+      key.publicKey === props.targetKey.publicKey,
+  );
 
   if (!managedKeyPair) {
     return null;
   }
 
-  return (
-    <KeyDisplay label="Private" keyValue={managedKeyPair.privateKey} />
-  )
+  return <KeyDisplay label="Private" keyValue={managedKeyPair.privateKey} />;
 }
 
 function KeyDisplay(props: { label: string; keyValue: string }) {

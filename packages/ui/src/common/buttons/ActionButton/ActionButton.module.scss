@@ -1,6 +1,6 @@
-@import '../../../styles/spacings';
-@import '../../../styles/colors';
-@import '../../../styles/typography';
+@import "../../../styles/spacings";
+@import "../../../styles/colors";
+@import "../../../styles/typography";
 
 .root {
   display: flex;
@@ -9,7 +9,7 @@
 
   &:hover {
     .header {
-      color: $grey
+      color: $grey;
     }
     .icon {
       transform: scale(1.05);
@@ -44,5 +44,4 @@
       height: 100%;
     }
   }
-
 }

@@ -22,7 +22,7 @@ export function StorageDataTypes(props: StorageDataTypesProps): ReactElement {
 }
 
 function getStoredDataTypes(
-  storageData: Record<string, unknown> | undefined
+  storageData: Record<string, unknown> | undefined,
 ): string[] {
   const nestedObjectsKeys = Object.keys(storageData ?? {});
   const uniqueDataTypes = new Set<string>();
@@ -48,7 +48,7 @@ function getStoredDataTypes(
 }
 
 function getDataTypeKeysAtCurrentDepth(
-  storageData: Record<string, unknown>
+  storageData: Record<string, unknown>,
 ): string[] {
   if ("kind" in storageData) {
     return [storageData.kind as string];

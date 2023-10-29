@@ -52,7 +52,7 @@ export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
     (match): Breadcrumb => ({
       to: match.pathname,
       label: match.handle.crumbName,
-    })
+    }),
   );
 
   if (breadcrumbs.length === 0) {

@@ -32,7 +32,7 @@ export function InteractionsPage(): ReactElement {
     },
   ];
   const [currentSideMenuTabId, setCurrentSideMenuTabId] = useState(
-    sideMenuTabs[0].id
+    sideMenuTabs[0].id,
   );
 
   const openEditorTabs: BaseTabItem[] = definitions.map((definition) => ({

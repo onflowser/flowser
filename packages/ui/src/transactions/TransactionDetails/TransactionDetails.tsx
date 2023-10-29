@@ -11,7 +11,7 @@ type TransactionDetailsProps = {
 };
 
 export const TransactionDetails: FunctionComponent<TransactionDetailsProps> = (
-  props
+  props,
 ) => {
   const { transactionId } = props;
   const { data: transaction, isLoading } = useGetTransaction(transactionId);

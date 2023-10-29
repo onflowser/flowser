@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 import classes from "./DictionaryBuilder.module.scss";
 import { SimpleButton } from "../../../../common/buttons/SimpleButton/SimpleButton";
 import { SizedBox } from "../../../../common/misc/SizedBox/SizedBox";
-import { MultiMap } from '../../../../utils/multi-map';
-import { FclDictionaryEntry, FclValue, FclValueUtils } from '@onflowser/core';
+import { MultiMap } from "../../../../utils/multi-map";
+import { FclDictionaryEntry, FclValue, FclValueUtils } from "@onflowser/core";
 
 export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;
@@ -40,7 +40,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
       return;
     }
     const valuesByKey = new MultiMap(
-      value.map((entry) => [entry.key, entry.value])
+      value.map((entry) => [entry.key, entry.value]),
     );
     const duplicatedEntry = Array.from(valuesByKey.entries())
       .filter((entry) => entry[1].length > 1)
@@ -57,7 +57,7 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
           <b>Duplicated keys found</b>
           <br />
           <span>Make sure that all keys are unique and specified.</span>
-        </div>
+        </div>,
       );
     }
   }, [value]);
@@ -69,13 +69,13 @@ export function DictionaryBuilder(props: CadenceValueBuilder): ReactElement {
   // Returns true if target entry was found by the provided key.
   function updateEntry(
     key: FclValue,
-    partialEntry: Partial<FclDictionaryEntry>
+    partialEntry: Partial<FclDictionaryEntry>,
   ): boolean {
     if (!isInitialized) {
       throw new Error("Not initialized");
     }
     const entryIndex = value.findIndex(
-      (entry: FclDictionaryEntry) => entry.key === key
+      (entry: FclDictionaryEntry) => entry.key === key,
     );
     const isEntryFound = entryIndex !== -1;
     if (isEntryFound) {

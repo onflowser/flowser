@@ -20,7 +20,7 @@ type TransactionDetailsTabsProps = Omit<StyledTabsProps, "tabs"> & {
 };
 
 export function TransactionDetailsTabs(
-  props: TransactionDetailsTabsProps
+  props: TransactionDetailsTabsProps,
 ): ReactElement {
   const { transaction, includeOverviewTab, includeScriptTab, ...tabProps } =
     props;
@@ -80,7 +80,7 @@ export function TransactionDetailsTabs(
         label: "Payload Signatures",
         content: <SignaturesTable signatures={transaction.payloadSignatures} />,
       },
-    ]
+    ],
   );
 
   return <StyledTabs tabs={tabs} {...tabProps} />;

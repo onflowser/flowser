@@ -29,7 +29,7 @@ type AccountDetailsProps = {
 };
 
 export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
-  props
+  props,
 ) => {
   const { accountId } = props;
   const { data: account, isLoading } = useGetAccount(accountId);

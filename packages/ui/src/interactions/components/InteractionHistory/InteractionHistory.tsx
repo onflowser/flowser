@@ -43,9 +43,7 @@ function BlockItem(props: BlockItemProps) {
 
   const { checkoutBlock } = useSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
-  const { data } = useGetTransactionsByBlock(
-    block.id
-  );
+  const { data } = useGetTransactionsByBlock(block.id);
   const firstTransaction = data?.[0];
 
   const transactionName = useTransactionName({
@@ -60,10 +58,7 @@ function BlockItem(props: BlockItemProps) {
       name: transactionName ?? `Tx from block #${block.height}`,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
-        firstTransaction.arguments.map((arg) => [
-          arg.identifier,
-          arg.value
-        ])
+        firstTransaction.arguments.map((arg) => [arg.identifier, arg.value]),
       ),
       initialOutcome: {
         transaction: {

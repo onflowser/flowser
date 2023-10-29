@@ -4,7 +4,7 @@ import { Input } from "../../../../common/inputs/Input/Input";
 import { FclValueUtils } from "@onflowser/core";
 
 export function FixedPointNumberBuilder(
-  props: CadenceValueBuilder
+  props: CadenceValueBuilder,
 ): ReactElement {
   const { disabled, value, setValue } = props;
 

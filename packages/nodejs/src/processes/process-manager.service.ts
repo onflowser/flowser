@@ -1,7 +1,8 @@
 import {
   ManagedProcess,
   ProcessOutputSource,
-  ManagedProcessOutput, ManagedProcessOptions
+  ManagedProcessOutput,
+  ManagedProcessOptions,
 } from "./managed-process";
 import { EventEmitter } from "node:events";
 import { IFlowserLogger } from "@onflowser/core";
@@ -14,12 +15,15 @@ export enum ProcessManagerEvent {
 type ProcessManagerOptions = {
   // False if consumer wants to handle process termination on exit themselves.
   gracefulShutdown: boolean;
-}
+};
 
 export class ProcessManagerService extends EventEmitter {
   private readonly processLookupById: Map<string, ManagedProcess>;
 
-  constructor(private readonly logger: IFlowserLogger, options: ProcessManagerOptions) {
+  constructor(
+    private readonly logger: IFlowserLogger,
+    options: ProcessManagerOptions,
+  ) {
     super();
     this.processLookupById = new Map();
 
@@ -43,12 +47,10 @@ export class ProcessManagerService extends EventEmitter {
     return new ManagedProcess(this.logger, options);
   }
 
-  findAllLogsByProcess(
-    processId: string,
-  ): ManagedProcessOutput[] {
+  findAllLogsByProcess(processId: string): ManagedProcessOutput[] {
     const process = this.processLookupById.get(processId);
     if (!process) {
-      throw new Error("Process not found")
+      throw new Error("Process not found");
     }
     return process.output;
   }
@@ -57,7 +59,7 @@ export class ProcessManagerService extends EventEmitter {
     const allProcesses = [...this.processLookupById.values()];
     return allProcesses.sort(
       (a, b) =>
-        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
     );
   }
 
@@ -97,7 +99,7 @@ export class ProcessManagerService extends EventEmitter {
    * If process exists with non-zero exit code, an error is thrown.
    */
   async runUntilTermination(
-    process: ManagedProcess
+    process: ManagedProcess,
   ): Promise<ManagedProcessOutput[]> {
     await this.start(process);
     await process.waitOnExit();
@@ -108,14 +110,14 @@ export class ProcessManagerService extends EventEmitter {
     ) {
       const errorOutput = process.output.filter(
         (outputLine) =>
-          outputLine.source == ProcessOutputSource.OUTPUT_SOURCE_STDERR
+          outputLine.source == ProcessOutputSource.OUTPUT_SOURCE_STDERR,
       );
       const errorMessage = errorOutput
         .map((errorLine) => errorLine.data)
         .filter((lineData) => lineData.length > 0)
         .join(" ... ");
       throw new Error(
-        `Managed process exited with code: ${process.childProcess.exitCode} (${errorMessage})`
+        `Managed process exited with code: ${process.childProcess.exitCode} (${errorMessage})`,
       );
     }
     return process.output;
@@ -126,7 +128,7 @@ export class ProcessManagerService extends EventEmitter {
   }
 
   async stopAll() {
-    this.logger.debug(`Stopping ${this.getAll().length} processes`)
+    this.logger.debug(`Stopping ${this.getAll().length} processes`);
     await Promise.all(this.getAll().map((process) => process.stop()));
   }
 

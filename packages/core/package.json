@@ -5,21 +5,23 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier . --write"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@onflowser/config": "*",
-    "@onflowser/api": "*",
     "@onflow/fcl": "^1.6.0",
+    "@onflowser/api": "*",
+    "@onflowser/config": "*",
     "axios": "^0.21.4",
     "node-abort-controller": "^3.0.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",
     "@types/node": "^16.11.6",
+    "prettier": "3.0.3",
     "typescript": "^4.3.5"
   }
 }

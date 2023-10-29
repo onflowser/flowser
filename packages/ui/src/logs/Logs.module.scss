@@ -1,7 +1,7 @@
-@import '../styles/colors';
-@import '../styles/spacings';
-@import '../styles/typography';
-@import '../styles/scrollbars';
+@import "../styles/colors";
+@import "../styles/spacings";
+@import "../styles/typography";
+@import "../styles/scrollbars";
 
 @mixin overlay {
   z-index: 99;
@@ -140,16 +140,16 @@
 
   [class="blue"],
   .blue {
-    color: #32BBC7;
+    color: #32bbc7;
   }
 
   [class="red"],
   .red {
-    color: #C33820;
+    color: #c33820;
   }
 
   [class="yellow"],
   .yellow {
-    color: #AEAD23;
+    color: #aead23;
   }
 }

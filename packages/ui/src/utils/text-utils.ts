@@ -9,7 +9,7 @@ export class TextUtils {
     const charsToTake = maxLength / 2;
     return `${text.slice(0, charsToTake)}${delimiter}${text.slice(
       text.length - charsToTake,
-      text.length
+      text.length,
     )}`;
   }
 

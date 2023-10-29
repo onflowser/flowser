@@ -9,9 +9,7 @@ export type FilePicker = {
   pickDirectory?: () => Promise<string | undefined>;
 };
 
-const FilePickerAdapterContext = createContext<FilePicker>(
-  undefined as never
-);
+const FilePickerAdapterContext = createContext<FilePicker>(undefined as never);
 
 export type FilePickerProviderProps = FilePicker & {
   children: ReactNode;

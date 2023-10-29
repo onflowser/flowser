@@ -16,10 +16,18 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { data, mutate } = useGetAccounts();
   const { walletService } = useServiceRegistry();
   const { data: allKeys } = useGetManagedKeys();
-  const accountsWithPrivateKeysLookup = new Set(allKeys?.filter(key => Boolean(key.privateKey)).map(key => key.address));
-  const accountsToShow = useMemo(() => addressBuilderOptions?.showManagedAccountsOnly
-    ? data?.filter((account) => accountsWithPrivateKeysLookup.has(account.address))
-    : data, [addressBuilderOptions?.showManagedAccountsOnly, data]);
+  const accountsWithPrivateKeysLookup = new Set(
+    allKeys?.filter((key) => Boolean(key.privateKey)).map((key) => key.address),
+  );
+  const accountsToShow = useMemo(
+    () =>
+      addressBuilderOptions?.showManagedAccountsOnly
+        ? data?.filter((account) =>
+            accountsWithPrivateKeysLookup.has(account.address),
+          )
+        : data,
+    [addressBuilderOptions?.showManagedAccountsOnly, data],
+  );
 
   useEffect(() => {
     const serviceAddress = "0xf8d6e0586b0a20c7";
@@ -74,7 +82,7 @@ function AccountButton(props: AccountButtonProps) {
       <div
         className={classNames(classes.avatarWrapper, {
           [classes.selectedAccount]: isSelected,
-          [classes.avatarWrapper__enabled]: !disabled
+          [classes.avatarWrapper__enabled]: !disabled,
         })}
       >
         <AccountAvatar address={account.address} className={classes.avatar} />
@@ -98,7 +106,7 @@ function NewAccountButton(props: NewAccountButtonProps) {
     <div
       className={classNames(
         classes.selectAccountButton,
-        classes.newAccountButton
+        classes.newAccountButton,
       )}
       onClick={async () => {
         try {

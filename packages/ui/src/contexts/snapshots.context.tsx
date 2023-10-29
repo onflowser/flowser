@@ -23,7 +23,7 @@ export type SnapshotsManager = {
 };
 
 const SnapshotsManagerContext = createContext<SnapshotsManager>(
-  {} as SnapshotsManager
+  {} as SnapshotsManager,
 );
 
 export function SnapshotsManagerProvider({
@@ -42,7 +42,7 @@ export function SnapshotsManagerProvider({
   const snapshotLookupByBlockId = useMemo(
     () =>
       new Map(stateSnapshots?.map((snapshot) => [snapshot.blockId, snapshot])),
-    [stateSnapshots]
+    [stateSnapshots],
   );
   const [showSnapshotModal, setShowSnapshotModal] = useState(false);
 
@@ -55,7 +55,7 @@ export function SnapshotsManagerProvider({
         "Snapshots can only be created when enabling the 'snapshot' option in settings",
         {
           duration: 5000,
-        }
+        },
       );
     } else {
       setShowSnapshotModal(true);
@@ -66,7 +66,7 @@ export function SnapshotsManagerProvider({
     const isSnapshotEnabled = currentWorkspace?.emulator?.snapshot;
     if (!isSnapshotEnabled) {
       toast.error(
-        "Can't jump to block, because 'snapshot' option is not enabled in project settings"
+        "Can't jump to block, because 'snapshot' option is not enabled in project settings",
       );
       return;
     }
@@ -92,7 +92,7 @@ export function SnapshotsManagerProvider({
       try {
         await snapshotService.jumpTo(snapshot.id);
         toast.success(
-          `Moved to block: ${FlowUtils.getShortedBlockId(snapshot.blockId)}`
+          `Moved to block: ${FlowUtils.getShortedBlockId(snapshot.blockId)}`,
         );
       } catch (e) {
         handleError(e);
@@ -134,7 +134,7 @@ export function SnapshotsManagerProvider({
       try {
         await snapshotService.rollbackToHeight(targetBlock.height);
         toast.success(
-          `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock.id)}`
+          `Moved to block: ${FlowUtils.getShortedBlockId(targetBlock.id)}`,
         );
       } catch (e) {
         handleError(e);
@@ -177,7 +177,7 @@ export function SnapshotsManagerProvider({
 
       rollbackToBlock(targetBlock);
     },
-    [currentWorkspace, blocks, snapshotLookupByBlockId]
+    [currentWorkspace, blocks, snapshotLookupByBlockId],
   );
 
   return (

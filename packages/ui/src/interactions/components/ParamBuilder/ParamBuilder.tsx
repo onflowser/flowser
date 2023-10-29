@@ -11,7 +11,7 @@ export type ParameterListBuilderProps = InteractionParameterBuilder & {
 };
 
 export function ParamListBuilder(
-  props: ParameterListBuilderProps
+  props: ParameterListBuilderProps,
 ): ReactElement {
   const { parameters, fclValuesByIdentifier, setFclValue } = props;
   return (

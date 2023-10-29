@@ -5,5 +5,5 @@ export * from "./flow-emulator.service";
 export * from "./flow-config.service";
 export * from "./flow-cli.service";
 export * from "./wallet.service";
-export * from "./processes/process-manager.service"
-export * from "./processes/managed-process"
+export * from "./processes/process-manager.service";
+export * from "./processes/managed-process";

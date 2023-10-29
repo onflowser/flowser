@@ -4,13 +4,18 @@ import {
   IResourceIndex,
   HashAlgorithm,
   SignatureAlgorithm,
-  ParsedInteractionOrError, OmitTimestamps
+  ParsedInteractionOrError,
+  OmitTimestamps,
 } from "@onflowser/api";
 import { IFlowInteractions } from "./flow-interactions.service";
 import { FlowAccountStorageService } from "./flow-storage.service";
-import { FlowApiStatus, FlowGatewayService, FlowAccountKeyEvent } from "./flow-gateway.service";
+import {
+  FlowApiStatus,
+  FlowGatewayService,
+  FlowAccountKeyEvent,
+} from "./flow-gateway.service";
 import { ensurePrefixedAddress } from "./utils";
-import { IFlowserLogger } from './logger';
+import { IFlowserLogger } from "./logger";
 import { FclValue } from "./fcl-value";
 
 // See https://developers.flow.com/cadence/language/core-events
@@ -136,7 +141,7 @@ export class FlowIndexerService {
 
     try {
       blockData.transactions.map((transaction) =>
-        this.subscribeToTransactionStatusUpdates(transaction.id)
+        this.subscribeToTransactionStatusUpdates(transaction.id),
       );
     } catch (e) {
       this.logger.error("Transaction status update failed", e);
@@ -144,7 +149,7 @@ export class FlowIndexerService {
   }
 
   private async subscribeToTransactionStatusUpdates(
-    transactionId: string
+    transactionId: string,
   ): Promise<void> {
     const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
@@ -156,7 +161,7 @@ export class FlowIndexerService {
             grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
             executionStatus: newStatus.status,
           },
-        })
+        }),
       );
     try {
       await this.flowGatewayService
@@ -173,9 +178,7 @@ export class FlowIndexerService {
   private async processBlockData(data: BlockData) {
     const blockPromise = this.blockIndex
       .create(this.createBlockEntity({ block: data.block }))
-      .catch((e: unknown) =>
-        this.logger.error("block save error", e)
-      );
+      .catch((e: unknown) => this.logger.error("block save error", e));
     const transactionPromises = Promise.all(
       data.transactions.map((transaction) =>
         this.processNewTransaction({
@@ -183,9 +186,9 @@ export class FlowIndexerService {
           transaction: transaction,
           transactionStatus: transaction.status,
         }).catch((e: any) =>
-          this.logger.error(`transaction save error: ${e.message}`, e.stack)
-        )
-      )
+          this.logger.error(`transaction save error: ${e.message}`, e.stack),
+        ),
+      ),
     );
     const eventPromises = Promise.all(
       data.events.map((flowEvent) =>
@@ -193,12 +196,12 @@ export class FlowIndexerService {
           .create(
             this.createEventEntity({
               event: flowEvent,
-            })
+            }),
           )
           .catch((e: any) =>
-            this.logger.error(`event save error: ${e.message}`, e.stack)
-          )
-      )
+            this.logger.error(`event save error: ${e.message}`, e.stack),
+          ),
+      ),
     );
 
     return Promise.all([
@@ -208,7 +211,7 @@ export class FlowIndexerService {
       this.processEventBatch({
         events: data.events,
         block: data.block,
-      })
+      }),
     ]);
   }
 
@@ -216,8 +219,8 @@ export class FlowIndexerService {
     const block = await this.flowGatewayService.getBlockByHeight(height);
     const collections = await Promise.all(
       block.collectionGuarantees.map(async (guarantee) =>
-        this.flowGatewayService.getCollectionById(guarantee.collectionId)
-      )
+        this.flowGatewayService.getCollectionById(guarantee.collectionId),
+      ),
     );
     const transactionIds = collections
       .map((collection) => collection.transactionIds)
@@ -225,13 +228,13 @@ export class FlowIndexerService {
 
     const transactionFutures = Promise.all(
       transactionIds.map((txId) =>
-        this.flowGatewayService.getTransactionById(txId)
-      )
+        this.flowGatewayService.getTransactionById(txId),
+      ),
     );
     const transactionStatusesFutures = Promise.all(
       transactionIds.map((txId) =>
-        this.flowGatewayService.getTransactionStatusById(txId)
-      )
+        this.flowGatewayService.getTransactionStatusById(txId),
+      ),
     );
 
     const [transactions, statuses] = await Promise.all([
@@ -250,7 +253,7 @@ export class FlowIndexerService {
           ...event,
           transactionId: tx.id,
           blockId: tx.referenceBlockId,
-        }))
+        })),
       )
       .flat();
 
@@ -272,14 +275,14 @@ export class FlowIndexerService {
         this.processSingleEvent({ event: flowEvent, block: block }).catch(
           (e) => {
             this.logger.error(
-              `Event handling error: ${
-                e.message
-              } (${JSON.stringify(flowEvent)})`,
-              e.stack
+              `Event handling error: ${e.message} (${JSON.stringify(
+                flowEvent,
+              )})`,
+              e.stack,
             );
-          }
-        )
-      )
+          },
+        ),
+      ),
     );
   }
 
@@ -288,9 +291,7 @@ export class FlowIndexerService {
     block: flowResource.FlowBlock;
   }) {
     const { event, block } = options;
-    this.logger.debug(
-      `Processing event: ${JSON.stringify(event)}`
-    );
+    this.logger.debug(`Processing event: ${JSON.stringify(event)}`);
 
     const isFlowTokenWithdrawnEvent = (eventId: string) =>
       /A\..*\.FlowToken\.TokensWithdrawn/.test(eventId);
@@ -311,46 +312,53 @@ export class FlowIndexerService {
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
-        // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
-        // return this.createAccount({ address, block });
+      // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
+      // return this.createAccount({ address, block });
     }
 
     switch (true) {
       case isFlowTokenWithdrawnEvent(event.type):
-        const tokenWithdrawnData = event.data as {from: string; amount: number}
+        const tokenWithdrawnData = event.data as {
+          from: string;
+          amount: number;
+        };
         // New emulator accounts are initialized
         // with a default Flow balance coming from null address.
         return tokenWithdrawnData.from
           ? this.updateAccountBalance(tokenWithdrawnData.from)
           : undefined;
       case isFlowTokenDepositedEvent(event.type):
-        const tokenDepositedData = event.data as {to: string; amount: number}
+        const tokenDepositedData = event.data as { to: string; amount: number };
         return this.updateAccountBalance(tokenDepositedData.to);
     }
   }
 
   private async processAccountKeyAddedEvent(event: FlowAccountKeyEvent) {
     const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
-    const account = await this.flowGatewayService.getAccount(event.data.address);
-    const key = account.keys.find(key => key.publicKey === publicKey);
+    const account = await this.flowGatewayService.getAccount(
+      event.data.address,
+    );
+    const key = account.keys.find((key) => key.publicKey === publicKey);
 
     if (key === undefined) {
-      throw new Error("Cannot find key from event")
+      throw new Error("Cannot find key from event");
     }
 
-    return this.accountKeyIndex.create(this.createKeyEntity({
-      key,
-      address: account.address
-    }))
+    return this.accountKeyIndex.create(
+      this.createKeyEntity({
+        key,
+        address: account.address,
+      }),
+    );
   }
 
   private async processAccountKeyRemovedEvent(event: FlowAccountKeyEvent) {
     const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
     const keyId = this.buildKeyId({
       address: event.data.address,
-      publicKey: publicKey
+      publicKey: publicKey,
     });
-    await this.accountKeyIndex.delete({id: keyId})
+    await this.accountKeyIndex.delete({ id: keyId });
   }
 
   private decodeUint8PublicKey(encodedKey: string[]) {
@@ -363,15 +371,15 @@ export class FlowIndexerService {
     transactionStatus: flowResource.FlowTransactionStatus;
   }) {
     const parsedInteraction = await this.flowInteractionsService.parse(
-      options.transaction.script
+      options.transaction.script,
     );
     if (parsedInteraction.error) {
       this.logger.error(
-        `Unexpected interaction parsing error: ${parsedInteraction.error}`
+        `Unexpected interaction parsing error: ${parsedInteraction.error}`,
       );
     }
     return this.transactionIndex.create(
-      this.createTransactionEntity({ ...options, parsedInteraction })
+      this.createTransactionEntity({ ...options, parsedInteraction }),
     );
   }
 
@@ -379,7 +387,7 @@ export class FlowIndexerService {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     // Use `upsert` instead of `create` because we are processing a batch
     // of events (which may include "account created" event) in parallel.
-    await this.accountIndex.upsert(this.createAccountEntity(flowAccount))
+    await this.accountIndex.upsert(this.createAccountEntity(flowAccount));
   }
 
   private async createAccount(options: {
@@ -393,10 +401,16 @@ export class FlowIndexerService {
       // Use `upsert` instead of `create` because we are processing a batch
       // of events (which may include "token balance updated" event) in parallel.
       this.accountIndex.upsert(this.createAccountEntity(flowAccount)),
-      Promise.all(flowAccount.keys.map(key => this.accountKeyIndex.create(this.createKeyEntity({
-        address,
-        key
-      })))),
+      Promise.all(
+        flowAccount.keys.map((key) =>
+          this.accountKeyIndex.create(
+            this.createKeyEntity({
+              address,
+              key,
+            }),
+          ),
+        ),
+      ),
       Promise.all(
         Object.keys(flowAccount.contracts).map((name) =>
           this.contractIndex.create(
@@ -405,9 +419,9 @@ export class FlowIndexerService {
               block: block,
               name,
               code: flowAccount.contracts[name],
-            })
-          )
-        )
+            }),
+          ),
+        ),
       ),
     ]);
   }
@@ -415,21 +429,22 @@ export class FlowIndexerService {
   private async reIndexAllAccountStorage() {
     const allAccounts = await this.accountIndex.findAll();
     this.logger.debug(
-      `Processing storages for accounts: ${allAccounts.map(e => e.address).join(", ")}`
+      `Processing storages for accounts: ${allAccounts
+        .map((e) => e.address)
+        .join(", ")}`,
     );
     await Promise.all(
       allAccounts.map((account: flowserResource.FlowAccount) =>
-        this.reIndexAccountStorage(account.address)
-      )
+        this.reIndexAccountStorage(account.address),
+      ),
     );
   }
 
   private async reIndexAccountStorage(address: string) {
-    const storages = await this.flowStorageService.getAccountStorageItems(
-      address
-    );
+    const storages =
+      await this.flowStorageService.getAccountStorageItems(address);
     return Promise.all(
-      storages.map((storage) => this.accountStorageIndex.upsert(storage))
+      storages.map((storage) => this.accountStorageIndex.upsert(storage)),
     );
   }
 
@@ -452,17 +467,19 @@ export class FlowIndexerService {
 
     await Promise.all(
       this.getAllWellKnownAddresses()
-        .filter(address => this.accountIndex.findOneById(address) !== undefined)
+        .filter(
+          (address) => this.accountIndex.findOneById(address) !== undefined,
+        )
         .map((address) =>
           this.createAccount({
             address,
             block: nonExistingBlock,
-          }).catch(error => {
+          }).catch((error) => {
             // Most likely an account not found error monotonic/non-monotonic addresses.
             // Can be safely ignored.
             // TODO(restructure): Smarter handling of monotonic/non-monotonic addresses
-          })
-        )
+          }),
+        ),
     );
   }
 
@@ -495,7 +512,9 @@ export class FlowIndexerService {
     ];
   }
 
-  private createAccountEntity(account: flowResource.FlowAccount): OmitTimestamps<flowserResource.FlowAccount> {
+  private createAccountEntity(
+    account: flowResource.FlowAccount,
+  ): OmitTimestamps<flowserResource.FlowAccount> {
     const address = ensurePrefixedAddress(account.address);
 
     const tags: flowserResource.FlowAccountTag[] = [];
@@ -505,8 +524,8 @@ export class FlowIndexerService {
     if (isDefaultAccount) {
       tags.push({
         name: "Default",
-        description: "This account was created automatically by the emulator."
-      })
+        description: "This account was created automatically by the emulator.",
+      });
     }
 
     const isServiceAccount = [
@@ -533,7 +552,7 @@ export class FlowIndexerService {
   }
 
   private createKeyEntity(options: {
-    address:string;
+    address: string;
     key: flowResource.FlowKey;
   }): OmitTimestamps<flowserResource.FlowAccountKey> {
     const { address, key } = options;
@@ -551,7 +570,7 @@ export class FlowIndexerService {
     return {
       id: this.buildKeyId({
         address,
-        publicKey: key.publicKey
+        publicKey: key.publicKey,
       }),
       index: key.index,
       address: address,
@@ -564,12 +583,9 @@ export class FlowIndexerService {
     };
   }
 
-  private buildKeyId(options: {
-    address: string;
-    publicKey: string
-  }) {
+  private buildKeyId(options: { address: string; publicKey: string }) {
     const accountAddress = ensurePrefixedAddress(options.address);
-    return `${accountAddress}.${options.publicKey}`
+    return `${accountAddress}.${options.publicKey}`;
   }
 
   private createEventEntity(options: {
@@ -636,7 +652,7 @@ export class FlowIndexerService {
     // But we don't need the type info since we already have
     // our own system of representing types with `CadenceType` message.
     function fromTypeAnnotatedFclArguments(
-      object: flowResource.FlowTypeAnnotatedValue
+      object: flowResource.FlowTypeAnnotatedValue,
     ): FclValue {
       const { type, value } = object;
       // Available type values are listed here:
@@ -653,7 +669,7 @@ export class FlowIndexerService {
           // TODO(restructure): Double check this
           // @ts-ignore
           return value?.map((element: any) =>
-            fromTypeAnnotatedFclArguments(element)
+            fromTypeAnnotatedFclArguments(element),
           );
         case "Path":
         case "PublicPath":
@@ -673,25 +689,25 @@ export class FlowIndexerService {
       referenceBlockId: transaction.referenceBlockId,
       gasLimit: transaction.gasLimit,
       authorizers: transaction.authorizers.map((address) =>
-        ensurePrefixedAddress(address)
+        ensurePrefixedAddress(address),
       ),
       arguments:
         parsedInteraction.interaction?.parameters.map(
           (parameter, index): flowserResource.FclArgumentWithMetadata => ({
             identifier: parameter.identifier,
             type: parameter.type,
-            value:  fromTypeAnnotatedFclArguments(transaction.args[index]),
-          })
+            value: fromTypeAnnotatedFclArguments(transaction.args[index]),
+          }),
         ) ?? [],
       proposalKey: {
         ...transaction.proposalKey,
         address: ensurePrefixedAddress(transaction.proposalKey.address),
       },
       envelopeSignatures: this.deserializeSignableObjects(
-        transaction.envelopeSignatures
+        transaction.envelopeSignatures,
       ),
       payloadSignatures: this.deserializeSignableObjects(
-        transaction.payloadSignatures
+        transaction.payloadSignatures,
       ),
       status: {
         errorMessage: transactionStatus.errorMessage,
@@ -708,7 +724,7 @@ export class FlowIndexerService {
   }
 
   private deserializeSignableObjects(
-    signableObjects: flowResource.FlowSignableObject[]
+    signableObjects: flowResource.FlowSignableObject[],
   ): flowserResource.SignableObject[] {
     return signableObjects.map((signable) => ({
       ...signable,

@@ -146,7 +146,7 @@ export class FlowCliService {
       flowFlags: ["version"],
     });
     const stdout = output.filter(
-      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT
+      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT,
     );
     const versionLog = stdout.find((log) => log.data.startsWith("Version"));
     // This should only happen with a test build,
@@ -162,14 +162,14 @@ export class FlowCliService {
   }
 
   private async runAndGetJsonOutput<Output>(
-    options: RunCliCommandOptions
+    options: RunCliCommandOptions,
   ): Promise<Output> {
     const output = await this.runAndGetOutput({
       ...options,
       flowFlags: [...options.flowFlags, "--output", "json"],
     });
     const lineWithData = output.find(
-      (outputLine) => outputLine.data.length > 0
+      (outputLine) => outputLine.data.length > 0,
     );
     if (!lineWithData) {
       throw new Error("Output line with JSON data not found");
@@ -196,10 +196,7 @@ export class FlowCliService {
     }
 
     if (flag.value !== undefined) {
-      return [
-        flag.key,
-        String(flag.value),
-      ];
+      return [flag.key, String(flag.value)];
     }
 
     return [];

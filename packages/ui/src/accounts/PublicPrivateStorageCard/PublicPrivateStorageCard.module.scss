@@ -12,7 +12,7 @@
   position: relative;
 
   &.introAnimation {
-    @include addNewContentAnimation(.4s);
+    @include addNewContentAnimation(0.4s);
   }
 
   .background {

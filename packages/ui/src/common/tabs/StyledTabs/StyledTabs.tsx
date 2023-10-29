@@ -9,11 +9,20 @@ export function StyledTabs(props: StyledTabsProps): ReactElement {
   return (
     <BaseTabs
       {...props}
-      tabWrapperClassName={classNames(classes.tabWrapper, props.tabWrapperClassName)}
-      inactiveTabClassName={classNames(classes.inactiveTab, props.inactiveTabClassName)}
+      tabWrapperClassName={classNames(
+        classes.tabWrapper,
+        props.tabWrapperClassName,
+      )}
+      inactiveTabClassName={classNames(
+        classes.inactiveTab,
+        props.inactiveTabClassName,
+      )}
       tabLabelClassName={classNames(classes.tabLabel, props.tabLabelClassName)}
       tabClassName={classNames(classes.tab, props.tabClassName)}
-      activeTabClassName={classNames(classes.activeTab, props.activeTabClassName)}
+      activeTabClassName={classNames(
+        classes.activeTab,
+        props.activeTabClassName,
+      )}
       contentClassName={classNames(classes.content, props.contentClassName)}
     />
   );

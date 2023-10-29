@@ -5,7 +5,7 @@ export interface UseFilterDataHook<T> {
 export const useFilterData = <T>(
   data: T[],
   searchTerm: string | undefined,
-  filterByProps?: string[]
+  filterByProps?: string[],
 ): UseFilterDataHook<T[]> => {
   if (!Array.isArray(data) || data.length === 0) {
     return { filteredData: data };
@@ -17,7 +17,7 @@ export const useFilterData = <T>(
         (item) =>
           JSON.stringify(item, filterByProps)
             .toLocaleLowerCase()
-            .indexOf(searchTerm.toLocaleLowerCase().toString()) !== -1
+            .indexOf(searchTerm.toLocaleLowerCase().toString()) !== -1,
       )
     : data;
   return { filteredData };

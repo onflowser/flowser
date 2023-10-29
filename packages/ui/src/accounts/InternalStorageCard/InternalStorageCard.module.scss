@@ -11,7 +11,7 @@
   background-color: transparentize($gray-110, 0.5);
 
   &.introAnimation {
-    @include addNewContentAnimation(.4s);
+    @include addNewContentAnimation(0.4s);
   }
 
   .header {

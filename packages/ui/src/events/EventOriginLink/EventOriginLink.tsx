@@ -2,7 +2,7 @@ import { ProjectLink } from "../../common/links/ProjectLink";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 import React, { ReactElement } from "react";
 import { EventUtils } from "../utils";
-import { FlowEvent } from '@onflowser/api';
+import { FlowEvent } from "@onflowser/api";
 
 export function EventOriginLink(props: { event: FlowEvent }): ReactElement {
   const { type } = props.event;

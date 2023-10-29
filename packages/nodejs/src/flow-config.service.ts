@@ -2,7 +2,7 @@ import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { IFlowserLogger, isObject } from '@onflowser/core';
+import { IFlowserLogger, isObject } from "@onflowser/core";
 
 type FlowAddress = string;
 
@@ -89,8 +89,7 @@ export class FlowConfigService {
   private configFileName = "flow.json";
   private workingDirectoryPath: string | undefined;
 
-  constructor (private readonly logger: IFlowserLogger) {
-  }
+  constructor(private readonly logger: IFlowserLogger) {}
 
   public async configure(config: FlowConfigServiceConfig) {
     this.workingDirectoryPath = config.workspacePath;
@@ -122,12 +121,12 @@ export class FlowConfigService {
       ([name, accountConfig]): FlowAbstractAccountConfig => {
         if (!accountConfig.address) {
           throw this.missingConfigError(
-            `accounts.${accountConfig.address}.address`
+            `accounts.${accountConfig.address}.address`,
           );
         }
         if (!accountConfig.key) {
           throw this.missingConfigError(
-            `accounts.${accountConfig.address}.key`
+            `accounts.${accountConfig.address}.key`,
           );
         }
         return {
@@ -135,7 +134,7 @@ export class FlowConfigService {
           address: accountConfig.address,
           privateKey: this.getPrivateKey(accountConfig.key),
         };
-      }
+      },
     );
   }
 
@@ -147,7 +146,7 @@ export class FlowConfigService {
       (nameKey) => ({
         name: nameKey,
         filePath: this.getContractFilePath(nameKey),
-      })
+      }),
     );
 
     return contractNamesAndPaths
@@ -157,7 +156,7 @@ export class FlowConfigService {
           name: contract.name,
           relativePath: contract.filePath,
           absolutePath: this.buildProjectPath(contract.filePath),
-        })
+        }),
       );
   }
 
@@ -171,7 +170,7 @@ export class FlowConfigService {
   }
 
   public async updateAccounts(
-    newOrUpdatedAccounts: FlowAbstractAccountConfig[]
+    newOrUpdatedAccounts: FlowAbstractAccountConfig[],
   ): Promise<void> {
     if (!this.config?.accounts) {
       throw new Error("Accounts config not loaded");
@@ -230,7 +229,7 @@ export class FlowConfigService {
   private async save() {
     await this.writeProjectFile(
       this.configFileName,
-      JSON.stringify(this.config, null, 4)
+      JSON.stringify(this.config, null, 4),
     );
   }
 

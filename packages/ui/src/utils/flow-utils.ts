@@ -76,7 +76,7 @@ export class FlowUtils {
         ...union,
         [entry.key]: formatEntryValue(entry.value),
       }),
-      {}
+      {},
     ) as FlowScriptError;
   }
 
@@ -113,12 +113,12 @@ export class FlowUtils {
     const charsToTake = 5;
     return `${blockId.slice(0, charsToTake)}...${blockId.slice(
       blockId.length - charsToTake,
-      blockId.length
+      blockId.length,
     )}`;
   }
 
   static getExecutionStatusName(
-    statusCode: ExecutionStatusCode | undefined
+    statusCode: ExecutionStatusCode | undefined,
   ): string {
     switch (statusCode) {
       case ExecutionStatusCode.EXECUTION_STATUS_EXECUTED:

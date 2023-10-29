@@ -33,7 +33,7 @@ export function useAnalytics(): Analytics {
   const { analyticsService } = useServiceRegistry();
   const [isConsented, setIsConsented] = useLocalStorage<boolean | undefined>(
     "consent-analytics",
-    undefined
+    undefined,
   );
   const currentProjectId = useCurrentWorkspaceId();
   const { data: currentProject } = useGetWorkspace(currentProjectId);

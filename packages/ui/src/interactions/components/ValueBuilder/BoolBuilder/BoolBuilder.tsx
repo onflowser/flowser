@@ -42,7 +42,7 @@ export function BoolBuilder(props: CadenceValueBuilder): ReactElement {
             return setValue(false);
           default:
             throw new Error(
-              "Unknown selected option value: " + event.target.value
+              "Unknown selected option value: " + event.target.value,
             );
         }
       }}

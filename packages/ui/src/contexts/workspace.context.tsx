@@ -15,7 +15,7 @@ export type WorkspaceManager = {
   closeWorkspace: () => Promise<void>;
   openWorkspace: (
     workspace: FlowserWorkspace,
-    options?: OpenWorkspaceOptions
+    options?: OpenWorkspaceOptions,
   ) => Promise<void>;
   removeWorkspace: (workspace: FlowserWorkspace) => void;
   updateWorkspace: (workspace: FlowserWorkspace) => Promise<FlowserWorkspace>;
@@ -25,7 +25,7 @@ export type WorkspaceManager = {
 type OpenWorkspaceOptions = { replaceCurrentPage: boolean };
 
 const WorkspaceManagerContext = createContext<WorkspaceManager>(
-  {} as WorkspaceManager
+  {} as WorkspaceManager,
 );
 
 export function WorkspaceManagerProvider({
@@ -87,7 +87,7 @@ export function WorkspaceManagerProvider({
 
   async function openWorkspace(
     project: FlowserWorkspace,
-    options?: OpenWorkspaceOptions
+    options?: OpenWorkspaceOptions,
   ) {
     try {
       await workspaceService.open(project.id);
@@ -105,16 +105,16 @@ export function WorkspaceManagerProvider({
   }
 
   async function createWorkspace(
-    workspace: FlowserWorkspace
+    workspace: FlowserWorkspace,
   ): Promise<FlowserWorkspace> {
-    await workspaceService.create(workspace)
+    await workspaceService.create(workspace);
     return workspace;
   }
 
   async function updateWorkspace(
-    workspace: FlowserWorkspace
+    workspace: FlowserWorkspace,
   ): Promise<FlowserWorkspace> {
-    await workspaceService.update(workspace)
+    await workspaceService.update(workspace);
     return workspace;
   }
 

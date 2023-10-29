@@ -85,7 +85,9 @@ export enum HashAlgorithm {
   KECCAK_256 = "KECCAK_256",
 }
 
-export interface FlowAccountKey extends TimestampedResource, IdentifiableResource {
+export interface FlowAccountKey
+  extends TimestampedResource,
+    IdentifiableResource {
   id: string;
   index: number;
   address: string;
@@ -101,9 +103,11 @@ export type ManagedKeyPair = {
   address: string;
   publicKey: string;
   privateKey: string;
-}
+};
 
-export interface FlowContract extends TimestampedResource, IdentifiableResource {
+export interface FlowContract
+  extends TimestampedResource,
+    IdentifiableResource {
   // ID is the combination of `address` and `name`.
   id: string;
   address: string;
@@ -136,7 +140,9 @@ export enum FlowStorageDomain {
   STORAGE_DOMAIN_STORAGE = 3,
 }
 
-export interface FlowAccountStorage extends TimestampedResource, IdentifiableResource {
+export interface FlowAccountStorage
+  extends TimestampedResource,
+    IdentifiableResource {
   id: string;
   address: string;
   domain: FlowStorageDomain;
@@ -187,7 +193,7 @@ export interface FclArgumentWithMetadata {
   identifier: string;
   value: FclValue;
   type: CadenceType;
-};
+}
 
 export interface CadenceType {
   kind: CadenceTypeKind;
@@ -306,9 +312,7 @@ export interface FlowserWorkspace extends TimestampedResource {
   gateway: FlowGatewayConfig | undefined;
 }
 
-export interface FlowGatewayConfig {
-
-}
+export interface FlowGatewayConfig {}
 
 export interface FlowEmulatorConfig {
   verboseLogging: boolean;

@@ -58,10 +58,10 @@ export function TemplatesRegistryProvider(props: {
           createdDate: new Date(template.createdDate),
           updatedDate: new Date(template.updatedDate),
           fclValuesByIdentifier: new Map(
-            Object.entries(template.fclValuesByIdentifier)
+            Object.entries(template.fclValuesByIdentifier),
           ),
           filePath: undefined,
-        })
+        }),
       ),
       ...(projectTemplatesData?.map(
         (template): InteractionDefinitionTemplate => ({
@@ -74,10 +74,10 @@ export function TemplatesRegistryProvider(props: {
           createdDate: new Date(template.createdAt),
           updatedDate: new Date(template.updatedAt),
           filePath: template.source?.filePath,
-        })
+        }),
       ) ?? []),
     ],
-    [customTemplates, projectTemplatesData]
+    [customTemplates, projectTemplatesData],
   );
 
   function saveTemplate(interaction: InteractionDefinition) {
@@ -85,7 +85,7 @@ export function TemplatesRegistryProvider(props: {
       name: interaction.name,
       code: interaction.code,
       fclValuesByIdentifier: Object.fromEntries(
-        interaction.fclValuesByIdentifier
+        interaction.fclValuesByIdentifier,
       ),
       transactionOptions: interaction.transactionOptions,
       createdDate: new Date().toISOString(),
@@ -94,7 +94,7 @@ export function TemplatesRegistryProvider(props: {
 
     setRawTemplates([
       ...customTemplates.filter(
-        (template) => template.name !== newTemplate.name
+        (template) => template.name !== newTemplate.name,
       ),
       newTemplate,
     ]);
@@ -103,8 +103,8 @@ export function TemplatesRegistryProvider(props: {
   function removeTemplate(template: InteractionDefinitionTemplate) {
     setRawTemplates((rawTemplates) =>
       rawTemplates.filter(
-        (existingTemplate) => existingTemplate.name !== template.name
-      )
+        (existingTemplate) => existingTemplate.name !== template.name,
+      ),
     );
   }
 

@@ -6,20 +6,24 @@
   "types": "./src/index.ts",
   "scripts": {
     "dev": "npm run build-bin",
-    "build-bin": "sh build-go-bindings.sh"
+    "build-bin": "sh build-go-bindings.sh",
+    "format": "prettier . --write"
   },
   "keywords": [],
-  "files": ["bin"],
+  "files": [
+    "bin"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@onflowser/config": "*",
     "@onflow/fcl": "^1.6.0",
+    "@onflowser/config": "*",
     "elliptic": "^6.5.4"
   },
   "devDependencies": {
+    "@types/elliptic": "^6.4.14",
     "@types/node": "^16.11.6",
-    "typescript": "^4.3.5",
-    "@types/elliptic": "^6.4.14"
+    "prettier": "3.0.3",
+    "typescript": "^4.3.5"
   }
 }

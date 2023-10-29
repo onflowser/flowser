@@ -18,7 +18,7 @@ function Value({ children, className, style, variant = "normal" }: ValueProps) {
       className={classNames(
         classes.root,
         getClassForVariant(variant),
-        className
+        className,
       )}
     >
       {children}

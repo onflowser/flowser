@@ -5,7 +5,7 @@ import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
 import { JsonView } from "../../common/code/JsonView/JsonView";
 import { StorageDataTypes } from "../StorageDataTypes/StorageDataTypes";
 import { FlowUtils } from "../../utils/flow-utils";
-import { FlowAccountStorage } from '@onflowser/api';
+import { FlowAccountStorage } from "@onflowser/api";
 
 type ExtendableStorageCardProps = {
   storageItem: FlowAccountStorage;
@@ -23,7 +23,7 @@ export function InternalStorageCard({
   const extendClass = classNames(className, {
     [classes.root]: true,
     [classes.gridItemExtended]: isExpanded,
-    [classes.introAnimation]: false
+    [classes.introAnimation]: false,
   });
 
   const pathIdentifier = storageItem.path.split("/").reverse()[0];

@@ -30,21 +30,21 @@ export class FlowInteractionsService implements IFlowInteractions {
   }
 
   public async getTemplates(
-    options: GetInteractionTemplatesOptions
+    options: GetInteractionTemplatesOptions,
   ): Promise<InteractionTemplate[]> {
     const potentialCadenceFilePaths = await this.findAllCadenceFiles(
-      options.workspacePath
+      options.workspacePath,
     );
     const templates = await Promise.all(
       potentialCadenceFilePaths.map((potentialCadenceFilePath) =>
-        this.buildMaybeTemplate(potentialCadenceFilePath)
-      )
+        this.buildMaybeTemplate(potentialCadenceFilePath),
+      ),
     );
     return templates.filter(isDefined);
   }
 
   private async buildMaybeTemplate(
-    filePath: string
+    filePath: string,
   ): Promise<InteractionTemplate | undefined> {
     const [fileContent, fileStats] = await Promise.all([
       fs.readFile(filePath),
@@ -87,14 +87,14 @@ export class FlowInteractionsService implements IFlowInteractions {
     const ignoredDirNames = new Set(["node_modules"]);
 
     const potentialDirPaths = filePaths.filter(
-      (path) => !/\.[a-z]+/.test(path)
+      (path) => !/\.[a-z]+/.test(path),
     );
     const descendantCadencePaths = await Promise.all(
       potentialDirPaths
         .filter((potentialDirPath) => !ignoredDirNames.has(potentialDirPath))
         .map((potentialDirPath) =>
-          this.findAllCadenceFiles(path.join(rootDirPath, potentialDirPath))
-        )
+          this.findAllCadenceFiles(path.join(rootDirPath, potentialDirPath)),
+        ),
     );
 
     const cadenceFilePaths = filePaths

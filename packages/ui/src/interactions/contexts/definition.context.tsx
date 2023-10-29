@@ -11,7 +11,7 @@ import {
 } from "../core/core-types";
 import { ParsedInteraction } from "@onflowser/api";
 import { FclValue } from "@onflowser/core";
-import { useGetParsedInteraction } from '../../api';
+import { useGetParsedInteraction } from "../../api";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;

@@ -6,7 +6,7 @@ import classNames from "classnames";
 import classes from "./FormFields.module.scss";
 import ToggleButton from "../../common/buttons/ToggleButton/ToggleButton";
 import { FormikErrors } from "formik";
-import { FlowserWorkspace } from '@onflowser/api';
+import { FlowserWorkspace } from "@onflowser/api";
 
 export type FieldProps = InputProps & {
   label?: string;
@@ -20,7 +20,7 @@ export type FieldProps = InputProps & {
     setFieldValue: (
       field: string,
       value: unknown,
-      shouldValidate?: boolean
+      shouldValidate?: boolean,
     ) => void;
   };
 };

@@ -1,7 +1,8 @@
 import {
   FclArgBuilder,
-  FclTypeLookup, FclValue,
-  FclValueUtils
+  FclTypeLookup,
+  FclValue,
+  FclValueUtils,
 } from "./fcl-value";
 import * as fcl from "@onflow/fcl";
 import axios from "axios";
@@ -119,37 +120,54 @@ type FlowEventInternal<Type, Data> = {
   type: Type;
   transactionIndex: number;
   eventIndex: number;
-  data: Data
+  data: Data;
 };
 
-
 // https://developers.flow.com/cadence/language/core-events#account-key-added
-export type FlowAccountKeyEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_KEY_ADDED | FlowCoreEventType.ACCOUNT_KEY_REMOVED, {
-  address: string;
-  publicKey: {
-    // https://developers.flow.com/cadence/language/crypto#publickey
-    publicKey: string[];
-    signatureAlgorithm: {
-      rawValue: FlowSignatureAlgorithm;
-    }
+export type FlowAccountKeyEvent = FlowEventInternal<
+  FlowCoreEventType.ACCOUNT_KEY_ADDED | FlowCoreEventType.ACCOUNT_KEY_REMOVED,
+  {
+    address: string;
+    publicKey: {
+      // https://developers.flow.com/cadence/language/crypto#publickey
+      publicKey: string[];
+      signatureAlgorithm: {
+        rawValue: FlowSignatureAlgorithm;
+      };
+    };
   }
-}>
+>;
 
 // https://developers.flow.com/cadence/language/core-events#account-contract-added
-export type FlowAccountContractEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED | FlowCoreEventType.ACCOUNT_CONTRACT_ADDED | FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED, {
-  address: string;
-  codeHash: string[];
-  // Contract name
-  contract: string;
-}>
+export type FlowAccountContractEvent = FlowEventInternal<
+  | FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED
+  | FlowCoreEventType.ACCOUNT_CONTRACT_ADDED
+  | FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED,
+  {
+    address: string;
+    codeHash: string[];
+    // Contract name
+    contract: string;
+  }
+>;
 
 // https://developers.flow.com/cadence/language/core-events#account-created
-export type FlowAccountEvent = FlowEventInternal<FlowCoreEventType.ACCOUNT_CREATED, {address: string}>;
+export type FlowAccountEvent = FlowEventInternal<
+  FlowCoreEventType.ACCOUNT_CREATED,
+  { address: string }
+>;
 
-export type FlowAnyEvent = FlowEventInternal<`A.${string}.${string}.${string}`, Record<string, any>>
+export type FlowAnyEvent = FlowEventInternal<
+  `A.${string}.${string}.${string}`,
+  Record<string, any>
+>;
 
 // https://docs.onflow.org/fcl/reference/api/#event-object
-export type FlowEvent = FlowAnyEvent | FlowAccountKeyEvent | FlowAccountEvent | FlowAccountContractEvent;
+export type FlowEvent =
+  | FlowAnyEvent
+  | FlowAccountKeyEvent
+  | FlowAccountEvent
+  | FlowAccountContractEvent;
 
 // https://developers.flow.com/tools/clients/fcl-js/api#authorization-function
 export type FlowAuthorizationFunction = () => unknown;
@@ -203,12 +221,14 @@ export class FlowGatewayService {
       });
   }
 
-  public async executeScript<Result>(options: ExecuteFlowScriptOptions): Promise<Result> {
+  public async executeScript<Result>(
+    options: ExecuteFlowScriptOptions,
+  ): Promise<Result> {
     return await fcl.query({
       cadence: options.cadence,
       args: (arg: FclArgBuilder, t: FclTypeLookup) => {
         const argumentFunction = FclValueUtils.getArgumentFunction(
-          options.arguments
+          options.arguments,
         );
         return argumentFunction(arg, t);
       },
@@ -221,13 +241,13 @@ export class FlowGatewayService {
    * https://developers.flow.com/tooling/fcl-js/transactions
    */
   public async sendTransaction(
-    options: SendFlowTransactionOptions
+    options: SendFlowTransactionOptions,
   ): Promise<{ transactionId: string }> {
     const transactionId = await fcl.mutate({
       cadence: options.cadence,
       args: (arg: FclArgBuilder, t: FclTypeLookup) => {
         const argumentFunction = FclValueUtils.getArgumentFunction(
-          options.arguments
+          options.arguments,
         );
         return argumentFunction(arg, t);
       },
@@ -241,7 +261,7 @@ export class FlowGatewayService {
   }
 
   public getTxStatusSubscription(
-    transactionId: string
+    transactionId: string,
   ): FlowTxStatusSubscription {
     return fcl.tx(transactionId);
   }
@@ -272,7 +292,7 @@ export class FlowGatewayService {
   }
 
   public async getTransactionStatusById(
-    transactionId: string
+    transactionId: string,
   ): Promise<FlowTransactionStatus> {
     return fcl.send([fcl.getTransactionStatus(transactionId)]).then(fcl.decode);
   }

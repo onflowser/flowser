@@ -9,7 +9,7 @@ import { ProjectLink } from "../../common/links/ProjectLink";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
-import { FlowEvent } from '@onflowser/api';
+import { FlowEvent } from "@onflowser/api";
 
 const columnHelper = createColumnHelper<FlowEvent>();
 
@@ -73,10 +73,5 @@ type EventsTableProps = {
 };
 
 export function EventsTable(props: EventsTableProps): ReactElement {
-  return (
-    <BaseTable<FlowEvent>
-      data={props.events}
-      columns={columns}
-    />
-  );
+  return <BaseTable<FlowEvent> data={props.events} columns={columns} />;
 }

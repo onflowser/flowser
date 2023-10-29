@@ -58,11 +58,11 @@ const transactionKindBySource = new Map<string, TransactionKind>(
   hardcodedTemplates.map((entry) => [
     InteractionUtils.normalizeCadenceCode(entry[0]),
     entry[1],
-  ])
+  ]),
 );
 
 export function useTransactionName(
-  props: UseInteractionNameProps
+  props: UseInteractionNameProps,
 ): string | undefined {
   const { transaction } = props;
   const { templates } = useTemplatesRegistry();
@@ -82,22 +82,22 @@ export function useTransactionName(
     }
 
     const sanitizedTargetCode = InteractionUtils.normalizeCadenceCode(
-      transaction.script
+      transaction.script,
     );
     return [...templates, ...definitions].find(
       (template) =>
         template.code &&
         InteractionUtils.normalizeCadenceCode(template.code) ===
-          sanitizedTargetCode
+          sanitizedTargetCode,
     )?.name;
   }, [transaction, templates, definitions]);
 }
 
 function getStandardInteractionName(
-  transaction: FlowTransaction
+  transaction: FlowTransaction,
 ): string | undefined {
   const kind = transactionKindBySource.get(
-    InteractionUtils.normalizeCadenceCode(transaction.script)
+    InteractionUtils.normalizeCadenceCode(transaction.script),
   );
 
   switch (kind) {
@@ -116,7 +116,10 @@ function getStandardInteractionName(
   }
 }
 
-function getArgumentValueById(transaction: FlowTransaction, id: string): FclValue {
+function getArgumentValueById(
+  transaction: FlowTransaction,
+  id: string,
+): FclValue {
   return transaction.arguments.find((argument) => argument.identifier === id)
-    ?.value
+    ?.value;
 }

@@ -80,7 +80,7 @@ export function ContractsTable(props: ContractsTableProps): ReactElement {
   const sortedContracts = useMemo(
     // Local project contracts should be shown first.
     () => props.contracts.sort((contract) => (contract.localConfig ? -1 : 1)),
-    [props.contracts]
+    [props.contracts],
   );
 
   return <BaseTable<FlowContract> columns={columns} data={sortedContracts} />;

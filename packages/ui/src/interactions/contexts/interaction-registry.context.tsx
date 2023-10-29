@@ -26,7 +26,7 @@ type InteractionsRegistry = {
   focusedDefinition: InteractionDefinition | undefined;
   create: (
     interaction: CreateInteractionDefinition,
-    options?: CreateInteractionOptions
+    options?: CreateInteractionOptions,
   ) => InteractionDefinition;
   update: (interaction: InteractionDefinition) => void;
   remove: (interactionId: string) => void;
@@ -61,7 +61,7 @@ export function InteractionRegistryProvider(props: {
   const focusedDefinition = useMemo(
     () =>
       definitions.find((definition) => definition.id === focusedInteractionId),
-    [focusedInteractionId, definitions]
+    [focusedInteractionId, definitions],
   );
 
   useEffect(() => {
@@ -80,13 +80,13 @@ export function InteractionRegistryProvider(props: {
           return updatedInteraction;
         }
         return existingInteraction;
-      })
+      }),
     );
   }
 
   function remove(interactionId: string) {
     const newDefinitions = definitions.filter(
-      (definition) => definition.id !== interactionId
+      (definition) => definition.id !== interactionId,
     );
     setDefinitions(newDefinitions);
     const lastDefinition = newDefinitions[newDefinitions.length - 1];
@@ -97,7 +97,7 @@ export function InteractionRegistryProvider(props: {
 
   function create(
     newPartialInteraction: CreateInteractionDefinition,
-    options?: CreateInteractionOptions
+    options?: CreateInteractionOptions,
   ): InteractionDefinition {
     const newPartialDefinitionId =
       newPartialInteraction.id ?? crypto.randomUUID();
@@ -105,9 +105,9 @@ export function InteractionRegistryProvider(props: {
       options?.deduplicateBySourceCodeSemantics
         ? InteractionUtils.areSemanticallyEquivalent(
             newPartialInteraction,
-            definition
+            definition,
           )
-        : definition.id === newPartialDefinitionId
+        : definition.id === newPartialDefinitionId,
     );
     if (existingInteraction) {
       return existingInteraction;

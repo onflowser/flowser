@@ -28,7 +28,7 @@ function isVerticalProps(props: LineSeparatorProps): props is VerticalProps {
 }
 
 function isHorizontalProps(
-  props: LineSeparatorProps
+  props: LineSeparatorProps,
 ): props is HorizontalProps {
   return "horizontal" in props;
 }

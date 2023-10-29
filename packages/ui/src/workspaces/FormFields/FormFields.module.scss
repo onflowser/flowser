@@ -3,10 +3,13 @@
 @import "../../styles/typography";
 @import "../../styles/animations";
 
-.textFieldRoot, .toggleFieldRoot {
+.textFieldRoot,
+.toggleFieldRoot {
   display: flex;
   margin: $spacing-l 0;
-  .label, .input, .description {
+  .label,
+  .input,
+  .description {
     display: flex;
     align-items: center;
   }
@@ -46,7 +49,8 @@
   .header {
     display: flex;
     margin-bottom: $spacing-base;
-    .title, .description {
+    .title,
+    .description {
       color: $gray-10;
     }
   }

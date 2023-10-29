@@ -65,7 +65,7 @@ export function BaseTable<TData>({
             className={classNames(
               classes.tableRow,
               classes.headerRow,
-              headerRowClass
+              headerRowClass,
             )}
             key={headerGroup.id}
           >
@@ -76,12 +76,12 @@ export function BaseTable<TData>({
               >
                 {flexRender(
                   header.column.columnDef.header,
-                  header.getContext()
+                  header.getContext(),
                 )}
               </div>
             ))}
           </BaseCard>
-        )
+        ),
       )}
       {table.getRowModel().rows.length === 0 && (
         <Message
@@ -99,7 +99,7 @@ export function BaseTable<TData>({
               classes.tableRow,
               typeof bodyRowClass === "function"
                 ? bodyRowClass(row)
-                : bodyRowClass
+                : bodyRowClass,
             )}
             key={row.id}
             showIntroAnimation={false}
@@ -113,7 +113,7 @@ export function BaseTable<TData>({
               </div>
             ))}
           </BaseCard>
-        )
+        ),
       )}
     </div>
   );

@@ -5,7 +5,7 @@ import SelectInput, {
   SelectInputOption,
 } from "../../../../common/inputs/SelectInput/SelectInput";
 import { Input } from "../../../../common/inputs/Input/Input";
-import { FclPathDomain, FclValueUtils } from '@onflowser/core';
+import { FclPathDomain, FclValueUtils } from "@onflowser/core";
 
 export function PathBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;
@@ -50,7 +50,7 @@ export function PathBuilder(props: CadenceValueBuilder): ReactElement {
     (domain): SelectInputOption => ({
       label: domain,
       value: domain,
-    })
+    }),
   );
 
   return (

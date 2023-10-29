@@ -73,7 +73,7 @@ export function Logs(props: LogsProps): ReactElement {
 
   useEffect(() => {
     const hasErrorLogs = logs.some(
-      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR
+      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR,
     );
     if (hasErrorLogs) {
       toast.error("Some process encountered errors", {
@@ -124,7 +124,7 @@ export function Logs(props: LogsProps): ReactElement {
       className={classNames(
         classes.root,
         getDrawerSizeClass(),
-        props.className
+        props.className,
       )}
       style={logDrawerSize === "custom" ? { top: mouseEvent?.clientY } : {}}
     >
@@ -237,7 +237,9 @@ function NoLogsHelpBanner() {
       description={
         <div>
           <p>
-            Flowser can only show logs, when emulator is run by Flowser itself. Make sure you aren't running the <code>flow emulator</code> command yourself.
+            Flowser can only show logs, when emulator is run by Flowser itself.
+            Make sure you aren't running the <code>flow emulator</code> command
+            yourself.
           </p>
         </div>
       }
@@ -252,11 +254,11 @@ function useRelevantLogs(options: {
   const { data: emulatorLogs } = useGetOutputsByProcess(emulatorProcessId);
   const { filteredData: logs } = useFilterData(
     emulatorLogs ?? [],
-    options.searchTerm
+    options.searchTerm,
   );
   const tailLogs = useMemo(
     () => logs.slice(logs.length - options.tailSize, logs.length),
-    [logs]
+    [logs],
   );
 
   return {

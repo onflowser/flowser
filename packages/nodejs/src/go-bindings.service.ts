@@ -25,7 +25,7 @@ type ExecuteGoBinResponse = {
 type GoBindingsConfig = {
   // Path to the directory, which contains the compiled Go binding file(s).
   binDirPath: string;
-}
+};
 
 export class GoBindingsService {
   private config: GoBindingsConfig;
@@ -35,7 +35,7 @@ export class GoBindingsService {
   }
 
   public async getParsedInteraction(
-    request: GetParsedInteractionRequest
+    request: GetParsedInteractionRequest,
   ): Promise<ParsedInteractionOrError> {
     const response = await this.execute({
       command: "get-parsed-interaction",
@@ -47,7 +47,10 @@ export class GoBindingsService {
 
     // Go code encodes the parameters as null when there is a parsing error.
     // Default to an empty array to match the expected structure.
-    if (parsedResponse.interaction && parsedResponse.interaction.parameters === null) {
+    if (
+      parsedResponse.interaction &&
+      parsedResponse.interaction.parameters === null
+    ) {
       parsedResponse.interaction.parameters = [];
     }
 
@@ -55,14 +58,14 @@ export class GoBindingsService {
   }
 
   public async getIndexOfAddress(
-    request: GetAddressIndexRequest
+    request: GetAddressIndexRequest,
   ): Promise<number> {
     const response = await this.execute({
       command: "get-address-index",
       arguments: [request.chainId, request.hexAddress],
     });
 
-    return Number(response.raw)
+    return Number(response.raw);
   }
 
   private execute(request: ExecuteGoBinRequest): Promise<ExecuteGoBinResponse> {
@@ -94,7 +97,7 @@ export class GoBindingsService {
   }
 
   private getExecutablePath(): string {
-    return path.join(this.config.binDirPath, this.getExecutableName())
+    return path.join(this.config.binDirPath, this.getExecutableName());
   }
 
   private getExecutableName(): string {

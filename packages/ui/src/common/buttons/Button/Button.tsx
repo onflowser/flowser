@@ -34,7 +34,7 @@ const Button: FunctionComponent<ButtonProps> = ({
         {
           [classes.disabled]: disabled,
           [classes.outlined]: outlined,
-        }
+        },
       )}
     >
       {loading && (

@@ -34,9 +34,9 @@ function StoredTemplates() {
   const filteredAndSortedTemplates = useMemo(
     () =>
       filteredTemplates.sort(
-        (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime()
+        (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime(),
       ),
-    [filteredTemplates]
+    [filteredTemplates],
   );
 
   return (
@@ -97,7 +97,7 @@ function FocusedTemplateSettings() {
   }
 
   const correspondingTemplate = templates.find(
-    (template) => template.id === focusedDefinition.id
+    (template) => template.id === focusedDefinition.id,
   );
 
   if (correspondingTemplate && correspondingTemplate.filePath) {

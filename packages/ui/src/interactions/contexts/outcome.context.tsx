@@ -3,7 +3,7 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
-  useState
+  useState,
 } from "react";
 import { CommonUtils } from "../../utils/common-utils";
 import { useInteractionDefinitionManager } from "./definition.context";
@@ -25,7 +25,7 @@ export function InteractionOutcomeManagerProvider(props: {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
   const { flowService } = useServiceRegistry();
-  const [outcome, setOutcome] = useState<InteractionOutcome|undefined>();
+  const [outcome, setOutcome] = useState<InteractionOutcome | undefined>();
 
   async function execute() {
     if (!definition) {
@@ -41,14 +41,12 @@ export function InteractionOutcomeManagerProvider(props: {
         return setOutcome(await executeTransaction(definition));
       default:
         // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
-        throw new Error(
-          `Can't execute interaction: ${parsedInteraction.kind}`
-        );
+        throw new Error(`Can't execute interaction: ${parsedInteraction.kind}`);
     }
   }
 
   async function executeTransaction(
-    definition: InteractionDefinition
+    definition: InteractionDefinition,
   ): Promise<InteractionOutcome | undefined> {
     const { transactionOptions } = definition;
     if (!transactionOptions) {
@@ -62,7 +60,7 @@ export function InteractionOutcomeManagerProvider(props: {
       toast.error(
         `Unspecified authorizers: ${unspecifiedAuthorizers
           .map((e) => e.index + 1)
-          .join(", ")}`
+          .join(", ")}`,
       );
       hasErrors = true;
     }
@@ -101,11 +99,13 @@ export function InteractionOutcomeManagerProvider(props: {
     }
   }
 
-  async function executeScript(definition: InteractionDefinition): Promise<InteractionOutcome | undefined> {
+  async function executeScript(
+    definition: InteractionDefinition,
+  ): Promise<InteractionOutcome | undefined> {
     try {
       const result = await flowService.executeScript({
         cadence: definition.code,
-        arguments: serializeParameters()
+        arguments: serializeParameters(),
       });
       return {
         script: {
@@ -144,8 +144,8 @@ export function InteractionOutcomeManagerProvider(props: {
           type: parameter.type,
           identifier: parameter.identifier,
         };
-      }
-    )
+      },
+    );
   }
 
   return (

@@ -9,7 +9,7 @@ export class InteractionUtils {
   // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#data-structure-serialization--identifier-generation
   static areSemanticallyEquivalent(
     a: IdentifiableInteractionDefinition,
-    b: IdentifiableInteractionDefinition
+    b: IdentifiableInteractionDefinition,
   ): boolean {
     return (
       this.normalizeCadenceCode(a.code) === this.normalizeCadenceCode(b.code)

@@ -41,7 +41,8 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        .openIcon, .closeIcon {
+        .openIcon,
+        .closeIcon {
           width: 20px;
           height: 20px;
         }

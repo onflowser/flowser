@@ -6,11 +6,13 @@
 }
 
 @mixin whitenOnHover() {
-  &, * {
+  &,
+  * {
     transition: 0.1s ease-in-out color;
   }
   &:hover {
-    &, * {
+    &,
+    * {
       color: white;
       fill: white;
     }
@@ -35,7 +37,6 @@
 }
 
 @mixin addNewContentAnimation($time) {
-
   -webkit-animation: new-content-animation #{$time}; /* Safari, Chrome and Opera > 12.1 */
   -moz-animation: new-content-animation #{$time}; /* Firefox < 16 */
   -ms-animation: new-content-animation #{$time}; /* Internet Explorer */
@@ -45,22 +46,31 @@
   @keyframes new-content-animation {
     from {
       opacity: 0;
-      background-color: #496F8D;
-      color: #496F8D;
+      background-color: #496f8d;
+      color: #496f8d;
       font-size: 98%; // Using lower percentage will break ellipsis on hashes :/
     }
 
     50% {
       opacity: 0.5;
-      background-color: #496F8D;
+      background-color: #496f8d;
     }
   }
 }
 
 @mixin flipVertical($time, $deg: 180deg) {
-  -webkit-transition: -webkit-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
-  -ms-transition: -ms-transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
-  transition: transform #{$time} ease-in-out, fill #{$time} ease, stroke #{$time} ease;
+  -webkit-transition:
+    -webkit-transform #{$time} ease-in-out,
+    fill #{$time} ease,
+    stroke #{$time} ease;
+  -ms-transition:
+    -ms-transform #{$time} ease-in-out,
+    fill #{$time} ease,
+    stroke #{$time} ease;
+  transition:
+    transform #{$time} ease-in-out,
+    fill #{$time} ease,
+    stroke #{$time} ease;
 
   transform: rotateX(#{$deg});
   -ms-transform: rotateX(#{$deg});

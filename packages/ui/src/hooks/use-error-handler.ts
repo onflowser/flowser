@@ -1,6 +1,6 @@
 import { CommonUtils } from "../utils/common-utils";
 import toast from "react-hot-toast";
-import { useServiceRegistry } from '../contexts/service-registry.context';
+import { useServiceRegistry } from "../contexts/service-registry.context";
 
 export type ErrorHandlerState = {
   handleError: (error: unknown) => void;

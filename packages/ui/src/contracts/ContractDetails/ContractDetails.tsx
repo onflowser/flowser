@@ -17,7 +17,7 @@ type ContractDetailsProps = {
 };
 
 export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
-  props
+  props,
 ) => {
   const { contractId } = props;
   const { isLoading, data: contract } = useGetContract(contractId);
@@ -56,7 +56,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     {
       label: "Created date",
       value: <DateDisplay date={contract.createdAt.toISOString()} />,
-    }
+    },
   );
 
   return (

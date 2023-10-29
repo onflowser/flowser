@@ -54,7 +54,7 @@ export const BlocksTable: FunctionComponent<BlocksTableProps> = (props) => {
         ),
       }),
     ],
-    [blocks]
+    [blocks],
   );
 
   return (

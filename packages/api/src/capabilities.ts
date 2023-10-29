@@ -17,7 +17,10 @@ export interface IResourceIndexReader<Resource extends TimestampedResource> {
 
 // Index is responsible for managing lifecycle timestamps,
 // so consumers shouldn't be passing in timestamps themselves.
-export type OmitTimestamps<Resource> = Omit<Resource, keyof TimestampedResource>
+export type OmitTimestamps<Resource> = Omit<
+  Resource,
+  keyof TimestampedResource
+>;
 
 export interface IResourceIndexWriter<Resource extends IndexableResource> {
   create(resource: OmitTimestamps<Resource>): Promise<void>;
