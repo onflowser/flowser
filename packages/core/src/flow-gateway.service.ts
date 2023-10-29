@@ -151,7 +151,7 @@ export type FlowAnyEvent = FlowEventInternal<`A.${string}.${string}.${string}`, 
 // https://docs.onflow.org/fcl/reference/api/#event-object
 export type FlowEvent = FlowAnyEvent | FlowAccountKeyEvent | FlowAccountEvent | FlowAccountContractEvent;
 
-// https://developers.flow.com/next/tooling/fcl-js/api#authorization-function
+// https://developers.flow.com/tools/clients/fcl-js/api#authorization-function
 export type FlowAuthorizationFunction = () => unknown;
 
 type SendFlowTransactionOptions = {

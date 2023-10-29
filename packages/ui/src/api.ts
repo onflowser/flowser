@@ -9,7 +9,8 @@ import {
   FlowserWorkspace, FlowserUsageRequirement,
   FlowStateSnapshot,
   FlowTransaction, InteractionTemplate,
-  ManagedProcessOutput, ParsedInteractionOrError
+  ManagedProcessOutput, ParsedInteractionOrError,
+  ManagedKeyPair
 } from '@onflowser/api';
 import { useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from './interactions/core/core-types';
@@ -47,12 +48,12 @@ export function useGetKeysByAccount(
   );
 }
 
-export function useGetKeys(): SWRResponse<FlowAccountKey[]> {
-  const { accountKeyIndex } = useServiceRegistry();
+export function useGetManagedKeys(): SWRResponse<ManagedKeyPair[]> {
+  const { walletService } = useServiceRegistry();
   return useSWR(
-    `keys`,
+    `managed-keys`,
     () =>
-      accountKeyIndex.findAll(),
+      walletService.listKeyPairs(),
     {
       refreshInterval: 1000,
     }

@@ -66,6 +66,7 @@ export function App() {
 
       <ServiceRegistryProvider
         services={{
+          walletService: window.electron.wallet,
           flowService: window.electron.flow,
           interactionsService: window.electron.interactions,
           accountIndex: indexes.account,

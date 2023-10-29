@@ -39,6 +39,7 @@ export class FlowserAppService {
   public readonly flowSnapshotsService: FlowSnapshotsService;
   public readonly flowConfigService: FlowConfigService;
   private readonly flowSnapshotsStorageService: FileStorageService;
+  private readonly walletStorageService: FileStorageService;
   private processingScheduler: AsyncIntervalScheduler;
 
   constructor() {
@@ -88,10 +89,11 @@ export class FlowserAppService {
       this.flowInteractionsService,
     );
     this.flowConfigService = new FlowConfigService(this.logger);
+    this.walletStorageService = new FileStorageService();
     this.walletService = new WalletService(
       this.flowCliService,
       this.flowGatewayService,
-      this.blockchainIndexService.indexes.accountKey,
+      this.walletStorageService,
     );
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
@@ -126,12 +128,19 @@ export class FlowserAppService {
       WorkspaceEvent.WORKSPACE_CLOSE,
       this.onWorkspaceClose.bind(this),
     );
-    this.flowSnapshotsService.on(FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT, () =>
-      this.blockchainIndexService.clear(),
+    this.flowSnapshotsService.on(
+      FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT,
+      this.onRollbackToBlockHeight.bind(this),
     );
-    this.flowSnapshotsService.on(FlowSnapshotsEvent.JUMP_TO, () =>
-      this.blockchainIndexService.clear(),
+    this.flowSnapshotsService.on(
+      FlowSnapshotsEvent.JUMP_TO,
+      this.onRollbackToBlockHeight.bind(this),
     );
+  }
+
+  private async onRollbackToBlockHeight() {
+    this.blockchainIndexService.clear();
+    await this.walletService.synchronizeKeys();
   }
 
   private async onWorkspaceOpen(workspaceId: string) {
@@ -159,6 +168,8 @@ export class FlowserAppService {
     this.flowSnapshotsStorageService.setFileName(
       `flowser-snapshots-${workspaceId}.json`,
     );
+    this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);
+    await this.walletService.synchronizeKeys();
 
     if (workspace.emulator) {
       this.flowSnapshotsService.configure({

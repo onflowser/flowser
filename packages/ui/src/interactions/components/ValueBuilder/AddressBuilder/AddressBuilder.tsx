@@ -9,13 +9,13 @@ import { Spinner } from "../../../../common/loaders/Spinner/Spinner";
 import { FclValueUtils } from "@onflowser/core";
 import { FlowAccount } from "@onflowser/api";
 import { useServiceRegistry } from "../../../../contexts/service-registry.context";
-import { useGetAccounts, useGetKeys } from "../../../../api";
+import { useGetAccounts, useGetManagedKeys } from "../../../../api";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, value, setValue, addressBuilderOptions } = props;
   const { data, mutate } = useGetAccounts();
-  const { flowService } = useServiceRegistry();
-  const { data: allKeys } = useGetKeys();
+  const { walletService } = useServiceRegistry();
+  const { data: allKeys } = useGetManagedKeys();
   const accountsWithPrivateKeysLookup = new Set(allKeys?.filter(key => Boolean(key.privateKey)).map(key => key.address));
   const accountsToShow = useMemo(() => addressBuilderOptions?.showManagedAccountsOnly
     ? data?.filter((account) => accountsWithPrivateKeysLookup.has(account.address))
@@ -32,7 +32,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
   }, [accountsToShow]);
 
   async function createNewAccount() {
-    await flowService.createAccount();
+    await walletService.createAccount();
     await mutate();
   }
 

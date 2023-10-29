@@ -10,8 +10,8 @@ export class FileStorageService implements PersistentStorage {
     this.fileName = fileName;
   }
 
-  setFileName(context: string) {
-    this.fileName = context;
+  setFileName(fileName: string) {
+    this.fileName = fileName;
   }
 
   async read(): Promise<string | undefined> {

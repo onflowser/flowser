@@ -9,7 +9,8 @@ import {
   FlowserWorkspace,
   FlowStateSnapshot,
   FlowTransaction, InteractionTemplate,
-  IResourceIndexReader, ManagedProcessOutput, ParsedInteractionOrError
+  IResourceIndexReader, ManagedProcessOutput, ParsedInteractionOrError,
+  ManagedKeyPair
 } from "@onflowser/api";
 
 export interface ISnapshotService {
@@ -52,9 +53,13 @@ export type ExecuteScriptRequest = {
 export interface IFlowService {
   sendTransaction(request: SendTransactionRequest): Promise<{ transactionId: string }>;
   executeScript(request: ExecuteScriptRequest): Promise<any>;
-  createAccount(): Promise<void>;
   getIndexOfAddress(address: string): Promise<number>;
   getFlowCliInfo(): Promise<FlowCliInfo>;
+}
+
+export interface IWalletService {
+  createAccount(): Promise<void>;
+  listKeyPairs(): Promise<ManagedKeyPair[]>;
 }
 
 interface IAnalyticsService {
@@ -74,6 +79,7 @@ export interface IProcessManagerService {
 type ServiceRegistry = {
   interactionsService: IInteractionService;
   flowService: IFlowService;
+  walletService: IWalletService;
   snapshotService: ISnapshotService;
   workspaceService: IWorkspaceService;
   analyticsService: IAnalyticsService;

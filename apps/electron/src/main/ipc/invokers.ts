@@ -6,6 +6,7 @@ import {
   IInteractionService,
   IProcessManagerService,
   ISnapshotService,
+  IWalletService,
   IWorkspaceService,
   SendTransactionRequest,
 } from '@onflowser/ui/src/contexts/service-registry.context';
@@ -23,7 +24,12 @@ const flow: IFlowService = {
     ipcRenderer.invoke(FlowserIpcEvent.FLOW_TRANSACTION_SEND, request),
   executeScript: (request: ExecuteScriptRequest): Promise<any> =>
     ipcRenderer.invoke(FlowserIpcEvent.FLOW_SCRIPT_EXECUTE, request),
-  createAccount: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_ACCOUNT_CREATE),
+};
+
+const wallet: IWalletService = {
+  createAccount: () =>
+    ipcRenderer.invoke(FlowserIpcEvent.WALLET_ACCOUNT_CREATE),
+  listKeyPairs: () => ipcRenderer.invoke(FlowserIpcEvent.WALLET_KEY_LIST),
 };
 
 const interactions: IInteractionService = {
@@ -87,5 +93,6 @@ export const electronInvokers = {
     getAll: (indexName: keyof BlockchainIndexes) =>
       ipcRenderer.invoke(FlowserIpcEvent.INDEX_GET_ALL, indexName),
   },
+  wallet,
   flow,
 };

@@ -100,7 +100,10 @@ export function registerHandlers() {
       event: IpcMainInvokeEvent,
       request: ExecuteScriptRequest,
     ) => flowGatewayService.executeScript(request),
-    [FlowserIpcEvent.FLOW_ACCOUNT_CREATE]: async (
+
+    [FlowserIpcEvent.WALLET_KEY_LIST]: (event: IpcMainInvokeEvent) =>
+      walletService.listKeyPairs(),
+    [FlowserIpcEvent.WALLET_ACCOUNT_CREATE]: async (
       event: IpcMainInvokeEvent,
     ) => {
       // There will be only 1 open workspace for now.

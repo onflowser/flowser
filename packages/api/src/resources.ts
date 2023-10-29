@@ -90,12 +90,17 @@ export interface FlowAccountKey extends TimestampedResource, IdentifiableResourc
   index: number;
   address: string;
   publicKey: string;
-  privateKey?: string;
   signAlgo: SignatureAlgorithm | undefined;
   hashAlgo: HashAlgorithm | undefined;
   weight: number;
   sequenceNumber: number;
   revoked: boolean;
+}
+
+export type ManagedKeyPair = {
+  address: string;
+  publicKey: string;
+  privateKey: string;
 }
 
 export interface FlowContract extends TimestampedResource, IdentifiableResource {

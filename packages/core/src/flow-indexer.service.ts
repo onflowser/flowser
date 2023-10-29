@@ -338,10 +338,7 @@ export class FlowIndexerService {
       throw new Error("Cannot find key from event")
     }
 
-    // Use `upsert` instead of `create` because a key
-    // may have already been created by wallet service.
-    // In that case we want to update everything except for the `privateKey field.
-    return this.accountKeyIndex.upsert(this.createKeyEntity({
+    return this.accountKeyIndex.create(this.createKeyEntity({
       key,
       address: account.address
     }))
@@ -393,8 +390,8 @@ export class FlowIndexerService {
     const flowAccount = await this.flowGatewayService.getAccount(address);
 
     await Promise.all([
-      // We need to use `upsert` instead of `create`,
-      // mainly because this account was possibly already created by wallet service.
+      // Use `upsert` instead of `create` because we are processing a batch
+      // of events (which may include "token balance updated" event) in parallel.
       this.accountIndex.upsert(this.createAccountEntity(flowAccount)),
       Promise.all(flowAccount.keys.map(key => this.accountKeyIndex.create(this.createKeyEntity({
         address,
@@ -564,8 +561,6 @@ export class FlowIndexerService {
       weight: key.weight,
       sequenceNumber: key.sequenceNumber,
       revoked: key.revoked,
-      // Do not include `privateKey` field here,
-      // otherwise it may override private key that was created by wallet service.
     };
   }
 
