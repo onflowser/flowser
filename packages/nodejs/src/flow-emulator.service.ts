@@ -142,7 +142,10 @@ export class FlowEmulatorService extends EventEmitter {
       flag("service-hash-algo", config.serviceHashAlgorithm),
       flag("rest-debug", config.enableRestDebug),
       flag("grpc-debug", config.enableGrpcDebug),
-      flag("persist", config.persist),
+      // Automatically enable persistence when snapshot option is used.
+      // Only required until below flow-emulator issue is resolved:
+      // https://github.com/onflow/flow-emulator/issues/490
+      flag("persist", config.persist || config.snapshot),
       flag("snapshot", config.snapshot),
       flag("dbpath", config.databasePath),
       flag("simple-addresses", config.useSimpleAddresses),
