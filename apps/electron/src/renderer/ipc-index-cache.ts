@@ -1,6 +1,8 @@
 import { IndexableResource, IResourceIndexReader } from '@onflowser/api';
 import { BlockchainIndexes } from '../services/blockchain-index.service';
 
+export const indexSyncIntervalInMs = 500;
+
 export class IpcIndexCache<Resource extends IndexableResource>
   implements IResourceIndexReader<Resource>
 {
@@ -31,7 +33,7 @@ export class IpcIndexCache<Resource extends IndexableResource>
   }
 
   syncOnInterval() {
-    setInterval(() => this.sync(), 1000);
+    setInterval(() => this.sync(), indexSyncIntervalInMs);
   }
 
   async sync() {

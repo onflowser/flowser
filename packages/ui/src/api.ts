@@ -1,4 +1,4 @@
-import useSWR, { SWRResponse } from "swr";
+import useSWR, { SWRConfiguration, SWRResponse } from "swr";
 import {
   FlowAccount,
   FlowAccountKey,
@@ -22,217 +22,164 @@ import { useEffect } from "react";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
-  return useSWR("accounts", () => accountIndex.findAll(), {
-    refreshInterval: 1000,
-  });
+  return useSWR("accounts", () => accountIndex.findAll());
 }
 
 export function useGetAccount(
-  id: string,
+  id: string
 ): SWRResponse<FlowAccount | undefined> {
   const { accountIndex } = useServiceRegistry();
-  return useSWR(`account/${id}`, () => accountIndex.findOneById(id), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`account/${id}`, () => accountIndex.findOneById(id));
 }
 
 export function useGetKeysByAccount(
-  address: string,
+  address: string
 ): SWRResponse<FlowAccountKey[]> {
   const { accountKeyIndex } = useServiceRegistry();
-  return useSWR(
-    `${address}/keys`,
-    () =>
-      accountKeyIndex
-        .findAll()
-        .then((res) => res.filter((e) => e.address === address)),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${address}/keys`, () =>
+    accountKeyIndex
+      .findAll()
+      .then((res) => res.filter((e) => e.address === address))
   );
 }
 
 export function useGetManagedKeys(): SWRResponse<ManagedKeyPair[]> {
   const { walletService } = useServiceRegistry();
-  return useSWR(`managed-keys`, () => walletService.listKeyPairs(), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`managed-keys`, () => walletService.listKeyPairs());
 }
 
 export function useGetStoragesByAccount(
-  id: string,
+  id: string
 ): SWRResponse<FlowAccountStorage[]> {
   const { accountStorageIndex } = useServiceRegistry();
-  return useSWR(
-    `${id}/storages`,
-    () =>
-      accountStorageIndex
-        .findAll()
-        .then((res) => res.filter((e) => e.address === id)),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${id}/storages`, () =>
+    accountStorageIndex
+      .findAll()
+      .then((res) => res.filter((e) => e.address === id))
   );
 }
 
 export function useGetContractsByAccount(
-  address: string,
+  address: string
 ): SWRResponse<FlowContract[]> {
   const { contractIndex } = useServiceRegistry();
-  return useSWR(
-    `${address}/contracts`,
-    () =>
-      contractIndex
-        .findAll()
-        .then((res) => res.filter((e) => e.address === address)),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${address}/contracts`, () =>
+    contractIndex
+      .findAll()
+      .then((res) => res.filter((e) => e.address === address))
   );
 }
 
 export function useGetTransactions(): SWRResponse<FlowTransaction[]> {
   const { transactionsIndex } = useServiceRegistry();
-  return useSWR(`transactions`, () => transactionsIndex.findAll(), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`transactions`, () => transactionsIndex.findAll());
 }
 
 export function useGetTransaction(
   id: string,
+  options?: SWRConfiguration
 ): SWRResponse<FlowTransaction | undefined> {
   const { transactionsIndex } = useServiceRegistry();
-  return useSWR(`transaction/${id}`, () => transactionsIndex.findOneById(id), {
-    refreshInterval: 1000,
-  });
+  return useSWR(
+    `transaction/${id}`,
+    () => transactionsIndex.findOneById(id),
+    options
+  );
 }
 
 export function useGetTransactionsByAccount(
-  address: string,
+  address: string
 ): SWRResponse<FlowTransaction[]> {
   const { transactionsIndex } = useServiceRegistry();
-  return useSWR(
-    `${address}/transactions`,
-    () =>
-      transactionsIndex
-        .findAll()
-        .then((res) =>
-          res.filter(
-            (e) =>
-              e.authorizers.includes(address) ||
-              e.payer === address ||
-              e.proposalKey.address === address,
-          ),
-        ),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${address}/transactions`, () =>
+    transactionsIndex
+      .findAll()
+      .then((res) =>
+        res.filter(
+          (e) =>
+            e.authorizers.includes(address) ||
+            e.payer === address ||
+            e.proposalKey.address === address
+        )
+      )
   );
 }
 
 export function useGetTransactionsByBlock(
-  blockId: string,
+  blockId: string
 ): SWRResponse<FlowTransaction[]> {
   const { transactionsIndex } = useServiceRegistry();
-  return useSWR(
-    `${blockId}/transactions`,
-    () =>
-      transactionsIndex
-        .findAll()
-        .then((res) => res.filter((e) => e.blockId === blockId)),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${blockId}/transactions`, () =>
+    transactionsIndex
+      .findAll()
+      .then((res) => res.filter((e) => e.blockId === blockId))
   );
 }
 
 export function useGetBlock(id: string): SWRResponse<FlowBlock | undefined> {
   const { blocksIndex } = useServiceRegistry();
 
-  return useSWR(`blocks/${id}`, () => blocksIndex.findOneById(id), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`blocks/${id}`, () => blocksIndex.findOneById(id));
 }
 
 export function useGetBlocks(): SWRResponse<FlowBlock[]> {
   const { blocksIndex } = useServiceRegistry();
 
-  return useSWR(`blocks`, () => blocksIndex.findAll(), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`blocks`, () => blocksIndex.findAll());
 }
 
 export function useGetContracts(): SWRResponse<FlowContract[]> {
   const { contractIndex } = useServiceRegistry();
 
-  return useSWR(`contracts`, () => contractIndex.findAll(), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`contracts`, () => contractIndex.findAll());
 }
 
 export function useGetContract(
-  id: string,
+  id: string
 ): SWRResponse<FlowContract | undefined> {
   const { contractIndex } = useServiceRegistry();
 
-  return useSWR(`contracts/${id}`, () => contractIndex.findOneById(id), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`contracts/${id}`, () => contractIndex.findOneById(id));
 }
 
 export function useGetEvents(): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
-  return useSWR(`events`, () => eventsIndex.findAll(), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`events`, () => eventsIndex.findAll());
 }
 
 export function useGetEventsByTransaction(
-  id: string,
+  id: string
 ): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
-  return useSWR(
-    `${id}/events`,
-    () =>
-      eventsIndex
-        .findAll()
-        .then((res) => res.filter((e) => e.transactionId === id)),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${id}/events`, () =>
+    eventsIndex
+      .findAll()
+      .then((res) => res.filter((e) => e.transactionId === id))
   );
 }
 
 export function useGetOutputsByProcess(
-  id: string,
+  id: string
 ): SWRResponse<ManagedProcessOutput[]> {
   const { processManagerService } = useServiceRegistry();
 
-  return useSWR(
-    `${id}/outputs`,
-    () => processManagerService.findAllLogsByProcessId(id),
-    {
-      refreshInterval: 1000,
-    },
+  return useSWR(`${id}/outputs`, () =>
+    processManagerService.findAllLogsByProcessId(id)
   );
 }
 
 export function useGetEvent(id: string): SWRResponse<FlowEvent | undefined> {
   const { eventsIndex } = useServiceRegistry();
 
-  return useSWR(`events/${id}`, () => eventsIndex.findOneById(id), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`events/${id}`, () => eventsIndex.findOneById(id));
 }
 
 export function useGetStateSnapshots(): SWRResponse<FlowStateSnapshot[]> {
   const { snapshotService } = useServiceRegistry();
 
-  return useSWR(`snapshots`, () => snapshotService.list(), {
-    refreshInterval: 1000,
-  });
+  return useSWR(`snapshots`, () => snapshotService.list());
 }
 
 export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
@@ -242,7 +189,7 @@ export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
 }
 
 export function useGetWorkspace(
-  id: string,
+  id: string
 ): SWRResponse<FlowserWorkspace | undefined> {
   const { workspaceService } = useServiceRegistry();
 
@@ -258,12 +205,12 @@ export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
 export function useGetAddressIndex(address: string): SWRResponse<number> {
   const { flowService } = useServiceRegistry();
   return useSWR(`account-index/${address}`, () =>
-    flowService.getIndexOfAddress(address),
+    flowService.getIndexOfAddress(address)
   );
 }
 
 export function useGetParsedInteraction(
-  request: InteractionDefinition,
+  request: InteractionDefinition
 ): SWRResponse<ParsedInteractionOrError> {
   const { interactionsService } = useServiceRegistry();
 
@@ -271,7 +218,7 @@ export function useGetParsedInteraction(
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
   const state = useSWR(`parsed-interaction/${request.id}`, () =>
-    interactionsService.parse(request.code),
+    interactionsService.parse(request.code)
   );
 
   useEffect(() => {
@@ -287,7 +234,7 @@ export function useGetInteractionTemplates(): SWRResponse<
   const { interactionsService } = useServiceRegistry();
 
   return useSWR(`interaction-templates`, () =>
-    interactionsService.getTemplates(),
+    interactionsService.getTemplates()
   );
 }
 

@@ -61,7 +61,7 @@ export class FlowIndexerService {
     private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
-    private flowInteractionsService: IFlowInteractions,
+    private flowInteractionsService: IFlowInteractions
   ) {}
 
   async processBlockchainData(): Promise<void> {
@@ -141,7 +141,7 @@ export class FlowIndexerService {
 
     try {
       blockData.transactions.map((transaction) =>
-        this.subscribeToTransactionStatusUpdates(transaction.id),
+        this.subscribeToTransactionStatusUpdates(transaction.id)
       );
     } catch (e) {
       this.logger.error("Transaction status update failed", e);
@@ -149,7 +149,7 @@ export class FlowIndexerService {
   }
 
   private async subscribeToTransactionStatusUpdates(
-    transactionId: string,
+    transactionId: string
   ): Promise<void> {
     const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
@@ -161,7 +161,7 @@ export class FlowIndexerService {
             grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
             executionStatus: newStatus.status,
           },
-        }),
+        })
       );
     try {
       await this.flowGatewayService
@@ -186,9 +186,9 @@ export class FlowIndexerService {
           transaction: transaction,
           transactionStatus: transaction.status,
         }).catch((e: any) =>
-          this.logger.error(`transaction save error: ${e.message}`, e.stack),
-        ),
-      ),
+          this.logger.error(`transaction save error: ${e.message}`, e.stack)
+        )
+      )
     );
     const eventPromises = Promise.all(
       data.events.map((flowEvent) =>
@@ -196,12 +196,12 @@ export class FlowIndexerService {
           .create(
             this.createEventEntity({
               event: flowEvent,
-            }),
+            })
           )
           .catch((e: any) =>
-            this.logger.error(`event save error: ${e.message}`, e.stack),
-          ),
-      ),
+            this.logger.error(`event save error: ${e.message}`, e.stack)
+          )
+      )
     );
 
     return Promise.all([
@@ -219,8 +219,8 @@ export class FlowIndexerService {
     const block = await this.flowGatewayService.getBlockByHeight(height);
     const collections = await Promise.all(
       block.collectionGuarantees.map(async (guarantee) =>
-        this.flowGatewayService.getCollectionById(guarantee.collectionId),
-      ),
+        this.flowGatewayService.getCollectionById(guarantee.collectionId)
+      )
     );
     const transactionIds = collections
       .map((collection) => collection.transactionIds)
@@ -228,13 +228,13 @@ export class FlowIndexerService {
 
     const transactionFutures = Promise.all(
       transactionIds.map((txId) =>
-        this.flowGatewayService.getTransactionById(txId),
-      ),
+        this.flowGatewayService.getTransactionById(txId)
+      )
     );
     const transactionStatusesFutures = Promise.all(
       transactionIds.map((txId) =>
-        this.flowGatewayService.getTransactionStatusById(txId),
-      ),
+        this.flowGatewayService.getTransactionStatusById(txId)
+      )
     );
 
     const [transactions, statuses] = await Promise.all([
@@ -253,7 +253,7 @@ export class FlowIndexerService {
           ...event,
           transactionId: tx.id,
           blockId: tx.referenceBlockId,
-        })),
+        }))
       )
       .flat();
 
@@ -276,13 +276,13 @@ export class FlowIndexerService {
           (e) => {
             this.logger.error(
               `Event handling error: ${e.message} (${JSON.stringify(
-                flowEvent,
+                flowEvent
               )})`,
-              e.stack,
+              e.stack
             );
-          },
-        ),
-      ),
+          }
+        )
+      )
     );
   }
 
@@ -336,7 +336,7 @@ export class FlowIndexerService {
   private async processAccountKeyAddedEvent(event: FlowAccountKeyEvent) {
     const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
     const account = await this.flowGatewayService.getAccount(
-      event.data.address,
+      event.data.address
     );
     const key = account.keys.find((key) => key.publicKey === publicKey);
 
@@ -348,7 +348,7 @@ export class FlowIndexerService {
       this.createKeyEntity({
         key,
         address: account.address,
-      }),
+      })
     );
   }
 
@@ -371,15 +371,15 @@ export class FlowIndexerService {
     transactionStatus: flowResource.FlowTransactionStatus;
   }) {
     const parsedInteraction = await this.flowInteractionsService.parse(
-      options.transaction.script,
+      options.transaction.script
     );
     if (parsedInteraction.error) {
       this.logger.error(
-        `Unexpected interaction parsing error: ${parsedInteraction.error}`,
+        `Unexpected interaction parsing error: ${parsedInteraction.error}`
       );
     }
     return this.transactionIndex.create(
-      this.createTransactionEntity({ ...options, parsedInteraction }),
+      this.createTransactionEntity({ ...options, parsedInteraction })
     );
   }
 
@@ -407,9 +407,9 @@ export class FlowIndexerService {
             this.createKeyEntity({
               address,
               key,
-            }),
-          ),
-        ),
+            })
+          )
+        )
       ),
       Promise.all(
         Object.keys(flowAccount.contracts).map((name) =>
@@ -419,9 +419,9 @@ export class FlowIndexerService {
               block: block,
               name,
               code: flowAccount.contracts[name],
-            }),
-          ),
-        ),
+            })
+          )
+        )
       ),
     ]);
   }
@@ -431,20 +431,21 @@ export class FlowIndexerService {
     this.logger.debug(
       `Processing storages for accounts: ${allAccounts
         .map((e) => e.address)
-        .join(", ")}`,
+        .join(", ")}`
     );
     await Promise.all(
       allAccounts.map((account: flowserResource.FlowAccount) =>
-        this.reIndexAccountStorage(account.address),
-      ),
+        this.reIndexAccountStorage(account.address)
+      )
     );
   }
 
   private async reIndexAccountStorage(address: string) {
-    const storages =
-      await this.flowStorageService.getAccountStorageItems(address);
+    const storages = await this.flowStorageService.getAccountStorageItems(
+      address
+    );
     return Promise.all(
-      storages.map((storage) => this.accountStorageIndex.upsert(storage)),
+      storages.map((storage) => this.accountStorageIndex.upsert(storage))
     );
   }
 
@@ -468,7 +469,7 @@ export class FlowIndexerService {
     await Promise.all(
       this.getAllWellKnownAddresses()
         .filter(
-          (address) => this.accountIndex.findOneById(address) !== undefined,
+          (address) => this.accountIndex.findOneById(address) !== undefined
         )
         .map((address) =>
           this.createAccount({
@@ -478,8 +479,8 @@ export class FlowIndexerService {
             // Most likely an account not found error monotonic/non-monotonic addresses.
             // Can be safely ignored.
             // TODO(restructure): Smarter handling of monotonic/non-monotonic addresses
-          }),
-        ),
+          })
+        )
     );
   }
 
@@ -513,7 +514,7 @@ export class FlowIndexerService {
   }
 
   private createAccountEntity(
-    account: flowResource.FlowAccount,
+    account: flowResource.FlowAccount
   ): OmitTimestamps<flowserResource.FlowAccount> {
     const address = ensurePrefixedAddress(account.address);
 
@@ -652,7 +653,7 @@ export class FlowIndexerService {
     // But we don't need the type info since we already have
     // our own system of representing types with `CadenceType` message.
     function fromTypeAnnotatedFclArguments(
-      object: flowResource.FlowTypeAnnotatedValue,
+      object: flowResource.FlowTypeAnnotatedValue
     ): FclValue {
       const { type, value } = object;
       // Available type values are listed here:
@@ -669,7 +670,7 @@ export class FlowIndexerService {
           // TODO(restructure): Double check this
           // @ts-ignore
           return value?.map((element: any) =>
-            fromTypeAnnotatedFclArguments(element),
+            fromTypeAnnotatedFclArguments(element)
           );
         case "Path":
         case "PublicPath":
@@ -689,7 +690,7 @@ export class FlowIndexerService {
       referenceBlockId: transaction.referenceBlockId,
       gasLimit: transaction.gasLimit,
       authorizers: transaction.authorizers.map((address) =>
-        ensurePrefixedAddress(address),
+        ensurePrefixedAddress(address)
       ),
       arguments:
         parsedInteraction.interaction?.parameters.map(
@@ -697,17 +698,17 @@ export class FlowIndexerService {
             identifier: parameter.identifier,
             type: parameter.type,
             value: fromTypeAnnotatedFclArguments(transaction.args[index]),
-          }),
+          })
         ) ?? [],
       proposalKey: {
         ...transaction.proposalKey,
         address: ensurePrefixedAddress(transaction.proposalKey.address),
       },
       envelopeSignatures: this.deserializeSignableObjects(
-        transaction.envelopeSignatures,
+        transaction.envelopeSignatures
       ),
       payloadSignatures: this.deserializeSignableObjects(
-        transaction.payloadSignatures,
+        transaction.payloadSignatures
       ),
       status: {
         errorMessage: transactionStatus.errorMessage,
@@ -724,7 +725,7 @@ export class FlowIndexerService {
   }
 
   private deserializeSignableObjects(
-    signableObjects: flowResource.FlowSignableObject[],
+    signableObjects: flowResource.FlowSignableObject[]
   ): flowserResource.SignableObject[] {
     return signableObjects.map((signable) => ({
       ...signable,

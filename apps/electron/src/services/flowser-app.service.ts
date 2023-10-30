@@ -20,6 +20,7 @@ import path from 'path';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 import { FileStorageService } from './file-storage.service';
+import { indexSyncIntervalInMs } from '../renderer/ipc-index-cache';
 
 // Root service that ties all the pieces together and orchestrates them.
 export class FlowserAppService {
@@ -46,7 +47,7 @@ export class FlowserAppService {
     this.flowGatewayService = new FlowGatewayService();
     this.logger = new WebLogger();
     this.flowAccountStorageService = new FlowAccountStorageService(
-      this.flowGatewayService,
+      this.flowGatewayService
     );
     this.goBindingsService = new GoBindingsService({
       // TODO(restructure): Test if this works on windows/linux
@@ -56,7 +57,7 @@ export class FlowserAppService {
           : process.resourcesPath,
     });
     this.flowInteractionsService = new FlowInteractionsService(
-      this.goBindingsService,
+      this.goBindingsService
     );
     this.processManagerService = new ProcessManagerService(this.logger, {
       // We are manually handling shutdown before the app closes
@@ -64,15 +65,15 @@ export class FlowserAppService {
     });
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
-      this.processManagerService,
+      this.processManagerService
     );
     this.flowSnapshotsStorageService = new FileStorageService();
     this.flowSnapshotsService = new FlowSnapshotsService(
-      this.flowSnapshotsStorageService,
+      this.flowSnapshotsStorageService
     );
     this.workspaceService = new WorkspaceService(
       this.flowEmulatorService,
-      new FileStorageService('flowser-workspaces.json'),
+      new FileStorageService('flowser-workspaces.json')
     );
     this.blockchainIndexService = new BlockchainIndexService();
     this.flowIndexerService = new FlowIndexerService(
@@ -86,18 +87,18 @@ export class FlowserAppService {
       this.blockchainIndexService.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
-      this.flowInteractionsService,
+      this.flowInteractionsService
     );
     this.flowConfigService = new FlowConfigService(this.logger);
     this.walletStorageService = new FileStorageService();
     this.walletService = new WalletService(
       this.flowCliService,
       this.flowGatewayService,
-      this.walletStorageService,
+      this.walletStorageService
     );
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
-      pollingIntervalInMs: 500,
+      pollingIntervalInMs: indexSyncIntervalInMs,
       functionToExecute: () => this.flowIndexerService.processBlockchainData(),
     });
     this.registerListeners();
@@ -122,19 +123,19 @@ export class FlowserAppService {
   private registerListeners() {
     this.workspaceService.on(
       WorkspaceEvent.WORKSPACE_OPEN,
-      this.onWorkspaceOpen.bind(this),
+      this.onWorkspaceOpen.bind(this)
     );
     this.workspaceService.on(
       WorkspaceEvent.WORKSPACE_CLOSE,
-      this.onWorkspaceClose.bind(this),
+      this.onWorkspaceClose.bind(this)
     );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT,
-      this.onRollbackToBlockHeight.bind(this),
+      this.onRollbackToBlockHeight.bind(this)
     );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.JUMP_TO,
-      this.onRollbackToBlockHeight.bind(this),
+      this.onRollbackToBlockHeight.bind(this)
     );
   }
 
@@ -166,7 +167,7 @@ export class FlowserAppService {
 
     // Separately store of each workspaces' data.
     this.flowSnapshotsStorageService.setFileName(
-      `flowser-snapshots-${workspaceId}.json`,
+      `flowser-snapshots-${workspaceId}.json`
     );
     await this.flowSnapshotsService.synchronizeIndex();
 

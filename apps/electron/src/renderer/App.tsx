@@ -17,11 +17,12 @@ import {
   FlowTransaction,
 } from '@onflowser/api';
 import { FlowserUsageRequirements } from '@onflowser/ui/src/common/misc/FlowserUsageRequirements/FlowserUsageRequirements';
-import { IpcIndexCache } from './ipc-index-cache';
-import { FlowserRouter } from './router';
-import { UpdateLoader } from './components/loaders/UpdateLoader';
-import { AnalyticsService } from '../services/analytics.service';
+import { SWRConfig } from 'swr';
 import { SentryRendererService } from '../services/sentry-renderer.service';
+import { AnalyticsService } from '../services/analytics.service';
+import { UpdateLoader } from './components/loaders/UpdateLoader';
+import { FlowserRouter } from './router';
+import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
 
 const indexes = {
   accountStorage: new IpcIndexCache<FlowAccountStorage>('accountStorage'),
@@ -64,50 +65,59 @@ export function App() {
         <UpdateLoader loadingPercentage={appUpdateDownloadPercentage} />
       )}
 
-      <ServiceRegistryProvider
-        services={{
-          walletService: window.electron.wallet,
-          flowService: window.electron.flow,
-          interactionsService: window.electron.interactions,
-          accountIndex: indexes.account,
-          accountStorageIndex: indexes.accountStorage,
-          contractIndex: indexes.contract,
-          eventsIndex: indexes.event,
-          blocksIndex: indexes.block,
-          accountKeyIndex: indexes.accountKey,
-          transactionsIndex: indexes.transaction,
-          processManagerService: window.electron.processManagerService,
-          monitoringService,
-          analyticsService,
-          workspaceService: window.electron.workspaces,
-          snapshotService: window.electron.snapshots,
+      <SWRConfig
+        value={{
+          refreshInterval: indexSyncIntervalInMs,
+          // Most of the time (e.g. when polling transaction in outcome display)
+          // we want this polling to happen with the same frequency as above.
+          errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <ConfirmDialogProvider>
-          <FilePickerProvider
-            pickDirectory={window.electron.app.showDirectoryPicker}
-          >
-            <ConsentAnalytics />
-            <FlowserUsageRequirements />
-            <FlowserRouter />
-            <Toaster
-              position="bottom-center"
-              gutter={8}
-              toastOptions={{
-                className: '',
-                style: {
-                  background: '#9BDEFA', // $blue
-                  color: '#363F53', // $table-line-background
-                  padding: '12px', // $spacing-base
-                  maxWidth: '400px',
-                  maxHeight: '200px',
-                  textOverflow: 'ellipsis',
-                },
-              }}
-            />
-          </FilePickerProvider>
-        </ConfirmDialogProvider>
-      </ServiceRegistryProvider>
+        <ServiceRegistryProvider
+          services={{
+            walletService: window.electron.wallet,
+            flowService: window.electron.flow,
+            interactionsService: window.electron.interactions,
+            accountIndex: indexes.account,
+            accountStorageIndex: indexes.accountStorage,
+            contractIndex: indexes.contract,
+            eventsIndex: indexes.event,
+            blocksIndex: indexes.block,
+            accountKeyIndex: indexes.accountKey,
+            transactionsIndex: indexes.transaction,
+            processManagerService: window.electron.processManagerService,
+            monitoringService,
+            analyticsService,
+            workspaceService: window.electron.workspaces,
+            snapshotService: window.electron.snapshots,
+          }}
+        >
+          <ConfirmDialogProvider>
+            <FilePickerProvider
+              pickDirectory={window.electron.app.showDirectoryPicker}
+            >
+              <ConsentAnalytics />
+              <FlowserUsageRequirements />
+              <FlowserRouter />
+              <Toaster
+                position="bottom-center"
+                gutter={8}
+                toastOptions={{
+                  className: '',
+                  style: {
+                    background: '#9BDEFA', // $blue
+                    color: '#363F53', // $table-line-background
+                    padding: '12px', // $spacing-base
+                    maxWidth: '400px',
+                    maxHeight: '200px',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+              />
+            </FilePickerProvider>
+          </ConfirmDialogProvider>
+        </ServiceRegistryProvider>
+      </SWRConfig>
     </>
   );
 }
