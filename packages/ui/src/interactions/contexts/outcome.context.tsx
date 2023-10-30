@@ -3,6 +3,7 @@ import React, {
   ReactElement,
   ReactNode,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { CommonUtils } from "../../utils/common-utils";
@@ -27,6 +28,10 @@ export function InteractionOutcomeManagerProvider(props: {
   const { flowService } = useServiceRegistry();
   const [outcome, setOutcome] = useState<InteractionOutcome | undefined>();
 
+  useEffect(() => {
+    setOutcome(definition.initialOutcome);
+  }, [definition]);
+
   async function execute() {
     if (!definition) {
       throw new Error("Assertion error: Expected interaction value");
@@ -46,7 +51,7 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   async function executeTransaction(
-    definition: InteractionDefinition,
+    definition: InteractionDefinition
   ): Promise<InteractionOutcome | undefined> {
     const { transactionOptions } = definition;
     if (!transactionOptions) {
@@ -60,7 +65,7 @@ export function InteractionOutcomeManagerProvider(props: {
       toast.error(
         `Unspecified authorizers: ${unspecifiedAuthorizers
           .map((e) => e.index + 1)
-          .join(", ")}`,
+          .join(", ")}`
       );
       hasErrors = true;
     }
@@ -100,7 +105,7 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   async function executeScript(
-    definition: InteractionDefinition,
+    definition: InteractionDefinition
   ): Promise<InteractionOutcome | undefined> {
     try {
       const result = await flowService.executeScript({
@@ -144,7 +149,7 @@ export function InteractionOutcomeManagerProvider(props: {
           type: parameter.type,
           identifier: parameter.identifier,
         };
-      },
+      }
     );
   }
 
