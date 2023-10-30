@@ -12,13 +12,21 @@ export class IpcIndexCache<Resource extends IndexableResource>
     this.syncOnInterval();
   }
 
-  async findOneById(id: string): Promise<Resource | undefined> {
-    return this.cachedResources.find((resource) => resource.id === id);
+  async findOneById(id: string): Promise<Resource> {
+    const resource = this.cachedResources.find((e) => e.id === id);
+
+    // Throw if not found,
+    // so that we can easily handle loading state (data=undefined) with SWR.
+    if (!resource) {
+      throw new Error('Resource not found');
+    }
+
+    return resource;
   }
 
   async findAll(): Promise<Resource[]> {
     return this.cachedResources.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
     );
   }
 

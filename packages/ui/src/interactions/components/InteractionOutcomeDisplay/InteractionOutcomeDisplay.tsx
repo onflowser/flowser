@@ -97,33 +97,26 @@ function EmptyState() {
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
   const { outcome } = props;
-  const { isLoading, data: transaction } = useGetTransaction(
-    outcome.transactionId!,
-  );
+  const { data, error } = useGetTransaction(outcome.transactionId!);
 
-  if (isLoading) {
+  if (!data) {
     return <SpinnerWithLabel label="Executing" />;
   }
 
-  if (!transaction) {
+  if (error) {
     // This happens if rollback is performed to a block before this transaction.
-    return (
-      <ErrorMessage
-        className={classes.errorWrapper}
-        error="Transaction not found"
-      />
-    );
+    return <ErrorMessage className={classes.errorWrapper} error={error} />;
   }
 
   return (
     <TransactionDetailsTabs
       // Re-mount this component when different transaction is used.
       // This is mainly to reset the initial focused tab.
-      key={transaction.id}
+      key={data.id}
       label="Transaction"
       includeOverviewTab={true}
       includeScriptTab={false}
-      transaction={transaction}
+      transaction={data}
     />
   );
 }
