@@ -133,8 +133,13 @@ export class FlowIndexerService {
     const blockData = await this.getBlockData(height);
 
     try {
-      await this.processBlockData(blockData);
-      await this.reIndexAllAccountStorage();
+      await Promise.all([
+        this.processBlockData(blockData),
+        // We don't know when account storage changed
+        // without parsing transaction source code.
+        // For now just re-index storage of all accounts.
+        this.reIndexAllAccountStorage(),
+      ]);
     } catch (e) {
       this.logger.error(`Failed to store block (#${height}) data`, e);
     }
@@ -450,8 +455,6 @@ export class FlowIndexerService {
   }
 
   private async processWellKnownAccounts() {
-    // TODO(restructure): Early exit if accounts already processed?
-
     // Afaik these well-known default accounts are
     // bootstrapped in a "meta-transaction",
     // which is hidden from the public blockchain.
