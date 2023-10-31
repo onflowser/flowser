@@ -112,7 +112,6 @@ export interface FlowContract
   id: string;
   address: string;
   name: string;
-  blockId: string;
   code: string;
   localConfig: FlowContractLocalConfig | undefined;
 }
@@ -254,7 +253,6 @@ export interface FlowEvent extends TimestampedResource {
   // ID is the combination of `transactionId` and `eventIndex`.
   id: string;
   transactionId: string;
-  blockId: string;
   eventIndex: number;
   type: string;
   transactionIndex: number;

@@ -13,26 +13,18 @@ import {
   FlowApiStatus,
   FlowGatewayService,
   FlowAccountKeyEvent,
+  FlowAccountContractEvent,
+  FlowCoreEventType,
 } from "./flow-gateway.service";
 import { ensurePrefixedAddress } from "./utils";
 import { IFlowserLogger } from "./logger";
 import { FclValue } from "./fcl-value";
 
-// See https://developers.flow.com/cadence/language/core-events
-enum FlowCoreEventType {
-  ACCOUNT_CREATED = "flow.AccountCreated",
-  ACCOUNT_KEY_ADDED = "flow.AccountKeyAdded",
-  ACCOUNT_KEY_REMOVED = "flow.AccountKeyRemoved",
-  ACCOUNT_CONTRACT_ADDED = "flow.AccountContractAdded",
-  ACCOUNT_CONTRACT_UPDATED = "flow.AccountContractUpdated",
-  ACCOUNT_CONTRACT_REMOVED = "flow.AccountContractRemoved",
-}
-
 type BlockData = {
   block: flowResource.FlowBlock;
   transactions: FlowTransactionWithStatus[];
   collections: flowResource.FlowCollection[];
-  events: ExtendedFlowEvent[];
+  events: flowResource.FlowEvent[];
 };
 
 type UnprocessedBlockInfo = {
@@ -42,11 +34,6 @@ type UnprocessedBlockInfo = {
 
 type FlowTransactionWithStatus = flowResource.FlowTransaction & {
   status: flowResource.FlowTransactionStatus;
-};
-
-export type ExtendedFlowEvent = flowResource.FlowEvent & {
-  blockId: string;
-  transactionId: string;
 };
 
 export class FlowIndexerService {
@@ -190,14 +177,21 @@ export class FlowIndexerService {
     const eventPromises = Promise.all(
       data.events.map((flowEvent) =>
         this.eventIndex
-          .create(
-            this.createEventEntity({
-              event: flowEvent,
-            })
-          )
+          .create(this.createEventEntity(flowEvent))
           .catch((e: any) =>
             this.logger.error(`event save error: ${e.message}`, e.stack)
           )
+      )
+    );
+
+    const eventProcessingPromises = Promise.all(
+      data.events.map((event) =>
+        this.processEvent(event).catch((e) => {
+          this.logger.error(
+            `Event handling error: ${e.message} (${JSON.stringify(event)})`,
+            e.stack
+          );
+        })
       )
     );
 
@@ -205,10 +199,7 @@ export class FlowIndexerService {
       blockPromise,
       transactionPromises,
       eventPromises,
-      this.processEventBatch({
-        events: data.events,
-        block: data.block,
-      }),
+      eventProcessingPromises,
     ]);
   }
 
@@ -262,32 +253,7 @@ export class FlowIndexerService {
     };
   }
 
-  private async processEventBatch(options: {
-    events: flowResource.FlowEvent[];
-    block: flowResource.FlowBlock;
-  }) {
-    const { events, block } = options;
-    await Promise.all(
-      events.map((flowEvent) =>
-        this.processSingleEvent({ event: flowEvent, block: block }).catch(
-          (e) => {
-            this.logger.error(
-              `Event handling error: ${e.message} (${JSON.stringify(
-                flowEvent
-              )})`,
-              e.stack
-            );
-          }
-        )
-      )
-    );
-  }
-
-  private async processSingleEvent(options: {
-    event: flowResource.FlowEvent;
-    block: flowResource.FlowBlock;
-  }) {
-    const { event, block } = options;
+  private async processEvent(event: flowResource.FlowEvent) {
     this.logger.debug(`Processing event: ${JSON.stringify(event)}`);
 
     const isFlowTokenWithdrawnEvent = (eventId: string) =>
@@ -298,19 +264,17 @@ export class FlowIndexerService {
     const address = ensurePrefixedAddress(event.data.address);
     switch (event.type) {
       case FlowCoreEventType.ACCOUNT_CREATED:
-        return this.createAccount({
-          address,
-          block,
-        });
+        return this.createAccount(address);
       case FlowCoreEventType.ACCOUNT_KEY_ADDED:
-        return this.processAccountKeyAddedEvent(event);
+        return this.onAccountKeyAddedEvent(event);
       case FlowCoreEventType.ACCOUNT_KEY_REMOVED:
-        return this.processAccountKeyRemovedEvent(event);
+        return this.onAccountKeyRemovedEvent(event);
       case FlowCoreEventType.ACCOUNT_CONTRACT_ADDED:
+        return this.onAccountContractAdded(event);
       case FlowCoreEventType.ACCOUNT_CONTRACT_UPDATED:
+        return this.onAccountContractUpdated(event);
       case FlowCoreEventType.ACCOUNT_CONTRACT_REMOVED:
-      // TODO: Stop re-fetching all contracts and instead use event.data.contract to get the removed/updated/added contract
-      // return this.createAccount({ address, block });
+        return this.onAccountContractRemoved(event);
     }
 
     switch (true) {
@@ -330,7 +294,46 @@ export class FlowIndexerService {
     }
   }
 
-  private async processAccountKeyAddedEvent(event: FlowAccountKeyEvent) {
+  private async onAccountContractAdded(event: FlowAccountContractEvent) {
+    const account = await this.flowGatewayService.getAccount(
+      event.data.address
+    );
+
+    await this.contractIndex.create(
+      this.createContractEntity({
+        account,
+        name: event.data.contract,
+      })
+    );
+  }
+
+  private async onAccountContractUpdated(event: FlowAccountContractEvent) {
+    const account = await this.flowGatewayService.getAccount(
+      event.data.address
+    );
+
+    await this.contractIndex.update(
+      this.createContractEntity({
+        account,
+        name: event.data.contract,
+      })
+    );
+  }
+
+  private async onAccountContractRemoved(event: FlowAccountContractEvent) {
+    const account = await this.flowGatewayService.getAccount(
+      event.data.address
+    );
+
+    await this.contractIndex.delete(
+      this.createContractEntity({
+        account,
+        name: event.data.contract,
+      })
+    );
+  }
+
+  private async onAccountKeyAddedEvent(event: FlowAccountKeyEvent) {
     const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
     const account = await this.flowGatewayService.getAccount(
       event.data.address
@@ -349,7 +352,7 @@ export class FlowIndexerService {
     );
   }
 
-  private async processAccountKeyRemovedEvent(event: FlowAccountKeyEvent) {
+  private async onAccountKeyRemovedEvent(event: FlowAccountKeyEvent) {
     const publicKey = this.decodeUint8PublicKey(event.data.publicKey.publicKey);
     const keyId = this.buildKeyId({
       address: event.data.address,
@@ -387,19 +390,15 @@ export class FlowIndexerService {
     await this.accountIndex.upsert(this.createAccountEntity(flowAccount));
   }
 
-  private async createAccount(options: {
-    address: string;
-    block: flowResource.FlowBlock;
-  }) {
-    const { address, block } = options;
-    const flowAccount = await this.flowGatewayService.getAccount(address);
+  private async createAccount(address: string) {
+    const account = await this.flowGatewayService.getAccount(address);
 
     await Promise.all([
       // Use `upsert` instead of `create` because we are processing a batch
       // of events (which may include "token balance updated" event) in parallel.
-      this.accountIndex.upsert(this.createAccountEntity(flowAccount)),
+      this.accountIndex.upsert(this.createAccountEntity(account)),
       Promise.all(
-        flowAccount.keys.map((key) =>
+        account.keys.map((key) =>
           this.accountKeyIndex.create(
             this.createKeyEntity({
               address,
@@ -409,13 +408,11 @@ export class FlowIndexerService {
         )
       ),
       Promise.all(
-        Object.keys(flowAccount.contracts).map((name) =>
+        Object.keys(account.contracts).map((name) =>
           this.contractIndex.create(
             this.createContractEntity({
-              account: flowAccount,
-              block: block,
+              account,
               name,
-              code: flowAccount.contracts[name],
             })
           )
         )
@@ -447,30 +444,13 @@ export class FlowIndexerService {
   }
 
   private async maybeProcessWellKnownAccounts() {
-    // Afaik these well-known default accounts are
-    // bootstrapped in a "meta-transaction",
-    // which is hidden from the public blockchain.
-    // See: https://github.com/onflow/flow-go/blob/master/fvm/bootstrap.go
-    const nonExistingBlock: flowResource.FlowBlock = {
-      id: "NULL",
-      blockSeals: [],
-      collectionGuarantees: [],
-      height: 0,
-      parentId: "",
-      signatures: [],
-      timestamp: 0,
-    };
-
     await Promise.all(
       this.getAllWellKnownAddresses()
         .filter(
           (address) => this.accountIndex.findOneById(address) !== undefined
         )
         .map((address) =>
-          this.createAccount({
-            address,
-            block: nonExistingBlock,
-          }).catch((error) => {
+          this.createAccount(address).catch((error) => {
             // Most likely an account not found error monotonic/non-monotonic addresses.
             // Can be safely ignored.
             // TODO(restructure): Smarter handling of monotonic/non-monotonic addresses
@@ -584,16 +564,14 @@ export class FlowIndexerService {
     return `${accountAddress}.${options.publicKey}`;
   }
 
-  private createEventEntity(options: {
-    event: ExtendedFlowEvent;
-  }): OmitTimestamps<flowserResource.FlowEvent> {
-    const { event } = options;
+  private createEventEntity(
+    event: flowResource.FlowEvent
+  ): OmitTimestamps<flowserResource.FlowEvent> {
     return {
       id: `${event.transactionId}.${event.eventIndex}`,
       type: event.type,
       transactionIndex: event.transactionIndex,
       transactionId: event.transactionId,
-      blockId: event.blockId,
       eventIndex: event.eventIndex,
       data: event.data,
     };
@@ -618,20 +596,17 @@ export class FlowIndexerService {
   }
 
   private createContractEntity(options: {
-    block: flowResource.FlowBlock;
     account: flowResource.FlowAccount;
     name: string;
-    code: string;
   }): OmitTimestamps<flowserResource.FlowContract> {
-    const { account, block, name, code } = options;
+    const { account, name } = options;
     return {
       id: `${account.address}.${name}`,
-      blockId: block.id,
       address: ensurePrefixedAddress(account.address),
       // TODO(restructure): Populate local config if applicable
       localConfig: undefined,
       name: name,
-      code: code,
+      code: account.contracts[name],
     };
   }
 

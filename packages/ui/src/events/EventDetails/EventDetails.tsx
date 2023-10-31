@@ -52,16 +52,6 @@ export const EventDetails: FunctionComponent<EventDetailsProps> = (props) => {
       ),
     },
     {
-      label: "Block",
-      value: (
-        <Value>
-          <ProjectLink to={`/blocks/${event.blockId}`}>
-            <MiddleEllipsis>{event.blockId}</MiddleEllipsis>
-          </ProjectLink>
-        </Value>
-      ),
-    },
-    {
       label: "Transaction",
       value: (
         <Value>
