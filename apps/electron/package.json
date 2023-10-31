@@ -36,7 +36,8 @@
   ],
   "main": "./src/main/main.ts",
   "scripts": {
-    "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
+    "generate-icons": "../../node_modules/.bin/electron-icon-maker --input=./assets/icon.png --output=./generated-icons",
+    "build": "npm run generate-icons && concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:dll": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
@@ -102,6 +103,7 @@
     "@fingerprintjs/fingerprintjs": "^4.1.0",
     "@sentry/electron": "^4.13.0",
     "electron-debug": "^3.2.0",
+    "electron-icon-maker": "^0.0.5",
     "electron-log": "^4.4.8",
     "electron-updater": "^6.1.4",
     "mixpanel-browser": "^2.47.0",

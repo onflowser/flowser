@@ -45,7 +45,7 @@ export class FlowserAppService {
 
   constructor() {
     this.flowGatewayService = new FlowGatewayService();
-    this.logger = new WebLogger();
+    this.logger = new ElectronLogger();
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService
     );
@@ -193,7 +193,7 @@ export class FlowserAppService {
   }
 }
 
-class WebLogger implements IFlowserLogger {
+class ElectronLogger implements IFlowserLogger {
   debug(message: any): void {
     console.debug(message);
   }
