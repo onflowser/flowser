@@ -49,11 +49,15 @@ export class FlowSnapshotsService extends EventEmitter {
       throw new Error("Failed creating snapshot");
     }
 
-    await this.persistSingle({
-      id: name,
-      blockId: response.data.blockId,
-      blockHeight: response.data.height,
-    });
+    const existing = await this.findAllPersisted();
+    await this.persistAll([
+      ...existing,
+      {
+        id: name,
+        blockId: response.data.blockId,
+        blockHeight: response.data.height,
+      },
+    ]);
 
     return response.data;
   }
@@ -103,8 +107,8 @@ export class FlowSnapshotsService extends EventEmitter {
     // Ensure we exclude the ones that were deleted without using Flowser.
     await this.persistAll(
       persistedSnapshots.filter((snapshot) =>
-        validSnapshotIdLookup.has(snapshot.id),
-      ),
+        validSnapshotIdLookup.has(snapshot.id)
+      )
     );
   }
 
@@ -135,12 +139,6 @@ export class FlowSnapshotsService extends EventEmitter {
   private async findAllPersisted(): Promise<FlowStateSnapshot[]> {
     const rawValue = await this.storage.read();
     return JSON.parse(rawValue ?? "[]");
-  }
-
-  private async persistSingle(snapshot: FlowStateSnapshot) {
-    const existing = await this.findAllPersisted();
-    // TODO(restructure): Do we need to do some kind of deduplication?
-    await this.persistAll([...existing, snapshot]);
   }
 
   private async persistAll(snapshots: FlowStateSnapshot[]) {

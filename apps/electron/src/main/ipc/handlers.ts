@@ -83,7 +83,6 @@ export function registerHandlers(appService: FlowserAppService) {
       event: IpcMainInvokeEvent
     ) => {
       // There will be only 1 open workspace for now.
-      // TODO(restructure): Handle this differently
       const openWorkspaces = await workspaceService.getOpenWorkspaces();
       return flowInteractionsService.getTemplates({
         workspacePath: openWorkspaces[0].filesystemPath,
@@ -115,7 +114,6 @@ export function registerHandlers(appService: FlowserAppService) {
       event: IpcMainInvokeEvent
     ) => {
       // There will be only 1 open workspace for now.
-      // TODO(restructure): Handle this differently
       const openWorkspaces = await workspaceService.getOpenWorkspaces();
       return walletService.createAccount({
         workspacePath: openWorkspaces[0].filesystemPath,

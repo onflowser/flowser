@@ -36,7 +36,7 @@ export type ManagedKeyPair = {
   privateKey: string;
 };
 
-// TODO(restructure): Should we import existing accounts from flow.json?
+// TODO(restructure-followup): Should we import existing accounts from flow.json?
 export class WalletService {
   constructor(
     private readonly cliService: FlowCliService,

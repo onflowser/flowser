@@ -453,7 +453,6 @@ export class FlowIndexerService {
           this.createAccount(address).catch((error) => {
             // Most likely an account not found error monotonic/non-monotonic addresses.
             // Can be safely ignored.
-            // TODO(restructure): Smarter handling of monotonic/non-monotonic addresses
           })
         )
     );
@@ -604,6 +603,7 @@ export class FlowIndexerService {
       id: `${account.address}.${name}`,
       address: ensurePrefixedAddress(account.address),
       // TODO(restructure): Populate local config if applicable
+      //  Or even better, create a separate "workspace contracts" API and remove this field.
       localConfig: undefined,
       name: name,
       code: account.contracts[name],

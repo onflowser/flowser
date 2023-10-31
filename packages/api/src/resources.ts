@@ -121,7 +121,7 @@ export interface FlowContractLocalConfig {
   absolutePath: string;
 }
 
-// TODO(restructure): Refactor FlowAccountStorage
+// TODO(restructure-followup): Refactor FlowAccountStorage
 export interface FlowAccountCapability {
   address: string;
   path: string;

@@ -12,7 +12,7 @@ interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
-// TODO(restructure): Add option to open a file/project from menu
+// TODO(restructure-followup): Add option to open a file/project from menu
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
   private appUpdateService: AppUpdateService;

@@ -10,7 +10,6 @@ export class IpcIndexCache<Resource extends IndexableResource>
 
   constructor(private readonly indexName: keyof BlockchainIndexes) {
     this.cachedResources = [];
-    // TODO(restructure): Maybe manually handle this from react app instead
     this.syncOnInterval();
   }
 
