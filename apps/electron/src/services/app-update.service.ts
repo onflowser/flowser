@@ -1,5 +1,6 @@
 import { autoUpdater } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
+import { FlowserIpcEvent } from '../main/ipc/events';
 
 export type RegisterListenersOptions = {
   silent?: boolean;
@@ -27,7 +28,7 @@ export class AppUpdateService {
       console.log(
         `Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`
       );
-      webContents?.send('update-download-progress', progress.percent);
+      webContents?.send(FlowserIpcEvent.APP_UPDATE_PROGRESS, progress.percent);
     });
 
     autoUpdater.once('update-available', () => {
@@ -40,7 +41,7 @@ export class AppUpdateService {
         })
         .then((buttonIndex) => {
           if (buttonIndex.response === 0) {
-            webContents?.send('update-download-start');
+            webContents?.send(FlowserIpcEvent.APP_UPDATE_START);
             autoUpdater.downloadUpdate();
           }
         });
@@ -56,7 +57,7 @@ export class AppUpdateService {
     });
 
     autoUpdater.once('update-downloaded', () => {
-      webContents?.send('update-download-end');
+      webContents?.send(FlowserIpcEvent.APP_UPDATE_END);
       dialog
         .showMessageBox({
           title: 'Install Updates',

@@ -13,10 +13,12 @@ import { app, BrowserWindow, dialog, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import crypto from 'crypto';
+import { IFlowserLogger } from '@onflowser/core';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { registerHandlers } from './ipc/handlers';
 import { FlowserAppService } from '../services/flowser-app.service';
+import { FlowserIpcEvent } from './ipc/events';
 
 class AppUpdater {
   constructor() {
@@ -26,7 +28,8 @@ class AppUpdater {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | undefined;
+let appService: FlowserAppService | undefined;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -48,7 +51,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload,
+      forceDownload
     )
     .catch(console.log);
 };
@@ -92,7 +95,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
+    mainWindow = undefined;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -108,14 +111,50 @@ const createWindow = async () => {
   // eslint-disable-next-line
   new AppUpdater();
 
-  registerHandlers();
+  appService = new FlowserAppService(new ElectronLogger());
 
-  await maybeOpenTemporaryWorkspace(mainWindow);
+  registerHandlers(appService);
+
+  await maybeOpenTemporaryWorkspace(appService, mainWindow);
 };
 
-const maybeOpenTemporaryWorkspace = async (window: BrowserWindow) => {
+class ElectronLogger implements IFlowserLogger {
+  debug(message: any): void {
+    console.debug(message);
+    this.logToBrowserConsole(message, 'debug');
+  }
+
+  error(message: any, error?: unknown): void {
+    console.error(message, error);
+    this.logToBrowserConsole(message, 'error');
+  }
+
+  log(message: any): void {
+    console.log(message);
+    this.logToBrowserConsole(message, 'log');
+  }
+
+  verbose(message: any): void {
+    console.debug(message);
+    this.logToBrowserConsole(message, 'verbose');
+  }
+
+  warn(message: any): void {
+    console.warn(message);
+    this.logToBrowserConsole(message, 'warn');
+  }
+
+  private logToBrowserConsole(message: string, level: string) {
+    mainWindow?.webContents?.send(FlowserIpcEvent.APP_LOG, message, level);
+  }
+}
+
+const maybeOpenTemporaryWorkspace = async (
+  appService: FlowserAppService,
+  window: BrowserWindow
+) => {
   try {
-    const { workspaceService } = FlowserAppService.create();
+    const { workspaceService } = appService;
     const { hasSwitch, getSwitchValue } = app.commandLine;
 
     // This flag must stay unchanged, since Flow CLI depends on it.
@@ -187,11 +226,13 @@ app
   .catch(console.log);
 
 app.on('before-quit', async (e) => {
-  const flowserAppService = FlowserAppService.create();
+  if (!appService) {
+    throw new Error('App service instance not found');
+  }
 
   // After we call app.quit(), before-quit is fired once more,
   // so we need to exit early if the cleanup already completed to avoid infinite recursion.
-  if (flowserAppService.isCleanupComplete()) {
+  if (appService.isCleanupComplete()) {
     return;
   }
 
@@ -203,10 +244,10 @@ app.on('before-quit', async (e) => {
     // If we trigger any method on destroyed window, electron throws an error.
     if (!mainWindow?.isDestroyed()) {
       // Notify renderer process
-      mainWindow?.webContents.send('exit');
+      mainWindow?.webContents.send(FlowserIpcEvent.APP_EXIT);
     }
 
-    await flowserAppService.cleanup();
+    await appService.cleanup();
   } catch (error: unknown) {
     await dialog.showMessageBox({
       message: `Couldn't shutdown successfully: ${String(error)}`,

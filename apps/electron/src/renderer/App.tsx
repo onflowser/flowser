@@ -43,6 +43,11 @@ export function App() {
     useState(0);
   const isUpdating = ![0, 100].includes(appUpdateDownloadPercentage);
 
+  window.electron.app.handleLog((log, level) => {
+    // @ts-ignore Ignore `level` cannot be used to index `console`.
+    console[level]?.(log);
+  });
+
   window.electron.app.handleExit(() => {
     setIsExiting(true);
   });

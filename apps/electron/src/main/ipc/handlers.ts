@@ -13,7 +13,7 @@ type EventListener = (
   ...args: any[]
 ) => Promise<any> | any;
 
-export function registerHandlers() {
+export function registerHandlers(appService: FlowserAppService) {
   const {
     workspaceService,
     blockchainIndexService,
@@ -24,7 +24,7 @@ export function registerHandlers() {
     walletService,
     flowSnapshotsService,
     processManagerService,
-  } = FlowserAppService.create();
+  } = appService;
 
   async function showDirectoryPicker() {
     const result = await dialog.showOpenDialog({
@@ -37,6 +37,14 @@ export function registerHandlers() {
   }
 
   const handlers: Record<FlowserIpcEvent, EventListener> = {
+    // These are invoked from main process and handled in renderer,
+    // so we don't need to implement the invoking logic here.
+    APP_EXIT(): any {},
+    APP_LOG(): any {},
+    APP_UPDATE_END(): any {},
+    APP_UPDATE_PROGRESS(): any {},
+    APP_UPDATE_START(): any {},
+
     [FlowserIpcEvent.APP_DIRECTORY_PICKER_SHOW]: (e: IpcMainInvokeEvent) =>
       showDirectoryPicker(),
 
@@ -46,16 +54,16 @@ export function registerHandlers() {
       workspaceService.open(id),
     [FlowserIpcEvent.WORKSPACES_CREATE]: (
       e: IpcMainInvokeEvent,
-      createdWorkspace: FlowserWorkspace,
+      createdWorkspace: FlowserWorkspace
     ) => workspaceService.create(createdWorkspace),
     [FlowserIpcEvent.WORKSPACES_UPDATE]: (
       e: IpcMainInvokeEvent,
-      updatedWorkspace: FlowserWorkspace,
+      updatedWorkspace: FlowserWorkspace
     ) => workspaceService.update(updatedWorkspace),
     [FlowserIpcEvent.WORKSPACES_LIST]: () => workspaceService.findAll(),
     [FlowserIpcEvent.WORKSPACES_FIND_BY_ID]: (
       e: IpcMainInvokeEvent,
-      id: string,
+      id: string
     ) => workspaceService.findById(id),
     [FlowserIpcEvent.WORKSPACES_REMOVE]: (e: IpcMainInvokeEvent, id: string) =>
       workspaceService.remove(id),
@@ -64,15 +72,15 @@ export function registerHandlers() {
 
     [FlowserIpcEvent.INDEX_GET_ALL]: (
       event: IpcMainInvokeEvent,
-      indexName: keyof BlockchainIndexes,
+      indexName: keyof BlockchainIndexes
     ) => blockchainIndexService.indexes[indexName].findAll(),
 
     [FlowserIpcEvent.INTERACTIONS_PARSE]: (
       event: IpcMainInvokeEvent,
-      sourceCode: string,
+      sourceCode: string
     ) => flowInteractionsService.parse(sourceCode),
     [FlowserIpcEvent.INTERACTIONS_LIST_TEMPLATES]: async (
-      event: IpcMainInvokeEvent,
+      event: IpcMainInvokeEvent
     ) => {
       // There will be only 1 open workspace for now.
       // TODO(restructure): Handle this differently
@@ -84,7 +92,7 @@ export function registerHandlers() {
 
     [FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX]: (
       event: IpcMainInvokeEvent,
-      address: string,
+      address: string
     ) =>
       goBindingsService.getIndexOfAddress({
         hexAddress: address,
@@ -94,17 +102,17 @@ export function registerHandlers() {
       flowCliService.getVersion(),
     [FlowserIpcEvent.FLOW_TRANSACTION_SEND]: (
       event: IpcMainInvokeEvent,
-      request: SendTransactionRequest,
+      request: SendTransactionRequest
     ) => walletService.sendTransaction(request),
     [FlowserIpcEvent.FLOW_SCRIPT_EXECUTE]: (
       event: IpcMainInvokeEvent,
-      request: ExecuteScriptRequest,
+      request: ExecuteScriptRequest
     ) => flowGatewayService.executeScript(request),
 
     [FlowserIpcEvent.WALLET_KEY_LIST]: (event: IpcMainInvokeEvent) =>
       walletService.listKeyPairs(),
     [FlowserIpcEvent.WALLET_ACCOUNT_CREATE]: async (
-      event: IpcMainInvokeEvent,
+      event: IpcMainInvokeEvent
     ) => {
       // There will be only 1 open workspace for now.
       // TODO(restructure): Handle this differently
@@ -118,20 +126,20 @@ export function registerHandlers() {
       flowSnapshotsService.findAll(),
     [FlowserIpcEvent.SNAPSHOTS_CREATE]: (
       event: IpcMainInvokeEvent,
-      name: string,
+      name: string
     ) => flowSnapshotsService.create(name),
     [FlowserIpcEvent.SNAPSHOTS_JUMP_TO]: (
       event: IpcMainInvokeEvent,
-      id: string,
+      id: string
     ) => flowSnapshotsService.jumpTo(id),
     [FlowserIpcEvent.SNAPSHOTS_ROLLBACK_TO_HEIGHT]: (
       event: IpcMainInvokeEvent,
-      height: number,
+      height: number
     ) => flowSnapshotsService.rollbackToHeight(height),
 
     [FlowserIpcEvent.PROCESS_LOGS_LIST]: (
       event: IpcMainInvokeEvent,
-      processId: string,
+      processId: string
     ) => processManagerService.findAllLogsByProcess(processId),
   };
 

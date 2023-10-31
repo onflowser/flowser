@@ -35,7 +35,6 @@ export class FlowserAppService {
   public readonly flowInteractionsService: FlowInteractionsService;
   public readonly flowCliService: FlowCliService;
   public readonly walletService: WalletService;
-  public readonly logger: IFlowserLogger;
   public readonly blockchainIndexService: BlockchainIndexService;
   public readonly flowSnapshotsService: FlowSnapshotsService;
   public readonly flowConfigService: FlowConfigService;
@@ -43,9 +42,8 @@ export class FlowserAppService {
   private readonly walletStorageService: FileStorageService;
   private processingScheduler: AsyncIntervalScheduler;
 
-  constructor() {
+  constructor(private readonly logger: IFlowserLogger) {
     this.flowGatewayService = new FlowGatewayService();
-    this.logger = new ElectronLogger();
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService
     );
@@ -102,13 +100,6 @@ export class FlowserAppService {
       functionToExecute: () => this.flowIndexerService.processBlockchainData(),
     });
     this.registerListeners();
-  }
-
-  static create(): FlowserAppService {
-    if (!this.instance) {
-      this.instance = new FlowserAppService();
-    }
-    return this.instance;
   }
 
   public isCleanupComplete(): boolean {
@@ -190,27 +181,5 @@ export class FlowserAppService {
     await this.flowEmulatorService.stopAndCleanup();
     this.blockchainIndexService.clear();
     this.processingScheduler.stop();
-  }
-}
-
-class ElectronLogger implements IFlowserLogger {
-  debug(message: any): void {
-    console.debug(message);
-  }
-
-  error(message: any, error?: unknown): void {
-    console.error(message, error);
-  }
-
-  log(message: any): void {
-    console.log(message);
-  }
-
-  verbose(message: any): void {
-    console.debug(message);
-  }
-
-  warn(message: any): void {
-    console.warn(message);
   }
 }
