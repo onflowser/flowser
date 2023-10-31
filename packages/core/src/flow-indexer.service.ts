@@ -66,29 +66,21 @@ export class FlowIndexerService {
 
   async processBlockchainData(): Promise<void> {
     const gatewayStatus = await this.flowGatewayService.getApiStatus();
+
     if (gatewayStatus !== FlowApiStatus.SERVICE_STATUS_ONLINE) {
       this.logger.debug("Gateway offline, pausing processing.");
       return;
     }
 
-    const [unprocessedBlockInfo] = await Promise.all([
+    const [unprocessedBlocksInfo] = await Promise.all([
       this.getUnprocessedBlocksInfo(),
-      this.processWellKnownAccounts(),
+      this.maybeProcessWellKnownAccounts(),
     ]);
-
-    const { nextBlockHeightToProcess, latestUnprocessedBlockHeight } =
-      unprocessedBlockInfo;
-    const hasBlocksToProcess =
-      nextBlockHeightToProcess <= latestUnprocessedBlockHeight;
-
-    if (!hasBlocksToProcess) {
-      return;
-    }
 
     try {
       for (
-        let height = nextBlockHeightToProcess;
-        height <= latestUnprocessedBlockHeight;
+        let height = unprocessedBlocksInfo.nextBlockHeightToProcess;
+        height <= unprocessedBlocksInfo.latestUnprocessedBlockHeight;
         height++
       ) {
         this.logger.debug(`Processing block: ${height}`);
@@ -103,11 +95,11 @@ export class FlowIndexerService {
   }
 
   private async getUnprocessedBlocksInfo(): Promise<UnprocessedBlockInfo> {
-    const [allBlocks, latestBlock] = await Promise.all([
+    const [indexedBlocks, latestBlock] = await Promise.all([
       this.blockIndex.findAll(),
       this.flowGatewayService.getLatestBlock(),
     ]);
-    const lastIndexedBlock = this.findLatestBlock(allBlocks);
+    const lastIndexedBlock = this.findLatestBlock(indexedBlocks);
     const nextBlockHeightToProcess = lastIndexedBlock
       ? lastIndexedBlock.blockHeight + 1
       : 0;
@@ -454,7 +446,7 @@ export class FlowIndexerService {
     );
   }
 
-  private async processWellKnownAccounts() {
+  private async maybeProcessWellKnownAccounts() {
     // Afaik these well-known default accounts are
     // bootstrapped in a "meta-transaction",
     // which is hidden from the public blockchain.
