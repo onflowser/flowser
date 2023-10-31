@@ -13,11 +13,15 @@ import { app, BrowserWindow, dialog, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { IFlowserLogger } from '@onflowser/core';
+import fixPath from 'fix-path';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { registerHandlers } from './ipc/handlers';
 import { FlowserAppService } from '../services/flowser-app.service';
 import { FlowserIpcEvent } from './ipc/events';
+
+// https://github.com/electron/electron-packager/issues/603
+fixPath();
 
 class AppUpdater {
   constructor() {

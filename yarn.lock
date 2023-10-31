@@ -2186,6 +2186,7 @@
     "@fingerprintjs/fingerprintjs" "^4.1.0"
     "@sentry/electron" "^4.13.0"
     electron-debug "^3.2.0"
+    electron-icon-maker "^0.0.5"
     electron-log "^4.4.8"
     electron-updater "^6.1.4"
     mixpanel-browser "^2.47.0"
@@ -5135,6 +5136,11 @@ default-gateway@^6.0.3:
   dependencies:
     execa "^5.0.0"
 
+default-shell@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/default-shell/-/default-shell-2.2.0.tgz"
+  integrity sha512-sPpMZcVhRQ0nEMDtuMJ+RtCxt7iHPAMBU+I4tAlo5dU1sjRpNax0crj6nR3qKpvVnckaQ9U38enXcwW9nZJeCw==
+
 defaults@^1.0.3:
   version "1.0.4"
   resolved "https://registry.npmjs.org/defaults/-/defaults-1.0.4.tgz"
@@ -6492,6 +6498,13 @@ find-up@^5.0.0:
   dependencies:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
+
+fix-path@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/fix-path/-/fix-path-4.0.0.tgz"
+  integrity sha512-g31GX207Tt+psI53ZSaB1egprYbEN0ZYl90aKcO22A2LmCNnFsSq3b5YpoKp3E/QEiWByTXGJOkFQG4S07Bc1A==
+  dependencies:
+    shell-path "^3.0.0"
 
 flat-cache@^3.0.4:
   version "3.1.0"
@@ -11064,6 +11077,22 @@ shebang-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
+
+shell-env@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/shell-env/-/shell-env-4.0.1.tgz"
+  integrity sha512-w3oeZ9qg/P6Lu6qqwavvMnB/bwfsz67gPB3WXmLd/n6zuh7TWQZtGa3iMEdmua0kj8rivkwl+vUjgLWlqZOMPw==
+  dependencies:
+    default-shell "^2.0.0"
+    execa "^5.1.1"
+    strip-ansi "^7.0.1"
+
+shell-path@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/shell-path/-/shell-path-3.0.0.tgz"
+  integrity sha512-HNIZ+W/3P0JuVTV03xjGqYKt3e3h0/Z4AH8TQWeth1LBtCusSjICgkdNdb3VZr6mI7ijE2AiFFpgkVMNKsALeQ==
+  dependencies:
+    shell-env "^4.0.0"
 
 shell-quote@^1.8.1:
   version "1.8.1"
