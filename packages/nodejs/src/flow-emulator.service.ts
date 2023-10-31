@@ -9,10 +9,6 @@ import {
 } from "@onflowser/api";
 import { ProcessManagerService } from "./processes/process-manager.service";
 
-export enum FlowEmulatorEvent {
-  APIS_STARTED = "APIS_STARTED",
-}
-
 type StartEmulatorRequest = {
   workspacePath: string;
   config: FlowEmulatorConfig;
@@ -47,8 +43,6 @@ export class FlowEmulatorService extends EventEmitter {
 
     // Resolves if APIs started or throws an error otherwise
     await Promise.race([this.waitUntilApisStarted(), this.throwIfErrored()]);
-
-    this.emit(FlowEmulatorEvent.APIS_STARTED);
   }
 
   public getDefaultConfig(): FlowEmulatorConfig {
@@ -90,7 +84,7 @@ export class FlowEmulatorService extends EventEmitter {
       return this.process.output.some(
         (output) =>
           output.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT &&
-          output.data.includes("Started"),
+          output.data.includes("Started")
       );
     };
     while (!hasStarted()) {
@@ -106,7 +100,7 @@ export class FlowEmulatorService extends EventEmitter {
       return this.process.output.find(
         (output) =>
           output.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR &&
-          output.data !== "",
+          output.data !== ""
       );
     };
     let retries = 5;

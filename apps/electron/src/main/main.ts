@@ -12,7 +12,6 @@ import path from 'path';
 import { app, BrowserWindow, dialog, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import crypto from 'crypto';
 import { IFlowserLogger } from '@onflowser/core';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -111,11 +110,11 @@ const createWindow = async () => {
   // eslint-disable-next-line
   new AppUpdater();
 
-  appService = new FlowserAppService(new ElectronLogger());
+  appService = new FlowserAppService(new ElectronLogger(), mainWindow);
 
   registerHandlers(appService);
 
-  await maybeOpenTemporaryWorkspace(appService, mainWindow);
+  await appService.openTemporaryWorkspace();
 };
 
 class ElectronLogger implements IFlowserLogger {
@@ -148,58 +147,6 @@ class ElectronLogger implements IFlowserLogger {
     mainWindow?.webContents?.send(FlowserIpcEvent.APP_LOG, message, level);
   }
 }
-
-const maybeOpenTemporaryWorkspace = async (
-  appService: FlowserAppService,
-  window: BrowserWindow
-) => {
-  try {
-    const { workspaceService } = appService;
-    const { hasSwitch, getSwitchValue } = app.commandLine;
-
-    // This flag must stay unchanged, since Flow CLI depends on it.
-    const workspacePathFlag = 'project-path';
-
-    const shouldOpenWorkspace = hasSwitch(workspacePathFlag);
-
-    if (shouldOpenWorkspace) {
-      const filesystemPath = getSwitchValue(workspacePathFlag);
-      const parsedPath = path.parse(filesystemPath);
-      const id = crypto
-        .createHash('sha256')
-        .update(path.normalize(filesystemPath))
-        .digest()
-        .toString('base64url');
-
-      await workspaceService.createTemporary({
-        id,
-        name: parsedPath.name,
-        filesystemPath,
-        emulator: undefined,
-        gateway: undefined,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      await workspaceService.open(id);
-
-      // Our react-router instance is configured to use hash-based navigation:
-      // https://reactrouter.com/en/main/routers/create-hash-router.
-      await window.loadURL(`${resolveHtmlPath('index.html')}#/projects/${id}`);
-    }
-  } catch (e: unknown) {
-    const result = await dialog.showMessageBox(window, {
-      message: `Failed to start project`,
-      detail: isErrorWithMessage(e) ? e.message : undefined,
-      type: 'error',
-      buttons: ['Quit'],
-    });
-    const quitClicked = result.response === 0;
-    if (quitClicked) {
-      app.exit(1);
-    }
-  }
-};
 
 /**
  * Add event listeners...
@@ -257,9 +204,3 @@ app.on('before-quit', async (e) => {
     app.quit();
   }
 });
-
-type ErrorWithMessage = { message: string };
-
-function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
-  return typeof error === 'object' && error !== null && 'message' in error;
-}

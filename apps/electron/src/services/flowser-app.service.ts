@@ -17,10 +17,14 @@ import {
   WalletService,
 } from '@onflowser/nodejs';
 import path from 'path';
+import crypto from 'crypto';
+import { app, BrowserWindow, dialog } from 'electron';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 import { FileStorageService } from './file-storage.service';
 import { indexSyncIntervalInMs } from '../renderer/ipc-index-cache';
+import { isErrorWithMessage } from '../utils';
+import { resolveHtmlPath } from '../main/util';
 
 // Root service that ties all the pieces together and orchestrates them.
 export class FlowserAppService {
@@ -42,7 +46,10 @@ export class FlowserAppService {
   private readonly walletStorageService: FileStorageService;
   private processingScheduler: AsyncIntervalScheduler;
 
-  constructor(private readonly logger: IFlowserLogger) {
+  constructor(
+    private readonly logger: IFlowserLogger,
+    private readonly window: BrowserWindow
+  ) {
     this.flowGatewayService = new FlowGatewayService();
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService
@@ -111,23 +118,97 @@ export class FlowserAppService {
     await this.processManagerService.stopAll();
   }
 
+  public async openTemporaryWorkspace(): Promise<void> {
+    const { hasSwitch, getSwitchValue } = app.commandLine;
+
+    // This flag must stay unchanged, since Flow CLI depends on it.
+    const workspacePathFlag = 'project-path';
+
+    const shouldOpenWorkspace = hasSwitch(workspacePathFlag);
+
+    if (shouldOpenWorkspace) {
+      const filesystemPath = getSwitchValue(workspacePathFlag);
+      const parsedPath = path.parse(filesystemPath);
+      // We need to use URL friendly format,
+      // since workspace IDs are used in URLs as parameters.
+      const id = crypto
+        .createHash('sha256')
+        .update(path.normalize(filesystemPath))
+        .digest()
+        .toString('base64url');
+
+      await this.workspaceService.createTemporary({
+        id,
+        name: parsedPath.name,
+        filesystemPath,
+        emulator: undefined,
+        gateway: undefined,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      await this.workspaceService.open(id);
+
+      // Our react-router instance is configured to use hash-based navigation:
+      // https://reactrouter.com/en/main/routers/create-hash-router.
+      await this.window.loadURL(
+        `${resolveHtmlPath('index.html')}#/projects/${id}`
+      );
+    }
+  }
+
   private registerListeners() {
     this.workspaceService.on(
       WorkspaceEvent.WORKSPACE_OPEN,
-      this.onWorkspaceOpen.bind(this)
+      this.handleListenerError(
+        this.onWorkspaceOpen.bind(this),
+        'Failed to open workspace'
+      ).bind(this)
     );
     this.workspaceService.on(
       WorkspaceEvent.WORKSPACE_CLOSE,
-      this.onWorkspaceClose.bind(this)
+      this.handleListenerError(
+        this.onWorkspaceClose.bind(this),
+        'Failed to close workspace'
+      ).bind(this)
     );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT,
-      this.onRollbackToBlockHeight.bind(this)
+      this.handleListenerError(
+        this.onRollbackToBlockHeight.bind(this),
+        'Failed to rollback to height'
+      ).bind(this)
     );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.JUMP_TO,
-      this.onRollbackToBlockHeight.bind(this)
+      this.handleListenerError(
+        this.onRollbackToBlockHeight.bind(this),
+        'Failed to jump to snapshot'
+      ).bind(this)
     );
+  }
+
+  private handleListenerError(
+    listener: (...args: any[]) => Promise<void>,
+    errorMessage: string
+  ) {
+    return async (...args: unknown[]) => {
+      try {
+        await listener(...args);
+      } catch (error) {
+        const result = await dialog.showMessageBox(this.window, {
+          message: errorMessage,
+          detail: isErrorWithMessage(error) ? error.message : undefined,
+          type: 'error',
+          buttons: ['Restart app'],
+        });
+        const quitClicked = result.response === 0;
+        if (quitClicked) {
+          app.relaunch();
+          app.quit();
+        }
+      }
+    };
   }
 
   private async onRollbackToBlockHeight() {
