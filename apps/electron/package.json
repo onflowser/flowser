@@ -106,7 +106,7 @@
     "electron-icon-maker": "^0.0.5",
     "electron-log": "^4.4.8",
     "electron-updater": "^6.1.4",
-    "fix-path": "^4.0.0",
+    "fix-path": "3.0.0",
     "mixpanel-browser": "^2.47.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
