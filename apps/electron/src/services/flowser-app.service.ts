@@ -224,8 +224,10 @@ export class FlowserAppService {
     });
 
     this.flowGatewayService.configure({
-      restServerAddress: 'http://localhost:8888',
       flowJSON: this.flowConfigService.getFlowJSON(),
+      restServerAddress: `http://localhost:${
+        workspace.emulator?.restServerPort ?? 8888
+      }`,
     });
 
     this.processingScheduler.start();
