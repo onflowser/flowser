@@ -237,10 +237,3 @@ export function useGetInteractionTemplates(): SWRResponse<
     interactionsService.getTemplates()
   );
 }
-
-export function useGetFlowserUsageRequirements(): SWRResponse<
-  FlowserUsageRequirement[]
-> {
-  // TODO(restructure): Implement and move to electron dir only
-  return useSWR(`usage-requirements`, () => []);
-}

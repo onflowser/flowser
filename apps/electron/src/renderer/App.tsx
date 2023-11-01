@@ -16,13 +16,13 @@ import {
   FlowEvent,
   FlowTransaction,
 } from '@onflowser/api';
-import { FlowserUsageRequirements } from '@onflowser/ui/src/common/misc/FlowserUsageRequirements/FlowserUsageRequirements';
 import { SWRConfig } from 'swr';
 import { SentryRendererService } from '../services/sentry-renderer.service';
 import { AnalyticsService } from '../services/analytics.service';
 import { UpdateLoader } from './components/loaders/UpdateLoader';
 import { FlowserRouter } from './router';
 import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
+import { DependencyErrors } from './components/DependencyErrors/DependencyErrors';
 
 const indexes = {
   accountStorage: new IpcIndexCache<FlowAccountStorage>('accountStorage'),
@@ -102,7 +102,7 @@ export function App() {
               pickDirectory={window.electron.app.showDirectoryPicker}
             >
               <ConsentAnalytics />
-              <FlowserUsageRequirements />
+              <DependencyErrors />
               <FlowserRouter />
               <Toaster
                 position="bottom-center"

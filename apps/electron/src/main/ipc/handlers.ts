@@ -24,6 +24,7 @@ export function registerHandlers(appService: FlowserAppService) {
     walletService,
     flowSnapshotsService,
     processManagerService,
+    dependencyManagerService,
   } = appService;
 
   async function showDirectoryPicker() {
@@ -45,43 +46,39 @@ export function registerHandlers(appService: FlowserAppService) {
     APP_UPDATE_PROGRESS(): any {},
     APP_UPDATE_START(): any {},
 
-    [FlowserIpcEvent.APP_DIRECTORY_PICKER_SHOW]: (e: IpcMainInvokeEvent) =>
-      showDirectoryPicker(),
+    APP_DEPENDENCY_ERRORS_LIST: () =>
+      dependencyManagerService.validateDependencies(),
 
-    [FlowserIpcEvent.WORKSPACES_CLOSE]: (e: IpcMainInvokeEvent, id: string) =>
+    APP_DIRECTORY_PICKER_SHOW: () => showDirectoryPicker(),
+
+    WORKSPACES_CLOSE: (e: IpcMainInvokeEvent, id: string) =>
       workspaceService.close(id),
-    [FlowserIpcEvent.WORKSPACES_OPEN]: (e: IpcMainInvokeEvent, id: string) =>
+    WORKSPACES_OPEN: (e: IpcMainInvokeEvent, id: string) =>
       workspaceService.open(id),
-    [FlowserIpcEvent.WORKSPACES_CREATE]: (
+    WORKSPACES_CREATE: (
       e: IpcMainInvokeEvent,
       createdWorkspace: FlowserWorkspace
     ) => workspaceService.create(createdWorkspace),
-    [FlowserIpcEvent.WORKSPACES_UPDATE]: (
+    WORKSPACES_UPDATE: (
       e: IpcMainInvokeEvent,
       updatedWorkspace: FlowserWorkspace
     ) => workspaceService.update(updatedWorkspace),
-    [FlowserIpcEvent.WORKSPACES_LIST]: () => workspaceService.findAll(),
-    [FlowserIpcEvent.WORKSPACES_FIND_BY_ID]: (
-      e: IpcMainInvokeEvent,
-      id: string
-    ) => workspaceService.findById(id),
-    [FlowserIpcEvent.WORKSPACES_REMOVE]: (e: IpcMainInvokeEvent, id: string) =>
+    WORKSPACES_LIST: () => workspaceService.findAll(),
+    WORKSPACES_FIND_BY_ID: (e: IpcMainInvokeEvent, id: string) =>
+      workspaceService.findById(id),
+    WORKSPACES_REMOVE: (e: IpcMainInvokeEvent, id: string) =>
       workspaceService.remove(id),
-    [FlowserIpcEvent.WORKSPACES_DEFAULT_SETTINGS]: (e: IpcMainInvokeEvent) =>
+    WORKSPACES_DEFAULT_SETTINGS: (e: IpcMainInvokeEvent) =>
       workspaceService.getDefaultSettings(),
 
-    [FlowserIpcEvent.INDEX_GET_ALL]: (
+    INDEX_GET_ALL: (
       event: IpcMainInvokeEvent,
       indexName: keyof BlockchainIndexes
     ) => blockchainIndexService.indexes[indexName].findAll(),
 
-    [FlowserIpcEvent.INTERACTIONS_PARSE]: (
-      event: IpcMainInvokeEvent,
-      sourceCode: string
-    ) => flowInteractionsService.parse(sourceCode),
-    [FlowserIpcEvent.INTERACTIONS_LIST_TEMPLATES]: async (
-      event: IpcMainInvokeEvent
-    ) => {
+    INTERACTIONS_PARSE: (event: IpcMainInvokeEvent, sourceCode: string) =>
+      flowInteractionsService.parse(sourceCode),
+    INTERACTIONS_LIST_TEMPLATES: async () => {
       // There will be only 1 open workspace for now.
       const openWorkspaces = await workspaceService.getOpenWorkspaces();
       return flowInteractionsService.getTemplates({
@@ -89,30 +86,23 @@ export function registerHandlers(appService: FlowserAppService) {
       });
     },
 
-    [FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX]: (
-      event: IpcMainInvokeEvent,
-      address: string
-    ) =>
+    FLOW_ACCOUNT_GET_INDEX: (event: IpcMainInvokeEvent, address: string) =>
       goBindingsService.getIndexOfAddress({
         hexAddress: address,
         chainId: 'flow-emulator',
       }),
-    [FlowserIpcEvent.FLOW_CLI_GET_INFO]: (event: IpcMainInvokeEvent) =>
-      flowCliService.getVersion(),
-    [FlowserIpcEvent.FLOW_TRANSACTION_SEND]: (
+    FLOW_CLI_GET_INFO: () => flowCliService.getVersion(),
+    FLOW_TRANSACTION_SEND: (
       event: IpcMainInvokeEvent,
       request: SendTransactionRequest
     ) => walletService.sendTransaction(request),
-    [FlowserIpcEvent.FLOW_SCRIPT_EXECUTE]: (
+    FLOW_SCRIPT_EXECUTE: (
       event: IpcMainInvokeEvent,
       request: ExecuteScriptRequest
     ) => flowGatewayService.executeScript(request),
 
-    [FlowserIpcEvent.WALLET_KEY_LIST]: (event: IpcMainInvokeEvent) =>
-      walletService.listKeyPairs(),
-    [FlowserIpcEvent.WALLET_ACCOUNT_CREATE]: async (
-      event: IpcMainInvokeEvent
-    ) => {
+    WALLET_KEY_LIST: () => walletService.listKeyPairs(),
+    WALLET_ACCOUNT_CREATE: async () => {
       // There will be only 1 open workspace for now.
       const openWorkspaces = await workspaceService.getOpenWorkspaces();
       return walletService.createAccount({
@@ -120,25 +110,16 @@ export function registerHandlers(appService: FlowserAppService) {
       });
     },
 
-    [FlowserIpcEvent.SNAPSHOTS_LIST]: (event: IpcMainInvokeEvent) =>
-      flowSnapshotsService.findAll(),
-    [FlowserIpcEvent.SNAPSHOTS_CREATE]: (
-      event: IpcMainInvokeEvent,
-      name: string
-    ) => flowSnapshotsService.create(name),
-    [FlowserIpcEvent.SNAPSHOTS_JUMP_TO]: (
-      event: IpcMainInvokeEvent,
-      id: string
-    ) => flowSnapshotsService.jumpTo(id),
-    [FlowserIpcEvent.SNAPSHOTS_ROLLBACK_TO_HEIGHT]: (
-      event: IpcMainInvokeEvent,
-      height: number
-    ) => flowSnapshotsService.rollbackToHeight(height),
+    SNAPSHOTS_LIST: () => flowSnapshotsService.findAll(),
+    SNAPSHOTS_CREATE: (event: IpcMainInvokeEvent, name: string) =>
+      flowSnapshotsService.create(name),
+    SNAPSHOTS_JUMP_TO: (event: IpcMainInvokeEvent, id: string) =>
+      flowSnapshotsService.jumpTo(id),
+    SNAPSHOTS_ROLLBACK_TO_HEIGHT: (event: IpcMainInvokeEvent, height: number) =>
+      flowSnapshotsService.rollbackToHeight(height),
 
-    [FlowserIpcEvent.PROCESS_LOGS_LIST]: (
-      event: IpcMainInvokeEvent,
-      processId: string
-    ) => processManagerService.findAllLogsByProcess(processId),
+    PROCESS_LOGS_LIST: (event: IpcMainInvokeEvent, processId: string) =>
+      processManagerService.findAllLogsByProcess(processId),
   };
 
   for (const eventName in handlers) {

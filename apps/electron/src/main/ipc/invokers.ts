@@ -73,6 +73,8 @@ const processManagerService: IProcessManagerService = {
 
 export const electronInvokers = {
   app: {
+    listDependencyErrors: () =>
+      ipcRenderer.invoke(FlowserIpcEvent.APP_DEPENDENCY_ERRORS_LIST),
     showDirectoryPicker: () =>
       ipcRenderer.invoke(FlowserIpcEvent.APP_DIRECTORY_PICKER_SHOW),
     handleExit: (callback: () => void) =>

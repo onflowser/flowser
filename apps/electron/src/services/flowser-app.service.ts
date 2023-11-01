@@ -25,6 +25,7 @@ import { FileStorageService } from './file-storage.service';
 import { indexSyncIntervalInMs } from '../renderer/ipc-index-cache';
 import { isErrorWithMessage } from '../utils';
 import { resolveHtmlPath } from '../main/util';
+import { DependencyManagerService } from './dependency-manager.service';
 
 // Root service that ties all the pieces together and orchestrates them.
 export class FlowserAppService {
@@ -42,6 +43,7 @@ export class FlowserAppService {
   public readonly blockchainIndexService: BlockchainIndexService;
   public readonly flowSnapshotsService: FlowSnapshotsService;
   public readonly flowConfigService: FlowConfigService;
+  public readonly dependencyManagerService: DependencyManagerService;
   private readonly flowSnapshotsStorageService: FileStorageService;
   private readonly walletStorageService: FileStorageService;
   private processingScheduler: AsyncIntervalScheduler;
@@ -100,6 +102,9 @@ export class FlowserAppService {
       this.flowCliService,
       this.flowGatewayService,
       this.walletStorageService
+    );
+    this.dependencyManagerService = new DependencyManagerService(
+      this.flowCliService
     );
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',

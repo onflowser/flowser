@@ -276,11 +276,9 @@ export interface ManagedProcess {
 }
 
 export enum ManagedProcessState {
-  MANAGED_PROCESS_STATE_UNSPECIFIED = 0,
-  MANAGED_PROCESS_STATE_NOT_RUNNING = 1,
-  MANAGED_PROCESS_STATE_RUNNING = 2,
-  MANAGED_PROCESS_STATE_ERROR = 3,
-  UNRECOGNIZED = -1,
+  NOT_RUNNING = 1,
+  RUNNING = 2,
+  ERROR = 3,
 }
 
 export interface CommandOptions {
@@ -337,17 +335,6 @@ export interface FlowEmulatorConfig {
   enableRestDebug: boolean;
   useSimpleAddresses: boolean;
   snapshot: boolean;
-}
-
-export enum FlowserUsageRequirementType {
-  UNSUPPORTED_CLI_VERSION,
-  MISSING_FLOW_CLI,
-}
-
-export interface FlowserUsageRequirement {
-  title: string;
-  description: string;
-  type: FlowserUsageRequirementType;
 }
 
 export interface InteractionTemplate extends TimestampedResource {
