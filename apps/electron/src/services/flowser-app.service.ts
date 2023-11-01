@@ -248,7 +248,6 @@ export class FlowserAppService {
     this.flowSnapshotsStorageService.setFileName(
       `flowser-snapshots-${workspaceId}.json`
     );
-    await this.flowSnapshotsService.synchronizeIndex();
 
     this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);
     await this.walletService.synchronizeIndex();
@@ -263,6 +262,8 @@ export class FlowserAppService {
           this.flowEmulatorService.getDefaultConfig().adminServerPort,
       });
     }
+
+    await this.flowSnapshotsService.synchronizeIndex();
   }
 
   private async onWorkspaceClose() {
