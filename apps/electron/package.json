@@ -1,39 +1,30 @@
 {
   "name": "@onflowser/electron",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Supercharged development on Flow blockchain ⚡",
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "flow-blockchain",
+    "blockchain",
+    "developer-tools",
+    "blockchain-explorer",
+    "block-explorer",
+    "onflow",
+    "tools"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://flowser.dev",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/onflowser/flowser/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/onflowser/flowser.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Flowser",
+    "email": "bart@flowser.dev",
+    "url": "https://flowser.dev"
   },
-  "contributors": [
-    {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    }
-  ],
   "main": "./src/main/main.ts",
   "scripts": {
     "generate-icons": "../../node_modules/.bin/electron-icon-maker --input=./assets/icon.png --output=./generated-icons",
