@@ -305,10 +305,7 @@ export interface FlowserWorkspace extends TimestampedResource {
   name: string;
   filesystemPath: string;
   emulator: FlowEmulatorConfig | undefined;
-  gateway: FlowGatewayConfig | undefined;
 }
-
-export interface FlowGatewayConfig {}
 
 export interface FlowEmulatorConfig {
   verboseLogging: boolean;

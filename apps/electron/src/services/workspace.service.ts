@@ -91,7 +91,6 @@ export class WorkspaceService extends EventEmitter {
       createdAt: new Date(),
       updatedAt: new Date(),
       emulator: this.flowEmulatorService.getDefaultConfig(),
-      gateway: undefined,
       id: randomUUID(),
       name: 'My awesome project',
     };

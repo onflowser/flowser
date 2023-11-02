@@ -147,7 +147,6 @@ export class FlowserAppService {
         name: parsedPath.name,
         filesystemPath,
         emulator: undefined,
-        gateway: undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
