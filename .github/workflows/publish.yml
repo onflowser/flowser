@@ -1,9 +1,10 @@
 name: Publish
 
 on:
-  release:
+  # TODO: Change back to release/created
+  pull_request:
     types:
-      - created
+      - opened
 
 jobs:
   publish:
@@ -27,6 +28,9 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4.1.0
 
       - name: Install and build
         run: |
