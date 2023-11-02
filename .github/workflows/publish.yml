@@ -1,21 +1,17 @@
 name: Publish
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - created
 
 jobs:
   publish:
-    # To enable auto publishing to github, update your electron publisher
-    # config in package.json > "build" and remove the conditional below
-    if: ${{ github.repository_owner == 'electron-react-boilerplate' }}
-
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ macos-latest ]
 
     steps:
       - name: Checkout git repo
@@ -27,11 +23,15 @@ jobs:
           node-version: 18
           cache: npm
 
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+
       - name: Install and build
         run: |
-          npm install
-          npm run postinstall
-          npm run build
+          yarn run postinstall
+          yarn run build
 
       - name: Publish releases
         env:
@@ -44,3 +44,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm exec electron-builder -- --publish always --win --mac --linux
+        working-directory: ./apps/electron

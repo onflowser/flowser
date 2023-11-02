@@ -1,10 +1,7 @@
 {
-  "name": "flowser",
+  "name": "@onflowser/flowser",
   "private": true,
   "description": "Easily inspect and debug Flow blockchain ⛓",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",

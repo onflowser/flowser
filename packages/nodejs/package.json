@@ -6,6 +6,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "dev": "npm run build-bin",
+    "build": "npm run build-bin",
     "build-bin": "sh build-go-bindings.sh",
     "format": "prettier . --write"
   },

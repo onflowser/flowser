@@ -57,7 +57,6 @@ export class FlowserAppService {
       this.flowGatewayService
     );
     this.goBindingsService = new GoBindingsService({
-      // TODO(restructure): Test if this works on windows/linux
       binDirPath:
         process.env.NODE_ENV === 'development'
           ? path.join(__dirname, '../../../../', 'packages', 'nodejs', 'bin')
