@@ -601,7 +601,7 @@ export class FlowIndexerService {
     return {
       id: `${account.address}.${name}`,
       address: ensurePrefixedAddress(account.address),
-      // TODO(restructure): Populate local config if applicable
+      // TODO(restructure-followup): Populate local config if applicable
       //  Or even better, create a separate "workspace contracts" API and remove this field.
       localConfig: undefined,
       name: name,
@@ -629,14 +629,12 @@ export class FlowIndexerService {
       // https://developers.flow.com/tooling/fcl-js/api#ftype
       switch (type) {
         case "Dictionary":
-          // TODO(restructure): Double check this
           // @ts-ignore
           return value?.map((entry: any) => ({
             key: fromTypeAnnotatedFclArguments(entry.key),
             value: fromTypeAnnotatedFclArguments(entry.value),
           }));
         case "Array":
-          // TODO(restructure): Double check this
           // @ts-ignore
           return value?.map((element: any) =>
             fromTypeAnnotatedFclArguments(element),
