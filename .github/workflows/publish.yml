@@ -1,10 +1,12 @@
 name: Publish
 
+# TODO: Change back to release/created
 on:
-  # TODO: Change back to release/created
+  push:
+    branches: [ "main" ]
   pull_request:
-    types:
-      - opened
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
 
 jobs:
   publish:
