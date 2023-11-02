@@ -9,7 +9,7 @@ export type RegisterListenersOptions = {
 
 export class AppUpdateService {
   async checkForUpdatesAndNotify(
-    options: RegisterListenersOptions
+    options: RegisterListenersOptions,
   ): Promise<void> {
     this.registerListeners(options);
     await autoUpdater.checkForUpdatesAndNotify();
@@ -26,7 +26,7 @@ export class AppUpdateService {
     autoUpdater.on('download-progress', (progress) => {
       console.log(`Download speed ${progress.bytesPerSecond}`);
       console.log(
-        `Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`
+        `Downloaded ${progress.percent}% (${progress.transferred}/${progress.total})`,
       );
       webContents?.send(FlowserIpcEvent.APP_UPDATE_PROGRESS, progress.percent);
     });
@@ -73,7 +73,7 @@ export class AppUpdateService {
       if (!options?.silent) {
         dialog.showErrorBox(
           'Update error',
-          error == null ? 'unknown' : (error.stack || error).toString()
+          error == null ? 'unknown' : (error.stack || error).toString(),
         );
       }
     });

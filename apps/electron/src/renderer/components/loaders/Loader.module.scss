@@ -1,7 +1,7 @@
-@import "../../../../../../packages/ui/src/styles/colors";
-@import "../../../../../../packages/ui/src/styles/spacings";
+@import '../../../../../../packages/ui/src/styles/colors';
+@import '../../../../../../packages/ui/src/styles/spacings';
 @import '../../../../../../packages/ui/src/styles/animations';
-@import "../../../../../../packages/ui/src/styles/typography";
+@import '../../../../../../packages/ui/src/styles/typography';
 
 .background {
   @include fadeInAnimation(0.4s);
@@ -29,7 +29,7 @@
   z-index: 100;
 
   .loader {
-    @include pulse(1s)
+    @include pulse(1s);
   }
 
   .title {

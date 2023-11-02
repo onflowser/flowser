@@ -8,7 +8,7 @@ export class FingerprintService {
     const fingerprint = await FingerprintJS.load();
     const { visitorId, confidence } = await fingerprint.get({ debug: false });
     console.log(
-      `Identifying user ${visitorId} with confidence ${confidence.score}`
+      `Identifying user ${visitorId} with confidence ${confidence.score}`,
     );
     return visitorId;
   }

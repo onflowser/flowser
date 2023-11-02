@@ -50,11 +50,11 @@ export class FlowserAppService {
 
   constructor(
     private readonly logger: IFlowserLogger,
-    private readonly window: BrowserWindow
+    private readonly window: BrowserWindow,
   ) {
     this.flowGatewayService = new FlowGatewayService();
     this.flowAccountStorageService = new FlowAccountStorageService(
-      this.flowGatewayService
+      this.flowGatewayService,
     );
     this.goBindingsService = new GoBindingsService({
       binDirPath:
@@ -63,7 +63,7 @@ export class FlowserAppService {
           : process.resourcesPath,
     });
     this.flowInteractionsService = new FlowInteractionsService(
-      this.goBindingsService
+      this.goBindingsService,
     );
     this.processManagerService = new ProcessManagerService(this.logger, {
       // We are manually handling shutdown before the app closes
@@ -71,15 +71,15 @@ export class FlowserAppService {
     });
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
-      this.processManagerService
+      this.processManagerService,
     );
     this.flowSnapshotsStorageService = new FileStorageService();
     this.flowSnapshotsService = new FlowSnapshotsService(
-      this.flowSnapshotsStorageService
+      this.flowSnapshotsStorageService,
     );
     this.workspaceService = new WorkspaceService(
       this.flowEmulatorService,
-      new FileStorageService('flowser-workspaces.json')
+      new FileStorageService('flowser-workspaces.json'),
     );
     this.blockchainIndexService = new BlockchainIndexService();
     this.flowIndexerService = new FlowIndexerService(
@@ -93,17 +93,17 @@ export class FlowserAppService {
       this.blockchainIndexService.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
-      this.flowInteractionsService
+      this.flowInteractionsService,
     );
     this.flowConfigService = new FlowConfigService(this.logger);
     this.walletStorageService = new FileStorageService();
     this.walletService = new WalletService(
       this.flowCliService,
       this.flowGatewayService,
-      this.walletStorageService
+      this.walletStorageService,
     );
     this.dependencyManagerService = new DependencyManagerService(
-      this.flowCliService
+      this.flowCliService,
     );
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
@@ -156,7 +156,7 @@ export class FlowserAppService {
       // Our react-router instance is configured to use hash-based navigation:
       // https://reactrouter.com/en/main/routers/create-hash-router.
       await this.window.loadURL(
-        `${resolveHtmlPath('index.html')}#/projects/${id}`
+        `${resolveHtmlPath('index.html')}#/projects/${id}`,
       );
     }
   }
@@ -166,35 +166,35 @@ export class FlowserAppService {
       WorkspaceEvent.WORKSPACE_OPEN,
       this.handleListenerError(
         this.onWorkspaceOpen.bind(this),
-        'Failed to open workspace'
-      ).bind(this)
+        'Failed to open workspace',
+      ).bind(this),
     );
     this.workspaceService.on(
       WorkspaceEvent.WORKSPACE_CLOSE,
       this.handleListenerError(
         this.onWorkspaceClose.bind(this),
-        'Failed to close workspace'
-      ).bind(this)
+        'Failed to close workspace',
+      ).bind(this),
     );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT,
       this.handleListenerError(
         this.onRollbackToBlockHeight.bind(this),
-        'Failed to rollback to height'
-      ).bind(this)
+        'Failed to rollback to height',
+      ).bind(this),
     );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.JUMP_TO,
       this.handleListenerError(
         this.onRollbackToBlockHeight.bind(this),
-        'Failed to jump to snapshot'
-      ).bind(this)
+        'Failed to jump to snapshot',
+      ).bind(this),
     );
   }
 
   private handleListenerError(
     listener: (...args: any[]) => Promise<void>,
-    errorMessage: string
+    errorMessage: string,
   ) {
     return async (...args: unknown[]) => {
       try {
@@ -245,7 +245,7 @@ export class FlowserAppService {
 
     // Separately store of each workspaces' data.
     this.flowSnapshotsStorageService.setFileName(
-      `flowser-snapshots-${workspaceId}.json`
+      `flowser-snapshots-${workspaceId}.json`,
     );
 
     this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);

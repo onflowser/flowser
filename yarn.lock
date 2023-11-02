@@ -2180,7 +2180,7 @@
     node-abort-controller "^3.0.1"
 
 "@onflowser/electron@file:/Users/bartkozorog/Projects/flowser/apps/electron":
-  version "3.0.0"
+  version "3.0.1"
   resolved "file:apps/electron"
   dependencies:
     "@fingerprintjs/fingerprintjs" "^4.1.0"
@@ -12439,15 +12439,6 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
-
-vite-plugin-svgr@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.npmjs.org/vite-plugin-svgr/-/vite-plugin-svgr-4.1.0.tgz"
-  integrity sha512-v7Qic+FWmCChgQNGSI4V8X63OEYsdUoLt66iqIcHozq9bfK/Dwmr0V+LBy1NE8CE98Y8HouEBJ+pto4AMfN5xw==
-  dependencies:
-    "@rollup/pluginutils" "^5.0.4"
-    "@svgr/core" "^8.1.0"
-    "@svgr/plugin-jsx" "^8.1.0"
 
 w3c-keyname@^2.2.4:
   version "2.2.8"

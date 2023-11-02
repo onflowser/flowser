@@ -6,7 +6,7 @@ files:
   - dist
   - node_modules
   - package.json
-afterSign: ".erb/scripts/notarize.js"
+afterSign: '.erb/scripts/notarize.js'
 
 mac:
   target:
@@ -31,7 +31,7 @@ dmg:
     - x: 439
       y: 358
       type: link
-      path: "/Applications"
+      path: '/Applications'
   artifactName: flowser-${version}-${os}-${arch}.${ext}
   background: assets/macos-background.tiff
 
@@ -70,15 +70,15 @@ directories:
   output: release/build
 
 extraResources:
-  - "./assets/**"
+  - './assets/**'
   # To reference files outside the electron directory we need to use the FileSet API.
   # See: https://github.com/electron-userland/electron-builder/issues/2693
-  - from: "../../packages/nodejs/bin/flowser-internal-amd64-darwin"
-    to: "."
-  - from: "../../packages/nodejs/bin/flowser-internal-amd64-linux"
-    to: "."
-  - from: "../../packages/nodejs/bin/flowser-internal-amd64.exe"
-    to: "."
+  - from: '../../packages/nodejs/bin/flowser-internal-amd64-darwin'
+    to: '.'
+  - from: '../../packages/nodejs/bin/flowser-internal-amd64-linux'
+    to: '.'
+  - from: '../../packages/nodejs/bin/flowser-internal-amd64.exe'
+    to: '.'
 
 publish:
   provider: github

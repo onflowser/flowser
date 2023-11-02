@@ -1,6 +1,6 @@
-import { Spinner } from "../../../../../../packages/ui/src/common/loaders/Spinner/Spinner";
-import React, { ReactElement } from "react";
-import classes from "./Loader.module.scss";
+import { Spinner } from '../../../../../../packages/ui/src/common/loaders/Spinner/Spinner';
+import React, { ReactElement } from 'react';
+import classes from './Loader.module.scss';
 
 export function ExitLoader(): ReactElement {
   return (

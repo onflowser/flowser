@@ -27,7 +27,7 @@ export class IpcIndexCache<Resource extends IndexableResource>
 
   async findAll(): Promise<Resource[]> {
     return this.cachedResources.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
   }
 

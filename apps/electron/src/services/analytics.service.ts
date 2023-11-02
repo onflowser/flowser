@@ -1,7 +1,7 @@
 import mixpanel, { Dict } from 'mixpanel-browser';
 import { FingerprintService } from './fingerprint.service';
 
-const enableAnalytics = process.env.NODE_ENV === "production";
+const enableAnalytics = process.env.NODE_ENV === 'production';
 
 export class AnalyticsService {
   private fingerprintService: FingerprintService;
@@ -11,14 +11,14 @@ export class AnalyticsService {
     this.init();
   }
   async init(): Promise<void> {
-    mixpanel.init("1b358339dc3d7476217983016b83fcab", {
+    mixpanel.init('1b358339dc3d7476217983016b83fcab', {
       debug: !enableAnalytics,
     });
 
     try {
       mixpanel.identify(await this.fingerprintService.getUserFingerprintId());
     } catch (e) {
-      console.error("Failed to identify user", e);
+      console.error('Failed to identify user', e);
     }
   }
 
@@ -32,14 +32,14 @@ export class AnalyticsService {
 
   track(event: string, properties: Dict = {}): void {
     if (!enableAnalytics) {
-      console.log("Analytics disabled. Skipping event ", event);
+      console.log('Analytics disabled. Skipping event ', event);
       return;
     }
 
     try {
       mixpanel.track(event, properties);
     } catch (e) {
-      console.error("Mixpanel error:", e);
+      console.error('Mixpanel error:', e);
     }
   }
 }

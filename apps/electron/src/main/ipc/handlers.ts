@@ -57,11 +57,11 @@ export function registerHandlers(appService: FlowserAppService) {
       workspaceService.open(id),
     WORKSPACES_CREATE: (
       e: IpcMainInvokeEvent,
-      createdWorkspace: FlowserWorkspace
+      createdWorkspace: FlowserWorkspace,
     ) => workspaceService.create(createdWorkspace),
     WORKSPACES_UPDATE: (
       e: IpcMainInvokeEvent,
-      updatedWorkspace: FlowserWorkspace
+      updatedWorkspace: FlowserWorkspace,
     ) => workspaceService.update(updatedWorkspace),
     WORKSPACES_LIST: () => workspaceService.findAll(),
     WORKSPACES_FIND_BY_ID: (e: IpcMainInvokeEvent, id: string) =>
@@ -73,7 +73,7 @@ export function registerHandlers(appService: FlowserAppService) {
 
     INDEX_GET_ALL: (
       event: IpcMainInvokeEvent,
-      indexName: keyof BlockchainIndexes
+      indexName: keyof BlockchainIndexes,
     ) => blockchainIndexService.indexes[indexName].findAll(),
 
     INTERACTIONS_PARSE: (event: IpcMainInvokeEvent, sourceCode: string) =>
@@ -94,11 +94,11 @@ export function registerHandlers(appService: FlowserAppService) {
     FLOW_CLI_GET_INFO: () => flowCliService.getVersion(),
     FLOW_TRANSACTION_SEND: (
       event: IpcMainInvokeEvent,
-      request: SendTransactionRequest
+      request: SendTransactionRequest,
     ) => walletService.sendTransaction(request),
     FLOW_SCRIPT_EXECUTE: (
       event: IpcMainInvokeEvent,
-      request: ExecuteScriptRequest
+      request: ExecuteScriptRequest,
     ) => flowGatewayService.executeScript(request),
 
     WALLET_KEY_LIST: () => walletService.listKeyPairs(),

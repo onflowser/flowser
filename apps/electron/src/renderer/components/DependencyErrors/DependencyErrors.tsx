@@ -30,7 +30,7 @@ export function DependencyErrors(): ReactElement | null {
 
 function useGetDependencyErrors(): SWRResponse<FlowserDependencyError[]> {
   return useSWR(`dependency-errors`, () =>
-    window.electron.app.listDependencyErrors()
+    window.electron.app.listDependencyErrors(),
   );
 }
 

@@ -19,7 +19,7 @@ const flow: IFlowService = {
     ipcRenderer.invoke(FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX, address),
   getFlowCliInfo: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_CLI_GET_INFO),
   sendTransaction: (
-    request: SendTransactionRequest
+    request: SendTransactionRequest,
   ): Promise<{ transactionId: string }> =>
     ipcRenderer.invoke(FlowserIpcEvent.FLOW_TRANSACTION_SEND, request),
   executeScript: (request: ExecuteScriptRequest): Promise<any> =>
@@ -81,7 +81,7 @@ export const electronInvokers = {
       ipcRenderer.on(FlowserIpcEvent.APP_EXIT, callback),
     handleLog: (callback: (log: string, level: string) => void) =>
       ipcRenderer.on(FlowserIpcEvent.APP_LOG, (event, log, level) =>
-        callback(log, level)
+        callback(log, level),
       ),
     handleUpdateDownloadStart: (callback: () => void) =>
       ipcRenderer.on(FlowserIpcEvent.APP_UPDATE_START, callback),
@@ -89,7 +89,7 @@ export const electronInvokers = {
       ipcRenderer.on(FlowserIpcEvent.APP_UPDATE_END, callback),
     handleUpdateDownloadProgress: (callback: (percentage: number) => void) =>
       ipcRenderer.on(FlowserIpcEvent.APP_UPDATE_PROGRESS, (event, value) =>
-        callback(value as unknown as number)
+        callback(value as unknown as number),
       ),
   },
   interactions,
