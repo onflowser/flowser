@@ -26,6 +26,7 @@ exports.default = async function notarizeMacos(context) {
     // Must be kept in sync with `appId` field in `electron-builder.yml`
     appBundleId: 'dev.flowser.app',
     appPath: `${appOutDir}/${appName}.app`,
+    teamId: 'A425JF6L5H',
     appleId: process.env.APPLE_ID,
     appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
   });
