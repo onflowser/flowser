@@ -303,17 +303,21 @@ export class FlowGatewayService {
     return { ...account, balance: account.balance / Math.pow(10, 8), address };
   }
 
-  public async getApiStatus(): Promise<FlowApiStatus> {
+  public async getRestApiStatus(): Promise<FlowApiStatus> {
     const restServerUrl = await fcl.config.get("accessNode.api");
 
     if (!restServerUrl) {
       throw new Error("accessNode.api not configured");
     }
 
+    return this.getApiStatus(restServerUrl);
+  }
+
+  public async getApiStatus(url: string) {
     try {
       await axios.request({
         method: "GET",
-        url: restServerUrl,
+        url,
         // Prevent axios from throwing on certain http response codes
         // https://github.com/axios/axios/issues/41
         validateStatus: () => true,

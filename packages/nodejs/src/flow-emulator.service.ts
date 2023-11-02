@@ -1,5 +1,10 @@
 import { ManagedProcess } from "./processes/managed-process";
-import { isDefined, waitForMs } from "@onflowser/core";
+import {
+  FlowApiStatus,
+  FlowGatewayService,
+  isDefined,
+  waitForMs,
+} from "@onflowser/core";
 import { EventEmitter } from "node:events";
 import {
   FlowEmulatorConfig,
@@ -17,8 +22,12 @@ type StartEmulatorRequest = {
 export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";
   private process: ManagedProcess | undefined;
+  private activeConfig: FlowEmulatorConfig | undefined;
 
-  constructor(private processManagerService: ProcessManagerService) {
+  constructor(
+    private processManagerService: ProcessManagerService,
+    private flowGatewayService: FlowGatewayService,
+  ) {
     super();
   }
 
@@ -28,6 +37,8 @@ export class FlowEmulatorService extends EventEmitter {
   }
 
   async start(request: StartEmulatorRequest) {
+    this.activeConfig = request.config;
+
     this.process = this.processManagerService.initManagedProcess({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
@@ -77,17 +88,24 @@ export class FlowEmulatorService extends EventEmitter {
 
   // Resolves once emulator process emits "Started <API-name>" logs.
   private async waitUntilApisStarted() {
-    const hasStarted = () => {
-      if (!this.process) {
-        throw new Error("Process not found");
+    const hasStarted = async () => {
+      if (!this.activeConfig) {
+        throw new Error("No active config found");
       }
-      return this.process.output.some(
-        (output) =>
-          output.source === ProcessOutputSource.OUTPUT_SOURCE_STDOUT &&
-          output.data.includes("Started")
+      const apiStatuses = await Promise.all([
+        this.flowGatewayService.getApiStatus(
+          `http://localhost:${this.activeConfig.restServerPort}`,
+        ),
+        this.flowGatewayService.getApiStatus(
+          `http://localhost:${this.activeConfig.adminServerPort}`,
+        ),
+      ]);
+
+      return apiStatuses.every(
+        (status) => status === FlowApiStatus.SERVICE_STATUS_ONLINE,
       );
     };
-    while (!hasStarted()) {
+    while (!(await hasStarted())) {
       await waitForMs(100);
     }
   }
@@ -100,7 +118,7 @@ export class FlowEmulatorService extends EventEmitter {
       return this.process.output.find(
         (output) =>
           output.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR &&
-          output.data !== ""
+          output.data !== "",
       );
     };
     let retries = 5;

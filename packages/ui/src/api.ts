@@ -26,20 +26,20 @@ export function useGetAccounts(): SWRResponse<FlowAccount[]> {
 }
 
 export function useGetAccount(
-  id: string
+  id: string,
 ): SWRResponse<FlowAccount | undefined> {
   const { accountIndex } = useServiceRegistry();
   return useSWR(`account/${id}`, () => accountIndex.findOneById(id));
 }
 
 export function useGetKeysByAccount(
-  address: string
+  address: string,
 ): SWRResponse<FlowAccountKey[]> {
   const { accountKeyIndex } = useServiceRegistry();
   return useSWR(`${address}/keys`, () =>
     accountKeyIndex
       .findAll()
-      .then((res) => res.filter((e) => e.address === address))
+      .then((res) => res.filter((e) => e.address === address)),
   );
 }
 
@@ -49,24 +49,24 @@ export function useGetManagedKeys(): SWRResponse<ManagedKeyPair[]> {
 }
 
 export function useGetStoragesByAccount(
-  id: string
+  id: string,
 ): SWRResponse<FlowAccountStorage[]> {
   const { accountStorageIndex } = useServiceRegistry();
   return useSWR(`${id}/storages`, () =>
     accountStorageIndex
       .findAll()
-      .then((res) => res.filter((e) => e.address === id))
+      .then((res) => res.filter((e) => e.address === id)),
   );
 }
 
 export function useGetContractsByAccount(
-  address: string
+  address: string,
 ): SWRResponse<FlowContract[]> {
   const { contractIndex } = useServiceRegistry();
   return useSWR(`${address}/contracts`, () =>
     contractIndex
       .findAll()
-      .then((res) => res.filter((e) => e.address === address))
+      .then((res) => res.filter((e) => e.address === address)),
   );
 }
 
@@ -77,18 +77,18 @@ export function useGetTransactions(): SWRResponse<FlowTransaction[]> {
 
 export function useGetTransaction(
   id: string,
-  options?: SWRConfiguration
+  options?: SWRConfiguration,
 ): SWRResponse<FlowTransaction | undefined> {
   const { transactionsIndex } = useServiceRegistry();
   return useSWR(
     `transaction/${id}`,
     () => transactionsIndex.findOneById(id),
-    options
+    options,
   );
 }
 
 export function useGetTransactionsByAccount(
-  address: string
+  address: string,
 ): SWRResponse<FlowTransaction[]> {
   const { transactionsIndex } = useServiceRegistry();
   return useSWR(`${address}/transactions`, () =>
@@ -99,20 +99,20 @@ export function useGetTransactionsByAccount(
           (e) =>
             e.authorizers.includes(address) ||
             e.payer === address ||
-            e.proposalKey.address === address
-        )
-      )
+            e.proposalKey.address === address,
+        ),
+      ),
   );
 }
 
 export function useGetTransactionsByBlock(
-  blockId: string
+  blockId: string,
 ): SWRResponse<FlowTransaction[]> {
   const { transactionsIndex } = useServiceRegistry();
   return useSWR(`${blockId}/transactions`, () =>
     transactionsIndex
       .findAll()
-      .then((res) => res.filter((e) => e.blockId === blockId))
+      .then((res) => res.filter((e) => e.blockId === blockId)),
   );
 }
 
@@ -135,7 +135,7 @@ export function useGetContracts(): SWRResponse<FlowContract[]> {
 }
 
 export function useGetContract(
-  id: string
+  id: string,
 ): SWRResponse<FlowContract | undefined> {
   const { contractIndex } = useServiceRegistry();
 
@@ -149,24 +149,24 @@ export function useGetEvents(): SWRResponse<FlowEvent[]> {
 }
 
 export function useGetEventsByTransaction(
-  id: string
+  id: string,
 ): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
   return useSWR(`${id}/events`, () =>
     eventsIndex
       .findAll()
-      .then((res) => res.filter((e) => e.transactionId === id))
+      .then((res) => res.filter((e) => e.transactionId === id)),
   );
 }
 
 export function useGetOutputsByProcess(
-  id: string
+  id: string,
 ): SWRResponse<ManagedProcessOutput[]> {
   const { processManagerService } = useServiceRegistry();
 
   return useSWR(`${id}/outputs`, () =>
-    processManagerService.findAllLogsByProcessId(id)
+    processManagerService.findAllLogsByProcessId(id),
   );
 }
 
@@ -189,7 +189,7 @@ export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
 }
 
 export function useGetWorkspace(
-  id: string
+  id: string,
 ): SWRResponse<FlowserWorkspace | undefined> {
   const { workspaceService } = useServiceRegistry();
 
@@ -205,12 +205,12 @@ export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
 export function useGetAddressIndex(address: string): SWRResponse<number> {
   const { flowService } = useServiceRegistry();
   return useSWR(`account-index/${address}`, () =>
-    flowService.getIndexOfAddress(address)
+    flowService.getIndexOfAddress(address),
   );
 }
 
 export function useGetParsedInteraction(
-  request: InteractionDefinition
+  request: InteractionDefinition,
 ): SWRResponse<ParsedInteractionOrError> {
   const { interactionsService } = useServiceRegistry();
 
@@ -218,7 +218,7 @@ export function useGetParsedInteraction(
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
   const state = useSWR(`parsed-interaction/${request.id}`, () =>
-    interactionsService.parse(request.code)
+    interactionsService.parse(request.code),
   );
 
   useEffect(() => {
@@ -234,6 +234,6 @@ export function useGetInteractionTemplates(): SWRResponse<
   const { interactionsService } = useServiceRegistry();
 
   return useSWR(`interaction-templates`, () =>
-    interactionsService.getTemplates()
+    interactionsService.getTemplates(),
   );
 }

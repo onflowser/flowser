@@ -51,7 +51,7 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   async function executeTransaction(
-    definition: InteractionDefinition
+    definition: InteractionDefinition,
   ): Promise<InteractionOutcome | undefined> {
     const { transactionOptions } = definition;
     if (!transactionOptions) {
@@ -65,7 +65,7 @@ export function InteractionOutcomeManagerProvider(props: {
       toast.error(
         `Unspecified authorizers: ${unspecifiedAuthorizers
           .map((e) => e.index + 1)
-          .join(", ")}`
+          .join(", ")}`,
       );
       hasErrors = true;
     }
@@ -105,7 +105,7 @@ export function InteractionOutcomeManagerProvider(props: {
   }
 
   async function executeScript(
-    definition: InteractionDefinition
+    definition: InteractionDefinition,
   ): Promise<InteractionOutcome | undefined> {
     try {
       const result = await flowService.executeScript({
@@ -149,7 +149,7 @@ export function InteractionOutcomeManagerProvider(props: {
           type: parameter.type,
           identifier: parameter.identifier,
         };
-      }
+      },
     );
   }
 

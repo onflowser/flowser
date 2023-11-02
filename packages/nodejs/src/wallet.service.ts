@@ -41,11 +41,11 @@ export class WalletService {
   constructor(
     private readonly cliService: FlowCliService,
     private readonly flowGateway: FlowGatewayService,
-    private readonly storageService: PersistentStorage
+    private readonly storageService: PersistentStorage,
   ) {}
 
   public async sendTransaction(
-    request: SendTransactionRequest
+    request: SendTransactionRequest,
   ): Promise<SendTransactionResponse> {
     const uniqueRoleAddresses = new Set([
       request.proposerAddress,
@@ -58,8 +58,8 @@ export class WalletService {
         async (address): Promise<[string, FlowAuthorizationFunction]> => [
           address,
           await this.withAuthorization({ address, managedKeyPairs }),
-        ]
-      )
+        ],
+      ),
     );
 
     function getAuthFunction(address: string) {
@@ -76,7 +76,7 @@ export class WalletService {
       proposer: getAuthFunction(request.proposerAddress),
       payer: getAuthFunction(request.payerAddress),
       authorizations: request.authorizerAddresses.map((address) =>
-        getAuthFunction(address)
+        getAuthFunction(address),
       ),
       arguments: request.arguments,
     });
@@ -89,7 +89,7 @@ export class WalletService {
   }): Promise<FlowAuthorizationFunction> {
     const { address, managedKeyPairs } = options;
     const managedKeyPairsOfAccount = managedKeyPairs.filter(
-      (e) => e.address === address
+      (e) => e.address === address,
     );
 
     if (managedKeyPairsOfAccount.length === 0) {
@@ -100,17 +100,17 @@ export class WalletService {
 
     const account = await this.flowGateway.getAccount(address);
     const associatedPublicKey = account.keys.find(
-      (key) => key.publicKey === managedKeyToUse.publicKey
+      (key) => key.publicKey === managedKeyToUse.publicKey,
     );
 
     if (!associatedPublicKey) {
       throw new Error(
-        `Associated public key not found for account: ${account}`
+        `Associated public key not found for account: ${account}`,
       );
     }
 
     const authn: FlowAuthorizationFunction = (
-      fclAccount: Record<string, unknown> = {}
+      fclAccount: Record<string, unknown> = {},
     ) => ({
       ...fclAccount,
       tempId: `${address}-${managedKeyToUse.privateKey}`,
@@ -125,7 +125,7 @@ export class WalletService {
           keyId: associatedPublicKey.index,
           signature: this.signWithPrivateKey(
             managedKeyToUse.privateKey,
-            signable.message
+            signable.message,
           ),
         };
       },
@@ -138,8 +138,8 @@ export class WalletService {
     const managedKeyPairs = await this.listKeyPairs();
     const associatedAccounts = await Promise.allSettled(
       managedKeyPairs.map((keyPair) =>
-        this.flowGateway.getAccount(keyPair.address)
-      )
+        this.flowGateway.getAccount(keyPair.address),
+      ),
     );
     const validKeyPairLookupByPublicKey = new Set(
       associatedAccounts
@@ -150,12 +150,12 @@ export class WalletService {
             return [];
           }
         })
-        .flat()
+        .flat(),
     );
     await this.writeKeyPairs(
       managedKeyPairs.filter((keyPair) =>
-        validKeyPairLookupByPublicKey.has(keyPair.publicKey)
-      )
+        validKeyPairLookupByPublicKey.has(keyPair.publicKey),
+      ),
     );
   }
 

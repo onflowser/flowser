@@ -107,8 +107,8 @@ export class FlowSnapshotsService extends EventEmitter {
     // Ensure we exclude the ones that were deleted without using Flowser.
     await this.persistAll(
       persistedSnapshots.filter((snapshot) =>
-        validSnapshotIdLookup.has(snapshot.id)
-      )
+        validSnapshotIdLookup.has(snapshot.id),
+      ),
     );
   }
 

@@ -72,6 +72,7 @@ export class FlowserAppService {
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
+      this.flowGatewayService,
     );
     this.flowSnapshotsStorageService = new FileStorageService();
     this.flowSnapshotsService = new FlowSnapshotsService(
