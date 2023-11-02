@@ -34,9 +34,8 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v4.1.0
 
-      - name: Install and build
+      - name: Build
         run: |
-          yarn run postinstall
           yarn run build
 
       - name: Publish releases
