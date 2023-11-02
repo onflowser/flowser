@@ -1,0 +1,54 @@
+@import "../styles/spacings";
+@import "../styles/colors";
+
+.pageRoot {
+  height: 100%;
+  display: flex;
+  column-gap: $spacing-base;
+  flex: 1;
+  background: $gray-110;
+  .leftSideMenu {
+    background: $gray-100;
+    flex: 1;
+    .content {
+      margin: $spacing-base;
+    }
+  }
+  .interactionsTabWrapper {
+    overflow-x: scroll;
+    .interactionTab {
+      max-width: 200px;
+      min-width: 200px;
+      margin-right: $spacing-s;
+      .label {
+        text-align: left;
+      }
+    }
+  }
+  .mainContent {
+    flex: 3;
+
+    .body {
+      height: 100%;
+      display: flex;
+      .content {
+        flex: 2;
+        display: flex;
+        row-gap: $spacing-base;
+        flex-direction: column;
+        overflow: hidden;
+        .code {
+          height: 60%;
+          background: $gray-100;
+        }
+        .details {
+          height: 40%;
+          background: $gray-100;
+          .error {
+            padding: $spacing-base;
+          }
+        }
+      }
+    }
+  }
+}

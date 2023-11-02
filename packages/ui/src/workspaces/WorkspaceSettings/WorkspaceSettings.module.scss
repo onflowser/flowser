@@ -1,0 +1,55 @@
+@import "../../styles/spacings";
+@import "../../styles/colors";
+@import "../../styles/typography";
+@import "../../styles/rules";
+@import "../../styles/animations";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 $spacing-xl;
+
+  .innerWrapper {
+    max-width: 1000px;
+    margin-top: $spacing-xl;
+    width: 100%;
+
+    .section {
+      margin-top: $spacing-xl;
+
+      .card {
+        padding: $spacing-l * 2 0;
+        margin-bottom: $spacing-base;
+      }
+
+      .radioCard {
+        display: flex;
+        justify-content: space-between;
+
+        .radioField {
+          flex: 1;
+          max-width: 300px;
+        }
+      }
+    }
+
+    .title {
+      color: $gray-10;
+    }
+  }
+
+  .footer {
+    margin: $spacing-xl * 2 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .footerButton {
+      margin: 0 $spacing-base;
+    }
+    .versionWrapper {
+      margin-top: $spacing-xl;
+    }
+  }
+}

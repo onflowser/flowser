@@ -1,0 +1,13 @@
+@import '../../../../../../packages/ui/src/styles/typography';
+@import '../../../../../../packages/ui/src/styles/spacings';
+
+.missingRequirementItem {
+  .title {
+    font-size: $font-size-large;
+    margin-bottom: $spacing-base;
+    display: block;
+  }
+  .description {
+    margin-bottom: $spacing-s;
+  }
+}

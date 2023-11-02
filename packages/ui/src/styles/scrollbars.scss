@@ -1,0 +1,21 @@
+@import "colors";
+
+@mixin styledScrollbars {
+  &::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb,
+  *::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 6px $gray-80;
+    border-radius: 5pt;
+  }
+}
+
+@mixin hiddenScrollbars {
+  &::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}

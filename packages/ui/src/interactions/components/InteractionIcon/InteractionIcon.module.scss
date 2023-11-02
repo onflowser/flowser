@@ -1,0 +1,14 @@
+@import "../../../styles/colors";
+
+.script {
+}
+
+.transaction {
+  * {
+    fill: $yellow;
+  }
+}
+
+.questionMark {
+  transform: scale(1.1);
+}

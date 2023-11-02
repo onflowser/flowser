@@ -1,0 +1,3 @@
+{
+  "extends": "@onflowser/config/tsconfig.json"
+}

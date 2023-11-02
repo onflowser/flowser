@@ -1,0 +1,68 @@
+@import "../../../styles/colors";
+@import "../../../styles/spacings";
+@import "../../../styles/typography";
+@import "../../../styles/animations";
+@import "../../../styles/scrollbars";
+
+.root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+
+  .header {
+    background: $gray-100;
+    position: sticky;
+    top: 0;
+    padding-bottom: $spacing-base;
+    // Question mark icon is displayed above the header for some reason.
+    z-index: 1;
+  }
+
+  .storedTemplates {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+    overflow-y: scroll;
+    @include styledScrollbars();
+    .item {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      font-size: $font-size-normal;
+      color: $gray-20;
+      @include whitenOnHover();
+
+      .trash {
+        @include scaleOnHover();
+        * {
+          fill: $gray-50;
+        }
+      }
+    }
+    .focusedItem {
+      color: $blue;
+      .trash {
+        * {
+          fill: $blue !important;
+        }
+      }
+    }
+  }
+
+  .focusedTemplate {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+    position: sticky;
+    padding-top: $spacing-base;
+    background: $gray-100;
+    bottom: 0;
+
+    .actionButtons {
+      display: flex;
+      column-gap: $spacing-base;
+    }
+  }
+}

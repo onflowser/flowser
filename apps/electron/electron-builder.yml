@@ -1,0 +1,86 @@
+productName: Flowser
+appId: dev.flowser.app
+asar: true
+asarUnpack: "**\\*.{node,dll}"
+files:
+  - dist
+  - node_modules
+  - package.json
+afterSign: '.erb/scripts/notarize.js'
+
+mac:
+  target:
+    target: default
+    arch:
+      - arm64
+      - x64
+  type: distribution
+  hardenedRuntime: true
+  entitlements: assets/entitlements.mac.plist
+  entitlementsInherit: assets/entitlements.mac.plist
+  gatekeeperAssess: false
+  artifactName: flowser-${version}-${os}-${arch}.${ext}
+  category: public.app-category.developer-tools
+
+dmg:
+  contents:
+    - x: 219
+      y: 358
+      type: dir
+      name: Flowser.app
+    - x: 439
+      y: 358
+      type: link
+      path: '/Applications'
+  artifactName: flowser-${version}-${os}-${arch}.${ext}
+  background: assets/macos-background.tiff
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: false
+  deleteAppDataOnUninstall: true
+  artifactName: flowser-${version}-${os}-${arch}.${ext}
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  artifactName: flowser-${version}-${os}-${arch}.${ext}
+  icon: generated-icons/icons/win/icon.ico
+
+linux:
+  target:
+    - target: deb
+      arch:
+        - arm64
+        - x64
+  category: Development
+  icon: generated-icons/icons/png/
+  artifactName: flowser-${version}-${os}-${arch}.${ext}
+
+directories:
+  app: release/app
+  buildResources: assets
+  output: release/build
+
+extraResources:
+  - './assets/**'
+  # To reference files outside the electron directory we need to use the FileSet API.
+  # See: https://github.com/electron-userland/electron-builder/issues/2693
+  - from: '../../packages/nodejs/bin/flowser-internal-amd64-darwin'
+    to: '.'
+  - from: '../../packages/nodejs/bin/flowser-internal-amd64-linux'
+    to: '.'
+  - from: '../../packages/nodejs/bin/flowser-internal-amd64.exe'
+    to: '.'
+
+publish:
+  provider: github
+  owner: onflowser
+  repo: flowser

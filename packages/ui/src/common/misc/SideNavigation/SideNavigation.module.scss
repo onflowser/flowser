@@ -1,0 +1,41 @@
+@import "../../../styles/colors";
+@import "../../../styles/spacings";
+@import "../../../styles/scrollbars";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: $spacing-base;
+  background: $gray-110;
+  align-items: center;
+  border-right: 1px solid $gray-80;
+  overflow-y: scroll;
+
+  @include hiddenScrollbars();
+
+  .linksWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+  }
+
+  .inactiveLink {
+    background: $gray-100;
+    opacity: 0.5;
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
+    transition: 0.1s ease-in-out all;
+  }
+
+  .activeLink {
+    border-color: #9bdefa;
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}

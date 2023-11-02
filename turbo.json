@@ -1,0 +1,21 @@
+{
+  "npmClient": "yarn",
+  "pipeline": {
+    "build": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "bin/**", ".next/**"]
+    },
+    "compile": {
+      "dependsOn": ["^build", "^compile"],
+      "outputs": ["dist/**", ".next/**"]
+    },
+    "format": {},
+    "lint": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false
+    }
+  }
+}

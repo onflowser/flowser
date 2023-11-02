@@ -1,0 +1,10 @@
+@import "../../../styles/colors";
+@import "../../../styles/typography";
+
+.root {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $blue;
+  font-size: $font-size-normal;
+}

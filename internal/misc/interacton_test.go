@@ -1,16 +1,33 @@
 package misc
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/onflow/cadence/runtime/parser"
 )
 
+func TestUnknownInteraction(t *testing.T) {
+	interaction := parseAndBuildInteraction("lorem ipsum")
+
+	if interaction.Kind != InteractionKindUnknown {
+		t.Error("Expected transaction kind unknown")
+	}
+
+	if len(interaction.Parameters) != 0 {
+		t.Error("Expected empty parameters list")
+	}
+
+	if interaction.Transaction != nil {
+		t.Error("Expected null transaction")
+	}
+}
+
 func TestSimpleInteraction(t *testing.T) {
 	interaction := parseAndBuildInteraction("transaction (addr: Address) {}")
 
 	if interaction.Kind != InteractionKindTransaction {
-		t.Error("Expected transaction kind")
+		t.Error("Expected transaction kind transaction")
 	}
 
 	if len(interaction.Parameters) != 1 {
@@ -138,7 +155,7 @@ func parseAndBuildInteraction(code string) *Interaction {
 	program, err := parser.ParseProgram(nil, []byte(code), parser.Config{})
 
 	if err != nil {
-		panic(err)
+		fmt.Printf("Interaction parsing error: %s\n", err)
 	}
 
 	return buildInteraction(program)

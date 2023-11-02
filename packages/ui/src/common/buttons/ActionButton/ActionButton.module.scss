@@ -1,0 +1,47 @@
+@import "../../../styles/spacings";
+@import "../../../styles/colors";
+@import "../../../styles/typography";
+
+.root {
+  display: flex;
+  padding: $spacing-base * 0.6 0;
+  align-items: center;
+
+  &:hover {
+    .header {
+      color: $grey;
+    }
+    .icon {
+      transform: scale(1.05);
+    }
+  }
+
+  .mainWrapper {
+    display: flex;
+    flex-direction: column;
+    margin-left: $spacing-s;
+    align-items: flex-start;
+  }
+
+  .header {
+    transition: 0.3s;
+    color: $gray-10;
+  }
+
+  .footer {
+    color: $gray-10;
+    opacity: 0.5;
+    font-size: $font-size-small;
+  }
+
+  .icon {
+    height: 30px;
+    width: 30px;
+    transition: 0.2s ease;
+
+    & > * {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

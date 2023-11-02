@@ -1,6 +1,0 @@
-@import "styles/scrollbars";
-
-.root {
-  overflow: scroll;
-  @include hiddenScrollbars()
-}

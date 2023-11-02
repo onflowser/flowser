@@ -1,0 +1,12 @@
+@import "../../../styles/colors";
+@import "../../../styles/scrollbars";
+
+.root {
+  display: inline-block;
+  font-size: 14px;
+  overflow: scroll;
+  height: 100%;
+  width: 100%;
+
+  @include hiddenScrollbars();
+}

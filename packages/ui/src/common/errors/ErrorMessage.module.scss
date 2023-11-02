@@ -1,0 +1,26 @@
+@import "../../styles/spacings";
+@import "../../styles/colors";
+@import "../../styles/typography";
+@import "../../styles/animations";
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .innerWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: $spacing-base;
+
+    .title {
+      font-size: $font-size-large;
+      color: $gray-10;
+    }
+
+    .description {
+      color: $gray-30;
+    }
+  }
+}
