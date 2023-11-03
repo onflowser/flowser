@@ -17,11 +17,21 @@ enum TransactionKind {
 
 const hardcodedTemplates: [string, TransactionKind][] = [
   [
-    `transaction(name: String, code: String ) {
-        prepare(signer: AuthAccount) {
-          signer.contracts.add(name: name, code: code.decodeHex() )
-        }
-      }`,
+    // Used by `flow emulator --contracts`
+    `transaction(name: String, code: String) {
+      prepare(signer: AuthAccount) {
+        signer.contracts.add(name: name, code: code.decodeHex() )
+      }
+    }`,
+    TransactionKind.DEPLOY_CONTRACT,
+  ],
+  // Used by `flow deploy`
+  [
+    `transaction(name: String, code: String) {
+      prepare(signer: AuthAccount) {
+        signer.contracts.add(name: name, code: code.utf8)
+      }
+    }`,
     TransactionKind.DEPLOY_CONTRACT,
   ],
   [
