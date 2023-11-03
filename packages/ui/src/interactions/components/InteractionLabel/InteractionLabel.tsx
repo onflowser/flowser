@@ -6,6 +6,7 @@ import classes from "./InteractionLabel.module.scss";
 import { InteractionDefinition } from "../../core/core-types";
 import { useGetParsedInteraction } from "../../../api";
 import { InteractionKind } from "@onflowser/api";
+import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 
 type InteractionLabelProps = {
   interaction: InteractionDefinition;
@@ -15,21 +16,20 @@ export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   const { interaction } = props;
   const { data } = useGetParsedInteraction(interaction);
 
-  if (!data) {
-    return <Spinner size={15} />;
-  }
-
   return (
     <div className={classes.root}>
       <div className={classes.iconWrapper}>
-        <InteractionIcon
+        {data ? <InteractionIcon
           interactionKind={
             data.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN
           }
-        />
+        /> : <Shimmer height={20} width={20} />}
+
       </div>
       <SizedBox width={10} inline />
-      <span className={classes.label}>{interaction.name}</span>
+      <span className={classes.label}>
+        {interaction ? interaction.name : <Shimmer height={20} width={100} />}
+      </span>
     </div>
   );
 }
