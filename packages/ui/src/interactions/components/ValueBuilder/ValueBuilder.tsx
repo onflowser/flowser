@@ -47,7 +47,9 @@ function UnknownType() {
       description={
         <div>
           For now, we only support built-in Cadence data types.
-          <ExternalLink href="https://developers.flow.com/cadence/language/values-and-types" />
+          <ExternalLink href="https://developers.flow.com/cadence/language/values-and-types">
+            Value and types
+          </ExternalLink>
         </div>
       }
     />

@@ -3,8 +3,8 @@ import { useInteractionRegistry } from "../../contexts/interaction-registry.cont
 import classes from "./InteractionTemplates.module.scss";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { PrimaryButton } from "../../../common/buttons/PrimaryButton/PrimaryButton";
-import { Input } from "../../../common/inputs/Input/Input";
-import { SearchInput } from "../../../common/inputs/SearchInput/SearchInput";
+import { Input } from "../../../common/inputs";
+import { SearchInput } from "../../../common/inputs";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
