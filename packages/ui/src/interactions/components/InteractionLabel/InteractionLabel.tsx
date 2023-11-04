@@ -19,12 +19,15 @@ export function InteractionLabel(props: InteractionLabelProps): ReactElement {
   return (
     <div className={classes.root}>
       <div className={classes.iconWrapper}>
-        {data ? <InteractionIcon
-          interactionKind={
-            data.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN
-          }
-        /> : <Shimmer height={20} width={20} />}
-
+        {data ? (
+          <InteractionIcon
+            interactionKind={
+              data.interaction?.kind ?? InteractionKind.INTERACTION_UNKNOWN
+            }
+          />
+        ) : (
+          <Shimmer height={20} width={20} />
+        )}
       </div>
       <SizedBox width={10} inline />
       <span className={classes.label}>

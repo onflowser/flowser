@@ -22,7 +22,21 @@ export class WorkspaceService extends EventEmitter {
     this.temporaryWorkspaceLookup = new Map();
   }
 
-  async getOpenWorkspaces(): Promise<FlowserWorkspace[]> {
+  async getOpenWorkspace(): Promise<FlowserWorkspace | undefined> {
+    const [openWorkspace] = await this.getOpenWorkspaces();
+    // There will be only 1 open workspace for now.
+    return openWorkspace;
+  }
+
+  async getOpenWorkspaceOrThrow(): Promise<FlowserWorkspace> {
+    const openWorkspace = await this.getOpenWorkspace();
+    if (!openWorkspace) {
+      throw new Error('Open workspace not found');
+    }
+    return openWorkspace;
+  }
+
+  private async getOpenWorkspaces(): Promise<FlowserWorkspace[]> {
     const allWorkspaces = await this.findAll();
     return allWorkspaces.filter((workspace) =>
       this.openWorkspaceIds.has(workspace.id),

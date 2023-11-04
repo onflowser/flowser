@@ -1,6 +1,6 @@
 import { CSSProperties } from "react";
 import Skeleton from "react-loading-skeleton";
-import 'react-loading-skeleton/dist/skeleton.css'
+import "react-loading-skeleton/dist/skeleton.css";
 
 export interface ShimmerProps {
   height?: number | string;
@@ -11,13 +11,7 @@ export interface ShimmerProps {
 }
 
 export function Shimmer(props: ShimmerProps) {
-  const {
-    height,
-    width,
-    className,
-    style,
-    inline,
-  } = props;
+  const { height, width, className, style, inline } = props;
 
   return (
     <Skeleton
@@ -29,7 +23,7 @@ export function Shimmer(props: ShimmerProps) {
         width,
         borderRadius: 10,
         ...style,
-        zIndex: 'unset'
+        zIndex: "unset",
       }}
       baseColor="#474752"
       highlightColor="#575762"

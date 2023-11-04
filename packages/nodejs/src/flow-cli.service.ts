@@ -1,6 +1,4 @@
-import {
-  ProcessOutputSource,
-} from "./processes/managed-process";
+import { ProcessOutputSource } from "./processes/managed-process";
 import { ProcessManagerService } from "./processes/process-manager.service";
 import { randomUUID } from "crypto";
 import { HashAlgorithm, SignatureAlgorithm } from "@onflowser/api";

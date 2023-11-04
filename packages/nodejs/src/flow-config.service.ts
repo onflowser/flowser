@@ -3,6 +3,7 @@ import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
 import { IFlowserLogger, isObject } from "@onflowser/core";
+import { EventEmitter } from "node:events";
 
 type FlowAddress = string;
 
@@ -83,13 +84,19 @@ type FlowConfigServiceConfig = {
   workspacePath: string;
 };
 
-export class FlowConfigService {
+export enum FlowConfigEvent {
+  FLOW_JSON_UPDATE = "FLOW_JSON_UPDATE"
+}
+
+export class FlowConfigService extends EventEmitter {
   private fileListenerController: AbortController | undefined;
   private config: FlowJSON | undefined;
   private configFileName = "flow.json";
   private workingDirectoryPath: string | undefined;
 
-  constructor(private readonly logger: IFlowserLogger) {}
+  constructor(private readonly logger: IFlowserLogger) {
+    super();
+  }
 
   public async configure(config: FlowConfigServiceConfig) {
     this.workingDirectoryPath = config.workspacePath;
@@ -192,10 +199,6 @@ export class FlowConfigService {
     return typeof keyConfig === "string" ? keyConfig : keyConfig.privateKey;
   }
 
-  public hasConfigFile(): boolean {
-    return fs.existsSync(this.getConfigPath());
-  }
-
   private async attachListeners() {
     this.fileListenerController = new AbortController();
     const { signal } = this.fileListenerController;
@@ -203,8 +206,9 @@ export class FlowConfigService {
       // @ts-ignore AbortController type (because it's a polyfill)
       const watcher = watch(this.getConfigPath(), { signal });
       for await (const event of watcher) {
-        // TODO(milestone-x): Refresh dependant services when config changes
+        this.logger.debug("Detected file change, reloading config from flow.json")
         await this.load();
+        this.emit(FlowConfigEvent.FLOW_JSON_UPDATE)
       }
     } catch (error) {
       if (isObject(error) && error["name"] !== "AbortError") {
