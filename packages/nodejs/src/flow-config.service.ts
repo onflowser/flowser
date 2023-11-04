@@ -85,7 +85,7 @@ type FlowConfigServiceConfig = {
 };
 
 export enum FlowConfigEvent {
-  FLOW_JSON_UPDATE = "FLOW_JSON_UPDATE"
+  FLOW_JSON_UPDATE = "FLOW_JSON_UPDATE",
 }
 
 export class FlowConfigService extends EventEmitter {
@@ -206,9 +206,11 @@ export class FlowConfigService extends EventEmitter {
       // @ts-ignore AbortController type (because it's a polyfill)
       const watcher = watch(this.getConfigPath(), { signal });
       for await (const event of watcher) {
-        this.logger.debug("Detected file change, reloading config from flow.json")
+        this.logger.debug(
+          "Detected file change, reloading config from flow.json",
+        );
         await this.load();
-        this.emit(FlowConfigEvent.FLOW_JSON_UPDATE)
+        this.emit(FlowConfigEvent.FLOW_JSON_UPDATE);
       }
     } catch (error) {
       if (isObject(error) && error["name"] !== "AbortError") {

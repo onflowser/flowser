@@ -1,4 +1,7 @@
-import { ManagedProcess } from "./processes/managed-process";
+import {
+  ManagedProcess,
+  ManagedProcessOutput,
+} from "./processes/managed-process";
 import {
   FlowApiStatus,
   FlowGatewayService,

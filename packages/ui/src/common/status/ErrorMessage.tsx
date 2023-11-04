@@ -35,7 +35,5 @@ type TransactionErrorProps = {
 };
 
 export function TransactionError(props: TransactionErrorProps): ReactElement {
-  return (
-    <pre className={classes.root}>{props.errorMessage}</pre>
-  );
+  return <pre className={classes.root}>{props.errorMessage}</pre>;
 }
