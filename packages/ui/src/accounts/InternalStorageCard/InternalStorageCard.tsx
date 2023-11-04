@@ -6,6 +6,7 @@ import { JsonView } from "../../common/code/JsonView/JsonView";
 import { StorageDataTypes } from "../StorageDataTypes/StorageDataTypes";
 import { FlowUtils } from "../../utils/flow-utils";
 import { FlowAccountStorage } from "@onflowser/api";
+import { useGetTokenMetadataList } from "../../api";
 
 type ExtendableStorageCardProps = {
   storageItem: FlowAccountStorage;
@@ -25,8 +26,13 @@ export function InternalStorageCard({
     [classes.gridItemExtended]: isExpanded,
     [classes.introAnimation]: false,
   });
-
+  const {data: tokenMetadataList} = useGetTokenMetadataList();
   const pathIdentifier = storageItem.path.split("/").reverse()[0];
+  const tokenMetadata = tokenMetadataList?.find(token => new Set([
+    token.path.balance,
+    token.path.vault,
+    token.path.receiver,
+  ]).has(storageItem.path));
 
   return (
     <div id={storageItem.id} className={extendClass}>
@@ -39,7 +45,16 @@ export function InternalStorageCard({
         </div>
       </SimpleButton>
       <div className={classes.body}>
-        <div className={classes.title}>{pathIdentifier}</div>
+        <div className={classes.titleAndLogo}>
+          {tokenMetadata && (
+            <img
+              style={{ height: 20, width: 20 }}
+              alt="Token logo"
+              src={tokenMetadata.logoURI}
+            />
+          )}
+          <div className={classes.title}>{pathIdentifier}</div>
+        </div>
         {isExpanded ? (
           <JsonView
             name="data"

@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { FlowAccountStorage } from "@onflowser/api";
+import { useGetTokenMetadataList } from "../../api";
 
 type StorageCardProps = {
   currentAccountAddress: string;
@@ -22,6 +23,12 @@ export function PublicPrivateStorageCard({
     currentAccountAddress,
     storageItem,
   });
+  const {data: tokenMetadataList} = useGetTokenMetadataList();
+  const tokenMetadata = tokenMetadataList?.find(token => new Set([
+    token.path.balance,
+    token.path.vault,
+    token.path.receiver,
+  ]).has(storageItem.targetPath));
 
   const pathIdentifier = storageItem.path.split("/").reverse()[0];
 
@@ -36,7 +43,16 @@ export function PublicPrivateStorageCard({
         <div className={classes.domainBadgeWrapper}>
           <StorageDomainBadge pathDomain={storageItem.domain} />
         </div>
-        <div className={classes.identifier}>{pathIdentifier}</div>
+        <div className={classes.identifierAndLogo}>
+          {tokenMetadata && (
+            <img
+              style={{ height: 20, width: 20 }}
+              alt="Token logo"
+              src={tokenMetadata.logoURI}
+            />
+          )}
+          <div className={classes.identifier}>{pathIdentifier}</div>
+        </div>
         <ProjectLink className={classes.link} to={targetStorageCardUrl} replace>
           <FlowserIcon.Link />
           <div className={classes.linkText}>{storageItem.targetPath}</div>

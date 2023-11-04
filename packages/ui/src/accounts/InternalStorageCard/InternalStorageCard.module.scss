@@ -62,6 +62,12 @@
     margin: $spacing-base;
     row-gap: $spacing-base;
 
+    .titleAndLogo {
+      display: flex;
+      align-items: center;
+      column-gap: $spacing-s;
+    }
+
     .title {
       display: inline-block;
       font-weight: bold;
