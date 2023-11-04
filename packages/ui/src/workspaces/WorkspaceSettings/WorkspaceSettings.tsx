@@ -292,13 +292,13 @@ export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
               <EmulatorToggleField
                 label="Persist"
                 path="persist"
-                description="Persist emaulator blockchain state between restarts"
+                description="Persist blockchain state between restarts"
                 formik={formik}
               />
               <EmulatorToggleField
                 label="Snapshots"
                 path="snapshot"
-                description="Enable blockchain state snapshots (this option automatically enables persistence)"
+                description="Enable blockchain state snapshots"
                 formik={formik}
               />
               <EmulatorToggleField
