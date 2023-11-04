@@ -12,7 +12,7 @@ import { useServiceRegistry } from "../../../../contexts/service-registry.contex
 import { useGetAccounts, useGetManagedKeys } from "../../../../api";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
-  const { disabled, value, setValue, addressBuilderOptions } = props;
+  const { disabled, value, type, setValue, addressBuilderOptions } = props;
   const { data, mutate } = useGetAccounts();
   const { walletService } = useServiceRegistry();
   const { data: allKeys } = useGetManagedKeys();
@@ -34,10 +34,22 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
     const defaultAccount =
       accountsToShow?.find((account) => account.address === serviceAddress) ??
       accountsToShow?.[0];
-    if (!FclValueUtils.isFclAddressValue(value) && defaultAccount) {
+    if (
+      !FclValueUtils.isFclAddressValue(value) &&
+      defaultAccount &&
+      !type.optional
+    ) {
       setValue(defaultAccount.address);
     }
   }, [accountsToShow]);
+
+  function toggleOrSelect(address: string) {
+    if (type.optional && value === address) {
+      setValue("")
+    } else {
+      setValue(address)
+    }
+  }
 
   async function createNewAccount() {
     await walletService.createAccount();
@@ -53,7 +65,7 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
             disabled={disabled}
             account={account}
             isSelected={value === account.address}
-            onSelect={() => setValue(account.address)}
+            onSelect={() => toggleOrSelect(account.address)}
           />
         ))}
         {!disabled && (
