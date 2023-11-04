@@ -79,10 +79,9 @@ export function registerHandlers(appService: FlowserAppService) {
     INTERACTIONS_PARSE: (event: IpcMainInvokeEvent, sourceCode: string) =>
       flowInteractionsService.parse(sourceCode),
     INTERACTIONS_LIST_TEMPLATES: async () => {
-      // There will be only 1 open workspace for now.
-      const openWorkspaces = await workspaceService.getOpenWorkspaces();
+      const openWorkspace = await workspaceService.getOpenWorkspaceOrThrow();
       return flowInteractionsService.getTemplates({
-        workspacePath: openWorkspaces[0].filesystemPath,
+        workspacePath: openWorkspace.filesystemPath,
       });
     },
 
@@ -103,10 +102,9 @@ export function registerHandlers(appService: FlowserAppService) {
 
     WALLET_KEY_LIST: () => walletService.listKeyPairs(),
     WALLET_ACCOUNT_CREATE: async () => {
-      // There will be only 1 open workspace for now.
-      const openWorkspaces = await workspaceService.getOpenWorkspaces();
+      const openWorkspace = await workspaceService.getOpenWorkspaceOrThrow();
       return walletService.createAccount({
-        workspacePath: openWorkspaces[0].filesystemPath,
+        workspacePath: openWorkspace.filesystemPath,
       });
     },
 

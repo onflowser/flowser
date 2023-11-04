@@ -8,7 +8,6 @@ import {
   FlowContract,
   FlowEvent,
   FlowserWorkspace,
-  FlowserUsageRequirement,
   FlowStateSnapshot,
   FlowTransaction,
   InteractionTemplate,

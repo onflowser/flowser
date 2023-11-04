@@ -9,6 +9,7 @@ import {
 import {
   AsyncIntervalScheduler,
   FlowCliService,
+  FlowConfigEvent,
   FlowConfigService,
   FlowEmulatorService,
   FlowInteractionsService,
@@ -190,6 +191,13 @@ export class FlowserAppService {
         'Failed to jump to snapshot',
       ).bind(this),
     );
+    this.flowConfigService.on(
+      FlowConfigEvent.FLOW_JSON_UPDATE,
+      this.handleListenerError(
+        this.onFlowJsonUpdate.bind(this),
+        'Failed to reload flow config',
+      ).bind(this),
+    );
   }
 
   private handleListenerError(
@@ -213,6 +221,19 @@ export class FlowserAppService {
         }
       }
     };
+  }
+
+  private async onFlowJsonUpdate() {
+    const openWorkspace = await this.workspaceService.getOpenWorkspace();
+
+    if (openWorkspace) {
+      this.flowGatewayService.configure({
+        flowJSON: this.flowConfigService.getFlowJSON(),
+        restServerAddress: `http://localhost:${
+          openWorkspace.emulator?.restServerPort ?? 8888
+        }`,
+      });
+    }
   }
 
   private async onRollbackToBlockHeight() {

@@ -56,6 +56,16 @@ export class FclValueUtils {
     t: FclTypeLookup,
     cadenceType: CadenceType,
   ): unknown {
+    if (cadenceType.optional) {
+      return t.Optional(
+        this.getFclType(
+          t,
+          // Trick to avoid infinite recursion.
+          // Should we instead represent optionally with a type node as any other type?
+          { ...cadenceType, optional: false },
+        ),
+      );
+    }
     switch (cadenceType.kind) {
       case CadenceTypeKind.CADENCE_TYPE_FIXED_POINT_NUMBER:
       case CadenceTypeKind.CADENCE_TYPE_INTEGER_NUMBER:
