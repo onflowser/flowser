@@ -45,9 +45,9 @@ export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
 
   function toggleOrSelect(address: string) {
     if (type.optional && value === address) {
-      setValue("")
+      setValue("");
     } else {
-      setValue(address)
+      setValue(address);
     }
   }
 

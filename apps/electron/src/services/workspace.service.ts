@@ -7,6 +7,7 @@ import { PersistentStorage } from '@onflowser/core/src/persistent-storage';
 export enum WorkspaceEvent {
   WORKSPACE_OPEN = 'WORKSPACE_OPEN',
   WORKSPACE_CLOSE = 'WORKSPACE_CLOSE',
+  WORKSPACE_UPDATE = 'WORKSPACE_UPDATE',
 }
 
 export class WorkspaceService extends EventEmitter {
@@ -84,6 +85,8 @@ export class WorkspaceService extends EventEmitter {
           : existingWorkspace,
       ),
     );
+
+    this.emit(WorkspaceEvent.WORKSPACE_UPDATE, updatedWorkspace.id);
   }
 
   async findById(id: string): Promise<FlowserWorkspace | undefined> {

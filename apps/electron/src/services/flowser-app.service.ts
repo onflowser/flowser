@@ -20,6 +20,7 @@ import {
 import path from 'path';
 import crypto from 'crypto';
 import { app, BrowserWindow, dialog } from 'electron';
+import { FlowserWorkspace } from '@onflowser/api';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 import { FileStorageService } from './file-storage.service';
@@ -177,6 +178,13 @@ export class FlowserAppService {
         'Failed to close workspace',
       ).bind(this),
     );
+    this.workspaceService.on(
+      WorkspaceEvent.WORKSPACE_UPDATE,
+      this.handleListenerError(
+        this.onWorkspaceUpdate.bind(this),
+        'Failed to update workspace',
+      ).bind(this),
+    );
     this.flowSnapshotsService.on(
       FlowSnapshotsEvent.ROLLBACK_TO_HEIGHT,
       this.handleListenerError(
@@ -208,6 +216,7 @@ export class FlowserAppService {
       try {
         await listener(...args);
       } catch (error) {
+        this.logger.error(error);
         const result = await dialog.showMessageBox(this.window, {
           message: errorMessage,
           detail: isErrorWithMessage(error) ? error.message : undefined,
@@ -241,12 +250,41 @@ export class FlowserAppService {
     await this.walletService.synchronizeIndex();
   }
 
+  private async onWorkspaceUpdate(workspaceId: string) {
+    const workspace = await this.workspaceService.findByIdOrThrow(workspaceId);
+
+    await this.flowEmulatorService.stopAndCleanup();
+
+    await this.startAndReindexEmulator(workspace);
+  }
+
   private async onWorkspaceOpen(workspaceId: string) {
     const workspace = await this.workspaceService.findByIdOrThrow(workspaceId);
 
     await this.flowConfigService.configure({
       workspacePath: workspace.filesystemPath,
     });
+
+    // Separately store of each workspaces' data.
+    this.flowSnapshotsStorageService.setFileName(
+      `flowser-snapshots-${workspaceId}.json`,
+    );
+
+    this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);
+
+    this.processingScheduler.start();
+    await this.startAndReindexEmulator(workspace);
+  }
+
+  private async startAndReindexEmulator(workspace: FlowserWorkspace) {
+    if (workspace.emulator) {
+      // TODO: Sometimes when we restart the emulator,
+      //  it complains that port 8080 is already taken.
+      await this.flowEmulatorService.start({
+        workspacePath: workspace.filesystemPath,
+        config: workspace.emulator,
+      });
+    }
 
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
@@ -255,22 +293,7 @@ export class FlowserAppService {
       }`,
     });
 
-    this.processingScheduler.start();
-
-    if (workspace.emulator) {
-      await this.flowEmulatorService.start({
-        workspacePath: workspace.filesystemPath,
-        config: workspace.emulator,
-      });
-    }
-
-    // Separately store of each workspaces' data.
-    this.flowSnapshotsStorageService.setFileName(
-      `flowser-snapshots-${workspaceId}.json`,
-    );
-
-    this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);
-    await this.walletService.synchronizeIndex();
+    this.blockchainIndexService.clear();
 
     if (workspace.emulator) {
       this.flowSnapshotsService.configure({
@@ -283,6 +306,7 @@ export class FlowserAppService {
       });
     }
 
+    await this.walletService.synchronizeIndex();
     await this.flowSnapshotsService.synchronizeIndex();
   }
 

@@ -105,10 +105,13 @@ export class ManagedProcess extends EventEmitter {
       if (!this.childProcess) {
         return;
       }
-      const isKilledSuccessfully = this.childProcess.kill("SIGINT");
       this.childProcess.once("error", (error) => {
         reject(error);
       });
+      this.childProcess.once("exit", (exitCode) => {
+        resolve(exitCode);
+      });
+      const isKilledSuccessfully = this.childProcess.kill("SIGINT");
       if (!isKilledSuccessfully) {
         this.logger.debug(
           `Process ${this.name} (${this.id}) didn't shutdown given SIGINT`,
@@ -116,9 +119,6 @@ export class ManagedProcess extends EventEmitter {
         // If the SIGINT signal doesn't work, force kill with SIGINT
         this.childProcess.kill("SIGKILL");
       }
-      this.childProcess.once("exit", (exitCode) => {
-        resolve(exitCode);
-      });
       // In the worst case, just inform the user that shutdown failed
       const rejectionTimeoutSec = 6;
       setTimeout(() => {
