@@ -244,4 +244,3 @@ export function useGetTokenMetadataList() {
     return tokenListContainer.getList();
   });
 }
-

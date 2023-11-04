@@ -27,13 +27,13 @@ export function InternalStorageCard({
     [classes.gridItemExtended]: isExpanded,
     [classes.introAnimation]: false,
   });
-  const {data: tokenMetadataList} = useGetTokenMetadataList();
+  const { data: tokenMetadataList } = useGetTokenMetadataList();
   const pathIdentifier = storageItem.path.split("/").reverse()[0];
-  const tokenMetadata = tokenMetadataList?.find(token => new Set([
-    token.path.balance,
-    token.path.vault,
-    token.path.receiver,
-  ]).has(storageItem.path));
+  const tokenMetadata = tokenMetadataList?.find((token) =>
+    new Set([token.path.balance, token.path.vault, token.path.receiver]).has(
+      storageItem.path,
+    ),
+  );
 
   return (
     <div id={storageItem.id} className={extendClass}>

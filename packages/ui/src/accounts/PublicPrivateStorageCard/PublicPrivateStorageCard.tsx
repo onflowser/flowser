@@ -24,12 +24,12 @@ export function PublicPrivateStorageCard({
     currentAccountAddress,
     storageItem,
   });
-  const {data: tokenMetadataList} = useGetTokenMetadataList();
-  const tokenMetadata = tokenMetadataList?.find(token => new Set([
-    token.path.balance,
-    token.path.vault,
-    token.path.receiver,
-  ]).has(storageItem.targetPath));
+  const { data: tokenMetadataList } = useGetTokenMetadataList();
+  const tokenMetadata = tokenMetadataList?.find((token) =>
+    new Set([token.path.balance, token.path.vault, token.path.receiver]).has(
+      storageItem.targetPath,
+    ),
+  );
 
   const pathIdentifier = storageItem.path.split("/").reverse()[0];
 
