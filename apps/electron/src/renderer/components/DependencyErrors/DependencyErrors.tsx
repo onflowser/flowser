@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { ActionDialog } from '@onflowser/ui/src/common/overlays/dialogs/action/ActionDialog';
-import { ReactElement } from 'react';
+import useSWR, { SWRResponse } from 'swr';
 import classes from './DependencyErrors.module.scss';
 import {
   FlowserDependencyError,
   FlowserDependencyErrorType,
 } from '../../../services/types';
-import useSWR, { SWRResponse } from 'swr';
 
 export function DependencyErrors(): ReactElement | null {
   const { data: errors } = useGetDependencyErrors();
@@ -29,8 +28,15 @@ export function DependencyErrors(): ReactElement | null {
 }
 
 function useGetDependencyErrors(): SWRResponse<FlowserDependencyError[]> {
-  return useSWR(`dependency-errors`, () =>
-    window.electron.app.listDependencyErrors(),
+  return useSWR<FlowserDependencyError[]>(
+    `dependency-errors`,
+    () => window.electron.app.listDependencyErrors(),
+    {
+      // Let's assume that once the user resolves the errors,
+      // there will be no need to validate them again within the same app session.
+      // They will always be re-validated on the next app run.
+      refreshInterval: (data) => (data?.length === 0 ? 0 : 1000),
+    },
   );
 }
 
