@@ -7,6 +7,7 @@ import { StorageDataTypes } from "../StorageDataTypes/StorageDataTypes";
 import { FlowUtils } from "../../utils/flow-utils";
 import { FlowAccountStorage } from "@onflowser/api";
 import { useGetTokenMetadataList } from "../../api";
+import { TokenIcon } from "../../common/icons/TokenIcon/TokenIcon";
 
 type ExtendableStorageCardProps = {
   storageItem: FlowAccountStorage;
@@ -46,13 +47,7 @@ export function InternalStorageCard({
       </SimpleButton>
       <div className={classes.body}>
         <div className={classes.titleAndLogo}>
-          {tokenMetadata && (
-            <img
-              style={{ height: 20, width: 20 }}
-              alt="Token logo"
-              src={tokenMetadata.logoURI}
-            />
-          )}
+          {tokenMetadata && <TokenIcon token={tokenMetadata} />}
           <div className={classes.title}>{pathIdentifier}</div>
         </div>
         {isExpanded ? (

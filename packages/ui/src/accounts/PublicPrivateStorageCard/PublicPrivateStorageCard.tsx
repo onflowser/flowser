@@ -7,6 +7,7 @@ import { ProjectLink } from "../../common/links/ProjectLink";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { FlowAccountStorage } from "@onflowser/api";
 import { useGetTokenMetadataList } from "../../api";
+import { TokenIcon } from "../../common/icons/TokenIcon/TokenIcon";
 
 type StorageCardProps = {
   currentAccountAddress: string;
@@ -44,13 +45,7 @@ export function PublicPrivateStorageCard({
           <StorageDomainBadge pathDomain={storageItem.domain} />
         </div>
         <div className={classes.identifierAndLogo}>
-          {tokenMetadata && (
-            <img
-              style={{ height: 20, width: 20 }}
-              alt="Token logo"
-              src={tokenMetadata.logoURI}
-            />
-          )}
+          {tokenMetadata && <TokenIcon token={tokenMetadata} />}
           <div className={classes.identifier}>{pathIdentifier}</div>
         </div>
         <ProjectLink className={classes.link} to={targetStorageCardUrl} replace>
