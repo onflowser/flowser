@@ -11,6 +11,7 @@ import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { IdeLink } from "../../common/links/IdeLink";
 import { useGetContract } from "../../api";
+import { ContractName } from "../ContractName/ContractName";
 
 type ContractDetailsProps = {
   contractId: string;
@@ -29,7 +30,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   const rows: DetailsCardColumn = [
     {
       label: "Name",
-      value: contract.name,
+      value: <ContractName contract={contract} />,
     },
     {
       label: "Account",
