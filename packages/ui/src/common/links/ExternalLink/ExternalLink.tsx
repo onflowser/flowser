@@ -30,5 +30,5 @@ export function ExternalLink({
 }
 
 function prettifyUrl(url: string) {
-  return url.replace(/https?:\/\//, "");
+  return url.replace(/https?:\/\//, "").replace(/www\./, "");
 }
