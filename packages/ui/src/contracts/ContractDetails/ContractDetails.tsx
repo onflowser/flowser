@@ -24,13 +24,15 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
 ) => {
   const { contractId } = props;
   const { isLoading, data: contract } = useGetContract(contractId);
-  const {data: tokenMetadataList} = useGetTokenMetadataList();
+  const { data: tokenMetadataList } = useGetTokenMetadataList();
 
   if (isLoading || !contract) {
     return <FullScreenLoading />;
   }
 
-  const tokenMetadata = tokenMetadataList?.find(token => token.contractName === contract.name)
+  const tokenMetadata = tokenMetadataList?.find(
+    (token) => token.contractName === contract.name,
+  );
 
   const primaryColumn: DetailsCardColumn = [
     {
@@ -65,12 +67,10 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     },
   );
 
-  const columns: DetailsCardColumn[] = [
-    primaryColumn
-  ];
+  const columns: DetailsCardColumn[] = [primaryColumn];
 
   if (tokenMetadata?.extensions) {
-    columns.push(buildMetadataUrlsColumn(tokenMetadata.extensions))
+    columns.push(buildMetadataUrlsColumn(tokenMetadata.extensions));
   }
 
   return (
@@ -94,49 +94,56 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   );
 };
 
-function buildMetadataUrlsColumn(extensions: TokenExtensions): DetailsCardColumn {
+function buildMetadataUrlsColumn(
+  extensions: TokenExtensions,
+): DetailsCardColumn {
   const metadataColumn: DetailsCardColumn = [];
 
   if (extensions.website) {
     metadataColumn.push({
       label: "Website",
-      value: <ExternalLink href={extensions.website} inline/>
-    })
+      value: <ExternalLink href={extensions.website} inline />,
+    });
   }
 
   if (extensions.github) {
     metadataColumn.push({
       label: "Github",
-      value: <ExternalLink href={extensions.github} inline/>
-    })
+      value: <ExternalLink href={extensions.github} inline />,
+    });
   }
 
   if (extensions.discord) {
     metadataColumn.push({
       label: "Discord",
-      value: <ExternalLink href={extensions.discord} inline/>
-    })
+      value: <ExternalLink href={extensions.discord} inline />,
+    });
   }
 
   if (extensions.twitter) {
     metadataColumn.push({
       label: "Twitter",
-      value: <ExternalLink href={extensions.twitter} inline/>
-    })
+      value: <ExternalLink href={extensions.twitter} inline />,
+    });
   }
 
   if (extensions.medium) {
     metadataColumn.push({
       label: "Medium",
-      value: <ExternalLink href={extensions.medium} inline/>
-    })
+      value: <ExternalLink href={extensions.medium} inline />,
+    });
   }
 
   if (extensions.coingeckoId) {
     metadataColumn.push({
       label: "CoinGecko",
-      value: <ExternalLink href={`https://www.coingecko.com/en/coins/${extensions.coingeckoId}`} inline />
-    })
+      value: (
+        <ExternalLink
+          href={`https://www.coingecko.com/en/coins/${extensions.coingeckoId}`}
+          inline
+        />
+      ),
+    });
   }
 
   return metadataColumn;
