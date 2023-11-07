@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import FullScreenLoading from "../../common/loaders/FullScreenLoading/FullScreenLoading";
 import classes from "./ContractDetails.module.scss";
 import {
   DetailsCard,
@@ -11,29 +10,31 @@ import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { IdeLink } from "../../common/links/IdeLink";
 import {
-  useGetContract,
+  useGetEventsByContract,
   useGetFlowConfigContracts,
   useGetTokenMetadataList,
 } from "../../api";
 import { ContractName } from "../ContractName/ContractName";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 import { TokenExtensions } from "flow-native-token-registry";
+import { StyledTabs } from "../../common/tabs/StyledTabs/StyledTabs";
+import { BaseTabItem } from "../../common/tabs/BaseTabs/BaseTabs";
+import { FlowConfigContract } from "../../contexts/service-registry.context";
+import { FlowContract } from "@onflowser/api";
+import { EventsTable } from "../../events/EventsTable/EventsTable";
+import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 
 type ContractDetailsProps = {
-  contractId: string;
+  contract: FlowContract;
 };
 
 export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   props,
 ) => {
-  const { contractId } = props;
-  const { isLoading, data: contract } = useGetContract(contractId);
+  const { contract } = props;
   const { data: tokenMetadataList } = useGetTokenMetadataList();
   const { data: flowConfigContracts } = useGetFlowConfigContracts();
-
-  if (isLoading || !contract) {
-    return <FullScreenLoading />;
-  }
+  const { data: events } = useGetEventsByContract(contract);
 
   const tokenMetadata = tokenMetadataList?.find(
     (token) => token.contractName === contract.name,
@@ -45,10 +46,10 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
       value: <ContractName contract={contract} />,
     },
     {
-      label: "Account",
+      label: "Deployed on",
       value: (
         <ProjectLink to={`/accounts/${contract.address}`}>
-          {contract.address}
+          <AccountLink address={contract.address} />
         </ProjectLink>
       ),
     },
@@ -82,24 +83,53 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     columns.push(buildMetadataUrlsColumn(tokenMetadata.extensions));
   }
 
+  const tabs: BaseTabItem[] = [
+    {
+      id: "code",
+      label: "Code",
+      content: (
+        <ContractCode
+          flowConfigContract={flowConfigContract}
+          contract={contract}
+        />
+      ),
+    },
+    {
+      id: "events",
+      label: "Events",
+      content: <EventsTable events={events ?? []} />,
+    },
+  ];
+
   return (
     <div className={classes.root}>
       <DetailsCard columns={columns} />
       <SizedBox height={30} />
-      <div className={classes.codeWrapper}>
-        {flowConfigContract && (
-          <div className={classes.actionButtons}>
-            Open in:
-            <IdeLink.VsCode filePath={flowConfigContract.absolutePath} />
-            <IdeLink.WebStorm filePath={flowConfigContract.absolutePath} />
-            <IdeLink.IntellijIdea filePath={flowConfigContract.absolutePath} />
-          </div>
-        )}
-        <CadenceEditor value={contract.code} editable={false} />
-      </div>
+
+      <StyledTabs tabs={tabs} />
     </div>
   );
 };
+
+function ContractCode(props: {
+  flowConfigContract: FlowConfigContract | undefined;
+  contract: FlowContract;
+}) {
+  const { flowConfigContract, contract } = props;
+  return (
+    <div className={classes.codeWrapper}>
+      {flowConfigContract && (
+        <div className={classes.actionButtons}>
+          Open in:
+          <IdeLink.VsCode filePath={flowConfigContract.absolutePath} />
+          <IdeLink.WebStorm filePath={flowConfigContract.absolutePath} />
+          <IdeLink.IntellijIdea filePath={flowConfigContract.absolutePath} />
+        </div>
+      )}
+      <CadenceEditor value={contract.code} editable={false} />
+    </div>
+  );
+}
 
 function buildMetadataUrlsColumn(
   extensions: TokenExtensions,

@@ -19,6 +19,7 @@ import { useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
+import { ensureNonPrefixedAddress } from "@onflowser/core";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -149,14 +150,34 @@ export function useGetEvents(): SWRResponse<FlowEvent[]> {
 }
 
 export function useGetEventsByTransaction(
-  id: string,
+  transaction: FlowTransaction,
 ): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
-  return useSWR(`${id}/events`, () =>
+  return useSWR(`${transaction.id}/events`, () =>
     eventsIndex
       .findAll()
-      .then((res) => res.filter((e) => e.transactionId === id)),
+      .then((res) => res.filter((e) => e.transactionId === transaction.id)),
+  );
+}
+
+export function useGetEventsByContract(
+  contract: FlowContract,
+): SWRResponse<FlowEvent[]> {
+  const { eventsIndex } = useServiceRegistry();
+
+  eventsIndex.findAll().then(console.log);
+
+  return useSWR(`${contract.id}/events`, () =>
+    eventsIndex
+      .findAll()
+      .then((res) =>
+        res.filter((e) =>
+          e.type.startsWith(
+            `A.${ensureNonPrefixedAddress(contract.address)}.${contract.name}`,
+          ),
+        ),
+      ),
   );
 }
 

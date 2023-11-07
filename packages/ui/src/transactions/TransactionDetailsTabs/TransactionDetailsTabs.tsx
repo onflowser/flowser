@@ -24,7 +24,7 @@ export function TransactionDetailsTabs(
 ): ReactElement {
   const { transaction, includeOverviewTab, includeScriptTab, ...tabProps } =
     props;
-  const { data: events } = useGetEventsByTransaction(transaction.id);
+  const { data: events } = useGetEventsByTransaction(transaction);
 
   const tabs: BaseTabItem[] = [];
 
