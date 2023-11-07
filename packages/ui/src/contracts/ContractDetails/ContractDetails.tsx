@@ -12,7 +12,7 @@ import { IdeLink } from "../../common/links/IdeLink";
 import {
   useGetEventsByContract,
   useGetFlowConfigContracts,
-  useGetTokenMetadataList
+  useGetTokenMetadataList,
 } from "../../api";
 import { ContractName } from "../ContractName/ContractName";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
@@ -31,7 +31,7 @@ type ContractDetailsProps = {
 export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   props,
 ) => {
-  const {contract} = props;
+  const { contract } = props;
   const { data: tokenMetadataList } = useGetTokenMetadataList();
   const { data: flowConfigContracts } = useGetFlowConfigContracts();
   const { data: events } = useGetEventsByContract(contract);
@@ -87,13 +87,18 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     {
       id: "code",
       label: "Code",
-      content: <ContractCode flowConfigContract={flowConfigContract} contract={contract} />
+      content: (
+        <ContractCode
+          flowConfigContract={flowConfigContract}
+          contract={contract}
+        />
+      ),
     },
     {
       id: "events",
       label: "Events",
-      content: <EventsTable events={events ?? []} />
-    }
+      content: <EventsTable events={events ?? []} />,
+    },
   ];
 
   return (
@@ -110,7 +115,7 @@ function ContractCode(props: {
   flowConfigContract: FlowConfigContract | undefined;
   contract: FlowContract;
 }) {
-  const {flowConfigContract, contract} = props;
+  const { flowConfigContract, contract } = props;
   return (
     <div className={classes.codeWrapper}>
       {flowConfigContract && (
@@ -123,7 +128,7 @@ function ContractCode(props: {
       )}
       <CadenceEditor value={contract.code} editable={false} />
     </div>
-  )
+  );
 }
 
 function buildMetadataUrlsColumn(

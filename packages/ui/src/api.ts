@@ -166,13 +166,18 @@ export function useGetEventsByContract(
 ): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
-  eventsIndex
-    .findAll().then(console.log)
+  eventsIndex.findAll().then(console.log);
 
   return useSWR(`${contract.id}/events`, () =>
     eventsIndex
       .findAll()
-      .then((res) => res.filter((e) => e.type.startsWith(`A.${ensureNonPrefixedAddress(contract.address)}.${contract.name}`))),
+      .then((res) =>
+        res.filter((e) =>
+          e.type.startsWith(
+            `A.${ensureNonPrefixedAddress(contract.address)}.${contract.name}`,
+          ),
+        ),
+      ),
   );
 }
 
