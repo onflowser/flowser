@@ -19,6 +19,7 @@ export function registerHandlers(appService: FlowserAppService) {
     blockchainIndexService,
     flowInteractionsService,
     flowCliService,
+    flowConfigService,
     goBindingsService,
     flowGatewayService,
     walletService,
@@ -91,6 +92,8 @@ export function registerHandlers(appService: FlowserAppService) {
         chainId: 'flow-emulator',
       }),
     FLOW_CLI_GET_INFO: () => flowCliService.getVersion(),
+    FLOW_CONFIG_GET_CONTRACTS: () => flowConfigService.getContracts(),
+    FLOW_CONFIG_GET_ACCOUNTS: () => flowConfigService.getAccounts(),
     FLOW_TRANSACTION_SEND: (
       event: IpcMainInvokeEvent,
       request: SendTransactionRequest,

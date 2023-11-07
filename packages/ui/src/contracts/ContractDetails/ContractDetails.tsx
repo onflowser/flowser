@@ -10,7 +10,7 @@ import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { IdeLink } from "../../common/links/IdeLink";
-import { useGetContract, useGetTokenMetadataList } from "../../api";
+import { useGetContract, useGetFlowConfigContracts, useGetTokenMetadataList } from "../../api";
 import { ContractName } from "../ContractName/ContractName";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 import { TokenExtensions } from "flow-native-token-registry";
@@ -25,6 +25,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   const { contractId } = props;
   const { isLoading, data: contract } = useGetContract(contractId);
   const { data: tokenMetadataList } = useGetTokenMetadataList();
+  const {data: flowConfigContracts} = useGetFlowConfigContracts();
 
   if (isLoading || !contract) {
     return <FullScreenLoading />;
@@ -49,10 +50,12 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     },
   ];
 
-  if (contract.localConfig) {
+  const flowConfigContract = flowConfigContracts?.find(e => e.name === contract.name)
+
+  if (flowConfigContract) {
     primaryColumn.push({
-      label: "Project path",
-      value: <span>{contract.localConfig.relativePath}</span>,
+      label: "File path",
+      value: <span>{flowConfigContract.relativePath}</span>,
     });
   }
 
@@ -78,13 +81,13 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
       <DetailsCard columns={columns} />
       <SizedBox height={30} />
       <div className={classes.codeWrapper}>
-        {contract.localConfig && (
+        {flowConfigContract && (
           <div className={classes.actionButtons}>
             Open in:
-            <IdeLink.VsCode filePath={contract.localConfig.absolutePath} />
-            <IdeLink.WebStorm filePath={contract.localConfig.absolutePath} />
+            <IdeLink.VsCode filePath={flowConfigContract.absolutePath} />
+            <IdeLink.WebStorm filePath={flowConfigContract.absolutePath} />
             <IdeLink.IntellijIdea
-              filePath={contract.localConfig.absolutePath}
+              filePath={flowConfigContract.absolutePath}
             />
           </div>
         )}

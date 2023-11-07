@@ -601,9 +601,6 @@ export class FlowIndexerService {
     return {
       id: `${account.address}.${name}`,
       address: ensurePrefixedAddress(account.address),
-      // TODO(restructure-followup): Populate local config if applicable
-      //  Or even better, create a separate "workspace contracts" API and remove this field.
-      localConfig: undefined,
       name: name,
       code: account.contracts[name],
     };

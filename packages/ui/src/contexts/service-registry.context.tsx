@@ -64,6 +64,25 @@ export interface IFlowService {
   getFlowCliInfo(): Promise<FlowCliInfo>;
 }
 
+export type FlowConfigAccount = {
+  name: string;
+  // Possibly without the '0x' prefix.
+  address: string;
+  privateKey: string | undefined;
+};
+
+export type FlowConfigContract = {
+  name: string;
+  // Path relative to the project root dir.
+  relativePath: string;
+  absolutePath: string;
+};
+
+export interface IFlowConfigService {
+  getAccounts(): Promise<FlowConfigAccount[]>;
+  getContracts(): Promise<FlowConfigContract[]>;
+}
+
 export interface IWalletService {
   createAccount(): Promise<void>;
   listKeyPairs(): Promise<ManagedKeyPair[]>;
@@ -86,6 +105,7 @@ export interface IProcessManagerService {
 type ServiceRegistry = {
   interactionsService: IInteractionService;
   flowService: IFlowService;
+  flowConfigService: IFlowConfigService;
   walletService: IWalletService;
   snapshotService: ISnapshotService;
   workspaceService: IWorkspaceService;

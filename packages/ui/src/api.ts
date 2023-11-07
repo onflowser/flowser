@@ -238,6 +238,16 @@ export function useGetInteractionTemplates(): SWRResponse<
   );
 }
 
+export function useGetFlowConfigContracts() {
+  const { flowConfigService } = useServiceRegistry();
+  return useSWR("flow-config/contracts", () => flowConfigService.getContracts());
+}
+
+export function useGetFlowConfigAccounts() {
+  const { flowConfigService } = useServiceRegistry();
+  return useSWR("flow-config/accounts", () => flowConfigService.getAccounts());
+}
+
 export function useGetTokenMetadataList() {
   return useSWR("token-list", async () => {
     const tokenListContainer = await new TokenListProvider().resolve();

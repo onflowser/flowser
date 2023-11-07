@@ -113,12 +113,6 @@ export interface FlowContract
   address: string;
   name: string;
   code: string;
-  localConfig: FlowContractLocalConfig | undefined;
-}
-
-export interface FlowContractLocalConfig {
-  relativePath: string;
-  absolutePath: string;
 }
 
 // TODO(restructure-followup): Refactor FlowAccountStorage
