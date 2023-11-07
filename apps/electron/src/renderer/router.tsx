@@ -33,6 +33,7 @@ import './App.scss';
 import {
   useGetAccounts,
   useGetBlocks,
+  useGetContract,
   useGetContracts,
   useGetEvents,
   useGetTransactions,
@@ -124,8 +125,13 @@ function ContractsTablePage() {
 
 function ContractDetailsPage() {
   const { contractId } = useParams();
+  const { data } = useGetContract(contractId!);
 
-  return <ContractDetails contractId={contractId!} />;
+  if (!data) {
+    return <FullScreenLoading />;
+  }
+
+  return <ContractDetails contract={data} />;
 }
 
 function EventsTablePage() {
