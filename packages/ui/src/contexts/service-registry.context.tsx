@@ -66,7 +66,6 @@ export interface IFlowService {
 
 export type FlowConfigAccount = {
   name: string;
-  // Possibly without the '0x' prefix.
   address: string;
   privateKey: string | undefined;
 };

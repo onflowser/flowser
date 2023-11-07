@@ -2,7 +2,7 @@ import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { IFlowserLogger, isObject } from "@onflowser/core";
+import { ensurePrefixedAddress, IFlowserLogger, isObject } from "@onflowser/core";
 import { EventEmitter } from "node:events";
 
 type FlowAddress = string;
@@ -68,7 +68,6 @@ type FlowJSON = {
 // of multiple configuration formats.
 export type FlowAbstractAccountConfig = {
   name: string;
-  // Possibly without the '0x' prefix.
   address: string;
   privateKey: string | undefined;
 };
@@ -138,7 +137,7 @@ export class FlowConfigService extends EventEmitter {
         }
         return {
           name,
-          address: accountConfig.address,
+          address: ensurePrefixedAddress(accountConfig.address),
           privateKey: this.getPrivateKey(accountConfig.key),
         };
       },
@@ -174,21 +173,6 @@ export class FlowConfigService extends EventEmitter {
     const contractConfig = this.config.contracts[contractNameKey];
     const isSimpleFormat = typeof contractConfig === "string";
     return isSimpleFormat ? contractConfig : contractConfig?.source;
-  }
-
-  public async updateAccounts(
-    newOrUpdatedAccounts: FlowAbstractAccountConfig[],
-  ): Promise<void> {
-    if (!this.config?.accounts) {
-      throw new Error("Accounts config not loaded");
-    }
-    for (const newOrUpdatedAccount of newOrUpdatedAccounts) {
-      this.config.accounts[newOrUpdatedAccount.name] = {
-        address: newOrUpdatedAccount.address,
-        key: newOrUpdatedAccount.privateKey,
-      };
-    }
-    await this.save();
   }
 
   private getPrivateKey(keyConfig: FlowAccountKeyConfig): string | undefined {
@@ -232,13 +216,6 @@ export class FlowConfigService extends EventEmitter {
     }
   }
 
-  private async save() {
-    await this.writeProjectFile(
-      this.configFileName,
-      JSON.stringify(this.config, null, 4),
-    );
-  }
-
   private getConfigPath() {
     return this.buildProjectPath(this.configFileName);
   }
@@ -246,10 +223,6 @@ export class FlowConfigService extends EventEmitter {
   private async readProjectFile(pathPostfix: string) {
     const data = await readFile(this.buildProjectPath(pathPostfix));
     return data.toString();
-  }
-
-  private async writeProjectFile(pathPostfix: string, data: string) {
-    return writeFile(this.buildProjectPath(pathPostfix), data);
   }
 
   private buildProjectPath(pathPostfix: string) {
