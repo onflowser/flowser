@@ -18,10 +18,11 @@ import { BaseTabItem } from "../../common/tabs/BaseTabs/BaseTabs";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import {
   useGetAccount,
-  useGetContractsByAccount, useGetFlowConfigAccounts,
+  useGetContractsByAccount,
+  useGetFlowConfigAccounts,
   useGetKeysByAccount,
   useGetStoragesByAccount,
-  useGetTransactionsByAccount
+  useGetTransactionsByAccount,
 } from "../../api";
 
 type AccountDetailsProps = {
@@ -37,34 +38,37 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
   const { data: contracts } = useGetContractsByAccount(accountId);
   const { data: keys } = useGetKeysByAccount(accountId);
   const { data: storageItems } = useGetStoragesByAccount(accountId);
-  const {data: flowConfigAccounts} = useGetFlowConfigAccounts();
+  const { data: flowConfigAccounts } = useGetFlowConfigAccounts();
 
   if (isLoading || !account) {
     return <FullScreenLoading />;
   }
 
   const column: DetailsCardColumn = [
-      {
-        label: "Address",
-        value: (
-          <>
-            <AccountAvatar address={account.address} />
-            <SizedBox width={10} />
-            <AccountName address={account.address} />
-          </>
-        ),
-      },
+    {
+      label: "Address",
+      value: (
+        <>
+          <AccountAvatar address={account.address} />
+          <SizedBox width={10} />
+          <AccountName address={account.address} />
+        </>
+      ),
+    },
   ];
 
-  const flowConfigAccount = flowConfigAccounts?.find(e => e.address === account.address);
+  const flowConfigAccount = flowConfigAccounts?.find(
+    (e) => e.address === account.address,
+  );
   if (flowConfigAccount) {
     column.push({
       label: "Name",
       value: flowConfigAccount.name,
-    })
+    });
   }
 
-  column.push({
+  column.push(
+    {
       label: "Balance",
       value: (
         <>
@@ -76,7 +80,8 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
     {
       label: "Created date",
       value: <DateDisplay date={account.createdAt.toISOString()} />,
-    },)
+    },
+  );
 
   const tabs: BaseTabItem[] = [
     {

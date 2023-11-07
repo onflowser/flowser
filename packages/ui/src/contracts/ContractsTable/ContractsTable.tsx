@@ -59,8 +59,10 @@ const columns = [
 
 function ContractTags(props: { contract: FlowContract }) {
   const { contract } = props;
-  const {data: flowConfigContracts} = useGetFlowConfigContracts();
-  const flowConfigContract = flowConfigContracts?.find(e => e.name === contract.name);
+  const { data: flowConfigContracts } = useGetFlowConfigContracts();
+  const flowConfigContract = flowConfigContracts?.find(
+    (e) => e.name === contract.name,
+  );
 
   if (flowConfigContract) {
     return (
@@ -81,14 +83,17 @@ type ContractsTableProps = {
 };
 
 export function ContractsTable(props: ContractsTableProps): ReactElement {
-  const {data: flowConfigContracts} = useGetFlowConfigContracts();
+  const { data: flowConfigContracts } = useGetFlowConfigContracts();
   const isContractInConfigLookup = new Set(
-    flowConfigContracts?.map(e => e.name)
-  )
+    flowConfigContracts?.map((e) => e.name),
+  );
 
   const sortedContracts = useMemo(
     // Local project contracts should be shown first.
-    () => props.contracts.sort((contract) => (isContractInConfigLookup.has(contract.name) ? -1 : 1)),
+    () =>
+      props.contracts.sort((contract) =>
+        isContractInConfigLookup.has(contract.name) ? -1 : 1,
+      ),
     [props.contracts],
   );
 

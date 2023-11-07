@@ -2,7 +2,11 @@ import { readFile, writeFile, watch } from "fs/promises";
 import * as path from "path";
 import { AbortController } from "node-abort-controller";
 import * as fs from "fs";
-import { ensurePrefixedAddress, IFlowserLogger, isObject } from "@onflowser/core";
+import {
+  ensurePrefixedAddress,
+  IFlowserLogger,
+  isObject,
+} from "@onflowser/core";
 import { EventEmitter } from "node:events";
 
 type FlowAddress = string;

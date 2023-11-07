@@ -240,7 +240,9 @@ export function useGetInteractionTemplates(): SWRResponse<
 
 export function useGetFlowConfigContracts() {
   const { flowConfigService } = useServiceRegistry();
-  return useSWR("flow-config/contracts", () => flowConfigService.getContracts());
+  return useSWR("flow-config/contracts", () =>
+    flowConfigService.getContracts(),
+  );
 }
 
 export function useGetFlowConfigAccounts() {

@@ -10,7 +10,11 @@ import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { IdeLink } from "../../common/links/IdeLink";
-import { useGetContract, useGetFlowConfigContracts, useGetTokenMetadataList } from "../../api";
+import {
+  useGetContract,
+  useGetFlowConfigContracts,
+  useGetTokenMetadataList,
+} from "../../api";
 import { ContractName } from "../ContractName/ContractName";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 import { TokenExtensions } from "flow-native-token-registry";
@@ -25,7 +29,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   const { contractId } = props;
   const { isLoading, data: contract } = useGetContract(contractId);
   const { data: tokenMetadataList } = useGetTokenMetadataList();
-  const {data: flowConfigContracts} = useGetFlowConfigContracts();
+  const { data: flowConfigContracts } = useGetFlowConfigContracts();
 
   if (isLoading || !contract) {
     return <FullScreenLoading />;
@@ -50,7 +54,9 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
     },
   ];
 
-  const flowConfigContract = flowConfigContracts?.find(e => e.name === contract.name)
+  const flowConfigContract = flowConfigContracts?.find(
+    (e) => e.name === contract.name,
+  );
 
   if (flowConfigContract) {
     primaryColumn.push({
@@ -86,9 +92,7 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
             Open in:
             <IdeLink.VsCode filePath={flowConfigContract.absolutePath} />
             <IdeLink.WebStorm filePath={flowConfigContract.absolutePath} />
-            <IdeLink.IntellijIdea
-              filePath={flowConfigContract.absolutePath}
-            />
+            <IdeLink.IntellijIdea filePath={flowConfigContract.absolutePath} />
           </div>
         )}
         <CadenceEditor value={contract.code} editable={false} />
