@@ -80,6 +80,7 @@ export function App() {
       >
         <ServiceRegistryProvider
           services={{
+            flowConfigService: window.electron.flowConfigService,
             walletService: window.electron.wallet,
             flowService: window.electron.flow,
             interactionsService: window.electron.interactions,

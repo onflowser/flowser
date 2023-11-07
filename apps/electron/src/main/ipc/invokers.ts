@@ -2,6 +2,7 @@ import { ipcRenderer } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
 import {
   ExecuteScriptRequest,
+  IFlowConfigService,
   IFlowService,
   IInteractionService,
   IProcessManagerService,
@@ -66,6 +67,13 @@ const snapshots: ISnapshotService = {
     ipcRenderer.invoke(FlowserIpcEvent.SNAPSHOTS_ROLLBACK_TO_HEIGHT, height),
 };
 
+const flowConfigService: IFlowConfigService = {
+  getContracts: () =>
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_CONFIG_GET_CONTRACTS),
+  getAccounts: () =>
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_CONFIG_GET_ACCOUNTS),
+};
+
 const processManagerService: IProcessManagerService = {
   findAllLogsByProcessId: (processId: string) =>
     ipcRenderer.invoke(FlowserIpcEvent.PROCESS_LOGS_LIST, processId),
@@ -92,6 +100,7 @@ export const electronInvokers = {
         callback(value as unknown as number),
       ),
   },
+  flowConfigService,
   interactions,
   workspaces,
   snapshots,

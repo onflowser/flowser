@@ -19,6 +19,7 @@ import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import {
   useGetAccount,
   useGetContractsByAccount,
+  useGetFlowConfigAccounts,
   useGetKeysByAccount,
   useGetStoragesByAccount,
   useGetTransactionsByAccount,
@@ -37,38 +38,50 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
   const { data: contracts } = useGetContractsByAccount(accountId);
   const { data: keys } = useGetKeysByAccount(accountId);
   const { data: storageItems } = useGetStoragesByAccount(accountId);
+  const { data: flowConfigAccounts } = useGetFlowConfigAccounts();
 
   if (isLoading || !account) {
     return <FullScreenLoading />;
   }
 
-  const detailsColumns: DetailsCardColumn[] = [
-    [
-      {
-        label: "Address",
-        value: (
-          <>
-            <AccountAvatar address={account.address} />
-            <SizedBox width={10} />
-            <AccountName address={account.address} />
-          </>
-        ),
-      },
-      {
-        label: "Balance",
-        value: (
-          <>
-            {account.balance}
-            <span className={classes.flowCurrency}>FLOW</span>
-          </>
-        ),
-      },
-      {
-        label: "Created date",
-        value: <DateDisplay date={account.createdAt.toISOString()} />,
-      },
-    ],
+  const column: DetailsCardColumn = [
+    {
+      label: "Address",
+      value: (
+        <>
+          <AccountAvatar address={account.address} />
+          <SizedBox width={10} />
+          <AccountName address={account.address} />
+        </>
+      ),
+    },
   ];
+
+  const flowConfigAccount = flowConfigAccounts?.find(
+    (e) => e.address === account.address,
+  );
+  if (flowConfigAccount) {
+    column.push({
+      label: "Name",
+      value: flowConfigAccount.name,
+    });
+  }
+
+  column.push(
+    {
+      label: "Balance",
+      value: (
+        <>
+          {account.balance}
+          <span className={classes.flowCurrency}>FLOW</span>
+        </>
+      ),
+    },
+    {
+      label: "Created date",
+      value: <DateDisplay date={account.createdAt.toISOString()} />,
+    },
+  );
 
   const tabs: BaseTabItem[] = [
     {
@@ -116,7 +129,7 @@ export const AccountDetails: FunctionComponent<AccountDetailsProps> = (
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <DetailsCard className={classes.detailsCard} columns={detailsColumns} />
+        <DetailsCard className={classes.detailsCard} columns={[column]} />
       </div>
       <SizedBox height={30} />
       <StyledTabs tabs={tabs} contentClassName={classes.tabContent} />

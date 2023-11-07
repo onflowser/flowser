@@ -11,6 +11,7 @@ import classes from "./ContractsTable.module.scss";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
 import { FlowContract } from "@onflowser/api";
 import { ContractName } from "../ContractName/ContractName";
+import { useGetFlowConfigContracts } from "../../api";
 
 const columnHelper = createColumnHelper<FlowContract>();
 
@@ -58,8 +59,12 @@ const columns = [
 
 function ContractTags(props: { contract: FlowContract }) {
   const { contract } = props;
+  const { data: flowConfigContracts } = useGetFlowConfigContracts();
+  const flowConfigContract = flowConfigContracts?.find(
+    (e) => e.name === contract.name,
+  );
 
-  if (contract.localConfig) {
+  if (flowConfigContract) {
     return (
       <Tooltip
         content="This contract is located in your local project."
@@ -78,9 +83,17 @@ type ContractsTableProps = {
 };
 
 export function ContractsTable(props: ContractsTableProps): ReactElement {
+  const { data: flowConfigContracts } = useGetFlowConfigContracts();
+  const isContractInConfigLookup = new Set(
+    flowConfigContracts?.map((e) => e.name),
+  );
+
   const sortedContracts = useMemo(
     // Local project contracts should be shown first.
-    () => props.contracts.sort((contract) => (contract.localConfig ? -1 : 1)),
+    () =>
+      props.contracts.sort((contract) =>
+        isContractInConfigLookup.has(contract.name) ? -1 : 1,
+      ),
     [props.contracts],
   );
 
