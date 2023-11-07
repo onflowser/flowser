@@ -18,6 +18,7 @@ import {
 import { useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
+import { TokenListProvider } from "flow-native-token-registry";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -235,4 +236,11 @@ export function useGetInteractionTemplates(): SWRResponse<
   return useSWR(`interaction-templates`, () =>
     interactionsService.getTemplates(),
   );
+}
+
+export function useGetTokenMetadataList() {
+  return useSWR("token-list", async () => {
+    const tokenListContainer = await new TokenListProvider().resolve();
+    return tokenListContainer.getList();
+  });
 }

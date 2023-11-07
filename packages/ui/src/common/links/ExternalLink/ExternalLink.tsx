@@ -21,7 +21,7 @@ export function ExternalLink({
       rel="noreferrer"
       href={href}
       className={classes.root}
-      style={{ display: inline ? "inline" : "flex", ...style }}
+      style={{ display: "flex", ...style }}
     >
       {!inline && <FlowserIcon.Link className={classes.icon} />}
       {children ?? <span className={classes.url}>{prettifyUrl(href)}</span>}
@@ -30,5 +30,5 @@ export function ExternalLink({
 }
 
 function prettifyUrl(url: string) {
-  return url.replace(/https?:\/\//, "");
+  return url.replace(/https?:\/\//, "").replace(/www\./, "");
 }

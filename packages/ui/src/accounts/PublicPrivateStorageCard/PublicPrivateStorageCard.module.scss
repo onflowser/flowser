@@ -37,6 +37,12 @@
       justify-content: end;
     }
 
+    .identifierAndLogo {
+      display: flex;
+      align-items: center;
+      column-gap: $spacing-s;
+    }
+
     .identifier {
       font-size: $font-size-large;
       color: $gray-10;

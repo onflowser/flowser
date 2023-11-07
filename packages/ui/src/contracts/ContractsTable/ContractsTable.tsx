@@ -10,6 +10,7 @@ import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import classes from "./ContractsTable.module.scss";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
 import { FlowContract } from "@onflowser/api";
+import { ContractName } from "../ContractName/ContractName";
 
 const columnHelper = createColumnHelper<FlowContract>();
 
@@ -19,7 +20,7 @@ const columns = [
     cell: (info) => (
       <Value>
         <ProjectLink to={`/contracts/${info.row.original.id}`}>
-          {info.row.original.name}
+          <ContractName contract={info.row.original} />
         </ProjectLink>
       </Value>
     ),
