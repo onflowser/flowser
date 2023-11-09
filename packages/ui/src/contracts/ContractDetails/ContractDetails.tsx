@@ -23,6 +23,7 @@ import { FlowConfigContract } from "../../contexts/service-registry.context";
 import { FlowContract } from "@onflowser/api";
 import { EventsTable } from "../../events/EventsTable/EventsTable";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
+import { Callout } from "../../common/misc/Callout/Callout";
 
 type ContractDetailsProps = {
   contract: FlowContract;
@@ -79,6 +80,12 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
 
   const columns: DetailsCardColumn[] = [primaryColumn];
 
+  // This is very naive check if contract implements a FungibleToken interface,
+  // but I think in most cases this will work and is sufficient for this use-case.
+  const isFungibleTokenContract = /import +FungibleToken/.test(contract.code);
+  const isMissingFungibleTokenMetadata =
+    flowConfigContract && isFungibleTokenContract && !tokenMetadata;
+
   if (tokenMetadata?.extensions) {
     columns.push(buildMetadataUrlsColumn(tokenMetadata.extensions));
   }
@@ -104,8 +111,20 @@ export const ContractDetails: FunctionComponent<ContractDetailsProps> = (
   return (
     <div className={classes.root}>
       <DetailsCard columns={columns} />
-      <SizedBox height={30} />
-
+      {isMissingFungibleTokenMetadata && (
+        <Callout
+          icon="💡"
+          title="Missing metadata"
+          description={
+            <>
+              No existing metadata entry is found for this FungibleToken
+              contract. If this is you contract, you may want to add metadata
+              for more user-friendly presentation in apps.{" "}
+              <ExternalLink href="https://github.com/FlowFans/flow-token-list#adding-new-token" />
+            </>
+          }
+        />
+      )}
       <StyledTabs tabs={tabs} />
     </div>
   );
