@@ -3,6 +3,7 @@
 .root {
   display: flex;
   flex-direction: column;
+  row-gap: $spacing-l;
 
   .codeWrapper {
     position: relative;
