@@ -7,7 +7,7 @@ import classes from "./DetailsCard.module.scss";
 import { SizedBox } from "../../misc/SizedBox/SizedBox";
 
 export type DetailsCardRow = {
-  label?: ReactElement | string;
+  label: ReactElement | string;
   value: ReactElement | string;
 };
 
@@ -26,11 +26,9 @@ export const DetailsCard: FC<DetailsCardProps> = ({ columns, className }) => {
           <div className={classes.column} key={index}>
             {rows?.map((row, i) => (
               <div key={i}>
-                {row.label && (
-                  <Label variant="medium" className={classes.label}>
-                    {row.label}
-                  </Label>
-                )}
+                <Label variant="medium" className={classes.label}>
+                  {row.label}
+                </Label>
                 <Value variant="small" className={classes.value}>
                   {row.value}
                 </Value>
