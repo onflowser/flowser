@@ -4,7 +4,6 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "../../common/cards/DetailsCard/DetailsCard";
-import { SizedBox } from "../../common/misc/SizedBox/SizedBox";
 import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { ProjectLink } from "../../common/links/ProjectLink";
