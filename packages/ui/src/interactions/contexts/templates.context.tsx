@@ -82,7 +82,7 @@ export function TemplatesRegistryProvider(props: {
       ) ?? []),
       ...(flixTemplates?.map((template): InteractionDefinitionTemplate => ({
         id: template.id,
-        name: template?.data?.messages?.title?.i18n?.["en-US"] ?? "Unknown",
+        name: getFlixTemplateName(template),
         code: template.data.cadence,
         transactionOptions: undefined,
         initialOutcome: undefined,
@@ -173,4 +173,15 @@ function useGetFlixInteractionTemplates(): SWRResponse<
   return useSWR(`flix-interaction-templates`, () =>
     fetch("http://localhost:3333/v1/templates").then(res => res.json())
   );
+}
+
+function getFlixTemplateName(template: FlixTemplate) {
+  const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
+  if (englishTitle) {
+    // Transactions generated with NFT catalog have this necessary prefix in titles.
+    // https://github.com/onflow/nft-catalog
+    return englishTitle.replace("This transaction ", "")
+  } else {
+    return "Unknown"
+  }
 }
