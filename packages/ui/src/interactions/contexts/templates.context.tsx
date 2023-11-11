@@ -2,10 +2,8 @@ import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useGetWorkspaceInteractionTemplates } from "../../api";
+import { useGetContracts, useGetWorkspaceInteractionTemplates } from "../../api";
 import useSWR, { SWRResponse } from "swr";
-import { InteractionTemplate } from "@onflowser/api";
-import { useServiceRegistry } from "../../contexts/service-registry.context";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -44,11 +42,19 @@ export function TemplatesRegistryProvider(props: {
 }): ReactElement {
   const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
   const {data: flixTemplates} = useGetFlixInteractionTemplates();
+  const {data: contracts} = useGetContracts();
+  const workspaceContractsLookupByName = new Set(contracts?.map(contract => contract.name))
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
 
   const randomId = () => String(Math.random() * 1000000);
+
+  // TODO: Improve this
+  function isFlixTemplateUseful(template: FlixTemplate) {
+    const importedContractNames = Object.values(template.data.dependencies).map(dependency => Object.keys(dependency)).flat();
+    return importedContractNames.some(contractName => workspaceContractsLookupByName.has(contractName))
+  }
 
   const templates = useMemo<InteractionDefinitionTemplate[]>(
     () => [
@@ -80,10 +86,10 @@ export function TemplatesRegistryProvider(props: {
           filePath: template.source?.filePath,
         }),
       ) ?? []),
-      ...(flixTemplates?.map((template): InteractionDefinitionTemplate => ({
+      ...(flixTemplates?.filter(isFlixTemplateUseful)?.map((template): InteractionDefinitionTemplate => ({
         id: template.id,
         name: getFlixTemplateName(template),
-        code: template.data.cadence,
+        code: getFlixTemplateFormattedCode(template),
         transactionOptions: undefined,
         initialOutcome: undefined,
         fclValuesByIdentifier: new Map(),
@@ -156,9 +162,22 @@ type FlixTemplate = {
       title?: FlixMessage;
       description?: FlixMessage;
     }
+    dependencies: Record<string, FlixDependency>;
     cadence: string;
     // TODO: Add other fields
   }
+}
+
+type FlixDependency = Record<string, {
+  mainnet: FlixDependencyOnNetwork;
+  testnet: FlixDependencyOnNetwork;
+}>
+
+type FlixDependencyOnNetwork = {
+  address: string;
+  fq_address: string;
+  pin: string;
+  pin_block_height: number;
 }
 
 type FlixMessage = {
@@ -173,6 +192,11 @@ function useGetFlixInteractionTemplates(): SWRResponse<
   return useSWR(`flix-interaction-templates`, () =>
     fetch("http://localhost:3333/v1/templates").then(res => res.json())
   );
+}
+
+function getFlixTemplateFormattedCode(template: FlixTemplate) {
+  const replacementPatterns = Object.keys(template.data.dependencies);
+  return replacementPatterns.reduce((cadence, pattern) => cadence.replace(`from ${pattern}`, ""), template.data.cadence)
 }
 
 function getFlixTemplateName(template: FlixTemplate) {
