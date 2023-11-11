@@ -2,7 +2,10 @@ import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useGetInteractionTemplates } from "../../api";
+import { useGetWorkspaceInteractionTemplates } from "../../api";
+import useSWR, { SWRResponse } from "swr";
+import { InteractionTemplate } from "@onflowser/api";
+import { useServiceRegistry } from "../../contexts/service-registry.context";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -39,7 +42,8 @@ const Context = createContext<InteractionTemplatesRegistry>(undefined as never);
 export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const { data: projectTemplatesData } = useGetInteractionTemplates();
+  const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
+  const {data: flixTemplates} = useGetFlixInteractionTemplates();
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
@@ -63,7 +67,7 @@ export function TemplatesRegistryProvider(props: {
           filePath: undefined,
         }),
       ),
-      ...(projectTemplatesData?.map(
+      ...(workspaceTemplates?.map(
         (template): InteractionDefinitionTemplate => ({
           id: randomId(),
           name: template.name,
@@ -76,8 +80,19 @@ export function TemplatesRegistryProvider(props: {
           filePath: template.source?.filePath,
         }),
       ) ?? []),
+      ...(flixTemplates?.map((template): InteractionDefinitionTemplate => ({
+        id: template.id,
+        name: template?.data?.messages?.title?.i18n?.["en-US"] ?? "Unknown",
+        code: template.data.cadence,
+        transactionOptions: undefined,
+        initialOutcome: undefined,
+        fclValuesByIdentifier: new Map(),
+        createdDate: new Date(),
+        updatedDate: new Date(),
+        filePath: undefined,
+      })) ?? []),
     ],
-    [customTemplates, projectTemplatesData],
+    [customTemplates, workspaceTemplates],
   );
 
   function saveTemplate(interaction: InteractionDefinition) {
@@ -129,4 +144,33 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   }
 
   return context;
+}
+
+// https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
+type FlixTemplate = {
+  id: string;
+  f_type: "InteractionTemplate";
+  f_version: string;
+  data: {
+    messages: {
+      title?: FlixMessage;
+      description?: FlixMessage;
+    }
+    cadence: string;
+    // TODO: Add other fields
+  }
+}
+
+type FlixMessage = {
+  i18n: {
+    "en-US"?: string
+  }
+}
+
+function useGetFlixInteractionTemplates(): SWRResponse<
+  FlixTemplate[]
+> {
+  return useSWR(`flix-interaction-templates`, () =>
+    fetch("http://localhost:3333/v1/templates").then(res => res.json())
+  );
 }

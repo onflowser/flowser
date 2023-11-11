@@ -249,12 +249,12 @@ export function useGetParsedInteraction(
   return state;
 }
 
-export function useGetInteractionTemplates(): SWRResponse<
+export function useGetWorkspaceInteractionTemplates(): SWRResponse<
   InteractionTemplate[]
 > {
   const { interactionsService } = useServiceRegistry();
 
-  return useSWR(`interaction-templates`, () =>
+  return useSWR(`workspace-interaction-templates`, () =>
     interactionsService.getTemplates(),
   );
 }
