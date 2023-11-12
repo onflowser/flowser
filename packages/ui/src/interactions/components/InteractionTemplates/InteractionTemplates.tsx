@@ -61,7 +61,7 @@ function StoredTemplates() {
             })}
           >
             <InteractionLabel interaction={template} />
-            {!template.filePath && (
+            {template.source === "session" && (
               <FlowserIcon.Trash
                 className={classes.trash}
                 onClick={(e) => {

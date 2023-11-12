@@ -20,6 +20,7 @@ export type InteractionDefinitionTemplate = InteractionDefinition & {
   // since that would require making changes to the file system,
   // which is not implemented yet.
   filePath: string | undefined;
+  source: "filesystem" | "flix" | "session";
 };
 
 // Internal structure that's persisted in local storage.
@@ -112,6 +113,7 @@ export function TemplatesRegistryProvider(props: {
             Object.entries(template.fclValuesByIdentifier),
           ),
           filePath: undefined,
+          source: "session"
         }),
       ),
       ...(workspaceTemplates?.map(
@@ -125,6 +127,7 @@ export function TemplatesRegistryProvider(props: {
           createdDate: new Date(template.createdAt),
           updatedDate: new Date(template.updatedAt),
           filePath: template.source?.filePath,
+          source: "filesystem"
         }),
       ) ?? []),
       ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
@@ -138,6 +141,7 @@ export function TemplatesRegistryProvider(props: {
           createdDate: new Date(),
           updatedDate: new Date(),
           filePath: undefined,
+          source: "flix"
         }),
       ) ?? []),
     ],
