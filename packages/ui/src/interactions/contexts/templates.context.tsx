@@ -2,7 +2,10 @@ import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { useGetContracts, useGetWorkspaceInteractionTemplates } from "../../api";
+import {
+  useGetContracts,
+  useGetWorkspaceInteractionTemplates,
+} from "../../api";
 import useSWR, { SWRResponse } from "swr";
 
 type InteractionTemplatesRegistry = {
@@ -41,8 +44,8 @@ export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
-  const {data: flixTemplates} = useGetFlixInteractionTemplates();
-  const {data: contracts} = useGetContracts();
+  const { data: flixTemplates } = useGetFlixInteractionTemplates();
+  const { data: contracts } = useGetContracts();
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
@@ -67,18 +70,29 @@ export function TemplatesRegistryProvider(props: {
     "NFTStorefront",
     "NFTStorefrontV2",
     "StakingProxy",
-    "FlowFees"
-  ])
+    "FlowFees",
+  ]);
 
   function isFlixTemplateUseful(template: FlixTemplate) {
-    const importedContractNames = Object.values(template.data.dependencies).map(dependency => Object.keys(dependency)).flat();
-    const nonCoreImportedContractNames = importedContractNames.filter(name => !flowCoreContractNames.has(name));
-    const nonCoreDeployedContractNamesLookup = new Set(contracts?.filter(contract => !flowCoreContractNames.has(contract.name)).map(contract => contract.name))
+    const importedContractNames = Object.values(template.data.dependencies)
+      .map((dependency) => Object.keys(dependency))
+      .flat();
+    const nonCoreImportedContractNames = importedContractNames.filter(
+      (name) => !flowCoreContractNames.has(name),
+    );
+    const nonCoreDeployedContractNamesLookup = new Set(
+      contracts
+        ?.filter((contract) => !flowCoreContractNames.has(contract.name))
+        .map((contract) => contract.name),
+    );
 
     // Interactions that only import core contracts are most likely generic ones,
     // not tailored specifically to some third party contract/project.
     const onlyImportsCoreContracts = nonCoreImportedContractNames.length === 0;
-    const importsSomeNonCoreDeployedContract = nonCoreImportedContractNames.some(contractName => nonCoreDeployedContractNamesLookup.has(contractName));
+    const importsSomeNonCoreDeployedContract =
+      nonCoreImportedContractNames.some((contractName) =>
+        nonCoreDeployedContractNamesLookup.has(contractName),
+      );
 
     return onlyImportsCoreContracts || importsSomeNonCoreDeployedContract;
   }
@@ -113,17 +127,19 @@ export function TemplatesRegistryProvider(props: {
           filePath: template.source?.filePath,
         }),
       ) ?? []),
-      ...(flixTemplates?.filter(isFlixTemplateUseful)?.map((template): InteractionDefinitionTemplate => ({
-        id: template.id,
-        name: getFlixTemplateName(template),
-        code: getFlixTemplateFormattedCode(template),
-        transactionOptions: undefined,
-        initialOutcome: undefined,
-        fclValuesByIdentifier: new Map(),
-        createdDate: new Date(),
-        updatedDate: new Date(),
-        filePath: undefined,
-      })) ?? []),
+      ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
+        (template): InteractionDefinitionTemplate => ({
+          id: template.id,
+          name: getFlixTemplateName(template),
+          code: getFlixTemplateFormattedCode(template),
+          transactionOptions: undefined,
+          initialOutcome: undefined,
+          fclValuesByIdentifier: new Map(),
+          createdDate: new Date(),
+          updatedDate: new Date(),
+          filePath: undefined,
+        }),
+      ) ?? []),
     ],
     [customTemplates, workspaceTemplates],
   );
@@ -188,42 +204,46 @@ type FlixTemplate = {
     messages: {
       title?: FlixMessage;
       description?: FlixMessage;
-    }
+    };
     dependencies: Record<string, FlixDependency>;
     cadence: string;
     // TODO: Add other fields
-  }
-}
+  };
+};
 
-type FlixDependency = Record<string, {
-  mainnet: FlixDependencyOnNetwork;
-  testnet: FlixDependencyOnNetwork;
-}>
+type FlixDependency = Record<
+  string,
+  {
+    mainnet: FlixDependencyOnNetwork;
+    testnet: FlixDependencyOnNetwork;
+  }
+>;
 
 type FlixDependencyOnNetwork = {
   address: string;
   fq_address: string;
   pin: string;
   pin_block_height: number;
-}
+};
 
 type FlixMessage = {
   i18n: {
-    "en-US"?: string
-  }
-}
+    "en-US"?: string;
+  };
+};
 
-function useGetFlixInteractionTemplates(): SWRResponse<
-  FlixTemplate[]
-> {
+function useGetFlixInteractionTemplates(): SWRResponse<FlixTemplate[]> {
   return useSWR(`flix-interaction-templates`, () =>
-    fetch("http://localhost:3333/v1/templates").then(res => res.json())
+    fetch("http://localhost:3333/v1/templates").then((res) => res.json()),
   );
 }
 
 function getFlixTemplateFormattedCode(template: FlixTemplate) {
   const replacementPatterns = Object.keys(template.data.dependencies);
-  return replacementPatterns.reduce((cadence, pattern) => cadence.replace(`from ${pattern}`, ""), template.data.cadence)
+  return replacementPatterns.reduce(
+    (cadence, pattern) => cadence.replace(`from ${pattern}`, ""),
+    template.data.cadence,
+  );
 }
 
 function getFlixTemplateName(template: FlixTemplate) {
@@ -231,8 +251,8 @@ function getFlixTemplateName(template: FlixTemplate) {
   if (englishTitle) {
     // Transactions generated with NFT catalog have this necessary prefix in titles.
     // https://github.com/onflow/nft-catalog
-    return englishTitle.replace("This transaction ", "")
+    return englishTitle.replace("This transaction ", "");
   } else {
-    return "Unknown"
+    return "Unknown";
   }
 }
