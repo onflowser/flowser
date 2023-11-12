@@ -144,9 +144,15 @@ func (a *App) executable(installDir string) (string, error) {
 		windows: "Flowser.exe",
 		linux:   "flowser",
 	}
-	file, ok := files[runtime.GOOS]
+	execFileSubPath, ok := files[runtime.GOOS]
 	if !ok {
 		return "", errorPlatformNotSupported
+	}
+
+	// some linux installers may install app in folder present in PATH.
+	execFilePath, err := exec.LookPath("flowser")
+	if err == nil {
+		return execFilePath, nil
 	}
 
 	appDir, err := a.appDir(installDir)
@@ -154,7 +160,7 @@ func (a *App) executable(installDir string) (string, error) {
 		return "", err
 	}
 
-	return path.Join(appDir, file), nil
+	return path.Join(appDir, execFileSubPath), nil
 }
 
 func downloadLatestReleaseAsset() (string, error) {
