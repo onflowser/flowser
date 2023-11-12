@@ -43,17 +43,44 @@ export function TemplatesRegistryProvider(props: {
   const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
   const {data: flixTemplates} = useGetFlixInteractionTemplates();
   const {data: contracts} = useGetContracts();
-  const workspaceContractsLookupByName = new Set(contracts?.map(contract => contract.name))
   const [customTemplates, setRawTemplates] = useLocalStorage<
     RawInteractionDefinitionTemplate[]
   >("interactions", []);
 
   const randomId = () => String(Math.random() * 1000000);
 
-  // TODO: Improve this
+  const flowCoreContractNames = new Set([
+    "FlowStorageFees",
+    "MetadataViews",
+    "NonFungibleToken",
+    "ViewResolver",
+    "FungibleToken",
+    "FungibleTokenMetadataViews",
+    "FlowToken",
+    "FlowClusterQC",
+    "FlowDKG",
+    "FlowEpoch",
+    "FlowIDTableStaking",
+    "FlowServiceAccount",
+    "FlowStakingCollection",
+    "LockedTokens",
+    "NFTStorefront",
+    "NFTStorefrontV2",
+    "StakingProxy",
+    "FlowFees"
+  ])
+
   function isFlixTemplateUseful(template: FlixTemplate) {
     const importedContractNames = Object.values(template.data.dependencies).map(dependency => Object.keys(dependency)).flat();
-    return importedContractNames.some(contractName => workspaceContractsLookupByName.has(contractName))
+    const nonCoreImportedContractNames = importedContractNames.filter(name => !flowCoreContractNames.has(name));
+    const nonCoreDeployedContractNamesLookup = new Set(contracts?.filter(contract => !flowCoreContractNames.has(contract.name)).map(contract => contract.name))
+
+    // Interactions that only import core contracts are most likely generic ones,
+    // not tailored specifically to some third party contract/project.
+    const onlyImportsCoreContracts = nonCoreImportedContractNames.length === 0;
+    const importsSomeNonCoreDeployedContract = nonCoreImportedContractNames.some(contractName => nonCoreDeployedContractNamesLookup.has(contractName));
+
+    return onlyImportsCoreContracts || importsSomeNonCoreDeployedContract;
   }
 
   const templates = useMemo<InteractionDefinitionTemplate[]>(
