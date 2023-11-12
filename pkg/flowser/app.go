@@ -20,6 +20,7 @@ import (
 const (
 	darwin  = "darwin"
 	windows = "windows"
+	linux   = "linux"
 )
 
 // New create new Flowser application.
@@ -29,7 +30,7 @@ func New() *App {
 
 type App struct{}
 
-var errorPlatformNotSupported = errors.New("OS not supported, only supporting Windows and Mac OS")
+var errorPlatformNotSupported = errors.New("platform not supported, please submit an issue: https://github.com/onflowser/flowser/issues")
 
 // Run starts the Flowser application with provided path to the flow project.
 //
@@ -94,16 +95,17 @@ func (a *App) Remove(installDir string) error {
 // unzip content from source compressed file to a target directory.
 func (a *App) unzip(source string, target string) error {
 	var cmd *exec.Cmd
+
+	appDir, err := a.appDir(target)
+	if err != nil {
+		return err
+	}
+
 	switch runtime.GOOS {
 	case darwin:
 		// Use native unzip tool as it handles the creation of required symbolic links
 		cmd = exec.Command("unzip", source, "-d", target)
 	case windows:
-		appDir, err := a.appDir(target)
-		if err != nil {
-			return err
-		}
-
 		if err := os.MkdirAll(appDir, os.ModePerm); err != nil {
 			return err
 		}
@@ -111,6 +113,8 @@ func (a *App) unzip(source string, target string) error {
 		// tar utility is available from Windows build 17063 consider using other command or a custom implementation
 		// https://learn.microsoft.com/en-us/virtualization/community/team-blog/2017/20171219-tar-and-curl-come-to-windows
 		cmd = exec.Command("tar", "-xf", source, "-C", appDir)
+	case linux:
+		cmd = exec.Command("unzip", source, "-d", appDir)
 	default:
 		return errorPlatformNotSupported
 	}
@@ -123,6 +127,7 @@ func (a *App) appDir(installDir string) (string, error) {
 	files := map[string]string{
 		darwin:  "Flowser.app",
 		windows: "@flowserapp",
+		linux:   "Flowser",
 	}
 	executable, ok := files[runtime.GOOS]
 	if !ok {
@@ -137,6 +142,7 @@ func (a *App) executable(installDir string) (string, error) {
 	files := map[string]string{
 		darwin:  "Contents/MacOS/Flowser",
 		windows: "Flowser.exe",
+		linux:   "flowser",
 	}
 	file, ok := files[runtime.GOOS]
 	if !ok {
@@ -214,6 +220,8 @@ func getAssetName(version string) (string, error) {
 		return fmt.Sprintf("Flowser-%s-mac.zip", version), nil
 	case windows:
 		return fmt.Sprintf("Flowser-%s-win.zip", version), nil
+	case linux:
+		return fmt.Sprintf("Flowser-%s-linux-arm64.zip", version), nil
 	default:
 		return "", errorPlatformNotSupported
 	}

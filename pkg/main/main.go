@@ -2,25 +2,42 @@ package main
 
 import (
 	"fmt"
-	"github.com/onflowser/flowser/pkg/flowser"
 	"os"
-	"path"
+
+	"github.com/onflowser/flowser/v2/pkg/flowser"
 )
 
 func main() {
-	app := flowser.New()
-	installDir := path.Join("..", "test-install")
+	if len(os.Args) < 3 {
+		panic("Missing args. Usage: <command_name> <install_dir>")
+	}
 
-	if !app.Installed(installDir) {
+	commandName := os.Args[1]
+	installDir := os.Args[2]
+
+	app := flowser.New()
+
+	switch commandName {
+	case "install":
+		if app.Installed(installDir) {
+			fmt.Println("Already installed")
+			os.Exit(0)
+		}
 		err := app.Install(installDir)
-		fmt.Println("Installing Flowser...")
 		if err != nil {
 			panic(err)
 		}
 
-	}
+	case "run":
+		if len(os.Args) != 4 {
+			fmt.Println("Missing project dir arg")
+			os.Exit(1)
+		}
+		projectDir := os.Args[3]
+		err := app.Run(installDir, projectDir)
 
-	projectDir := os.Args[1]
-	fmt.Println("Running Flowser")
-	app.Run(installDir, projectDir)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
