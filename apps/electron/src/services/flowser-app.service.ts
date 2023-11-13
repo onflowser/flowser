@@ -31,7 +31,6 @@ import { DependencyManagerService } from './dependency-manager.service';
 
 // Root service that ties all the pieces together and orchestrates them.
 export class FlowserAppService {
-  static instance: FlowserAppService;
   public readonly flowGatewayService: FlowGatewayService;
   public readonly flowIndexerService: FlowIndexerService;
   public readonly flowAccountStorageService: FlowAccountStorageService;
@@ -272,7 +271,6 @@ export class FlowserAppService {
 
     this.walletStorageService.setFileName(`flowser-wallet-${workspaceId}.json`);
 
-    this.processingScheduler.start();
     await this.startAndReindexEmulator(workspace);
   }
 
@@ -306,6 +304,7 @@ export class FlowserAppService {
       });
     }
 
+    this.processingScheduler.start();
     await this.walletService.synchronizeIndex();
     await this.flowSnapshotsService.synchronizeIndex();
   }
