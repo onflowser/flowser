@@ -1,4 +1,4 @@
-EXEC_PATH=bin
+OUT_PATH=bin
 BIN_PREFIX=flowser-internal
 SOURCE_PATH=../../internal/main.go
 
@@ -10,12 +10,25 @@ SOURCE_PATH=../../internal/main.go
 
 # https://freshman.tech/snippets/go/cross-compile-go-programs
 
+rm -r $OUT_PATH
+mkdir -p $OUT_PATH
+
+function build() {
+  GOOS=$1
+  GOARCH=$2
+  POSTFIX=$3
+  GOOS=$GOOS GOARCH=$GOARCH go build -o "${OUT_PATH}/${BIN_PREFIX}-${GOARCH}-${GOOS}${POSTFIX}" "${SOURCE_PATH}"
+}
+
 # Windows
-GOOS=windows GOARCH=amd64 go build -o "${EXEC_PATH}/${BIN_PREFIX}-amd64.exe" "${SOURCE_PATH}"
+build windows amd64 .exe
+build windows arm64 .exe
 
 # MacOS
-GOOS=darwin GOARCH=amd64 go build -o "${EXEC_PATH}/${BIN_PREFIX}-amd64-darwin" "${SOURCE_PATH}"
+build darwin amd64
+build darwin arm64
 
 # Linux
-GOOS=linux GOARCH=amd64 go build -o "${EXEC_PATH}/${BIN_PREFIX}-amd64-linux" "${SOURCE_PATH}"
+build linux amd64
+build linux arm64
 

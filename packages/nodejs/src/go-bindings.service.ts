@@ -101,15 +101,34 @@ export class GoBindingsService {
   }
 
   private getExecutableName(): string {
-    switch (os.platform()) {
-      case "darwin":
-        return "flowser-internal-amd64-darwin";
-      case "linux":
-        return "flowser-internal-amd64-linux";
-      case "win32":
-        return "flowser-internal-amd64.exe";
-      default:
-        throw new Error(`Unsupported platform: ${os.platform()}`);
+    const archRemap = new Map([
+      ["x64", "amd64"]
+    ]);
+    const platformRemap = new Map([
+      ["win32", "windows"]
+    ]);
+
+    const arch = archRemap.get(os.arch()) ?? os.arch();
+    const platform = platformRemap.get(os.platform()) ?? os.platform();
+    const extension = platform === "windows" ? ".exe" : "";
+
+    const supportedArches = new Set([
+      "amd64",
+      "arm64"
+    ]);
+    if (!supportedArches.has(arch)) {
+      throw new Error(`Unsupported architecture: ${arch}`)
     }
+
+    const supportedPlatforms = new Set([
+      "darwin",
+      "linux",
+      "win32"
+    ]);
+    if (!supportedPlatforms.has(platform)) {
+      throw new Error(`Unsupported platform: ${platform}`)
+    }
+
+    return `flowser-internal-${arch}-${platform}${extension}`
   }
 }
