@@ -201,10 +201,7 @@ func getLatestRelease() (*flowserRelease, error) {
 		return nil, err
 	}
 	latestVersion := strings.Replace(*release.TagName, "v", "", 1)
-	targetAssetName, err := getAssetName(latestVersion)
-	if err != nil {
-		return nil, err
-	}
+	targetAssetName := getAssetName(latestVersion)
 	for _, asset := range release.Assets {
 		if *asset.Name == targetAssetName {
 			return &flowserRelease{
@@ -213,22 +210,9 @@ func getLatestRelease() (*flowserRelease, error) {
 			}, nil
 		}
 	}
-	return nil, errors.New("no asset found")
+	return nil, fmt.Errorf("asset not found: %s", targetAssetName)
 }
 
-func getAssetName(version string) (string, error) {
-	isArm := strings.HasPrefix(runtime.GOARCH, "arm")
-	switch runtime.GOOS {
-	case darwin:
-		if isArm {
-			return fmt.Sprintf("Flowser-%s-arm64-mac.zip", version), nil
-		}
-		return fmt.Sprintf("Flowser-%s-mac.zip", version), nil
-	case windows:
-		return fmt.Sprintf("Flowser-%s-win.zip", version), nil
-	case linux:
-		return fmt.Sprintf("Flowser-%s-linux-arm64.zip", version), nil
-	default:
-		return "", errorPlatformNotSupported
-	}
+func getAssetName(version string) string {
+	return fmt.Sprintf("Flowser-%s-%s-%s.zip", version, runtime.GOOS, runtime.GOARCH)
 }
