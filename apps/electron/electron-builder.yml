@@ -7,6 +7,7 @@ files:
   - node_modules
   - package.json
 afterSign: '.erb/scripts/notarize.js'
+artifactName: flowser-${version}-${os}-${arch}.${ext}
 
 mac:
   target:
@@ -19,8 +20,14 @@ mac:
   entitlements: assets/entitlements.mac.plist
   entitlementsInherit: assets/entitlements.mac.plist
   gatekeeperAssess: false
-  artifactName: flowser-${version}-${os}-${arch}.${ext}
   category: public.app-category.developer-tools
+  extraResources:
+    # To reference files outside the electron directory we need to use the FileSet API.
+    # See: https://github.com/electron-userland/electron-builder/issues/2693
+    - from: '../../packages/nodejs/bin/flowser-internal-amd64-darwin'
+      to: '.'
+    - from: '../../packages/nodejs/bin/flowser-internal-arm64-darwin'
+      to: '.'
 
 dmg:
   contents:
@@ -32,14 +39,12 @@ dmg:
       y: 358
       type: link
       path: '/Applications'
-  artifactName: flowser-${version}-${os}-${arch}.${ext}
   background: assets/macos-background.tiff
 
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: false
   deleteAppDataOnUninstall: true
-  artifactName: flowser-${version}-${os}-${arch}.${ext}
 
 win:
   target:
@@ -51,8 +56,14 @@ win:
       arch:
         - arm64
         - x64
-  artifactName: flowser-${version}-${os}-${arch}.${ext}
   icon: generated-icons/icons/win/icon.ico
+  extraResources:
+    # To reference files outside the electron directory we need to use the FileSet API.
+    # See: https://github.com/electron-userland/electron-builder/issues/2693
+    - from: '../../packages/nodejs/bin/flowser-internal-amd64-windows.exe'
+      to: '.'
+    - from: '../../packages/nodejs/bin/flowser-internal-arm64-windows.exe'
+      to: '.'
 
 linux:
   target:
@@ -60,25 +71,24 @@ linux:
       arch:
         - arm64
         - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
   category: Development
   icon: generated-icons/icons/png/
-  artifactName: flowser-${version}-${os}-${arch}.${ext}
+  extraResources:
+    # To reference files outside the electron directory we need to use the FileSet API.
+    # See: https://github.com/electron-userland/electron-builder/issues/2693
+    - from: '../../packages/nodejs/bin/flowser-internal-amd64-linux'
+      to: '.'
+    - from: '../../packages/nodejs/bin/flowser-internal-arm64-linux'
+      to: '.'
 
 directories:
   app: release/app
   buildResources: assets
   output: release/build
-
-extraResources:
-  - './assets/**'
-  # To reference files outside the electron directory we need to use the FileSet API.
-  # See: https://github.com/electron-userland/electron-builder/issues/2693
-  - from: '../../packages/nodejs/bin/flowser-internal-amd64-darwin'
-    to: '.'
-  - from: '../../packages/nodejs/bin/flowser-internal-amd64-linux'
-    to: '.'
-  - from: '../../packages/nodejs/bin/flowser-internal-amd64.exe'
-    to: '.'
 
 publish:
   provider: github
