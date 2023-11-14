@@ -1,6 +1,6 @@
 {
   "name": "@onflowser/electron",
-  "version": "3.0.1",
+  "version": "3.1.1",
   "description": "Supercharged development on Flow blockchain ⚡",
   "keywords": [
     "flow-blockchain",
@@ -36,6 +36,7 @@
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
     "package:all": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux --mac --win --publish never && npm run build:dll",
+    "package:linux": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux  --publish never && npm run build:dll",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "dev": "npm run start",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
