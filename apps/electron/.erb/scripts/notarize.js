@@ -27,6 +27,7 @@ exports.default = async function notarizeMacos(context) {
     appBundleId: 'dev.flowser.app',
     appPath: `${appOutDir}/${appName}.app`,
     teamId: 'A425JF6L5H',
+    tool: 'notarytool',
     appleId: process.env.APPLE_ID,
     appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
   });
