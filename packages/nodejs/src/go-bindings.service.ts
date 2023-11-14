@@ -123,7 +123,7 @@ export class GoBindingsService {
     const supportedPlatforms = new Set([
       "darwin",
       "linux",
-      "win32"
+      "windows"
     ]);
     if (!supportedPlatforms.has(platform)) {
       throw new Error(`Unsupported platform: ${platform}`)
