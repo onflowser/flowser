@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onflowser/flowser/v2/pkg/flowser"
+	"github.com/onflowser/flowser/v3/pkg/flowser"
 )
 
 func main() {

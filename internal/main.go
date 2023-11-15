@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/onflowser/flowser/v2/internal/misc"
+	"github.com/onflowser/flowser/v3/internal/misc"
 )
 
 func main() {
