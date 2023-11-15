@@ -149,7 +149,7 @@ func (a *App) executable(installDir string) (string, error) {
 		return "", errorPlatformNotSupported
 	}
 
-	// some linux installers may install app in folder present in PATH.
+	// some linux installers (e.g. for .deb file) move the app file to PATH dir (e.g. /usr/bin/flowser)
 	execFilePath, err := exec.LookPath("flowser")
 	if err == nil {
 		return execFilePath, nil
