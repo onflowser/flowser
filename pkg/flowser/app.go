@@ -214,5 +214,11 @@ func getLatestRelease() (*flowserRelease, error) {
 }
 
 func getAssetName(version string) string {
-	return fmt.Sprintf("Flowser-%s-%s-%s.zip", version, runtime.GOOS, runtime.GOARCH)
+	arch := runtime.GOARCH
+
+	if arch == "amd64" {
+		arch = "x64"
+	}
+
+	return fmt.Sprintf("flowser-%s-%s-%s.zip", version, runtime.GOOS, arch)
 }
