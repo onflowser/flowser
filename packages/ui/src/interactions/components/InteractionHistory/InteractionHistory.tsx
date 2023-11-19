@@ -15,8 +15,7 @@ import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 export function InteractionHistory(): ReactElement {
   const { data: blocks } = useGetBlocks();
 
-  // There should always be at least one (initial) block.
-  if (!blocks || blocks.length === 0) {
+  if (!blocks) {
     return (
       <div className={classes.loadingRoot}>
         <Spinner size={30} />

@@ -25,7 +25,7 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
-  const { flowService } = useServiceRegistry();
+  const { interactionsService } = useServiceRegistry();
   const [outcome, setOutcome] = useState<InteractionOutcome | undefined>();
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export function InteractionOutcomeManagerProvider(props: {
       return undefined;
     }
     try {
-      const result = await flowService.sendTransaction({
+      const result = await interactionsService.sendTransaction({
         cadence: definition.code,
         authorizerAddresses: transactionOptions.authorizerAddresses,
         proposerAddress: transactionOptions.proposerAddress,
@@ -108,7 +108,7 @@ export function InteractionOutcomeManagerProvider(props: {
     definition: InteractionDefinition,
   ): Promise<InteractionOutcome | undefined> {
     try {
-      const result = await flowService.executeScript({
+      const result = await interactionsService.executeScript({
         cadence: definition.code,
         arguments: serializeParameters(),
       });

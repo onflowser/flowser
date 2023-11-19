@@ -218,9 +218,9 @@ export function useGetWorkspace(
 }
 
 export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
-  const { flowService } = useServiceRegistry();
+  const { flowCliService } = useServiceRegistry();
 
-  return useSWR(`flow-cli`, () => flowService.getFlowCliInfo());
+  return useSWR(`flow-cli`, () => flowCliService.getFlowCliInfo());
 }
 
 export function useGetAddressIndex(address: string): SWRResponse<number> {

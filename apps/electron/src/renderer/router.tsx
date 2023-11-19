@@ -30,7 +30,10 @@ import { EventDetails } from '@onflowser/ui/src/events/EventDetails/EventDetails
 import { SnapshotsManagerProvider } from '@onflowser/ui/src/contexts/snapshots.context';
 import FullScreenLoading from '@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading';
 import { useServiceRegistry } from '@onflowser/ui/src/contexts/service-registry.context';
-import { AnalyticEvent } from '@onflowser/ui/src/hooks/use-analytics';
+import {
+  AnalyticEvent,
+  useAnalytics,
+} from '@onflowser/ui/src/hooks/use-analytics';
 import './App.scss';
 import {
   useGetAccounts,
@@ -43,6 +46,7 @@ import {
 import { WorkspaceList } from '@onflowser/ui/src/workspaces/WorkspaceList/WorkspaceList';
 import { WorkspaceSettings } from '@onflowser/ui/src/workspaces/WorkspaceSettings/WorkspaceSettings';
 import { NavigationProvider } from '@onflowser/ui/src/contexts/navigation.context';
+import { ConsentDialog } from '@onflowser/ui/src/common/overlays/dialogs/consent/ConsentDialog';
 
 function BrowserRouterEvents(props: { children: ReactNode }): ReactElement {
   const location = useLocation();
@@ -166,6 +170,7 @@ const routes: RouteObject[] = [
           <SnapshotsManagerProvider>
             <BrowserRouterEvents>
               <Outlet />
+              <ConsentAnalytics />
             </BrowserRouterEvents>
           </SnapshotsManagerProvider>
         </WorkspaceManagerProvider>
@@ -347,5 +352,15 @@ function ReactRouterNavigationProvider(props: { children: ReactNode }) {
     >
       {props.children}
     </NavigationProvider>
+  );
+}
+
+function ConsentAnalytics() {
+  const { isConsented, setIsConsented } = useAnalytics();
+  if (isConsented !== undefined) {
+    return null;
+  }
+  return (
+    <ConsentDialog consent={isConsented ?? true} setConsent={setIsConsented} />
   );
 }

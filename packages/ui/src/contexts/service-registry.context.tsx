@@ -39,6 +39,10 @@ export interface IWorkspaceService {
 export interface IInteractionService {
   parse(sourceCode: string): Promise<ParsedInteractionOrError>;
   getTemplates(): Promise<InteractionTemplate[]>;
+  sendTransaction(
+    request: SendTransactionRequest,
+  ): Promise<{ transactionId: string }>;
+  executeScript(request: ExecuteScriptRequest): Promise<any>;
 }
 
 export type SendTransactionRequest = {
@@ -56,12 +60,7 @@ export type ExecuteScriptRequest = {
 };
 
 export interface IFlowService {
-  sendTransaction(
-    request: SendTransactionRequest,
-  ): Promise<{ transactionId: string }>;
-  executeScript(request: ExecuteScriptRequest): Promise<any>;
   getIndexOfAddress(address: string): Promise<number>;
-  getFlowCliInfo(): Promise<FlowCliInfo>;
 }
 
 export type FlowConfigAccount = {
@@ -80,6 +79,10 @@ export type FlowConfigContract = {
 export interface IFlowConfigService {
   getAccounts(): Promise<FlowConfigAccount[]>;
   getContracts(): Promise<FlowConfigContract[]>;
+}
+
+export interface IFlowCliService {
+  getFlowCliInfo(): Promise<FlowCliInfo>;
 }
 
 export interface IWalletService {
@@ -104,6 +107,7 @@ export interface IProcessManagerService {
 type ServiceRegistry = {
   interactionsService: IInteractionService;
   flowService: IFlowService;
+  flowCliService: IFlowCliService;
   flowConfigService: IFlowConfigService;
   walletService: IWalletService;
   snapshotService: ISnapshotService;

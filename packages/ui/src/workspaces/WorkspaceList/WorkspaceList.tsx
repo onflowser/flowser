@@ -10,7 +10,7 @@ import { useAnalytics } from "../../hooks/use-analytics";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { TextUtils } from "../../utils/text-utils";
 import { useGetWorkspaces } from "../../api";
-import { useLocation, useNavigate } from "contexts/navigation.context";
+import { useLocation, useNavigate } from "../../contexts/navigation.context";
 import { ProjectLink } from "../../common/links/ProjectLink";
 
 type ProjectTab = {

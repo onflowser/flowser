@@ -2,6 +2,7 @@ import { ipcRenderer } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
 import {
   ExecuteScriptRequest,
+  IFlowCliService,
   IFlowConfigService,
   IFlowService,
   IInteractionService,
@@ -18,13 +19,10 @@ import { BlockchainIndexes } from '../../services/blockchain-index.service';
 const flow: IFlowService = {
   getIndexOfAddress: (address: string) =>
     ipcRenderer.invoke(FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX, address),
+};
+
+const flowCliService: IFlowCliService = {
   getFlowCliInfo: () => ipcRenderer.invoke(FlowserIpcEvent.FLOW_CLI_GET_INFO),
-  sendTransaction: (
-    request: SendTransactionRequest,
-  ): Promise<{ transactionId: string }> =>
-    ipcRenderer.invoke(FlowserIpcEvent.FLOW_TRANSACTION_SEND, request),
-  executeScript: (request: ExecuteScriptRequest): Promise<any> =>
-    ipcRenderer.invoke(FlowserIpcEvent.FLOW_SCRIPT_EXECUTE, request),
 };
 
 const wallet: IWalletService = {
@@ -38,6 +36,12 @@ const interactions: IInteractionService = {
     ipcRenderer.invoke(FlowserIpcEvent.INTERACTIONS_PARSE, sourceCode),
   getTemplates: () =>
     ipcRenderer.invoke(FlowserIpcEvent.INTERACTIONS_LIST_TEMPLATES),
+  sendTransaction: (
+    request: SendTransactionRequest,
+  ): Promise<{ transactionId: string }> =>
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_TRANSACTION_SEND, request),
+  executeScript: (request: ExecuteScriptRequest): Promise<any> =>
+    ipcRenderer.invoke(FlowserIpcEvent.FLOW_SCRIPT_EXECUTE, request),
 };
 
 const workspaces: IWorkspaceService = {
@@ -100,6 +104,7 @@ export const electronInvokers = {
         callback(value as unknown as number),
       ),
   },
+  flowCliService,
   flowConfigService,
   interactions,
   workspaces,

@@ -102,7 +102,6 @@ export function App() {
             <FilePickerProvider
               pickDirectory={window.electron.app.showDirectoryPicker}
             >
-              <ConsentAnalytics />
               <DependencyErrors />
               <FlowserRouter />
               <Toaster
@@ -125,15 +124,5 @@ export function App() {
         </ServiceRegistryProvider>
       </SWRConfig>
     </>
-  );
-}
-
-function ConsentAnalytics() {
-  const { isConsented, setIsConsented } = useAnalytics();
-  if (isConsented !== undefined) {
-    return null;
-  }
-  return (
-    <ConsentDialog consent={isConsented ?? true} setConsent={setIsConsented} />
   );
 }
