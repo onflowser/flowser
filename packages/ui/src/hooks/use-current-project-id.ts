@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "../contexts/navigation.context";
 
 export function useCurrentWorkspaceId(): string {
   const { workspaceId } = useParams();

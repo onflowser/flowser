@@ -21,7 +21,7 @@ export class TextUtils {
     return formatter.format(value);
   }
 
-  static longDate(value: string): string {
+  static longDate(value: string | Date): string {
     return dateFormat(value, "dS mmm yyyy, hh:MM:ss");
   }
 }

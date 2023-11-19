@@ -95,6 +95,7 @@ const configuration: webpack.Configuration = {
       },
       // SVG
       // https://react-svgr.com/docs/webpack/#use-svgr-and-asset-svg-in-the-same-project
+      // This should match the config in `next.config.js`
       {
         test: /\.svg$/i,
         type: 'asset',

@@ -6,6 +6,8 @@ import {
   RouteObject,
   RouterProvider,
   useLocation,
+  useMatches,
+  useNavigate,
   useParams,
 } from 'react-router-dom';
 import { WorkspaceLayout } from '@onflowser/ui/src/common/layouts/ProjectLayout/WorkspaceLayout';
@@ -40,6 +42,7 @@ import {
 } from '@onflowser/ui/src/api';
 import { WorkspaceList } from '@onflowser/ui/src/workspaces/WorkspaceList/WorkspaceList';
 import { WorkspaceSettings } from '@onflowser/ui/src/workspaces/WorkspaceSettings/WorkspaceSettings';
+import { NavigationProvider } from '@onflowser/ui/src/contexts/navigation.context';
 
 function BrowserRouterEvents(props: { children: ReactNode }): ReactElement {
   const location = useLocation();
@@ -158,13 +161,15 @@ const routes: RouteObject[] = [
   {
     path: 'projects',
     element: (
-      <WorkspaceManagerProvider>
-        <SnapshotsManagerProvider>
-          <BrowserRouterEvents>
-            <Outlet />
-          </BrowserRouterEvents>
-        </SnapshotsManagerProvider>
-      </WorkspaceManagerProvider>
+      <ReactRouterNavigationProvider>
+        <WorkspaceManagerProvider>
+          <SnapshotsManagerProvider>
+            <BrowserRouterEvents>
+              <Outlet />
+            </BrowserRouterEvents>
+          </SnapshotsManagerProvider>
+        </WorkspaceManagerProvider>
+      </ReactRouterNavigationProvider>
     ),
     handle: createCrumbHandle({
       crumbName: 'Projects',
@@ -319,4 +324,28 @@ const hashRouter = createHashRouter(routes);
 
 export function FlowserRouter(): ReactElement {
   return <RouterProvider router={hashRouter} />;
+}
+
+function ReactRouterNavigationProvider(props: { children: ReactNode }) {
+  const matches = useMatches();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  return (
+    <NavigationProvider
+      controller={{
+        matches,
+        location: {
+          hash: location.hash,
+          search: new URLSearchParams(location.search),
+          pathname: location.pathname,
+        },
+        navigate,
+        params,
+      }}
+    >
+      {props.children}
+    </NavigationProvider>
+  );
 }

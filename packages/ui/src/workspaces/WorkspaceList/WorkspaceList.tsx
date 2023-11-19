@@ -1,5 +1,4 @@
 import React, { FunctionComponent, ReactElement, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
 import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
 import classes from "./WorkspaceList.module.scss";
@@ -11,6 +10,8 @@ import { useAnalytics } from "../../hooks/use-analytics";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { TextUtils } from "../../utils/text-utils";
 import { useGetWorkspaces } from "../../api";
+import { useLocation, useNavigate } from "contexts/navigation.context";
+import { ProjectLink } from "../../common/links/ProjectLink";
 
 type ProjectTab = {
   id: string;
@@ -59,10 +60,10 @@ export const WorkspaceList: FunctionComponent = () => {
                 [classes.activeTab]: tab.id === activeTab.id,
               })}
             >
-              <Link to={`/projects#${tab.id}`} className={classes.tabLink}>
+              <ProjectLink to={`#${tab.id}`} className={classes.tabLink}>
                 <div className={classes.indicator} />
                 {tab.label}
-              </Link>
+              </ProjectLink>
             </li>
           ))}
         </ul>

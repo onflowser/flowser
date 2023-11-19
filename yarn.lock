@@ -2257,6 +2257,15 @@
     reactjs-popup "2.0.5"
     yup "^0.32.11"
 
+"@onflowser/web@file:/Users/bartkozorog/Projects/flowser/apps/web":
+  version "0.1.0"
+  resolved "file:apps/web"
+  dependencies:
+    "@onflowser/ui" "*"
+    next "14.0.3"
+    react "^18"
+    react-dom "^18"
+
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
   resolved "https://registry.npmjs.org/@pkgjs/parseargs/-/parseargs-0.11.0.tgz"
@@ -6658,14 +6667,6 @@ flow-native-token-registry@^0.1.4:
   integrity sha512-81q0HGBQL92b2C87lXA3YMiEDFd+w+7G8q6fRNFWsgc+OycOgUa0ViPsDXq7F2Eesgee/mhAk1FmFHS510mtmQ==
   dependencies:
     cross-fetch "^3.1.5"
-
-"@onflowser/web@file:/Users/bartkozorog/Projects/flowser/apps/@onflowser/web":
-  version "0.1.0"
-  resolved "file:apps/@onflowser/web"
-  dependencies:
-    next "14.0.3"
-    react "^18"
-    react-dom "^18"
 
 flux@^4.0.1:
   version "4.0.4"
