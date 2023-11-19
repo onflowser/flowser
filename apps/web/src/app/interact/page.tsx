@@ -12,13 +12,11 @@ export default function Page() {
   return(
     <NextJsNavigationProvider>
       <ServiceRegistryProvider services={{} as never}>
-        <WorkspaceLayout>
           <InteractionRegistryProvider>
             <TemplatesRegistryProvider>
               <InteractionsPage />
             </TemplatesRegistryProvider>
           </InteractionRegistryProvider>
-        </WorkspaceLayout>
       </ServiceRegistryProvider>
     </NextJsNavigationProvider>
   )
