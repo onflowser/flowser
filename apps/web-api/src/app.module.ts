@@ -1,10 +1,24 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { GoBindingsService } from '@onflowser/nodejs';
+import path from 'path';
 
 @Module({
   imports: [],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: GoBindingsService,
+      useValue: new GoBindingsService({
+        binDirPath: path.join(
+          __dirname,
+          '../../../../',
+          'packages',
+          'nodejs',
+          'bin',
+        ),
+      }),
+    },
+  ],
 })
 export class AppModule {}
