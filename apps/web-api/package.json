@@ -25,7 +25,8 @@
     "@nestjs/platform-express": "^10.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "@onflowser/nodejs": "*"
+    "@onflowser/nodejs": "*",
+    "@onflowser/config": "*"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

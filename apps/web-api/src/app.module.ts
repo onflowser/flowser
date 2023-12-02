@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { GoBindingsService } from '@onflowser/nodejs';
-import path from 'path';
+import * as path from 'path';
 
 @Module({
   imports: [],
@@ -12,7 +12,7 @@ import path from 'path';
       useValue: new GoBindingsService({
         binDirPath: path.join(
           __dirname,
-          '../../../../',
+          '../../../',
           'packages',
           'nodejs',
           'bin',

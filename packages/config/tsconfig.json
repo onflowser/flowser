@@ -1,28 +1,21 @@
 {
   "compilerOptions": {
-    "lib": ["ES2015"],
-    "strict": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "umd",
     "declaration": true,
-    "removeComments": true,
+    "removeComments": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
-    "types": ["node", "jest"],
-    "downlevelIteration": true,
+    "target": "es2022",
+    "moduleResolution": "node",
     "sourceMap": true,
+    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "strictBindCallApply": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": true
   }
 }
