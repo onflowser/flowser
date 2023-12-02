@@ -4,7 +4,7 @@ import {GoBindingsService} from "@onflowser/nodejs"
 const goBindingsService = new GoBindingsService({
   binDirPath: path.join(
     __dirname,
-    '../../../../../../..',
+    '../../../../../../../..',
     'packages',
     'nodejs',
     'bin',
