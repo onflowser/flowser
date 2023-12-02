@@ -1,13 +1,3 @@
 {
-  "compilerOptions": {
-    "outDir": "./dist"
-  },
-  "extends": "@onflowser/config/tsconfig.json",
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules"
-  ]
+  "extends": "@onflowser/config/tsconfig.json"
 }
