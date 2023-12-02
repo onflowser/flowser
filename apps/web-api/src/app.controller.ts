@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { GoBindingsService } from '@onflowser/nodejs';
 
 @Controller()
@@ -13,6 +13,13 @@ export class AppController {
     return this.goBindingsService.getIndexOfAddress({
       hexAddress: address,
       chainId,
+    });
+  }
+
+  @Get('interaction/parsed')
+  getParsedInteraction(@Query('sourceCode') sourceCode: string) {
+    return this.goBindingsService.getParsedInteraction({
+      sourceCode,
     });
   }
 }
