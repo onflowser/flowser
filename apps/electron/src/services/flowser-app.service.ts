@@ -5,6 +5,7 @@ import {
   FlowSnapshotsEvent,
   FlowSnapshotsService,
   IFlowserLogger,
+  InMemoryIndex,
 } from '@onflowser/core';
 import {
   AsyncIntervalScheduler,
@@ -83,19 +84,21 @@ export class FlowserAppService {
       this.flowEmulatorService,
       new FileStorageService('flowser-workspaces.json'),
     );
-    this.blockchainIndexService = new BlockchainIndexService();
+    this.blockchainIndexService = new BlockchainIndexService({
+      accountKey: new InMemoryIndex(),
+      transaction: new InMemoryIndex(),
+      block: new InMemoryIndex(),
+      account: new InMemoryIndex(),
+      event: new InMemoryIndex(),
+      contract: new InMemoryIndex(),
+      accountStorage: new InMemoryIndex(),
+    });
     this.flowIndexerService = new FlowIndexerService(
       this.logger,
-      this.blockchainIndexService.indexes.transaction,
-      this.blockchainIndexService.indexes.account,
-      this.blockchainIndexService.indexes.block,
-      this.blockchainIndexService.indexes.event,
-      this.blockchainIndexService.indexes.contract,
-      this.blockchainIndexService.indexes.accountKey,
-      this.blockchainIndexService.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
       this.flowInteractionsService,
+      this.blockchainIndexService.indexes,
     );
     this.flowConfigService = new FlowConfigService(this.logger);
     this.walletStorageService = new FileStorageService();
@@ -110,7 +113,7 @@ export class FlowserAppService {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
       pollingIntervalInMs: indexSyncIntervalInMs,
-      functionToExecute: () => this.flowIndexerService.processBlockchainData(),
+      functionToExecute: () => this.flowIndexerService.processBlockchain(),
     });
     this.registerListeners();
   }

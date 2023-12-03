@@ -83,6 +83,7 @@ export function App() {
             flowConfigService: window.electron.flowConfigService,
             walletService: window.electron.wallet,
             flowService: window.electron.flow,
+            flowCliService: window.electron.flowCliService,
             interactionsService: window.electron.interactions,
             accountIndex: indexes.account,
             accountStorageIndex: indexes.accountStorage,

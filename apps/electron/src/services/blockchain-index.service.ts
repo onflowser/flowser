@@ -10,7 +10,6 @@ import {
   IResourceIndex,
   TimestampedResource,
 } from '@onflowser/api';
-import { InMemoryIndex } from '@onflowser/core';
 
 export type BlockchainIndexes = {
   accountStorage: IResourceIndex<FlowAccountStorage>;
@@ -23,19 +22,7 @@ export type BlockchainIndexes = {
 };
 
 export class BlockchainIndexService {
-  public readonly indexes: BlockchainIndexes;
-
-  constructor() {
-    this.indexes = {
-      accountKey: new InMemoryIndex(),
-      transaction: new InMemoryIndex(),
-      block: new InMemoryIndex(),
-      account: new InMemoryIndex(),
-      event: new InMemoryIndex(),
-      contract: new InMemoryIndex(),
-      accountStorage: new InMemoryIndex(),
-    };
-  }
+  constructor(public readonly indexes: BlockchainIndexes) {}
 
   clear() {
     this.findAll().forEach((index) => index.clear());

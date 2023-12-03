@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const sourceCode = searchParams.get('sourceCode');
 
-  if (!sourceCode) {
+  if (sourceCode === null) {
     throw new Error("Missing `sourceCode` query param")
   }
 

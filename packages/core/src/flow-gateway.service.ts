@@ -75,7 +75,9 @@ export type FlowSignableObject = {
 
 // https://docs.onflow.org/fcl/reference/api/#transactionstatusobject
 export type FlowTransactionStatus = {
+  blockId: string;
   status: number;
+  statusString: string;
   statusCode: number;
   errorMessage: string;
   events: FlowEvent[];

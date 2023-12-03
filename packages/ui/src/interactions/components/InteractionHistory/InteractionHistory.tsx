@@ -23,6 +23,14 @@ export function InteractionHistory(): ReactElement {
     );
   }
 
+  if (blocks.length === 0) {
+    return (
+      <div className={classes.loadingRoot}>
+        No blocks yet
+      </div>
+    )
+  }
+
   return (
     <div>
       {blocks.map((block) => (
