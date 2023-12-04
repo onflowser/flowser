@@ -33,7 +33,7 @@ function StoredTemplates() {
     if (searchTerm === "") {
       return templates;
     }
-    return templates.filter((template) => template.name.includes(searchTerm));
+    return templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, templates]);
   const filteredAndSortedTemplates = useMemo(
     () =>
