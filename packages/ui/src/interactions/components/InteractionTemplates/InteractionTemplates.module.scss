@@ -60,6 +60,14 @@
     padding-top: $spacing-base;
     background: $gray-100;
     bottom: 0;
+  }
+
+  .workspaceInfo {
+    border-radius: $border-radius-input;
+    background: $gray-80;
+    padding: $spacing-base;
+    display: flex;
+    column-gap: $spacing-base;
 
     .actionButtons {
       display: flex;

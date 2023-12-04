@@ -143,11 +143,13 @@ function WorkspaceTemplateInfo(props: { workspaceTemplate: WorkspaceTemplate }) 
   return (
     <div className={classes.focusedTemplate}>
       <FlixInfo sourceCode={workspaceTemplate.code} />
-      Open in:
-      <div className={classes.actionButtons}>
-        <IdeLink.VsCode filePath={workspaceTemplate.filePath} />
-        <IdeLink.WebStorm filePath={workspaceTemplate.filePath} />
-        <IdeLink.IntellijIdea filePath={workspaceTemplate.filePath} />
+      <div className={classes.workspaceInfo}>
+        Open in:
+        <div className={classes.actionButtons}>
+          <IdeLink.VsCode filePath={workspaceTemplate.filePath} />
+          <IdeLink.WebStorm filePath={workspaceTemplate.filePath} />
+          <IdeLink.IntellijIdea filePath={workspaceTemplate.filePath} />
+        </div>
       </div>
     </div>
   );
