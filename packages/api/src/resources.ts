@@ -328,13 +328,11 @@ export interface FlowEmulatorConfig {
   snapshot: boolean;
 }
 
-export interface InteractionTemplate extends TimestampedResource {
+export interface WorkspaceTemplate extends TimestampedResource {
   id: string;
   name: string;
   code: string;
-  source: {
-    filePath?: string;
-  };
+  filePath: string;
 }
 
 export interface FlowCliInfo {

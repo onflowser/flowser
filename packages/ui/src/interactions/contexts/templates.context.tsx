@@ -7,6 +7,7 @@ import {
   useGetWorkspaceInteractionTemplates,
 } from "../../api";
 import useSWR, { SWRResponse } from "swr";
+import { WorkspaceTemplate } from "@onflowser/api";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -15,16 +16,14 @@ type InteractionTemplatesRegistry = {
 };
 
 export type InteractionDefinitionTemplate = InteractionDefinition & {
-  // Specified for project-based interaction templates.
-  // These templates can't be updated,
-  // since that would require making changes to the file system,
-  // which is not implemented yet.
-  filePath: string | undefined;
-  source: "filesystem" | "flix" | "session";
+  source: "workspace" | "flix" | "session";
+
+  flix: FlixTemplate | undefined;
+  workspace: WorkspaceTemplate | undefined;
 };
 
 // Internal structure that's persisted in local storage.
-type RawInteractionDefinitionTemplate = {
+type SerializedSessionTemplate = {
   name: string;
   code: string;
   fclValuesByIdentifier: Record<string, FclValue>;
@@ -47,8 +46,8 @@ export function TemplatesRegistryProvider(props: {
   const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
   const { data: flixTemplates } = useGetFlixInteractionTemplates();
   const { data: contracts } = useGetContracts();
-  const [customTemplates, setRawTemplates] = useLocalStorage<
-    RawInteractionDefinitionTemplate[]
+  const [sessionTemplates, setSessionTemplates] = useLocalStorage<
+    SerializedSessionTemplate[]
   >("interactions", []);
 
   const randomId = () => String(Math.random() * 1000000);
@@ -100,7 +99,7 @@ export function TemplatesRegistryProvider(props: {
 
   const templates = useMemo<InteractionDefinitionTemplate[]>(
     () => [
-      ...customTemplates.map(
+      ...sessionTemplates.map(
         (template): InteractionDefinitionTemplate => ({
           id: randomId(),
           name: template.name,
@@ -112,7 +111,8 @@ export function TemplatesRegistryProvider(props: {
           fclValuesByIdentifier: new Map(
             Object.entries(template.fclValuesByIdentifier),
           ),
-          filePath: undefined,
+          workspace: undefined,
+          flix: undefined,
           source: "session"
         }),
       ),
@@ -126,8 +126,9 @@ export function TemplatesRegistryProvider(props: {
           fclValuesByIdentifier: new Map(),
           createdDate: new Date(template.createdAt),
           updatedDate: new Date(template.updatedAt),
-          filePath: template.source?.filePath,
-          source: "filesystem"
+          workspace: template,
+          flix: undefined,
+          source: "workspace"
         }),
       ) ?? []),
       ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
@@ -140,16 +141,17 @@ export function TemplatesRegistryProvider(props: {
           fclValuesByIdentifier: new Map(),
           createdDate: new Date(),
           updatedDate: new Date(),
-          filePath: undefined,
+          workspace: undefined,
+          flix: undefined,
           source: "flix"
         }),
       ) ?? []),
     ],
-    [customTemplates, workspaceTemplates],
+    [sessionTemplates, workspaceTemplates],
   );
 
   function saveTemplate(interaction: InteractionDefinition) {
-    const newTemplate: RawInteractionDefinitionTemplate = {
+    const newTemplate: SerializedSessionTemplate = {
       name: interaction.name,
       code: interaction.code,
       fclValuesByIdentifier: Object.fromEntries(
@@ -160,8 +162,8 @@ export function TemplatesRegistryProvider(props: {
       updatedDate: new Date().toISOString(),
     };
 
-    setRawTemplates([
-      ...customTemplates.filter(
+    setSessionTemplates([
+      ...sessionTemplates.filter(
         (template) => template.name !== newTemplate.name,
       ),
       newTemplate,
@@ -169,7 +171,7 @@ export function TemplatesRegistryProvider(props: {
   }
 
   function removeTemplate(template: InteractionDefinitionTemplate) {
-    setRawTemplates((rawTemplates) =>
+    setSessionTemplates((rawTemplates) =>
       rawTemplates.filter(
         (existingTemplate) => existingTemplate.name !== template.name,
       ),

@@ -15,7 +15,7 @@ export function InteractionTemplates(): ReactElement {
   return (
     <div className={classes.root}>
       <StoredTemplates />
-      <FocusedTemplateSettings />
+      <FocusedInteraction />
     </div>
   );
 }
@@ -88,7 +88,7 @@ function StoredTemplates() {
   );
 }
 
-function FocusedTemplateSettings() {
+function FocusedInteraction() {
   const { focusedDefinition, update } = useInteractionRegistry();
   const { templates, saveTemplate } = useTemplatesRegistry();
 
@@ -100,14 +100,14 @@ function FocusedTemplateSettings() {
     (template) => template.id === focusedDefinition.id,
   );
 
-  if (correspondingTemplate && correspondingTemplate.filePath) {
+  if (correspondingTemplate && correspondingTemplate.workspace) {
     return (
       <div className={classes.focusedTemplate}>
         Open in:
         <div className={classes.actionButtons}>
-          <IdeLink.VsCode filePath={correspondingTemplate.filePath} />
-          <IdeLink.WebStorm filePath={correspondingTemplate.filePath} />
-          <IdeLink.IntellijIdea filePath={correspondingTemplate.filePath} />
+          <IdeLink.VsCode filePath={correspondingTemplate.workspace.filePath} />
+          <IdeLink.WebStorm filePath={correspondingTemplate.workspace.filePath} />
+          <IdeLink.IntellijIdea filePath={correspondingTemplate.workspace.filePath} />
         </div>
       </div>
     );
