@@ -10,6 +10,10 @@ import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
 import { IdeLink } from "../../../common/links/IdeLink";
+import { WorkspaceTemplate } from "@onflowser/api";
+import { FLOW_FLIX_URL, useFlixSearch } from "../../../hooks/flix";
+import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
+import { LineSeparator } from "../../../common/misc/LineSeparator/LineSeparator";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -34,9 +38,9 @@ function StoredTemplates() {
   const filteredAndSortedTemplates = useMemo(
     () =>
       filteredTemplates.sort(
-        (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime(),
+        (a, b) => b.updatedDate.getTime() - a.updatedDate.getTime()
       ),
-    [filteredTemplates],
+    [filteredTemplates]
   );
 
   return (
@@ -57,7 +61,7 @@ function StoredTemplates() {
               setFocused(createdInteraction.id);
             }}
             className={classNames(classes.item, {
-              [classes.focusedItem]: focusedDefinition?.id === template.id,
+              [classes.focusedItem]: focusedDefinition?.id === template.id
             })}
           >
             <InteractionLabel interaction={template} />
@@ -76,7 +80,7 @@ function StoredTemplates() {
                     ),
                     confirmButtonLabel: "REMOVE",
                     cancelButtonLabel: "CANCEL",
-                    onConfirm: () => removeTemplate(template),
+                    onConfirm: () => removeTemplate(template)
                   });
                 }}
               />
@@ -89,32 +93,38 @@ function StoredTemplates() {
 }
 
 function FocusedInteraction() {
+  const { focusedDefinition } = useInteractionRegistry();
+  const { templates } = useTemplatesRegistry();
+
+  const correspondingTemplate = templates.find(
+    (template) => template.id === focusedDefinition?.id
+  );
+
+  if (!correspondingTemplate) {
+    return <SessionTemplateSettings />;
+  }
+
+  switch (correspondingTemplate.source) {
+    case "workspace":
+      return <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />;
+    case "flix":
+      return <FlixInfo sourceCode={correspondingTemplate.flix!.data.cadence} />;
+    case "session":
+      return <SessionTemplateSettings />;
+  }
+}
+
+function SessionTemplateSettings() {
   const { focusedDefinition, update } = useInteractionRegistry();
-  const { templates, saveTemplate } = useTemplatesRegistry();
+  const { saveTemplate } = useTemplatesRegistry();
 
   if (!focusedDefinition) {
     return null;
   }
 
-  const correspondingTemplate = templates.find(
-    (template) => template.id === focusedDefinition.id,
-  );
-
-  if (correspondingTemplate && correspondingTemplate.workspace) {
-    return (
-      <div className={classes.focusedTemplate}>
-        Open in:
-        <div className={classes.actionButtons}>
-          <IdeLink.VsCode filePath={correspondingTemplate.workspace.filePath} />
-          <IdeLink.WebStorm filePath={correspondingTemplate.workspace.filePath} />
-          <IdeLink.IntellijIdea filePath={correspondingTemplate.workspace.filePath} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={classes.focusedTemplate}>
+      <FlixInfo sourceCode={focusedDefinition.code} />
       <Input
         placeholder="Name"
         value={focusedDefinition.name}
@@ -123,6 +133,49 @@ function FocusedInteraction() {
       <PrimaryButton onClick={() => saveTemplate(focusedDefinition)}>
         Save
       </PrimaryButton>
+    </div>
+  );
+}
+
+function WorkspaceTemplateInfo(props: { workspaceTemplate: WorkspaceTemplate }) {
+  const { workspaceTemplate } = props;
+
+  return (
+    <div className={classes.focusedTemplate}>
+      <FlixInfo sourceCode={workspaceTemplate.code} />
+      Open in:
+      <div className={classes.actionButtons}>
+        <IdeLink.VsCode filePath={workspaceTemplate.filePath} />
+        <IdeLink.WebStorm filePath={workspaceTemplate.filePath} />
+        <IdeLink.IntellijIdea filePath={workspaceTemplate.filePath} />
+      </div>
+    </div>
+  );
+}
+
+function FlixInfo(props: { sourceCode: string }) {
+  const { data } = useFlixSearch(props.sourceCode);
+
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <div className={classes.flixInfo}>
+      <div className={classes.title}>
+        <ExternalLink className={classes.link} inline href="https://developers.flow.com/build/advanced-concepts/flix">
+          Verified by
+          <div className={classes.nameAndLogo}>
+            <span>FLIX</span>
+            <FlowserIcon.VerifiedCheck />
+          </div>
+        </ExternalLink>
+      </div>
+      <LineSeparator horizontal />
+      <div className={classes.body}>
+        <p>{data.data.messages.description?.i18n["en-US"]}</p>
+        <ExternalLink inline href={`${FLOW_FLIX_URL}/v1/templates/${data.id}`} />
+      </div>
     </div>
   );
 }

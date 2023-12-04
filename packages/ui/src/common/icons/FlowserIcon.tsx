@@ -32,6 +32,7 @@ import Shrink from "./assets/shrink.svg";
 import Logs from "./assets/logs.svg";
 import { TbBrandVscode } from "react-icons/tb";
 import { SiWebstorm, SiIntellijidea } from "react-icons/si";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 export const FlowserIcon = {
   Logs: Logs,
@@ -69,4 +70,5 @@ export const FlowserIcon = {
   WebStorm: SiWebstorm,
   VsCode: TbBrandVscode,
   IntellijIdea: SiIntellijidea,
+  VerifiedCheck: RiVerifiedBadgeFill
 };

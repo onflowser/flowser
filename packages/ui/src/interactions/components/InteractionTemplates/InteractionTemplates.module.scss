@@ -3,6 +3,7 @@
 @import "../../../styles/typography";
 @import "../../../styles/animations";
 @import "../../../styles/scrollbars";
+@import "../../../styles/rules";
 
 .root {
   height: 100%;
@@ -63,6 +64,29 @@
     .actionButtons {
       display: flex;
       column-gap: $spacing-base;
+    }
+  }
+
+  .flixInfo {
+    border-radius: $border-radius-input;
+    background: $gray-80;
+    padding: $spacing-base;
+    .title {
+      font-weight: bold;
+      .link {
+        color: $white;
+      }
+      .nameAndLogo {
+        color: $strong-green;
+        display: inline-flex !important;
+        align-items: center;
+        column-gap: 3px;
+      }
+    }
+    .body {
+      display: flex;
+      flex-direction: column;
+      row-gap: $spacing-base;
     }
   }
 }

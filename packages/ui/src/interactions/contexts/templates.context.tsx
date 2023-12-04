@@ -6,8 +6,8 @@ import {
   useGetContracts,
   useGetWorkspaceInteractionTemplates,
 } from "../../api";
-import useSWR, { SWRResponse } from "swr";
 import { WorkspaceTemplate } from "@onflowser/api";
+import { FlixTemplate, useListFlixTemplates } from "../../hooks/flix";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -44,7 +44,7 @@ export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
   const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
-  const { data: flixTemplates } = useGetFlixInteractionTemplates();
+  const { data: flixTemplates } = useListFlixTemplates();
   const { data: contracts } = useGetContracts();
   const [sessionTemplates, setSessionTemplates] = useLocalStorage<
     SerializedSessionTemplate[]
@@ -142,7 +142,7 @@ export function TemplatesRegistryProvider(props: {
           createdDate: new Date(),
           updatedDate: new Date(),
           workspace: undefined,
-          flix: undefined,
+          flix: template,
           source: "flix"
         }),
       ) ?? []),
@@ -199,49 +199,6 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   }
 
   return context;
-}
-
-// https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
-type FlixTemplate = {
-  id: string;
-  f_type: "InteractionTemplate";
-  f_version: string;
-  data: {
-    messages: {
-      title?: FlixMessage;
-      description?: FlixMessage;
-    };
-    dependencies: Record<string, FlixDependency>;
-    cadence: string;
-    // TODO: Add other fields
-  };
-};
-
-type FlixDependency = Record<
-  string,
-  {
-    mainnet: FlixDependencyOnNetwork;
-    testnet: FlixDependencyOnNetwork;
-  }
->;
-
-type FlixDependencyOnNetwork = {
-  address: string;
-  fq_address: string;
-  pin: string;
-  pin_block_height: number;
-};
-
-type FlixMessage = {
-  i18n: {
-    "en-US"?: string;
-  };
-};
-
-function useGetFlixInteractionTemplates(): SWRResponse<FlixTemplate[]> {
-  return useSWR(`flix-interaction-templates`, () =>
-    fetch("http://localhost:3333/v1/templates").then((res) => res.json()),
-  );
 }
 
 function getFlixTemplateFormattedCode(template: FlixTemplate) {
