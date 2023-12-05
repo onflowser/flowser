@@ -126,6 +126,8 @@ function SessionTemplateSettings() {
     return null;
   }
 
+  console.log(focusedDefinition)
+
   return (
     <div className={classes.focusedTemplate}>
       <FlixInfo sourceCode={focusedDefinition.code} />

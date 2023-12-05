@@ -30,6 +30,7 @@
     .item {
       cursor: pointer;
       display: flex;
+      align-items: center;
       justify-content: space-between;
       font-size: $font-size-normal;
       color: $gray-20;
@@ -37,6 +38,7 @@
 
       .trash {
         @include scaleOnHover();
+        min-width: 20px;
         * {
           fill: $gray-50;
         }
