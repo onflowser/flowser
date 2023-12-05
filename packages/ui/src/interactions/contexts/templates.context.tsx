@@ -204,7 +204,13 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
 function getFlixTemplateFormattedCode(template: FlixTemplate) {
   const replacementPatterns = Object.keys(template.data.dependencies);
   return replacementPatterns.reduce(
-    (cadence, pattern) => cadence.replace(`from ${pattern}`, ""),
+    (cadence, pattern) => {
+      const contractName = Object.keys(template.data.dependencies[pattern])[0];
+
+      return cadence
+        .replace(new RegExp(`from\\s+${pattern}`), "")
+        .replace(new RegExp(`import\\s+${contractName}`), `import "${contractName}"`)
+    },
     template.data.cadence,
   );
 }
