@@ -64,7 +64,8 @@ export function useFlixSearch(options: {
       })
     }).then((res) => res.json()),
     {
-      refreshInterval: 0
+      refreshInterval: 0,
+      shouldRetryOnError: false
     }
   );
 }
