@@ -63,5 +63,8 @@ export function useFlixSearch(options: {
         network: options.network
       })
     }).then((res) => res.json()),
+    {
+      refreshInterval: 0
+    }
   );
 }
