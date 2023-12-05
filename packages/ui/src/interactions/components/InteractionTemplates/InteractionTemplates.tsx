@@ -108,7 +108,11 @@ function FocusedInteraction() {
     case "workspace":
       return <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />;
     case "flix":
-      return <FlixInfo sourceCode={correspondingTemplate.flix!.data.cadence} />;
+      return (
+        <div className={classes.focusedTemplate}>
+          <FlixInfo sourceCode={correspondingTemplate.flix!.data.cadence} />
+        </div>
+      )
     case "session":
       return <SessionTemplateSettings />;
   }
@@ -159,7 +163,23 @@ function FlixInfo(props: { sourceCode: string }) {
   const { data } = useFlixSearch(props.sourceCode);
 
   if (!data) {
-    return null;
+    return (
+      <div className={classes.flixInfo}>
+        <div className={classes.title}>
+          Unverified
+          <FlowserIcon.CircleCross />
+        </div>
+        <LineSeparator horizontal />
+        <div className={classes.body}>
+          <p>
+            This interaction is not yet verified by FLIX.
+          </p>
+          <ExternalLink inline href="https://github.com/onflow/flow-interaction-template-service#-propose-interaction-template">
+            Submit for verification
+          </ExternalLink>
+        </div>
+      </div>
+    )
   }
 
   return (
