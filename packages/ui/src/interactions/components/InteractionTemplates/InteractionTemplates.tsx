@@ -101,22 +101,28 @@ function FocusedInteraction() {
     (template) => template.id === focusedDefinition?.id
   );
 
-  if (!correspondingTemplate) {
-    return <SessionTemplateSettings />;
+  function renderContent() {
+    if (!correspondingTemplate) {
+      return <SessionTemplateSettings />;
+    }
+
+    switch (correspondingTemplate.source) {
+      case "workspace":
+        return <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />;
+      case "flix":
+        // Already shown at the top.
+        return null;
+      case "session":
+        return <SessionTemplateSettings />;
+    }
   }
 
-  switch (correspondingTemplate.source) {
-    case "workspace":
-      return <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />;
-    case "flix":
-      return (
-        <div className={classes.focusedTemplate}>
-          <FlixInfo sourceCode={correspondingTemplate.code} />
-        </div>
-      )
-    case "session":
-      return <SessionTemplateSettings />;
-  }
+  return (
+    <div className={classes.focusedTemplate}>
+      {focusedDefinition && <FlixInfo sourceCode={focusedDefinition.code} />}
+      {renderContent()}
+    </div>
+  )
 }
 
 function SessionTemplateSettings() {
@@ -128,8 +134,7 @@ function SessionTemplateSettings() {
   }
 
   return (
-    <div className={classes.focusedTemplate}>
-      <FlixInfo sourceCode={focusedDefinition.code} />
+    <>
       <Input
         placeholder="Name"
         value={focusedDefinition.name}
@@ -138,7 +143,7 @@ function SessionTemplateSettings() {
       <PrimaryButton onClick={() => saveTemplate(focusedDefinition)}>
         Save
       </PrimaryButton>
-    </div>
+    </>
   );
 }
 
@@ -146,15 +151,12 @@ function WorkspaceTemplateInfo(props: { workspaceTemplate: WorkspaceTemplate }) 
   const { workspaceTemplate } = props;
 
   return (
-    <div className={classes.focusedTemplate}>
-      <FlixInfo sourceCode={workspaceTemplate.code} />
-      <div className={classes.workspaceInfo}>
-        Open in:
-        <div className={classes.actionButtons}>
-          <IdeLink.VsCode filePath={workspaceTemplate.filePath} />
-          <IdeLink.WebStorm filePath={workspaceTemplate.filePath} />
-          <IdeLink.IntellijIdea filePath={workspaceTemplate.filePath} />
-        </div>
+    <div className={classes.workspaceInfo}>
+      Open in:
+      <div className={classes.actionButtons}>
+        <IdeLink.VsCode filePath={workspaceTemplate.filePath} />
+        <IdeLink.WebStorm filePath={workspaceTemplate.filePath} />
+        <IdeLink.IntellijIdea filePath={workspaceTemplate.filePath} />
       </div>
     </div>
   );
