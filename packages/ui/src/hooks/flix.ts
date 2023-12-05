@@ -46,16 +46,19 @@ export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   );
 }
 
-export function useFlixSearch(sourceCode: string): SWRResponse<FlixTemplate | undefined> {
-  return useSWR(`flix/templates/${sourceCode}`, () =>
+export function useFlixSearch(options: {
+  sourceCode: string;
+  network: "emulator" | "testnet" | "mainnet";
+}): SWRResponse<FlixTemplate | undefined> {
+  return useSWR(`flix/templates/${options.sourceCode}`, () =>
     fetch(`${FLOWSER_FLIX_URL}/v1/templates/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        cadence_base64: btoa(sourceCode),
-        network: "mainnet"
+        cadence_base64: btoa(options.sourceCode),
+        network: options.network
       })
     }).then((res) => res.json()),
   );

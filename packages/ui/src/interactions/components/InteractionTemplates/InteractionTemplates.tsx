@@ -14,6 +14,7 @@ import { WorkspaceTemplate } from "@onflowser/api";
 import { FLOW_FLIX_URL, useFlixSearch } from "../../../hooks/flix";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
 import { LineSeparator } from "../../../common/misc/LineSeparator/LineSeparator";
+import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -110,7 +111,7 @@ function FocusedInteraction() {
     case "flix":
       return (
         <div className={classes.focusedTemplate}>
-          <FlixInfo sourceCode={correspondingTemplate.flix!.data.cadence} />
+          <FlixInfo sourceCode={correspondingTemplate.code} />
         </div>
       )
     case "session":
@@ -125,8 +126,6 @@ function SessionTemplateSettings() {
   if (!focusedDefinition) {
     return null;
   }
-
-  console.log(focusedDefinition)
 
   return (
     <div className={classes.focusedTemplate}>
@@ -162,7 +161,14 @@ function WorkspaceTemplateInfo(props: { workspaceTemplate: WorkspaceTemplate }) 
 }
 
 function FlixInfo(props: { sourceCode: string }) {
-  const { data } = useFlixSearch(props.sourceCode);
+  const { data, isLoading } = useFlixSearch({
+    sourceCode: props.sourceCode,
+    network: "emulator"
+  });
+
+  if (isLoading) {
+    return <Shimmer height={150} />
+  }
 
   if (!data) {
     return (
