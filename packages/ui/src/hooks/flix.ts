@@ -6,15 +6,18 @@ export type FlixTemplate = {
   f_type: "InteractionTemplate";
   f_version: string;
   data: {
-    messages: {
-      title?: FlixMessage;
-      description?: FlixMessage;
-    };
+    messages: FlixMessages;
     dependencies: Record<string, FlixDependency>;
     cadence: string;
-    // TODO: Add other fields
+    arguments: Record<string, FlixArgument>;
   };
 };
+
+export type FlixArgument = {
+  index: number;
+  type: string;
+  messages: FlixMessages;
+}
 
 type FlixDependency = Record<
   string,
@@ -31,7 +34,12 @@ type FlixDependencyOnNetwork = {
   pin_block_height: number;
 };
 
-type FlixMessage = {
+type FlixMessages = {
+  title?: FlixI18nMessage;
+  description?: FlixI18nMessage;
+};
+
+type FlixI18nMessage = {
   i18n: {
     "en-US"?: string;
   };
