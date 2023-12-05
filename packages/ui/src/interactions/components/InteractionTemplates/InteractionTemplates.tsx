@@ -163,7 +163,7 @@ function WorkspaceTemplateInfo(props: { workspaceTemplate: WorkspaceTemplate }) 
 function FlixInfo(props: { sourceCode: string }) {
   const { data, isLoading } = useFlixSearch({
     sourceCode: props.sourceCode,
-    network: "emulator"
+    network: "any"
   });
 
   if (isLoading) {

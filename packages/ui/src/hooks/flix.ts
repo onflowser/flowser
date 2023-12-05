@@ -48,9 +48,9 @@ export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
 
 export function useFlixSearch(options: {
   sourceCode: string;
-  // Supports emulator as of:
+  // Supports "any" network as of:
   // https://github.com/onflowser/flow-interaction-template-service/pull/4
-  network: "emulator" | "testnet" | "mainnet";
+  network: "any" | "testnet" | "mainnet";
 }): SWRResponse<FlixTemplate | undefined> {
   return useSWR(`flix/templates/${options.sourceCode}`, () =>
     fetch(`${FLOWSER_FLIX_URL}/v1/templates/search`, {
