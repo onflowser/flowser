@@ -135,7 +135,7 @@ export function TemplatesRegistryProvider(props: {
         (template): InteractionDefinitionTemplate => ({
           id: template.id,
           name: getFlixTemplateName(template),
-          code: getFlixTemplateFormattedCode(template),
+          code: getCadenceWithNewImportSyntax(template),
           transactionOptions: undefined,
           initialOutcome: undefined,
           fclValuesByIdentifier: new Map(),
@@ -201,7 +201,10 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   return context;
 }
 
-function getFlixTemplateFormattedCode(template: FlixTemplate) {
+// Transform imports with replacement patterns to the new import syntax,
+// since FLIX v1.0 doesn't support new import syntax yet.
+// https://github.com/onflow/flow-interaction-template-tools/issues/12
+function getCadenceWithNewImportSyntax(template: FlixTemplate) {
   const replacementPatterns = Object.keys(template.data.dependencies);
   return replacementPatterns.reduce(
     (cadence, pattern) => {
