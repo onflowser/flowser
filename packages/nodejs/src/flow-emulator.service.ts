@@ -55,8 +55,7 @@ export class FlowEmulatorService extends EventEmitter {
     });
     await this.processManagerService.start(this.process);
 
-    // Resolves if APIs started or throws an error otherwise
-    await Promise.race([this.waitUntilApisStarted(), this.throwIfErrored()]);
+    await this.waitUntilApisStarted();
   }
 
   public getDefaultConfig(): FlowEmulatorConfig {
@@ -110,28 +109,6 @@ export class FlowEmulatorService extends EventEmitter {
     };
     while (!(await hasStarted())) {
       await waitForMs(100);
-    }
-  }
-
-  private async throwIfErrored() {
-    const getErrorOutput = () => {
-      if (!this.process) {
-        throw new Error("Process not found");
-      }
-      return this.process.output.find(
-        (output) =>
-          output.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR &&
-          output.data !== "",
-      );
-    };
-    let retries = 5;
-    while (retries >= 0) {
-      const error = getErrorOutput();
-      if (error) {
-        throw new Error("Emulator failed to start: " + error.data);
-      }
-      await waitForMs(100);
-      retries--;
     }
   }
 
