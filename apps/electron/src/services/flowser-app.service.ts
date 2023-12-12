@@ -287,24 +287,20 @@ export class FlowserAppService {
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
       restServerAddress: `http://localhost:${
-        workspace.emulator?.restServerPort ?? 8888
+        workspace.emulator?.restServerPort ??
+        this.flowEmulatorService.getDefaultConfig().restServerPort
       }`,
     });
 
+    this.flowSnapshotsService.configure({
+      adminServerPort:
+        workspace.emulator?.adminServerPort ??
+        this.flowEmulatorService.getDefaultConfig().adminServerPort,
+    });
+
     this.blockchainIndexService.clear();
-
-    if (workspace.emulator) {
-      this.flowSnapshotsService.configure({
-        adminServerPort: workspace.emulator.adminServerPort,
-      });
-    } else {
-      this.flowSnapshotsService.configure({
-        adminServerPort:
-          this.flowEmulatorService.getDefaultConfig().adminServerPort,
-      });
-    }
-
     this.processingScheduler.start();
+
     await this.walletService.synchronizeIndex();
     await this.flowSnapshotsService.synchronizeIndex();
   }
