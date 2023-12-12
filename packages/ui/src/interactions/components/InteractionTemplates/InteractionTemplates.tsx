@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useState } from "react";
+import React, { Fragment, ReactElement, useMemo, useState } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
@@ -122,7 +122,7 @@ function FocusedInteraction() {
       {focusedDefinition && <FlixInfo sourceCode={focusedDefinition.code} />}
       {renderContent()}
     </div>
-  )
+  );
 }
 
 function SessionTemplateSettings() {
@@ -169,44 +169,49 @@ function FlixInfo(props: { sourceCode: string }) {
   });
 
   if (isLoading) {
-    return <Shimmer height={150} />
+    return <Shimmer height={150} />;
   }
 
-  if (!data) {
-    return (
-      <div className={classes.flixInfo}>
-        <div className={classes.title}>
-          Unverified
-          <FlowserIcon.CircleCross />
-        </div>
-        <LineSeparator horizontal />
-        <div className={classes.body}>
-          <p>
-            This interaction is not yet verified by FLIX.
-          </p>
-          <ExternalLink inline href="https://github.com/onflow/flow-interaction-template-service#-propose-interaction-template">
-            Submit for verification
-          </ExternalLink>
-        </div>
-      </div>
-    )
-  }
+  const isVerified = data !== undefined;
 
   return (
     <div className={classes.flixInfo}>
-      <div className={classes.title}>
-        <ExternalLink className={classes.link} inline href="https://developers.flow.com/build/advanced-concepts/flix">
-          Verified by
-          <div className={classes.nameAndLogo}>
-            <span>FLIX</span>
-            <FlowserIcon.VerifiedCheck />
-          </div>
+      <div className={classes.header}>
+        <ExternalLink className={classes.title} inline href="https://developers.flow.com/build/advanced-concepts/flix">
+          FLIX:
         </ExternalLink>
+        {isVerified ? (
+          <Fragment>
+            verified
+            <FlowserIcon.VerifiedCheck className={classes.verifiedIcon} />
+          </Fragment>
+        ) : (
+          <Fragment>
+            unverified
+            <FlowserIcon.CircleCross className={classes.unverifiedIcon} />
+          </Fragment>
+        )}
       </div>
       <LineSeparator horizontal />
       <div className={classes.body}>
-        <p>{data.data.messages.description?.i18n["en-US"]}</p>
-        <ExternalLink inline href={`${FLOW_FLIX_URL}/v1/templates/${data.id}`} />
+        {isVerified ? (
+          <Fragment>
+            <p>{data.data.messages.description?.i18n["en-US"]}</p>
+            <ExternalLink inline href={`${FLOW_FLIX_URL}/v1/templates/${data.id}`} />
+          </Fragment>
+        ) : (
+          <Fragment>
+            <p>
+              This interaction is not yet verified by FLIX.
+            </p>
+            <ExternalLink
+              inline
+              href="https://github.com/onflow/flow-interaction-template-service#-propose-interaction-template"
+            >
+              Submit for verification
+            </ExternalLink>
+          </Fragment>
+        )}
       </div>
     </div>
   );

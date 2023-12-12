@@ -12,7 +12,7 @@
   justify-content: space-between;
   position: relative;
 
-  .header {
+  & > .header {
     background: $gray-100;
     position: sticky;
     top: 0;
@@ -76,30 +76,37 @@
       column-gap: $spacing-base;
     }
   }
+}
 
-  .flixInfo {
-    border-radius: $border-radius-input;
-    background: $gray-80;
-    padding: $spacing-base;
+.flixInfo {
+  border-radius: $border-radius-input;
+  background: $gray-80;
+  padding: $spacing-base;
+  .header {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    column-gap: 3px;
     .title {
-      font-weight: bold;
-      display: flex;
-      column-gap: 3px;
-      align-items: center;
-      .link {
-        color: $white;
-      }
-      .nameAndLogo {
-        color: $strong-green;
-        display: inline-flex !important;
-        align-items: center;
-        column-gap: 3px;
-      }
+      color: $strong-green;
+      display: inline-flex !important;
     }
-    .body {
-      display: flex;
-      flex-direction: column;
-      row-gap: $spacing-base;
+    @mixin icon {
+      height: 15px;
+      width: 15px;
     }
+    .verifiedIcon {
+      color: $strong-green;
+      @include icon;
+    }
+    .unverifiedIcon {
+      color: $color-red;
+      @include icon;
+    }
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
   }
 }
