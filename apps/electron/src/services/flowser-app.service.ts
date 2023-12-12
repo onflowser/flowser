@@ -21,6 +21,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { app, BrowserWindow, dialog } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
+import { HttpService } from '@onflowser/core/src/http.service';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 import { FileStorageService } from './file-storage.service';
@@ -48,12 +49,14 @@ export class FlowserAppService {
   private readonly flowSnapshotsStorageService: FileStorageService;
   private readonly walletStorageService: FileStorageService;
   private processingScheduler: AsyncIntervalScheduler;
+  private httpService: HttpService;
 
   constructor(
     private readonly logger: IFlowserLogger,
     private readonly window: BrowserWindow,
   ) {
-    this.flowGatewayService = new FlowGatewayService();
+    this.httpService = new HttpService(logger);
+    this.flowGatewayService = new FlowGatewayService(this.httpService);
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService,
     );
@@ -73,11 +76,11 @@ export class FlowserAppService {
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
-      this.flowGatewayService,
     );
     this.flowSnapshotsStorageService = new FileStorageService();
     this.flowSnapshotsService = new FlowSnapshotsService(
       this.flowSnapshotsStorageService,
+      this.httpService,
     );
     this.workspaceService = new WorkspaceService(
       this.flowEmulatorService,

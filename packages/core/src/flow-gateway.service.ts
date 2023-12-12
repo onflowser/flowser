@@ -7,6 +7,7 @@ import {
 import * as fcl from "@onflow/fcl";
 import axios from "axios";
 import { FclArgumentWithMetadata } from "@onflowser/api";
+import { HttpService } from "./http.service";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -204,12 +205,10 @@ type FlowGatewayConfig = {
   flowJSON: unknown;
 };
 
-export enum FlowApiStatus {
-  SERVICE_STATUS_ONLINE = 1,
-  SERVICE_STATUS_OFFLINE = 2,
-}
-
 export class FlowGatewayService {
+
+  constructor(private readonly httpService: HttpService) {}
+
   public configure(config: FlowGatewayConfig): void {
     fcl
       .config({
@@ -303,32 +302,13 @@ export class FlowGatewayService {
     return { ...account, balance: account.balance / Math.pow(10, 8), address };
   }
 
-  public async getRestApiStatus(): Promise<FlowApiStatus> {
+  public async isRestApiReachable(): Promise<boolean> {
     const restServerUrl = await fcl.config.get("accessNode.api");
 
     if (!restServerUrl) {
       throw new Error("accessNode.api not configured");
     }
 
-    return this.getApiStatus(restServerUrl);
-  }
-
-  public async getApiStatus(url: string) {
-    try {
-      await axios.request({
-        method: "GET",
-        url,
-        // Prevent axios from throwing on certain http response codes
-        // https://github.com/axios/axios/issues/41
-        validateStatus: () => true,
-      });
-      // Assume that if response is received, server is online
-      // Ideally we should send a ping request to access API
-      // but that endpoint isn't implemented on emulator side (afaik)
-      // https://github.com/onflow/flow/blob/master/protobuf/flow/access/access.proto#L20
-      return FlowApiStatus.SERVICE_STATUS_ONLINE;
-    } catch (error) {
-      return FlowApiStatus.SERVICE_STATUS_OFFLINE;
-    }
+    return this.httpService.isReachable(restServerUrl);
   }
 }
