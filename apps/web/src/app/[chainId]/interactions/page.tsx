@@ -17,14 +17,14 @@ import {
 } from "@onflowser/api";
 import {
   BlockchainIndexes,
-  FlowAccountStorageService, FlowGatewayService,
+  FlowAccountStorageService, FlowAuthorizationFunction, FlowGatewayService,
   FlowIndexerService,
   IFlowserLogger,
   InMemoryIndex
 } from "@onflowser/core";
 import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
-import { ScriptOutcome } from "@onflowser/ui/src/interactions/core/core-types";
-
+import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
+import * as fcl from "@onflow/fcl"
 
 class InteractionsService implements IInteractionService {
 
@@ -52,8 +52,15 @@ class InteractionsService implements IInteractionService {
     return fetch(url).then(res => res.json())
   }
 
-  sendTransaction(request: SendTransactionRequest): Promise<{ transactionId: string }> {
-    return Promise.resolve({ transactionId: "" });
+  async sendTransaction(request: SendTransactionRequest): Promise<TransactionOutcome> {
+    const authz = fcl.authz as unknown as FlowAuthorizationFunction;
+    return await this.flowGatewayService.sendTransaction({
+      cadence: request.cadence,
+      arguments: request.arguments,
+      authorizations: [authz],
+      payer: authz,
+      proposer: authz
+    })
   }
 
 }
@@ -212,17 +219,20 @@ export default function Page() {
       case "flow-emulator":
         return appService.flowGatewayService.configure({
           network: "local",
-          restServerAddress: "http://localhost:8080"
+          accessNodeRestApiUrl: "http://localhost:8080",
+          discoveryWalletUrl: "http://localhost:8701/fcl/authn"
         });
       case "flow-testnet":
         return appService.flowGatewayService.configure({
           network: "testnet",
-          restServerAddress: "https://rest-testnet.onflow.org"
+          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
         });
       case "flow-mainnet":
         return appService.flowGatewayService.configure({
           network: "mainnet",
-          restServerAddress: "https://rest-mainnet.onflow.org"
+          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
         });
       default:
         throw new Error(`Unsupported chain: ${chainId}`)

@@ -203,7 +203,8 @@ type FlowTxStatusSubscription = {
 
 type FlowGatewayConfig = {
   network: "local" | "canarynet" | "testnet" | "mainnet"
-  restServerAddress: string;
+  accessNodeRestApiUrl: string;
+  discoveryWalletUrl: string;
   flowJSON?: unknown;
 };
 
@@ -216,8 +217,9 @@ export class FlowGatewayService {
   public configure(config: FlowGatewayConfig): void {
     const configured = fcl
       .config({
-        "accessNode.api": config.restServerAddress,
+        "accessNode.api": config.accessNodeRestApiUrl,
         "flow.network": config.network,
+        "discovery.wallet": config.discoveryWalletUrl
       });
 
     if (config.flowJSON) {

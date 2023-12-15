@@ -240,7 +240,7 @@ export class FlowserAppService {
     if (openWorkspace) {
       this.flowGatewayService.configure({
         flowJSON: this.flowConfigService.getFlowJSON(),
-        restServerAddress: `http://localhost:${
+        accessNodeRestApiUrl: `http://localhost:${
           openWorkspace.emulator?.restServerPort ?? 8888
         }`,
       });
@@ -289,7 +289,7 @@ export class FlowserAppService {
 
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
-      restServerAddress: `http://localhost:${
+      accessNodeRestApiUrl: `http://localhost:${
         workspace.emulator?.restServerPort ?? 8888
       }`,
     });
