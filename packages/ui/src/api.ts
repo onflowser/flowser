@@ -20,6 +20,7 @@ import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
 import { ensureNonPrefixedAddress } from "@onflowser/core";
+import { useChainId } from "./contexts/chain-id.context";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -225,8 +226,9 @@ export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
 
 export function useGetAddressIndex(address: string): SWRResponse<number> {
   const { flowService } = useServiceRegistry();
-  return useSWR(`account-index/${address}`, () =>
-    flowService.getIndexOfAddress(address),
+  const chainID = useChainId();
+  return useSWR(`${chainID}/account-index/${address}`, () =>
+    flowService.getIndexOfAddress(chainID, address),
   );
 }
 

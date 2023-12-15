@@ -86,10 +86,14 @@ export function registerHandlers(appService: FlowserAppService) {
       });
     },
 
-    FLOW_ACCOUNT_GET_INDEX: (event: IpcMainInvokeEvent, address: string) =>
+    FLOW_ACCOUNT_GET_INDEX: (
+      event: IpcMainInvokeEvent,
+      chainID: string,
+      address: string,
+    ) =>
       goBindingsService.getIndexOfAddress({
         hexAddress: address,
-        chainId: 'flow-emulator',
+        chainId: chainID,
       }),
     FLOW_CLI_GET_INFO: () => flowCliService.getVersion(),
     FLOW_CONFIG_GET_CONTRACTS: () => flowConfigService.getContracts(),

@@ -6,7 +6,7 @@ import { NavigationProvider } from "@onflowser/ui/src/contexts/navigation.contex
 import { ReactNode } from "react";
 import { useParams, useSelectedLayoutSegments, usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
-  ExecuteScriptRequest,
+  ExecuteScriptRequest, IFlowService,
   IInteractionService, SendTransactionRequest,
   ServiceRegistryProvider
 } from "@onflowser/ui/src/contexts/service-registry.context";
@@ -22,6 +22,7 @@ import {
   IFlowserLogger,
   InMemoryIndex
 } from "@onflowser/core";
+import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
 
 
 class InteractionsService implements IInteractionService {
@@ -186,30 +187,46 @@ class FlowserAppService {
 const appService = new FlowserAppService();
 
 export default function Page() {
+  const { chainId } = useParams();
+
+  if (!isValidChainID(chainId)) {
+    return <div>Unknown chain</div>
+  }
 
   return (
-    <NextJsNavigationProvider>
-      <ServiceRegistryProvider
-        // @ts-ignore
-        services={{
-          interactionsService: appService.interactionsService,
-          transactionsIndex: appService.getTransactionIndex(),
-          blocksIndex: appService.getBlockIndex(),
-          accountIndex: appService.getAccountsIndex(),
-          eventsIndex: appService.getEventsIndex(),
-          contractIndex: appService.getContractsIndex(),
-          accountStorageIndex: appService.getAccountStorageIndex(),
-          accountKeyIndex: appService.getAccountKeysIndex()
-        }}
-      >
-        <InteractionRegistryProvider>
-          <TemplatesRegistryProvider>
-            <InteractionsPage />
-          </TemplatesRegistryProvider>
-        </InteractionRegistryProvider>
-      </ServiceRegistryProvider>
-    </NextJsNavigationProvider>
+    <ChainIdProvider config={{ chainId }}>
+      <NextJsNavigationProvider>
+        <ServiceRegistryProvider
+          // @ts-ignore
+          services={{
+            flowService: new FlowService(),
+            interactionsService: appService.interactionsService,
+            transactionsIndex: appService.getTransactionIndex(),
+            blocksIndex: appService.getBlockIndex(),
+            accountIndex: appService.getAccountsIndex(),
+            eventsIndex: appService.getEventsIndex(),
+            contractIndex: appService.getContractsIndex(),
+            accountStorageIndex: appService.getAccountStorageIndex(),
+            accountKeyIndex: appService.getAccountKeysIndex()
+          }}
+        >
+          <InteractionRegistryProvider>
+            <TemplatesRegistryProvider>
+              <InteractionsPage />
+            </TemplatesRegistryProvider>
+          </InteractionRegistryProvider>
+        </ServiceRegistryProvider>
+      </NextJsNavigationProvider>
+    </ChainIdProvider>
   );
+}
+
+class FlowService implements IFlowService {
+    async getIndexOfAddress(chainID: ChainID, address: string): Promise<number> {
+      const response = await fetch(`${window.location.origin}/${chainID}/addresses/${address}/index`);
+      const data = await response.json();
+      return data.index as number;
+    }
 }
 
 function NextJsNavigationProvider(props: { children: ReactNode }) {

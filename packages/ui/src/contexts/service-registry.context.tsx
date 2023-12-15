@@ -17,6 +17,7 @@ import {
   ParsedInteractionOrError,
   ManagedKeyPair,
 } from "@onflowser/api";
+import { ChainID } from "./chain-id.context";
 
 export interface ISnapshotService {
   list(): Promise<FlowStateSnapshot[]>;
@@ -60,7 +61,7 @@ export type ExecuteScriptRequest = {
 };
 
 export interface IFlowService {
-  getIndexOfAddress(address: string): Promise<number>;
+  getIndexOfAddress(chainID: ChainID, address: string): Promise<number>;
 }
 
 export type FlowConfigAccount = {

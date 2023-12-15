@@ -17,8 +17,12 @@ import { FlowserIpcEvent } from './events';
 import { BlockchainIndexes } from '../../services/blockchain-index.service';
 
 const flow: IFlowService = {
-  getIndexOfAddress: (address: string) =>
-    ipcRenderer.invoke(FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX, address),
+  getIndexOfAddress: (chainID, address) =>
+    ipcRenderer.invoke(
+      FlowserIpcEvent.FLOW_ACCOUNT_GET_INDEX,
+      chainID,
+      address,
+    ),
 };
 
 const flowCliService: IFlowCliService = {
