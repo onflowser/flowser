@@ -202,8 +202,9 @@ type FlowTxStatusSubscription = {
 };
 
 type FlowGatewayConfig = {
+  network: "local" | "canarynet" | "testnet" | "mainnet"
   restServerAddress: string;
-  flowJSON: unknown;
+  flowJSON?: unknown;
 };
 
 export enum FlowApiStatus {
@@ -213,14 +214,17 @@ export enum FlowApiStatus {
 
 export class FlowGatewayService {
   public configure(config: FlowGatewayConfig): void {
-    fcl
+    const configured = fcl
       .config({
         "accessNode.api": config.restServerAddress,
-        "flow.network": "emulator",
-      })
-      .load({
-        flowJSON: config.flowJSON,
+        "flow.network": config.network,
       });
+
+    if (config.flowJSON) {
+      configured.load({
+        flowJSON: config.flowJSON,
+      })
+    }
   }
 
   public async executeScript<Result>(

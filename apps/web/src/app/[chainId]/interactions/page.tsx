@@ -23,11 +23,22 @@ import {
   InMemoryIndex
 } from "@onflowser/core";
 import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
+import { ScriptOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 
 
 class InteractionsService implements IInteractionService {
-  executeScript(request: ExecuteScriptRequest): Promise<any> {
-    return Promise.resolve(undefined);
+
+  constructor(private readonly flowGatewayService: FlowGatewayService) {}
+
+  async executeScript(request: ExecuteScriptRequest): Promise<ScriptOutcome> {
+    const result = await this.flowGatewayService.executeScript({
+      cadence: request.cadence,
+      arguments: request.arguments
+    });
+
+    return {
+      result
+    }
   }
 
   getTemplates(): Promise<InteractionTemplate[]> {
@@ -35,7 +46,8 @@ class InteractionsService implements IInteractionService {
   }
 
   async parse(sourceCode: string): Promise<ParsedInteractionOrError> {
-    const url = new URL("http://localhost:3000/flow-emulator/interactions/parsed");
+    // It doesn't matter which chain ID we use in URL.
+    const url = new URL(`${window.location.origin}/flow-emulator/interactions/parsed`);
     url.searchParams.append("sourceCode", sourceCode);
     return fetch(url).then(res => res.json())
   }
@@ -90,7 +102,9 @@ class FlowserAppService {
 
     this.logger = new WebLogger();
     this.flowGatewayService = new FlowGatewayService()
-    this.interactionsService = new InteractionsService()
+    this.interactionsService = new InteractionsService(
+      this.flowGatewayService
+    )
     this.flowAccountStorageService = new FlowAccountStorageService(this.flowGatewayService);
 
     this.indexer = new FlowIndexerService(
@@ -192,6 +206,30 @@ export default function Page() {
   if (!isValidChainID(chainId)) {
     return <div>Unknown chain</div>
   }
+
+  function configureGateway(chainId: ChainID) {
+    switch (chainId) {
+      case "flow-emulator":
+        return appService.flowGatewayService.configure({
+          network: "local",
+          restServerAddress: "http://localhost:8080"
+        });
+      case "flow-testnet":
+        return appService.flowGatewayService.configure({
+          network: "testnet",
+          restServerAddress: "https://rest-testnet.onflow.org"
+        });
+      case "flow-mainnet":
+        return appService.flowGatewayService.configure({
+          network: "mainnet",
+          restServerAddress: "https://rest-mainnet.onflow.org"
+        });
+      default:
+        throw new Error(`Unsupported chain: ${chainId}`)
+    }
+  }
+
+  configureGateway(chainId);
 
   return (
     <ChainIdProvider config={{ chainId }}>

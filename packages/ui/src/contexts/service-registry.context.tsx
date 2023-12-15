@@ -18,6 +18,7 @@ import {
   ManagedKeyPair,
 } from "@onflowser/api";
 import { ChainID } from "./chain-id.context";
+import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
 
 export interface ISnapshotService {
   list(): Promise<FlowStateSnapshot[]>;
@@ -42,8 +43,8 @@ export interface IInteractionService {
   getTemplates(): Promise<InteractionTemplate[]>;
   sendTransaction(
     request: SendTransactionRequest,
-  ): Promise<{ transactionId: string }>;
-  executeScript(request: ExecuteScriptRequest): Promise<any>;
+  ): Promise<TransactionOutcome>;
+  executeScript(request: ExecuteScriptRequest): Promise<ScriptOutcome>;
 }
 
 export type SendTransactionRequest = {
@@ -110,7 +111,7 @@ type ServiceRegistry = {
   flowService: IFlowService;
   flowCliService: IFlowCliService;
   flowConfigService: IFlowConfigService;
-  walletService: IWalletService;
+  walletService?: IWalletService;
   snapshotService: ISnapshotService;
   workspaceService: IWorkspaceService;
   analyticsService: IAnalyticsService;

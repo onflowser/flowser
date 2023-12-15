@@ -47,7 +47,7 @@ export function useGetKeysByAccount(
 
 export function useGetManagedKeys(): SWRResponse<ManagedKeyPair[]> {
   const { walletService } = useServiceRegistry();
-  return useSWR(`managed-keys`, () => walletService.listKeyPairs());
+  return useSWR(`managed-keys`, () => walletService ? walletService.listKeyPairs() : []);
 }
 
 export function useGetStoragesByAccount(
