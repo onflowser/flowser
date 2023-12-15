@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ExitLoader } from './components/loaders/ExitLoader';
 import { ConfirmDialogProvider } from '@onflowser/ui/src/contexts/confirm-dialog.context';
-import { FilePickerProvider } from '@onflowser/ui/src/contexts/platform-adapter.context';
+import { FilePickerProvider } from 'packages/ui/src/contexts/file-picker.context';
 import { useAnalytics } from '@onflowser/ui/src/hooks/use-analytics';
 import { ConsentDialog } from '@onflowser/ui/src/common/overlays/dialogs/consent/ConsentDialog';
 import { Toaster } from 'react-hot-toast';

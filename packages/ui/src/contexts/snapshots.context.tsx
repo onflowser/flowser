@@ -12,7 +12,7 @@ import { useErrorHandler } from "../hooks/use-error-handler";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
 import { FlowUtils } from "../utils/flow-utils";
 import { SnapshotDialog } from "../common/overlays/dialogs/snapshot/SnapshotDialog";
-import { useProjectManager } from "./workspace.context";
+import { useWorkspaceManager } from "./workspace.context";
 import { FlowBlock, FlowStateSnapshot } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
 import { useGetBlocks, useGetStateSnapshots } from "../api";
@@ -36,7 +36,7 @@ export function SnapshotsManagerProvider({
   const { track } = useAnalytics();
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
   const { showDialog } = useConfirmDialog();
-  const { currentWorkspace } = useProjectManager();
+  const { currentWorkspace } = useWorkspaceManager();
   const { data: blocks } = useGetBlocks();
   const { data: stateSnapshots } = useGetStateSnapshots();
   const snapshotLookupByBlockId = useMemo(

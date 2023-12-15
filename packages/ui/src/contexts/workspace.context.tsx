@@ -139,6 +139,6 @@ export function WorkspaceManagerProvider({
   );
 }
 
-export function useProjectManager(): WorkspaceManager {
+export function useWorkspaceManager(): WorkspaceManager {
   return useContext(WorkspaceManagerContext);
 }

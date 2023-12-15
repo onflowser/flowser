@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import classes from "./SideNavigation.module.scss";
 import { SizedBox } from "../SizedBox/SizedBox";
 import classNames from "classnames";
-import { useProjectManager } from "../../../contexts/workspace.context";
+import { useWorkspaceManager } from "../../../contexts/workspace.context";
 import { buildProjectUrl, ProjectLink } from "../../links/ProjectLink";
 import { FlowserIcon } from "../../icons/FlowserIcon";
 import { useCurrentWorkspaceId } from "../../../hooks/use-current-project-id";
@@ -13,7 +13,7 @@ type SideNavigationProps = {
 };
 
 export function SideNavigation(props: SideNavigationProps): ReactElement {
-  const { closeWorkspace } = useProjectManager();
+  const { closeWorkspace } = useWorkspaceManager();
 
   return (
     <div className={classNames(classes.root, props.className)}>

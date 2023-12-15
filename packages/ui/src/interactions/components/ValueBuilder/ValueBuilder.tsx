@@ -11,7 +11,6 @@ import { BoolBuilder } from "./BoolBuilder/BoolBuilder";
 import { Callout } from "../../../common/misc/Callout/Callout";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
-import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { IntegerNumberBuilder } from "./IntegerNumberBuilder/IntegerNumberBuilder";
 import { CadenceTypeKind } from "@onflowser/api";
 

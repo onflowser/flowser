@@ -3,7 +3,7 @@ import IconButton from "../../common/buttons/IconButton/IconButton";
 import longLogo from "../../assets/long_logo.png";
 import classes from "./WorkspaceList.module.scss";
 import classNames from "classnames";
-import { useProjectManager } from "../../contexts/workspace.context";
+import { useWorkspaceManager } from "../../contexts/workspace.context";
 import { SimpleButton } from "../../common/buttons/SimpleButton/SimpleButton";
 import { ConsentDialog } from "../../common/overlays/dialogs/consent/ConsentDialog";
 import { useAnalytics } from "../../hooks/use-analytics";
@@ -86,7 +86,7 @@ export const WorkspaceList: FunctionComponent = () => {
 
 function WorkspaceListContent() {
   const { data: projects, error } = useGetWorkspaces();
-  const { openWorkspace, removeWorkspace } = useProjectManager();
+  const { openWorkspace, removeWorkspace } = useWorkspaceManager();
   const showProjectList = projects && projects.length > 0;
 
   if (error) {
