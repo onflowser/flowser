@@ -15,7 +15,7 @@ import {
   ParsedInteractionOrError,
   ManagedKeyPair,
 } from "@onflowser/api";
-import { useServiceRegistry } from "./contexts/service-registry.context";
+import { useRequiredService, useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
@@ -185,7 +185,7 @@ export function useGetEventsByContract(
 export function useGetOutputsByProcess(
   id: string,
 ): SWRResponse<ManagedProcessOutput[]> {
-  const { processManagerService } = useServiceRegistry();
+  const processManagerService = useRequiredService("processManagerService");
 
   return useSWR(`${id}/outputs`, () =>
     processManagerService.findAllLogsByProcessId(id),
@@ -199,13 +199,13 @@ export function useGetEvent(id: string): SWRResponse<FlowEvent | undefined> {
 }
 
 export function useGetStateSnapshots(): SWRResponse<FlowStateSnapshot[]> {
-  const { snapshotService } = useServiceRegistry();
+  const snapshotService = useRequiredService("snapshotService");
 
   return useSWR(`snapshots`, () => snapshotService.list());
 }
 
 export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
-  const { workspaceService } = useServiceRegistry();
+  const workspaceService = useRequiredService("workspaceService");
 
   return useSWR("workspaces", () => workspaceService.list());
 }
@@ -213,13 +213,13 @@ export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
 export function useGetWorkspace(
   id: string,
 ): SWRResponse<FlowserWorkspace | undefined> {
-  const { workspaceService } = useServiceRegistry();
+  const workspaceService = useRequiredService("workspaceService");
 
   return useSWR(`projects/${id}`, () => workspaceService.findById(id));
 }
 
 export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
-  const { flowCliService } = useServiceRegistry();
+  const flowCliService = useRequiredService("flowCliService");
 
   return useSWR(`flow-cli`, () => flowCliService.getFlowCliInfo());
 }
@@ -262,14 +262,16 @@ export function useGetWorkspaceInteractionTemplates(): SWRResponse<
 }
 
 export function useGetFlowConfigContracts() {
-  const { flowConfigService } = useServiceRegistry();
+  const flowConfigService = useRequiredService("flowConfigService");
+
   return useSWR("flow-config/contracts", () =>
     flowConfigService.getContracts(),
   );
 }
 
 export function useGetFlowConfigAccounts() {
-  const { flowConfigService } = useServiceRegistry();
+  const flowConfigService = useRequiredService("flowConfigService");
+
   return useSWR("flow-config/accounts", () => flowConfigService.getAccounts());
 }
 

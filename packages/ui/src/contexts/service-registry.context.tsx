@@ -108,15 +108,6 @@ export interface IProcessManagerService {
 
 type ServiceRegistry = {
   interactionsService: IInteractionService;
-  flowService: IFlowService;
-  flowCliService: IFlowCliService;
-  flowConfigService: IFlowConfigService;
-  walletService?: IWalletService;
-  snapshotService: ISnapshotService;
-  workspaceService: IWorkspaceService;
-  analyticsService: IAnalyticsService;
-  monitoringService: IMonitoringService;
-  processManagerService: IProcessManagerService;
   accountIndex: IResourceIndexReader<FlowAccount>;
   accountStorageIndex: IResourceIndexReader<FlowAccountStorage>;
   contractIndex: IResourceIndexReader<FlowContract>;
@@ -124,6 +115,16 @@ type ServiceRegistry = {
   blocksIndex: IResourceIndexReader<FlowBlock>;
   eventsIndex: IResourceIndexReader<FlowEvent>;
   accountKeyIndex: IResourceIndexReader<FlowAccountKey>;
+  // Optional services, as they may not be available/relevant in all environments.
+  monitoringService?: IMonitoringService;
+  analyticsService?: IAnalyticsService;
+  processManagerService?: IProcessManagerService;
+  flowService: IFlowService;
+  flowCliService?: IFlowCliService;
+  flowConfigService?: IFlowConfigService;
+  walletService?: IWalletService;
+  snapshotService?: ISnapshotService;
+  workspaceService?: IWorkspaceService;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(
@@ -151,4 +152,17 @@ export function useServiceRegistry(): ServiceRegistry {
   }
 
   return context;
+}
+
+
+export function useRequiredService<Key extends keyof ServiceRegistry>(name: Key): NonNullable<ServiceRegistry[Key]> {
+  const registry = useServiceRegistry();
+
+  const service = registry[name];
+
+  if (service === undefined) {
+    throw new Error(`Required service ${name} not found`)
+  }
+
+  return service;
 }

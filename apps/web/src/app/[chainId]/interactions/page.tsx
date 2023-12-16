@@ -313,7 +313,6 @@ export default function Page() {
     <ChainIdProvider config={{ chainId }}>
       <NextJsNavigationProvider>
         <ServiceRegistryProvider
-          // @ts-ignore
           services={{
             flowService: new FlowService(),
             interactionsService: appService.interactionsService,

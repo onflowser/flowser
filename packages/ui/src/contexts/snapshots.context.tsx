@@ -14,7 +14,7 @@ import { FlowUtils } from "../utils/flow-utils";
 import { SnapshotDialog } from "../common/overlays/dialogs/snapshot/SnapshotDialog";
 import { useWorkspaceManager } from "./workspace.context";
 import { FlowBlock, FlowStateSnapshot } from "@onflowser/api";
-import { useServiceRegistry } from "./service-registry.context";
+import { useRequiredService } from "./service-registry.context";
 import { useGetBlocks, useGetStateSnapshots } from "../api";
 
 export type SnapshotsManager = {
@@ -23,7 +23,7 @@ export type SnapshotsManager = {
 };
 
 const SnapshotsManagerContext = createContext<SnapshotsManager>(
-  {} as SnapshotsManager,
+  undefined as never
 );
 
 export function SnapshotsManagerProvider({
@@ -31,7 +31,7 @@ export function SnapshotsManagerProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { snapshotService } = useServiceRegistry();
+  const snapshotService = useRequiredService("snapshotService");
 
   const { track } = useAnalytics();
   const { handleError } = useErrorHandler(SnapshotsManagerProvider.name);
@@ -193,6 +193,16 @@ export function SnapshotsManagerProvider({
   );
 }
 
-export function useSnapshotsManager(): SnapshotsManager {
+export function useOptionalSnapshotsManager(): SnapshotsManager | undefined {
   return useContext(SnapshotsManagerContext);
+}
+
+export function useSnapshotsManager(): SnapshotsManager {
+  const context = useOptionalSnapshotsManager();
+
+  if (context === undefined) {
+    throw new Error("Snapshot manager provider not found");
+  }
+
+  return context;
 }

@@ -8,7 +8,9 @@ import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
-import { useSnapshotsManager } from "../../../contexts/snapshots.context";
+import {
+  useOptionalSnapshotsManager,
+} from "../../../contexts/snapshots.context";
 import { FlowBlock, FlowTransaction } from "@onflowser/api";
 import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 
@@ -48,7 +50,7 @@ function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const menuIconSize = 15;
 
-  const { checkoutBlock } = useSnapshotsManager();
+  const snapshotsManager = useOptionalSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
   const { data } = useGetTransactionsByBlock(block.id);
   const firstTransaction = data?.[0];
@@ -97,14 +99,16 @@ function BlockItem(props: BlockItemProps) {
         <SizedBox width={10} />
         View transaction
       </MenuItem>
-      <MenuItem onClick={() => checkoutBlock(block.id)}>
-        <FlowserIcon.CircleArrowLeft
-          width={menuIconSize}
-          height={menuIconSize}
-        />
-        <SizedBox width={10} />
-        Rollback to block
-      </MenuItem>
+      {snapshotsManager && (
+        <MenuItem onClick={() => snapshotsManager.checkoutBlock(block.id)}>
+          <FlowserIcon.CircleArrowLeft
+            width={menuIconSize}
+            height={menuIconSize}
+          />
+          <SizedBox width={10} />
+          Rollback to block
+        </MenuItem>
+      )}
     </FlowserMenu>
   );
 }
