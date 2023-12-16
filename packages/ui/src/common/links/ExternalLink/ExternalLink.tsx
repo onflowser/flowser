@@ -1,12 +1,14 @@
 import React, { ReactNode, ReactElement, CSSProperties } from "react";
 import { FlowserIcon } from "../../icons/FlowserIcon";
 import classes from "./ExternalLink.module.scss";
+import classNames from "classnames";
 
 export type ExternalLinkProps = {
   children?: ReactNode;
   href: string;
   inline?: boolean;
   style?: CSSProperties;
+  className?: string;
 };
 
 export function ExternalLink({
@@ -14,13 +16,14 @@ export function ExternalLink({
   children,
   inline,
   style,
+  className
 }: ExternalLinkProps): ReactElement {
   return (
     <a
       target="_blank"
       rel="noreferrer"
       href={href}
-      className={classes.root}
+      className={classNames(classes.root, className)}
       style={{ display: "flex", ...style }}
     >
       {!inline && <FlowserIcon.Link className={classes.icon} />}
@@ -30,5 +33,8 @@ export function ExternalLink({
 }
 
 function prettifyUrl(url: string) {
-  return url.replace(/https?:\/\//, "").replace(/www\./, "").replace(/\/$/, "")
+  return url
+    .replace(/https?:\/\//, "")
+    .replace(/www\./, "")
+    .replace(/\/$/, "");
 }

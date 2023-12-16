@@ -11,7 +11,7 @@ import {
   FlowserWorkspace,
   FlowStateSnapshot,
   FlowTransaction,
-  InteractionTemplate,
+  WorkspaceTemplate,
   IResourceIndexReader,
   ManagedProcessOutput,
   ParsedInteractionOrError,
@@ -40,7 +40,7 @@ export interface IWorkspaceService {
 
 export interface IInteractionService {
   parse(sourceCode: string): Promise<ParsedInteractionOrError>;
-  getTemplates(): Promise<InteractionTemplate[]>;
+  getTemplates(): Promise<WorkspaceTemplate[]>;
   sendTransaction(
     request: SendTransactionRequest,
   ): Promise<TransactionOutcome>;

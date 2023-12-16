@@ -45,7 +45,7 @@ function ExecuteButton() {
 }
 
 function TopContent() {
-  const { setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
+  const { flixTemplate, setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
     useInteractionDefinitionManager();
   const {walletService} = useServiceRegistry();
 
@@ -75,6 +75,7 @@ function TopContent() {
         parameters={parsedInteraction?.parameters ?? []}
         setFclValue={setFclValue}
         fclValuesByIdentifier={fclValuesByIdentifier}
+        flixTemplate={flixTemplate}
       />
       <SizedBox height={30} />
       {showSigningSettings && (

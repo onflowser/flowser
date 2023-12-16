@@ -10,7 +10,7 @@ import {
   FlowserWorkspace,
   FlowStateSnapshot,
   FlowTransaction,
-  InteractionTemplate,
+  WorkspaceTemplate,
   ManagedProcessOutput,
   ParsedInteractionOrError,
   ManagedKeyPair,
@@ -251,12 +251,12 @@ export function useGetParsedInteraction(
   return state;
 }
 
-export function useGetInteractionTemplates(): SWRResponse<
-  InteractionTemplate[]
+export function useGetWorkspaceInteractionTemplates(): SWRResponse<
+  WorkspaceTemplate[]
 > {
   const { interactionsService } = useServiceRegistry();
 
-  return useSWR(`interaction-templates`, () =>
+  return useSWR(`workspace-interaction-templates`, () =>
     interactionsService.getTemplates(),
   );
 }
