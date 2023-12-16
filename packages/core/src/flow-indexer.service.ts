@@ -323,23 +323,32 @@ export class FlowIndexerService {
   ): Promise<void> {
     const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
-      .subscribe((newStatus) => {
-        console.log("new status", newStatus)
-          this.indexes.transaction.update({
-            id: transactionId,
-            status: {
-              errorMessage: newStatus.errorMessage,
-              grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
-              executionStatus: newStatus.status
-            }
-          });
-        },
-      );
+      .subscribe(async (newStatus) => {
+        const indexedBlock = await this.indexes.block.findOneById(newStatus.blockId)
+
+        // When initial status is fetched,
+        // transaction may not be included in the block yet.
+        if (newStatus.blockId && indexedBlock === undefined) {
+          const block = await this.flowGatewayService.getBlockById(newStatus.blockId);
+          await this.processBlock(block, {
+            skipTransactionProcessing: true
+          })
+        }
+
+        await this.indexes.transaction.update({
+          id: transactionId,
+          blockId: newStatus.blockId,
+          status: {
+            errorMessage: newStatus.errorMessage,
+            grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
+            executionStatus: newStatus.status
+          }
+        });
+      });
     try {
       await this.flowGatewayService
         .getTxStatusSubscription(transactionId)
         .onceSealed();
-      console.log("sealed")
     } catch (e: unknown) {
       this.logger.error("Failed to wait on sealed transaction", e);
     } finally {

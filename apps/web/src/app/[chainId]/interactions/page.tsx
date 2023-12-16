@@ -143,10 +143,6 @@ class FlowserAppService {
           transaction,
           transactionStatus
         });
-        const block = await this.flowGatewayService.getBlockById(transactionStatus.blockId);
-        await this.indexer.processBlock(block, {
-          skipTransactionProcessing: true
-        })
         return this.blockchainIndexes.transaction.findOneById(id);
       },
     }
