@@ -50,9 +50,9 @@ export interface IInteractionService {
 export type SendTransactionRequest = {
   // TODO(web): These should probably be of type FlowAuthorizationFunction when generalizing for web version
   cadence: string;
-  proposerAddress: string;
-  payerAddress: string;
-  authorizerAddresses: string[];
+  proposerAddress?: string;
+  payerAddress?: string;
+  authorizerAddresses?: string[];
   arguments: FclArgumentWithMetadata[];
 };
 
