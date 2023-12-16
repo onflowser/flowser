@@ -11,9 +11,16 @@ import {
   ServiceRegistryProvider
 } from "@onflowser/ui/src/contexts/service-registry.context";
 import {
-  FlowAccount, FlowAccountKey, FlowAccountStorage, FlowBlock, FlowContract, FlowEvent, FlowTransaction,
-  InteractionTemplate, IResourceIndexReader,
-  ParsedInteractionOrError
+  FlowAccount,
+  FlowAccountKey,
+  FlowAccountStorage,
+  FlowBlock,
+  FlowContract,
+  FlowEvent,
+  FlowTransaction,
+  IndexableResource,
+  IResourceIndexReader, OmitTimestamps,
+  ParsedInteractionOrError, RequireOnly, WorkspaceTemplate
 } from "@onflowser/api";
 import {
   BlockchainIndexes,
@@ -44,7 +51,7 @@ class InteractionsService implements IInteractionService {
     }
   }
 
-  getTemplates(): Promise<InteractionTemplate[]> {
+  getTemplates(): Promise<WorkspaceTemplate[]> {
     return Promise.resolve([]);
   }
 
@@ -92,6 +99,49 @@ class WebLogger implements IFlowserLogger {
 
 }
 
+class LocalStorageIndex<Resource extends IndexableResource> extends InMemoryIndex<Resource> {
+  constructor(private readonly storageKey: string) {
+    super();
+    this.syncFromLocalStorage();
+  }
+
+  async create(resource: OmitTimestamps<Resource>): Promise<void> {
+    await super.create(resource);
+    this.syncToLocalStorage()
+  }
+
+  async update(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void> {
+    await super.update(resource);
+    this.syncToLocalStorage()
+  }
+
+  async delete(resource: OmitTimestamps<RequireOnly<Resource, "id">>): Promise<void> {
+    await super.delete(resource);
+    this.syncToLocalStorage()
+  }
+
+  async clear(): Promise<void> {
+    await super.clear();
+    this.syncToLocalStorage();
+  }
+
+  private syncToLocalStorage() {
+    window.localStorage.setItem(
+      this.storageKey,
+      JSON.stringify(Object.fromEntries(this.lookup.entries()))
+    );
+  }
+
+  private syncFromLocalStorage() {
+    const serializedLookup = window.localStorage.getItem(this.storageKey);
+    if (serializedLookup !== null) {
+      this.lookup = new Map(
+        Object.entries(JSON.parse(serializedLookup))
+      )
+    }
+  }
+}
+
 class FlowserAppService {
   readonly blockchainIndexes: BlockchainIndexes;
   readonly logger: IFlowserLogger;
@@ -100,15 +150,20 @@ class FlowserAppService {
   readonly interactionsService: InteractionsService;
   private readonly indexer: FlowIndexerService;
 
-  constructor() {
+  constructor(chainId: ChainID) {
+
+    function buildStorageKey(resourceName: string) {
+      return `${chainId}/${resourceName}`
+    }
+
     this.blockchainIndexes = {
-      accountKey: new InMemoryIndex(),
-      transaction: new InMemoryIndex(),
-      block: new InMemoryIndex(),
-      account: new InMemoryIndex(),
-      event: new InMemoryIndex(),
-      contract: new InMemoryIndex(),
-      accountStorage: new InMemoryIndex(),
+      accountKey: new LocalStorageIndex(buildStorageKey("accountKeys")),
+      transaction: new LocalStorageIndex(buildStorageKey("transactions")),
+      block: new LocalStorageIndex(buildStorageKey("blocks")),
+      account: new LocalStorageIndex(buildStorageKey("accounts")),
+      event: new LocalStorageIndex(buildStorageKey("events")),
+      contract: new LocalStorageIndex(buildStorageKey("contracts")),
+      accountStorage: new LocalStorageIndex(buildStorageKey("accountStorages")),
     }
 
     this.logger = new WebLogger();
@@ -209,7 +264,6 @@ class FlowserAppService {
   }
 }
 
-const appService = new FlowserAppService();
 
 export default function Page() {
   const { chainId } = useParams();
@@ -217,6 +271,8 @@ export default function Page() {
   if (!isValidChainID(chainId)) {
     return <div>Unknown chain</div>
   }
+
+  const appService = new FlowserAppService(chainId);
 
   function configureGateway(chainId: ChainID) {
     switch (chainId) {
