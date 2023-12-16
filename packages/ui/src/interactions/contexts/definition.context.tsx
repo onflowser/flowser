@@ -12,10 +12,12 @@ import {
 import { ParsedInteraction } from "@onflowser/api";
 import { FclValue } from "@onflowser/core";
 import { useGetParsedInteraction } from "../../api";
+import { FlixTemplate, useFlixSearch } from "../../hooks/flix";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
   parseError: string | undefined;
+  flixTemplate: FlixTemplate | undefined;
   parsedInteraction: ParsedInteraction | undefined;
   definition: InteractionDefinition;
   partialUpdate: (definition: Partial<InteractionDefinition>) => void;
@@ -36,6 +38,10 @@ export function InteractionDefinitionManagerProvider(props: {
   const { update } = useInteractionRegistry();
   const { data, isLoading } = useGetParsedInteraction(definition);
   const fclValuesByIdentifier = definition.fclValuesByIdentifier;
+  const { data: flixTemplate } = useFlixSearch({
+    sourceCode: definition.code,
+    network: "any"
+  })
 
   function partialUpdate(newDefinition: Partial<InteractionDefinition>) {
     update({ ...definition, ...newDefinition });
@@ -55,6 +61,7 @@ export function InteractionDefinitionManagerProvider(props: {
     <Context.Provider
       value={{
         definition,
+        flixTemplate,
         parsedInteraction: data?.interaction,
         partialUpdate,
         setFclValue,

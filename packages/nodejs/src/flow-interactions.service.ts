@@ -2,21 +2,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { GoBindingsService } from "./go-bindings.service";
 import { isDefined } from "@onflowser/core";
-import { InteractionKind, ParsedInteractionOrError } from "@onflowser/api";
+import { InteractionKind, ParsedInteractionOrError, WorkspaceTemplate } from "@onflowser/api";
 import { IFlowInteractions } from "@onflowser/core";
-
-export interface InteractionTemplate {
-  id: string;
-  name: string;
-  code: string;
-  source: InteractionTemplate_Source | undefined;
-  createdDate: string;
-  updatedDate: string;
-}
-
-interface InteractionTemplate_Source {
-  filePath: string;
-}
 
 type GetInteractionTemplatesOptions = {
   workspacePath: string;
@@ -31,7 +18,7 @@ export class FlowInteractionsService implements IFlowInteractions {
 
   public async getTemplates(
     options: GetInteractionTemplatesOptions,
-  ): Promise<InteractionTemplate[]> {
+  ): Promise<WorkspaceTemplate[]> {
     const potentialCadenceFilePaths = await this.findAllCadenceFiles(
       options.workspacePath,
     );
@@ -45,7 +32,7 @@ export class FlowInteractionsService implements IFlowInteractions {
 
   private async buildMaybeTemplate(
     filePath: string,
-  ): Promise<InteractionTemplate | undefined> {
+  ): Promise<WorkspaceTemplate | undefined> {
     const [fileContent, fileStats] = await Promise.all([
       fs.readFile(filePath),
       fs.stat(filePath),
@@ -67,11 +54,9 @@ export class FlowInteractionsService implements IFlowInteractions {
         id: filePath,
         name: path.basename(filePath),
         code,
-        updatedDate: fileStats.mtime.toISOString(),
-        createdDate: fileStats.ctime.toISOString(),
-        source: {
-          filePath,
-        },
+        updatedAt: fileStats.mtime,
+        createdAt: fileStats.ctime,
+        filePath
       };
     } else {
       return undefined;

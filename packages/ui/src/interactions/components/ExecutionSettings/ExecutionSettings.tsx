@@ -44,7 +44,7 @@ function ExecuteButton() {
 }
 
 function TopContent() {
-  const { setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
+  const { flixTemplate, setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
     useInteractionDefinitionManager();
 
   if (definition.code === "") {
@@ -70,6 +70,7 @@ function TopContent() {
         parameters={parsedInteraction?.parameters ?? []}
         setFclValue={setFclValue}
         fclValuesByIdentifier={fclValuesByIdentifier}
+        flixTemplate={flixTemplate}
       />
       <SizedBox height={30} />
       {parsedInteraction?.kind === InteractionKind.INTERACTION_TRANSACTION && (
