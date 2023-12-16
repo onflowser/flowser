@@ -64,12 +64,13 @@ export class FlowIndexerService {
       ) {
         try {
           this.logger.debug(`Processing block: ${height}`);
+          const block = await this.flowGatewayService.getBlockByHeight(height);
           // TODO: Can we now process blocks in parallel?
           // Blocks must be processed in sequential order (not in parallel)
           // because objects on subsequent blocks can reference objects from previous blocks
           // (e.g. a transaction may reference an account from previous block)
           await Promise.all([
-            this.processBlock(height),
+            this.processBlock(block),
             // We don't know when account storage changed
             // without parsing transaction source code.
             // For now just re-index storage of all accounts.
@@ -108,8 +109,18 @@ export class FlowIndexerService {
     return latestBlock;
   }
 
-  public async processBlock(height: number): Promise<void> {
-    const block = await this.flowGatewayService.getBlockByHeight(height);
+  public async processBlock(block: flowResource.FlowBlock, options?: {
+    skipTransactionProcessing?: boolean;
+  }): Promise<void> {
+
+    await this.indexes.block
+      .create(this.createBlockEntity({ block }))
+      .catch((e: unknown) => this.logger.error("block save error", e));
+
+    if (options?.skipTransactionProcessing) {
+      return;
+    }
+
     const collections = await Promise.all(
       block.collectionGuarantees.map(async (guarantee) =>
         this.flowGatewayService.getCollectionById(guarantee.collectionId),
@@ -143,10 +154,6 @@ export class FlowIndexerService {
       )
       .flat();
 
-    const blockPromise = this.indexes.block
-      .create(this.createBlockEntity({ block }))
-      .catch((e: unknown) => this.logger.error("block save error", e));
-
     const transactionPromises = Promise.all(
       transactionsWithStatuses.map((transaction) =>
         this.processTransaction({
@@ -170,7 +177,6 @@ export class FlowIndexerService {
     );
 
     await Promise.all([
-      blockPromise,
       transactionPromises,
       eventPromises,
     ]);
@@ -317,20 +323,23 @@ export class FlowIndexerService {
   ): Promise<void> {
     const unsubscribe = this.flowGatewayService
       .getTxStatusSubscription(transactionId)
-      .subscribe((newStatus) =>
-        this.indexes.transaction.update({
-          id: transactionId,
-          status: {
-            errorMessage: newStatus.errorMessage,
-            grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
-            executionStatus: newStatus.status,
-          },
-        }),
+      .subscribe((newStatus) => {
+        console.log("new status", newStatus)
+          this.indexes.transaction.update({
+            id: transactionId,
+            status: {
+              errorMessage: newStatus.errorMessage,
+              grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
+              executionStatus: newStatus.status
+            }
+          });
+        },
       );
     try {
       await this.flowGatewayService
         .getTxStatusSubscription(transactionId)
         .onceSealed();
+      console.log("sealed")
     } catch (e: unknown) {
       this.logger.error("Failed to wait on sealed transaction", e);
     } finally {

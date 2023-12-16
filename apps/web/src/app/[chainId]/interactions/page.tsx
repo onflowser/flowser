@@ -25,6 +25,9 @@ import {
 import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
+import { SWRConfig } from 'swr';
+
+const indexSyncIntervalInMs = 500;
 
 class InteractionsService implements IInteractionService {
 
@@ -140,6 +143,10 @@ class FlowserAppService {
           transaction,
           transactionStatus
         });
+        const block = await this.flowGatewayService.getBlockById(transactionStatus.blockId);
+        await this.indexer.processBlock(block, {
+          skipTransactionProcessing: true
+        })
         return this.blockchainIndexes.transaction.findOneById(id);
       },
     }
@@ -243,6 +250,14 @@ export default function Page() {
   configureGateway(chainId);
 
   return (
+    <SWRConfig
+      value={{
+        refreshInterval: indexSyncIntervalInMs,
+        // Most of the time (e.g. when polling transaction in outcome display)
+        // we want this polling to happen with the same frequency as above.
+        errorRetryInterval: indexSyncIntervalInMs,
+      }}
+    >
     <ChainIdProvider config={{ chainId }}>
       <NextJsNavigationProvider>
         <ServiceRegistryProvider
@@ -267,6 +282,7 @@ export default function Page() {
         </ServiceRegistryProvider>
       </NextJsNavigationProvider>
     </ChainIdProvider>
+    </SWRConfig>
   );
 }
 

@@ -76,9 +76,10 @@ export type FlowSignableObject = {
 // https://docs.onflow.org/fcl/reference/api/#transactionstatusobject
 export type FlowTransactionStatus = {
   blockId: string;
-  status: number;
+  // https://developers.flow.com/tools/clients/fcl-js/api#transaction-statuses
+  status: 0 | 1 | 2 | 3 | 4 | 5;
   statusString: string;
-  statusCode: number;
+  statusCode: 1 | 0;
   errorMessage: string;
   events: FlowEvent[];
 };
@@ -285,6 +286,12 @@ export class FlowGatewayService {
   public async getBlockByHeight(height: number): Promise<FlowBlock> {
     return fcl
       .send([fcl.getBlock(), fcl.atBlockHeight(height)])
+      .then(fcl.decode);
+  }
+
+  public async getBlockById(id: string): Promise<FlowBlock> {
+    return fcl
+      .send([fcl.getBlock(), fcl.atBlockId(id)])
       .then(fcl.decode);
   }
 
