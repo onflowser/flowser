@@ -278,22 +278,21 @@ export class FlowserAppService {
   }
 
   private async startAndReindexEmulator(workspace: FlowserWorkspace) {
-    if (workspace.emulator) {
-      // TODO: Sometimes when we restart the emulator,
-      //  it complains that port 8080 is already taken.
-      await this.flowEmulatorService.start({
-        workspacePath: workspace.filesystemPath,
-        config: workspace.emulator,
-      });
-    }
+    const emulatorConfig =
+      workspace.emulator ?? this.flowEmulatorService.getDefaultConfig();
 
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
-      restServerAddress: `http://localhost:${
-        workspace.emulator?.restServerPort ??
-        this.flowEmulatorService.getDefaultConfig().restServerPort
-      }`,
+      restServerAddress: `http://localhost:${emulatorConfig.restServerPort}`,
     });
+
+    const isEmulatorOnline = await this.flowGatewayService.isRestApiReachable();
+    if (!isEmulatorOnline) {
+      await this.flowEmulatorService.start({
+        workspacePath: workspace.filesystemPath,
+        config: emulatorConfig,
+      });
+    }
 
     this.flowSnapshotsService.configure({
       adminServerPort:
