@@ -32,5 +32,11 @@
     display: flex;
     flex-direction: column;
     row-gap: $spacing-base;
+
+    .auditorList {
+      display: flex;
+      flex-direction: row;
+      column-gap: $spacing-s;
+    }
   }
 }
