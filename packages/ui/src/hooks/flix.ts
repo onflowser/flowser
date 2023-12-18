@@ -13,6 +13,16 @@ export type FlixTemplate = {
   };
 };
 
+export type FlixAuditor = {
+  f_type: "FlowInteractionTemplateAuditor";
+  f_version: string;
+  address: string;
+  name: string;
+  twitter_url: string;
+  website_url: string;
+}
+
+
 export type FlixArgument = {
   index: number;
   type: string;
@@ -46,7 +56,7 @@ type FlixI18nMessage = {
 };
 
 export const FLOW_FLIX_URL = "https://flix.flow.com";
-export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com"
+export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com";
 
 export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   return useSWR(`flix/templates`, () =>
@@ -71,6 +81,20 @@ export function useFlixSearch(options: {
         network: options.network
       })
     }).then((res) => res.json()),
+    {
+      refreshInterval: 0,
+      shouldRetryOnError: false
+    }
+  );
+}
+
+export function useFlixTemplateAuditors(options: {
+  templateId: string;
+  network: "testnet" | "mainnet";
+}): SWRResponse<FlixAuditor[]> {
+  return useSWR(`flix/${options.network}/templates/${options.templateId}/auditors`, () =>
+      fetch(`${FLOWSER_FLIX_URL}/v1/templates/${options.templateId}/auditors?network=${options.network}`)
+        .then((res) => res.json()),
     {
       refreshInterval: 0,
       shouldRetryOnError: false

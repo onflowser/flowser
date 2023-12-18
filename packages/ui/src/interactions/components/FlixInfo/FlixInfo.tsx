@@ -1,4 +1,4 @@
-import { FLOW_FLIX_URL, useFlixSearch } from "../../../hooks/flix";
+import { FlixAuditor, FLOW_FLIX_URL, useFlixSearch, useFlixTemplateAuditors } from "../../../hooks/flix";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import classes from "./FlixInfo.module.scss";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
@@ -44,6 +44,7 @@ export function FlixInfo(props: FlixInfoProps) {
       <div className={classes.body}>
         {isVerified ? (
           <Fragment>
+            <AuditInfo templateId={data.id} />
             <p>{data.data.messages.description?.i18n["en-US"]}</p>
             <ExternalLink inline href={`${FLOW_FLIX_URL}/v1/templates/${data.id}`} />
           </Fragment>
@@ -63,4 +64,34 @@ export function FlixInfo(props: FlixInfoProps) {
       </div>
     </div>
   );
+}
+
+function AuditInfo(props: {templateId: string}) {
+  const {data} = useFlixTemplateAuditors({
+    templateId: props.templateId,
+    // Use mainnet for now, as mainnet likely has the most audits.
+    network: "mainnet"
+  });
+
+  if (!data) {
+    return <Shimmer height={50} />;
+  }
+
+  if (data.length === 0) {
+    // FLIX templates are treated as being more trustworthy/verified,
+    // even if no official audits were performed.
+    // For now just ignore the case where no audits exist.
+    return null;
+  }
+
+  return (
+    <div>
+      Audited by:
+      {data.map((auditor) =>
+        <ExternalLink href={auditor.twitter_url} inline>
+          {auditor.name}
+        </ExternalLink>
+      )}
+    </div>
+  )
 }
