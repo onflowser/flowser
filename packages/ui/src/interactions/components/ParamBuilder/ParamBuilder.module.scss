@@ -9,12 +9,17 @@
 
 .paramRoot {
   .label {
-    margin-bottom: $spacing-base;
     .identifier {
       margin-right: $spacing-s;
     }
     .type {
       color: $gray-10;
     }
+  }
+  .description {
+    color: $gray-20;
+  }
+  .valueBuilder {
+    margin-top: $spacing-base;
   }
 }
