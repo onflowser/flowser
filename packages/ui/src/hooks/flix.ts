@@ -56,7 +56,7 @@ type FlixI18nMessage = {
 };
 
 export const FLOW_FLIX_URL = "https://flix.flow.com";
-export const FLOWSER_FLIX_URL = "http://localhost:3333"
+export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com";
 
 export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   return useSWR(`flix/templates`, () =>

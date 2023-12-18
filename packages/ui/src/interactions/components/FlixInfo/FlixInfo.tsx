@@ -85,11 +85,11 @@ function AuditInfo(props: {templateId: string}) {
   }
 
   return (
-    <div className={classes.auditorList}>
+    <div>
       Audited by:
-      {data.map((auditor, index) =>
+      {data.map((auditor) =>
         <ExternalLink href={auditor.twitter_url} inline>
-          {auditor.name}{index + 1 < data.length ? "," : ""}
+          {auditor.name}
         </ExternalLink>
       )}
     </div>
