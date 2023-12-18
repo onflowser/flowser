@@ -1,0 +1,36 @@
+@import "../../../styles/colors";
+@import "../../../styles/spacings";
+@import "../../../styles/rules";
+
+.root {
+  border-radius: $border-radius-input;
+  background: $gray-80;
+  padding: $spacing-base;
+  .header {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    column-gap: 3px;
+    .title {
+      color: $strong-green;
+      display: inline-flex !important;
+    }
+    @mixin icon {
+      height: 15px;
+      width: 15px;
+    }
+    .verifiedIcon {
+      color: $strong-green;
+      @include icon;
+    }
+    .unverifiedIcon {
+      color: $color-red;
+      @include icon;
+    }
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
+  }
+}
