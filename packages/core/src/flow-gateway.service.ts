@@ -201,7 +201,7 @@ type FlowTxStatusSubscription = {
 };
 
 type FlowGatewayConfig = {
-  restServerAddress: string;
+  restAccessApiUrl: string;
   flowJSON: unknown;
 };
 
@@ -212,7 +212,7 @@ export class FlowGatewayService {
   public configure(config: FlowGatewayConfig): void {
     fcl
       .config({
-        "accessNode.api": config.restServerAddress,
+        "accessNode.api": config.restAccessApiUrl,
         "flow.network": "emulator",
       })
       .load({

@@ -12,10 +12,12 @@ import {
   FlowConfigEvent,
   FlowConfigService,
   FlowEmulatorService,
+  FlowDevWalletService,
   FlowInteractionsService,
   GoBindingsService,
   ProcessManagerService,
   WalletService,
+  FlowDevWalletConfig,
 } from '@onflowser/nodejs';
 import path from 'path';
 import crypto from 'crypto';
@@ -37,6 +39,7 @@ export class FlowserAppService {
   public readonly flowAccountStorageService: FlowAccountStorageService;
   public readonly processManagerService: ProcessManagerService;
   public readonly flowEmulatorService: FlowEmulatorService;
+  private readonly flowDevWalletService: FlowDevWalletService;
   public readonly workspaceService: WorkspaceService;
   public readonly goBindingsService: GoBindingsService;
   public readonly flowInteractionsService: FlowInteractionsService;
@@ -99,6 +102,11 @@ export class FlowserAppService {
       this.flowAccountStorageService,
       this.flowGatewayService,
       this.flowInteractionsService,
+    );
+    this.flowDevWalletService = new FlowDevWalletService(
+      this.logger,
+      this.httpService,
+      this.processManagerService,
     );
     this.flowConfigService = new FlowConfigService(this.logger);
     this.walletStorageService = new FileStorageService();
@@ -240,7 +248,7 @@ export class FlowserAppService {
     if (openWorkspace) {
       this.flowGatewayService.configure({
         flowJSON: this.flowConfigService.getFlowJSON(),
-        restServerAddress: `http://localhost:${
+        restAccessApiUrl: `http://localhost:${
           openWorkspace.emulator?.restServerPort ?? 8888
         }`,
       });
@@ -281,9 +289,16 @@ export class FlowserAppService {
     const emulatorConfig =
       workspace.emulator ?? this.flowEmulatorService.getDefaultConfig();
 
+    const restAccessApiUrl = `http://localhost:${emulatorConfig.restServerPort}`;
+
+    const devWalletConfig: FlowDevWalletConfig = {
+      workspacePath: workspace.filesystemPath,
+      restAccessApiUrl,
+    };
+
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
-      restServerAddress: `http://localhost:${emulatorConfig.restServerPort}`,
+      restAccessApiUrl,
     });
 
     const isEmulatorOnline = await this.flowGatewayService.isRestApiReachable();
@@ -292,6 +307,12 @@ export class FlowserAppService {
         workspacePath: workspace.filesystemPath,
         config: emulatorConfig,
       });
+    }
+
+    const isDevWalletOnline =
+      await this.flowDevWalletService.isReachable(devWalletConfig);
+    if (!isDevWalletOnline) {
+      await this.flowDevWalletService.start(devWalletConfig);
     }
 
     this.flowSnapshotsService.configure({
