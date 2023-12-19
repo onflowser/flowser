@@ -252,8 +252,25 @@ function useRelevantLogs(options: {
   tailSize: number;
 }) {
   const { data: emulatorLogs } = useGetOutputsByProcess(emulatorProcessId);
+  const { data: devWalletLogs } = useGetOutputsByProcess(devWalletProcessId);
+  const combinedLogs = useMemo(() => {
+    const logs = [];
+
+    if (emulatorLogs) {
+      logs.push(...emulatorLogs)
+    }
+
+    if (devWalletLogs) {
+      logs.push(...devWalletLogs)
+    }
+
+    return logs.sort(
+      (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+    )
+  }, [emulatorLogs, devWalletLogs])
   const { filteredData: logs } = useFilterData(
-    emulatorLogs ?? [],
+    combinedLogs,
     options.searchTerm,
   );
   const tailLogs = useMemo(
@@ -296,3 +313,4 @@ const VerticalDragLine = ({
 };
 
 const emulatorProcessId = "emulator";
+const devWalletProcessId = "dev-wallet";
