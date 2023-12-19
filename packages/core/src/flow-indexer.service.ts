@@ -10,7 +10,6 @@ import {
 import { IFlowInteractions } from "./flow-interactions.service";
 import { FlowAccountStorageService } from "./flow-storage.service";
 import {
-  FlowApiStatus,
   FlowGatewayService,
   FlowAccountKeyEvent,
   FlowAccountContractEvent,
@@ -52,9 +51,9 @@ export class FlowIndexerService {
   ) {}
 
   async processBlockchainData(): Promise<void> {
-    const gatewayStatus = await this.flowGatewayService.getRestApiStatus();
+    const isGatewayOnline = await this.flowGatewayService.isRestApiReachable();
 
-    if (gatewayStatus !== FlowApiStatus.SERVICE_STATUS_ONLINE) {
+    if (!isGatewayOnline) {
       this.logger.debug("Gateway offline, pausing processing.");
       return;
     }

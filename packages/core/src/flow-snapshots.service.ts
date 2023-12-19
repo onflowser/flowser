@@ -2,6 +2,7 @@ import axios, { Method } from "axios";
 import { FlowEmulatorConfig, FlowStateSnapshot } from "@onflowser/api";
 import { PersistentStorage } from "./persistent-storage";
 import EventEmitter from "events";
+import { HttpService } from "./http.service";
 
 type ListSnapshotsResponse = {
   names: string[];
@@ -23,7 +24,10 @@ export enum FlowSnapshotsEvent {
 export class FlowSnapshotsService extends EventEmitter {
   private config: FlowSnapshotsConfig;
 
-  constructor(private readonly storage: PersistentStorage) {
+  constructor(
+    private readonly storage: PersistentStorage,
+    private readonly httpService: HttpService
+  ) {
     super();
     this.config = {
       adminServerPort: 8080,
@@ -145,30 +149,15 @@ export class FlowSnapshotsService extends EventEmitter {
     await this.storage.write(JSON.stringify(snapshots));
   }
 
-  private async emulatorRequest<ResponseData>(options: {
+  private async emulatorRequest<Response>(options: {
     method: Method;
     endpoint: string;
   }) {
     const { adminServerPort } = this.config;
 
-    try {
-      return await axios.request<ResponseData>({
-        method: options.method,
-        url: `http://localhost:${adminServerPort}/emulator${options.endpoint}`,
-        // Prevent axios from throwing on certain http response codes
-        // https://github.com/axios/axios/issues/41
-        validateStatus: () => true,
-      });
-    } catch (error) {
-      if (!axios.isAxiosError(error)) {
-        throw error;
-      }
-
-      if (error.code === "ECONNREFUSED") {
-        throw new Error("Emulator offline");
-      }
-
-      throw error;
-    }
+    return this.httpService.request<Response>({
+      method: options.method,
+      url: `http://localhost:${adminServerPort}/emulator${options.endpoint}`
+    })
   }
 }
