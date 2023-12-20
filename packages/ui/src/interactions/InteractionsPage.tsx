@@ -14,10 +14,14 @@ import { CadenceEditor } from "../common/code/CadenceEditor/CadenceEditor";
 import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDisplay/InteractionOutcomeDisplay";
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
+import { useConfirmDialog } from "../contexts/confirm-dialog.context";
+import { useTemplatesRegistry } from "./contexts/templates.context";
 
 export function InteractionsPage(): ReactElement {
   const { definitions, focusedDefinition, remove, setFocused, create } =
     useInteractionRegistry();
+  const { saveTemplate } = useTemplatesRegistry();
+  const confirmDialog = useConfirmDialog()
 
   const sideMenuTabs: BaseTabItem[] = [
     {
@@ -64,7 +68,18 @@ export function InteractionsPage(): ReactElement {
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
-        onClose={(tab) => remove(tab.id)}
+        onClose={tab => {
+
+          // TODO(rework-template-saving): Only prompt if there isn't an exact snippet (based on the source) already saved
+          confirmDialog.showDialog({
+            title: "Save as snippet?",
+            body: <span>Canceling will discard your changes.</span>,
+            confirmButtonLabel: "Save",
+            cancelButtonLabel: "Don't save",
+            onConfirm: () => saveTemplate(focusedDefinition!),
+            onCancel: () => remove(tab.id)
+          })
+        }}
         onAddNew={() => {
           const createdInteraction = create({
             name: "New interaction",

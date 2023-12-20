@@ -1,19 +1,20 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, ReactElement, useState } from "react";
 import Button from "../../../buttons/Button/Button";
-import { ActionDialog, ActionDialogProps } from "../action/ActionDialog";
+import { ActionDialog } from "../action/ActionDialog";
 
-export type ConfirmDialogProps = ActionDialogProps & {
-  onClose: () => void | Promise<void>;
+export type ConfirmDialogProps = {
+  onCancel: () => void | Promise<void>;
   onConfirm: () => void | Promise<void>;
   confirmButtonLabel?: string;
   cancelButtonLabel?: string;
   className?: string;
   title: string;
+  children: ReactElement[] | ReactElement;
 };
 
 export const ConfirmationDialog: FunctionComponent<ConfirmDialogProps> = ({
   onConfirm,
-  onClose,
+  onCancel,
   title,
   confirmButtonLabel = "OK",
   cancelButtonLabel = "CANCEL",
@@ -28,7 +29,7 @@ export const ConfirmationDialog: FunctionComponent<ConfirmDialogProps> = ({
       await onConfirm();
     } finally {
       setLoading(false);
-      onClose();
+      onCancel();
     }
   }
 
@@ -36,10 +37,10 @@ export const ConfirmationDialog: FunctionComponent<ConfirmDialogProps> = ({
     <ActionDialog
       title={title}
       className={className}
-      onClose={onClose}
+      onClose={onCancel}
       footer={
         <>
-          <Button outlined={true} variant="middle" onClick={onClose}>
+          <Button outlined={true} variant="middle" onClick={onCancel}>
             {cancelButtonLabel}
           </Button>
           <Button loading={isLoading} variant="middle" onClick={handleConfirm}>
