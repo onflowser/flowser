@@ -135,7 +135,7 @@ function FocusedInteraction() {
 
   return (
     <div className={classes.focusedTemplate}>
-      {focusedDefinition && <FlixInfo sourceCode={focusedDefinition.code} />}
+      {focusedDefinition && <FlixInfo interaction={focusedDefinition} />}
       {correspondingTemplate?.source === "workspace" && (
         <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />
       )}
