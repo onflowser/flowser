@@ -5,18 +5,17 @@ import { Input } from "../../../common/inputs";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
+import { InteractionDefinition } from "../../core/core-types";
 
 type SaveSnippetDialogProps = {
+  interaction: InteractionDefinition;
   onClose: () => void;
 }
 
 export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
-  const { focusedDefinition, update, remove } = useInteractionRegistry();
+  const { interaction } = props;
+  const { update, remove } = useInteractionRegistry();
   const { saveTemplate } = useTemplatesRegistry();
-
-  if (!focusedDefinition) {
-    throw new Error("Expected focused interaction definition")
-  }
 
   return (
     <ActionDialog
@@ -25,13 +24,13 @@ export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
       footer={
         <>
           <Button outlined variant="middle" onClick={() => {
-            remove(focusedDefinition.id);
+            remove(interaction.id);
             props.onClose();
           }}>
             Discard
           </Button>
           <Button variant="middle" onClick={() => {
-            saveTemplate(focusedDefinition);
+            saveTemplate(interaction);
             props.onClose();
           }}>
             Save
@@ -45,8 +44,8 @@ export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
       <SizedBox height={20} />
       <Input
         placeholder="Name"
-        value={focusedDefinition.name}
-        onChange={(e) => update({ ...focusedDefinition, name: e.target.value })}
+        value={interaction.name}
+        onChange={(e) => update({ ...interaction, name: e.target.value })}
       />
     </ActionDialog>
   )

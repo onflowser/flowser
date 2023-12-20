@@ -15,11 +15,14 @@ import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDispla
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
+import { useTemplatesRegistry } from "./contexts/templates.context";
+import { InteractionDefinition } from "./core/core-types";
 
 export function InteractionsPage(): ReactElement {
-  const { definitions, focusedDefinition, setFocused, create } =
+  const { definitions, focusedDefinition, setFocused, create, remove } =
     useInteractionRegistry();
-  const [showSaveSnippetDialog, setShowSaveSnippetDialog] = useState(false);
+  const {templates} = useTemplatesRegistry();
+  const [interactionToSaveBeforeClose, setInteractionToSaveBeforeClose] = useState<InteractionDefinition>();
 
   const sideMenuTabs: BaseTabItem[] = [
     {
@@ -51,8 +54,11 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
-      {showSaveSnippetDialog && (
-        <SaveSnippetDialog onClose={() => setShowSaveSnippetDialog(false)} />
+      {interactionToSaveBeforeClose !== undefined && (
+        <SaveSnippetDialog
+          interaction={interactionToSaveBeforeClose}
+          onClose={() => setInteractionToSaveBeforeClose(undefined)}
+        />
       )}
       <BaseTabs
         className={classes.leftSideMenu}
@@ -69,8 +75,15 @@ export function InteractionsPage(): ReactElement {
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
-        // TODO(rework-template-saving): Only prompt if there isn't an exact snippet (based on the source) already saved
-        onClose={() => setShowSaveSnippetDialog(true)}
+        onClose={(tab) => {
+          const interaction = definitions.find(e => e.id === tab.id)!;
+          const exactTemplateMatch = templates.find(template => template.code === interaction.code);
+          if (exactTemplateMatch) {
+            remove(interaction.id)
+          } else {
+            setInteractionToSaveBeforeClose(interaction);
+          }
+        }}
         onAddNew={() => {
           const createdInteraction = create({
             name: "New interaction",
