@@ -6,6 +6,7 @@ import React, {
 import classes from "./BaseDialog.module.scss";
 import classNames from "classnames";
 import { BaseCard } from "../../../cards/BaseCard/BaseCard";
+import { FlowserIcon } from "../../../icons/FlowserIcon";
 
 export type DialogProps = {
   children: ReactElement[] | ReactElement;
@@ -31,6 +32,12 @@ export const BaseDialog: FunctionComponent<DialogProps> = ({
     <div className={classes.root} onClick={onOutsideClick}>
       <div className={classNames(classes.dialog, className)}>
         <BaseCard className={classes.card} onClick={onClickInside}>
+          <FlowserIcon.Close
+            className={classes.closeButton}
+            width={20}
+            height={20}
+            onClick={onClose}
+          />
           {children}
         </BaseCard>
       </div>

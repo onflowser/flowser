@@ -1,5 +1,6 @@
 @import "../../../../styles/colors";
 @import "../../../../styles/rules";
+@import "../../../../styles/spacings";
 
 .root {
   z-index: 1001;
@@ -22,6 +23,13 @@
     background: $gray-110;
     border-radius: $border-radius-md;
     border: 1px solid $gray-50;
+
+    .closeButton {
+      cursor: pointer;
+      position: absolute;
+      top: $spacing-base;
+      right: $spacing-base;
+    }
 
     .card {
       max-height: 90vh;

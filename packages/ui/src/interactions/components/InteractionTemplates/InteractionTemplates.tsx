@@ -53,18 +53,18 @@ function StoredTemplates() {
 
   function renderSourceFilterBadge(sourceType: InteractionSourceType) {
     const nameLookup: Record<InteractionSourceType, string> = {
-      flix: "FLIX",
-      session: "SNIPPET",
-      workspace: "FILE"
+      flix: "flix",
+      session: "snippets",
+      workspace: "files"
     }
 
     const isSelected = filterToSources.includes(sourceType);
 
     return (
       <BaseBadge
-        style={{
-          background: isSelected ? "gray" : undefined
-        }}
+        className={classNames(classes.badge, {
+          [classes.selectedBadge]: isSelected
+        })}
         onClick={() => toggleSourceFilter(sourceType)}>
         {nameLookup[sourceType]}
       </BaseBadge>

@@ -24,10 +24,7 @@ export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
       onClose={props.onClose}
       footer={
         <>
-          <Button outlined={true} variant="middle" onClick={props.onClose}>
-            Cancel
-          </Button>
-          <Button variant="middle" onClick={() => {
+          <Button outlined variant="middle" onClick={() => {
             remove(focusedDefinition.id);
             props.onClose();
           }}>
