@@ -6,10 +6,12 @@ import { SearchInput } from "../../../common/inputs";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
-import { useTemplatesRegistry } from "../../contexts/templates.context";
+import { InteractionSourceType, useTemplatesRegistry } from "../../contexts/templates.context";
 import { IdeLink } from "../../../common/links/IdeLink";
 import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixInfo } from "../FlixInfo/FlixInfo";
+import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 export function InteractionTemplates(): ReactElement {
   return (
@@ -25,12 +27,14 @@ function StoredTemplates() {
   const [searchTerm, setSearchTerm] = useState("");
   const { create, focusedDefinition, setFocused } = useInteractionRegistry();
   const { templates, removeTemplate } = useTemplatesRegistry();
+  const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
   const filteredTemplates = useMemo(() => {
-    if (searchTerm === "") {
-      return templates;
-    }
-    return templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [searchTerm, templates]);
+    const searchQueryResults = searchTerm === "" ? templates : templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const sourceFilterResults = filterToSources.length === 0 ? searchQueryResults : searchQueryResults.filter(e => filterToSources.includes(e.source));
+
+    return sourceFilterResults;
+  }, [searchTerm, filterToSources, templates]);
   const filteredAndSortedTemplates = useMemo(
     () =>
       filteredTemplates.sort(
@@ -38,6 +42,34 @@ function StoredTemplates() {
       ),
     [filteredTemplates]
   );
+
+  function toggleSourceFilter(sourceType: InteractionSourceType) {
+    if (filterToSources.includes(sourceType)) {
+      setFilterToSources(filterToSources.filter(e => e !== sourceType));
+    } else {
+      setFilterToSources([...filterToSources, sourceType])
+    }
+  }
+
+  function renderSourceFilterBadge(sourceType: InteractionSourceType) {
+    const nameLookup: Record<InteractionSourceType, string> = {
+      flix: "FLIX",
+      session: "SNIPPET",
+      workspace: "FILE"
+    }
+
+    const isSelected = filterToSources.includes(sourceType);
+
+    return (
+      <BaseBadge
+        style={{
+          background: isSelected ? "gray" : undefined
+        }}
+        onClick={() => toggleSourceFilter(sourceType)}>
+        {nameLookup[sourceType]}
+      </BaseBadge>
+    )
+  }
 
   return (
     <div>
@@ -47,6 +79,11 @@ function StoredTemplates() {
           searchTerm={searchTerm}
           onChangeSearchTerm={setSearchTerm}
         />
+        <div className={classes.badgeFilters}>
+          {renderSourceFilterBadge("flix")}
+          {renderSourceFilterBadge("session")}
+          {renderSourceFilterBadge("workspace")}
+        </div>
       </div>
       <div className={classes.storedTemplates}>
         {filteredAndSortedTemplates.map((template) => (
