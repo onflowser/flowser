@@ -16,7 +16,7 @@ import classNames from "classnames";
 import { SimpleButton } from "../common/buttons/SimpleButton/SimpleButton";
 import { Callout } from "../common/misc/Callout/Callout";
 import { SearchInput } from "../common/inputs";
-import { ManagedProcess, ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
+import { ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
 import AnsiHtmlConvert from "ansi-to-html";
 import { FlowserIcon } from "../common/icons/FlowserIcon";
 import { useGetOutputsByProcess, useGetProcesses } from "../api";
@@ -354,8 +354,7 @@ fcl
         </BaseDialog>
       )}
       <div className={classes.devWalletStatus} onClick={() => setShowHelp(true)}>
-        <div className={classes.statusBadge} />
-        Wallet running on port {walletPort}
+        Configure your app
       </div>
     </Fragment>
   )

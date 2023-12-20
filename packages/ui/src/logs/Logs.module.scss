@@ -89,12 +89,6 @@
         display: flex;
         align-items: center;
         column-gap: $spacing-s;
-        .statusBadge {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: $strong-green;
-        }
       }
 
       & > div {
