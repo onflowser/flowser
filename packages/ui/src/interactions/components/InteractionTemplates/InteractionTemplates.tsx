@@ -102,26 +102,13 @@ function FocusedInteraction() {
     (template) => template.id === focusedDefinition?.id
   );
 
-  function renderContent() {
-    if (!correspondingTemplate) {
-      return <SessionTemplateSettings />;
-    }
-
-    switch (correspondingTemplate.source) {
-      case "workspace":
-        return <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />;
-      case "flix":
-        // Already shown at the top.
-        return null;
-      case "session":
-        return <SessionTemplateSettings />;
-    }
-  }
-
   return (
     <div className={classes.focusedTemplate}>
       {focusedDefinition && <FlixInfo sourceCode={focusedDefinition.code} />}
-      {renderContent()}
+      <SessionTemplateSettings />
+      {correspondingTemplate?.source === "workspace" && (
+        <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />
+      )}
     </div>
   );
 }
