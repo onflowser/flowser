@@ -155,6 +155,9 @@ export function Logs(props: LogsProps): ReactElement {
         )}
 
         <div className={classes.rightContainer}>
+          {devWalletProcess && (
+            <DevWalletStatus process={devWalletProcess} />
+          )}
           {logDrawerSize !== "tiny" && (
             <SearchInput
               className={classes.searchBox}
@@ -162,9 +165,6 @@ export function Logs(props: LogsProps): ReactElement {
               searchTerm={searchTerm}
               onChangeSearchTerm={setSearchTerm}
             />
-          )}
-          {logDrawerSize === "tiny" && devWalletProcess && (
-            <DevWalletStatus process={devWalletProcess} />
           )}
           <div>
             {["tiny", "small", "custom"].includes(logDrawerSize) && (
@@ -318,10 +318,13 @@ const VerticalDragLine = ({
 };
 
 function DevWalletStatus(props: {process: ManagedProcess}) {
+  // TODO(dev-wallet): Read from a global configuration provider instead of parsing process flags
+  const walletPort = Number(props.process.command?.args?.find(arg => arg.startsWith("--port"))?.split("=")[1] ?? 8701);
+
   return (
     <div className={classes.devWalletStatus}>
       <div className={classes.statusBadge} />
-      Wallet running on port 8888
+      Wallet running on port {walletPort}
     </div>
   )
 }
