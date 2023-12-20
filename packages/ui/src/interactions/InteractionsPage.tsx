@@ -14,14 +14,12 @@ import { CadenceEditor } from "../common/code/CadenceEditor/CadenceEditor";
 import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDisplay/InteractionOutcomeDisplay";
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
-import { useConfirmDialog } from "../contexts/confirm-dialog.context";
-import { useTemplatesRegistry } from "./contexts/templates.context";
+import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
 
 export function InteractionsPage(): ReactElement {
-  const { definitions, focusedDefinition, remove, setFocused, create } =
+  const { definitions, focusedDefinition, setFocused, create } =
     useInteractionRegistry();
-  const { saveTemplate } = useTemplatesRegistry();
-  const confirmDialog = useConfirmDialog()
+  const [showSaveSnippetDialog, setShowSaveSnippetDialog] = useState(false);
 
   const sideMenuTabs: BaseTabItem[] = [
     {
@@ -53,6 +51,9 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
+      {showSaveSnippetDialog && (
+        <SaveSnippetDialog onClose={() => setShowSaveSnippetDialog(false)} />
+      )}
       <BaseTabs
         className={classes.leftSideMenu}
         contentClassName={classes.content}
@@ -68,18 +69,8 @@ export function InteractionsPage(): ReactElement {
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
-        onClose={tab => {
-
-          // TODO(rework-template-saving): Only prompt if there isn't an exact snippet (based on the source) already saved
-          confirmDialog.showDialog({
-            title: "Save as snippet?",
-            body: <span>Canceling will discard your changes.</span>,
-            confirmButtonLabel: "Save",
-            cancelButtonLabel: "Don't save",
-            onConfirm: () => saveTemplate(focusedDefinition!),
-            onCancel: () => remove(tab.id)
-          })
-        }}
+        // TODO(rework-template-saving): Only prompt if there isn't an exact snippet (based on the source) already saved
+        onClose={() => setShowSaveSnippetDialog(true)}
         onAddNew={() => {
           const createdInteraction = create({
             name: "New interaction",

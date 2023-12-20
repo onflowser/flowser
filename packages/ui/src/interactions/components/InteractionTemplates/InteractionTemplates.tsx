@@ -1,9 +1,7 @@
-import React, { Fragment, ReactElement, useMemo, useState } from "react";
+import React, { ReactElement, useMemo, useState } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
-import { PrimaryButton } from "../../../common/buttons/PrimaryButton/PrimaryButton";
-import { Input } from "../../../common/inputs";
 import { SearchInput } from "../../../common/inputs";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
@@ -11,10 +9,6 @@ import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
 import { IdeLink } from "../../../common/links/IdeLink";
 import { WorkspaceTemplate } from "@onflowser/api";
-import { FLOW_FLIX_URL, useFlixSearch } from "../../../hooks/flix";
-import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
-import { LineSeparator } from "../../../common/misc/LineSeparator/LineSeparator";
-import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import { FlixInfo } from "../FlixInfo/FlixInfo";
 
 export function InteractionTemplates(): ReactElement {
@@ -105,33 +99,10 @@ function FocusedInteraction() {
   return (
     <div className={classes.focusedTemplate}>
       {focusedDefinition && <FlixInfo sourceCode={focusedDefinition.code} />}
-      <SessionTemplateSettings />
       {correspondingTemplate?.source === "workspace" && (
         <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />
       )}
     </div>
-  );
-}
-
-function SessionTemplateSettings() {
-  const { focusedDefinition, update } = useInteractionRegistry();
-  const { saveTemplate } = useTemplatesRegistry();
-
-  if (!focusedDefinition) {
-    return null;
-  }
-
-  return (
-    <>
-      <Input
-        placeholder="Name"
-        value={focusedDefinition.name}
-        onChange={(e) => update({ ...focusedDefinition, name: e.target.value })}
-      />
-      <PrimaryButton onClick={() => saveTemplate(focusedDefinition)}>
-        Save
-      </PrimaryButton>
-    </>
   );
 }
 
