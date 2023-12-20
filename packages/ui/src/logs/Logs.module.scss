@@ -85,6 +85,7 @@
       align-items: center;
 
       .devWalletStatus {
+        cursor: pointer;
         display: flex;
         align-items: center;
         column-gap: $spacing-s;

@@ -1,10 +1,11 @@
 import React, {
+  Fragment,
   ReactElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 import classes from "./Logs.module.scss";
 import { CaretIcon } from "../common/icons/CaretIcon/CaretIcon";
@@ -19,6 +20,10 @@ import { ManagedProcess, ManagedProcessOutput, ProcessOutputSource } from "@onfl
 import AnsiHtmlConvert from "ansi-to-html";
 import { FlowserIcon } from "../common/icons/FlowserIcon";
 import { useGetOutputsByProcess, useGetProcesses } from "../api";
+import { BaseDialog } from "../common/overlays/dialogs/base/BaseDialog";
+import { ExternalLink } from "../common/links/ExternalLink/ExternalLink";
+import { CadenceEditor } from "../common/code/CadenceEditor/CadenceEditor";
+import { SizedBox } from "../common/misc/SizedBox/SizedBox";
 
 type LogsProps = {
   className?: string;
@@ -45,8 +50,6 @@ export function Logs(props: LogsProps): ReactElement {
     tailSize: 5,
   });
   const mouseEvent = useMouseMove(trackMousePosition);
-  const {data: processes} = useGetProcesses();
-  const devWalletProcess = processes?.find(e => e.id === devWalletProcessId);
 
   const getDrawerSizeClass = useCallback(() => {
     return logDrawerSize === "tiny"
@@ -155,9 +158,7 @@ export function Logs(props: LogsProps): ReactElement {
         )}
 
         <div className={classes.rightContainer}>
-          {devWalletProcess && (
-            <DevWalletStatus process={devWalletProcess} />
-          )}
+          <ConfigurationHelp />
           {logDrawerSize !== "tiny" && (
             <SearchInput
               className={classes.searchBox}
@@ -317,15 +318,46 @@ const VerticalDragLine = ({
   );
 };
 
-function DevWalletStatus(props: {process: ManagedProcess}) {
-  // TODO(dev-wallet): Read from a global configuration provider instead of parsing process flags
-  const walletPort = Number(props.process.command?.args?.find(arg => arg.startsWith("--port"))?.split("=")[1] ?? 8701);
+function ConfigurationHelp() {
+  const [showHelp, setShowHelp] = useState(false);
+  // TODO(web-app): Read from a global configuration provider instead of parsing process flags
+  const {data: processes} = useGetProcesses();
+  const devWalletProcess = processes?.find(e => e.id === devWalletProcessId);
+  const emulatorProcess = processes?.find(e => e.id === emulatorProcessId);
+  const walletPort = Number(devWalletProcess?.command?.args?.find(arg => arg.startsWith("--port"))?.split("=")?.[1] ?? 8701);
+  const restApiPort = Number(emulatorProcess?.command?.args?.find(arg => arg.startsWith("--rest-port"))?.split("=")?.[1] ?? 8888);
+
+  const configJsCode = `import * as fcl from "@onflow/fcl"
+
+fcl
+  .config()
+  // Point App at Emulator REST API
+  .put("accessNode.api", "http://localhost:${restApiPort}")
+  // Point FCL at dev-wallet
+  .put("discovery.wallet", "http://localhost:${walletPort}/fcl/authn")`;
 
   return (
-    <div className={classes.devWalletStatus}>
-      <div className={classes.statusBadge} />
-      Wallet running on port {walletPort}
-    </div>
+    <Fragment>
+      {showHelp && (
+        <BaseDialog onClose={() => setShowHelp(false)}>
+          <h2>Configure your application</h2>
+          <SizedBox height={20} />
+          <p>
+            Use this code to setup FCL (Flow Client Library) to work with your local development environment.
+          </p>
+          <SizedBox height={10} />
+          <CadenceEditor value={configJsCode} />
+          <SizedBox height={10} />
+          <ExternalLink href="https://developers.flow.com/tools/flow-dev-wallet#configuring-your-javascript-application">
+            Learn more in the official docs
+          </ExternalLink>
+        </BaseDialog>
+      )}
+      <div className={classes.devWalletStatus} onClick={() => setShowHelp(true)}>
+        <div className={classes.statusBadge} />
+        Wallet running on port {walletPort}
+      </div>
+    </Fragment>
   )
 }
 
