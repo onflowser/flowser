@@ -15,10 +15,10 @@ import classNames from "classnames";
 import { SimpleButton } from "../common/buttons/SimpleButton/SimpleButton";
 import { Callout } from "../common/misc/Callout/Callout";
 import { SearchInput } from "../common/inputs";
-import { ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
+import { ManagedProcess, ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
 import AnsiHtmlConvert from "ansi-to-html";
 import { FlowserIcon } from "../common/icons/FlowserIcon";
-import { useGetOutputsByProcess } from "../api";
+import { useGetOutputsByProcess, useGetProcesses } from "../api";
 
 type LogsProps = {
   className?: string;
@@ -45,6 +45,8 @@ export function Logs(props: LogsProps): ReactElement {
     tailSize: 5,
   });
   const mouseEvent = useMouseMove(trackMousePosition);
+  const {data: processes} = useGetProcesses();
+  const devWalletProcess = processes?.find(e => e.id === devWalletProcessId);
 
   const getDrawerSizeClass = useCallback(() => {
     return logDrawerSize === "tiny"
@@ -160,6 +162,9 @@ export function Logs(props: LogsProps): ReactElement {
               searchTerm={searchTerm}
               onChangeSearchTerm={setSearchTerm}
             />
+          )}
+          {logDrawerSize === "tiny" && devWalletProcess && (
+            <DevWalletStatus process={devWalletProcess} />
           )}
           <div>
             {["tiny", "small", "custom"].includes(logDrawerSize) && (
@@ -311,6 +316,15 @@ const VerticalDragLine = ({
     />
   );
 };
+
+function DevWalletStatus(props: {process: ManagedProcess}) {
+  return (
+    <div className={classes.devWalletStatus}>
+      <div className={classes.statusBadge} />
+      Wallet running on port 8888
+    </div>
+  )
+}
 
 const emulatorProcessId = "emulator";
 const devWalletProcessId = "dev-wallet";

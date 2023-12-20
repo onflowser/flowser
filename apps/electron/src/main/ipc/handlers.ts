@@ -1,5 +1,5 @@
 import { dialog, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { FlowserWorkspace } from '@onflowser/api';
+import { FlowserWorkspace, ManagedProcess } from '@onflowser/api';
 import {
   ExecuteScriptRequest,
   SendTransactionRequest,
@@ -121,6 +121,17 @@ export function registerHandlers(appService: FlowserAppService) {
 
     PROCESS_LOGS_LIST: (event: IpcMainInvokeEvent, processId: string) =>
       processManagerService.findAllLogsByProcess(processId),
+    PROCESS_LIST: () =>
+      processManagerService.getAll().map(
+        (process): ManagedProcess => ({
+          id: process.id,
+          state: process.state,
+          name: process.options.name,
+          command: process.options.command,
+          createdAt: process.createdAt,
+          updatedAt: process.updatedAt,
+        }),
+      ),
   };
 
   for (const eventName in handlers) {
