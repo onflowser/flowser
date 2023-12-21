@@ -73,19 +73,22 @@
       height: 50px;
       overflow: scroll;
       filter: blur(1.3px);
-      -o-filter: blur(1.3px);
-      -ms-filter: blur(1.3px);
-      -moz-filter: blur(1.3px);
-      -webkit-filter: blur(1.3px);
     }
 
     .rightContainer {
       display: flex;
       margin-left: auto;
       align-items: center;
+      column-gap: $spacing-l * 2;
 
-      & > div {
-        margin-left: 20px;
+      .configureAppLabel {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        column-gap: $spacing-s;
+        color: $gray-10;
+        font-weight: bold;
+        white-space: nowrap;
       }
 
       .control {

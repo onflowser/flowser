@@ -25,9 +25,8 @@ export class FlowEmulatorService extends EventEmitter {
     super();
   }
 
-  async stopAndCleanup() {
+  async stop() {
     await this.processManagerService.remove(FlowEmulatorService.processId);
-    this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
   async start(request: StartEmulatorRequest) {

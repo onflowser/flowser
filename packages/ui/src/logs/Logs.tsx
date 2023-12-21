@@ -1,10 +1,11 @@
 import React, {
+  Fragment,
   ReactElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 import classes from "./Logs.module.scss";
 import { CaretIcon } from "../common/icons/CaretIcon/CaretIcon";
@@ -18,7 +19,11 @@ import { SearchInput } from "../common/inputs";
 import { ManagedProcessOutput, ProcessOutputSource } from "@onflowser/api";
 import AnsiHtmlConvert from "ansi-to-html";
 import { FlowserIcon } from "../common/icons/FlowserIcon";
-import { useGetOutputsByProcess } from "../api";
+import { useGetOutputsByProcess, useGetProcesses } from "../api";
+import { BaseDialog } from "../common/overlays/dialogs/base/BaseDialog";
+import { ExternalLink } from "../common/links/ExternalLink/ExternalLink";
+import { CadenceEditor } from "../common/code/CadenceEditor/CadenceEditor";
+import { SizedBox } from "../common/misc/SizedBox/SizedBox";
 
 type LogsProps = {
   className?: string;
@@ -153,6 +158,7 @@ export function Logs(props: LogsProps): ReactElement {
         )}
 
         <div className={classes.rightContainer}>
+          <ConfigureYourAppHelp />
           {logDrawerSize !== "tiny" && (
             <SearchInput
               className={classes.searchBox}
@@ -237,9 +243,10 @@ function NoLogsHelpBanner() {
       description={
         <div>
           <p>
-            Flowser can only show logs, when emulator is run by Flowser itself.
-            Make sure you aren't running the <code>flow emulator</code> command
-            yourself.
+            Flowser isn't running any Flow development services (emulator or wallet).
+          </p>
+          <p>
+            You are probably running these services yourself with Flow CLI.
           </p>
         </div>
       }
@@ -252,8 +259,25 @@ function useRelevantLogs(options: {
   tailSize: number;
 }) {
   const { data: emulatorLogs } = useGetOutputsByProcess(emulatorProcessId);
+  const { data: devWalletLogs } = useGetOutputsByProcess(devWalletProcessId);
+  const combinedLogs = useMemo(() => {
+    const logs = [];
+
+    if (emulatorLogs) {
+      logs.push(...emulatorLogs)
+    }
+
+    if (devWalletLogs) {
+      logs.push(...devWalletLogs)
+    }
+
+    return logs.sort(
+      (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+    )
+  }, [emulatorLogs, devWalletLogs])
   const { filteredData: logs } = useFilterData(
-    emulatorLogs ?? [],
+    combinedLogs,
     options.searchTerm,
   );
   const tailLogs = useMemo(
@@ -295,4 +319,47 @@ const VerticalDragLine = ({
   );
 };
 
+function ConfigureYourAppHelp() {
+  const [showHelp, setShowHelp] = useState(false);
+  // TODO(web-app): Read from a global configuration provider instead of parsing process flags
+  const {data: processes} = useGetProcesses();
+  const devWalletProcess = processes?.find(e => e.id === devWalletProcessId);
+  const emulatorProcess = processes?.find(e => e.id === emulatorProcessId);
+  const walletPort = Number(devWalletProcess?.command?.args?.find(arg => arg.startsWith("--port"))?.split("=")?.[1] || 8701);
+  const restApiPort = Number(emulatorProcess?.command?.args?.find(arg => arg.startsWith("--rest-port"))?.split("=")?.[1] || 8888);
+
+  const configJsCode = `import * as fcl from "@onflow/fcl"
+
+fcl
+  .config()
+  // Point App at Emulator REST API
+  .put("accessNode.api", "http://localhost:${restApiPort}")
+  // Point FCL at Flow development wallet
+  .put("discovery.wallet", "http://localhost:${walletPort}/fcl/authn")`;
+
+  return (
+    <Fragment>
+      {showHelp && (
+        <BaseDialog onClose={() => setShowHelp(false)}>
+          <h2>Configure your application</h2>
+          <SizedBox height={20} />
+          <p>
+            Use this code to setup FCL (Flow Client Library) to work with your local development environment.
+          </p>
+          <SizedBox height={10} />
+          <CadenceEditor value={configJsCode} />
+          <SizedBox height={10} />
+          <ExternalLink href="https://developers.flow.com/tools/clients/fcl-js/api#common-configuration-keys">
+            Learn more in the official docs
+          </ExternalLink>
+        </BaseDialog>
+      )}
+      <div className={classes.configureAppLabel} onClick={() => setShowHelp(true)}>
+        🚀 Configure your app
+      </div>
+    </Fragment>
+  )
+}
+
 const emulatorProcessId = "emulator";
+const devWalletProcessId = "dev-wallet";

@@ -1,7 +1,7 @@
 import React, {
   FunctionComponent,
   MouseEventHandler,
-  ReactElement,
+  ReactNode
 } from "react";
 import classes from "./BaseDialog.module.scss";
 import classNames from "classnames";
@@ -9,7 +9,7 @@ import { BaseCard } from "../../../cards/BaseCard/BaseCard";
 import { FlowserIcon } from "../../../icons/FlowserIcon";
 
 export type DialogProps = {
-  children: ReactElement[] | ReactElement;
+  children: ReactNode;
   onClose: MouseEventHandler<HTMLDivElement>;
   className?: string;
 };
