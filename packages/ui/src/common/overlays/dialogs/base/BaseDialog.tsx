@@ -1,7 +1,7 @@
 import React, {
   FunctionComponent,
   MouseEventHandler,
-  ReactNode, useRef
+  ReactNode
 } from "react";
 import classes from "./BaseDialog.module.scss";
 import classNames from "classnames";
@@ -18,18 +18,13 @@ export const BaseDialog: FunctionComponent<DialogProps> = ({
   onClose,
   className,
 }) => {
-  const isClickInitiatedInside = useRef<boolean>();
-
   const onOutsideClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    if (isClickInitiatedInside.current) {
-      onClose(event);
-    }
+    onClose(event);
   };
 
   const onClickInside = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-    isClickInitiatedInside.current = true;
   };
 
   return (
