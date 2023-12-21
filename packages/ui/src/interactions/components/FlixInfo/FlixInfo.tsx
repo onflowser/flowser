@@ -80,11 +80,7 @@ function AuditInfo(props: {templateId: string}) {
     network: "mainnet"
   });
 
-  if (!data) {
-    return <Shimmer height={50} />;
-  }
-
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     // FLIX templates are treated as being more trustworthy/verified,
     // even if no official audits were performed.
     // For now just ignore the case where no audits exist.
