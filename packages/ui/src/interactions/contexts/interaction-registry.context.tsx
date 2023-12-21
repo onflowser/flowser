@@ -40,7 +40,7 @@ export function InteractionRegistryProvider(props: {
 }): ReactElement {
   const defaultInteraction: InteractionDefinition = {
     id: crypto.randomUUID(),
-    name: "Your first interaction",
+    name: "New interaction",
     code: "",
     fclValuesByIdentifier: new Map(),
     initialOutcome: undefined,
