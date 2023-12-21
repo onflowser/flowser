@@ -243,9 +243,10 @@ function NoLogsHelpBanner() {
       description={
         <div>
           <p>
-            Flowser can only show logs, when emulator is run by Flowser itself.
-            Make sure you aren't running the <code>flow emulator</code> command
-            yourself.
+            Flowser isn't running any Flow development services (emulator or wallet).
+          </p>
+          <p>
+            You are probably running these services yourself with Flow CLI.
           </p>
         </div>
       }
