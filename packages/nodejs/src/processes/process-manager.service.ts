@@ -50,7 +50,7 @@ export class ProcessManagerService extends EventEmitter {
   findAllLogsByProcess(processId: string): ManagedProcessOutput[] {
     const process = this.processLookupById.get(processId);
     if (!process) {
-      throw new Error("Process not found");
+      throw new Error(`Process not found: ${processId}`);
     }
     return process.output;
   }

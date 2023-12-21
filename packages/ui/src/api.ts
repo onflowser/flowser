@@ -13,7 +13,7 @@ import {
   WorkspaceTemplate,
   ManagedProcessOutput,
   ParsedInteractionOrError,
-  ManagedKeyPair,
+  ManagedKeyPair, ManagedProcess
 } from "@onflowser/api";
 import { useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from "./interactions/core/core-types";
@@ -166,8 +166,6 @@ export function useGetEventsByContract(
 ): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
-  eventsIndex.findAll().then(console.log);
-
   return useSWR(`${contract.id}/events`, () =>
     eventsIndex
       .findAll()
@@ -181,13 +179,22 @@ export function useGetEventsByContract(
   );
 }
 
+export function useGetProcesses(
+): SWRResponse<ManagedProcess[]> {
+  const { processManagerService } = useServiceRegistry();
+
+  return useSWR(`processes`, () =>
+    processManagerService.listProcesses(),
+  );
+}
+
 export function useGetOutputsByProcess(
   id: string,
 ): SWRResponse<ManagedProcessOutput[]> {
   const { processManagerService } = useServiceRegistry();
 
   return useSWR(`${id}/outputs`, () =>
-    processManagerService.findAllLogsByProcessId(id),
+    processManagerService.listLogsByProcessId(id),
   );
 }
 

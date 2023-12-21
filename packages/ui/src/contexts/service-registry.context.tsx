@@ -16,6 +16,7 @@ import {
   ManagedProcessOutput,
   ParsedInteractionOrError,
   ManagedKeyPair,
+  ManagedProcess
 } from "@onflowser/api";
 
 export interface ISnapshotService {
@@ -98,7 +99,8 @@ interface IMonitoringService {
 }
 
 export interface IProcessManagerService {
-  findAllLogsByProcessId(processId: string): Promise<ManagedProcessOutput[]>;
+  listProcesses(): Promise<ManagedProcess[]>
+  listLogsByProcessId(processId: string): Promise<ManagedProcessOutput[]>;
 }
 
 type ServiceRegistry = {

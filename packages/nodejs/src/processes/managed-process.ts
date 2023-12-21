@@ -6,6 +6,7 @@ import {
 import { randomUUID } from "crypto";
 import { EventEmitter } from "node:events";
 import { IFlowserLogger } from "@onflowser/core";
+import { ManagedProcessState } from "@onflowser/api";
 
 export type ManagedProcessOptions = {
   id?: string;
@@ -20,12 +21,6 @@ export type ManagedProcessOptions = {
 export enum ProcessOutputSource {
   OUTPUT_SOURCE_STDOUT = 1,
   OUTPUT_SOURCE_STDERR = 2,
-}
-
-export enum ManagedProcessState {
-  MANAGED_PROCESS_STATE_NOT_RUNNING = "not_running",
-  MANAGED_PROCESS_STATE_RUNNING = "running",
-  MANAGED_PROCESS_STATE_ERROR = "error",
 }
 
 export interface ManagedProcessOutput {
@@ -61,7 +56,7 @@ export class ManagedProcess extends EventEmitter {
     this.name = options.name;
     this.options = options;
     this.output = [];
-    this.state = ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING;
+    this.state = ManagedProcessState.NOT_RUNNING;
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -140,7 +135,7 @@ export class ManagedProcess extends EventEmitter {
     }
     this.childProcess.once("spawn", () => {
       console.debug(`Process ${this.id} started`);
-      this.setState(ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING);
+      this.setState(ManagedProcessState.RUNNING);
     });
     this.childProcess.once("exit", (code, signal) => {
       console.debug(
@@ -148,8 +143,8 @@ export class ManagedProcess extends EventEmitter {
       );
       this.setState(
         code !== null && code > 0
-          ? ManagedProcessState.MANAGED_PROCESS_STATE_ERROR
-          : ManagedProcessState.MANAGED_PROCESS_STATE_NOT_RUNNING,
+          ? ManagedProcessState.ERROR
+          : ManagedProcessState.NOT_RUNNING,
       );
       this.detachEventListeners();
     });
@@ -198,6 +193,6 @@ export class ManagedProcess extends EventEmitter {
   }
 
   public isRunning() {
-    return this.state === ManagedProcessState.MANAGED_PROCESS_STATE_RUNNING;
+    return this.state === ManagedProcessState.RUNNING;
   }
 }
