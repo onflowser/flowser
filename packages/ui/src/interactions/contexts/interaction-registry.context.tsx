@@ -46,8 +46,8 @@ export function InteractionRegistryProvider(props: {
     initialOutcome: undefined,
     transactionOptions: {
       authorizerAddresses: [],
-      proposerAddress: "0xf8d6e0586b0a20c7",
-      payerAddress: "0xf8d6e0586b0a20c7",
+      proposerAddress: "",
+      payerAddress: "",
     },
     createdDate: new Date(),
     updatedDate: new Date(),
