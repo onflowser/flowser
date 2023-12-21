@@ -1,26 +1,33 @@
-import { FlixAuditor, FLOW_FLIX_URL, useFlixSearch, useFlixTemplateAuditors } from "../../../hooks/flix";
+import {
+  FLIX_TEMPLATE_NOT_FOUND,
+  FlixAuditor,
+  FLOW_FLIX_URL,
+  useFlixSearch,
+  useFlixTemplateAuditors
+} from "../../../hooks/flix";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import classes from "./FlixInfo.module.scss";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
 import React, { Fragment } from "react";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { LineSeparator } from "../../../common/misc/LineSeparator/LineSeparator";
+import { InteractionDefinition } from "../../core/core-types";
 
 type FlixInfoProps = {
-  sourceCode: string;
+  interaction: InteractionDefinition
 }
 
 export function FlixInfo(props: FlixInfoProps) {
-  const { data, isLoading } = useFlixSearch({
-    sourceCode: props.sourceCode,
+  const { data } = useFlixSearch({
+    interaction: props.interaction,
     network: "any"
   });
 
-  if (isLoading) {
+  if (data === undefined) {
     return <Shimmer height={150} />;
   }
 
-  const isVerified = data !== undefined;
+  const isVerified = data !== FLIX_TEMPLATE_NOT_FOUND;
 
   return (
     <div className={classes.root}>

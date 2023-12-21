@@ -13,12 +13,35 @@
   position: relative;
 
   .header {
+    display: flex;
+    flex-direction: column;
+    row-gap: $spacing-base;
     background: $gray-100;
     position: sticky;
     top: 0;
     padding-bottom: $spacing-base;
     // Question mark icon is displayed above the header for some reason.
     z-index: 1;
+
+    .badgeFilters {
+      display: flex;
+      flex-direction: row;
+      column-gap: $spacing-s;
+      .badge {
+        cursor: pointer;
+        display: flex;
+        height: 20px;
+        align-items: center;
+        border-color: $gray-30;
+        color: $gray-30;
+        text-transform: capitalize;
+      }
+      .selectedBadge {
+        border-color: $gray-50;
+        background: $gray-50;
+        color: white;
+      }
+    }
   }
 
   .storedTemplates {

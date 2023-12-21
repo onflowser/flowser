@@ -1,32 +1,10 @@
 @import "../../../../styles/colors";
 @import "../../../../styles/rules";
+@import "../../../../styles/spacings";
 
-.root {
-  z-index: 1001;
-  display: flex;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
-  background: transparentize($gray-110, 0.5);
-  backdrop-filter: blur(2px);
-
-  .dialog {
-    width: 600px;
-    max-width: 90vw;
-    min-height: 100px;
-    background: $gray-110;
-    border-radius: $border-radius-md;
-    border: 1px solid $gray-50;
-    color: $white;
-
-    .card {
-      max-height: 90vh;
-      overflow-y: scroll;
-    }
-  }
+.closeButton {
+  cursor: pointer;
+  position: absolute;
+  top: $spacing-base;
+  right: $spacing-base;
 }
