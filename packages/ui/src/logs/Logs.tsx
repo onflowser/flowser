@@ -158,7 +158,7 @@ export function Logs(props: LogsProps): ReactElement {
         )}
 
         <div className={classes.rightContainer}>
-          <ConfigurationHelp />
+          <ConfigureYourAppHelp />
           {logDrawerSize !== "tiny" && (
             <SearchInput
               className={classes.searchBox}
@@ -318,14 +318,14 @@ const VerticalDragLine = ({
   );
 };
 
-function ConfigurationHelp() {
+function ConfigureYourAppHelp() {
   const [showHelp, setShowHelp] = useState(false);
   // TODO(web-app): Read from a global configuration provider instead of parsing process flags
   const {data: processes} = useGetProcesses();
   const devWalletProcess = processes?.find(e => e.id === devWalletProcessId);
   const emulatorProcess = processes?.find(e => e.id === emulatorProcessId);
-  const walletPort = Number(devWalletProcess?.command?.args?.find(arg => arg.startsWith("--port"))?.split("=")?.[1] ?? 8701);
-  const restApiPort = Number(emulatorProcess?.command?.args?.find(arg => arg.startsWith("--rest-port"))?.split("=")?.[1] ?? 8888);
+  const walletPort = Number(devWalletProcess?.command?.args?.find(arg => arg.startsWith("--port"))?.split("=")?.[1] || 8701);
+  const restApiPort = Number(emulatorProcess?.command?.args?.find(arg => arg.startsWith("--rest-port"))?.split("=")?.[1] || 8888);
 
   const configJsCode = `import * as fcl from "@onflow/fcl"
 
@@ -333,7 +333,7 @@ fcl
   .config()
   // Point App at Emulator REST API
   .put("accessNode.api", "http://localhost:${restApiPort}")
-  // Point FCL at dev-wallet
+  // Point FCL at Flow development wallet
   .put("discovery.wallet", "http://localhost:${walletPort}/fcl/authn")`;
 
   return (
@@ -348,13 +348,13 @@ fcl
           <SizedBox height={10} />
           <CadenceEditor value={configJsCode} />
           <SizedBox height={10} />
-          <ExternalLink href="https://developers.flow.com/tools/flow-dev-wallet#configuring-your-javascript-application">
+          <ExternalLink href="https://developers.flow.com/tools/clients/fcl-js/api#common-configuration-keys">
             Learn more in the official docs
           </ExternalLink>
         </BaseDialog>
       )}
-      <div className={classes.devWalletStatus} onClick={() => setShowHelp(true)}>
-        Configure your app
+      <div className={classes.configureAppLabel} onClick={() => setShowHelp(true)}>
+        🚀 Configure your app
       </div>
     </Fragment>
   )
