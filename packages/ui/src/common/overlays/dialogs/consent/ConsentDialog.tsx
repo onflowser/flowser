@@ -21,7 +21,7 @@ export function ConsentDialog({
   const [tempConsent, setTempConsent] = useState<boolean>(consent);
 
   return (
-    <BaseDialog onClose={onClose} className={classes.modal}>
+    <BaseDialog onClose={onClose}>
       <div className={classes.root}>
         <div className={classes.header}>
           <FlowserIcon.Logo />

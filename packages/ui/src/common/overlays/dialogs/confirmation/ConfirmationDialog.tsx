@@ -7,7 +7,6 @@ export type ConfirmDialogProps = {
   onConfirm: () => void | Promise<void>;
   confirmButtonLabel?: string;
   cancelButtonLabel?: string;
-  className?: string;
   title: string;
   children: ReactElement[] | ReactElement;
 };
@@ -19,7 +18,6 @@ export const ConfirmationDialog: FunctionComponent<ConfirmDialogProps> = ({
   confirmButtonLabel = "OK",
   cancelButtonLabel = "CANCEL",
   children,
-  className = "",
 }) => {
   const [isLoading, setLoading] = useState(false);
 
@@ -36,7 +34,6 @@ export const ConfirmationDialog: FunctionComponent<ConfirmDialogProps> = ({
   return (
     <ActionDialog
       title={title}
-      className={className}
       onClose={onCancel}
       footer={
         <>

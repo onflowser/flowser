@@ -8,7 +8,7 @@
   flex-direction: column;
   align-items: center;
   color: $gray-10;
-  padding: $spacing-l * 3 $spacing-l * 6;
+  padding: $spacing-l * 2 $spacing-l * 2;
   @include fadeInAnimation(0.5s);
 
   h3 {

@@ -38,7 +38,7 @@ export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
         </>
       }
     >
-      <p style={{ textAlign: "center" }}>
+      <p style={{ textAlign: "center", maxWidth: "400px" }}>
         When saving your interaction as a snippet, it will appear under "Templates" tab on the left.
       </p>
       <SizedBox height={20} />

@@ -2,25 +2,6 @@
 @import "../../../../styles/rules";
 @import "../../../../styles/spacings";
 
-.content {
-  position: absolute;
-  inset: $spacing-xl;
-  overflow: auto;
-  outline: none;
-  background: $gray-110;
-  color: $white;
-  padding: $spacing-l * 2;
-  border-radius: $border-radius-md;
-  border: 1px solid $gray-50;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: transparentize($gray-110, 0.5);
-  backdrop-filter: blur(2px);
-}
-
 .closeButton {
   cursor: pointer;
   position: absolute;
