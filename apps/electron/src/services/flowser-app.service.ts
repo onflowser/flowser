@@ -294,6 +294,7 @@ export class FlowserAppService {
     const devWalletConfig: FlowDevWalletConfig = {
       workspacePath: workspace.filesystemPath,
       restAccessApiUrl,
+      port: 8701,
     };
 
     this.flowGatewayService.configure({

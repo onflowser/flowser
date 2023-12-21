@@ -6,7 +6,7 @@ import { HttpService } from "@onflowser/core/src/http.service";
 export type FlowDevWalletConfig = {
   restAccessApiUrl: string;
   workspacePath: string;
-  port?: number;
+  port: number;
 }
 
 export class FlowDevWalletService {
@@ -42,6 +42,6 @@ export class FlowDevWalletService {
   }
 
   async isReachable(config: FlowDevWalletConfig): Promise<boolean> {
-    return this.httpService.isReachable(`http://localhost:${config.port}/api/`);
+    return this.httpService.isReachable(`http://localhost:${config.port}`);
   }
 }
