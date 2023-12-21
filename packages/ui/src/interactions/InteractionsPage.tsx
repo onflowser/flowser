@@ -78,8 +78,9 @@ export function InteractionsPage(): ReactElement {
         onClose={(tab) => {
           const interaction = definitions.find(e => e.id === tab.id)!;
           const exactTemplateMatch = templates.find(template => template.code === interaction.code);
-          if (exactTemplateMatch && interaction.code !== "") {
-            remove(interaction.id)
+          const isAlreadySavedOrEmpty = exactTemplateMatch || interaction.code === "";
+          if (isAlreadySavedOrEmpty) {
+            remove(interaction.id);
           } else {
             setInteractionToSaveBeforeClose(interaction);
           }
