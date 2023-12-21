@@ -166,8 +166,6 @@ export function useGetEventsByContract(
 ): SWRResponse<FlowEvent[]> {
   const { eventsIndex } = useServiceRegistry();
 
-  eventsIndex.findAll().then(console.log);
-
   return useSWR(`${contract.id}/events`, () =>
     eventsIndex
       .findAll()

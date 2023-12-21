@@ -119,8 +119,14 @@ export function registerHandlers(appService: FlowserAppService) {
     SNAPSHOTS_ROLLBACK_TO_HEIGHT: (event: IpcMainInvokeEvent, height: number) =>
       flowSnapshotsService.rollbackToHeight(height),
 
-    PROCESS_LOGS_LIST: (event: IpcMainInvokeEvent, processId: string) =>
-      processManagerService.findAllLogsByProcess(processId),
+    PROCESS_LOGS_LIST: (event: IpcMainInvokeEvent, processId: string) => {
+      try {
+        return processManagerService.findAllLogsByProcess(processId);
+      } catch (error) {
+        // Return no logs, if process not found
+        return [];
+      }
+    },
     PROCESS_LIST: () =>
       processManagerService.getAll().map(
         (process): ManagedProcess => ({

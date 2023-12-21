@@ -41,7 +41,12 @@ export class FlowDevWalletService {
     await this.processManagerService.start(devWalletProcess);
   }
 
+  async stop() {
+    await this.processManagerService.remove(FlowDevWalletService.processId);
+  }
+
   async isReachable(config: FlowDevWalletConfig): Promise<boolean> {
     return this.httpService.isReachable(`http://localhost:${config.port}`);
   }
+
 }

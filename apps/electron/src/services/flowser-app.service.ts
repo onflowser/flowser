@@ -263,7 +263,7 @@ export class FlowserAppService {
   private async onWorkspaceUpdate(workspaceId: string) {
     const workspace = await this.workspaceService.findByIdOrThrow(workspaceId);
 
-    await this.flowEmulatorService.stopAndCleanup();
+    await this.flowEmulatorService.stop();
 
     await this.startAndReindexEmulator(workspace);
   }
@@ -330,7 +330,10 @@ export class FlowserAppService {
   }
 
   private async onWorkspaceClose() {
-    await this.flowEmulatorService.stopAndCleanup();
+    await Promise.all([
+      this.flowEmulatorService.stop(),
+      this.flowDevWalletService.stop(),
+    ]);
     this.blockchainIndexService.clear();
     this.processingScheduler.stop();
   }
