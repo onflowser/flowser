@@ -61,7 +61,7 @@ export function InteractionDefinitionManagerProvider(props: {
     <Context.Provider
       value={{
         definition,
-        flixTemplate,
+        flixTemplate: flixTemplate ?? undefined,
         parsedInteraction: data?.interaction,
         partialUpdate,
         setFclValue,
