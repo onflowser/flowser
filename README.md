@@ -5,7 +5,7 @@
 </div>
 
 
-Flowser is a user-friendly GUI development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing blockchain emulator, indexing the blockchain, executing interactions and much more!
+Flowser is a user-friendly GUI development tool for [Flow blockchain](https://www.onflow.org/). It does the heavy work of managing Flow development services, indexing the blockchain, executing interactions and much more!
 
 ## Get started
 
