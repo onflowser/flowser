@@ -1,4 +1,6 @@
 import useSWR, { SWRResponse } from "swr";
+import { InteractionDefinition } from "../interactions/core/core-types";
+import { useEffect } from "react";
 
 // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
 export type FlixTemplate = {
@@ -12,6 +14,16 @@ export type FlixTemplate = {
     arguments: Record<string, FlixArgument>;
   };
 };
+
+export type FlixAuditor = {
+  f_type: "FlowInteractionTemplateAuditor";
+  f_version: string;
+  address: string;
+  name: string;
+  twitter_url: string;
+  website_url: string;
+}
+
 
 export type FlixArgument = {
   index: number;
@@ -46,7 +58,7 @@ type FlixI18nMessage = {
 };
 
 export const FLOW_FLIX_URL = "https://flix.flow.com";
-export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com"
+export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com";
 
 export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   return useSWR(`flix/templates`, () =>
@@ -54,23 +66,51 @@ export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   );
 }
 
+// We are forced to use `null` as value for "not found",
+// as `undefined` is already used by SWR to represent "no data".
+export const FLIX_TEMPLATE_NOT_FOUND = null;
+
 export function useFlixSearch(options: {
-  sourceCode: string;
+  interaction: InteractionDefinition;
   // Supports "any" network as of:
   // https://github.com/onflowser/flow-interaction-template-service/pull/4
   network: "any" | "testnet" | "mainnet";
-}): SWRResponse<FlixTemplate | undefined> {
-  return useSWR(`flix/templates/${options.sourceCode}`, () =>
+}): SWRResponse<FlixTemplate | null> {
+
+  // We are not using `sourceCode` as the cache key,
+  // to avoid the flickering UI effect that's caused
+  // by undefined parsed interaction every time the source code changes.
+  const state = useSWR(`flix/templates/${options.interaction.id}`, () =>
     fetch(`${FLOWSER_FLIX_URL}/v1/templates/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        cadence_base64: btoa(options.sourceCode),
+        cadence_base64: btoa(options.interaction.code),
         network: options.network
       })
-    }).then((res) => res.json()),
+    }).then((res) => res.status === 200 ? res.json() : null),
+    {
+      refreshInterval: 0,
+      shouldRetryOnError: false,
+    }
+  );
+
+  useEffect(() => {
+    state.mutate();
+  }, [options.interaction.code]);
+
+  return state;
+}
+
+export function useFlixTemplateAuditors(options: {
+  templateId: string;
+  network: "testnet" | "mainnet";
+}): SWRResponse<FlixAuditor[]> {
+  return useSWR(`flix/${options.network}/templates/${options.templateId}/auditors`, () =>
+      fetch(`${FLOWSER_FLIX_URL}/v1/templates/${options.templateId}/auditors?network=${options.network}`)
+        .then((res) => res.json()),
     {
       refreshInterval: 0,
       shouldRetryOnError: false

@@ -224,6 +224,7 @@ function SigningSettings() {
       <h2>Signing</h2>
       <SizedBox height={20} />
       <ParamBuilder
+        flixArgument={undefined}
         parameter={{
           identifier: "Proposer",
           type: {
@@ -243,6 +244,7 @@ function SigningSettings() {
       />
       <SizedBox height={12} />
       <ParamBuilder
+        flixArgument={undefined}
         parameter={{
           identifier: "Payer",
           type: {

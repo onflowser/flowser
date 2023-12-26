@@ -264,9 +264,8 @@ export interface ManagedProcess {
   name: string;
   command: CommandOptions | undefined;
   state: ManagedProcessState;
-  output: ManagedProcessOutput[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export enum ManagedProcessState {
@@ -277,7 +276,7 @@ export enum ManagedProcessState {
 
 export interface CommandOptions {
   name: string;
-  args: string[];
+  args?: string[];
 }
 
 export interface ManagedProcessOutput {

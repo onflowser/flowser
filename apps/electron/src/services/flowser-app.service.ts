@@ -13,15 +13,18 @@ import {
   FlowConfigEvent,
   FlowConfigService,
   FlowEmulatorService,
+  FlowDevWalletService,
   FlowInteractionsService,
   GoBindingsService,
   ProcessManagerService,
   WalletService,
+  FlowDevWalletConfig,
 } from '@onflowser/nodejs';
 import path from 'path';
 import crypto from 'crypto';
 import { app, BrowserWindow, dialog } from 'electron';
 import { FlowserWorkspace } from '@onflowser/api';
+import { HttpService } from '@onflowser/core/src/http.service';
 import { WorkspaceEvent, WorkspaceService } from './workspace.service';
 import { BlockchainIndexService } from './blockchain-index.service';
 import { FileStorageService } from './file-storage.service';
@@ -37,6 +40,7 @@ export class FlowserAppService {
   public readonly flowAccountStorageService: FlowAccountStorageService;
   public readonly processManagerService: ProcessManagerService;
   public readonly flowEmulatorService: FlowEmulatorService;
+  private readonly flowDevWalletService: FlowDevWalletService;
   public readonly workspaceService: WorkspaceService;
   public readonly goBindingsService: GoBindingsService;
   public readonly flowInteractionsService: FlowInteractionsService;
@@ -49,12 +53,14 @@ export class FlowserAppService {
   private readonly flowSnapshotsStorageService: FileStorageService;
   private readonly walletStorageService: FileStorageService;
   private processingScheduler: AsyncIntervalScheduler;
+  private httpService: HttpService;
 
   constructor(
     private readonly logger: IFlowserLogger,
     private readonly window: BrowserWindow,
   ) {
-    this.flowGatewayService = new FlowGatewayService();
+    this.httpService = new HttpService(logger);
+    this.flowGatewayService = new FlowGatewayService(this.httpService);
     this.flowAccountStorageService = new FlowAccountStorageService(
       this.flowGatewayService,
     );
@@ -74,11 +80,11 @@ export class FlowserAppService {
     this.flowCliService = new FlowCliService(this.processManagerService);
     this.flowEmulatorService = new FlowEmulatorService(
       this.processManagerService,
-      this.flowGatewayService,
     );
     this.flowSnapshotsStorageService = new FileStorageService();
     this.flowSnapshotsService = new FlowSnapshotsService(
       this.flowSnapshotsStorageService,
+      this.httpService,
     );
     this.workspaceService = new WorkspaceService(
       this.flowEmulatorService,
@@ -99,6 +105,11 @@ export class FlowserAppService {
       this.flowGatewayService,
       this.flowInteractionsService,
       this.blockchainIndexService.indexes,
+    );
+    this.flowDevWalletService = new FlowDevWalletService(
+      this.logger,
+      this.httpService,
+      this.processManagerService,
     );
     this.flowConfigService = new FlowConfigService(this.logger);
     this.walletStorageService = new FileStorageService();
@@ -255,7 +266,7 @@ export class FlowserAppService {
   private async onWorkspaceUpdate(workspaceId: string) {
     const workspace = await this.workspaceService.findByIdOrThrow(workspaceId);
 
-    await this.flowEmulatorService.stopAndCleanup();
+    await this.flowEmulatorService.stop();
 
     await this.startAndReindexEmulator(workspace);
   }
@@ -278,42 +289,54 @@ export class FlowserAppService {
   }
 
   private async startAndReindexEmulator(workspace: FlowserWorkspace) {
-    if (workspace.emulator) {
-      // TODO: Sometimes when we restart the emulator,
-      //  it complains that port 8080 is already taken.
-      await this.flowEmulatorService.start({
-        workspacePath: workspace.filesystemPath,
-        config: workspace.emulator,
-      });
-    }
+    const emulatorConfig =
+      workspace.emulator ?? this.flowEmulatorService.getDefaultConfig();
+
+    const restAccessApiUrl = `http://localhost:${emulatorConfig.restServerPort}`;
+
+    const devWalletConfig: FlowDevWalletConfig = {
+      workspacePath: workspace.filesystemPath,
+      restAccessApiUrl,
+      port: 8701,
+    };
 
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
-      accessNodeRestApiUrl: `http://localhost:${
-        workspace.emulator?.restServerPort ?? 8888
-      }`,
+      restAccessApiUrl,
     });
 
-    this.blockchainIndexService.clear();
-
-    if (workspace.emulator) {
-      this.flowSnapshotsService.configure({
-        adminServerPort: workspace.emulator.adminServerPort,
-      });
-    } else {
-      this.flowSnapshotsService.configure({
-        adminServerPort:
-          this.flowEmulatorService.getDefaultConfig().adminServerPort,
+    const isEmulatorOnline = await this.flowGatewayService.isRestApiReachable();
+    if (!isEmulatorOnline) {
+      await this.flowEmulatorService.start({
+        workspacePath: workspace.filesystemPath,
+        config: emulatorConfig,
       });
     }
 
+    const isDevWalletOnline =
+      await this.flowDevWalletService.isReachable(devWalletConfig);
+    if (!isDevWalletOnline) {
+      await this.flowDevWalletService.start(devWalletConfig);
+    }
+
+    this.flowSnapshotsService.configure({
+      adminServerPort:
+        workspace.emulator?.adminServerPort ??
+        this.flowEmulatorService.getDefaultConfig().adminServerPort,
+    });
+
+    this.blockchainIndexService.clear();
     this.processingScheduler.start();
+
     await this.walletService.synchronizeIndex();
     await this.flowSnapshotsService.synchronizeIndex();
   }
 
   private async onWorkspaceClose() {
-    await this.flowEmulatorService.stopAndCleanup();
+    await Promise.all([
+      this.flowEmulatorService.stop(),
+      this.flowDevWalletService.stop(),
+    ]);
     this.blockchainIndexService.clear();
     this.processingScheduler.stop();
   }

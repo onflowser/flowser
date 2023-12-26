@@ -50,7 +50,6 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
 
   return (
     <ActionDialog
-      className={classes.root}
       title="Create emulator snapshot"
       onClose={onClose}
       footer={

@@ -16,6 +16,7 @@ import {
   ManagedProcessOutput,
   ParsedInteractionOrError,
   ManagedKeyPair,
+  ManagedProcess
 } from "@onflowser/api";
 import { ChainID } from "./chain-id.context";
 import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
@@ -103,7 +104,8 @@ interface IMonitoringService {
 }
 
 export interface IProcessManagerService {
-  findAllLogsByProcessId(processId: string): Promise<ManagedProcessOutput[]>;
+  listProcesses(): Promise<ManagedProcess[]>
+  listLogsByProcessId(processId: string): Promise<ManagedProcessOutput[]>;
 }
 
 type ServiceRegistry = {

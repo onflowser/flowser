@@ -14,10 +14,15 @@ import { CadenceEditor } from "../common/code/CadenceEditor/CadenceEditor";
 import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDisplay/InteractionOutcomeDisplay";
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
+import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
+import { useTemplatesRegistry } from "./contexts/templates.context";
+import { InteractionDefinition } from "./core/core-types";
 
 export function InteractionsPage(): ReactElement {
-  const { definitions, focusedDefinition, remove, setFocused, create } =
+  const { definitions, focusedDefinition, setFocused, create, remove } =
     useInteractionRegistry();
+  const {templates} = useTemplatesRegistry();
+  const [interactionToSaveBeforeClose, setInteractionToSaveBeforeClose] = useState<InteractionDefinition>();
 
   const sideMenuTabs: BaseTabItem[] = [
     {
@@ -49,6 +54,12 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
+      {interactionToSaveBeforeClose !== undefined && (
+        <SaveSnippetDialog
+          interaction={interactionToSaveBeforeClose}
+          onClose={() => setInteractionToSaveBeforeClose(undefined)}
+        />
+      )}
       <BaseTabs
         className={classes.leftSideMenu}
         contentClassName={classes.content}
@@ -64,7 +75,16 @@ export function InteractionsPage(): ReactElement {
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
-        onClose={(tab) => remove(tab.id)}
+        onClose={(tab) => {
+          const interaction = definitions.find(e => e.id === tab.id)!;
+          const exactTemplateMatch = templates.find(template => template.code === interaction.code);
+          const isAlreadySavedOrEmpty = exactTemplateMatch || interaction.code === "";
+          if (isAlreadySavedOrEmpty) {
+            remove(interaction.id);
+          } else {
+            setInteractionToSaveBeforeClose(interaction);
+          }
+        }}
         onAddNew={() => {
           const createdInteraction = create({
             name: "New interaction",

@@ -15,8 +15,10 @@ type InteractionTemplatesRegistry = {
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
+export type InteractionSourceType = "workspace" | "flix" | "session";
+
 export type InteractionDefinitionTemplate = InteractionDefinition & {
-  source: "workspace" | "flix" | "session";
+  source: InteractionSourceType;
 
   flix: FlixTemplate | undefined;
   workspace: WorkspaceTemplate | undefined;

@@ -39,7 +39,7 @@ export function InteractionDefinitionManagerProvider(props: {
   const { data, isLoading } = useGetParsedInteraction(definition);
   const fclValuesByIdentifier = definition.fclValuesByIdentifier;
   const { data: flixTemplate } = useFlixSearch({
-    sourceCode: definition.code,
+    interaction: definition,
     network: "any"
   })
 
@@ -61,7 +61,7 @@ export function InteractionDefinitionManagerProvider(props: {
     <Context.Provider
       value={{
         definition,
-        flixTemplate,
+        flixTemplate: flixTemplate ?? undefined,
         parsedInteraction: data?.interaction,
         partialUpdate,
         setFclValue,

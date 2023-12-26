@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { FlowserWorkspace } from '@onflowser/api';
+import { FlowserWorkspace, ManagedProcess } from '@onflowser/api';
 import {
   ExecuteScriptRequest,
   IFlowCliService,
@@ -83,8 +83,9 @@ const flowConfigService: IFlowConfigService = {
 };
 
 const processManagerService: IProcessManagerService = {
-  findAllLogsByProcessId: (processId: string) =>
+  listLogsByProcessId: (processId: string) =>
     ipcRenderer.invoke(FlowserIpcEvent.PROCESS_LOGS_LIST, processId),
+  listProcesses: () => ipcRenderer.invoke(FlowserIpcEvent.PROCESS_LIST),
 };
 
 export const electronInvokers = {

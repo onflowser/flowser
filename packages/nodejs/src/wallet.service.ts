@@ -136,16 +136,16 @@ export class WalletService {
 
   public async synchronizeIndex() {
     const managedKeyPairs = await this.listKeyPairs();
-    const associatedAccounts = await Promise.allSettled(
+    const associatedAccountResults = await Promise.allSettled(
       managedKeyPairs.map((keyPair) =>
         this.flowGateway.getAccount(keyPair.address),
       ),
     );
     const validKeyPairLookupByPublicKey = new Set(
-      associatedAccounts
-        .map((account) => {
-          if (account.status === "fulfilled") {
-            return account.value.keys.map((key) => key.publicKey);
+      associatedAccountResults
+        .map((result) => {
+          if (result.status === "fulfilled") {
+            return result.value.keys.map((key) => key.publicKey);
           } else {
             return [];
           }

@@ -1,18 +1,13 @@
 import {
   ManagedProcess,
-  ManagedProcessOutput,
 } from "./processes/managed-process";
 import {
-  FlowApiStatus,
-  FlowGatewayService,
   isDefined,
-  waitForMs,
 } from "@onflowser/core";
 import { EventEmitter } from "node:events";
 import {
   FlowEmulatorConfig,
   HashAlgorithm,
-  ProcessOutputSource,
   SignatureAlgorithm,
 } from "@onflowser/api";
 import { ProcessManagerService } from "./processes/process-manager.service";
@@ -25,23 +20,16 @@ type StartEmulatorRequest = {
 export class FlowEmulatorService extends EventEmitter {
   public static readonly processId = "emulator";
   private process: ManagedProcess | undefined;
-  private activeConfig: FlowEmulatorConfig | undefined;
 
-  constructor(
-    private processManagerService: ProcessManagerService,
-    private flowGatewayService: FlowGatewayService,
-  ) {
+  constructor(private processManagerService: ProcessManagerService) {
     super();
   }
 
-  async stopAndCleanup() {
+  async stop() {
     await this.processManagerService.remove(FlowEmulatorService.processId);
-    this.processManagerService.get(FlowEmulatorService.processId)?.clearLogs();
   }
 
   async start(request: StartEmulatorRequest) {
-    this.activeConfig = request.config;
-
     this.process = this.processManagerService.initManagedProcess({
       id: FlowEmulatorService.processId,
       name: "Flow emulator",
@@ -54,9 +42,6 @@ export class FlowEmulatorService extends EventEmitter {
       },
     });
     await this.processManagerService.start(this.process);
-
-    // Resolves if APIs started or throws an error otherwise
-    await Promise.race([this.waitUntilApisStarted(), this.throwIfErrored()]);
   }
 
   public getDefaultConfig(): FlowEmulatorConfig {
@@ -87,52 +72,6 @@ export class FlowEmulatorService extends EventEmitter {
       useSimpleAddresses: false,
       logFormat: "text",
     };
-  }
-
-  // Resolves once emulator process emits "Started <API-name>" logs.
-  private async waitUntilApisStarted() {
-    const hasStarted = async () => {
-      if (!this.activeConfig) {
-        throw new Error("No active config found");
-      }
-      const apiStatuses = await Promise.all([
-        this.flowGatewayService.getApiStatus(
-          `http://localhost:${this.activeConfig.restServerPort}`,
-        ),
-        this.flowGatewayService.getApiStatus(
-          `http://localhost:${this.activeConfig.adminServerPort}`,
-        ),
-      ]);
-
-      return apiStatuses.every(
-        (status) => status === FlowApiStatus.SERVICE_STATUS_ONLINE,
-      );
-    };
-    while (!(await hasStarted())) {
-      await waitForMs(100);
-    }
-  }
-
-  private async throwIfErrored() {
-    const getErrorOutput = () => {
-      if (!this.process) {
-        throw new Error("Process not found");
-      }
-      return this.process.output.find(
-        (output) =>
-          output.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR &&
-          output.data !== "",
-      );
-    };
-    let retries = 5;
-    while (retries >= 0) {
-      const error = getErrorOutput();
-      if (error) {
-        throw new Error("Emulator failed to start: " + error.data);
-      }
-      await waitForMs(100);
-      retries--;
-    }
   }
 
   private getProcessFlags(config: FlowEmulatorConfig): string[] {
