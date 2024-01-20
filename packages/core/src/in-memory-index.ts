@@ -8,7 +8,7 @@ import {
 export class InMemoryIndex<Resource extends IndexableResource>
   implements IResourceIndex<Resource>
 {
-  private readonly lookup: Map<string, Resource>;
+  protected lookup: Map<string, Resource>;
 
   constructor() {
     this.lookup = new Map();

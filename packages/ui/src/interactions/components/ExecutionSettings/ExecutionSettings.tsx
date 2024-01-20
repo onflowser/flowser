@@ -10,6 +10,7 @@ import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
 import { CadenceType, CadenceTypeKind, InteractionKind } from "@onflowser/api";
 import { TransactionOptions } from "../../core/core-types";
 import { FclValue, FclValueUtils } from "@onflowser/core";
+import { useServiceRegistry } from "../../../contexts/service-registry.context";
 
 export function ExecutionSettings(): ReactElement {
   return (
@@ -46,6 +47,10 @@ function ExecuteButton() {
 function TopContent() {
   const { flixTemplate, setFclValue, fclValuesByIdentifier, definition, parsedInteraction } =
     useInteractionDefinitionManager();
+  const {walletService} = useServiceRegistry();
+
+  // Signing settings are not needed when using standard flow wallet API.
+  const showSigningSettings = parsedInteraction?.kind === InteractionKind.INTERACTION_TRANSACTION && walletService;
 
   if (definition.code === "") {
     return <EmptyInteractionHelp />;
@@ -73,7 +78,7 @@ function TopContent() {
         flixTemplate={flixTemplate}
       />
       <SizedBox height={30} />
-      {parsedInteraction?.kind === InteractionKind.INTERACTION_TRANSACTION && (
+      {showSigningSettings && (
         <SigningSettings />
       )}
     </>

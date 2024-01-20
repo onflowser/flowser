@@ -15,11 +15,12 @@ import {
   ParsedInteractionOrError,
   ManagedKeyPair, ManagedProcess
 } from "@onflowser/api";
-import { useServiceRegistry } from "./contexts/service-registry.context";
+import { useRequiredService, useServiceRegistry } from "./contexts/service-registry.context";
 import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
 import { ensureNonPrefixedAddress } from "@onflowser/core";
+import { useChainId } from "./contexts/chain-id.context";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -46,7 +47,7 @@ export function useGetKeysByAccount(
 
 export function useGetManagedKeys(): SWRResponse<ManagedKeyPair[]> {
   const { walletService } = useServiceRegistry();
-  return useSWR(`managed-keys`, () => walletService.listKeyPairs());
+  return useSWR(`managed-keys`, () => walletService ? walletService.listKeyPairs() : []);
 }
 
 export function useGetStoragesByAccount(
@@ -191,7 +192,7 @@ export function useGetProcesses(
 export function useGetOutputsByProcess(
   id: string,
 ): SWRResponse<ManagedProcessOutput[]> {
-  const { processManagerService } = useServiceRegistry();
+  const processManagerService = useRequiredService("processManagerService");
 
   return useSWR(`${id}/outputs`, () =>
     processManagerService.listLogsByProcessId(id),
@@ -205,13 +206,13 @@ export function useGetEvent(id: string): SWRResponse<FlowEvent | undefined> {
 }
 
 export function useGetStateSnapshots(): SWRResponse<FlowStateSnapshot[]> {
-  const { snapshotService } = useServiceRegistry();
+  const snapshotService = useRequiredService("snapshotService");
 
   return useSWR(`snapshots`, () => snapshotService.list());
 }
 
 export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
-  const { workspaceService } = useServiceRegistry();
+  const workspaceService = useRequiredService("workspaceService");
 
   return useSWR("workspaces", () => workspaceService.list());
 }
@@ -219,41 +220,52 @@ export function useGetWorkspaces(): SWRResponse<FlowserWorkspace[]> {
 export function useGetWorkspace(
   id: string,
 ): SWRResponse<FlowserWorkspace | undefined> {
-  const { workspaceService } = useServiceRegistry();
+  const workspaceService = useRequiredService("workspaceService");
 
   return useSWR(`projects/${id}`, () => workspaceService.findById(id));
 }
 
 export function useGetFlowCliInfo(): SWRResponse<FlowCliInfo> {
-  const { flowService } = useServiceRegistry();
+  const flowCliService = useRequiredService("flowCliService");
 
-  return useSWR(`flow-cli`, () => flowService.getFlowCliInfo());
+  return useSWR(`flow-cli`, () => flowCliService.getFlowCliInfo());
 }
 
 export function useGetAddressIndex(address: string): SWRResponse<number> {
   const { flowService } = useServiceRegistry();
-  return useSWR(`account-index/${address}`, () =>
-    flowService.getIndexOfAddress(address),
+  const chainID = useChainId();
+  return useSWR(`${chainID}/account-index/${address}`, () =>
+    flowService.getIndexOfAddress(chainID, address),
   );
 }
 
 export function useGetParsedInteraction(
   request: InteractionDefinition,
-): SWRResponse<ParsedInteractionOrError> {
+): { data: ParsedInteractionOrError | undefined, isLoading: boolean } {
   const { interactionsService } = useServiceRegistry();
 
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
-  const state = useSWR(`parsed-interaction/${request.id}`, () =>
-    interactionsService.parse(request.code),
+  const state = useSWR(`parsed-interaction/${request.id}`, async () =>
+      ({
+        source: request.code,
+        response: await interactionsService.parse(request.code)
+      }),
+    {
+      refreshInterval: 0,
+      revalidateOnMount: false
+    }
   );
 
   useEffect(() => {
-    state.mutate();
+    // Avoid revalidating up-to-date cache on mount.
+    if (state.data?.source !== request.code) {
+      state.mutate();
+    }
   }, [request.code]);
 
-  return state;
+  return {...state, data: state.data?.response };
 }
 
 export function useGetWorkspaceInteractionTemplates(): SWRResponse<
@@ -267,14 +279,16 @@ export function useGetWorkspaceInteractionTemplates(): SWRResponse<
 }
 
 export function useGetFlowConfigContracts() {
-  const { flowConfigService } = useServiceRegistry();
+  const flowConfigService = useRequiredService("flowConfigService");
+
   return useSWR("flow-config/contracts", () =>
     flowConfigService.getContracts(),
   );
 }
 
 export function useGetFlowConfigAccounts() {
-  const { flowConfigService } = useServiceRegistry();
+  const flowConfigService = useRequiredService("flowConfigService");
+
   return useSWR("flow-config/accounts", () => flowConfigService.getAccounts());
 }
 

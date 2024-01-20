@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { ReactElement } from "react";
-import ReactJson from "react-json-view";
 import classes from "./JsonView.module.scss";
+import ReactJson from "@microlink/react-json-view"
 
 type JsonViewProps = {
   className?: string;
@@ -13,7 +13,6 @@ type JsonViewProps = {
 export function JsonView(props: JsonViewProps): ReactElement {
   return (
     <div className={classNames(classes.root, props.className)}>
-      {/* @ts-ignore */}
       <ReactJson
         name={props.name}
         style={{ backgroundColor: "none" }}

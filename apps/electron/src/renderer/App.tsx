@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { ExitLoader } from './components/loaders/ExitLoader';
 import { ConfirmDialogProvider } from '@onflowser/ui/src/contexts/confirm-dialog.context';
-import { FilePickerProvider } from '@onflowser/ui/src/contexts/platform-adapter.context';
-import { useAnalytics } from '@onflowser/ui/src/hooks/use-analytics';
-import { ConsentDialog } from '@onflowser/ui/src/common/overlays/dialogs/consent/ConsentDialog';
+import { FilePickerProvider } from '@onflowser/ui/src/contexts/file-picker.context';
 import { Toaster } from 'react-hot-toast';
 import './App.scss';
 import { ServiceRegistryProvider } from '@onflowser/ui/src/contexts/service-registry.context';
@@ -17,12 +15,13 @@ import {
   FlowTransaction,
 } from '@onflowser/api';
 import { SWRConfig } from 'swr';
-import { SentryRendererService } from '../services/sentry-renderer.service';
-import { AnalyticsService } from '../services/analytics.service';
-import { UpdateLoader } from './components/loaders/UpdateLoader';
-import { FlowserRouter } from './router';
-import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
+import { ChainIdProvider } from '@onflowser/ui/src/contexts/chain-id.context';
 import { DependencyErrors } from './components/DependencyErrors/DependencyErrors';
+import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
+import { FlowserRouter } from './router';
+import { UpdateLoader } from './components/loaders/UpdateLoader';
+import { AnalyticsService } from '../services/analytics.service';
+import { SentryRendererService } from '../services/sentry-renderer.service';
 
 const indexes = {
   accountStorage: new IpcIndexCache<FlowAccountStorage>('accountStorage'),
@@ -78,62 +77,54 @@ export function App() {
           errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <ServiceRegistryProvider
-          services={{
-            flowConfigService: window.electron.flowConfigService,
-            walletService: window.electron.wallet,
-            flowService: window.electron.flow,
-            interactionsService: window.electron.interactions,
-            accountIndex: indexes.account,
-            accountStorageIndex: indexes.accountStorage,
-            contractIndex: indexes.contract,
-            eventsIndex: indexes.event,
-            blocksIndex: indexes.block,
-            accountKeyIndex: indexes.accountKey,
-            transactionsIndex: indexes.transaction,
-            processManagerService: window.electron.processManagerService,
-            monitoringService,
-            analyticsService,
-            workspaceService: window.electron.workspaces,
-            snapshotService: window.electron.snapshots,
-          }}
-        >
-          <ConfirmDialogProvider>
-            <FilePickerProvider
-              pickDirectory={window.electron.app.showDirectoryPicker}
-            >
-              <ConsentAnalytics />
-              <DependencyErrors />
-              <FlowserRouter />
-              <Toaster
-                position="bottom-center"
-                gutter={8}
-                toastOptions={{
-                  className: '',
-                  style: {
-                    background: '#9BDEFA', // $blue
-                    color: '#363F53', // $table-line-background
-                    padding: '12px', // $spacing-base
-                    maxWidth: '400px',
-                    maxHeight: '200px',
-                    textOverflow: 'ellipsis',
-                  },
-                }}
-              />
-            </FilePickerProvider>
-          </ConfirmDialogProvider>
-        </ServiceRegistryProvider>
+        <ChainIdProvider config={{ chainId: 'flow-emulator' }}>
+          <ServiceRegistryProvider
+            services={{
+              flowConfigService: window.electron.flowConfigService,
+              walletService: window.electron.wallet,
+              flowService: window.electron.flow,
+              flowCliService: window.electron.flowCliService,
+              interactionsService: window.electron.interactions,
+              accountIndex: indexes.account,
+              accountStorageIndex: indexes.accountStorage,
+              contractIndex: indexes.contract,
+              eventsIndex: indexes.event,
+              blocksIndex: indexes.block,
+              accountKeyIndex: indexes.accountKey,
+              transactionsIndex: indexes.transaction,
+              processManagerService: window.electron.processManagerService,
+              monitoringService,
+              analyticsService,
+              workspaceService: window.electron.workspaces,
+              snapshotService: window.electron.snapshots,
+            }}
+          >
+            <ConfirmDialogProvider>
+              <FilePickerProvider
+                pickDirectory={window.electron.app.showDirectoryPicker}
+              >
+                <DependencyErrors />
+                <FlowserRouter />
+                <Toaster
+                  position="bottom-center"
+                  gutter={8}
+                  toastOptions={{
+                    className: '',
+                    style: {
+                      background: '#9BDEFA', // $blue
+                      color: '#363F53', // $table-line-background
+                      padding: '12px', // $spacing-base
+                      maxWidth: '400px',
+                      maxHeight: '200px',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                />
+              </FilePickerProvider>
+            </ConfirmDialogProvider>
+          </ServiceRegistryProvider>
+        </ChainIdProvider>
       </SWRConfig>
     </>
-  );
-}
-
-function ConsentAnalytics() {
-  const { isConsented, setIsConsented } = useAnalytics();
-  if (isConsented !== undefined) {
-    return null;
-  }
-  return (
-    <ConsentDialog consent={isConsented ?? true} setConsent={setIsConsented} />
   );
 }

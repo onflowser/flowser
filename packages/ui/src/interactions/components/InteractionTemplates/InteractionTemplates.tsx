@@ -90,7 +90,13 @@ function StoredTemplates() {
           <div
             key={template.id}
             onClick={() => {
-              const createdInteraction = create(template);
+              const createdInteraction = create({
+                ...template,
+                // Provide a different ID as the template,
+                // otherwise parsed data won't be reflected correctly
+                // when changing source code.
+                id: crypto.randomUUID()
+              });
               setFocused(createdInteraction.id);
             }}
             className={classNames(classes.item, {

@@ -4,7 +4,7 @@ import { ProcessManagerService } from "./processes/process-manager.service";
 import { HttpService } from "@onflowser/core/src/http.service";
 
 export type FlowDevWalletConfig = {
-  restAccessApiUrl: string;
+  accessNodeRestApiUrl: string;
   workspacePath: string;
   port: number;
 }
@@ -30,7 +30,7 @@ export class FlowDevWalletService {
         name: "flow",
         args: [
           "dev-wallet",
-          flag("emulator-host", config.restAccessApiUrl),
+          flag("emulator-host", config.accessNodeRestApiUrl),
           flag("port", config.port)
         ].filter(isDefined),
         options: {

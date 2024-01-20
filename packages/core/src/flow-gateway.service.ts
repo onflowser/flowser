@@ -76,8 +76,11 @@ export type FlowSignableObject = {
 
 // https://docs.onflow.org/fcl/reference/api/#transactionstatusobject
 export type FlowTransactionStatus = {
-  status: number;
-  statusCode: number;
+  blockId: string;
+  // https://developers.flow.com/tools/clients/fcl-js/api#transaction-statuses
+  status: 0 | 1 | 2 | 3 | 4 | 5;
+  statusString: string;
+  statusCode: 1 | 0;
   errorMessage: string;
   events: FlowEvent[];
 };
@@ -201,8 +204,10 @@ type FlowTxStatusSubscription = {
 };
 
 type FlowGatewayConfig = {
-  restAccessApiUrl: string;
-  flowJSON: unknown;
+  network: "local" | "canarynet" | "testnet" | "mainnet"
+  accessNodeRestApiUrl: string;
+  discoveryWalletUrl: string;
+  flowJSON?: unknown;
 };
 
 export class FlowGatewayService {
@@ -210,14 +215,24 @@ export class FlowGatewayService {
   constructor(private readonly httpService: HttpService) {}
 
   public configure(config: FlowGatewayConfig): void {
-    fcl
+    const configured = fcl
       .config({
-        "accessNode.api": config.restAccessApiUrl,
-        "flow.network": "emulator",
-      })
-      .load({
-        flowJSON: config.flowJSON,
+        "accessNode.api": config.accessNodeRestApiUrl,
+        "flow.network": config.network,
+        "discovery.wallet": config.discoveryWalletUrl,
+        "app.detail.icon": "https://flowser.dev/icon.png",
+        "app.detail.title": "Flowser"
       });
+
+    if (config.flowJSON) {
+      configured.load({
+        flowJSON: config.flowJSON,
+      })
+    }
+  }
+
+  public configureFlowJSON(flowJSON?: unknown) {
+    fcl.config().load({ flowJSON })
   }
 
   public async executeScript<Result>(
@@ -276,6 +291,12 @@ export class FlowGatewayService {
   public async getBlockByHeight(height: number): Promise<FlowBlock> {
     return fcl
       .send([fcl.getBlock(), fcl.atBlockHeight(height)])
+      .then(fcl.decode);
+  }
+
+  public async getBlockById(id: string): Promise<FlowBlock> {
+    return fcl
+      .send([fcl.getBlock(), fcl.atBlockId(id)])
       .then(fcl.decode);
   }
 

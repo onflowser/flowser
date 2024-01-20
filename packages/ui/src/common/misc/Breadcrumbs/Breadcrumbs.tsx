@@ -1,9 +1,9 @@
 import React, { ReactElement } from "react";
-import { NavLink, useMatches, useNavigate } from "react-router-dom";
 import classes from "./Breadcrumbs.module.scss";
 import classNames from "classnames";
 import { FlowserIcon } from "../../icons/FlowserIcon";
 import { useCurrentWorkspaceId } from "../../../hooks/use-current-project-id";
+import { useMatches, useNavigate } from "../../../contexts/navigation.context";
 
 type BreadcrumbsProps = {
   className?: string;
@@ -69,9 +69,10 @@ export function Breadcrumbs(props: BreadcrumbsProps): ReactElement | null {
       <div className={classes.breadcrumbs}>
         {breadcrumbs
           .map<React.ReactNode>((item, key) => (
-            <NavLink key={key} to={item.to}>
+            // TODO(web-mvp): Update styles
+            <div key={key} onClick={() => navigate(item.to)}>
               {item.label}
-            </NavLink>
+            </div>
           ))
           .reduce((prev, curr, i) => [
             prev,

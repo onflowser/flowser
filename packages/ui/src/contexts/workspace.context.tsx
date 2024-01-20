@@ -2,13 +2,13 @@ import React, { createContext, ReactElement, useContext } from "react";
 import toast from "react-hot-toast";
 import { useConfirmDialog } from "./confirm-dialog.context";
 import { AnalyticEvent, useAnalytics } from "../hooks/use-analytics";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useErrorHandler } from "../hooks/use-error-handler";
 import { useCurrentWorkspaceId } from "../hooks/use-current-project-id";
 import { FlowserWorkspace } from "@onflowser/api";
 import { useServiceRegistry } from "./service-registry.context";
 import { useGetWorkspace } from "../api";
+import { useNavigate } from "./navigation.context";
 
 export type WorkspaceManager = {
   currentWorkspace: FlowserWorkspace | undefined;
@@ -139,6 +139,6 @@ export function WorkspaceManagerProvider({
   );
 }
 
-export function useProjectManager(): WorkspaceManager {
+export function useWorkspaceManager(): WorkspaceManager {
   return useContext(WorkspaceManagerContext);
 }

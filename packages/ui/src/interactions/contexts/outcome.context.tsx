@@ -25,7 +25,7 @@ export function InteractionOutcomeManagerProvider(props: {
 }): ReactElement {
   const { definition, fclValuesByIdentifier, parsedInteraction } =
     useInteractionDefinitionManager();
-  const { flowService } = useServiceRegistry();
+  const { interactionsService } = useServiceRegistry();
   const [outcome, setOutcome] = useState<InteractionOutcome | undefined>();
 
   useEffect(() => {
@@ -45,7 +45,6 @@ export function InteractionOutcomeManagerProvider(props: {
       case InteractionKind.INTERACTION_TRANSACTION:
         return setOutcome(await executeTransaction(definition));
       default:
-        // TODO(feature-interact-screen): If there are syntax errors, interaction will be treated as "unknown"
         throw new Error(`Can't execute interaction: ${parsedInteraction.kind}`);
     }
   }
@@ -54,38 +53,13 @@ export function InteractionOutcomeManagerProvider(props: {
     definition: InteractionDefinition,
   ): Promise<InteractionOutcome | undefined> {
     const { transactionOptions } = definition;
-    if (!transactionOptions) {
-      throw new Error("Transaction options must be set");
-    }
-    let hasErrors = false;
-    const unspecifiedAuthorizers = transactionOptions.authorizerAddresses
-      .map((value, index) => ({ value, index }))
-      .filter((e) => e.value === "");
-    if (unspecifiedAuthorizers.length > 0) {
-      toast.error(
-        `Unspecified authorizers: ${unspecifiedAuthorizers
-          .map((e) => e.index + 1)
-          .join(", ")}`,
-      );
-      hasErrors = true;
-    }
-    if (!transactionOptions.proposerAddress) {
-      toast.error("Must specify a proposer");
-      hasErrors = true;
-    }
-    if (!transactionOptions.payerAddress) {
-      toast.error("Must specify a payer");
-      hasErrors = true;
-    }
-    if (hasErrors) {
-      return undefined;
-    }
     try {
-      const result = await flowService.sendTransaction({
+      // TODO(web): Make sure error validation is handled when using custom wallet service
+      const result = await interactionsService.sendTransaction({
         cadence: definition.code,
-        authorizerAddresses: transactionOptions.authorizerAddresses,
-        proposerAddress: transactionOptions.proposerAddress,
-        payerAddress: transactionOptions.payerAddress,
+        authorizerAddresses: transactionOptions?.authorizerAddresses,
+        proposerAddress: transactionOptions?.proposerAddress,
+        payerAddress: transactionOptions?.payerAddress,
         arguments: serializeParameters(),
       });
       return {
@@ -108,7 +82,7 @@ export function InteractionOutcomeManagerProvider(props: {
     definition: InteractionDefinition,
   ): Promise<InteractionOutcome | undefined> {
     try {
-      const result = await flowService.executeScript({
+      const result = await interactionsService.executeScript({
         cadence: definition.code,
         arguments: serializeParameters(),
       });

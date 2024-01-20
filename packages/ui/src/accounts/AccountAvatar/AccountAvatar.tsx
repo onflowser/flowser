@@ -83,7 +83,8 @@ export function AccountAvatar({
         width: size,
       }}
       alt={address}
-      src={avatarUrl}
+      // @ts-ignore Url is an object when using Next.js.
+      src={avatarUrl?.src ?? avatarUrl}
     />
   );
 }

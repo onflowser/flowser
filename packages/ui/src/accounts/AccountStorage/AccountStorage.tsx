@@ -1,5 +1,4 @@
 import { AnalyticEvent, useAnalytics } from "../../hooks/use-analytics";
-import { useUrlQuery } from "../../hooks/use-url-query";
 import React, { ReactElement, useEffect, useState } from "react";
 import { PublicPrivateStorageCard } from "../PublicPrivateStorageCard/PublicPrivateStorageCard";
 import { InternalStorageCard } from "../InternalStorageCard/InternalStorageCard";
@@ -7,6 +6,7 @@ import classNames from "classnames";
 import classes from "./AccountStorage.module.scss";
 import { scrollableElementId } from "../../common/layouts/ProjectLayout/WorkspaceLayout";
 import { FlowStorageDomain, FlowAccountStorage } from "@onflowser/api";
+import { useLocation } from "../../contexts/navigation.context";
 
 type AccountStorageProps = {
   storageItems: FlowAccountStorage[];
@@ -15,8 +15,8 @@ type AccountStorageProps = {
 export function AccountStorage(props: AccountStorageProps): ReactElement {
   const { storageItems } = props;
   const { track } = useAnalytics();
-  const urlQueryParams = useUrlQuery();
-  const focusedStorageId = urlQueryParams.get("focusedStorageId");
+  const {search} = useLocation();
+  const focusedStorageId = search.get("focusedStorageId");
   const [expandedCardIds, setExpandedCardIds] = useState(
     new Set<string>(focusedStorageId ? [focusedStorageId] : []),
   );
