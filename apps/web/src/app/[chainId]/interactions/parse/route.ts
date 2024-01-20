@@ -1,5 +1,5 @@
 import path from "path";
-import {GoBindingsService} from "@onflowser/nodejs"
+import {GoBindingsService} from "../../../../../../../packages/nodejs/src"
 
 const goBindingsService = new GoBindingsService({
   binDirPath: path.join(
