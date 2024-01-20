@@ -249,6 +249,9 @@ export function useGetParsedInteraction(
   // by undefined parsed interaction every time the source code changes.
   const state = useSWR(`parsed-interaction/${request.id}`, () =>
     interactionsService.parse(request.code),
+    {
+      refreshInterval: 0
+    }
   );
 
   useEffect(() => {
