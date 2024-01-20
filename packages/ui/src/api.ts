@@ -241,24 +241,31 @@ export function useGetAddressIndex(address: string): SWRResponse<number> {
 
 export function useGetParsedInteraction(
   request: InteractionDefinition,
-): SWRResponse<ParsedInteractionOrError> {
+): { data: ParsedInteractionOrError | undefined, isLoading: boolean } {
   const { interactionsService } = useServiceRegistry();
 
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
-  const state = useSWR(`parsed-interaction/${request.id}`, () =>
-    interactionsService.parse(request.code),
+  const state = useSWR(`parsed-interaction/${request.id}`, async () =>
+      ({
+        source: request.code,
+        response: await interactionsService.parse(request.code)
+      }),
     {
-      refreshInterval: 0
+      refreshInterval: 0,
+      revalidateOnMount: false
     }
   );
 
   useEffect(() => {
-    state.mutate();
+    // Avoid revalidating up-to-date cache on mount.
+    if (state.data?.source !== request.code) {
+      state.mutate();
+    }
   }, [request.code]);
 
-  return state;
+  return {...state, data: state.data?.response };
 }
 
 export function useGetWorkspaceInteractionTemplates(): SWRResponse<
