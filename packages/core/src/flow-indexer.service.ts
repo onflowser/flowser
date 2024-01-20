@@ -43,7 +43,7 @@ export class FlowIndexerService {
     private indexes: BlockchainIndexes
   ) {}
 
-  public async processBlockchainData(): Promise<void> {
+  public async processBlockchain(): Promise<void> {
     const isGatewayOnline = await this.flowGatewayService.isRestApiReachable();
 
     if (!isGatewayOnline) {

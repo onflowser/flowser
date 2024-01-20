@@ -219,7 +219,9 @@ export class FlowGatewayService {
       .config({
         "accessNode.api": config.accessNodeRestApiUrl,
         "flow.network": config.network,
-        "discovery.wallet": config.discoveryWalletUrl
+        "discovery.wallet": config.discoveryWalletUrl,
+        "app.detail.icon": "https://flowser.dev/icon.png",
+        "app.detail.title": "Flowser"
       });
 
     if (config.flowJSON) {
@@ -227,6 +229,10 @@ export class FlowGatewayService {
         flowJSON: config.flowJSON,
       })
     }
+  }
+
+  public configureFlowJSON(flowJSON?: unknown) {
+    fcl.config().load({ flowJSON })
   }
 
   public async executeScript<Result>(

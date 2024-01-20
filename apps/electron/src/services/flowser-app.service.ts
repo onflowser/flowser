@@ -249,12 +249,9 @@ export class FlowserAppService {
     const openWorkspace = await this.workspaceService.getOpenWorkspace();
 
     if (openWorkspace) {
-      this.flowGatewayService.configure({
-        flowJSON: this.flowConfigService.getFlowJSON(),
-        accessNodeRestApiUrl: `http://localhost:${
-          openWorkspace.emulator?.restServerPort ?? 8888
-        }`,
-      });
+      this.flowGatewayService.configureFlowJSON(
+        this.flowConfigService.getFlowJSON(),
+      );
     }
   }
 
@@ -292,17 +289,19 @@ export class FlowserAppService {
     const emulatorConfig =
       workspace.emulator ?? this.flowEmulatorService.getDefaultConfig();
 
-    const restAccessApiUrl = `http://localhost:${emulatorConfig.restServerPort}`;
+    const accessNodeRestApiUrl = `http://localhost:${emulatorConfig.restServerPort}`;
 
     const devWalletConfig: FlowDevWalletConfig = {
       workspacePath: workspace.filesystemPath,
-      restAccessApiUrl,
+      accessNodeRestApiUrl,
       port: 8701,
     };
 
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
-      restAccessApiUrl,
+      accessNodeRestApiUrl,
+      discoveryWalletUrl: 'http://localhost:8701/fcl/authn',
+      network: 'local',
     });
 
     const isEmulatorOnline = await this.flowGatewayService.isRestApiReachable();

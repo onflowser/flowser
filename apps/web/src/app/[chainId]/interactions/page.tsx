@@ -33,6 +33,7 @@ import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/cont
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
 import { SWRConfig } from 'swr';
+import { HttpService } from "@onflowser/core/src/http.service";
 
 const indexSyncIntervalInMs = 500;
 
@@ -148,6 +149,7 @@ class FlowserAppService {
   readonly flowAccountStorageService: FlowAccountStorageService;
   readonly flowGatewayService: FlowGatewayService;
   readonly interactionsService: InteractionsService;
+  readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
 
   constructor(chainId: ChainID) {
@@ -167,7 +169,10 @@ class FlowserAppService {
     }
 
     this.logger = new WebLogger();
-    this.flowGatewayService = new FlowGatewayService()
+    this.httpService = new HttpService(this.logger);
+    this.flowGatewayService = new FlowGatewayService(
+      this.httpService
+    )
     this.interactionsService = new InteractionsService(
       this.flowGatewayService
     )
@@ -267,6 +272,11 @@ class FlowserAppService {
 
 export default function Page() {
   const { chainId } = useParams();
+
+  // TODO: Why is window undefined if we use "use client"?
+  if (typeof window === "undefined") {
+    return null;
+  }
 
   if (!isValidChainID(chainId)) {
     return <div>Unknown chain</div>
