@@ -58,9 +58,10 @@ class InteractionsService implements IInteractionService {
 
   async parse(sourceCode: string): Promise<ParsedInteractionOrError> {
     // It doesn't matter which chain ID we use in URL.
-    const url = new URL(`${window.location.origin}/flow-emulator/interactions/parse`);
-    url.searchParams.append("sourceCode", sourceCode);
-    return fetch(url).then(res => res.json())
+    return fetch(`${window.location.origin}/flow-emulator/interactions/parse`, {
+      method: "POST",
+      body: JSON.stringify({ sourceCode }),
+    }).then(res => res.json())
   }
 
   async sendTransaction(request: SendTransactionRequest): Promise<TransactionOutcome> {

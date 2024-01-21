@@ -1,5 +1,5 @@
 import path from "path";
-import {GoBindingsService} from "../../../../../../../packages/nodejs/src"
+import {GoBindingsService} from "@onflowser/nodejs"
 
 const goBindingsService = new GoBindingsService({
   binDirPath: path.join(
@@ -11,12 +11,12 @@ const goBindingsService = new GoBindingsService({
   ),
 });
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const sourceCode = searchParams.get('sourceCode');
+export async function POST(request: Request) {
+  const requestBody = await request.json();
+  const sourceCode = requestBody?.sourceCode;
 
-  if (sourceCode === null) {
-    throw new Error("Missing `sourceCode` query param")
+  if (!sourceCode) {
+    throw new Error("Missing `sourceCode` field in body")
   }
 
   const parsedInteraction = await goBindingsService.getParsedInteraction({
