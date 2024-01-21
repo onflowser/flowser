@@ -7,6 +7,7 @@ type ProjectLinkProps = {
   to: string;
   className?: string;
   children: ReactNode;
+  onClick?: () => void;
 };
 
 export function ProjectLink(props: ProjectLinkProps): ReactElement {

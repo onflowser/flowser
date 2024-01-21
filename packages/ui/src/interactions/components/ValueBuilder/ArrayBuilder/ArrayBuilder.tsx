@@ -4,7 +4,7 @@ import { ValueBuilder } from "../ValueBuilder";
 import classes from "./ArrayBuilder.module.scss";
 import { SimpleButton } from "../../../../common/buttons/SimpleButton/SimpleButton";
 import { SizedBox } from "../../../../common/misc/SizedBox/SizedBox";
-import { FclValueUtils } from "@onflowser/core";
+import { FclArrayValue, FclValue, FclValueUtils } from "@onflowser/core";
 
 export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;
@@ -28,7 +28,7 @@ export function ArrayBuilder(props: CadenceValueBuilder): ReactElement {
     }
   });
 
-  function setElement(index: number, element: FclValueUtils) {
+  function setElement(index: number, element: FclValue) {
     if (isInitialized) {
       value[index] = element;
       setValue(value);

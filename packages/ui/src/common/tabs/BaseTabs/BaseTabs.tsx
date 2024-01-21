@@ -70,7 +70,7 @@ export function BaseTabs(props: BaseTabsProps): ReactElement {
               {onClose && (
                 <FlowserIcon.Close
                   className={classes.closeButton}
-                  onClick={(e) => {
+                  onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     onClose(tab);
                   }}

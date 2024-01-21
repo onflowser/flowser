@@ -33,7 +33,7 @@ export function WorkspaceManagerProvider({
 }: {
   children: ReactElement;
 }): ReactElement {
-  const { workspaceService } = useServiceRegistry();
+  const workspaceService = useRequiredWorkspaceService();
 
   const { track } = useAnalytics();
   const navigate = useNavigate();
@@ -141,4 +141,14 @@ export function WorkspaceManagerProvider({
 
 export function useWorkspaceManager(): WorkspaceManager {
   return useContext(WorkspaceManagerContext);
+}
+
+function useRequiredWorkspaceService() {
+  const { workspaceService } = useServiceRegistry();
+
+  if (!workspaceService) {
+    throw new Error("Workspace service not found")
+  }
+
+  return workspaceService;
 }

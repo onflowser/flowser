@@ -107,7 +107,7 @@ function StoredTemplates() {
             {template.source === "session" && (
               <FlowserIcon.Trash
                 className={classes.trash}
-                onClick={(e) => {
+                onClick={(e: MouseEvent) => {
                   e.stopPropagation();
                   showDialog({
                     title: "Remove template",
