@@ -22,6 +22,7 @@
     "swr": "^2.2.4"
   },
   "dependencies": {
+    "react-hot-toast": "^2.1.1",
     "@codemirror/legacy-modes": "^6.1.0",
     "@microlink/react-json-view": "^1.23.0",
     "@onflowser/api": "*",
