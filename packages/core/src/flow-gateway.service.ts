@@ -5,7 +5,6 @@ import {
   FclValueUtils,
 } from "./fcl-value";
 import * as fcl from "@onflow/fcl";
-import axios from "axios";
 import { FclArgumentWithMetadata } from "@onflowser/api";
 import { HttpService } from "./http.service";
 
@@ -331,5 +330,15 @@ export class FlowGatewayService {
     }
 
     return this.httpService.isReachable(restServerUrl);
+  }
+
+  public async isDiscoveryWalletReachable(): Promise<boolean> {
+    const discoveryWalletUrl = await fcl.config.get("discovery.wallet");
+
+    if (!discoveryWalletUrl) {
+      throw new Error("discovery.wallet not configured");
+    }
+
+    return this.httpService.isReachable(discoveryWalletUrl);
   }
 }

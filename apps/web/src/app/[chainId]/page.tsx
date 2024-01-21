@@ -32,8 +32,9 @@ import {
 import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
-import { SWRConfig } from 'swr';
+import useSWR, { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
+import FullScreenLoading from "@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading";
 
 const indexSyncIntervalInMs = 500;
 
@@ -152,7 +153,7 @@ class FlowserAppService {
   readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
 
-  constructor(chainId: ChainID) {
+  constructor(public readonly chainId: ChainID) {
 
     function buildStorageKey(resourceName: string) {
       return `${chainId}/${resourceName}`
@@ -279,6 +280,7 @@ export default function Page() {
   }
 
   if (!isValidChainID(chainId)) {
+    // TODO: Return 404 error
     return <div>Unknown chain</div>
   }
 
@@ -312,39 +314,100 @@ export default function Page() {
   configureGateway(chainId);
 
   return (
-    <SWRConfig
-      value={{
-        refreshInterval: indexSyncIntervalInMs,
-        // Most of the time (e.g. when polling transaction in outcome display)
-        // we want this polling to happen with the same frequency as above.
-        errorRetryInterval: indexSyncIntervalInMs,
-      }}
-    >
-    <ChainIdProvider config={{ chainId }}>
-      <NextJsNavigationProvider>
-        <ServiceRegistryProvider
-          services={{
-            flowService: new FlowService(),
-            interactionsService: appService.interactionsService,
-            transactionsIndex: appService.getTransactionIndex(),
-            blocksIndex: appService.getBlockIndex(),
-            accountIndex: appService.getAccountsIndex(),
-            eventsIndex: appService.getEventsIndex(),
-            contractIndex: appService.getContractsIndex(),
-            accountStorageIndex: appService.getAccountStorageIndex(),
-            accountKeyIndex: appService.getAccountKeysIndex()
-          }}
-        >
-          <InteractionRegistryProvider>
-            <TemplatesRegistryProvider>
-              <InteractionsPage />
-            </TemplatesRegistryProvider>
-          </InteractionRegistryProvider>
-        </ServiceRegistryProvider>
-      </NextJsNavigationProvider>
-    </ChainIdProvider>
-    </SWRConfig>
+    <OptionalEmulatorSetupPrompt appService={appService}>
+      <SWRConfig
+        value={{
+          refreshInterval: indexSyncIntervalInMs,
+          // Most of the time (e.g. when polling transaction in outcome display)
+          // we want this polling to happen with the same frequency as above.
+          errorRetryInterval: indexSyncIntervalInMs,
+        }}
+      >
+        <ChainIdProvider config={{ chainId }}>
+          <NextJsNavigationProvider>
+            <ServiceRegistryProvider
+              services={{
+                flowService: new FlowService(),
+                interactionsService: appService.interactionsService,
+                transactionsIndex: appService.getTransactionIndex(),
+                blocksIndex: appService.getBlockIndex(),
+                accountIndex: appService.getAccountsIndex(),
+                eventsIndex: appService.getEventsIndex(),
+                contractIndex: appService.getContractsIndex(),
+                accountStorageIndex: appService.getAccountStorageIndex(),
+                accountKeyIndex: appService.getAccountKeysIndex()
+              }}
+            >
+              <InteractionRegistryProvider>
+                <TemplatesRegistryProvider>
+                  <InteractionsPage />
+                </TemplatesRegistryProvider>
+              </InteractionRegistryProvider>
+            </ServiceRegistryProvider>
+          </NextJsNavigationProvider>
+        </ChainIdProvider>
+      </SWRConfig>
+    </OptionalEmulatorSetupPrompt>
   );
+}
+
+function OptionalEmulatorSetupPrompt(props: {
+  children: ReactNode;
+  appService: FlowserAppService;
+}) {
+  const {flowGatewayService, chainId} = props.appService;
+
+  const {data} = useSWR("api-status", () =>
+    Promise.all([
+     flowGatewayService.isRestApiReachable(),
+     flowGatewayService.isDiscoveryWalletReachable(),
+    ]).then(([isRestApiReachable, isDiscoveryWalletReachable]) => ({
+      isRestApiReachable,
+      isDiscoveryWalletReachable
+    }))
+  );
+
+  if (chainId !== "flow-emulator") {
+    return props.children;
+  }
+
+  if (!data) {
+    return <FullScreenLoading />
+  }
+
+  const areEmulatorApisReachable = data.isRestApiReachable && data.isDiscoveryWalletReachable;
+
+  if (areEmulatorApisReachable) {
+    return props.children;
+  }
+
+  return (
+    <div className="flex flex-col justify-center items-center h-full gap-y-2">
+      <ApiSetupPrompt
+        isReachable={data.isRestApiReachable}
+        label="Start emulator"
+        setupCommand="flow emulator"
+      />
+      <ApiSetupPrompt
+        isReachable={data.isDiscoveryWalletReachable}
+        label="Start wallet"
+        setupCommand="flow dev-wallet"
+      />
+    </div>
+  )
+}
+
+function ApiSetupPrompt(props: {
+  isReachable: boolean;
+  label: string;
+  setupCommand: string;
+}) {
+  return (
+    <div className="flex flex-col">
+      {props.label} {props.isReachable ? '✅' : '❌'}
+      <code>{props.setupCommand}</code>
+    </div>
+  )
 }
 
 class FlowService implements IFlowService {
