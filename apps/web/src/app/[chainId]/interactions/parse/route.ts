@@ -28,7 +28,9 @@ export async function POST(request: Request) {
       sourceCode
     });
 
-    return Response.json(parsedInteraction)
+    return Response.json(parsedInteraction, {
+      status: 200
+    })
   } catch (error: any) {
     return Response.json({
       message: `Error parsing: ${error.message}`
