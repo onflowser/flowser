@@ -16,14 +16,24 @@ export async function POST(request: Request) {
   const sourceCode = requestBody?.sourceCode;
 
   if (!sourceCode) {
-    return new Response("Missing `sourceCode` field in body", {
+    return Response.json({
+      message: "Missing `sourceCode` field in body"
+    }, {
       status: 400
     })
   }
 
-  const parsedInteraction = await goBindingsService.getParsedInteraction({
-    sourceCode
-  })
+  try {
+    const parsedInteraction = await goBindingsService.getParsedInteraction({
+      sourceCode
+    });
 
-  return Response.json(parsedInteraction)
+    return Response.json(parsedInteraction)
+  } catch (error: any) {
+    return Response.json({
+      message: `Error parsing: ${error.message}`
+    }, {
+      status: 500
+    })
+  }
 }
