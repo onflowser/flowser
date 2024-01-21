@@ -289,7 +289,7 @@ export default function Page() {
       case "flow-emulator":
         return appService.flowGatewayService.configure({
           network: "local",
-          accessNodeRestApiUrl: "http://localhost:8080",
+          accessNodeRestApiUrl: "http://localhost:8888",
           discoveryWalletUrl: "http://localhost:8701/fcl/authn"
         });
       case "flow-testnet":
