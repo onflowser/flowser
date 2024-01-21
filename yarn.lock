@@ -2226,7 +2226,6 @@
     mixpanel-browser "^2.47.0"
     react "^18.2.0"
     react-dom "^18.2.0"
-    react-hot-toast "^2.1.1"
     react-router-dom "^6.16.0"
     semver "^7.5.4"
     swr "^2.2.4"
@@ -2261,6 +2260,7 @@
     formik "^2.2.9"
     mixpanel-browser "^2.47.0"
     react-helmet "^6.1.0"
+    react-hot-toast "^2.1.1"
     react-icons "^4.11.0"
     react-loading-skeleton "^3.3.1"
     react-modal "^3.16.1"
@@ -2273,9 +2273,11 @@
   resolved "file:apps/web"
   dependencies:
     "@onflowser/ui" "*"
+    "@svgr/webpack" "^8.1.0"
     next "^14.0.4"
     react "^18"
     react-dom "^18"
+    swr "^2.2.4"
 
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
@@ -2737,6 +2739,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/dateformat@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.npmjs.org/@types/dateformat/-/dateformat-5.0.2.tgz"
+  integrity sha512-M95hNBMa/hnwErH+a+VOD/sYgTmo15OTYTM2Hr52/e0OdOuY+Crag+kd3/ioZrhg0WGbl9Sm3hR7UU+MH6rfOw==
+
 "@types/debug@^4.1.6":
   version "4.1.9"
   resolved "https://registry.npmjs.org/@types/debug/-/debug-4.1.9.tgz"
@@ -2989,6 +2996,13 @@
   version "18.0.3"
   resolved "https://registry.npmjs.org/@types/react-test-renderer/-/react-test-renderer-18.0.3.tgz"
   integrity sha512-4wcNLnY6nIT+L6g94CpzL4CXX2P18JvKPU9CDlaHr3DnbP3GiaQLhDotJqjWlVqOcE4UhLRjp0MtxqwuNKONnA==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react-timeago@^4.1.7":
+  version "4.1.7"
+  resolved "https://registry.npmjs.org/@types/react-timeago/-/react-timeago-4.1.7.tgz"
+  integrity sha512-ogD4Ror/hDG+pQggCX+TgPgJ8W2jeeUxsgNU485Qpm0Ma+E2TND2EJuKwK5+sxlkDXDEgsHradO0zWBkTgLzNg==
   dependencies:
     "@types/react" "*"
 
@@ -10617,7 +10631,7 @@ react-helmet@^6.1.0:
     react-fast-compare "^3.1.1"
     react-side-effect "^2.1.0"
 
-react-hot-toast@^2.1.1, react-hot-toast@^2.4.1:
+react-hot-toast@^2.4.1:
   version "2.4.1"
   resolved "https://registry.npmjs.org/react-hot-toast/-/react-hot-toast-2.4.1.tgz"
   integrity sha512-j8z+cQbWIM5LY37pR6uZR6D4LfseplqnuAO4co4u8917hBUvXlEqyP1ZzqVLcqoyUesZZv/ImreoCeHVDpE5pQ==

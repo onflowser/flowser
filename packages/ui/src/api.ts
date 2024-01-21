@@ -185,7 +185,7 @@ export function useGetProcesses(
   const { processManagerService } = useServiceRegistry();
 
   return useSWR(`processes`, () =>
-    processManagerService.listProcesses(),
+    processManagerService ? processManagerService.listProcesses() : [],
   );
 }
 

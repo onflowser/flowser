@@ -40,14 +40,14 @@ export function useAnalytics(): Analytics {
 
   useEffect(() => {
     if (isConsented) {
-      analyticsService.enable();
+      analyticsService?.enable();
     } else {
-      analyticsService.disable();
+      analyticsService?.disable();
     }
   }, [isConsented]);
 
   function track(event: AnalyticEvent, properties?: Record<string, unknown>) {
-    return analyticsService.track(event, {
+    return analyticsService?.track(event, {
       ...properties,
       projectName: currentProject?.name,
     });

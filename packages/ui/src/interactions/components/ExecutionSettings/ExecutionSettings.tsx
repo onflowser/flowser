@@ -311,6 +311,7 @@ function AuthorizerSettings() {
           <SizedBox height={12} />
           <ParamBuilder
             key={index}
+            flixArgument={undefined}
             parameter={{
               identifier: `Authorizer ${
                 authorizerAddresses.length > 1 ? index + 1 : ""
