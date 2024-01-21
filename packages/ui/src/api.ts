@@ -259,6 +259,8 @@ export function useGetParsedInteraction(
   );
 
   useEffect(() => {
+    // TODO: This will revalidate (trigger a request) by every consumer who uses this hook.
+    //  Since mutate will be triggered within each consumers lifecycle.
     // Avoid revalidating up-to-date cache on mount.
     if (state.data?.source !== request.code) {
       state.mutate();
