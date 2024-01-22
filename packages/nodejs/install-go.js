@@ -55,7 +55,7 @@ async function main() {
   if (!goInstalled && os.platform() === "linux") {
     const goVersion = '1.19'; // Update this as needed
     const platform = 'linux-amd64';
-    const url = `https://golang.org/dl/go${goVersion}.${platform}.tar.gz`;
+    const url = `https://dl.google.com/go/go${goVersion}.${platform}.tar.gz`;
     const dest = `/tmp/go${goVersion}.${platform}.tar.gz`;
     await downloadFile(url, dest);
     await installGo(dest);
