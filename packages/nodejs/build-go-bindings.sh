@@ -1,6 +1,10 @@
 OUT_PATH=bin
 BIN_PREFIX=flowser-internal
 SOURCE_PATH=../../internal/main.go
+# This is added in case it's run on linux with newly installed go bin using `install-go.js`.
+PATH=$PATH:/usr/local/go/bin
+
+echo "Building using go $(go version) from $(which go)"
 
 # Technically, only 64bit architectures are supported, since
 # Cadence can't be built for 32bit arch due to constant overflows:
@@ -10,7 +14,7 @@ SOURCE_PATH=../../internal/main.go
 
 # https://freshman.tech/snippets/go/cross-compile-go-programs
 
-rm -r $OUT_PATH
+rm -rf $OUT_PATH
 mkdir -p $OUT_PATH
 
 function build() {
@@ -21,14 +25,22 @@ function build() {
 }
 
 # Windows
-build windows amd64 .exe
-build windows arm64 .exe
+if [[ $* == *--windows* ]]; then
+  echo "Building for Windows ..."
+  build windows amd64 .exe
+  build windows arm64 .exe
+fi
 
 # MacOS
-build darwin amd64
-build darwin arm64
+if [[ $* == *--darwin* ]]; then
+  echo "Building for MacOS ..."
+  build darwin amd64
+  build darwin arm64
+fi
 
 # Linux
-build linux amd64
-build linux arm64
-
+if [[ $* == *--linux* ]]; then
+  echo "Building for Linux ..."
+  build linux amd64
+  build linux arm64
+fi

@@ -1,9 +1,14 @@
 {
   "npmClient": "yarn",
   "pipeline": {
-    "build": {
+    "build-electron": {
       "cache": false,
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build-electron"],
+      "outputs": ["dist/**", "bin/**"]
+    },
+    "build-web": {
+      "cache": false,
+      "dependsOn": ["^build-web"],
       "outputs": ["dist/**", "bin/**", ".next/**"]
     },
     "compile": {

@@ -5,9 +5,9 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "dev": "npm run build-bin",
-    "build": "npm run build-bin",
-    "build-bin": "sh build-go-bindings.sh",
+    "dev": "sh build-go-bindings.sh --darwin",
+    "build-web": "node install-go.js && sh build-go-bindings.sh --linux",
+    "build-electron": "npm run build-bin --linux --darwin --windows",
     "format": "prettier . --write"
   },
   "keywords": [],
