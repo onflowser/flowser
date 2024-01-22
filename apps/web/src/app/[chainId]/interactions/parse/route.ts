@@ -15,14 +15,16 @@ const goBindingsService = new GoBindingsService({
         'nodejs',
         'bin',
       )
-    : path.join(process.cwd(), "../../bin"),
+    : path.join(process.cwd(), ".next/bin"),
 });
 
 export async function POST(request: Request) {
-  console.log(fs.readdirSync(path.join(process.cwd(), "../../..")))
-  console.log(fs.readdirSync(path.join(process.cwd(), "../..")))
-  console.log(fs.readdirSync(path.join(process.cwd(), "../")))
-  console.log(fs.readdirSync(path.join(process.cwd(), ".")));
+  console.log(fs.readdirSync(path.join(process.cwd(), ".next")));
+  console.log(fs.readdirSync(path.join(__dirname, ".")));
+  console.log(fs.readdirSync(path.join(__dirname, "..")));
+  console.log(fs.readdirSync(path.join(__dirname, "../..")));
+  console.log(fs.readdirSync(path.join(__dirname, "../../..")));
+  console.log(fs.readdirSync(path.join(__dirname, "../../../..")));
 
   const requestBody = await request.json();
   const sourceCode = requestBody?.sourceCode;
