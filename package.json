@@ -3,7 +3,8 @@
   "private": true,
   "description": "Easily inspect and debug Flow blockchain ⛓",
   "scripts": {
-    "build": "turbo run build",
+    "build-electron": "turbo run build-electron",
+    "build-web": "turbo run build-web",
     "dev": "turbo run dev --parallel",
     "compile": "turbo run compile",
     "lint": "turbo run lint",

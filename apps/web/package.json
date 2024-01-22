@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm run setup-bin && next dev",
+    "build-web": "npm run setup-bin && next build",
+    "setup-bin": "mkdir -p public/bin && cp ../../packages/nodejs/bin/flowser-internal-amd64-linux public/bin/flowser-internal-amd64-linux",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@onflowser/ui": "*",
+    "@onflowser/nodejs": "*",
     "next": "^14.0.4",
     "react": "^18",
     "react-dom": "^18",
