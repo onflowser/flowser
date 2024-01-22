@@ -50,6 +50,7 @@ function installGo(filePath) {
   })
 }
 
+// We need to install go in our web deployment pipeline on Vercel.
 async function main() {
   const goInstalled = await isGoInstalled();
   if (!goInstalled && os.platform() === "linux") {
