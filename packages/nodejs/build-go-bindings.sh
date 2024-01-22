@@ -25,16 +25,22 @@ function build() {
 }
 
 # Windows
-echo "Building for Windows ..."
-build windows amd64 .exe
-build windows arm64 .exe
+if [[ $* == *--windows* ]]; then
+  echo "Building for Windows ..."
+  build windows amd64 .exe
+  build windows arm64 .exe
+fi
 
 # MacOS
-echo "Building for MacOS ..."
-build darwin amd64
-build darwin arm64
+if [[ $* == *--darwin* ]]; then
+  echo "Building for MacOS ..."
+  build darwin amd64
+  build darwin arm64
+fi
 
 # Linux
-echo "Building for Linux ..."
-build linux amd64
-build linux arm64
+if [[ $* == *--linux* ]]; then
+  echo "Building for Linux ..."
+  build linux amd64
+  build linux arm64
+fi
