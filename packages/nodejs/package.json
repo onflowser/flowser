@@ -5,8 +5,6 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "postinstall": "go-npm install",
-    "preuninstall": "go-npm uninstall",
     "dev": "npm run build-bin",
     "build": "npm run build-bin",
     "build-bin": "sh build-go-bindings.sh",
@@ -21,8 +19,7 @@
   "dependencies": {
     "@onflow/fcl": "^1.6.0",
     "@onflowser/config": "*",
-    "elliptic": "^6.5.4",
-    "go-npm": "^0.1.9"
+    "elliptic": "^6.5.4"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.14",

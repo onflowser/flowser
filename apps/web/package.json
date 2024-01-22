@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@onflowser/nodejs": "*",
     "@onflowser/ui": "*",
-    "@svgr/webpack": "^8.1.0",
+    "@onflowser/nodejs": "*",
     "next": "^14.0.4",
     "react": "^18",
     "react-dom": "^18",
-    "swr": "^2.2.4"
+    "swr": "^2.2.4",
+    "@svgr/webpack": "^8.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
