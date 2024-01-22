@@ -4,7 +4,7 @@ SOURCE_PATH=../../internal/main.go
 # This is added in case it's run on linux with newly installed go bin using `install-go.js`.
 PATH=$PATH:/usr/local/go/bin
 
-echo "Building using go ${go version} from ${which go}"
+echo "Building using go $(go version) from $(which go)"
 
 # Technically, only 64bit architectures are supported, since
 # Cadence can't be built for 32bit arch due to constant overflows:
@@ -39,3 +39,5 @@ echo "Building for Linux ..."
 build linux amd64
 build linux arm64
 
+echo "Done"
+tree $OUT_PATH
