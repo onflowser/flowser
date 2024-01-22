@@ -38,6 +38,3 @@ build darwin arm64
 echo "Building for Linux ..."
 build linux amd64
 build linux arm64
-
-echo "Done"
-tree $OUT_PATH
