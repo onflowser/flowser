@@ -1,11 +1,14 @@
-const { exec } = require('child_process/promises');
+const { exec } = require('child_process');
 const https = require('https');
 const fs = require('fs');
 const os = require('os');
+const { promisify } = require('util');
+
+const execAsync = promisify(exec);
 
 async function isGoInstalled() {
   try {
-    const { stdout } = await exec('go version');
+    const { stdout } = await execAsync('go version');
     console.log('Go is already installed:', stdout.trim());
     return true;
   } catch (error) {
@@ -34,7 +37,7 @@ function installGo(filePath) {
     console.log('Go installed successfully');
     // Updating PATH to include Go (this will only affect this script's process)
     process.env.PATH += ':/usr/local/go/bin';
-    const { stdout } = await exec('go version');
+    const { stdout } = await execAsync('go version');
     console.log('Installed Go version:', stdout.trim());
   });
 }
