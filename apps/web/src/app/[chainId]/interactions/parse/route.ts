@@ -1,12 +1,7 @@
-import path from "path";
 import {GoBindingsService} from "@onflowser/nodejs"
 
 const goBindingsService = new GoBindingsService({
-  binDirPath: path.join(
-    __dirname,
-    '../../..',
-    'bin',
-  ),
+  binDirPath: __dirname,
 });
 
 export async function POST(request: Request) {
