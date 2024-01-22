@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npm run setup-bin && next dev",
     "build": "npm run setup-bin && next build",
-    "setup-bin": "cp ../../packages/nodejs/bin/flowser-internal-amd64-linux public/bin/flowser-internal-amd64-linux",
+    "setup-bin": "mkdir -p public/bin && cp ../../packages/nodejs/bin/flowser-internal-amd64-linux public/bin/flowser-internal-amd64-linux",
     "start": "next start",
     "lint": "next lint"
   },
