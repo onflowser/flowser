@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run build-bin",
     "build": "npm run build-bin",
-    "build-bin": "sh build-go-bindings.sh",
+    "build-bin": "node install-go.js && sh build-go-bindings.sh",
     "format": "prettier . --write"
   },
   "keywords": [],
