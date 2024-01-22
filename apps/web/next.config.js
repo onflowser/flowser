@@ -1,10 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverRuntimeConfig: {
-    // A workaround to retrieve project root path.
-    // https://github.com/vercel/next.js/issues/8251#issuecomment-547702744
-    PROJECT_ROOT: __dirname
-  },
   images: {
     remotePatterns: [
       {

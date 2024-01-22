@@ -1,6 +1,5 @@
 import {GoBindingsService} from "@onflowser/nodejs"
 import path from "path";
-import getConfig from 'next/config'
 import fs from "fs";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -16,13 +15,26 @@ const goBindingsService = new GoBindingsService({
         'nodejs',
         'bin',
       )
-    : path.join(process.cwd(), ".next/bin"),
+    : path.resolve(process.cwd(), ".next/bin"),
 });
 
 export async function POST(request: Request) {
-  const { serverRuntimeConfig } = getConfig();
-  console.log(fs.readdirSync(path.join(serverRuntimeConfig.PROJECT_ROOT)))
-  console.log(fs.readdirSync(path.join(serverRuntimeConfig.PROJECT_ROOT), {recursive: true}))
+  // https://github.com/vercel/next.js/issues/8251#issuecomment-657770901
+  try {
+    console.log(path.resolve("./public"));
+  } catch (e) {
+    console.error(e)
+  }
+  try {
+    console.log(fs.readdirSync(process.cwd(), {recursive: true}))
+  } catch (error) {
+    console.error(error)
+  }
+  try {
+    console.log(fs.readdirSync(path.resolve("./public")))
+  }catch (error) {
+    console.error(error)
+  }
 
   const requestBody = await request.json();
   const sourceCode = requestBody?.sourceCode;
