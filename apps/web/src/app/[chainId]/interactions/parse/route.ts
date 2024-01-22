@@ -1,6 +1,6 @@
 import {GoBindingsService} from "@onflowser/nodejs"
 import path from "path";
-import fs from "fs";
+import { execSync } from "child_process"
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -19,12 +19,13 @@ const goBindingsService = new GoBindingsService({
 });
 
 export async function POST(request: Request) {
-  console.log(fs.readdirSync(path.join(process.cwd(), ".next")));
-  console.log(fs.readdirSync(path.join(__dirname, ".")));
-  console.log(fs.readdirSync(path.join(__dirname, "..")));
-  console.log(fs.readdirSync(path.join(__dirname, "../..")));
-  console.log(fs.readdirSync(path.join(__dirname, "../../..")));
-  console.log(fs.readdirSync(path.join(__dirname, "../../../..")));
+  console.log(execSync("find . -name 'flowser*'", {
+    cwd: process.cwd()
+  }));
+
+  console.log(execSync("find . -name 'flowser*'", {
+    cwd: path.join(process.cwd(), "../../..")
+  }));
 
   const requestBody = await request.json();
   const sourceCode = requestBody?.sourceCode;
