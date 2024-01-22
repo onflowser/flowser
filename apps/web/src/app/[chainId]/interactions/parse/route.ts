@@ -1,5 +1,6 @@
 import {GoBindingsService} from "@onflowser/nodejs"
 import path from "path";
+import fs from "fs";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -14,10 +15,15 @@ const goBindingsService = new GoBindingsService({
         'nodejs',
         'bin',
       )
-    : __dirname,
+    : path.join(process.cwd(), "../../bin"),
 });
 
 export async function POST(request: Request) {
+  console.log(fs.readdirSync(path.join(process.cwd(), "../../..")))
+  console.log(fs.readdirSync(path.join(process.cwd(), "../..")))
+  console.log(fs.readdirSync(path.join(process.cwd(), "../")))
+  console.log(fs.readdirSync(path.join(process.cwd(), ".")));
+
   const requestBody = await request.json();
   const sourceCode = requestBody?.sourceCode;
 
