@@ -15,7 +15,7 @@ type SaveSnippetDialogProps = {
 export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
   const { interactionId } = props;
   const { definitions, update, remove } = useInteractionRegistry();
-  const { saveTemplate } = useTemplatesRegistry();
+  const { saveAsSessionTemplate } = useTemplatesRegistry();
   const interaction = definitions.find(e => e.id === interactionId);
 
   if (!interaction) {
@@ -35,7 +35,7 @@ export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
             Discard
           </Button>
           <Button variant="middle" onClick={() => {
-            saveTemplate(interaction);
+            saveAsSessionTemplate(interaction);
             props.onClose();
           }}>
             Save

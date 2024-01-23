@@ -85,7 +85,7 @@ function BlockItem(props: BlockItemProps) {
 
   return (
     <FlowserMenu
-      position="anchor"
+      position="auto"
       align="center"
       direction="right"
       menuButton={
