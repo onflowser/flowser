@@ -1,7 +1,6 @@
 import React, { ReactElement, useMemo, useState } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
-import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { SearchInput } from "../../../common/inputs";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
@@ -17,7 +16,6 @@ import { FlixInfo } from "../FlixInfo/FlixInfo";
 import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { MenuItem } from "@szhsin/react-menu";
-import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { EditTemplateNameDialog } from "../EditTemplateNameDialog/EditTemplateNameDialog";
 
@@ -106,7 +104,6 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
   const templatesRegistry = useTemplatesRegistry();
   const { showDialog } = useConfirmDialog();
   const [showEditModal, setShowEditModal] = useState(false);
-  const menuIconSize = 15;
 
   function openTemplate(template: InteractionDefinitionTemplate) {
     const createdInteraction = interactionRegistry.create({
@@ -130,7 +127,7 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
       ),
       confirmButtonLabel: "REMOVE",
       cancelButtonLabel: "CANCEL",
-      onConfirm: () => templatesRegistry.removeTemplate(template)
+      onConfirm: () => templatesRegistry.removeSessionTemplate(template)
     });
   }
 
@@ -153,24 +150,18 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
         }
       >
         <MenuItem onClick={() => openTemplate(template)}>
-          <FlowserIcon.Link width={menuIconSize} height={menuIconSize} />
-          <SizedBox width={10} />
           Open in new tab
         </MenuItem>
 
         {template.source === "session" && (
           <MenuItem onClick={() => setShowEditModal(true)}>
-            <FlowserIcon.Trash width={menuIconSize} height={menuIconSize} />
-            <SizedBox width={10} />
             Rename
           </MenuItem>
         )}
 
         {template.source === "session" && (
           <MenuItem onClick={() => removeTemplate(template)}>
-            <FlowserIcon.Trash width={menuIconSize} height={menuIconSize} />
-            <SizedBox width={10} />
-            Remove
+            Delete
           </MenuItem>
         )}
       </FlowserMenu>
