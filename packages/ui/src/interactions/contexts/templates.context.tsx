@@ -7,7 +7,7 @@ import {
   useGetWorkspaceInteractionTemplates,
 } from "../../api";
 import { WorkspaceTemplate } from "@onflowser/api";
-import { FlixTemplate, useListFlixTemplates } from "../../hooks/flix";
+import { FlixTemplate, useListFlixTemplates } from "../../hooks/use-flix";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];

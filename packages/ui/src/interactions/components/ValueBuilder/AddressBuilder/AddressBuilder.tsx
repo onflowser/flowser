@@ -10,7 +10,6 @@ import { FclValueUtils } from "@onflowser/core";
 import { FlowAccount } from "@onflowser/api";
 import { IWalletService, useServiceRegistry } from "../../../../contexts/service-registry.context";
 import { useGetAccounts, useGetManagedKeys } from "../../../../api";
-import { useChainId } from "../../../../contexts/chain-id.context";
 import { TextualBuilder } from "../TextualBuilder/TextualBuilder";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {

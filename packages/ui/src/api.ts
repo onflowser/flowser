@@ -20,7 +20,7 @@ import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
 import { ensureNonPrefixedAddress } from "@onflowser/core";
-import { useChainId } from "./contexts/chain-id.context";
+import { useChainId } from "./contexts/flow-network.context";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();

@@ -29,7 +29,12 @@ import {
   IFlowserLogger,
   InMemoryIndex
 } from "@onflowser/core";
-import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
+import {
+  ChainID,
+  FlowNetworkId,
+  FlowNetworkProvider,
+  isValidFlowNetwork
+} from "@onflowser/ui/src/contexts/flow-network.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
 import { SWRConfig } from 'swr';
@@ -153,10 +158,10 @@ class FlowserAppService {
   readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
 
-  constructor(chainId: ChainID) {
+  constructor(networkId: FlowNetworkId) {
 
     function buildStorageKey(resourceName: string) {
-      return `${chainId}/${resourceName}`
+      return `${networkId}/${resourceName}`
     }
 
     this.blockchainIndexes = {
@@ -186,6 +191,31 @@ class FlowserAppService {
       this.interactionsService,
       this.blockchainIndexes
     )
+
+    this.configureGateway(networkId);
+  }
+
+  private configureGateway(networkId: FlowNetworkId) {
+    switch (networkId) {
+      case "emulator":
+        return this.flowGatewayService.configure({
+          network: "local",
+          accessNodeRestApiUrl: "http://localhost:8888",
+          discoveryWalletUrl: "http://localhost:8701/fcl/authn"
+        });
+      case "testnet":
+        return this.flowGatewayService.configure({
+          network: "testnet",
+          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
+        });
+      case "mainnet":
+        return this.flowGatewayService.configure({
+          network: "mainnet",
+          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
+        });
+    }
   }
 
   getTransactionIndex(): IResourceIndexReader<FlowTransaction> {
@@ -272,45 +302,18 @@ class FlowserAppService {
 
 
 export default function Page() {
-  const { chainId } = useParams();
+  const { networkId } = useParams();
 
   // TODO: Why is window undefined if we use "use client"?
   if (typeof window === "undefined") {
     return null;
   }
 
-  if (!isValidChainID(chainId)) {
-    return <div>Unknown chain</div>
+  if (!isValidFlowNetwork(networkId)) {
+    return <div>Unknown Flow network: {networkId}</div>
   }
 
-  const appService = new FlowserAppService(chainId);
-
-  function configureGateway(chainId: ChainID) {
-    switch (chainId) {
-      case "flow-emulator":
-        return appService.flowGatewayService.configure({
-          network: "local",
-          accessNodeRestApiUrl: "http://localhost:8888",
-          discoveryWalletUrl: "http://localhost:8701/fcl/authn"
-        });
-      case "flow-testnet":
-        return appService.flowGatewayService.configure({
-          network: "testnet",
-          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
-          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
-        });
-      case "flow-mainnet":
-        return appService.flowGatewayService.configure({
-          network: "mainnet",
-          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
-          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
-        });
-      default:
-        throw new Error(`Unsupported chain: ${chainId}`)
-    }
-  }
-
-  configureGateway(chainId);
+  const appService = new FlowserAppService(networkId);
 
   return (
     <SWRConfig
@@ -321,7 +324,7 @@ export default function Page() {
         errorRetryInterval: indexSyncIntervalInMs,
       }}
     >
-    <ChainIdProvider config={{ chainId }}>
+    <FlowNetworkProvider config={{ networkId }}>
       <NextJsNavigationProvider>
         <ServiceRegistryProvider
           services={{
@@ -343,7 +346,7 @@ export default function Page() {
           </InteractionRegistryProvider>
         </ServiceRegistryProvider>
       </NextJsNavigationProvider>
-    </ChainIdProvider>
+    </FlowNetworkProvider>
     </SWRConfig>
   );
 }

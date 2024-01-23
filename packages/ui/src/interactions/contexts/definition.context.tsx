@@ -12,7 +12,7 @@ import {
 import { ParsedInteraction } from "@onflowser/api";
 import { FclValue } from "@onflowser/core";
 import { useGetParsedInteraction } from "../../api";
-import { FlixTemplate, useFlixSearch } from "../../hooks/flix";
+import { FlixTemplate, useFlixSearch } from "../../hooks/use-flix";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;

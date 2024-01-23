@@ -14,13 +14,13 @@ export default function Home() {
       <div className="text-center flex flex-col">
         <span>Choose a network</span>
         <div className="flex gap-x-2">
-          <Link href="/flow-emulator">
+          <Link href="/emulator">
             Emulator
           </Link>
-          <Link href="/flow-testnet">
+          <Link href="/testnet">
             Testnet
           </Link>
-          <Link href="/flow-mainnet">
+          <Link href="/mainnet">
             Mainnet
           </Link>
         </div>

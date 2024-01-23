@@ -5,7 +5,7 @@ import { InteractionParameterBuilder } from "../../contexts/definition.context";
 import classes from "./ParamBuilder.module.scss";
 import { CadenceValueBuilder } from "../ValueBuilder/interface";
 import { CadenceParameter } from "@onflowser/api";
-import { FlixArgument, FlixTemplate } from "../../../hooks/flix";
+import { FlixArgument, FlixTemplate } from "../../../hooks/use-flix";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 
 export type ParameterListBuilderProps = InteractionParameterBuilder & {

@@ -4,7 +4,7 @@ import {
   FLOW_FLIX_URL,
   useFlixSearch,
   useFlixTemplateAuditors
-} from "../../../hooks/flix";
+} from "../../../hooks/use-flix";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import classes from "./FlixInfo.module.scss";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
