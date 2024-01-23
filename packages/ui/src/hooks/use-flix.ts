@@ -66,6 +66,12 @@ export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   );
 }
 
+export function useGetFlixTemplate(id: string): SWRResponse<FlixTemplate> {
+  return useSWR(`flix/templates/${id}`, () =>
+    fetch(`${FLOWSER_FLIX_URL}/v1/templates/${id}`).then((res) => res.json()),
+  );
+}
+
 // We are forced to use `null` as value for "not found",
 // as `undefined` is already used by SWR to represent "no data".
 export const FLIX_TEMPLATE_NOT_FOUND = null;

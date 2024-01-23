@@ -1,9 +1,15 @@
 "use client";
 import { InteractionsPage } from "@onflowser/ui/src/interactions/InteractionsPage";
-import { InteractionRegistryProvider } from "@onflowser/ui/src/interactions/contexts/interaction-registry.context";
-import { TemplatesRegistryProvider } from "@onflowser/ui/src/interactions/contexts/templates.context";
+import {
+  InteractionRegistryProvider,
+  useInteractionRegistry
+} from "@onflowser/ui/src/interactions/contexts/interaction-registry.context";
+import {
+  flixTemplateToInteraction,
+  TemplatesRegistryProvider
+} from "@onflowser/ui/src/interactions/contexts/templates.context";
 import { NavigationProvider } from "@onflowser/ui/src/contexts/navigation.context";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useParams, useSelectedLayoutSegments, usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
   ExecuteScriptRequest, IFlowService,
@@ -39,6 +45,7 @@ import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interaction
 import * as fcl from "@onflow/fcl"
 import { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
+import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 
 const indexSyncIntervalInMs = 500;
 
@@ -302,15 +309,11 @@ class FlowserAppService {
 
 
 export default function Page() {
-  const { networkId } = useParams();
+  const { networkId } = usePageParams();
 
   // TODO: Why is window undefined if we use "use client"?
   if (typeof window === "undefined") {
     return null;
-  }
-
-  if (!isValidFlowNetwork(networkId)) {
-    return <div>Unknown Flow network: {networkId}</div>
   }
 
   const appService = new FlowserAppService(networkId);
@@ -341,7 +344,7 @@ export default function Page() {
         >
           <InteractionRegistryProvider>
             <TemplatesRegistryProvider>
-              <InteractionsPage />
+              <Content />
             </TemplatesRegistryProvider>
           </InteractionRegistryProvider>
         </ServiceRegistryProvider>
@@ -349,6 +352,22 @@ export default function Page() {
     </FlowNetworkProvider>
     </SWRConfig>
   );
+}
+
+function Content() {
+  const { interaction } = usePageParams();
+  const interactionRegistry = useInteractionRegistry();
+  const { data: flix } = useGetFlixTemplate(interaction ?? "");
+
+  useEffect(() => {
+    if (flix) {
+      const interaction = flixTemplateToInteraction(flix);
+      interactionRegistry.create(interaction);
+      interactionRegistry.setFocused(interaction.id);
+    }
+  }, [flix]);
+
+  return <InteractionsPage />;
 }
 
 class FlowService implements IFlowService {
@@ -388,4 +407,17 @@ function NextJsNavigationProvider(props: { children: ReactNode }) {
       {props.children}
     </NavigationProvider>
   );
+}
+
+function usePageParams() {
+  const { networkId, interaction } = useParams();
+
+  if (!isValidFlowNetwork(networkId)) {
+    throw new Error(`Unknown Flow network: ${networkId}`)
+  }
+
+  return {
+    networkId,
+    interaction: interaction?.[0] as string | undefined
+  }
 }

@@ -135,14 +135,7 @@ export function TemplatesRegistryProvider(props: {
       ) ?? []),
       ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
         (template): InteractionDefinitionTemplate => ({
-          id: template.id,
-          name: getFlixTemplateName(template),
-          code: getCadenceWithNewImportSyntax(template),
-          transactionOptions: undefined,
-          initialOutcome: undefined,
-          fclValuesByIdentifier: new Map(),
-          createdDate: new Date(),
-          updatedDate: new Date(),
+          ...flixTemplateToInteraction(template),
           workspace: undefined,
           flix: template,
           source: "flix"
@@ -228,5 +221,18 @@ function getFlixTemplateName(template: FlixTemplate) {
     return englishTitle.replace("This transaction ", "");
   } else {
     return "Unknown";
+  }
+}
+
+export function flixTemplateToInteraction(template: FlixTemplate): InteractionDefinition {
+  return {
+    id: template.id,
+    name: getFlixTemplateName(template),
+    code: getCadenceWithNewImportSyntax(template),
+    transactionOptions: undefined,
+    initialOutcome: undefined,
+    fclValuesByIdentifier: new Map(),
+    createdDate: new Date(),
+    updatedDate: new Date(),
   }
 }
