@@ -8,8 +8,8 @@ import {
 } from "../../api";
 import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixTemplate, useListFlixTemplates } from "../../hooks/use-flix";
-import { useFlowNetworkId } from "../../contexts/flow-network.context";
-import { FlixUtils } from "../../utils/flix-utils";
+import { FlowNetworkId, useFlowNetworkId } from "../../contexts/flow-network.context";
+import { FlixUtils } from "@onflowser/core/src/flix-utils";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -138,7 +138,7 @@ export function TemplatesRegistryProvider(props: {
       ) ?? []),
       ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
         (template): InteractionDefinitionTemplate => ({
-          ...FlixUtils.flixTemplateToInteraction(template, flowNetworkId),
+          ...flixTemplateToInteraction(template, flowNetworkId),
           workspace: undefined,
           flix: template,
           source: "flix"
@@ -197,4 +197,17 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   }
 
   return context;
+}
+
+export function flixTemplateToInteraction(template: FlixTemplate, networkId: FlowNetworkId): InteractionDefinition {
+  return {
+    id: template.id,
+    name: FlixUtils.getFlixTemplateName(template),
+    code: FlixUtils.getCadenceSourceCode(template, networkId),
+    transactionOptions: undefined,
+    initialOutcome: undefined,
+    fclValuesByIdentifier: new Map(),
+    createdDate: new Date(),
+    updatedDate: new Date(),
+  }
 }

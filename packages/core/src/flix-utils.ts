@@ -1,23 +1,22 @@
-import { FlixTemplate } from "../hooks/use-flix";
-import { InteractionDefinition } from "../interactions/core/core-types";
-import { FlowNetworkId } from "../contexts/flow-network.context";
+import { FlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
+
+// TODO: Consolidate with FlowNetworkId
+type FlixNetworkId = "mainnet" | "testnet" | "emulator";
 
 export class FlixUtils {
 
-  static flixTemplateToInteraction(template: FlixTemplate, networkId: FlowNetworkId): InteractionDefinition {
-    return {
-      id: template.id,
-      name: this.getFlixTemplateName(template),
-      code: this.getCadenceSourceCode(template, networkId),
-      transactionOptions: undefined,
-      initialOutcome: undefined,
-      fclValuesByIdentifier: new Map(),
-      createdDate: new Date(),
-      updatedDate: new Date(),
+  static getFlixTemplateName(template: FlixTemplate) {
+    const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
+    if (englishTitle) {
+      // Transactions generated with NFT catalog have this necessary prefix in titles.
+      // https://github.com/onflow/nft-catalog
+      return englishTitle.replace("This transaction ", "");
+    } else {
+      return "Unknown";
     }
   }
 
-  private static getCadenceSourceCode(template: FlixTemplate, networkId: FlowNetworkId) {
+  static getCadenceSourceCode(template: FlixTemplate, networkId: FlixNetworkId) {
     if (networkId === "emulator") {
       return this.getCadenceWithNewImportSyntax(template);
     } else {
@@ -53,16 +52,5 @@ export class FlixUtils {
       },
       template.data.cadence,
     );
-  }
-
-  private static getFlixTemplateName(template: FlixTemplate) {
-    const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
-    if (englishTitle) {
-      // Transactions generated with NFT catalog have this necessary prefix in titles.
-      // https://github.com/onflow/nft-catalog
-      return englishTitle.replace("This transaction ", "");
-    } else {
-      return "Unknown";
-    }
   }
 }

@@ -5,7 +5,7 @@ import {
   useInteractionRegistry
 } from "@onflowser/ui/src/interactions/contexts/interaction-registry.context";
 import {
-  TemplatesRegistryProvider
+  TemplatesRegistryProvider, flixTemplateToInteraction
 } from "@onflowser/ui/src/interactions/contexts/templates.context";
 import { NavigationProvider } from "@onflowser/ui/src/contexts/navigation.context";
 import { ReactNode, useEffect } from "react";
@@ -45,7 +45,7 @@ import * as fcl from "@onflow/fcl"
 import { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
-import { FlixUtils } from "@onflowser/ui/src/utils/flix-utils";
+import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { useInteractionsPageParams } from "@/app/[networkId]/[[...interaction]]/use-params";
 
 const indexSyncIntervalInMs = 500;
@@ -362,7 +362,7 @@ function Content() {
 
   useEffect(() => {
     if (flix) {
-      const interaction = FlixUtils.flixTemplateToInteraction(flix, networkId);
+      const interaction = flixTemplateToInteraction(flix, networkId);
       interactionRegistry.create(interaction);
       interactionRegistry.setFocused(interaction.id);
     }
