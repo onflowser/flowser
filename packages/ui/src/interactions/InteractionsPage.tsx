@@ -22,7 +22,7 @@ export function InteractionsPage(): ReactElement {
   const { definitions, focusedDefinition, setFocused, create, remove } =
     useInteractionRegistry();
   const {templates} = useTemplatesRegistry();
-  const [interactionToSaveBeforeClose, setInteractionToSaveBeforeClose] = useState<InteractionDefinition>();
+  const [interactionIdToSaveBeforeClose, setInteractionIdToSaveBeforeClose] = useState<string>();
 
   const sideMenuTabs: BaseTabItem[] = [
     {
@@ -54,10 +54,10 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
-      {interactionToSaveBeforeClose !== undefined && (
+      {interactionIdToSaveBeforeClose !== undefined && (
         <SaveSnippetDialog
-          interaction={interactionToSaveBeforeClose}
-          onClose={() => setInteractionToSaveBeforeClose(undefined)}
+          interactionId={interactionIdToSaveBeforeClose}
+          onClose={() => setInteractionIdToSaveBeforeClose(undefined)}
         />
       )}
       <BaseTabs
@@ -82,7 +82,7 @@ export function InteractionsPage(): ReactElement {
           if (isAlreadySavedOrEmpty) {
             remove(interaction.id);
           } else {
-            setInteractionToSaveBeforeClose(interaction);
+            setInteractionIdToSaveBeforeClose(interaction.id);
           }
         }}
         onAddNew={() => {

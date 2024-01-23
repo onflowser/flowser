@@ -8,14 +8,19 @@ import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
 import { InteractionDefinition } from "../../core/core-types";
 
 type SaveSnippetDialogProps = {
-  interaction: InteractionDefinition;
+  interactionId: string;
   onClose: () => void;
 }
 
 export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
-  const { interaction } = props;
-  const { update, remove } = useInteractionRegistry();
+  const { interactionId } = props;
+  const { definitions, update, remove } = useInteractionRegistry();
   const { saveTemplate } = useTemplatesRegistry();
+  const interaction = definitions.find(e => e.id === interactionId);
+
+  if (!interaction) {
+    throw new Error("Invariant: Interaction not found in registry")
+  }
 
   return (
     <ActionDialog
