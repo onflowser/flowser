@@ -5,7 +5,11 @@ type FlixNetworkId = "mainnet" | "testnet" | "emulator";
 
 export class FlixUtils {
 
-  static getFlixTemplateName(template: FlixTemplate) {
+  static getDescription(template: FlixTemplate) {
+    return template.data.messages.description?.i18n["en-US"];
+  }
+
+  static getName(template: FlixTemplate) {
     const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
     if (englishTitle) {
       // Transactions generated with NFT catalog have this necessary prefix in titles.

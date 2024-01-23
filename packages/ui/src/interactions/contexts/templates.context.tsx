@@ -202,7 +202,7 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
 export function flixTemplateToInteraction(template: FlixTemplate, networkId: FlowNetworkId): InteractionDefinition {
   return {
     id: template.id,
-    name: FlixUtils.getFlixTemplateName(template),
+    name: FlixUtils.getName(template),
     code: FlixUtils.getCadenceSourceCode(template, networkId),
     transactionOptions: undefined,
     initialOutcome: undefined,

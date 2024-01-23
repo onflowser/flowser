@@ -11,6 +11,7 @@ type Props = {
 export async function generateMetadata(
   props: Props,
 ): Promise<Metadata> {
+  const {interaction, networkId} = props.params;
   const httpService = new HttpService({
     ...console,
     verbose: console.debug
@@ -22,12 +23,15 @@ export async function generateMetadata(
 
   const flix = await flixService.getById(props.params.interaction ?? "");
 
-  const title = flix ? FlixUtils.getFlixTemplateName(flix) : "Unknown interaction"
+  const title = `Interaction: ${flix ? FlixUtils.getName(flix) : "unknown"}`
 
   return {
     title,
     openGraph: {
-      title
+      title,
+      images: [
+        `/og?flixId=${interaction}&networkId=${networkId}`
+      ]
     },
   }
 }
