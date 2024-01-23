@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run setup-bin && next dev",
+    "dev": "next dev",
     "build-web": "npm run setup-bin && next build",
     "setup-bin": "mkdir -p public/bin && cp ../../packages/nodejs/bin/flowser-internal-amd64-linux public/bin/flowser-internal-amd64-linux",
     "start": "next start",
