@@ -12,6 +12,15 @@ export async function generateMetadata(
   props: Props,
 ): Promise<Metadata> {
   const {interaction, networkId} = props.params;
+
+  if (interaction) {
+    return getFlixMetadata(networkId, interaction);
+  } else {
+    return getDefaultMetadata();
+  }
+}
+
+async function getFlixMetadata(networkId: string, flixId: string): Promise<Metadata> {
   const httpService = new HttpService({
     ...console,
     verbose: console.debug
@@ -21,18 +30,35 @@ export async function generateMetadata(
   };
   const flixService = new FlowFlixService(flixConfig, httpService);
 
-  const flix = await flixService.getById(props.params.interaction ?? "");
+  const template = await flixService.getById(flixId);
 
-  const title = `Interaction: ${flix ? FlixUtils.getName(flix) : "unknown"}`
+  if (template) {
+    const title = `Interaction: ${FlixUtils.getName(template)}`;
+    const description = FlixUtils.getDescription(template)
 
-  return {
-    title,
-    openGraph: {
+    return {
       title,
+      description,
+      openGraph: {
+        images: [
+          `/og?flixId=${flixId}&networkId=${networkId}`
+        ]
+      },
+    }
+  } else {
+    return getDefaultMetadata()
+  }
+}
+
+function getDefaultMetadata(): Metadata {
+  return {
+    title: "Flowser - Interact on Flow ⚡",
+    description: "Supercharged interactions #onFlow blockchain.",
+    openGraph: {
       images: [
-        `/og?flixId=${interaction}&networkId=${networkId}`
+        "https://flowser.dev/social.png"
       ]
-    },
+    }
   }
 }
 
