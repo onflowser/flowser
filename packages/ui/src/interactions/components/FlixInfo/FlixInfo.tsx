@@ -4,7 +4,7 @@ import {
   FLOW_FLIX_URL,
   useFlixSearch,
   useFlixTemplateAuditors
-} from "../../../hooks/flix";
+} from "../../../hooks/use-flix";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import classes from "./FlixInfo.module.scss";
 import { ExternalLink } from "../../../common/links/ExternalLink/ExternalLink";
@@ -12,6 +12,7 @@ import React, { Fragment } from "react";
 import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { LineSeparator } from "../../../common/misc/LineSeparator/LineSeparator";
 import { InteractionDefinition } from "../../core/core-types";
+import { FlixUtils } from "@onflowser/core";
 
 type FlixInfoProps = {
   interaction: InteractionDefinition
@@ -52,7 +53,7 @@ export function FlixInfo(props: FlixInfoProps) {
         {isVerified ? (
           <Fragment>
             <AuditInfo templateId={data.id} />
-            <p>{data.data.messages.description?.i18n["en-US"]}</p>
+            <p>{FlixUtils.getDescription(data)}</p>
             <ExternalLink inline href={`${FLOW_FLIX_URL}/v1/templates/${data.id}`} />
           </Fragment>
         ) : (

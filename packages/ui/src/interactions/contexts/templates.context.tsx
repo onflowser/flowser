@@ -7,7 +7,9 @@ import {
   useGetWorkspaceInteractionTemplates,
 } from "../../api";
 import { WorkspaceTemplate } from "@onflowser/api";
-import { FlixTemplate, useListFlixTemplates } from "../../hooks/flix";
+import { FlixTemplate, useListFlixTemplates } from "../../hooks/use-flix";
+import { FlowNetworkId, useFlowNetworkId } from "../../contexts/flow-network.context";
+import { FlixUtils } from "@onflowser/core/src/flix-utils";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];
@@ -51,6 +53,7 @@ export function TemplatesRegistryProvider(props: {
   const [sessionTemplates, setSessionTemplates] = useLocalStorage<
     SerializedSessionTemplate[]
   >("interactions", []);
+  const flowNetworkId = useFlowNetworkId();
 
   const randomId = () => String(Math.random() * 1000000);
 
@@ -135,21 +138,14 @@ export function TemplatesRegistryProvider(props: {
       ) ?? []),
       ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
         (template): InteractionDefinitionTemplate => ({
-          id: template.id,
-          name: getFlixTemplateName(template),
-          code: getCadenceWithNewImportSyntax(template),
-          transactionOptions: undefined,
-          initialOutcome: undefined,
-          fclValuesByIdentifier: new Map(),
-          createdDate: new Date(),
-          updatedDate: new Date(),
+          ...flixTemplateToInteraction(template, flowNetworkId),
           workspace: undefined,
           flix: template,
           source: "flix"
         }),
       ) ?? []),
     ],
-    [sessionTemplates, workspaceTemplates],
+    [sessionTemplates, workspaceTemplates, flowNetworkId],
   );
 
   function saveTemplate(interaction: InteractionDefinition) {
@@ -203,30 +199,15 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   return context;
 }
 
-// Transform imports with replacement patterns to the new import syntax,
-// since FLIX v1.0 doesn't support new import syntax yet.
-// https://github.com/onflow/flow-interaction-template-tools/issues/12
-function getCadenceWithNewImportSyntax(template: FlixTemplate) {
-  const replacementPatterns = Object.keys(template.data.dependencies);
-  return replacementPatterns.reduce(
-    (cadence, pattern) => {
-      const contractName = Object.keys(template.data.dependencies[pattern])[0];
-
-      return cadence
-        .replace(new RegExp(`from\\s+${pattern}`), "")
-        .replace(new RegExp(`import\\s+${contractName}`), `import "${contractName}"`)
-    },
-    template.data.cadence,
-  );
-}
-
-function getFlixTemplateName(template: FlixTemplate) {
-  const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
-  if (englishTitle) {
-    // Transactions generated with NFT catalog have this necessary prefix in titles.
-    // https://github.com/onflow/nft-catalog
-    return englishTitle.replace("This transaction ", "");
-  } else {
-    return "Unknown";
+export function flixTemplateToInteraction(template: FlixTemplate, networkId: FlowNetworkId): InteractionDefinition {
+  return {
+    id: template.id,
+    name: FlixUtils.getName(template),
+    code: FlixUtils.getCadenceSourceCode(template, networkId),
+    transactionOptions: undefined,
+    initialOutcome: undefined,
+    fclValuesByIdentifier: new Map(),
+    createdDate: new Date(),
+    updatedDate: new Date(),
   }
 }
