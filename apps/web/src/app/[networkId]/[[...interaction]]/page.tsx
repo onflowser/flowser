@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { InteractionsPageParams } from "./use-params";
-import ClientContent from "./content";
 import { FlixUtils, FlowFlixService } from "@onflowser/core";
 import { HttpService } from "@onflowser/core/src/http.service";
+import Root from './root';
+import { RootLoader } from "@/app/[networkId]/[[...interaction]]/root-loader";
 
 type Props = {
   params: InteractionsPageParams
@@ -63,5 +64,5 @@ function getDefaultMetadata(): Metadata {
 }
 
 export default function Page({ params }: Props) {
-  return <ClientContent />
+  return <RootLoader />
 }

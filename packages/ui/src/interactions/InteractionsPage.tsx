@@ -139,3 +139,5 @@ function InteractionDetails() {
 
   return <InteractionOutcomeDisplay />;
 }
+
+export default InteractionsPage;

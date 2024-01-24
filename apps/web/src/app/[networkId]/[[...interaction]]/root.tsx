@@ -45,6 +45,7 @@ import { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "@/app/[networkId]/[[...interaction]]/use-params";
+import dynamic from "next/dynamic";
 
 const indexSyncIntervalInMs = 500;
 
@@ -307,13 +308,8 @@ class FlowserAppService {
 }
 
 
-export default function ClientContent() {
+export default function Root() {
   const { networkId } = useInteractionsPageParams();
-
-  // TODO: Why is window undefined if we use "use client"?
-  if (typeof window === "undefined") {
-    return null;
-  }
 
   const appService = new FlowserAppService(networkId);
 
