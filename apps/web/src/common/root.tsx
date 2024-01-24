@@ -44,8 +44,7 @@ import * as fcl from "@onflow/fcl"
 import { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
-import { useInteractionsPageParams } from "@/app/[networkId]/[[...interaction]]/use-params";
-import dynamic from "next/dynamic";
+import { useInteractionsPageParams } from "./use-params";
 
 const indexSyncIntervalInMs = 500;
 

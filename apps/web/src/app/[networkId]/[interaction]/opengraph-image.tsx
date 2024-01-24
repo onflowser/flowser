@@ -1,16 +1,25 @@
 import { ImageResponse } from 'next/og';
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlixTemplate } from "@onflowser/core/src/flow-flix.service";
+import { InteractionsPageParams } from '@/common/use-params';
 
 export const runtime = 'edge';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const flixId = searchParams.get('flixId');
-  const networkId = searchParams.get('networkId') as any;
+export const size = {
+  width: 1200,
+  height: 630,
+};
 
-  if (flixId) {
-    const flix = await fetchFlixTemplateById(flixId);
+type Props = {
+  params: InteractionsPageParams;
+}
+
+// https://nextjs.org/docs/app/api-reference/file-conventions/metadata/opengraph-image
+export default async function Image(props: Props) {
+  const {interaction, networkId} = props.params;
+
+  if (interaction) {
+    const flix = await fetchFlixTemplateById(interaction);
 
     return new ImageResponse(
       (
@@ -74,17 +83,11 @@ export async function GET(request: Request) {
           </pre>
         </div>
       ),
-      {
-        width: 1200,
-        height: 630,
-      },
+      size
     );
   }
 
-  return new ImageResponse(<>Unknown interaction</>, {
-    width: 1200,
-    height: 630,
-  });
+  return new ImageResponse(<>Unknown interaction</>, size);
 }
 
 // We can't use the standard FlixService,

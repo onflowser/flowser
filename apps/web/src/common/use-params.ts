@@ -15,6 +15,6 @@ export function useInteractionsPageParams(): InteractionsPageParams {
 
   return {
     networkId,
-    interaction: interaction?.[0] as string | undefined
+    interaction: interaction as string | undefined
   }
 }

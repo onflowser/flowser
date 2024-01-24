@@ -1,27 +1,21 @@
-import type { Metadata } from 'next'
-import { InteractionsPageParams } from "./use-params";
-import { FlixUtils, FlowFlixService } from "@onflowser/core";
+import { InteractionsPageParams } from "@/common/use-params";
+import { Metadata } from "next";
 import { HttpService } from "@onflowser/core/src/http.service";
-import Root from './root';
-import { RootLoader } from "@/app/[networkId]/[[...interaction]]/root-loader";
+import { FlixUtils, FlowFlixService } from "@onflowser/core";
 
-type Props = {
+export async function getInteractionPageMetadata(
   params: InteractionsPageParams
-}
-
-export async function generateMetadata(
-  props: Props,
 ): Promise<Metadata> {
-  const {interaction, networkId} = props.params;
+  const {interaction} = params;
 
   if (interaction) {
-    return getFlixMetadata(networkId, interaction);
+    return getFlixMetadata(interaction);
   } else {
     return getDefaultMetadata();
   }
 }
 
-async function getFlixMetadata(networkId: string, flixId: string): Promise<Metadata> {
+async function getFlixMetadata(flixId: string): Promise<Metadata> {
   const httpService = new HttpService({
     ...console,
     verbose: console.debug
@@ -40,11 +34,6 @@ async function getFlixMetadata(networkId: string, flixId: string): Promise<Metad
     return {
       title,
       description,
-      openGraph: {
-        images: [
-          `/og?flixId=${flixId}&networkId=${networkId}`
-        ]
-      },
     }
   } else {
     return getDefaultMetadata()
@@ -61,8 +50,4 @@ function getDefaultMetadata(): Metadata {
       ]
     }
   }
-}
-
-export default function Page({ params }: Props) {
-  return <RootLoader />
 }
