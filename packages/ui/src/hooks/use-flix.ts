@@ -66,8 +66,8 @@ export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   );
 }
 
-export function useGetFlixTemplate(id: string): SWRResponse<FlixTemplate> {
-  return useSWR(`flix/templates/${id}`, () =>
+export function useGetFlixTemplate(id: string | undefined): SWRResponse<FlixTemplate> {
+  return useSWR(id ? `flix/templates/${id}` : null, () =>
     fetch(`${FLOWSER_FLIX_URL}/v1/templates/${id}`).then((res) => res.json()),
   );
 }

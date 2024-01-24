@@ -38,7 +38,6 @@ import {
   ChainID,
   FlowNetworkId,
   FlowNetworkProvider,
-  isValidFlowNetwork
 } from "@onflowser/ui/src/contexts/flow-network.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
@@ -357,7 +356,7 @@ export default function ClientContent() {
 function Content() {
   const { networkId, interaction } = useInteractionsPageParams();
   const interactionRegistry = useInteractionRegistry();
-  const { data: flix } = useGetFlixTemplate(interaction ?? "");
+  const { data: flix } = useGetFlixTemplate(interaction);
 
   useEffect(() => {
     if (flix) {
