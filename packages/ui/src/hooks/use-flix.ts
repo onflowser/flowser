@@ -1,6 +1,7 @@
 import useSWR, { SWRResponse } from "swr";
 import { InteractionDefinition } from "../interactions/core/core-types";
 import { useEffect } from "react";
+import { useFlowNetworkId } from "../contexts/flow-network.context";
 
 // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
 export type FlixTemplate = {
@@ -78,10 +79,8 @@ export const FLIX_TEMPLATE_NOT_FOUND = null;
 
 export function useFlixSearch(options: {
   interaction: InteractionDefinition;
-  // Supports "any" network as of:
-  // https://github.com/onflowser/flow-interaction-template-service/pull/4
-  network: "any" | "testnet" | "mainnet";
 }): SWRResponse<FlixTemplate | null> {
+  const networkId = useFlowNetworkId();
 
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
@@ -94,7 +93,9 @@ export function useFlixSearch(options: {
       },
       body: JSON.stringify({
         cadence_base64: btoa(options.interaction.code),
-        network: options.network
+        // Supports "any" network as of:
+        // https://github.com/onflowser/flow-interaction-template-service/pull/4
+        network: networkId === "emulator" ? "any" : networkId
       })
     }).then((res) => res.status === 200 ? res.json() : null),
     {

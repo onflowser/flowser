@@ -21,7 +21,6 @@ type FlixInfoProps = {
 export function FlixInfo(props: FlixInfoProps) {
   const { data } = useFlixSearch({
     interaction: props.interaction,
-    network: "any"
   });
 
   if (data === undefined) {

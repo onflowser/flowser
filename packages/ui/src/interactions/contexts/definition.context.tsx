@@ -40,7 +40,6 @@ export function InteractionDefinitionManagerProvider(props: {
   const fclValuesByIdentifier = definition.fclValuesByIdentifier;
   const { data: flixTemplate } = useFlixSearch({
     interaction: definition,
-    network: "any"
   })
 
   function partialUpdate(newDefinition: Partial<InteractionDefinition>) {
