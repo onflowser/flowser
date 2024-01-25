@@ -1,7 +1,5 @@
 import { FlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
-
-// TODO: Consolidate with FlowNetworkId
-type FlixNetworkId = "mainnet" | "testnet" | "emulator";
+import { FlowNetworkId } from "./flow-utils";
 
 export class FlixUtils {
 
@@ -20,7 +18,7 @@ export class FlixUtils {
     }
   }
 
-  static getCadenceSourceCode(template: FlixTemplate, networkId: FlixNetworkId) {
+  static getCadenceSourceCode(template: FlixTemplate, networkId: FlowNetworkId) {
     if (networkId === "emulator") {
       return this.getCadenceWithNewImportSyntax(template);
     } else {

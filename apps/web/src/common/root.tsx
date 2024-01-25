@@ -35,8 +35,6 @@ import {
   InMemoryIndex
 } from "@onflowser/core";
 import {
-  ChainID,
-  FlowNetworkId,
   FlowNetworkProvider,
 } from "@onflowser/ui/src/contexts/flow-network.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
@@ -45,6 +43,7 @@ import { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-params";
+import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 
 const indexSyncIntervalInMs = 500;
 
@@ -69,7 +68,7 @@ class InteractionsService implements IInteractionService {
 
   async parse(sourceCode: string): Promise<ParsedInteractionOrError> {
     // It doesn't matter which chain ID we use in URL.
-    return fetch(`${window.location.origin}/flow-emulator/interactions/parse`, {
+    return fetch(`${window.location.origin}/parse-interaction`, {
       method: "POST",
       body: JSON.stringify({ sourceCode }),
     }).then(res => res.json())
@@ -374,7 +373,7 @@ function Content() {
 
 class FlowService implements IFlowService {
     async getIndexOfAddress(chainID: ChainID, address: string): Promise<number> {
-      const response = await fetch(`${window.location.origin}/${chainID}/addresses/${address}/index`);
+      const response = await fetch(`${window.location.origin}/get-address-index?chainId=${chainID}&address=${address}`);
       const data = await response.json();
       return data.index as number;
     }

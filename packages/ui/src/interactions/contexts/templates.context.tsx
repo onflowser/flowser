@@ -8,8 +8,9 @@ import {
 } from "../../api";
 import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixTemplate, useListFlixTemplates } from "../../hooks/use-flix";
-import { FlowNetworkId, useFlowNetworkId } from "../../contexts/flow-network.context";
+import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
+import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 
 type InteractionTemplatesRegistry = {
   templates: InteractionDefinitionTemplate[];

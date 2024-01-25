@@ -9,7 +9,7 @@ const goBindingsService = new GoBindingsService({
   binDirPath: isDev
     ? path.join(
         __dirname,
-        '../../../../../../../..',
+        '../../../../../..',
         'packages',
         'nodejs',
         'bin',

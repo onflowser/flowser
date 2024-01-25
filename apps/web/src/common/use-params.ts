@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import { FlowNetworkId, isValidFlowNetwork } from "@onflowser/ui/src/contexts/flow-network.context";
+import { FlowNetworkId, FlowUtils } from "@onflowser/core/src/flow-utils";
 
 export type InteractionsPageParams = {
   networkId: FlowNetworkId;
@@ -9,7 +9,7 @@ export type InteractionsPageParams = {
 export function useInteractionsPageParams(): InteractionsPageParams {
   const { networkId, interaction } = useParams();
 
-  if (!isValidFlowNetwork(networkId)) {
+  if (!FlowUtils.isValidFlowNetwork(networkId)) {
     throw new Error(`Unknown Flow network: ${networkId}`)
   }
 
