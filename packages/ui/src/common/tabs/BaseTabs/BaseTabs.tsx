@@ -3,13 +3,13 @@ import React, { ReactElement, useState } from "react";
 import classes from "./BaseTabs.module.scss";
 import { FlowserIcon } from "../../icons/FlowserIcon";
 
-export type BaseTabItem = {
-  id: string;
+export type BaseTabItem<IdType = string> = {
+  id: IdType;
   label: React.ReactNode | string;
   content: React.ReactNode;
 };
 
-export type BaseTabsProps = {
+export type BaseTabsProps<IdType = string> = {
   label?: string;
   className?: string;
   tabClassName?: string;
@@ -19,13 +19,13 @@ export type BaseTabsProps = {
   inactiveTabClassName?: string;
   contentClassName?: string;
   currentTabId?: string | undefined;
-  onChangeTab?: (tab: BaseTabItem) => void;
-  onClose?: (tab: BaseTabItem) => void;
+  onChangeTab?: (tab: BaseTabItem<IdType>) => void;
+  onClose?: (tab: BaseTabItem<IdType>) => void;
   onAddNew?: () => void;
-  tabs: BaseTabItem[];
+  tabs: BaseTabItem<IdType>[];
 };
 
-export function BaseTabs(props: BaseTabsProps): ReactElement {
+export function BaseTabs<IdType>(props: BaseTabsProps<IdType>): ReactElement {
   const {
     label,
     className,
@@ -39,7 +39,7 @@ export function BaseTabs(props: BaseTabsProps): ReactElement {
   const [fallbackCurrentTabId, setFallbackCurrentTabId] = useState(tabs[0]?.id);
   const currentTabId = props.currentTabId ?? fallbackCurrentTabId;
 
-  function onChangeTab(tab: BaseTabItem) {
+  function onChangeTab(tab: BaseTabItem<IdType>) {
     if (props.onChangeTab) {
       props.onChangeTab(tab);
     } else {
@@ -56,7 +56,7 @@ export function BaseTabs(props: BaseTabsProps): ReactElement {
           const isActive = currentTabId === tab.id;
           return (
             <button
-              key={tab.id}
+              key={String(tab.id)}
               className={classNames(classes.tabButton, props.tabClassName, {
                 [props.activeTabClassName ?? classes.tabButtonActive]: isActive,
                 [props.inactiveTabClassName ?? classes.tabButtonInactive]:

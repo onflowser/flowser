@@ -361,7 +361,15 @@ function Content() {
     }
   }, [flix, networkId]);
 
-  return <InteractionsPage />;
+  return (
+    <InteractionsPage
+      tabOrder={["templates", "history"]}
+      enabledInteractionSourceTypes={[
+        'session',
+        'flix',
+      ]}
+    />
+  );
 }
 
 class FlowService implements IFlowService {

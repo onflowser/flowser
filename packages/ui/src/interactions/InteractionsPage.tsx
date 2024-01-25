@@ -15,16 +15,24 @@ import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDispla
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
-import { useTemplatesRegistry } from "./contexts/templates.context";
+import { InteractionSourceType, useTemplatesRegistry } from "./contexts/templates.context";
 import { InteractionDefinition } from "./core/core-types";
 
-export function InteractionsPage(): ReactElement {
+type InteractionsPageTab = "history" | "templates"
+
+type InteractionsPageProps = {
+  tabOrder: InteractionsPageTab[];
+  enabledInteractionSourceTypes: InteractionSourceType[];
+}
+
+export function InteractionsPage(props: InteractionsPageProps): ReactElement {
   const { definitions, focusedDefinition, setFocused, create, remove } =
     useInteractionRegistry();
   const {templates} = useTemplatesRegistry();
   const [interactionIdToSaveBeforeClose, setInteractionIdToSaveBeforeClose] = useState<string>();
 
-  const sideMenuTabs: BaseTabItem[] = [
+
+  const unOrderedTabs: BaseTabItem<InteractionsPageTab>[] = [
     {
       id: "history",
       label: "History",
@@ -33,9 +41,11 @@ export function InteractionsPage(): ReactElement {
     {
       id: "templates",
       label: "Templates",
-      content: <InteractionTemplates />,
+      content: <InteractionTemplates enabledSourceTypes={props.enabledInteractionSourceTypes} />,
     },
   ];
+
+  const sideMenuTabs: BaseTabItem<InteractionsPageTab>[] = props.tabOrder.map(tabId => unOrderedTabs.find(tab => tab.id === tabId)!);
   const [currentSideMenuTabId, setCurrentSideMenuTabId] = useState(
     sideMenuTabs[0].id,
   );

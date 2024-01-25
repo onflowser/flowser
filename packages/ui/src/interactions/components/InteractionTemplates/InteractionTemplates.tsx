@@ -13,16 +13,20 @@ import { FlixInfo } from "../FlixInfo/FlixInfo";
 import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
-export function InteractionTemplates(): ReactElement {
+type InteractionTemplatesProps = {
+  enabledSourceTypes: InteractionSourceType[];
+}
+
+export function InteractionTemplates(props: InteractionTemplatesProps): ReactElement {
   return (
     <div className={classes.root}>
-      <StoredTemplates />
+      <StoredTemplates {...props} />
       <FocusedInteraction />
     </div>
   );
 }
 
-function StoredTemplates() {
+function StoredTemplates(props: InteractionTemplatesProps) {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
   const { create, focusedDefinition, setFocused } = useInteractionRegistry();
@@ -52,6 +56,10 @@ function StoredTemplates() {
   }
 
   function renderSourceFilterBadge(sourceType: InteractionSourceType) {
+    if (!props.enabledSourceTypes.includes(sourceType)) {
+      return null;
+    }
+
     const nameLookup: Record<InteractionSourceType, string> = {
       flix: "flix",
       session: "snippets",
