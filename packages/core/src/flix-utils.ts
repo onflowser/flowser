@@ -28,6 +28,18 @@ export class FlixUtils {
     }
   }
 
+  static hasDependenciesForNetwork(template: FlixTemplate, networkId: "mainnet" | "testnet") {
+    let hasDependencies = true;
+
+    for (const replacementPattern in template.data.dependencies) {
+      const dependency = template.data.dependencies[replacementPattern];
+      const networkInfo = Object.values(dependency)[0];
+      hasDependencies = hasDependencies && Boolean(networkInfo[networkId])
+    }
+
+    return hasDependencies;
+  }
+
   private static getCadenceWithNetworkDependencies(template: FlixTemplate, networkId: "mainnet" | "testnet") {
     let cadence = template.data.cadence;
 

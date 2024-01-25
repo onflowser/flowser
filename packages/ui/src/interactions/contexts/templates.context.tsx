@@ -49,6 +49,7 @@ export function TemplatesRegistryProvider(props: {
 }): ReactElement {
   const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
   const { data: flixTemplates } = useListFlixTemplates();
+  const networkId = useFlowNetworkId()
   const { data: contracts } = useGetContracts();
   const [sessionTemplates, setSessionTemplates] = useLocalStorage<
     SerializedSessionTemplate[]
@@ -78,7 +79,18 @@ export function TemplatesRegistryProvider(props: {
     "FlowFees",
   ]);
 
-  function isFlixTemplateUseful(template: FlixTemplate) {
+  function isSupportedOnCurrentNetwork(template: FlixTemplate) {
+    if (networkId === "emulator") {
+      return isSupportedOnEmulatorNetwork(template)
+    } else {
+      return FlixUtils.hasDependenciesForNetwork(template, networkId);
+    }
+  }
+
+  // Since FLIX v1 doesn't officially support the emulator network,
+  // we must manually check if the provided template depends on contracts
+  // that are known to be deployed on the emulator network.
+  function isSupportedOnEmulatorNetwork(template: FlixTemplate) {
     const importedContractNames = Object.values(template.data.dependencies)
       .map((dependency) => Object.keys(dependency))
       .flat();
@@ -136,7 +148,7 @@ export function TemplatesRegistryProvider(props: {
           source: "workspace"
         }),
       ) ?? []),
-      ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
+      ...(flixTemplates?.filter(isSupportedOnCurrentNetwork)?.map(
         (template): InteractionDefinitionTemplate => ({
           ...flixTemplateToInteraction(template, flowNetworkId),
           workspace: undefined,
