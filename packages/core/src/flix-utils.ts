@@ -10,11 +10,44 @@ export class FlixUtils {
   static getName(template: FlixTemplate) {
     const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
     if (englishTitle) {
-      // Transactions generated with NFT catalog have this necessary prefix in titles.
-      // https://github.com/onflow/nft-catalog
-      return englishTitle.replace("This transaction ", "");
+      return this.shortenName(englishTitle)
     } else {
       return "Unknown";
+    }
+  }
+
+  // https://github.com/onflow/nft-catalog
+  private static shortenName(name: string) {
+    // Transactions generated with NFT catalog have this necessary prefix in titles.
+    // https://github.com/onflow/nft-catalog
+    const isGeneratedUsingNftCatalog = name.startsWith("This transaction ");
+
+    if (isGeneratedUsingNftCatalog) {
+      const replacements: string[][] = [
+        [
+          "This transaction initializes a user's account to support",
+          "Initialize"
+        ],
+        [
+          "This transaction facilitates the listing of a",
+          "List"
+        ],
+        [
+          "NFT with the StorefrontV2 contract",
+          "NFT"
+        ],
+        [
+          "This transaction facilitates the purchase of a listed",
+          "Purchase"
+        ],
+        [
+          "using StorefrontV2",
+          ""
+        ]
+      ];
+      return replacements.reduce((name, replacement) => name.replace(replacement[0], replacement[1]), name);
+    } else {
+      return name;
     }
   }
 

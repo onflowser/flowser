@@ -220,7 +220,8 @@ export function flixTemplateToInteraction(template: FlixTemplate, networkId: Flo
     transactionOptions: undefined,
     initialOutcome: undefined,
     fclValuesByIdentifier: new Map(),
-    createdDate: new Date(),
-    updatedDate: new Date(),
+    // Use the same date for all FLIX templates for consistent sorting.
+    createdDate: new Date(0),
+    updatedDate: new Date(0),
   }
 }
