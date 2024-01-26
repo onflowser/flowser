@@ -79,8 +79,9 @@ class InteractionsService implements IInteractionService {
     return await this.flowGatewayService.sendTransaction({
       cadence: request.cadence,
       arguments: request.arguments,
-      // TODO(web): Authorizers must match the number of AuthAccount's passed to prepare statement
-      authorizations: [],
+      // TODO(web): Generalize authorizers
+      // For now assume there will only ever be 1 authorizer (which is true for most of txs).
+      authorizations: [authz],
       payer: authz,
       proposer: authz
     })
