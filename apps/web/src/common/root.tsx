@@ -45,6 +45,7 @@ import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-params";
 import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
+import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 
 const indexSyncIntervalInMs = 500;
 
@@ -166,6 +167,7 @@ class FlowserAppService {
   readonly logger: IFlowserLogger;
   readonly flowAccountStorageService: FlowAccountStorageService;
   readonly flowGatewayService: FlowGatewayService;
+  readonly flowNamesService: FlowNamesService;
   readonly interactionsService: InteractionsService;
   readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
@@ -190,7 +192,23 @@ class FlowserAppService {
     this.httpService = new HttpService(this.logger);
     this.flowGatewayService = new FlowGatewayService(
       this.httpService
-    )
+    );
+
+    const findAddressByNetworkId = new Map<FlowNetworkId, string>([
+      ["mainnet", "0x097bafa4e0b48eef"],
+      ["testnet", "0afe396ebc8eee65"]
+    ]);
+
+    const flownsAddressByNetworkId = new Map<FlowNetworkId, string>([
+      ["mainnet", "0x233eb012d34b0070"],
+      ["testnet", "0xb05b2abb42335e88"]
+    ])
+
+    this.flowNamesService = new FlowNamesService({
+      findAddress: findAddressByNetworkId.get(networkId)!,
+      flownsAddress: flownsAddressByNetworkId.get(networkId)!
+    });
+
     this.interactionsService = new InteractionsService(
       this.flowGatewayService
     )
