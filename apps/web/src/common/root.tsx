@@ -44,6 +44,7 @@ import { HttpService } from "@onflowser/core/src/http.service";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-params";
 import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import defaultFlowJson from "./default-flow.json";
 
 const indexSyncIntervalInMs = 500;
 
@@ -203,16 +204,21 @@ class FlowserAppService {
       this.blockchainIndexes
     )
 
-    this.configureGateway(networkId);
+    this.configureNetwork(networkId);
   }
 
-  private configureGateway(networkId: FlowNetworkId) {
+  private configureNetwork(networkId: FlowNetworkId) {
     switch (networkId) {
       case "emulator":
         return this.flowGatewayService.configure({
           network: "local",
           accessNodeRestApiUrl: "http://localhost:8888",
-          discoveryWalletUrl: "http://localhost:8701/fcl/authn"
+          discoveryWalletUrl: "http://localhost:8701/fcl/authn",
+          // TODO(web): Provide a way for users to overwrite the default flow.json config?
+          // Provide config to support new import syntax in interactions.
+          // Default flow.json configuration taken from the standard scaffold.
+          // https://github.com/sideninja/flow-basic-scaffold/blob/main/flow.json
+          flowJSON: defaultFlowJson
         });
       case "testnet":
         return this.flowGatewayService.configure({
