@@ -150,6 +150,11 @@ class LocalStorageIndex<Resource extends IndexableResource> extends InMemoryInde
     if (serializedLookup !== null) {
       this.lookup = new Map(
         Object.entries(JSON.parse(serializedLookup))
+          .map(([key, value]: [any, any]) => [key, {
+            ...value,
+            createdAt: new Date(value.createdAt),
+            updatedAt: new Date(value.updatedAt),
+          }])
       )
     }
   }

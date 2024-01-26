@@ -15,7 +15,15 @@ import { FlowBlock, FlowTransaction } from "@onflowser/api";
 import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 
 export function InteractionHistory(): ReactElement {
-  const { data: blocks } = useGetBlocks();
+  const { data: blocks, error } = useGetBlocks();
+
+  if (error) {
+    return (
+      <div className={classes.loadingRoot}>
+        Error: {error}
+      </div>
+    )
+  }
 
   if (!blocks) {
     return (
