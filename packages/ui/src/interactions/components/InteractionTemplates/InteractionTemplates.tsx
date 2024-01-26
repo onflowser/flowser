@@ -12,6 +12,7 @@ import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixInfo } from "../FlixInfo/FlixInfo";
 import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 
 type InteractionTemplatesProps = {
   enabledSourceTypes: InteractionSourceType[];
@@ -30,7 +31,7 @@ function StoredTemplates(props: InteractionTemplatesProps) {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
   const { create, focusedDefinition, setFocused } = useInteractionRegistry();
-  const { templates, removeTemplate } = useTemplatesRegistry();
+  const { isLoading, templates, removeTemplate } = useTemplatesRegistry();
   const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
   const filteredTemplates = useMemo(() => {
     const searchQueryResults = searchTerm === "" ? templates : templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -94,6 +95,9 @@ function StoredTemplates(props: InteractionTemplatesProps) {
         </div>
       </div>
       <div className={classes.storedTemplates}>
+        {isLoading && Array.from({length: 30}).map(() => (
+          <Shimmer height={24} />
+        ))}
         {filteredAndSortedTemplates.map((template) => (
           <div
             key={template.id}

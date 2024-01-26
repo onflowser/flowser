@@ -13,6 +13,7 @@ import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 
 type InteractionTemplatesRegistry = {
+  isLoading: boolean;
   templates: InteractionDefinitionTemplate[];
   saveTemplate: (definition: InteractionDefinition) => void;
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
@@ -56,6 +57,7 @@ export function TemplatesRegistryProvider(props: {
     SerializedSessionTemplate[]
   >("interactions", []);
   const flowNetworkId = useFlowNetworkId();
+  const isLoading = !workspaceTemplates || !flixTemplates || !contracts;
 
   const randomId = () => String(Math.random() * 1000000);
 
@@ -192,6 +194,7 @@ export function TemplatesRegistryProvider(props: {
   return (
     <Context.Provider
       value={{
+        isLoading,
         templates,
         removeTemplate,
         saveTemplate,
