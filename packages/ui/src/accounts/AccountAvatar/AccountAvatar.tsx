@@ -19,7 +19,7 @@ import avatar14 from "./avatars/14.jpg";
 import avatar15 from "./avatars/15.jpg";
 import avatar16 from "./avatars/16.jpg";
 import { Spinner } from "../../common/loaders/Spinner/Spinner";
-import { useGetAddressIndex } from "../../api";
+import { useGetAddressIndex, useGetAddressNameInfo } from "../../api";
 
 const avatarUrls = [
   avatar1,
@@ -52,6 +52,7 @@ export function AccountAvatar({
   className,
 }: AccountAvatarProps): ReactElement | null {
   const { data: addressIndex } = useGetAddressIndex(address);
+  const { data: nameInfo } = useGetAddressNameInfo(address);
 
   const avatarUrl = useMemo(() => {
     const isServiceAccount = [
@@ -84,7 +85,7 @@ export function AccountAvatar({
       }}
       alt={address}
       // @ts-ignore Url is an object when using Next.js.
-      src={avatarUrl?.src ?? avatarUrl}
+      src={nameInfo?.avatar || avatarUrl?.src || avatarUrl}
     />
   );
 }

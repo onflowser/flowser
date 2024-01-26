@@ -26,6 +26,15 @@ pub fun main(nameHash: String): Domains.DomainDetail? {
 `;
 
 // language=Cadence
+const resolveAddressToFindNameCadence = `
+import FIND, Profile from 0xFindAddress
+
+pub fun main(address: Address) :  String? {
+    return FIND.reverseLookup(address)
+}
+`
+
+// language=Cadence
 const lookupProfileByFindNameSource = `
 import FIND, Profile from 0xFindAddress
 
@@ -86,12 +95,12 @@ export type FlownsDomainDetail = {
   createdAt: string;
 };
 
-export type FlowNameRawInfo = {
+type RawNameMetadata = {
   flowns: FlownsDomainDetail | null;
   find: FindUserProfile | null;
-};
+}
 
-export type FlowAbstractNameInfo = {
+export type FlowNameMetadata = RawNameMetadata & {
   address: string;
   domainName: string;
   twitterUrl?: string;
@@ -108,28 +117,35 @@ type Config = {
 }
 
 export class FlowNamesService {
-  constructor(private readonly config: Config) {
+  constructor(config: Config) {
     fcl.config()
       .put("0xFlownsAddress", config.flownsAddress)
       // @ts-ignore
       .put("0xFindAddress", config.findAddress);
   }
 
-  public async resolveNameToAddress(name: string): Promise<string | undefined> {
-    const { flowns, find } = await this.getRawInfosByName(name);
-    return flowns?.owner ?? find?.address;
+  public async getMetadataByAddress(address: string): Promise<FlowNameMetadata | undefined> {
+    const name = await this.resolveAddressToFindName(address);
+
+    if (!name) {
+      return undefined;
+    }
+
+    return this.getMetadataByName(name);
   }
 
-  public async getNameInfo(
+  public async getMetadataByName(
     name: string
-  ): Promise<FlowAbstractNameInfo | undefined> {
-    const { find, flowns } = await this.getRawInfosByName(name);
+  ): Promise<FlowNameMetadata | undefined> {
+    const rawMetadata = await this.getRawInfosByName(name);
+
+    const {find, flowns} = rawMetadata;
 
     if (!find && !flowns) {
       return undefined;
     }
 
-    // TODO: What are the possible link types?
+    // TODO: What are the supported link types?
     const twitterLink = find?.links.find((link) => link.type === "twitter");
     const websiteLink = find?.links.find((link) => link.type === "globe");
 
@@ -143,10 +159,11 @@ export class FlowNamesService {
       websiteUrl: websiteLink?.url,
       tags: find?.tags,
       description: find?.description,
+      ...rawMetadata,
     };
   }
 
-  public async getRawInfosByName(name: string): Promise<FlowNameRawInfo> {
+  public async getRawInfosByName(name: string): Promise<RawNameMetadata> {
     const [flownsResponse, findResponse] = await Promise.allSettled([
       this.lookupDomainByFlownsName(name),
       this.lookupProfileByFindName(name),
@@ -159,12 +176,17 @@ export class FlowNamesService {
     };
   }
 
+  private async resolveAddressToFindName(address: string): Promise<string | undefined> {
+    const response = await fcl
+      .send([
+        fcl.script(resolveAddressToFindNameCadence),
+        fcl.args([fcl.arg(address, type.Address)])
+      ]);
+    return fcl.decode(response);
+  }
+
   private async lookupDomainByFlownsName(name: string): Promise<FlownsDomainDetail> {
-    const isFlownsName = name.endsWith(".fn");
-    if (!isFlownsName) {
-      return Promise.reject("Not a valid .fn name");
-    }
-    const nameHash = this.flownsNameHash(name);
+    const nameHash = this.flownsNameHash(this.addPostfixIfMissing(name, ".fn"));
     const response = await fcl
       .send([
         fcl.script(lookupDomainByFlownsNameHashSource),
@@ -173,15 +195,19 @@ export class FlowNamesService {
     return fcl.decode(response);
   }
 
-  private async lookupProfileByFindName(name: string): Promise<FindUserProfile> {
-    const isFindName = name.endsWith(".find");
-    if (!isFindName) {
-      return Promise.reject("Not a valid .find name");
+  private addPostfixIfMissing(text: string, postfix: string) {
+    if (text.endsWith(postfix)) {
+      return text;
+    } else {
+      return text + postfix;
     }
+  }
+
+  private async lookupProfileByFindName(name: string): Promise<FindUserProfile> {
     const response = await fcl
       .send([
         fcl.script(lookupProfileByFindNameSource),
-        fcl.args([fcl.arg(name, type.String)])
+        fcl.args([fcl.arg(this.addPostfixIfMissing(name, ".find"), type.String)])
       ]);
 
     return fcl.decode(response);

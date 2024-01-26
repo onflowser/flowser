@@ -362,7 +362,8 @@ export default function Root() {
             eventsIndex: appService.getEventsIndex(),
             contractIndex: appService.getContractsIndex(),
             accountStorageIndex: appService.getAccountStorageIndex(),
-            accountKeyIndex: appService.getAccountKeysIndex()
+            accountKeyIndex: appService.getAccountKeysIndex(),
+            flowNamesService: appService.flowNamesService
           }}
         >
           <InteractionRegistryProvider>
