@@ -373,14 +373,9 @@ function Content() {
   }, [flix, networkId]);
 
   useEffect(() => {
-    // On testnet/mainnet networks we use different
-    // wallets/addresses than on the emulator network.
-    // Switching between testnet <-> mainnet is done automatically.
-    // But since we use a different wallet for emulator network,
-    // we must sign out the user manually before connecting to dev wallet.
-    if (networkId === "emulator") {
-      fcl.unauthenticate()
-    }
+    // Sign out the user when switching networks
+    // or "address is invalid for chain" error will be thrown.
+    fcl.unauthenticate()
   }, [networkId]);
 
   return (
