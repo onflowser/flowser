@@ -278,8 +278,9 @@ class FlowserAppService {
     return {
       findAll: () => this.blockchainIndexes.block.findAll(),
       findOneById: async id => {
-        console.log("block id", id);
-        return undefined;
+        const block = await this.flowGatewayService.getBlockById(id)
+        await this.indexer.processBlock(block);
+        return this.blockchainIndexes.block.findOneById(id);
       }
     }
   }
