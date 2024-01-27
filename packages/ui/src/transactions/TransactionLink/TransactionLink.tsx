@@ -12,6 +12,7 @@ type TransactionLinkProps = {
 export function TransactionLink(props: TransactionLinkProps) {
   const {transactionId} = props;
   const networkId = useFlowNetworkId();
+  const transactionUrl = useTransactionUrl(transactionId);
 
   const transactionIdDisplay = (
     <MiddleEllipsis className={classes.ellipsis}>
@@ -27,9 +28,22 @@ export function TransactionLink(props: TransactionLinkProps) {
     )
   } else {
     return (
-      <ExternalLink href={`https://www.flowdiver.io/tx/${transactionId}`} inline>
+      <ExternalLink href={transactionUrl} inline>
         {transactionIdDisplay}
       </ExternalLink>
     )
+  }
+}
+
+function useTransactionUrl(transactionId: string) {
+  const networkId = useFlowNetworkId();
+
+  switch (networkId) {
+    case "emulator":
+      throw new Error("Not supported for emulator network")
+    case "mainnet":
+      return `https://www.flowdiver.io/tx/${transactionId}`
+    case "testnet":
+      return `https://www.testnet.flowdiver.io/tx/${transactionId}`
   }
 }
