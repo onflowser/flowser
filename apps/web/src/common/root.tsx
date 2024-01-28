@@ -39,14 +39,18 @@ import {
 } from "@onflowser/ui/src/contexts/flow-network.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
-import { SWRConfig } from 'swr';
+import useSWR, { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
+import FullScreenLoading from "@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-interaction-page-params";
 import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
+import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
 
 const indexSyncIntervalInMs = 500;
+const emulatorRestApiPort = 8888;
+const discoveryWalletPort = 8701;
 
 class InteractionsService implements IInteractionService {
 
@@ -171,7 +175,7 @@ class FlowserAppService {
   readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
 
-  constructor(networkId: FlowNetworkId) {
+  constructor(public readonly networkId: FlowNetworkId) {
 
     function buildStorageKey(resourceName: string) {
       return `${networkId}/${resourceName}`
@@ -227,8 +231,8 @@ class FlowserAppService {
       case "emulator":
         return this.flowGatewayService.configure({
           network: "local",
-          accessNodeRestApiUrl: "http://localhost:8888",
-          discoveryWalletUrl: "http://localhost:8701/fcl/authn",
+          accessNodeRestApiUrl: `http://localhost:${emulatorRestApiPort}`,
+          discoveryWalletUrl: `http://localhost:${discoveryWalletPort}/fcl/authn`,
           // TODO(web): Provide a way for users to overwrite the default flow.json config?
           // Provide config to support new import syntax in interactions.
           // Default flow.json configuration taken from the standard scaffold.
@@ -339,39 +343,114 @@ export default function Root() {
   const appService = new FlowserAppService(networkId);
 
   return (
-    <SWRConfig
-      value={{
-        refreshInterval: indexSyncIntervalInMs,
-        // Most of the time (e.g. when polling transaction in outcome display)
-        // we want this polling to happen with the same frequency as above.
-        errorRetryInterval: indexSyncIntervalInMs,
-      }}
-    >
-    <FlowNetworkProvider config={{ networkId }}>
-      <NextJsNavigationProvider>
-        <ServiceRegistryProvider
-          services={{
-            flowService: new FlowService(),
-            interactionsService: appService.interactionsService,
-            transactionsIndex: appService.getTransactionIndex(),
-            blocksIndex: appService.getBlockIndex(),
-            accountIndex: appService.getAccountsIndex(),
-            eventsIndex: appService.getEventsIndex(),
-            contractIndex: appService.getContractsIndex(),
-            accountStorageIndex: appService.getAccountStorageIndex(),
-            accountKeyIndex: appService.getAccountKeysIndex()
-          }}
-        >
-          <InteractionRegistryProvider>
-            <TemplatesRegistryProvider>
-              <Content />
-            </TemplatesRegistryProvider>
-          </InteractionRegistryProvider>
-        </ServiceRegistryProvider>
-      </NextJsNavigationProvider>
-    </FlowNetworkProvider>
-    </SWRConfig>
+    <OptionalEmulatorSetupPrompt appService={appService}>
+      <SWRConfig
+        value={{
+          refreshInterval: indexSyncIntervalInMs,
+          // Most of the time (e.g. when polling transaction in outcome display)
+          // we want this polling to happen with the same frequency as above.
+          errorRetryInterval: indexSyncIntervalInMs,
+        }}
+      >
+        <FlowNetworkProvider config={{ networkId }}>
+          <NextJsNavigationProvider>
+            <ServiceRegistryProvider
+              services={{
+                flowService: new FlowService(),
+                interactionsService: appService.interactionsService,
+                transactionsIndex: appService.getTransactionIndex(),
+                blocksIndex: appService.getBlockIndex(),
+                accountIndex: appService.getAccountsIndex(),
+                eventsIndex: appService.getEventsIndex(),
+                contractIndex: appService.getContractsIndex(),
+                accountStorageIndex: appService.getAccountStorageIndex(),
+                accountKeyIndex: appService.getAccountKeysIndex()
+              }}
+            >
+              <InteractionRegistryProvider>
+                <TemplatesRegistryProvider>
+                  <Content />
+                </TemplatesRegistryProvider>
+              </InteractionRegistryProvider>
+            </ServiceRegistryProvider>
+          </NextJsNavigationProvider>
+        </FlowNetworkProvider>
+      </SWRConfig>
+    </OptionalEmulatorSetupPrompt>
   );
+}
+
+function OptionalEmulatorSetupPrompt(props: {
+  children: ReactNode;
+  appService: FlowserAppService;
+}) {
+  const {flowGatewayService, networkId} = props.appService;
+
+  const {data} = useSWR("api-status", () =>
+    Promise.all([
+     flowGatewayService.isRestApiReachable(),
+     flowGatewayService.isDiscoveryWalletReachable(),
+    ]).then(([isRestApiReachable, isDiscoveryWalletReachable]) => ({
+      isRestApiReachable,
+      isDiscoveryWalletReachable
+    }))
+  );
+
+  if (networkId !== "emulator") {
+    return props.children;
+  }
+
+  if (!data) {
+    return <FullScreenLoading />
+  }
+
+  const areEmulatorApisReachable = data.isRestApiReachable && data.isDiscoveryWalletReachable;
+
+  if (areEmulatorApisReachable) {
+    return props.children;
+  }
+
+  return (
+    <>
+      {props.children}
+      {!areEmulatorApisReachable && (
+        <BaseDialog>
+          <div className="flex flex-col justify-center h-full gap-y-4">
+             <div className="flex flex-col gap-y-2">
+               <h2 className="font-bold text-2xl">Before you start 👀</h2>
+               <p>You need to run the following Flow development services manually.</p>
+             </div>
+            <ApiSetupPrompt
+              isReachable={data.isRestApiReachable}
+              label="Emulator"
+              setupCommand="flow emulator"
+              expectedPort={emulatorRestApiPort}
+            />
+            <ApiSetupPrompt
+              isReachable={data.isDiscoveryWalletReachable}
+              label="Dev wallet"
+              setupCommand="flow dev-wallet"
+              expectedPort={discoveryWalletPort}
+            />
+          </div>
+        </BaseDialog>
+      )}
+    </>
+  )
+}
+
+function ApiSetupPrompt(props: {
+  isReachable: boolean;
+  label: string;
+  setupCommand: string;
+  expectedPort: number;
+}) {
+  return (
+    <div className="flex flex-col">
+      <code>{props.isReachable ? '✅' : '❌'} {props.setupCommand}</code>
+      <span className="text-gray-400">{props.label} must be running on port {props.expectedPort}.</span>
+    </div>
+  )
 }
 
 function Content() {
