@@ -172,7 +172,7 @@ class FlowserAppService {
   readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
 
-  constructor(networkId: FlowNetworkId) {
+  constructor(public readonly networkId: FlowNetworkId) {
 
     function buildStorageKey(resourceName: string) {
       return `${networkId}/${resourceName}`
@@ -349,7 +349,7 @@ export default function Root() {
           errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <FlowNetworkProvider config={{ chainId }}>
+        <FlowNetworkProvider config={{ networkId }}>
           <NextJsNavigationProvider>
             <ServiceRegistryProvider
               services={{
@@ -381,7 +381,7 @@ function OptionalEmulatorSetupPrompt(props: {
   children: ReactNode;
   appService: FlowserAppService;
 }) {
-  const {flowGatewayService, chainId} = props.appService;
+  const {flowGatewayService, networkId} = props.appService;
 
   const {data} = useSWR("api-status", () =>
     Promise.all([
@@ -393,7 +393,7 @@ function OptionalEmulatorSetupPrompt(props: {
     }))
   );
 
-  if (chainId !== "flow-emulator") {
+  if (networkId !== "emulator") {
     return props.children;
   }
 
