@@ -21,17 +21,17 @@ type InteractionTemplatesProps = {
 export function InteractionTemplates(props: InteractionTemplatesProps): ReactElement {
   return (
     <div className={classes.root}>
-      <StoredTemplates {...props} />
+      <TemplatesList {...props} />
       <FocusedInteraction />
     </div>
   );
 }
 
-function StoredTemplates(props: InteractionTemplatesProps) {
+function TemplatesList(props: InteractionTemplatesProps) {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
   const { create, focusedDefinition, setFocused } = useInteractionRegistry();
-  const { isLoading, templates, removeTemplate } = useTemplatesRegistry();
+  const { error, isLoading, templates, removeTemplate } = useTemplatesRegistry();
   const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
   const filteredTemplates = useMemo(() => {
     const searchQueryResults = searchTerm === "" ? templates : templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -94,10 +94,8 @@ function StoredTemplates(props: InteractionTemplatesProps) {
           {renderSourceFilterBadge("workspace")}
         </div>
       </div>
-      <div className={classes.storedTemplates}>
-        {isLoading && Array.from({length: 30}).map(() => (
-          <Shimmer height={24} />
-        ))}
+      <div className={classes.templatesList}>
+        {error && <span className={classes.error}>{error}</span>}
         {filteredAndSortedTemplates.map((template) => (
           <div
             key={template.id}
@@ -137,6 +135,9 @@ function StoredTemplates(props: InteractionTemplatesProps) {
               />
             )}
           </div>
+        ))}
+        {isLoading && Array.from({length: 30}).map(() => (
+          <Shimmer height={24} />
         ))}
       </div>
     </div>

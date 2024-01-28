@@ -11,9 +11,11 @@ import { FlixTemplate, useListFlixTemplates } from "../../hooks/use-flix";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import { SWRResponse } from "swr";
 
 type InteractionTemplatesRegistry = {
   isLoading: boolean;
+  error: string | undefined;
   templates: InteractionDefinitionTemplate[];
   saveTemplate: (definition: InteractionDefinition) => void;
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
@@ -49,15 +51,22 @@ const Context = createContext<InteractionTemplatesRegistry>(undefined as never);
 export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
-  const { data: flixTemplates } = useListFlixTemplates();
+  const workspaceTemplates = useGetWorkspaceInteractionTemplates();
+  const flixTemplates = useListFlixTemplates();
   const networkId = useFlowNetworkId()
   const { data: contracts } = useGetContracts();
   const [sessionTemplates, setSessionTemplates] = useLocalStorage<
     SerializedSessionTemplate[]
   >("interactions", []);
   const flowNetworkId = useFlowNetworkId();
-  const isLoading = !workspaceTemplates || !flixTemplates || !contracts;
+  console.log(flixTemplates)
+  const isLoading =
+    getIsLoading(workspaceTemplates) ||
+    getIsLoading(flixTemplates) ||
+    !contracts;
+  const error =
+    getErrorMessage("Fail to load file templates", workspaceTemplates) ||
+    getErrorMessage("Fail to load FLIX templates", flixTemplates);
 
   const randomId = () => String(Math.random() * 1000000);
 
@@ -136,7 +145,7 @@ export function TemplatesRegistryProvider(props: {
           source: "session"
         }),
       ),
-      ...(workspaceTemplates?.map(
+      ...(workspaceTemplates.data?.map(
         (template): InteractionDefinitionTemplate => ({
           id: randomId(),
           name: template.name,
@@ -151,7 +160,7 @@ export function TemplatesRegistryProvider(props: {
           source: "workspace"
         }),
       ) ?? []),
-      ...(flixTemplates?.filter(isSupportedOnCurrentNetwork)?.map(
+      ...(flixTemplates.data?.filter(isSupportedOnCurrentNetwork)?.map(
         (template): InteractionDefinitionTemplate => ({
           ...flixTemplateToInteraction(template, flowNetworkId),
           workspace: undefined,
@@ -194,6 +203,7 @@ export function TemplatesRegistryProvider(props: {
   return (
     <Context.Provider
       value={{
+        error,
         isLoading,
         templates,
         removeTemplate,
@@ -227,4 +237,16 @@ export function flixTemplateToInteraction(template: FlixTemplate, networkId: Flo
     createdDate: new Date(0),
     updatedDate: new Date(0),
   }
+}
+
+function getErrorMessage(label: string, swrResponse: SWRResponse) {
+  if (swrResponse.error) {
+    return `${label}: ${swrResponse.error?.message || swrResponse.error}`
+  } else {
+    return undefined;
+  }
+}
+
+function getIsLoading(swrResponse: SWRResponse) {
+  return !swrResponse.data && !swrResponse.error
 }

@@ -9,7 +9,7 @@ import ReactModal from 'react-modal';
 
 export type DialogProps = {
   children: ReactNode;
-  onClose: MouseEventHandler<HTMLDivElement>;
+  onClose?: MouseEventHandler<HTMLDivElement>;
   zIndex?: string;
 };
 
@@ -52,12 +52,14 @@ export const BaseDialog: FunctionComponent<DialogProps> = ({
         }
       }}
     >
-      <FlowserIcon.Close
-        className={classes.closeButton}
-        width={20}
-        height={20}
-        onClick={onClose}
-      />
+      {onClose && (
+        <FlowserIcon.Close
+          className={classes.closeButton}
+          width={20}
+          height={20}
+          onClick={onClose}
+        />
+      )}
       {children}
     </ReactModal>
   );

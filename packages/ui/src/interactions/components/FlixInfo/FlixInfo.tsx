@@ -1,6 +1,5 @@
 import {
   FLIX_TEMPLATE_NOT_FOUND,
-  FlixAuditor,
   FLOW_FLIX_URL,
   useFlixSearch,
   useFlixTemplateAuditors
@@ -19,9 +18,17 @@ type FlixInfoProps = {
 }
 
 export function FlixInfo(props: FlixInfoProps) {
-  const { data } = useFlixSearch({
+  const { data, error } = useFlixSearch({
     interaction: props.interaction,
   });
+
+  if (error) {
+    return (
+      <div className={classes.root}>
+        <span className={classes.error}>FLIX error: {error?.message || String(error)}</span>
+      </div>
+    )
+  }
 
   if (data === undefined) {
     return <Shimmer height={150} />;

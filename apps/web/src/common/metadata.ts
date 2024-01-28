@@ -1,4 +1,4 @@
-import { InteractionsPageParams } from "@/common/use-params";
+import { InteractionsPageParams } from "@/common/use-interaction-page-params";
 import { Metadata } from "next";
 import { HttpService } from "@onflowser/core/src/http.service";
 import { FlixUtils, FlowFlixService } from "@onflowser/core";
