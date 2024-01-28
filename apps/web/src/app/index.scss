@@ -1,8 +1,8 @@
 @import '../../../../packages/ui/src/styles/colors';
 @import '../../../../packages/ui/src/styles/typography';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 * {
   margin: 0;
