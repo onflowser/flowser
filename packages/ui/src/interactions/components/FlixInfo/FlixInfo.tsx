@@ -25,7 +25,7 @@ export function FlixInfo(props: FlixInfoProps) {
   if (error) {
     return (
       <div className={classes.root}>
-        <span className={classes.error}>Error: {String(error)}</span>
+        <span className={classes.error}>FLIX error: {error?.message || String(error)}</span>
       </div>
     )
   }
