@@ -77,12 +77,13 @@ class InteractionsService implements IInteractionService {
 
   async sendTransaction(request: SendTransactionRequest): Promise<TransactionOutcome> {
     const authz = fcl.authz as unknown as FlowAuthorizationFunction;
+    const parsedInteraction = await this.parse(request.cadence);
+    const authorizersCount = parsedInteraction.interaction?.transaction?.authorizerCount ?? 0;
     return await this.flowGatewayService.sendTransaction({
       cadence: request.cadence,
       arguments: request.arguments,
-      // TODO(web): Generalize authorizers
-      // For now assume there will only ever be 1 authorizer (which is true for most of txs).
-      authorizations: [authz],
+      // TODO(web): Refactor send transaction API
+      authorizations: Array.from({ length: authorizersCount }).map(() => authz),
       payer: authz,
       proposer: authz
     })
