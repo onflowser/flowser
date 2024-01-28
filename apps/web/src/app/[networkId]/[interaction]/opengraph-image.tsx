@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlixTemplate } from "@onflowser/core/src/flow-flix.service";
-import { InteractionsPageParams } from '@/common/use-params';
+import { InteractionsPageParams } from '@/common/use-interaction-page-params';
 
 export const runtime = 'edge';
 

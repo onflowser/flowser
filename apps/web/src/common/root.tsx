@@ -42,7 +42,7 @@ import * as fcl from "@onflow/fcl"
 import { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
-import { useInteractionsPageParams } from "./use-params";
+import { useInteractionsPageParams } from "./use-interaction-page-params";
 import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
 
@@ -176,14 +176,28 @@ class FlowserAppService {
       return `${networkId}/${resourceName}`
     }
 
-    this.blockchainIndexes = {
-      accountKey: new LocalStorageIndex(buildStorageKey("accountKeys")),
-      transaction: new LocalStorageIndex(buildStorageKey("transactions")),
-      block: new LocalStorageIndex(buildStorageKey("blocks")),
-      account: new LocalStorageIndex(buildStorageKey("accounts")),
-      event: new LocalStorageIndex(buildStorageKey("events")),
-      contract: new LocalStorageIndex(buildStorageKey("contracts")),
-      accountStorage: new LocalStorageIndex(buildStorageKey("accountStorages")),
+    // Emulator network is reset every time emulator is stopped (if --persist flag is omitted).
+    // For simplify sake don't persist the cache between page refreshes.
+    if (networkId === "emulator") {
+      this.blockchainIndexes = {
+        accountKey: new InMemoryIndex(),
+        transaction: new InMemoryIndex(),
+        block: new InMemoryIndex(),
+        account: new InMemoryIndex(),
+        event: new InMemoryIndex(),
+        contract: new InMemoryIndex(),
+        accountStorage: new InMemoryIndex(),
+      }
+    } else {
+      this.blockchainIndexes = {
+        accountKey: new LocalStorageIndex(buildStorageKey("accountKeys")),
+        transaction: new LocalStorageIndex(buildStorageKey("transactions")),
+        block: new LocalStorageIndex(buildStorageKey("blocks")),
+        account: new LocalStorageIndex(buildStorageKey("accounts")),
+        event: new LocalStorageIndex(buildStorageKey("events")),
+        contract: new LocalStorageIndex(buildStorageKey("contracts")),
+        accountStorage: new LocalStorageIndex(buildStorageKey("accountStorages")),
+      }
     }
 
     this.logger = new WebLogger();
