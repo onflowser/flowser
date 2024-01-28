@@ -46,6 +46,7 @@ import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-interaction-page-params";
 import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
+import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
 
 const indexSyncIntervalInMs = 500;
 
@@ -408,18 +409,25 @@ function OptionalEmulatorSetupPrompt(props: {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center h-full gap-y-2">
-      <ApiSetupPrompt
-        isReachable={data.isRestApiReachable}
-        label="Start emulator"
-        setupCommand="flow emulator"
-      />
-      <ApiSetupPrompt
-        isReachable={data.isDiscoveryWalletReachable}
-        label="Start wallet"
-        setupCommand="flow dev-wallet"
-      />
-    </div>
+    <>
+      {props.children}
+      {!areEmulatorApisReachable && (
+        <BaseDialog>
+          <div className="flex flex-col justify-center h-full gap-y-2">
+            <ApiSetupPrompt
+              isReachable={data.isRestApiReachable}
+              label="Start emulator"
+              setupCommand="flow emulator"
+            />
+            <ApiSetupPrompt
+              isReachable={data.isDiscoveryWalletReachable}
+              label="Start wallet"
+              setupCommand="flow dev-wallet"
+            />
+          </div>
+        </BaseDialog>
+      )}
+    </>
   )
 }
 
