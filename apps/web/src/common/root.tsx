@@ -49,6 +49,8 @@ import defaultFlowJson from "./default-flow.json";
 import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
 
 const indexSyncIntervalInMs = 500;
+const emulatorRestApiPort = 8888;
+const discoveryWalletPort = 8701;
 
 class InteractionsService implements IInteractionService {
 
@@ -229,8 +231,8 @@ class FlowserAppService {
       case "emulator":
         return this.flowGatewayService.configure({
           network: "local",
-          accessNodeRestApiUrl: "http://localhost:8888",
-          discoveryWalletUrl: "http://localhost:8701/fcl/authn",
+          accessNodeRestApiUrl: `http://localhost:${emulatorRestApiPort}`,
+          discoveryWalletUrl: `http://localhost:${discoveryWalletPort}/fcl/authn`,
           // TODO(web): Provide a way for users to overwrite the default flow.json config?
           // Provide config to support new import syntax in interactions.
           // Default flow.json configuration taken from the standard scaffold.
@@ -413,16 +415,22 @@ function OptionalEmulatorSetupPrompt(props: {
       {props.children}
       {!areEmulatorApisReachable && (
         <BaseDialog>
-          <div className="flex flex-col justify-center h-full gap-y-2">
+          <div className="flex flex-col justify-center h-full gap-y-4">
+             <div className="flex flex-col gap-y-2">
+               <h2 className="font-bold text-2xl">Before you start 👀</h2>
+               <p>You need to run the following Flow development services manually.</p>
+             </div>
             <ApiSetupPrompt
               isReachable={data.isRestApiReachable}
-              label="Start emulator"
+              label="Emulator"
               setupCommand="flow emulator"
+              expectedPort={emulatorRestApiPort}
             />
             <ApiSetupPrompt
               isReachable={data.isDiscoveryWalletReachable}
-              label="Start wallet"
+              label="Dev wallet"
               setupCommand="flow dev-wallet"
+              expectedPort={discoveryWalletPort}
             />
           </div>
         </BaseDialog>
@@ -435,11 +443,12 @@ function ApiSetupPrompt(props: {
   isReachable: boolean;
   label: string;
   setupCommand: string;
+  expectedPort: number;
 }) {
   return (
     <div className="flex flex-col">
-      {props.label} {props.isReachable ? '✅' : '❌'}
-      <code>{props.setupCommand}</code>
+      <code>{props.isReachable ? '✅' : '❌'} {props.setupCommand}</code>
+      <span className="text-gray-400">{props.label} must be running on port {props.expectedPort}.</span>
     </div>
   )
 }
