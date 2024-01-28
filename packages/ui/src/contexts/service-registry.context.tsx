@@ -18,8 +18,8 @@ import {
   ManagedKeyPair,
   ManagedProcess
 } from "@onflowser/api";
-import { ChainID } from "./chain-id.context";
 import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
+import { ChainID } from "@onflowser/core/src/flow-utils";
 
 export interface ISnapshotService {
   list(): Promise<FlowStateSnapshot[]>;

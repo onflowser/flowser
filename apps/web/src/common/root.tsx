@@ -1,9 +1,14 @@
 "use client";
 import { InteractionsPage } from "@onflowser/ui/src/interactions/InteractionsPage";
-import { InteractionRegistryProvider } from "@onflowser/ui/src/interactions/contexts/interaction-registry.context";
-import { TemplatesRegistryProvider } from "@onflowser/ui/src/interactions/contexts/templates.context";
+import {
+  InteractionRegistryProvider,
+  useInteractionRegistry
+} from "@onflowser/ui/src/interactions/contexts/interaction-registry.context";
+import {
+  TemplatesRegistryProvider, flixTemplateToInteraction
+} from "@onflowser/ui/src/interactions/contexts/templates.context";
 import { NavigationProvider } from "@onflowser/ui/src/contexts/navigation.context";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useParams, useSelectedLayoutSegments, usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
   ExecuteScriptRequest, IFlowService,
@@ -29,12 +34,18 @@ import {
   IFlowserLogger,
   InMemoryIndex
 } from "@onflowser/core";
-import { ChainID, ChainIdProvider, isValidChainID } from "@onflowser/ui/src/contexts/chain-id.context";
+import {
+  FlowNetworkProvider,
+} from "@onflowser/ui/src/contexts/flow-network.context";
 import { ScriptOutcome, TransactionOutcome } from "@onflowser/ui/src/interactions/core/core-types";
 import * as fcl from "@onflow/fcl"
 import useSWR, { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import FullScreenLoading from "@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading";
+import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
+import { useInteractionsPageParams } from "./use-interaction-page-params";
+import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import defaultFlowJson from "./default-flow.json";
 
 const indexSyncIntervalInMs = 500;
 
@@ -59,7 +70,7 @@ class InteractionsService implements IInteractionService {
 
   async parse(sourceCode: string): Promise<ParsedInteractionOrError> {
     // It doesn't matter which chain ID we use in URL.
-    return fetch(`${window.location.origin}/flow-emulator/interactions/parse`, {
+    return fetch(`${window.location.origin}/parse-interaction`, {
       method: "POST",
       body: JSON.stringify({ sourceCode }),
     }).then(res => res.json())
@@ -67,11 +78,13 @@ class InteractionsService implements IInteractionService {
 
   async sendTransaction(request: SendTransactionRequest): Promise<TransactionOutcome> {
     const authz = fcl.authz as unknown as FlowAuthorizationFunction;
+    const parsedInteraction = await this.parse(request.cadence);
+    const authorizersCount = parsedInteraction.interaction?.transaction?.authorizerCount ?? 0;
     return await this.flowGatewayService.sendTransaction({
       cadence: request.cadence,
       arguments: request.arguments,
-      // TODO(web): Authorizers must match the number of AuthAccount's passed to prepare statement
-      authorizations: [],
+      // TODO(web): Refactor send transaction API
+      authorizations: Array.from({ length: authorizersCount }).map(() => authz),
       payer: authz,
       proposer: authz
     })
@@ -140,6 +153,11 @@ class LocalStorageIndex<Resource extends IndexableResource> extends InMemoryInde
     if (serializedLookup !== null) {
       this.lookup = new Map(
         Object.entries(JSON.parse(serializedLookup))
+          .map(([key, value]: [any, any]) => [key, {
+            ...value,
+            createdAt: new Date(value.createdAt),
+            updatedAt: new Date(value.updatedAt),
+          }])
       )
     }
   }
@@ -154,20 +172,34 @@ class FlowserAppService {
   readonly httpService: HttpService;
   private readonly indexer: FlowIndexerService;
 
-  constructor(public readonly chainId: ChainID) {
+  constructor(networkId: FlowNetworkId) {
 
     function buildStorageKey(resourceName: string) {
-      return `${chainId}/${resourceName}`
+      return `${networkId}/${resourceName}`
     }
 
-    this.blockchainIndexes = {
-      accountKey: new LocalStorageIndex(buildStorageKey("accountKeys")),
-      transaction: new LocalStorageIndex(buildStorageKey("transactions")),
-      block: new LocalStorageIndex(buildStorageKey("blocks")),
-      account: new LocalStorageIndex(buildStorageKey("accounts")),
-      event: new LocalStorageIndex(buildStorageKey("events")),
-      contract: new LocalStorageIndex(buildStorageKey("contracts")),
-      accountStorage: new LocalStorageIndex(buildStorageKey("accountStorages")),
+    // Emulator network is reset every time emulator is stopped (if --persist flag is omitted).
+    // For simplify sake don't persist the cache between page refreshes.
+    if (networkId === "emulator") {
+      this.blockchainIndexes = {
+        accountKey: new InMemoryIndex(),
+        transaction: new InMemoryIndex(),
+        block: new InMemoryIndex(),
+        account: new InMemoryIndex(),
+        event: new InMemoryIndex(),
+        contract: new InMemoryIndex(),
+        accountStorage: new InMemoryIndex(),
+      }
+    } else {
+      this.blockchainIndexes = {
+        accountKey: new LocalStorageIndex(buildStorageKey("accountKeys")),
+        transaction: new LocalStorageIndex(buildStorageKey("transactions")),
+        block: new LocalStorageIndex(buildStorageKey("blocks")),
+        account: new LocalStorageIndex(buildStorageKey("accounts")),
+        event: new LocalStorageIndex(buildStorageKey("events")),
+        contract: new LocalStorageIndex(buildStorageKey("contracts")),
+        accountStorage: new LocalStorageIndex(buildStorageKey("accountStorages")),
+      }
     }
 
     this.logger = new WebLogger();
@@ -187,6 +219,36 @@ class FlowserAppService {
       this.interactionsService,
       this.blockchainIndexes
     )
+
+    this.configureNetwork(networkId);
+  }
+
+  private configureNetwork(networkId: FlowNetworkId) {
+    switch (networkId) {
+      case "emulator":
+        return this.flowGatewayService.configure({
+          network: "local",
+          accessNodeRestApiUrl: "http://localhost:8888",
+          discoveryWalletUrl: "http://localhost:8701/fcl/authn",
+          // TODO(web): Provide a way for users to overwrite the default flow.json config?
+          // Provide config to support new import syntax in interactions.
+          // Default flow.json configuration taken from the standard scaffold.
+          // https://github.com/sideninja/flow-basic-scaffold/blob/main/flow.json
+          flowJSON: defaultFlowJson
+        });
+      case "testnet":
+        return this.flowGatewayService.configure({
+          network: "testnet",
+          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
+        });
+      case "mainnet":
+        return this.flowGatewayService.configure({
+          network: "mainnet",
+          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
+        });
+    }
   }
 
   getTransactionIndex(): IResourceIndexReader<FlowTransaction> {
@@ -272,47 +334,10 @@ class FlowserAppService {
 }
 
 
-export default function Page() {
-  const { chainId } = useParams();
+export default function Root() {
+  const { networkId } = useInteractionsPageParams();
 
-  // TODO: Why is window undefined if we use "use client"?
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  if (!isValidChainID(chainId)) {
-    // TODO: Return 404 error
-    return <div>Unknown chain</div>
-  }
-
-  const appService = new FlowserAppService(chainId);
-
-  function configureGateway(chainId: ChainID) {
-    switch (chainId) {
-      case "flow-emulator":
-        return appService.flowGatewayService.configure({
-          network: "local",
-          accessNodeRestApiUrl: "http://localhost:8888",
-          discoveryWalletUrl: "http://localhost:8701/fcl/authn"
-        });
-      case "flow-testnet":
-        return appService.flowGatewayService.configure({
-          network: "testnet",
-          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
-          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
-        });
-      case "flow-mainnet":
-        return appService.flowGatewayService.configure({
-          network: "mainnet",
-          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
-          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
-        });
-      default:
-        throw new Error(`Unsupported chain: ${chainId}`)
-    }
-  }
-
-  configureGateway(chainId);
+  const appService = new FlowserAppService(networkId);
 
   return (
     <OptionalEmulatorSetupPrompt appService={appService}>
@@ -324,7 +349,7 @@ export default function Page() {
           errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <ChainIdProvider config={{ chainId }}>
+        <FlowNetworkProvider config={{ chainId }}>
           <NextJsNavigationProvider>
             <ServiceRegistryProvider
               services={{
@@ -341,12 +366,12 @@ export default function Page() {
             >
               <InteractionRegistryProvider>
                 <TemplatesRegistryProvider>
-                  <InteractionsPage />
+                  <Content />
                 </TemplatesRegistryProvider>
               </InteractionRegistryProvider>
             </ServiceRegistryProvider>
           </NextJsNavigationProvider>
-        </ChainIdProvider>
+        </FlowNetworkProvider>
       </SWRConfig>
     </OptionalEmulatorSetupPrompt>
   );
@@ -411,9 +436,39 @@ function ApiSetupPrompt(props: {
   )
 }
 
+function Content() {
+  const { networkId, interaction } = useInteractionsPageParams();
+  const interactionRegistry = useInteractionRegistry();
+  const { data: flix } = useGetFlixTemplate(interaction);
+
+  useEffect(() => {
+    if (flix) {
+      const interaction = flixTemplateToInteraction(flix, networkId);
+      interactionRegistry.create(interaction);
+      interactionRegistry.setFocused(interaction.id);
+    }
+  }, [flix, networkId]);
+
+  useEffect(() => {
+    // Sign out the user when switching networks
+    // or "address is invalid for chain" error will be thrown.
+    fcl.unauthenticate()
+  }, [networkId]);
+
+  return (
+    <InteractionsPage
+      tabOrder={["templates", "history"]}
+      enabledInteractionSourceTypes={[
+        'session',
+        'flix',
+      ]}
+    />
+  );
+}
+
 class FlowService implements IFlowService {
     async getIndexOfAddress(chainID: ChainID, address: string): Promise<number> {
-      const response = await fetch(`${window.location.origin}/${chainID}/addresses/${address}/index`);
+      const response = await fetch(`${window.location.origin}/get-address-index?chainId=${chainID}&address=${address}`);
       const data = await response.json();
       return data.index as number;
     }

@@ -1,6 +1,7 @@
 import useSWR, { SWRResponse } from "swr";
 import { InteractionDefinition } from "../interactions/core/core-types";
 import { useEffect } from "react";
+import { useFlowNetworkId } from "../contexts/flow-network.context";
 
 // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
 export type FlixTemplate = {
@@ -66,16 +67,20 @@ export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   );
 }
 
+export function useGetFlixTemplate(id: string | undefined): SWRResponse<FlixTemplate> {
+  return useSWR(id ? `flix/templates/${id}` : null, () =>
+    fetch(`${FLOWSER_FLIX_URL}/v1/templates/${id}`).then((res) => res.json()),
+  );
+}
+
 // We are forced to use `null` as value for "not found",
 // as `undefined` is already used by SWR to represent "no data".
 export const FLIX_TEMPLATE_NOT_FOUND = null;
 
 export function useFlixSearch(options: {
   interaction: InteractionDefinition;
-  // Supports "any" network as of:
-  // https://github.com/onflowser/flow-interaction-template-service/pull/4
-  network: "any" | "testnet" | "mainnet";
 }): SWRResponse<FlixTemplate | null> {
+  const networkId = useFlowNetworkId();
 
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
@@ -88,7 +93,9 @@ export function useFlixSearch(options: {
       },
       body: JSON.stringify({
         cadence_base64: btoa(options.interaction.code),
-        network: options.network
+        // Supports "any" network as of:
+        // https://github.com/onflowser/flow-interaction-template-service/pull/4
+        network: networkId === "emulator" ? "any" : networkId
       })
     }).then((res) => res.status === 200 ? res.json() : null),
     {

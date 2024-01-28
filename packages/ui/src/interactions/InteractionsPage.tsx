@@ -15,16 +15,24 @@ import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDispla
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
-import { useTemplatesRegistry } from "./contexts/templates.context";
+import { InteractionSourceType, useTemplatesRegistry } from "./contexts/templates.context";
 import { InteractionDefinition } from "./core/core-types";
 
-export function InteractionsPage(): ReactElement {
+type InteractionsPageTab = "history" | "templates"
+
+type InteractionsPageProps = {
+  tabOrder: InteractionsPageTab[];
+  enabledInteractionSourceTypes: InteractionSourceType[];
+}
+
+export function InteractionsPage(props: InteractionsPageProps): ReactElement {
   const { definitions, focusedDefinition, setFocused, create, remove } =
     useInteractionRegistry();
   const {templates} = useTemplatesRegistry();
-  const [interactionToSaveBeforeClose, setInteractionToSaveBeforeClose] = useState<InteractionDefinition>();
+  const [interactionIdToSaveBeforeClose, setInteractionIdToSaveBeforeClose] = useState<string>();
 
-  const sideMenuTabs: BaseTabItem[] = [
+
+  const unOrderedTabs: BaseTabItem<InteractionsPageTab>[] = [
     {
       id: "history",
       label: "History",
@@ -33,9 +41,11 @@ export function InteractionsPage(): ReactElement {
     {
       id: "templates",
       label: "Templates",
-      content: <InteractionTemplates />,
+      content: <InteractionTemplates enabledSourceTypes={props.enabledInteractionSourceTypes} />,
     },
   ];
+
+  const sideMenuTabs: BaseTabItem<InteractionsPageTab>[] = props.tabOrder.map(tabId => unOrderedTabs.find(tab => tab.id === tabId)!);
   const [currentSideMenuTabId, setCurrentSideMenuTabId] = useState(
     sideMenuTabs[0].id,
   );
@@ -54,10 +64,10 @@ export function InteractionsPage(): ReactElement {
 
   return (
     <div className={classes.pageRoot}>
-      {interactionToSaveBeforeClose !== undefined && (
+      {interactionIdToSaveBeforeClose !== undefined && (
         <SaveSnippetDialog
-          interaction={interactionToSaveBeforeClose}
-          onClose={() => setInteractionToSaveBeforeClose(undefined)}
+          interactionId={interactionIdToSaveBeforeClose}
+          onClose={() => setInteractionIdToSaveBeforeClose(undefined)}
         />
       )}
       <BaseTabs
@@ -82,7 +92,7 @@ export function InteractionsPage(): ReactElement {
           if (isAlreadySavedOrEmpty) {
             remove(interaction.id);
           } else {
-            setInteractionToSaveBeforeClose(interaction);
+            setInteractionIdToSaveBeforeClose(interaction.id);
           }
         }}
         onAddNew={() => {
@@ -139,3 +149,5 @@ function InteractionDetails() {
 
   return <InteractionOutcomeDisplay />;
 }
+
+export default InteractionsPage;

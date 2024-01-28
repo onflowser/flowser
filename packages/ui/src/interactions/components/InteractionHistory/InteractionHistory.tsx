@@ -15,7 +15,15 @@ import { FlowBlock, FlowTransaction } from "@onflowser/api";
 import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 
 export function InteractionHistory(): ReactElement {
-  const { data: blocks } = useGetBlocks();
+  const { data: blocks, error } = useGetBlocks();
+
+  if (error) {
+    return (
+      <div className={classes.loadingRoot}>
+        Error: {error}
+      </div>
+    )
+  }
 
   if (!blocks) {
     return (
@@ -28,7 +36,7 @@ export function InteractionHistory(): ReactElement {
   if (blocks.length === 0) {
     return (
       <div className={classes.loadingRoot}>
-        No blocks yet
+        Empty history
       </div>
     )
   }

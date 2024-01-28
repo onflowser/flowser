@@ -315,7 +315,16 @@ const routes: RouteObject[] = [
             children: [
               {
                 index: true,
-                element: <InteractionsPage />,
+                element: (
+                  <InteractionsPage
+                    enabledInteractionSourceTypes={[
+                      'session',
+                      'flix',
+                      'workspace',
+                    ]}
+                    tabOrder={['history', 'templates']}
+                  />
+                ),
               },
             ],
           },

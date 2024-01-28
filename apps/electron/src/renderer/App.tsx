@@ -15,7 +15,7 @@ import {
   FlowTransaction,
 } from '@onflowser/api';
 import { SWRConfig } from 'swr';
-import { ChainIdProvider } from '@onflowser/ui/src/contexts/chain-id.context';
+import { FlowNetworkProvider } from 'packages/ui/src/contexts/flow-network.context';
 import { DependencyErrors } from './components/DependencyErrors/DependencyErrors';
 import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
 import { FlowserRouter } from './router';
@@ -77,7 +77,7 @@ export function App() {
           errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <ChainIdProvider config={{ chainId: 'flow-emulator' }}>
+        <FlowNetworkProvider config={{ chainId: 'flow-emulator' }}>
           <ServiceRegistryProvider
             services={{
               flowConfigService: window.electron.flowConfigService,
@@ -123,7 +123,7 @@ export function App() {
               </FilePickerProvider>
             </ConfirmDialogProvider>
           </ServiceRegistryProvider>
-        </ChainIdProvider>
+        </FlowNetworkProvider>
       </SWRConfig>
     </>
   );

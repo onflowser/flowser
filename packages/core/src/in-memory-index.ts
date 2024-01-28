@@ -59,7 +59,7 @@ export class InMemoryIndex<Resource extends IndexableResource>
   }
 
   async findAll(): Promise<Resource[]> {
-    return Array.from(this.lookup.values());
+    return Array.from(this.lookup.values()).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
 
   async findOneById(id: string): Promise<Resource | undefined> {
