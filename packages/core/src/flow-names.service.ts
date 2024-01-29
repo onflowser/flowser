@@ -132,12 +132,12 @@ export class FlowNamesService {
 
     const {find, flowns} = namesLookup;
 
-    const metadatas = await Promise.all([
+    const metadata = await Promise.all([
       this.getProfileByFindName(find),
       this.getProfileByFlownsName(flowns),
     ]);
 
-    return metadatas.filter(Boolean) as FlowNameProfile[];
+    return metadata.filter(Boolean) as FlowNameProfile[];
   }
 
   private async resolveAddressToFlowNames(address: string): Promise<Record<string, string>> {

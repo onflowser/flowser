@@ -75,6 +75,8 @@ export function AccountAvatar({
     return <Spinner size={size} />;
   }
 
+  const flowDomainAvatar = domainProfiles?.map(e => e.avatar)?.filter(Boolean)?.[0];
+
   return (
     <img
       className={className}
@@ -85,7 +87,7 @@ export function AccountAvatar({
       }}
       alt={address}
       // @ts-ignore Url is an object when using Next.js.
-      src={domainProfiles?.find(e => e.avatar)?.[0] || avatarUrl?.src || avatarUrl}
+      src={flowDomainAvatar || avatarUrl?.src || avatarUrl}
     />
   );
 }
