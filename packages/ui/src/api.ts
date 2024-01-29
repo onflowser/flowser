@@ -21,7 +21,7 @@ import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
 import { ensureNonPrefixedAddress } from "@onflowser/core";
 import { useChainId, useFlowNetworkId } from "./contexts/flow-network.context";
-import { FlowNameMetadata } from "@onflowser/core/src/flow-names.service";
+import { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -240,11 +240,11 @@ export function useGetAddressIndex(address: string): SWRResponse<number> {
   );
 }
 
-export function useGetAddressNameInfo(address: string): SWRResponse<FlowNameMetadata | undefined> {
+export function useGetAddressNameInfo(address: string): SWRResponse<FlowNameProfile[]> {
   const { flowNamesService } = useServiceRegistry();
   const networkId = useFlowNetworkId();
   return useSWR(`${networkId}/name-info/${address}`, () =>
-    flowNamesService?.getMetadataByAddress(address),
+    flowNamesService?.getProfilesByAddress(address) ?? [],
   );
 }
 

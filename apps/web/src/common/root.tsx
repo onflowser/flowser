@@ -221,11 +221,17 @@ class FlowserAppService {
     const flownsAddressByNetworkId = new Map<FlowNetworkId, string>([
       ["mainnet", "0x233eb012d34b0070"],
       ["testnet", "0xb05b2abb42335e88"]
+    ]);
+
+    const domainUtilsAddressByNetworkId = new Map<FlowNetworkId, string>([
+      ["mainnet", "0x1b3930856571a52b"],
+      ["testnet", "0xbca26f5091cd39ec"]
     ])
 
     this.flowNamesService = new FlowNamesService({
       findAddress: findAddressByNetworkId.get(networkId)!,
-      flownsAddress: flownsAddressByNetworkId.get(networkId)!
+      flownsAddress: flownsAddressByNetworkId.get(networkId)!,
+      domainUtilsAddress: domainUtilsAddressByNetworkId.get(networkId)!
     });
 
     this.interactionsService = new InteractionsService(

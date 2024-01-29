@@ -25,12 +25,13 @@ pub fun main(nameHash: String): Domains.DomainDetail? {
 }
 `;
 
+// https://contractbrowser.com/A.1b3930856571a52b.DomainUtils
 // language=Cadence
-const resolveAddressToFindNameCadence = `
-import FIND, Profile from 0xFindAddress
+const resolveAddressToFlowDomains = `
+import DomainUtils from 0xDomainUtils
 
-pub fun main(address: Address) :  String? {
-    return FIND.reverseLookup(address)
+pub fun main(address: Address): {String: String} {
+  return DomainUtils.getDefaultDomainsOfAddress(address)
 }
 `
 
@@ -95,12 +96,7 @@ export type FlownsDomainDetail = {
   createdAt: string;
 };
 
-type RawNameMetadata = {
-  flowns: FlownsDomainDetail | null;
-  find: FindUserProfile | null;
-}
-
-export type FlowNameMetadata = RawNameMetadata & {
+export type FlowNameProfile = {
   address: string;
   domainName: string;
   twitterUrl?: string;
@@ -114,6 +110,7 @@ export type FlowNameMetadata = RawNameMetadata & {
 type Config = {
   findAddress: string;
   flownsAddress: string;
+  domainUtilsAddress: string;
 }
 
 export class FlowNamesService {
@@ -121,71 +118,73 @@ export class FlowNamesService {
     fcl.config()
       .put("0xFlownsAddress", config.flownsAddress)
       // @ts-ignore
+      .put("0xDomainUtils", config.domainUtilsAddress)
+      // @ts-ignore
       .put("0xFindAddress", config.findAddress);
   }
 
-  public async getMetadataByAddress(address: string): Promise<FlowNameMetadata | undefined> {
-    const name = await this.resolveAddressToFindName(address);
+  public async getProfilesByAddress(address: string): Promise<FlowNameProfile[]> {
+    const namesLookup = await this.resolveAddressToFlowNames(address);
 
-    if (!name) {
-      return undefined;
+    if (Object.entries(namesLookup).length === 0) {
+      return [];
     }
 
-    return this.getMetadataByName(name);
-  }
+    const {find, flowns} = namesLookup;
 
-  public async getMetadataByName(
-    name: string
-  ): Promise<FlowNameMetadata | undefined> {
-    const rawMetadata = await this.getRawInfosByName(name);
-
-    const {find, flowns} = rawMetadata;
-
-    if (!find && !flowns) {
-      return undefined;
-    }
-
-    // TODO: What are the supported link types?
-    const twitterLink = find?.links.find((link) => link.type === "twitter");
-    const websiteLink = find?.links.find((link) => link.type === "globe");
-
-    return {
-      address: find?.address ?? flowns?.owner!,
-      domainName: find?.findName ?? flowns?.name!,
-      name: find?.name ?? flowns?.name,
-      avatar: find?.avatar,
-      // TODO: Read from flowns text records
-      twitterUrl: twitterLink?.url,
-      websiteUrl: websiteLink?.url,
-      tags: find?.tags,
-      description: find?.description,
-      ...rawMetadata,
-    };
-  }
-
-  public async getRawInfosByName(name: string): Promise<RawNameMetadata> {
-    const [flownsResponse, findResponse] = await Promise.allSettled([
-      this.lookupDomainByFlownsName(name),
-      this.lookupProfileByFindName(name),
+    const metadatas = await Promise.all([
+      this.getProfileByFindName(find),
+      this.getProfileByFlownsName(flowns),
     ]);
 
-    return {
-      flowns:
-        flownsResponse.status === "fulfilled" ? flownsResponse.value : null,
-      find: findResponse.status === "fulfilled" ? findResponse.value : null,
-    };
+    return metadatas.filter(Boolean) as FlowNameProfile[];
   }
 
-  private async resolveAddressToFindName(address: string): Promise<string | undefined> {
+  private async resolveAddressToFlowNames(address: string): Promise<Record<string, string>> {
     const response = await fcl
       .send([
-        fcl.script(resolveAddressToFindNameCadence),
+        fcl.script(resolveAddressToFlowDomains),
         fcl.args([fcl.arg(address, type.Address)])
       ]);
     return fcl.decode(response);
   }
 
-  private async lookupDomainByFlownsName(name: string): Promise<FlownsDomainDetail> {
+  private async getProfileByFindName(name: string): Promise<FlowNameProfile | undefined> {
+    const profile = await this.lookupProfileByFindName(name);
+
+    // TODO: What are the supported link types?
+    const twitterLink = profile?.links.find((link) => link.type === "twitter");
+    const websiteLink = profile?.links.find((link) => link.type === "globe");
+
+    return {
+      address: profile?.address,
+      domainName: profile?.findName,
+      name: profile?.name,
+      avatar: profile?.avatar,
+      twitterUrl: twitterLink?.url,
+      websiteUrl: websiteLink?.url,
+      tags: profile?.tags,
+      description: profile?.description,
+    };
+  }
+
+  private async getProfileByFlownsName(name: string): Promise<FlowNameProfile | undefined> {
+    const profile = await this.lookupProfileByFlownsName(name);
+
+    return {
+      address: profile?.owner!,
+      domainName: profile?.name!,
+      name: profile?.name,
+      avatar: undefined,
+      // TODO: Read from flowns text records
+      twitterUrl: undefined,
+      websiteUrl: undefined,
+      tags: [],
+      description: undefined,
+    };
+  }
+
+  private async lookupProfileByFlownsName(name: string): Promise<FlownsDomainDetail> {
     const nameHash = this.flownsNameHash(this.addPostfixIfMissing(name, ".fn"));
     const response = await fcl
       .send([

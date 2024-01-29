@@ -10,12 +10,12 @@ type AccountNameProps = {
 
 export function AccountName(props: AccountNameProps): ReactElement {
   const { address, short, className } = props;
-  const { data: nameInfo } = useGetAddressNameInfo(address);
+  const { data: domainProfiles } = useGetAddressNameInfo(address);
 
-  if (nameInfo) {
+  if (domainProfiles && domainProfiles.length > 0) {
     return (
       <div className={className}>
-        {nameInfo.name}
+        {domainProfiles[0].name}
       </div>
     )
   }

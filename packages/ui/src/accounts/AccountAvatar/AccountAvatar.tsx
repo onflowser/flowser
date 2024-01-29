@@ -52,7 +52,7 @@ export function AccountAvatar({
   className,
 }: AccountAvatarProps): ReactElement | null {
   const { data: addressIndex } = useGetAddressIndex(address);
-  const { data: nameInfo } = useGetAddressNameInfo(address);
+  const { data: domainProfiles } = useGetAddressNameInfo(address);
 
   const avatarUrl = useMemo(() => {
     const isServiceAccount = [
@@ -85,7 +85,7 @@ export function AccountAvatar({
       }}
       alt={address}
       // @ts-ignore Url is an object when using Next.js.
-      src={nameInfo?.avatar || avatarUrl?.src || avatarUrl}
+      src={domainProfiles?.find(e => e.avatar)?.[0] || avatarUrl?.src || avatarUrl}
     />
   );
 }
