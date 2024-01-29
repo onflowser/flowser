@@ -28,6 +28,10 @@ export function TransactionOverview(
         value: <TransactionLink transactionId={transaction.id} />,
       },
       {
+        label: "Block ID",
+        value: <BlockLink blockId={transaction.blockId} />,
+      },
+      {
         label: "Status",
         value: <ExecutionStatusBadge status={transaction.status} />,
       },
@@ -38,10 +42,6 @@ export function TransactionOverview(
       {
         label: "Created date",
         value: <DateDisplay date={transaction.createdAt.toISOString()} />,
-      },
-      {
-        label: "Block ID",
-        value: <BlockLink blockId={transaction.blockId} />,
       },
     ],
     [

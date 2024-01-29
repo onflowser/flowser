@@ -10,6 +10,7 @@ import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
 import { FlowEvent } from "@onflowser/api";
+import { TransactionLink } from "../../transactions/TransactionLink/TransactionLink";
 
 const columnHelper = createColumnHelper<FlowEvent>();
 
@@ -50,11 +51,7 @@ const columns = [
     header: () => <Label variant="medium">TRANSACTION</Label>,
     cell: (info) => (
       <Value>
-        <ProjectLink to={`/transactions/${info.getValue()}`}>
-          <MiddleEllipsis className={classes.hashEvents}>
-            {info.getValue()}
-          </MiddleEllipsis>
-        </ProjectLink>
+        <TransactionLink transactionId={info.getValue()} />
       </Value>
     ),
   }),
