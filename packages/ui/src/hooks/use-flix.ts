@@ -64,6 +64,9 @@ export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com
 export function useListFlixTemplates(): SWRResponse<FlixTemplate[]> {
   return useSWR(`flix/templates`, () =>
     fetch(`${FLOWSER_FLIX_URL}/v1/templates`).then((res) => res.json()),
+    {
+      refreshInterval: 0
+    }
   );
 }
 
