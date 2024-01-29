@@ -2208,7 +2208,7 @@
     "@onflow/fcl" "^1.6.0"
     "@onflowser/api" "*"
     "@onflowser/config" "*"
-    axios "^0.21.4"
+    axios "^1.6.5"
     axios-retry "^4.0.0"
     node-abort-controller "^3.0.1"
 
@@ -8508,6 +8508,11 @@ jpeg-js@^0.4.0:
   version "0.4.4"
   resolved "https://registry.npmjs.org/jpeg-js/-/jpeg-js-0.4.4.tgz"
   integrity sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==
+
+js-sha3@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.npmjs.org/js-sha3/-/js-sha3-0.8.0.tgz"
+  integrity sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

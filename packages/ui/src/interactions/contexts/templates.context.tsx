@@ -1,4 +1,4 @@
-import React, { createContext, ReactElement, useContext, useMemo } from "react";
+import React, { createContext, ReactElement, useContext, useEffect, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
 import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
@@ -59,7 +59,6 @@ export function TemplatesRegistryProvider(props: {
     SerializedSessionTemplate[]
   >("interactions", []);
   const flowNetworkId = useFlowNetworkId();
-  console.log(flixTemplates)
   const isLoading =
     getIsLoading(workspaceTemplates) ||
     getIsLoading(flixTemplates) ||
