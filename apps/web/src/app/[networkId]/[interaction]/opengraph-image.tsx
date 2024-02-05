@@ -3,6 +3,7 @@ import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.service";
 import { InteractionsPageParams } from '@/common/use-interaction-page-params';
 import { FlowserIcon } from "@onflowser/ui/src/common/icons/FlowserIcon";
+import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 
 export const runtime = 'edge';
 
@@ -30,59 +31,98 @@ export default async function Image(props: Props) {
       fetchFlixAuditorsById(interaction, networkId),
     ]);
 
+    const dependencies = FlixUtils.getDependencies(flix, networkId);
+    const profile = await getProfilesByAddress(dependencies[0].address, networkId);
+    const avatarUrl = profile[0]?.avatar ?? "https://flowser.dev/icon.png";
+
     return new ImageResponse(
       (
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             background: "white",
-            color: "#31363d",
             height: '100%',
             width: '100%',
             padding: 50,
-            rowGap: 20
+            columnGap: 20
           }}
         >
-          <span
+          <div
             style={{
-              fontSize: 100,
-              fontWeight: 800
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              color: "#31363d",
+              rowGap: 20,
+              flex: 5
             }}
           >
-            {FlixUtils.getName(flix)}
-          </span>
-          <span
-            style={{
-              fontSize: 40,
-              fontWeight: 400,
-              color: "#616569"
-            }}
-          >
-            {FlixUtils.getDescription(flix)}
-          </span>
-          {auditors.length > 0 && (
             <div
               style={{
                 display: "flex",
-                columnGap: 10,
-                fontSize: 20
+                flexDirection: "column"
               }}
             >
               <span
                 style={{
+                  fontSize: 100,
+                  fontWeight: 800
+                }}
+              >
+                {FlixUtils.getName(flix)}
+              </span>
+              <span
+                style={{
+                  fontSize: 40,
+                  fontWeight: 400,
+                  color: "#616569"
+                }}
+                >
+                {FlixUtils.getDescription(flix)}
+              </span>
+            </div>
+            {auditors.length > 0 && (
+              <div
+                style={{
                   display: "flex",
-                  alignItems: "center"
+                  columnGap: 30,
+                  fontSize: 20
+                }}
+              >
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  columnGap: 10,
                 }}
               >
                 <FlowserIcon.VerifiedCheck style={{ color: "#01ec8a" }} />
                 Verified
               </span>
-              <span>
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  columnGap: 10,
+                }}
+              >
+                <FlowserIcon.Star style={{ color: "#616569", transform: 'scale(1.3)' }} />
                 {auditors.length} Auditor{auditors.length > 1 ? "s" : ""}
               </span>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flex: 1
+          }}
+          >
+            <img
+              alt=""
+              src={avatarUrl}
+            />
+          </div>
         </div>
       ),
       {
@@ -123,9 +163,17 @@ async function fetchFlixAuditorsById(id: string, networkId: string): Promise<Fli
   return await res.json();
 }
 
-async function fetchFont(path: string) {
-  console.log(path)
-  return fetch(
-    new URL(path, import.meta.url)
-  ).then((res) => res.arrayBuffer())
+async function getProfilesByAddress(address: string, networkId: FlowNetworkId) {
+  const res = await fetch(`${getApiRouteHost()}/get-address-info?address=${address}&networkId=${networkId}`);
+  return await res.json();
+}
+
+// TODO: This wont work in preview deployments
+function getApiRouteHost() {
+  const isDev = process.env.NODE_ENV === "development";
+  if (isDev) {
+    return "http://localhost:3000"
+  } else {
+    return "https://interact.flowser.dev/"
+  }
 }

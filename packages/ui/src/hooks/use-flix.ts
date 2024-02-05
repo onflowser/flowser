@@ -2,7 +2,9 @@ import useSWR, { SWRResponse } from "swr";
 import { InteractionDefinition } from "../interactions/core/core-types";
 import { useEffect } from "react";
 import { useFlowNetworkId } from "../contexts/flow-network.context";
+import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 
+// TODO: Refactor to use types from flix service
 // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
 export type FlixTemplate = {
   id: string;
@@ -34,10 +36,8 @@ export type FlixArgument = {
 
 type FlixDependency = Record<
   string,
-  {
-    mainnet: FlixDependencyOnNetwork;
-    testnet: FlixDependencyOnNetwork;
-  }
+  // Only defined for `testnet` and `mainnet` networks.
+  Record<FlowNetworkId, FlixDependencyOnNetwork>
 >;
 
 type FlixDependencyOnNetwork = {

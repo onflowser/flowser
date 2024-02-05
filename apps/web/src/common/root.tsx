@@ -50,8 +50,6 @@ import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
 
 const indexSyncIntervalInMs = 500;
-const emulatorRestApiPort = 8888;
-const discoveryWalletPort = 8701;
 
 class InteractionsService implements IInteractionService {
 
@@ -213,25 +211,8 @@ class FlowserAppService {
       this.httpService
     );
 
-    const findAddressByNetworkId = new Map<FlowNetworkId, string>([
-      ["mainnet", "0x097bafa4e0b48eef"],
-      ["testnet", "0afe396ebc8eee65"]
-    ]);
-
-    const flownsAddressByNetworkId = new Map<FlowNetworkId, string>([
-      ["mainnet", "0x233eb012d34b0070"],
-      ["testnet", "0xb05b2abb42335e88"]
-    ]);
-
-    const domainUtilsAddressByNetworkId = new Map<FlowNetworkId, string>([
-      ["mainnet", "0x1b3930856571a52b"],
-      ["testnet", "0xbca26f5091cd39ec"]
-    ])
-
     this.flowNamesService = new FlowNamesService({
-      findAddress: findAddressByNetworkId.get(networkId)!,
-      flownsAddress: flownsAddressByNetworkId.get(networkId)!,
-      domainUtilsAddress: domainUtilsAddressByNetworkId.get(networkId)!
+      networkId
     });
 
     this.interactionsService = new InteractionsService(
@@ -251,30 +232,13 @@ class FlowserAppService {
   }
 
   private configureNetwork(networkId: FlowNetworkId) {
-    switch (networkId) {
-      case "emulator":
-        return this.flowGatewayService.configure({
-          network: "local",
-          accessNodeRestApiUrl: `http://localhost:${emulatorRestApiPort}`,
-          discoveryWalletUrl: `http://localhost:${discoveryWalletPort}/fcl/authn`,
-          // TODO(web): Provide a way for users to overwrite the default flow.json config?
-          // Provide config to support new import syntax in interactions.
-          // Default flow.json configuration taken from the standard scaffold.
-          // https://github.com/sideninja/flow-basic-scaffold/blob/main/flow.json
-          flowJSON: defaultFlowJson
-        });
-      case "testnet":
-        return this.flowGatewayService.configure({
-          network: "testnet",
-          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
-          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
-        });
-      case "mainnet":
-        return this.flowGatewayService.configure({
-          network: "mainnet",
-          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
-          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
-        });
+    this.flowGatewayService.configureWithDefaults(networkId);
+    if (networkId === "emulator") {
+      // TODO(web): Provide a way for users to overwrite the default flow.json config?
+      // Provide config to support new import syntax in interactions.
+      // Default flow.json configuration taken from the standard scaffold.
+      // https://github.com/sideninja/flow-basic-scaffold/blob/main/flow.json
+      this.flowGatewayService.configureFlowJSON(defaultFlowJson)
     }
   }
 
@@ -452,13 +416,13 @@ function OptionalEmulatorSetupPrompt(props: {
               isReachable={data.isRestApiReachable}
               label="Emulator"
               setupCommand="flow emulator"
-              expectedPort={emulatorRestApiPort}
+              expectedPort={FlowGatewayService.defaultPorts.emulatorRestApiPort}
             />
             <ApiSetupPrompt
               isReachable={data.isDiscoveryWalletReachable}
               label="Dev wallet"
               setupCommand="flow dev-wallet"
-              expectedPort={discoveryWalletPort}
+              expectedPort={FlowGatewayService.defaultPorts.discoveryWalletPort}
             />
           </div>
         </BaseDialog>

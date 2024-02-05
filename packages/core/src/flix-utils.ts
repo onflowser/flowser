@@ -1,7 +1,25 @@
-import { FlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
+import { FlixTemplate } from "./flow-flix.service";
 import { FlowNetworkId } from "./flow-utils";
 
+type FlixDependencySummary = {
+  name: string;
+  address: string;
+}
+
 export class FlixUtils {
+
+  static getDependencies(template: FlixTemplate, networkId: FlowNetworkId): FlixDependencySummary[] {
+    return Object
+      .values(template.data.dependencies)
+      .map((entry): FlixDependencySummary => {
+        const name = Object.keys(entry)[0];
+        const info = Object.values(entry)[0];
+        return {
+          name,
+          address: info[networkId].address
+        }
+      });
+  }
 
   static getDescription(template: FlixTemplate) {
     return template.data.messages.description?.i18n["en-US"];

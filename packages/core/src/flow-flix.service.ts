@@ -1,4 +1,5 @@
 import { HttpService } from "./http.service";
+import { FlowNetworkId } from "./flow-utils";
 
 // https://github.com/onflow/flips/blob/main/application/20220503-interaction-templates.md#interaction-interfaces
 export type FlixTemplate = {
@@ -31,10 +32,8 @@ export type FlixArgument = {
 
 type FlixDependency = Record<
   string,
-  {
-    mainnet: FlixDependencyOnNetwork;
-    testnet: FlixDependencyOnNetwork;
-  }
+  // Only defined for `testnet` and `mainnet` networks.
+  Record<FlowNetworkId, FlixDependencyOnNetwork>
 >;
 
 type FlixDependencyOnNetwork = {
