@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
-import { FlixTemplate } from "@onflowser/core/src/flow-flix.service";
+import { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.service";
 import { InteractionsPageParams } from '@/common/use-interaction-page-params';
+import { FlowserIcon } from "@onflowser/ui/src/common/icons/FlowserIcon";
 
 export const runtime = 'edge';
 
@@ -18,72 +19,87 @@ type Props = {
 export default async function Image(props: Props) {
   const {interaction, networkId} = props.params;
 
+  const [interBold, interRegular] = await Promise.all([
+    fetch(new URL("./Inter-Bold.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
+    fetch(new URL("./Inter-Regular.ttf", import.meta.url)).then((res) => res.arrayBuffer())
+  ])
+
   if (interaction) {
-    const flix = await fetchFlixTemplateById(interaction);
+    const [flix, auditors] = await Promise.all([
+      fetchFlixTemplateById(interaction),
+      fetchFlixAuditorsById(interaction, networkId),
+    ]);
 
     return new ImageResponse(
       (
         <div
           style={{
-            display: 'flex',
-            color: '#e5e5e5',
-            background: '#262b32',
-            width: '100%',
+            display: "flex",
+            flexDirection: "column",
+            background: "white",
+            color: "#31363d",
             height: '100%',
-            flexDirection: 'column',
-            padding: 20,
-            paddingBottom: 0
+            width: '100%',
+            padding: 50,
+            rowGap: 20
           }}
         >
-          <div
+          <span
             style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between"
+              fontSize: 100,
+              fontWeight: 800
             }}
           >
+            {FlixUtils.getName(flix)}
+          </span>
+          <span
+            style={{
+              fontSize: 40,
+              fontWeight: 400,
+              color: "#616569"
+            }}
+          >
+            {FlixUtils.getDescription(flix)}
+          </span>
+          {auditors.length > 0 && (
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
-                rowGap: 20
-            }}
+                columnGap: 10,
+                fontSize: 20
+              }}
             >
               <span
-                style={{ fontSize: 60 }}
-              >
-                {FlixUtils.getName(flix)}
-              </span>
-              <span
                 style={{
-                  fontSize: 30,
-                  maxWidth: 600,
-              }}
+                  display: "flex",
+                  alignItems: "center"
+                }}
               >
-                {FlixUtils.getDescription(flix)}
+                <FlowserIcon.VerifiedCheck style={{ color: "#01ec8a" }} />
+                Verified
+              </span>
+              <span>
+                {auditors.length} Auditor{auditors.length > 1 ? "s" : ""}
               </span>
             </div>
-            <img
-              width="256"
-              height="256"
-              src="https://flowser.dev/icon.png"
-              style={{
-                borderRadius: 128,
-              }}
-            />
-          </div>
-          <pre
-            style={{
-              fontSize: 18,
-              color: "#8b949e"
-          }}
-          >
-            {FlixUtils.getCadenceSourceCode(flix, networkId)}
-          </pre>
+          )}
         </div>
       ),
-      size
+      {
+        ...size,
+        fonts: [
+          {
+            name: 'Inter',
+            data: interBold,
+            weight: 800
+          },
+          {
+            name: 'Inter',
+            data: interRegular,
+            weight: 400
+          },
+        ]
+      }
     );
   }
 
@@ -94,7 +110,22 @@ export default async function Image(props: Props) {
 // since that uses axios to for network calls
 // and axios can't be used in edge runtime.
 // See: https://github.com/axios/axios/issues/5523
+
+const flixApiHost = `https://flowser-flix-368a32c94da2.herokuapp.com`;
+
 async function fetchFlixTemplateById(id: string): Promise<FlixTemplate> {
-  const res = await fetch(`https://flowser-flix-368a32c94da2.herokuapp.com/v1/templates/${id}`);
+  const res = await fetch(`${flixApiHost}/v1/templates/${id}`);
   return await res.json();
+}
+
+async function fetchFlixAuditorsById(id: string, networkId: string): Promise<FlixAuditor[]> {
+  const res = await fetch(`${flixApiHost}/v1/templates/${id}/auditors?network=${networkId}`);
+  return await res.json();
+}
+
+async function fetchFont(path: string) {
+  console.log(path)
+  return fetch(
+    new URL(path, import.meta.url)
+  ).then((res) => res.arrayBuffer())
 }
