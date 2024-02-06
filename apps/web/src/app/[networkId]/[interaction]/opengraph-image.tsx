@@ -34,6 +34,10 @@ export default async function Image(props: Props) {
     const dependencies = FlixUtils.getDependencies(flix, networkId);
     const profile = await getProfilesByAddress(dependencies[0].address, networkId);
     const avatarUrl = profile[0]?.avatar ?? "https://flowser.dev/icon.png";
+    const sourceCodeLines = FlixUtils.getCadenceSourceCode(flix, networkId).split("\n");
+    const linesToShow = 4;
+    const shownLines = sourceCodeLines.slice(0, linesToShow);
+    const hiddenLinesCount = sourceCodeLines.length - linesToShow;
 
     return new ImageResponse(
       (
@@ -52,7 +56,7 @@ export default async function Image(props: Props) {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              color: "#31363d",
+              color: "#31363C",
               rowGap: 20,
               flex: 5
             }}
@@ -66,6 +70,7 @@ export default async function Image(props: Props) {
               <span
                 style={{
                   fontSize: 100,
+                  lineHeight: 1,
                   fontWeight: 800
                 }}
               >
@@ -81,6 +86,37 @@ export default async function Image(props: Props) {
                 {FlixUtils.getDescription(flix)}
               </span>
             </div>
+            <pre
+              style={{
+                background: "#f4f4f4",
+                borderRadius: 20,
+                padding: 10,
+                overflow: 'hidden',
+                height: 150,
+                fontSize: 22,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {shownLines
+                .map(row => (
+                  <code
+                    key={row}
+                    style={{
+                      // Make comments less visible
+                      color: /\/\/\//.test(row) ? "rgba(116,116,116,0.49)" : "#747474",
+                      minHeight: 24,
+                  }}
+                  >
+                    {row}
+                  </code>
+                ))}
+                {hiddenLinesCount > 0 && (
+                  <code style={{ color: "#747474", fontSize: 15, marginTop: 5 }}>
+                    + {hiddenLinesCount} lines
+                  </code>
+                )}
+            </pre>
             {auditors.length > 0 && (
               <div
                 style={{
