@@ -20,8 +20,8 @@ type Props = {
 export default async function Image(props: Props) {
   const {interaction, networkId} = props.params;
 
-  const [interBold, interRegular] = await Promise.all([
-    fetch(new URL("./Inter-Bold.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
+  const [interBlack, interRegular] = await Promise.all([
+    fetch(new URL("./Inter-Black.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
     fetch(new URL("./Inter-Regular.ttf", import.meta.url)).then((res) => res.arrayBuffer())
   ])
 
@@ -35,9 +35,18 @@ export default async function Image(props: Props) {
     const profile = await getProfilesByAddress(dependencies[0].address, networkId);
     const avatarUrl = profile[0]?.avatar ?? "https://flowser.dev/icon.png";
     const sourceCodeLines = FlixUtils.getCadenceSourceCode(flix, networkId).split("\n");
-    const linesToShow = 4;
-    const shownLines = sourceCodeLines.slice(0, linesToShow);
-    const hiddenLinesCount = sourceCodeLines.length - linesToShow;
+    const linesToShow = 3;
+    const excludeComments = true;
+    const trimmedCodeLines = sourceCodeLines
+      .filter(row => excludeComments ? !isComment(row) : true)
+      .filter(row => row.trim().length > 0);
+    const shownLines = trimmedCodeLines.slice(0, linesToShow);
+    const hiddenLinesCount = trimmedCodeLines.length - linesToShow;
+
+    const commonIconStyle = {
+      width: 25,
+      height: 25
+    }
 
     return new ImageResponse(
       (
@@ -56,7 +65,6 @@ export default async function Image(props: Props) {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              color: "#31363C",
               rowGap: 20,
               flex: 5
             }}
@@ -64,14 +72,16 @@ export default async function Image(props: Props) {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                rowGap: 10,
               }}
             >
               <span
                 style={{
                   fontSize: 100,
                   lineHeight: 1,
-                  fontWeight: 800
+                  fontWeight: 800,
+                  color: "#31363C"
                 }}
               >
                 {FlixUtils.getName(flix)}
@@ -80,7 +90,7 @@ export default async function Image(props: Props) {
                 style={{
                   fontSize: 40,
                   fontWeight: 400,
-                  color: "#616569"
+                  color: "#56595E"
                 }}
                 >
                 {FlixUtils.getDescription(flix)}
@@ -92,7 +102,7 @@ export default async function Image(props: Props) {
                 borderRadius: 20,
                 padding: 10,
                 overflow: 'hidden',
-                height: 150,
+                height: 120,
                 fontSize: 22,
                 display: "flex",
                 flexDirection: "column",
@@ -104,7 +114,7 @@ export default async function Image(props: Props) {
                     key={row}
                     style={{
                       // Make comments less visible
-                      color: /\/\/\//.test(row) ? "rgba(116,116,116,0.49)" : "#747474",
+                      color: isComment(row) ? "rgba(116,116,116,0.49)" : "#747474",
                       minHeight: 24,
                   }}
                   >
@@ -122,7 +132,8 @@ export default async function Image(props: Props) {
                 style={{
                   display: "flex",
                   columnGap: 30,
-                  fontSize: 20
+                  fontSize: 25,
+                  color: "#31363C",
                 }}
               >
               <span
@@ -132,7 +143,7 @@ export default async function Image(props: Props) {
                   columnGap: 10,
                 }}
               >
-                <FlowserIcon.VerifiedCheck style={{ color: "#01ec8a" }} />
+                <FlowserIcon.VerifiedCheck style={{ color: "#01ec8a", ...commonIconStyle }} />
                 Verified
               </span>
               <span
@@ -142,7 +153,7 @@ export default async function Image(props: Props) {
                   columnGap: 10,
                 }}
               >
-                <FlowserIcon.Star style={{ color: "#616569", transform: 'scale(1.3)' }} />
+                <FlowserIcon.StarFill style={{ color: "#B5B5B5", ...commonIconStyle }} />
                 {auditors.length} Auditor{auditors.length > 1 ? "s" : ""}
               </span>
               </div>
@@ -166,7 +177,7 @@ export default async function Image(props: Props) {
         fonts: [
           {
             name: 'Inter',
-            data: interBold,
+            data: interBlack,
             weight: 800
           },
           {
@@ -204,7 +215,7 @@ async function getProfilesByAddress(address: string, networkId: FlowNetworkId) {
   return await res.json();
 }
 
-// TODO: This wont work in preview deployments
+// This wont work in preview deployments
 function getApiRouteHost() {
   const isDev = process.env.NODE_ENV === "development";
   if (isDev) {
@@ -212,4 +223,8 @@ function getApiRouteHost() {
   } else {
     return "https://interact.flowser.dev/"
   }
+}
+
+function isComment(code: string) {
+  return /\/\/\//.test(code)
 }
