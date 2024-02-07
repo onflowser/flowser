@@ -324,5 +324,5 @@ function getApiRouteHost() {
 }
 
 function isComment(code: string) {
-  return /\/\/\//.test(code)
+  return /\/\/\/?/.test(code)
 }
