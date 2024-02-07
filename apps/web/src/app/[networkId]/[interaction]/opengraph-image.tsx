@@ -2,9 +2,9 @@ import { ImageResponse } from 'next/og';
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.service";
 import { InteractionsPageParams } from '@/common/use-interaction-page-params';
-import { FlowserIcon } from "@onflowser/ui/src/common/icons/FlowserIcon";
 import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
+import { RiVerifiedBadgeFill, RiStarFill } from "react-icons/ri";
 
 export const runtime = 'edge';
 
@@ -126,14 +126,10 @@ function TitleAndDescription(props: {flix: FlixTemplate}) {
 
 function AuditorInfo(props: { auditors: FlixAuditor[]}) {
   const {auditors} = props;
+  const iconSize = 25;
 
   if (auditors.length === 0) {
     return null;
-  }
-
-  const commonIconStyle = {
-    width: 25,
-    height: 25
   }
 
   return (
@@ -153,9 +149,7 @@ function AuditorInfo(props: { auditors: FlixAuditor[]}) {
           columnGap: 10,
         }}
       >
-        <FlowserIcon.VerifiedCheck
-          style={{ color: "#01ec8a", ...commonIconStyle }}
-        />
+        <RiVerifiedBadgeFill size={iconSize} color="#01ec8a" />
         Verified
       </span>
       <span
@@ -165,7 +159,7 @@ function AuditorInfo(props: { auditors: FlixAuditor[]}) {
           columnGap: 10,
         }}
       >
-        <FlowserIcon.StarFill style={{ color: "#B5B5B5", ...commonIconStyle }} />
+        <RiStarFill size={iconSize} color="#B5B5B5" />
         {auditors.length} Auditor{auditors.length > 1 ? "s" : ""}
       </span>
     </div>
