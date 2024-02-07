@@ -5,12 +5,12 @@ import { InteractionParameterBuilder } from "../../contexts/definition.context";
 import classes from "./ParamBuilder.module.scss";
 import { CadenceValueBuilder } from "../ValueBuilder/interface";
 import { CadenceParameter } from "@onflowser/api";
-import { FlixArgument, FlixTemplate } from "../../../hooks/use-flix";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
+import { FlixV1Argument, FlixV1Template } from "@onflowser/core";
 
 export type ParameterListBuilderProps = InteractionParameterBuilder & {
   parameters: CadenceParameter[];
-  flixTemplate: FlixTemplate | undefined;
+  flixTemplate: FlixV1Template | undefined;
 };
 
 export function ParamListBuilder(
@@ -34,7 +34,7 @@ export function ParamListBuilder(
 
 export type ParameterBuilderProps = Omit<CadenceValueBuilder, "type"> & {
   parameter: CadenceParameter;
-  flixArgument: FlixArgument | undefined;
+  flixArgument: FlixV1Argument | undefined;
 };
 
 export function ParamBuilder(props: ParameterBuilderProps): ReactElement {

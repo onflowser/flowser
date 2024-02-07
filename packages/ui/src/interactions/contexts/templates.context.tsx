@@ -1,13 +1,13 @@
-import React, { createContext, ReactElement, useContext, useEffect, useMemo } from "react";
+import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
-import { FclValue } from "@onflowser/core";
+import { FclValue, FlixV1Template } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import {
   useGetContracts,
   useGetWorkspaceInteractionTemplates,
 } from "../../api";
 import { WorkspaceTemplate } from "@onflowser/api";
-import { FlixTemplate, useListFlixTemplates } from "../../hooks/use-flix";
+import { useListFlixTemplates } from "../../hooks/use-flix";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
@@ -26,7 +26,7 @@ export type InteractionSourceType = "workspace" | "flix" | "session";
 export type InteractionDefinitionTemplate = InteractionDefinition & {
   source: InteractionSourceType;
 
-  flix: FlixTemplate | undefined;
+  flix: FlixV1Template | undefined;
   workspace: WorkspaceTemplate | undefined;
 };
 
@@ -90,7 +90,7 @@ export function TemplatesRegistryProvider(props: {
     "FlowFees",
   ]);
 
-  function isSupportedOnCurrentNetwork(template: FlixTemplate) {
+  function isSupportedOnCurrentNetwork(template: FlixV1Template) {
     if (networkId === "emulator") {
       return isSupportedOnEmulatorNetwork(template)
     } else {
@@ -101,7 +101,7 @@ export function TemplatesRegistryProvider(props: {
   // Since FLIX v1 doesn't officially support the emulator network,
   // we must manually check if the provided template depends on contracts
   // that are known to be deployed on the emulator network.
-  function isSupportedOnEmulatorNetwork(template: FlixTemplate) {
+  function isSupportedOnEmulatorNetwork(template: FlixV1Template) {
     const importedContractNames = Object.values(template.data.dependencies)
       .map((dependency) => Object.keys(dependency))
       .flat();
@@ -224,7 +224,7 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   return context;
 }
 
-export function flixTemplateToInteraction(template: FlixTemplate, networkId: FlowNetworkId): InteractionDefinition {
+export function flixTemplateToInteraction(template: FlixV1Template, networkId: FlowNetworkId): InteractionDefinition {
   return {
     id: template.id,
     name: FlixUtils.getName(template),

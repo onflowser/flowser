@@ -4,7 +4,7 @@ import type { InteractionsPageParams } from '@/common/use-interaction-page-param
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
 import { FlowUtils } from "@onflowser/core/src/flow-utils";
-import { FlixAuditor, FlixTemplateV1 } from "@onflowser/core/src/flix-v1";
+import { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
 
 export const runtime = 'edge';
 
@@ -111,7 +111,7 @@ function FallbackPreview() {
   )
 }
 
-function TitleAndDescription(props: {flix: FlixTemplateV1}) {
+function TitleAndDescription(props: {flix: FlixV1Template}) {
   return (
     <div
       style={{
@@ -143,7 +143,7 @@ function TitleAndDescription(props: {flix: FlixTemplateV1}) {
   )
 }
 
-function AuditorInfo(props: { auditors: FlixAuditor[]}) {
+function AuditorInfo(props: { auditors: FlixV1Auditor[]}) {
   const {auditors} = props;
   const iconSize = 25;
 
@@ -288,7 +288,7 @@ function RiStarFill(props: IconProps) {
 
 const flixApiHost = `https://flowser-flix-368a32c94da2.herokuapp.com`;
 
-async function fetchFlixTemplateById(id: string): Promise<FlixTemplateV1 | undefined> {
+async function fetchFlixTemplateById(id: string): Promise<FlixV1Template | undefined> {
   const res = await fetch(`${flixApiHost}/v1/templates/${id}`);
   if (res.status === 200) {
     return await res.json();
@@ -297,7 +297,7 @@ async function fetchFlixTemplateById(id: string): Promise<FlixTemplateV1 | undef
   }
 }
 
-async function fetchFlixAuditorsById(id: string, networkId: string): Promise<FlixAuditor[]> {
+async function fetchFlixAuditorsById(id: string, networkId: string): Promise<FlixV1Auditor[]> {
   const res = await fetch(`${flixApiHost}/v1/templates/${id}/auditors?network=${networkId}`);
   return await res.json();
 }

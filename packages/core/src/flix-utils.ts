@@ -1,5 +1,5 @@
 import type { FlowNetworkId } from "./flow-utils";
-import type { FlixTemplateV1 } from "./flix-v1";
+import type { FlixV1Template } from "./flix-v1";
 
 type FlixDependencySummary = {
   name: string;
@@ -8,7 +8,7 @@ type FlixDependencySummary = {
 
 export class FlixUtils {
 
-  static getDependencies(template: FlixTemplateV1, networkId: FlowNetworkId): FlixDependencySummary[] {
+  static getDependencies(template: FlixV1Template, networkId: FlowNetworkId): FlixDependencySummary[] {
     return Object
       .values(template.data.dependencies)
       .map((entry): FlixDependencySummary => {
@@ -21,11 +21,11 @@ export class FlixUtils {
       });
   }
 
-  static getDescription(template: FlixTemplateV1) {
+  static getDescription(template: FlixV1Template) {
     return template.data.messages.description?.i18n["en-US"];
   }
 
-  static getName(template: FlixTemplateV1) {
+  static getName(template: FlixV1Template) {
     const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
     if (englishTitle) {
       return this.shortenName(englishTitle)
@@ -69,7 +69,7 @@ export class FlixUtils {
     }
   }
 
-  static getCadenceSourceCode(template: FlixTemplateV1, networkId: FlowNetworkId) {
+  static getCadenceSourceCode(template: FlixV1Template, networkId: FlowNetworkId) {
     if (networkId === "emulator") {
       return this.getCadenceWithNewImportSyntax(template);
     } else {
@@ -77,7 +77,7 @@ export class FlixUtils {
     }
   }
 
-  static hasDependenciesForNetwork(template: FlixTemplateV1, networkId: "mainnet" | "testnet") {
+  static hasDependenciesForNetwork(template: FlixV1Template, networkId: "mainnet" | "testnet") {
     let hasDependencies = true;
 
     for (const replacementPattern in template.data.dependencies) {
@@ -89,7 +89,7 @@ export class FlixUtils {
     return hasDependencies;
   }
 
-  private static getCadenceWithNetworkDependencies(template: FlixTemplateV1, networkId: "mainnet" | "testnet") {
+  private static getCadenceWithNetworkDependencies(template: FlixV1Template, networkId: "mainnet" | "testnet") {
     let cadence = template.data.cadence;
 
     for (const replacementPattern in template.data.dependencies) {
@@ -105,7 +105,7 @@ export class FlixUtils {
   // Transform imports with replacement patterns to the new import syntax,
   // since FLIX v1.0 doesn't support new import syntax yet.
   // https://github.com/onflow/flow-interaction-template-tools/issues/12
-  private static getCadenceWithNewImportSyntax(template: FlixTemplateV1) {
+  private static getCadenceWithNewImportSyntax(template: FlixV1Template) {
     const replacementPatterns = Object.keys(template.data.dependencies);
     return replacementPatterns.reduce(
       (cadence, pattern) => {
