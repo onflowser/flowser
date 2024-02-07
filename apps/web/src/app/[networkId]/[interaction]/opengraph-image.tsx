@@ -80,7 +80,7 @@ export default async function Image(props: Props) {
           }}
           >
             <AccountImage addressIndex={addressIndex} profiles={flowNameProfiles} />
-            <FlowserLogo size={60} />
+            <FlowserLogo size={40} />
           </div>
         </div>
       ),
@@ -235,7 +235,8 @@ function FlowserLogo(props: { size: number }) {
       src="https://flowser.dev/icon.png"
       style={{
         width: props.size,
-        height: props.size
+        height: props.size,
+        transform: "scale(1.2)"
       }}
     />
   )
