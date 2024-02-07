@@ -53,13 +53,13 @@ export default async function Image(props: Props) {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              rowGap: 20,
+              rowGap: 30,
               flex: 5,
             }}
           >
             <TitleAndDescription flix={flix} />
-            <CodePreview cadence={cadenceSourceCode} />
             <AuditorInfo auditors={auditors} />
+            <CodePreview cadence={cadenceSourceCode} />
           </div>
           <div
             style={{
