@@ -32,6 +32,9 @@ export default async function Image(props: Props) {
       fetchFlixAuditorsById(interaction, networkId),
     ]);
 
+    if (!flix) {
+      return new ImageResponse(<FallbackPreview />, size);
+    }
 
     const cadenceSourceCode = FlixUtils.getCadenceSourceCode(flix, networkId);
     const dependencies = FlixUtils.getDependencies(flix, networkId);
@@ -48,8 +51,8 @@ export default async function Image(props: Props) {
           style={{
             display: "flex",
             background: "white",
-            height: '100%',
-            width: '100%',
+            height: size.height,
+            width: size.width,
             padding: 50,
             columnGap: 20
           }}
@@ -99,7 +102,13 @@ export default async function Image(props: Props) {
     );
   }
 
-  return new ImageResponse(<>Unknown interaction</>, size);
+  return new ImageResponse(<FallbackPreview />, size);
+}
+
+function FallbackPreview() {
+  return (
+    <img style={size} alt="" src="https://flowser.dev/social.png" />
+  )
 }
 
 function TitleAndDescription(props: {flix: FlixTemplate}) {
@@ -278,9 +287,13 @@ function RiStarFill(props: IconProps) {
 
 const flixApiHost = `https://flowser-flix-368a32c94da2.herokuapp.com`;
 
-async function fetchFlixTemplateById(id: string): Promise<FlixTemplate> {
+async function fetchFlixTemplateById(id: string): Promise<FlixTemplate | undefined> {
   const res = await fetch(`${flixApiHost}/v1/templates/${id}`);
-  return await res.json();
+  if (res.status === 200) {
+    return await res.json();
+  } else {
+    return undefined;
+  }
 }
 
 async function fetchFlixAuditorsById(id: string, networkId: string): Promise<FlixAuditor[]> {
