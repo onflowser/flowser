@@ -70,10 +70,14 @@ export default async function Image(props: Props) {
           <div
             style={{
               display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
               flex: 1
           }}
           >
             <AccountImage addressIndex={addressIndex} profiles={flowNameProfiles} />
+            <FlowserLogo size={60} />
           </div>
         </div>
       ),
@@ -212,6 +216,19 @@ function CodePreview(props: {cadence: string}) {
         </code>
       )}
     </pre>
+  )
+}
+
+function FlowserLogo(props: { size: number }) {
+  return (
+    <img
+      alt=""
+      src="https://flowser.dev/icon.png"
+      style={{
+        width: props.size,
+        height: props.size
+      }}
+    />
   )
 }
 
