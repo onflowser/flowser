@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { ImageResponse } from 'next/og';
-// import { FlixUtils } from "@onflowser/core/src/flix-utils";
-// import type { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.service";
-// import type { InteractionsPageParams } from '@/common/use-interaction-page-params';
-// import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
-// import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
+import { FlixUtils } from "@onflowser/core/src/flix-utils";
+import type { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.service";
+import type { InteractionsPageParams } from '@/common/use-interaction-page-params';
+import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
 
 export const runtime = 'edge';
 
@@ -22,8 +21,8 @@ export default async function Image(props: Props) {
   const {interaction, networkId} = props.params;
 
   const [interBlack, interRegular] = await Promise.all([
-    // fetch(new URL("./Inter-Black.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
-    // fetch(new URL("./Inter-Regular.ttf", import.meta.url)).then((res) => res.arrayBuffer())
+    fetch(new URL("./Inter-Black.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
+    fetch(new URL("./Inter-Regular.ttf", import.meta.url)).then((res) => res.arrayBuffer())
   ])
 
   if (interaction) {
