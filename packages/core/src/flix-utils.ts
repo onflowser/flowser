@@ -1,5 +1,5 @@
-import { FlixTemplate } from "./flow-flix.service";
-import { FlowNetworkId } from "./flow-utils";
+import type { FlixTemplate } from "./flow-flix.service";
+import type { FlowNetworkId } from "./flow-utils";
 
 type FlixDependencySummary = {
   name: string;
