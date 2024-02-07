@@ -181,30 +181,30 @@ function CodePreview(props: {cadence: string}) {
       style={{
         background: "#f4f4f4",
         borderRadius: 20,
-        padding: 10,
+        padding: 20,
         overflow: "hidden",
         fontSize: 22,
         display: "flex",
         flexDirection: "column",
       }}
     >
-    {shownLines.map((row) => (
-      <code
-        key={row}
-        style={{
-          // Make comments less visible
-          color: isComment(row) ? "rgba(116,116,116,0.49)" : "#747474",
-          minHeight: 24,
-        }}
-      >
-        {row}
-      </code>
-    ))}
-        {hiddenLinesCount > 0 && (
-          <code style={{ color: "#747474", fontSize: 15, marginTop: 5 }}>
-            + {hiddenLinesCount} lines
-          </code>
-        )}
+      {shownLines.map((row) => (
+        <code
+          key={row}
+          style={{
+            // Make comments less visible
+            color: isComment(row) ? "rgba(116,116,116,0.49)" : "#747474",
+            minHeight: 24,
+          }}
+        >
+          {row}
+        </code>
+      ))}
+      {hiddenLinesCount > 0 && (
+        <code style={{ color: "#747474", fontSize: 15, marginTop: 10 }}>
+          + {hiddenLinesCount} lines
+        </code>
+      )}
     </pre>
   )
 }
