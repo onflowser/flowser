@@ -1,10 +1,10 @@
 import { ImageResponse } from 'next/og';
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
-import type { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.service";
 import type { InteractionsPageParams } from '@/common/use-interaction-page-params';
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
 import { FlowUtils } from "@onflowser/core/src/flow-utils";
+import { FlixAuditor, FlixTemplateV1 } from "@onflowser/core/src/flix-v1";
 
 export const runtime = 'edge';
 
@@ -111,7 +111,7 @@ function FallbackPreview() {
   )
 }
 
-function TitleAndDescription(props: {flix: FlixTemplate}) {
+function TitleAndDescription(props: {flix: FlixTemplateV1}) {
   return (
     <div
       style={{
@@ -288,7 +288,7 @@ function RiStarFill(props: IconProps) {
 
 const flixApiHost = `https://flowser-flix-368a32c94da2.herokuapp.com`;
 
-async function fetchFlixTemplateById(id: string): Promise<FlixTemplate | undefined> {
+async function fetchFlixTemplateById(id: string): Promise<FlixTemplateV1 | undefined> {
   const res = await fetch(`${flixApiHost}/v1/templates/${id}`);
   if (res.status === 200) {
     return await res.json();
