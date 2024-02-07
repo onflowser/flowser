@@ -1,10 +1,10 @@
 import { ImageResponse } from 'next/og';
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
-import type { InteractionsPageParams } from '@/common/use-interaction-page-params';
+import { FlowUtils } from "@onflowser/core/src/flow-utils";
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
-import { FlowUtils } from "@onflowser/core/src/flow-utils";
-import { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
+import type { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
+import { InteractionsPageParams } from "@/common/interaction-page-params";
 
 export const runtime = 'edge';
 
