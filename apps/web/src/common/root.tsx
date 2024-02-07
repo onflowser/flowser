@@ -44,7 +44,7 @@ import { HttpService } from "@onflowser/core/src/http.service";
 import FullScreenLoading from "@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading";
 import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-interaction-page-params";
-import { ChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import { FlowChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
 import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
@@ -476,7 +476,7 @@ function Content() {
 }
 
 class FlowService implements IFlowService {
-    async getIndexOfAddress(chainID: ChainID, address: string): Promise<number> {
+    async getIndexOfAddress(chainID: FlowChainID, address: string): Promise<number> {
       const response = await fetch(`${window.location.origin}/get-address-index?chainId=${chainID}&address=${address}`);
       const data = await response.json();
       return data.index as number;

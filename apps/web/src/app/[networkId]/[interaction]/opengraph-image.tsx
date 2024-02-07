@@ -4,6 +4,7 @@ import type { FlixTemplate, FlixAuditor } from "@onflowser/core/src/flow-flix.se
 import type { InteractionsPageParams } from '@/common/use-interaction-page-params';
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
+import { FlowUtils } from "@onflowser/core/src/flow-utils";
 
 export const runtime = 'edge';
 
@@ -31,9 +32,15 @@ export default async function Image(props: Props) {
       fetchFlixAuditorsById(interaction, networkId),
     ]);
 
-    const dependencies = FlixUtils.getDependencies(flix, networkId);
-    const flowNameProfiles = await getProfilesByAddress(dependencies[0].address, networkId);
+
     const cadenceSourceCode = FlixUtils.getCadenceSourceCode(flix, networkId);
+    const dependencies = FlixUtils.getDependencies(flix, networkId);
+    const address = dependencies[0].address;
+
+    const [flowNameProfiles, addressIndex] = await Promise.all([
+      getProfilesByAddress(address, networkId),
+      getAddressIndex(address, networkId)
+    ]);
 
     return new ImageResponse(
       (
@@ -66,7 +73,7 @@ export default async function Image(props: Props) {
               flex: 1
           }}
           >
-            <AccountImage profiles={flowNameProfiles} />
+            <AccountImage addressIndex={addressIndex} profiles={flowNameProfiles} />
           </div>
         </div>
       ),
@@ -208,13 +215,20 @@ function CodePreview(props: {cadence: string}) {
   )
 }
 
-function AccountImage(props: {profiles: FlowNameProfile[]}) {
-  const avatarUrl = props.profiles[0]?.avatar ?? "https://flowser.dev/icon.png";
-
+function AccountImage(props: { addressIndex: number; profiles: FlowNameProfile[]}) {
+  // Total default avatar count listed in:
+  // https://github.com/onflowser/flowser/tree/main/packages/ui/src/accounts/AccountAvatar/avatars
+  const totalDefaultAvatarCount = 16;
+  const defaultAvatarIndex = props.addressIndex % totalDefaultAvatarCount;
+  const defaultAvatarUrl = `https://github.com/onflowser/flowser/blob/main/packages/ui/src/accounts/AccountAvatar/avatars/${defaultAvatarIndex}.jpg?raw=true`
+  const avatarUrl = props.profiles[0]?.avatar ?? defaultAvatarUrl;
   return (
     <img
       alt=""
       src={avatarUrl}
+      style={{
+        borderRadius: 20
+      }}
     />
   )
 }
@@ -260,6 +274,12 @@ async function fetchFlixAuditorsById(id: string, networkId: string): Promise<Fli
 async function getProfilesByAddress(address: string, networkId: FlowNetworkId): Promise<FlowNameProfile[]> {
   const res = await fetch(`${getApiRouteHost()}/get-address-info?address=${address}&networkId=${networkId}`);
   return await res.json();
+}
+
+async function getAddressIndex(address: string, networkId: FlowNetworkId): Promise<number> {
+  const res = await fetch(`${getApiRouteHost()}/get-address-index?address=${address}&chainId=${FlowUtils.networkIdToChainId(networkId)}`);
+  const data = await res.json();
+  return data.index as number;
 }
 
 // This wont work in preview deployments
