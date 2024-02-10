@@ -236,7 +236,9 @@ function FlowserLogo(props: { size: number }) {
       style={{
         width: props.size,
         height: props.size,
-        transform: "scale(1.2)"
+        transform: "scale(1.2)",
+        borderRadius: "50%",
+        background: "#1d2b42"
       }}
     />
   )
