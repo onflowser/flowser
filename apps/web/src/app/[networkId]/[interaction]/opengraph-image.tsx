@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { ImageResponse } from 'next/og';
-import { FlixUtils } from "@onflowser/core/src/flix-utils";
+// import { FlixUtils } from "@onflowser/core/src/flix-utils";
 // import { FlowUtils } from "@onflowser/core/src/flow-utils";
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
