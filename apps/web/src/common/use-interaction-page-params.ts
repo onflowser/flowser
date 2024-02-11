@@ -1,10 +1,6 @@
 import { useParams } from "next/navigation";
-import { FlowNetworkId, FlowUtils } from "@onflowser/core/src/flow-utils";
-
-export type InteractionsPageParams = {
-  networkId: FlowNetworkId;
-  interaction?: string;
-}
+import { FlowUtils } from "@onflowser/core/src/flow-utils";
+import { InteractionsPageParams } from "@/common/interaction-page-params";
 
 export function useInteractionsPageParams(): InteractionsPageParams {
   const { networkId, interaction } = useParams();

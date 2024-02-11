@@ -10,3 +10,4 @@ export * from "./flow-storage.service";
 export * from "./flow-indexer.service";
 export * from "./flow-interactions.service";
 export * from "./flow-flix.service";
+export * from "./flix-v1";

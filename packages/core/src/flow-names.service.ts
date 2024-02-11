@@ -1,7 +1,9 @@
+// @ts-nocheck
 import * as fcl from "@onflow/fcl";
 // @ts-ignore
 import * as type from "@onflow/types";
 import Sha3 from "js-sha3";
+import type { FlowNetworkId } from "./flow-utils";
 
 // language=Cadence
 const lookupDomainByFlownsNameHashSource = `
@@ -108,19 +110,32 @@ export type FlowNameProfile = {
 };
 
 type Config = {
-  findAddress: string;
-  flownsAddress: string;
-  domainUtilsAddress: string;
+  networkId: FlowNetworkId
 }
 
 export class FlowNamesService {
   constructor(config: Config) {
+    const findAddressByNetworkId = new Map<FlowNetworkId, string>([
+      ["mainnet", "0x097bafa4e0b48eef"],
+      ["testnet", "0afe396ebc8eee65"]
+    ]);
+
+    const flownsAddressByNetworkId = new Map<FlowNetworkId, string>([
+      ["mainnet", "0x233eb012d34b0070"],
+      ["testnet", "0xb05b2abb42335e88"]
+    ]);
+
+    const domainUtilsAddressByNetworkId = new Map<FlowNetworkId, string>([
+      ["mainnet", "0x1b3930856571a52b"],
+      ["testnet", "0xbca26f5091cd39ec"]
+    ])
+
     fcl.config()
-      .put("0xFlownsAddress", config.flownsAddress)
+      .put("0xFlownsAddress", flownsAddressByNetworkId.get(config.networkId))
       // @ts-ignore
-      .put("0xDomainUtils", config.domainUtilsAddress)
+      .put("0xDomainUtils", domainUtilsAddressByNetworkId.get(config.networkId))
       // @ts-ignore
-      .put("0xFindAddress", config.findAddress);
+      .put("0xFindAddress", findAddressByNetworkId.get(config.networkId));
   }
 
   public async getProfilesByAddress(address: string): Promise<FlowNameProfile[]> {

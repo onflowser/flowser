@@ -5,6 +5,7 @@ import CursorClick from "./assets/cursor_click.svg";
 import LogoRound from "./assets/logo_round.svg";
 import Logo from "./assets/logo.svg";
 import Star from "./assets/star.svg";
+import StarFill from "./assets/star-fill.svg";
 import Transaction from "./assets/transaction.svg";
 import ArtistPalette from "./assets/artist_palette.svg";
 import Settings from "./assets/settings.svg";
@@ -51,6 +52,7 @@ export const FlowserIcon = {
   CursorClick: CursorClick,
   LogoRound: LogoRound,
   Star: Star,
+  StarFill: StarFill,
   Transaction: Transaction,
   Script: Script,
   QuestionMark: QuestionMark,

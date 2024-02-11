@@ -19,7 +19,7 @@ import {
   ManagedProcess
 } from "@onflowser/api";
 import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
-import { ChainID } from "@onflowser/core/src/flow-utils";
+import { FlowChainID } from "@onflowser/core/src/flow-utils";
 import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 
 export interface ISnapshotService {
@@ -64,7 +64,7 @@ export type ExecuteScriptRequest = {
 };
 
 export interface IFlowService {
-  getIndexOfAddress(chainID: ChainID, address: string): Promise<number>;
+  getIndexOfAddress(chainID: FlowChainID, address: string): Promise<number>;
 }
 
 export type FlowConfigAccount = {

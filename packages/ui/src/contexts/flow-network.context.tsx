@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext } from "react";
-import { ChainID, FlowNetworkId, FlowUtils } from "@onflowser/core/src/flow-utils";
+import { FlowChainID, FlowNetworkId, FlowUtils } from "@onflowser/core/src/flow-utils";
 
 type FlowNetworkProviderProps = {
   networkId: FlowNetworkId;
@@ -28,12 +28,12 @@ export function useFlowNetworkId(): FlowNetworkId {
   return context.networkId;
 }
 
-export function useChainId(): ChainID {
+export function useChainId(): FlowChainID {
   const context = useContext(Context);
 
   if (context === undefined) {
     throw new Error("FlowNetworkProvider not found")
   }
 
-  return FlowUtils.flowNetworkIdToChainId(context.networkId);
+  return FlowUtils.networkIdToChainId(context.networkId);
 }

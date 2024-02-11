@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getInteractionPageMetadata } from "@/common/metadata";
-import { InteractionsPageParams } from "@/common/use-interaction-page-params";
 import { RootLoader } from '@/common/root-loader';
+import { InteractionsPageParams } from "@/common/interaction-page-params";
 
 type Props = {
   params: InteractionsPageParams
