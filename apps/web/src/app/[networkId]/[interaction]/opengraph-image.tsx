@@ -5,7 +5,7 @@ import { ImageResponse } from 'next/og';
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
 import type { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
-import { InteractionsPageParams } from "@/common/interaction-page-params";
+import type { InteractionsPageParams } from "@/common/interaction-page-params";
 
 export const runtime = 'edge';
 
