@@ -323,7 +323,7 @@ function getApiRouteHost() {
   if (isDev) {
     return "http://localhost:3000"
   } else {
-    return "https://interact.flowser.dev/"
+    return "https://interact.flowser.dev"
   }
 }
 
