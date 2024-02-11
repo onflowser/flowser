@@ -1,12 +1,13 @@
-// @ts-nocheck
 import { ImageResponse } from 'next/og';
-// import { FlixUtils } from "@onflowser/core/src/flix-utils";
-// import { FlowUtils } from "@onflowser/core/src/flow-utils";
-// import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
-// import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
-// import type { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
-// import type { InteractionsPageParams } from "@/common/interaction-page-params";
+import { FlixUtils } from "@onflowser/core/src/flix-utils";
+import { FlowUtils } from "@onflowser/core/src/flow-utils";
+import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
+import type { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
+import type { InteractionsPageParams } from "@/common/interaction-page-params";
 
+// Don't use edge runtime because of the code size limit.
+// See: https://github.com/vercel/commerce/issues/1028
 // export const runtime = 'edge';
 
 export const size = {
