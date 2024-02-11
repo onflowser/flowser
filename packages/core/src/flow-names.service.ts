@@ -1,9 +1,9 @@
 // @ts-nocheck
-import * as fcl from "@onflow/fcl";
+// import * as fcl from "@onflow/fcl";
 // @ts-ignore
-import * as type from "@onflow/types";
+// import * as type from "@onflow/types";
 // import Sha3 from "js-sha3";
-import { FlowNetworkId } from "./flow-utils";
+import type { FlowNetworkId } from "./flow-utils";
 
 // language=Cadence
 const lookupDomainByFlownsNameHashSource = `
