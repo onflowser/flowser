@@ -7,7 +7,7 @@ import { ImageResponse } from 'next/og';
 // import type { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
 // import type { InteractionsPageParams } from "@/common/interaction-page-params";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 export const size = {
   width: 1200,
