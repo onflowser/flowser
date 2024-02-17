@@ -23,9 +23,11 @@ type Props = {
 export default async function Image(props: Props) {
   const {interaction, networkId} = props.params;
 
+  const host = getApiRouteHost();
+
   const [interBlack, interRegular] = await Promise.all([
-    fetch(new URL("./Inter-Black.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
-    fetch(new URL("./Inter-Regular.ttf", import.meta.url)).then((res) => res.arrayBuffer())
+    fetch(new URL(host + "/Inter-Black.ttf", import.meta.url)).then((res) => res.arrayBuffer()),
+    fetch(new URL(host + "/Inter-Regular.ttf", import.meta.url)).then((res) => res.arrayBuffer())
   ])
 
   if (interaction) {
