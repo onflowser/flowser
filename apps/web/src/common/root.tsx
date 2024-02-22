@@ -464,13 +464,16 @@ function Content() {
 
   useEffect(() => {
     const focusedInteraction = interactionRegistry.focusedDefinition;
+    // Native browser state API is supported by Next.js.
+    // See: https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#using-the-native-history-api
     if (focusedInteraction?.forkedFromTemplateId) {
-      // https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#using-the-native-history-api
       window.history.replaceState(
         null,
         '',
         `/${networkId}/${focusedInteraction.forkedFromTemplateId}`
       )
+    } else {
+      window.history.replaceState(null, '', `/${networkId}`);
     }
   }, [interactionRegistry.focusedDefinition]);
 
