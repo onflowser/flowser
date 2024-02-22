@@ -99,6 +99,7 @@ export function InteractionsPage(props: InteractionsPageProps): ReactElement {
           const createdInteraction = create({
             name: "New interaction",
             code: "",
+            forkedFromTemplateId: undefined,
             fclValuesByIdentifier: new Map(),
             transactionOptions: undefined,
             initialOutcome: undefined,

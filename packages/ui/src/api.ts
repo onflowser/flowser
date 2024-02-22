@@ -249,7 +249,7 @@ export function useGetAddressNameInfo(address: string): SWRResponse<FlowNameProf
 }
 
 export function useGetParsedInteraction(
-  request: InteractionDefinition,
+  request: Pick<InteractionDefinition, "code" | "id">,
 ): { data: ParsedInteractionOrError | undefined, isLoading: boolean } {
   const { interactionsService } = useServiceRegistry();
 

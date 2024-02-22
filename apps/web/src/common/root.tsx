@@ -5,7 +5,7 @@ import {
   useInteractionRegistry
 } from "@onflowser/ui/src/interactions/contexts/interaction-registry.context";
 import {
-  TemplatesRegistryProvider, flixTemplateToInteraction
+  TemplatesRegistryProvider, useTemplatesRegistry
 } from "@onflowser/ui/src/interactions/contexts/templates.context";
 import { NavigationProvider } from "@onflowser/ui/src/contexts/navigation.context";
 import { ReactNode, useEffect } from "react";
@@ -42,7 +42,6 @@ import * as fcl from "@onflow/fcl"
 import useSWR, { SWRConfig } from 'swr';
 import { HttpService } from "@onflowser/core/src/http.service";
 import FullScreenLoading from "@onflowser/ui/src/common/loaders/FullScreenLoading/FullScreenLoading";
-import { useGetFlixTemplate } from "@onflowser/ui/src/hooks/use-flix";
 import { useInteractionsPageParams } from "./use-interaction-page-params";
 import { FlowChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
@@ -448,15 +447,35 @@ function ApiSetupPrompt(props: {
 function Content() {
   const { networkId, interaction } = useInteractionsPageParams();
   const interactionRegistry = useInteractionRegistry();
-  const { data: flix } = useGetFlixTemplate(interaction);
+  const templatesRegistry = useTemplatesRegistry();
 
   useEffect(() => {
-    if (flix) {
-      const interaction = flixTemplateToInteraction(flix, networkId);
-      interactionRegistry.create(interaction);
-      interactionRegistry.setFocused(interaction.id);
+    const template = templatesRegistry.templates.find(e => e.id === interaction);
+    if (!interactionRegistry.focusedDefinition && template && template.source === "flix") {
+      const interactionId = crypto.randomUUID();
+      interactionRegistry.create({
+        ...template,
+        id: interactionId,
+        forkedFromTemplateId: template.id
+      });
+      interactionRegistry.setFocused(interactionId);
     }
-  }, [flix, networkId]);
+  }, [networkId, templatesRegistry.templates]);
+
+  useEffect(() => {
+    const focusedInteraction = interactionRegistry.focusedDefinition;
+    // Native browser state API is supported by Next.js.
+    // See: https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#using-the-native-history-api
+    if (focusedInteraction?.forkedFromTemplateId) {
+      window.history.replaceState(
+        null,
+        '',
+        `/${networkId}/${focusedInteraction.forkedFromTemplateId}`
+      )
+    } else {
+      window.history.replaceState(null, '', `/${networkId}`);
+    }
+  }, [interactionRegistry.focusedDefinition]);
 
   useEffect(() => {
     // Sign out the user when switching networks
