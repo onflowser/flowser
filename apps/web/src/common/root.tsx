@@ -459,6 +459,17 @@ function Content() {
   }, [flix, networkId]);
 
   useEffect(() => {
+    if (interactionRegistry.focusedDefinition) {
+      // https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating#using-the-native-history-api
+      window.history.replaceState(
+        null,
+        '',
+        `/${networkId}/${interactionRegistry.focusedDefinition.id}`
+      )
+    }
+  }, [interactionRegistry.focusedDefinition]);
+
+  useEffect(() => {
     // Sign out the user when switching networks
     // or "address is invalid for chain" error will be thrown.
     fcl.unauthenticate()
