@@ -23,7 +23,7 @@ type InteractionTemplatesRegistry = {
 
 export type InteractionSourceType = "workspace" | "flix" | "session";
 
-export type InteractionDefinitionTemplate = InteractionDefinition & {
+export type InteractionDefinitionTemplate = Omit<InteractionDefinition, "forkedFromTemplateId"> & {
   source: InteractionSourceType;
 
   flix: FlixV1Template | undefined;
@@ -66,8 +66,6 @@ export function TemplatesRegistryProvider(props: {
   const error =
     getErrorMessage("Fail to load file templates", workspaceTemplates) ||
     getErrorMessage("Fail to load FLIX templates", flixTemplates);
-
-  const randomId = () => String(Math.random() * 1000000);
 
   const flowCoreContractNames = new Set([
     "FlowStorageFees",
@@ -129,7 +127,7 @@ export function TemplatesRegistryProvider(props: {
     () => [
       ...sessionTemplates.map(
         (template): InteractionDefinitionTemplate => ({
-          id: randomId(),
+          id: template.name,
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
@@ -146,7 +144,7 @@ export function TemplatesRegistryProvider(props: {
       ),
       ...(workspaceTemplates.data?.map(
         (template): InteractionDefinitionTemplate => ({
-          id: randomId(),
+          id: template.id,
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
@@ -161,7 +159,15 @@ export function TemplatesRegistryProvider(props: {
       ) ?? []),
       ...(flixTemplates.data?.filter(isSupportedOnCurrentNetwork)?.map(
         (template): InteractionDefinitionTemplate => ({
-          ...flixTemplateToInteraction(template, flowNetworkId),
+          id: template.id,
+          name: FlixUtils.getName(template),
+          code: FlixUtils.getCadenceSourceCode(template, networkId),
+          transactionOptions: undefined,
+          initialOutcome: undefined,
+          fclValuesByIdentifier: new Map(),
+          // Use the same date for all FLIX templates for consistent sorting.
+          createdDate: new Date(0),
+          updatedDate: new Date(0),
           workspace: undefined,
           flix: template,
           source: "flix"
@@ -222,20 +228,6 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   }
 
   return context;
-}
-
-export function flixTemplateToInteraction(template: FlixV1Template, networkId: FlowNetworkId): InteractionDefinition {
-  return {
-    id: template.id,
-    name: FlixUtils.getName(template),
-    code: FlixUtils.getCadenceSourceCode(template, networkId),
-    transactionOptions: undefined,
-    initialOutcome: undefined,
-    fclValuesByIdentifier: new Map(),
-    // Use the same date for all FLIX templates for consistent sorting.
-    createdDate: new Date(0),
-    updatedDate: new Date(0),
-  }
 }
 
 function getErrorMessage(label: string, swrResponse: SWRResponse) {

@@ -67,12 +67,13 @@ function BlockItem(props: BlockItemProps) {
     transaction: firstTransaction,
   });
 
-  function onForkAsTemplate() {
+  function openTransaction() {
     if (!firstTransaction?.proposalKey) {
       return;
     }
     const createdInteraction = create({
       name: transactionName ?? `Tx from block #${block.height}`,
+      forkedFromTemplateId: undefined,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
         firstTransaction.arguments.map((arg) => [arg.identifier, arg.value]),
@@ -102,7 +103,7 @@ function BlockItem(props: BlockItemProps) {
         </div>
       }
     >
-      <MenuItem onClick={() => onForkAsTemplate()}>
+      <MenuItem onClick={() => openTransaction()}>
         <FlowserIcon.Share width={menuIconSize} height={menuIconSize} />
         <SizedBox width={10} />
         View transaction

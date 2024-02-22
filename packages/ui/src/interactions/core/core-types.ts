@@ -2,6 +2,7 @@ import { FclValue } from "@onflowser/core";
 
 export type InteractionDefinition = {
   id: string;
+  forkedFromTemplateId: string | undefined;
   name: string;
   code: string;
   fclValuesByIdentifier: FclValueLookupByIdentifier;

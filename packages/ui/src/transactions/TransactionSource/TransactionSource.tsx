@@ -24,6 +24,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
     const createdInteraction = create(
       {
         name: transactionName ?? "Unknown",
+        forkedFromTemplateId: undefined,
         code: transaction.script,
         fclValuesByIdentifier: new Map(
           transaction.arguments.map((arg) => [arg.identifier, arg.value]),

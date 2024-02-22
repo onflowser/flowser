@@ -102,6 +102,7 @@ function TemplatesList(props: InteractionTemplatesProps) {
             onClick={() => {
               const createdInteraction = create({
                 ...template,
+                forkedFromTemplateId: template.id,
                 // Provide a different ID as the template,
                 // otherwise parsed data won't be reflected correctly
                 // when changing source code.
