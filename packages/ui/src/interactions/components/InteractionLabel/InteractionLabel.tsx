@@ -9,7 +9,7 @@ import { InteractionKind } from "@onflowser/api";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 
 type InteractionLabelProps = {
-  interaction: InteractionDefinition;
+  interaction: Pick<InteractionDefinition, "code" | "id">;
 };
 
 export function InteractionLabel(props: InteractionLabelProps): ReactElement {
