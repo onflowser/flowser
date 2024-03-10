@@ -53,7 +53,7 @@ function TopContent() {
   const showSigningSettings = parsedInteraction?.kind === InteractionKind.INTERACTION_TRANSACTION && walletService;
 
   if (definition.code === "") {
-    return <EmptyInteractionHelp />;
+    return null;
   }
 
   if (
@@ -82,44 +82,6 @@ function TopContent() {
         <SigningSettings />
       )}
     </>
-  );
-}
-
-function EmptyInteractionHelp() {
-  return (
-    <Callout
-      icon="💡"
-      title="Interacting with the blockchain"
-      description={
-        <div>
-          <p>
-            Cadence transactions or scripts are used to interact with the Flow
-            blockchain.
-          </p>
-          <SizedBox height={10} />
-          <p>
-            <b>
-              <ExternalLink
-                inline
-                href="https://developers.flow.com/cadence/language/transactions"
-              >
-                Transactions
-              </ExternalLink>
-            </b>{" "}
-            can be used to trigger state changes, while{" "}
-            <b>
-              <ExternalLink
-                inline
-                href="https://developers.flow.com/tooling/fcl-js/scripts"
-              >
-                scripts
-              </ExternalLink>
-            </b>{" "}
-            are used for reading existing state from the blockchain.
-          </p>
-        </div>
-      }
-    />
   );
 }
 

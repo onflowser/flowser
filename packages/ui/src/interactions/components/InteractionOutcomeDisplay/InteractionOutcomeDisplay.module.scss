@@ -1,11 +1,18 @@
 @import "../../../styles/spacings";
+@import "../../../styles/colors";
 
 .root {
   max-height: 40vh;
   height: 100%;
 
-  .emptyStateWrapper {
+  .emptyState {
     padding: $spacing-base;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: $gray-20;
   }
 
   .transactionOverview {

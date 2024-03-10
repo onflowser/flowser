@@ -16,7 +16,10 @@ import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
 import { InteractionSourceType, useTemplatesRegistry } from "./contexts/templates.context";
-import { InteractionDefinition } from "./core/core-types";
+import { LineSeparator } from "../common/misc/LineSeparator/LineSeparator";
+import { ExternalLink } from "../common/links/ExternalLink/ExternalLink";
+import { Callout } from "../common/misc/Callout/Callout";
+import { SizedBox } from "../common/misc/SizedBox/SizedBox";
 
 type InteractionsPageTab = "history" | "templates"
 
@@ -85,6 +88,7 @@ export function InteractionsPage(props: InteractionsPageProps): ReactElement {
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
         tabs={openEditorTabs}
+        defaultContent={<EmptyState />}
         onClose={(tab) => {
           const interaction = definitions.find(e => e.id === tab.id)!;
           const exactTemplateMatch = templates.find(template => template.code === interaction.code);
@@ -109,6 +113,61 @@ export function InteractionsPage(props: InteractionsPageProps): ReactElement {
       />
     </div>
   );
+}
+
+function EmptyState() {
+  return (
+    <div className={classes.emptyState}>
+      <Callout
+        icon="🚀"
+        title="Getting started #onFlow"
+        description={
+          <div>
+            <p>
+              Here are some resources that should help you get started on
+              Flow.
+            </p>
+            <LineSeparator horizontal />
+            <ExternalLink href="https://developers.flow.com" />
+            <ExternalLink href="https://academy.ecdao.org" />
+          </div>
+        }
+      />
+      <Callout
+        icon="💡"
+        title="Interacting with the blockchain"
+        description={
+          <div>
+            <p>
+              Cadence transactions or scripts are used to interact with the Flow
+              blockchain.
+            </p>
+            <SizedBox height={10} />
+            <p>
+              <b>
+                <ExternalLink
+                  inline
+                  href="https://developers.flow.com/cadence/language/transactions"
+                >
+                  Transactions
+                </ExternalLink>
+              </b>{" "}
+              can be used to trigger state changes, while{" "}
+              <b>
+                <ExternalLink
+                  inline
+                  href="https://developers.flow.com/tooling/fcl-js/scripts"
+                >
+                  scripts
+                </ExternalLink>
+              </b>{" "}
+              are used for reading existing state from the blockchain.
+            </p>
+          </div>
+        }
+      />
+    </div>
+  )
 }
 
 function InteractionBody(): ReactElement {
