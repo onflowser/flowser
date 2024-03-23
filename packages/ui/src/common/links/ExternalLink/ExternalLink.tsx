@@ -24,7 +24,7 @@ export function ExternalLink({
       rel="noreferrer"
       href={href}
       className={classNames(classes.root, className)}
-      style={{ display: "flex", ...style }}
+      style={{ display: inline ? "inline-block" : "flex", ...style }}
     >
       {!inline && <FlowserIcon.Link className={classes.icon} />}
       {children ?? <span className={classes.url}>{prettifyUrl(href)}</span>}

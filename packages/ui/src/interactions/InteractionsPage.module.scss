@@ -1,5 +1,6 @@
 @import "../styles/spacings";
 @import "../styles/colors";
+@import "../styles/typography";
 
 .pageRoot {
   height: 100%;
@@ -28,15 +29,6 @@
   }
   .mainContent {
     flex: 3;
-
-    .emptyState {
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      row-gap: $spacing-base;
-    }
 
     .body {
       height: 100%;

@@ -38,7 +38,24 @@ const Context = createContext<InteractionsRegistry>(undefined as never);
 export function InteractionRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const [definitions, setDefinitions] = useState<InteractionDefinition[]>([]);
+  const defaultInteraction: InteractionDefinition = {
+    id: crypto.randomUUID(),
+    forkedFromTemplateId: undefined,
+    name: "Untitled",
+    code: "",
+    fclValuesByIdentifier: new Map(),
+    initialOutcome: undefined,
+    transactionOptions: {
+      authorizerAddresses: [],
+      proposerAddress: "",
+      payerAddress: "",
+    },
+    createdDate: new Date(),
+    updatedDate: new Date(),
+  };
+  const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
+    defaultInteraction
+  ]);
   const [focusedInteractionId, setFocusedInteractionId] = useState<
     string | undefined
   >();
@@ -47,6 +64,15 @@ export function InteractionRegistryProvider(props: {
       definitions.find((definition) => definition.id === focusedInteractionId),
     [focusedInteractionId, definitions],
   );
+
+  useEffect(() => {
+    // Make sure there is always at least one tab open.
+    // Otherwise, the UI looks weird.
+    if (definitions.length === 0) {
+      setDefinitions([defaultInteraction]);
+      setFocusedInteractionId(defaultInteraction.id);
+    }
+  }, [definitions]);
 
   function update(updatedInteraction: InteractionDefinition) {
     setDefinitions((interactions) =>
