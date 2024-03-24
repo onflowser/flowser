@@ -2,7 +2,7 @@ import { createColumnHelper } from "@tanstack/table-core";
 import Label from "../../common/misc/Label/Label";
 import classes from "./AccountKeysTable.module.scss";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
-import CopyButton from "../../common/buttons/CopyButton/CopyButton";
+import { CopyButton } from "../../common/buttons/CopyButton/CopyButton";
 import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import { FlowUtils } from "../../utils/flow-utils";
 import React, { ReactElement } from "react";

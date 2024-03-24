@@ -48,6 +48,7 @@ import defaultFlowJson from "./default-flow.json";
 import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
 import { NetworkDropdown } from "./NetworkDropdown";
+import { ProfileDropdown } from "@/common/ProfileDropdown";
 
 const indexSyncIntervalInMs = 500;
 
@@ -487,7 +488,8 @@ function Content() {
   return (
     <InteractionsPage
       headerRowContent={
-        <div className="m-2">
+        <div className="m-2 flex gap-x-[10px]">
+          <ProfileDropdown currentNetwork={networkId} />
           <NetworkDropdown value={networkId} onChange={setNetworkId} />
         </div>
       }
