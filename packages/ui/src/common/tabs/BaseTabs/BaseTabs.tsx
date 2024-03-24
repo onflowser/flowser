@@ -23,6 +23,8 @@ export type BaseTabsProps<IdType = string> = {
   onClose?: (tab: BaseTabItem<IdType>) => void;
   onAddNew?: () => void;
   defaultContent?: ReactNode;
+  // Will appear after all tab buttons.
+  contentAfterTabs?: ReactNode;
   tabs: BaseTabItem<IdType>[];
 };
 
@@ -52,40 +54,43 @@ export function BaseTabs<IdType>(props: BaseTabsProps<IdType>): ReactElement {
   const currentTab = tabs.find((tab) => tab.id === currentTabId);
   return (
     <div className={classNames(classes.root, className)}>
-      <div className={classNames(classes.tabWrapper, tabWrapperClassName)}>
-        {label && <span className={classes.label}>{label}:</span>}
-        {tabs.map((tab) => {
-          const isActive = currentTabId === tab.id;
-          return (
-            <button
-              key={String(tab.id)}
-              className={classNames(classes.tabButton, props.tabClassName, {
-                [props.activeTabClassName ?? classes.tabButtonActive]: isActive,
-                [props.inactiveTabClassName ?? classes.tabButtonInactive]:
-                  !isActive,
-              })}
-              onClick={() => onChangeTab(tab)}
-            >
+      <div className={classes.tabAndEndContentWrapper}>
+        <div className={classNames(classes.tabWrapper, tabWrapperClassName)}>
+          {label && <span className={classes.label}>{label}:</span>}
+          {tabs.map((tab) => {
+            const isActive = currentTabId === tab.id;
+            return (
+              <button
+                key={String(tab.id)}
+                className={classNames(classes.tabButton, props.tabClassName, {
+                  [props.activeTabClassName ?? classes.tabButtonActive]: isActive,
+                  [props.inactiveTabClassName ?? classes.tabButtonInactive]:
+                    !isActive,
+                })}
+                onClick={() => onChangeTab(tab)}
+              >
               <span className={classNames(classes.label, tabLabelClassName)}>
                 {tab.label}
               </span>
-              {onClose && (
-                <FlowserIcon.Close
-                  className={classes.closeButton}
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    onClose(tab);
-                  }}
-                />
-              )}
+                {onClose && (
+                  <FlowserIcon.Close
+                    className={classes.closeButton}
+                    onClick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      onClose(tab);
+                    }}
+                  />
+                )}
+              </button>
+            );
+          })}
+          {onAddNew && (
+            <button className={classes.newTabButton} onClick={() => onAddNew()}>
+              <FlowserIcon.Plus />
             </button>
-          );
-        })}
-        {onAddNew && (
-          <button className={classes.newTabButton} onClick={() => onAddNew()}>
-            <FlowserIcon.Plus />
-          </button>
-        )}
+          )}
+        </div>
+        {props.contentAfterTabs}
       </div>
       <div
         className={classNames(props.contentClassName, classes.content)}

@@ -6,17 +6,22 @@ export type FlowNetworkId = "mainnet" | "testnet" | "emulator"
 
 export class FlowUtils {
 
-  static isValidFlowNetwork(value: unknown): value is FlowNetworkId {
-    if (typeof value !== "string") {
-      return false;
-    }
-    const validChainIds: Record<FlowNetworkId, true> = {
+  static getValidFlowNetworks(): FlowNetworkId[] {
+    const validNetworkIds: Record<FlowNetworkId, true> = {
       "mainnet": true,
       "testnet": true,
       "emulator": true
     };
 
-    return validChainIds[value as FlowNetworkId] ?? false
+    return Object.keys(validNetworkIds) as FlowNetworkId[];
+  }
+
+  static isValidFlowNetwork(value: unknown): value is FlowNetworkId {
+    if (typeof value !== "string") {
+      return false;
+    }
+
+    return this.getValidFlowNetworks().includes(value as FlowNetworkId);
   }
 
   static networkIdToChainId(networkId: FlowNetworkId): FlowChainID {

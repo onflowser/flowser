@@ -33,6 +33,7 @@ import Expand from "./assets/expand.svg";
 import Shrink from "./assets/shrink.svg";
 import Logs from "./assets/logs.svg";
 import { TbBrandVscode } from "react-icons/tb";
+import { IoIosArrowDown } from "react-icons/io";
 import { SiWebstorm, SiIntellijidea } from "react-icons/si";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 
@@ -74,5 +75,6 @@ export const FlowserIcon = {
   WebStorm: SiWebstorm,
   VsCode: TbBrandVscode,
   IntellijIdea: SiIntellijidea,
-  VerifiedCheck: RiVerifiedBadgeFill
+  VerifiedCheck: RiVerifiedBadgeFill,
+  ArrowDown: IoIosArrowDown
 };
