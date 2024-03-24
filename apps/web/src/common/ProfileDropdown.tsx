@@ -101,6 +101,7 @@ export function ProfileDropdown(props: ProfileDropdownProps) {
     return (
       <button onClick={() => fcl.authenticate()} className="border flex gap-x-[10px] border-gray-500 text-gray-300 items-center p-2 rounded-sm">
         <span>Connect</span>
+        <FlowserIcon.Connect />
       </button>
     )
   }

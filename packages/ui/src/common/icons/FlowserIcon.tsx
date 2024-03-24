@@ -39,6 +39,7 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { RxExit } from "react-icons/rx";
 import { GoArrowSwitch } from "react-icons/go";
 import { GoLinkExternal } from "react-icons/go";
+import { TbPlugConnected } from "react-icons/tb";
 
 export const FlowserIcon = {
   DocumentWithArrow: DocumentWithArrow,
@@ -81,5 +82,6 @@ export const FlowserIcon = {
   IntellijIdea: SiIntellijidea,
   VerifiedCheck: RiVerifiedBadgeFill,
   ArrowDown: IoIosArrowDown,
-  Switch: GoArrowSwitch
+  Switch: GoArrowSwitch,
+  Connect: TbPlugConnected
 };
