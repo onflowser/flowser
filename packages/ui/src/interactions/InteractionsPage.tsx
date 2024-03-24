@@ -16,10 +16,6 @@ import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
 import { InteractionSourceType, useTemplatesRegistry } from "./contexts/templates.context";
-import { LineSeparator } from "../common/misc/LineSeparator/LineSeparator";
-import { ExternalLink } from "../common/links/ExternalLink/ExternalLink";
-import { Callout } from "../common/misc/Callout/Callout";
-import { SizedBox } from "../common/misc/SizedBox/SizedBox";
 
 type InteractionsPageTab = "history" | "templates"
 
