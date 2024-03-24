@@ -15,6 +15,7 @@ import { ScriptOutcome, TransactionOutcome } from "../../core/core-types";
 import { InteractionKind } from "@onflowser/api";
 import { useGetTransaction } from "../../../api";
 import { ErrorMessage } from "../../../common/errors/ErrorMessage";
+import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 
 export function InteractionOutcomeDisplay(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -30,10 +31,9 @@ export function InteractionOutcomeDisplay(): ReactElement {
 }
 
 function EmptyState() {
-  const { parsedInteraction } = useInteractionDefinitionManager();
-
   return (
     <div className={classes.emptyState}>
+      <FlowserIcon.DocumentWithArrow className={classes.icon} />
       <span>Not executed</span>
     </div>
   )
