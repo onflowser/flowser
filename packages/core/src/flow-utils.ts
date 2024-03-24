@@ -33,4 +33,20 @@ export class FlowUtils {
 
     return lookup[networkId];
   }
+
+  static getFlowViewAccountUrl(networkId: FlowNetworkId, address: string) {
+    switch (networkId) {
+      case "emulator":
+        return `https://www.emulator.flowview.app/account/${address}`
+      case "mainnet":
+        return `https://www.flowview.app/account/${address}`
+      case "testnet":
+        return `https://www.testnet.flowview.app/account/${address}`
+    }
+  }
+
+  static getContractBrowserAccountUrl(networkId: FlowNetworkId, address: string) {
+    // Contract browser doesn't have separate URLs for each network for now
+    return `https://contractbrowser.com/account/${address}`
+  }
 }
