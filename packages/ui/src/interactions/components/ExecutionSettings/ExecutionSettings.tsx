@@ -54,8 +54,11 @@ function TopContent() {
 
   if (
     // Parsed interaction isn't defined if parsing fails.
-    !parsedInteraction ||
-    parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN
+    definition.code !== "" &&
+    (
+      !parsedInteraction ||
+      parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN
+    )
   ) {
     return <UnknownInteractionHelp />;
   }
@@ -74,7 +77,7 @@ function TopContent() {
           flixTemplate={flixTemplate}
         />
       ) : (
-        <span>No parameters</span>
+        <span>No parameters to set</span>
       )}
       <SizedBox height={30} />
       {showSigningSettings && (
