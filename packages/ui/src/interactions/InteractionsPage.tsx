@@ -16,7 +16,6 @@ import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
 import { InteractionSourceType, useTemplatesRegistry } from "./contexts/templates.context";
-import { InteractionDefinition } from "./core/core-types";
 
 type InteractionsPageTab = "history" | "templates"
 
@@ -97,7 +96,7 @@ export function InteractionsPage(props: InteractionsPageProps): ReactElement {
         }}
         onAddNew={() => {
           const createdInteraction = create({
-            name: "New interaction",
+            name: "Untitled",
             code: "",
             forkedFromTemplateId: undefined,
             fclValuesByIdentifier: new Map(),

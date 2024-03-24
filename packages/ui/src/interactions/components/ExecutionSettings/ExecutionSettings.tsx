@@ -52,31 +52,33 @@ function TopContent() {
   // Signing settings are not needed when using standard flow wallet API.
   const showSigningSettings = parsedInteraction?.kind === InteractionKind.INTERACTION_TRANSACTION && walletService;
 
-  if (definition.code === "") {
-    return <EmptyInteractionHelp />;
-  }
-
   if (
     // Parsed interaction isn't defined if parsing fails.
-    !parsedInteraction ||
-    parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN
+    definition.code !== "" &&
+    (
+      !parsedInteraction ||
+      parsedInteraction?.kind === InteractionKind.INTERACTION_UNKNOWN
+    )
   ) {
     return <UnknownInteractionHelp />;
   }
 
+  const parameters = parsedInteraction?.parameters ?? [];
+
   return (
     <>
-      <div>
-        <h2>Arguments</h2>
-        <SizedBox height={20} />
-        {parsedInteraction?.parameters.length === 0 && <NoArgumentsHelp />}
-      </div>
-      <ParamListBuilder
-        parameters={parsedInteraction?.parameters ?? []}
-        setFclValue={setFclValue}
-        fclValuesByIdentifier={fclValuesByIdentifier}
-        flixTemplate={flixTemplate}
-      />
+      <b>Parameters</b>
+      <SizedBox height={20} />
+      {parameters.length > 0 ? (
+        <ParamListBuilder
+          parameters={parameters}
+          setFclValue={setFclValue}
+          fclValuesByIdentifier={fclValuesByIdentifier}
+          flixTemplate={flixTemplate}
+        />
+      ) : (
+        <span>No parameters to set</span>
+      )}
       <SizedBox height={30} />
       {showSigningSettings && (
         <SigningSettings />
@@ -85,112 +87,23 @@ function TopContent() {
   );
 }
 
-function EmptyInteractionHelp() {
-  return (
-    <Callout
-      icon="💡"
-      title="Interacting with the blockchain"
-      description={
-        <div>
-          <p>
-            Cadence transactions or scripts are used to interact with the Flow
-            blockchain.
-          </p>
-          <SizedBox height={10} />
-          <p>
-            <b>
-              <ExternalLink
-                inline
-                href="https://developers.flow.com/cadence/language/transactions"
-              >
-                Transactions
-              </ExternalLink>
-            </b>{" "}
-            can be used to trigger state changes, while{" "}
-            <b>
-              <ExternalLink
-                inline
-                href="https://developers.flow.com/tooling/fcl-js/scripts"
-              >
-                scripts
-              </ExternalLink>
-            </b>{" "}
-            are used for reading existing state from the blockchain.
-          </p>
-        </div>
-      }
-    />
-  );
-}
-
 function UnknownInteractionHelp() {
   return (
-    <Callout
-      icon="❓"
-      title="Unknown interaction"
-      description={
-        <div>
-          <p>
-            This interaction is neither a transaction or script. To learn more,
-            head over to the official Flow documentation.
-          </p>
-          <SizedBox height={10} />
-          <ExternalLink href="https://developers.flow.com/cadence/language/transactions">
-            Transactions docs
-          </ExternalLink>
-          <ExternalLink href="https://developers.flow.com/tooling/fcl-js/scripts">
-            Scripts docs
-          </ExternalLink>
-        </div>
-      }
-    />
+    <div>
+      <b>Unknown interaction</b>
+      <p>
+        This interaction is neither a transaction or script. To learn more,
+        head over to the official Flow documentation.
+      </p>
+      <SizedBox height={10} />
+      <ExternalLink href="https://developers.flow.com/cadence/language/transactions">
+        Transactions docs
+      </ExternalLink>
+      <ExternalLink href="https://developers.flow.com/tooling/fcl-js/scripts">
+        Scripts docs
+      </ExternalLink>
+    </div>
   );
-}
-
-function NoArgumentsHelp() {
-  const { parsedInteraction } = useInteractionDefinitionManager();
-  switch (parsedInteraction?.kind) {
-    case InteractionKind.INTERACTION_TRANSACTION:
-      return (
-        <Callout
-          icon="💡"
-          title="Transaction without parameters"
-          description={
-            <div>
-              <p>
-                Parameters allow you to inject values without having to specify
-                them in code.
-              </p>
-              <SizedBox height={10} />
-              <ExternalLink href="https://developers.flow.com/cadence/language/transactions#transaction-parameters">
-                Learn more in Flow docs
-              </ExternalLink>
-            </div>
-          }
-        />
-      );
-    case InteractionKind.INTERACTION_SCRIPT:
-      return (
-        <Callout
-          icon="💡"
-          title="Script without parameters"
-          description={
-            <div>
-              <p>
-                Parameters allow you to inject values without having to specify
-                them in code.
-              </p>
-              <SizedBox height={10} />
-              <ExternalLink href="https://developers.flow.com/cadence/language/transactions#transaction-parameters">
-                Learn more in Flow docs
-              </ExternalLink>
-            </div>
-          }
-        />
-      );
-    default:
-      return null;
-  }
 }
 
 const initialTransactionOptions: TransactionOptions = {

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, ReactNode, useState } from "react";
 import classes from "./BaseTabs.module.scss";
 import { FlowserIcon } from "../../icons/FlowserIcon";
 
@@ -22,6 +22,7 @@ export type BaseTabsProps<IdType = string> = {
   onChangeTab?: (tab: BaseTabItem<IdType>) => void;
   onClose?: (tab: BaseTabItem<IdType>) => void;
   onAddNew?: () => void;
+  defaultContent?: ReactNode;
   tabs: BaseTabItem<IdType>[];
 };
 
@@ -34,6 +35,7 @@ export function BaseTabs<IdType>(props: BaseTabsProps<IdType>): ReactElement {
     tabs,
     onClose,
     onAddNew,
+    defaultContent
   } = props;
 
   const [fallbackCurrentTabId, setFallbackCurrentTabId] = useState(tabs[0]?.id);
@@ -89,7 +91,7 @@ export function BaseTabs<IdType>(props: BaseTabsProps<IdType>): ReactElement {
         className={classNames(props.contentClassName, classes.content)}
         style={{ flex: 1 }}
       >
-        {currentTab?.content}
+        {currentTab?.content ?? defaultContent}
       </div>
     </div>
   );

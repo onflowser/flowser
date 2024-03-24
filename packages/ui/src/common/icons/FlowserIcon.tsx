@@ -27,6 +27,7 @@ import Copy from "./assets/copy.svg";
 import Caret from "./assets/caret.svg";
 import CircleCross from "./assets/circle-cross.svg";
 import CircleCheck from "./assets/circle-check.svg";
+import DocumentWithArrow from "./assets/document-with-arrow.svg";
 import CircleQuestionMark from "./assets/circle-question-mark.svg";
 import Expand from "./assets/expand.svg";
 import Shrink from "./assets/shrink.svg";
@@ -36,6 +37,7 @@ import { SiWebstorm, SiIntellijidea } from "react-icons/si";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 export const FlowserIcon = {
+  DocumentWithArrow: DocumentWithArrow,
   Logs: Logs,
   Expand: Expand,
   Shrink: Shrink,
