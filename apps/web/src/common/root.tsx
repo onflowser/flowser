@@ -47,6 +47,8 @@ import { FlowChainID, FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import defaultFlowJson from "./default-flow.json";
 import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
+import { NetworkDropdown } from "./NetworkDropdown";
+import { ProfileDropdown } from "@/common/ProfileDropdown";
 
 const indexSyncIntervalInMs = 500;
 
@@ -445,7 +447,7 @@ function ApiSetupPrompt(props: {
 }
 
 function Content() {
-  const { networkId, interaction } = useInteractionsPageParams();
+  const { networkId, interaction, setNetworkId } = useInteractionsPageParams();
   const interactionRegistry = useInteractionRegistry();
   const templatesRegistry = useTemplatesRegistry();
 
@@ -485,6 +487,12 @@ function Content() {
 
   return (
     <InteractionsPage
+      headerRowContent={
+        <div className="m-2 flex gap-x-[10px]">
+          <ProfileDropdown currentNetwork={networkId} />
+          <NetworkDropdown value={networkId} onChange={setNetworkId} />
+        </div>
+      }
       tabOrder={["templates", "history"]}
       enabledInteractionSourceTypes={[
         'session',

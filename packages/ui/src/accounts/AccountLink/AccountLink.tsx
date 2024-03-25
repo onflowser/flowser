@@ -5,6 +5,7 @@ import classes from "./AccountLink.module.scss";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
+import { FlowUtils } from "@onflowser/core/src/flow-utils";
 
 type AccountLinkProps = {
   address: string;
@@ -13,7 +14,7 @@ type AccountLinkProps = {
 export function AccountLink(props: AccountLinkProps): ReactElement {
   const { address } = props;
   const networkId = useFlowNetworkId();
-  const accountUrl = useAccountUrl(address);
+  const accountUrl = FlowUtils.getFlowViewAccountUrl(networkId, address)
 
   const accountDisplay = (
     <>
@@ -36,17 +37,4 @@ export function AccountLink(props: AccountLinkProps): ReactElement {
     );
   }
 
-}
-
-function useAccountUrl(address: string) {
-  const networkId = useFlowNetworkId();
-
-  switch (networkId) {
-    case "emulator":
-      return `https://www.emulator.flowview.app/account/${address}`
-    case "mainnet":
-      return `https://www.flowview.app/account/${address}`
-    case "testnet":
-      return `https://www.testnet.flowview.app/account/${address}`
-  }
 }

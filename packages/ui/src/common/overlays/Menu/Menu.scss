@@ -11,4 +11,10 @@
       background: transparentize($gray-50, 0.5);
     }
   }
+
+  &__divider {
+    height: 1px;
+    margin: 0.5rem 0;
+    background-color: transparentize($gray-50, 0.4);
+  }
 }

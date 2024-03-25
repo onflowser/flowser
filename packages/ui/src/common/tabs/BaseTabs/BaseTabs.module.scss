@@ -9,6 +9,11 @@
   overflow: hidden;
   height: 100%;
 
+  .tabAndEndContentWrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .tabWrapper {
     display: flex;
     align-items: center;

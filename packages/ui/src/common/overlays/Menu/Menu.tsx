@@ -10,6 +10,6 @@ import "./Menu.scss";
 
 type MenuProps = ReactMenuProps;
 
-export function FlowserMenu(props: MenuProps): ReactElement {
+export function Menu(props: MenuProps): ReactElement {
   return <ReactMenu transition {...props} />;
 }
