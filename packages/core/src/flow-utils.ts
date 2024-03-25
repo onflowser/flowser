@@ -46,7 +46,22 @@ export class FlowUtils {
   }
 
   static getContractBrowserAccountUrl(networkId: FlowNetworkId, address: string) {
-    // Contract browser doesn't have separate URLs for each network for now
-    return `https://contractbrowser.com/account/${address}`
+    if (networkId === "emulator") {
+      return undefined;
+    } else {
+      // Contract browser doesn't have separate URLs for each network for now
+      return `https://contractbrowser.com/account/${address}`
+    }
+  }
+
+  static getFlowDiverAccountUrl(networkId: FlowNetworkId, address: string) {
+    switch (networkId) {
+      case "emulator":
+        return undefined;
+      case "mainnet":
+        return `https://www.flowdiver.io/account/${address}`
+      case "testnet":
+        return `https://testnet.flowdiver.io/account/${address}`
+    }
   }
 }

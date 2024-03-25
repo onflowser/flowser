@@ -66,7 +66,7 @@ export function ProfileDropdown(props: ProfileDropdownProps) {
           className="flex justify-between gap-x-2"
           onClick={() => window.open(FlowUtils.getFlowViewAccountUrl(currentNetwork, signedInUser.addr!), "_blank")}
         >
-          <span className="flex gap-x-1 items-center">
+          <span className="flex gap-x-2 items-center">
             <Image width={iconSize} height={iconSize} src="/flowview.png" alt="flowview logo" />
             FlowView
           </span>
@@ -76,9 +76,19 @@ export function ProfileDropdown(props: ProfileDropdownProps) {
           className="flex justify-between gap-x-2"
           onClick={() => window.open(FlowUtils.getContractBrowserAccountUrl(currentNetwork, signedInUser.addr!), "_blank")}
         >
-          <span className="flex gap-x-1 items-center">
+          <span className="flex gap-x-2 items-center">
             <Image width={iconSize} height={iconSize} src="/contractbrowser.png" alt="contractbrowser logo" />
             ContractBrowser
+          </span>
+          <FlowserIcon.ExternalLink />
+        </MenuItem>
+        <MenuItem
+          className="flex justify-between gap-x-2"
+          onClick={() => window.open(FlowUtils.getFlowDiverAccountUrl(currentNetwork, signedInUser.addr!), "_blank")}
+        >
+          <span className="flex gap-x-2 items-center">
+            <Image width={iconSize} height={iconSize} src="/flowdiver.png" alt="flowdiver logo" />
+            FlowDiver
           </span>
           <FlowserIcon.ExternalLink />
         </MenuItem>
