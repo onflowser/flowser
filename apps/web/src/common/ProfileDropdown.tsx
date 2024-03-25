@@ -34,6 +34,24 @@ export function ProfileDropdown(props: ProfileDropdownProps) {
   }, []);
 
   if (signedInUser?.addr) {
+    const accountLinks = [
+      {
+        label: "FlowView",
+        iconPath: "/flowview.png",
+        url: FlowUtils.getFlowViewAccountUrl(currentNetwork, signedInUser.addr!)
+      },
+      {
+        label: "ContractBrowser",
+        iconPath: "/contractbrowser.png",
+        url: FlowUtils.getContractBrowserAccountUrl(currentNetwork, signedInUser.addr!)
+      },
+      {
+        label: "FlowDiver",
+        iconPath: "/flowdiver.png",
+        url: FlowUtils.getFlowDiverAccountUrl(currentNetwork, signedInUser.addr!)
+      }
+    ]
+
     return (
       <Menu
         position="anchor"
@@ -62,36 +80,19 @@ export function ProfileDropdown(props: ProfileDropdownProps) {
         <MenuHeader>
           View your account on
         </MenuHeader>
-        <MenuItem
-          className="flex justify-between gap-x-2"
-          onClick={() => window.open(FlowUtils.getFlowViewAccountUrl(currentNetwork, signedInUser.addr!), "_blank")}
-        >
+        {accountLinks.filter(link => link.url !== undefined).map(link => (
+          <MenuItem
+            key={link.url}
+            className="flex justify-between gap-x-2"
+            onClick={() => window.open(link.url, "_blank")}
+          >
           <span className="flex gap-x-2 items-center">
-            <Image width={iconSize} height={iconSize} src="/flowview.png" alt="flowview logo" />
-            FlowView
+            <Image width={iconSize} height={iconSize} src={link.iconPath} alt={`${link.label} logo`} />
+            {link.label}
           </span>
-          <FlowserIcon.ExternalLink />
-        </MenuItem>
-        <MenuItem
-          className="flex justify-between gap-x-2"
-          onClick={() => window.open(FlowUtils.getContractBrowserAccountUrl(currentNetwork, signedInUser.addr!), "_blank")}
-        >
-          <span className="flex gap-x-2 items-center">
-            <Image width={iconSize} height={iconSize} src="/contractbrowser.png" alt="contractbrowser logo" />
-            ContractBrowser
-          </span>
-          <FlowserIcon.ExternalLink />
-        </MenuItem>
-        <MenuItem
-          className="flex justify-between gap-x-2"
-          onClick={() => window.open(FlowUtils.getFlowDiverAccountUrl(currentNetwork, signedInUser.addr!), "_blank")}
-        >
-          <span className="flex gap-x-2 items-center">
-            <Image width={iconSize} height={iconSize} src="/flowdiver.png" alt="flowdiver logo" />
-            FlowDiver
-          </span>
-          <FlowserIcon.ExternalLink />
-        </MenuItem>
+            <FlowserIcon.ExternalLink />
+          </MenuItem>
+        ))}
         <MenuDivider />
         <MenuHeader>
           Actions
