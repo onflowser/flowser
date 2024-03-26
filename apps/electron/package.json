@@ -27,7 +27,7 @@
   "main": "./src/main/main.ts",
   "scripts": {
     "generate-icons": "../../node_modules/.bin/electron-icon-maker --input=./assets/icon.png --output=./generated-icons",
-    "build": "npm run generate-icons && concurrently \"npm run build:main\" \"npm run build:renderer\"",
+    "build-electron": "npm run generate-icons && concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:dll": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
@@ -105,7 +105,6 @@
     "mixpanel-browser": "^2.47.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hot-toast": "^2.1.1",
     "react-router-dom": "^6.16.0",
     "semver": "^7.5.4",
     "swr": "^2.2.4"

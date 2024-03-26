@@ -3,14 +3,13 @@ import {
   DetailsCard,
   DetailsCardColumn,
 } from "../../common/cards/DetailsCard/DetailsCard";
-import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
-import classes from "./TransactionOverview.module.scss";
 import { ExecutionStatusBadge } from "../../common/status/ExecutionStatusBadge";
 import { GrcpStatusBadge } from "../../common/status/GrcpStatusBadge";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
-import { ProjectLink } from "../../common/links/ProjectLink";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { FlowTransaction } from "@onflowser/api";
+import { TransactionLink } from "../TransactionLink/TransactionLink";
+import { BlockLink } from "../../blocks/BlockLink/BlockLink";
 
 type TransactionOverviewProps = {
   transaction: FlowTransaction;
@@ -26,13 +25,11 @@ export function TransactionOverview(
     [
       {
         label: "Transaction",
-        value: (
-          <ProjectLink to={`/transactions/${transaction.id}`}>
-            <MiddleEllipsis className={classes.ellipsis}>
-              {transaction.id}
-            </MiddleEllipsis>
-          </ProjectLink>
-        ),
+        value: <TransactionLink transactionId={transaction.id} />,
+      },
+      {
+        label: "Block ID",
+        value: <BlockLink blockId={transaction.blockId} />,
       },
       {
         label: "Status",
@@ -45,16 +42,6 @@ export function TransactionOverview(
       {
         label: "Created date",
         value: <DateDisplay date={transaction.createdAt.toISOString()} />,
-      },
-      {
-        label: "Block ID",
-        value: (
-          <ProjectLink to={`/blocks/${transaction.blockId}`}>
-            <MiddleEllipsis className={classes.ellipsis}>
-              {transaction.blockId}
-            </MiddleEllipsis>
-          </ProjectLink>
-        ),
       },
     ],
     [

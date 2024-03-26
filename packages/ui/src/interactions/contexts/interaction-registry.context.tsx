@@ -40,7 +40,8 @@ export function InteractionRegistryProvider(props: {
 }): ReactElement {
   const defaultInteraction: InteractionDefinition = {
     id: crypto.randomUUID(),
-    name: "New interaction",
+    forkedFromTemplateId: undefined,
+    name: "Untitled",
     code: "",
     fclValuesByIdentifier: new Map(),
     initialOutcome: undefined,
@@ -53,7 +54,7 @@ export function InteractionRegistryProvider(props: {
     updatedDate: new Date(),
   };
   const [definitions, setDefinitions] = useState<InteractionDefinition[]>([
-    defaultInteraction,
+    defaultInteraction
   ]);
   const [focusedInteractionId, setFocusedInteractionId] = useState<
     string | undefined

@@ -19,38 +19,31 @@ import { ensurePrefixedAddress } from "./utils";
 import { IFlowserLogger } from "./logger";
 import { FclValue } from "./fcl-value";
 
-type BlockData = {
-  block: flowResource.FlowBlock;
-  transactions: FlowTransactionWithStatus[];
-  collections: flowResource.FlowCollection[];
-  events: flowResource.FlowEvent[];
-};
-
 type UnprocessedBlockInfo = {
   nextBlockHeightToProcess: number;
   latestUnprocessedBlockHeight: number;
 };
 
-type FlowTransactionWithStatus = flowResource.FlowTransaction & {
-  status: flowResource.FlowTransactionStatus;
+export type BlockchainIndexes = {
+  accountStorage: IResourceIndex<flowserResource.FlowAccountStorage>;
+  contract: IResourceIndex<flowserResource.FlowContract>;
+  accountKey: IResourceIndex<flowserResource.FlowAccountKey>;
+  block: IResourceIndex<flowserResource.FlowBlock>;
+  event: IResourceIndex<flowserResource.FlowEvent>;
+  transaction: IResourceIndex<flowserResource.FlowTransaction>;
+  account: IResourceIndex<flowserResource.FlowAccount>;
 };
 
 export class FlowIndexerService {
   constructor(
     private readonly logger: IFlowserLogger,
-    private transactionIndex: IResourceIndex<flowserResource.FlowTransaction>,
-    private accountIndex: IResourceIndex<flowserResource.FlowAccount>,
-    private blockIndex: IResourceIndex<flowserResource.FlowBlock>,
-    private eventIndex: IResourceIndex<flowserResource.FlowEvent>,
-    private contractIndex: IResourceIndex<flowserResource.FlowContract>,
-    private accountKeyIndex: IResourceIndex<flowserResource.FlowAccountKey>,
-    private accountStorageIndex: IResourceIndex<flowserResource.FlowAccountStorage>,
     private flowStorageService: FlowAccountStorageService,
     private flowGatewayService: FlowGatewayService,
     private flowInteractionsService: IFlowInteractions,
+    private indexes: BlockchainIndexes
   ) {}
 
-  async processBlockchainData(): Promise<void> {
+  public async processBlockchain(): Promise<void> {
     const isGatewayOnline = await this.flowGatewayService.isRestApiReachable();
 
     if (!isGatewayOnline) {
@@ -63,26 +56,36 @@ export class FlowIndexerService {
       this.maybeProcessWellKnownAccounts(),
     ]);
 
-    try {
       for (
         let height = unprocessedBlocksInfo.nextBlockHeightToProcess;
         height <= unprocessedBlocksInfo.latestUnprocessedBlockHeight;
         height++
       ) {
-        this.logger.debug(`Processing block: ${height}`);
-        // Blocks must be processed in sequential order (not in parallel)
-        // because objects on subsequent blocks can reference objects from previous blocks
-        // (e.g. a transaction may reference an account from previous block)
-        await this.processBlockWithHeight(height);
+        try {
+          this.logger.debug(`Processing block: ${height}`);
+          const block = await this.flowGatewayService.getBlockByHeight(height);
+          // TODO: Can we now process blocks in parallel?
+          // Blocks must be processed in sequential order (not in parallel)
+          // because objects on subsequent blocks can reference objects from previous blocks
+          // (e.g. a transaction may reference an account from previous block)
+          await Promise.all([
+            this.processBlock(block, {
+              indexTransactions: true
+            }),
+            // We don't know when account storage changed
+            // without parsing transaction source code.
+            // For now just re-index storage of all accounts.
+            this.reIndexAllAccountStorage(),
+          ]);
+        } catch (e) {
+          this.logger.error(`Failed to process block (#${height}) data`, e);
+        }
       }
-    } catch (e) {
-      return this.logger.debug(`failed to fetch block data: ${e}`);
-    }
   }
 
   private async getUnprocessedBlocksInfo(): Promise<UnprocessedBlockInfo> {
     const [indexedBlocks, latestBlock] = await Promise.all([
-      this.blockIndex.findAll(),
+      this.indexes.block.findAll(),
       this.flowGatewayService.getLatestBlock(),
     ]);
     const lastIndexedBlock = this.findLatestBlock(indexedBlocks);
@@ -107,103 +110,19 @@ export class FlowIndexerService {
     return latestBlock;
   }
 
-  private async processBlockWithHeight(height: number) {
-    const blockData = await this.getBlockData(height);
+  public async processBlock(block: flowResource.FlowBlock, options: {
+    // Should index all block transaction
+    indexTransactions: boolean;
+  }): Promise<void> {
 
-    try {
-      await Promise.all([
-        this.processBlockData(blockData),
-        // We don't know when account storage changed
-        // without parsing transaction source code.
-        // For now just re-index storage of all accounts.
-        this.reIndexAllAccountStorage(),
-      ]);
-    } catch (e) {
-      this.logger.error(`Failed to store block (#${height}) data`, e);
-    }
-
-    try {
-      blockData.transactions.map((transaction) =>
-        this.subscribeToTransactionStatusUpdates(transaction.id),
-      );
-    } catch (e) {
-      this.logger.error("Transaction status update failed", e);
-    }
-  }
-
-  private async subscribeToTransactionStatusUpdates(
-    transactionId: string,
-  ): Promise<void> {
-    const unsubscribe = this.flowGatewayService
-      .getTxStatusSubscription(transactionId)
-      .subscribe((newStatus) =>
-        this.transactionIndex.update({
-          id: transactionId,
-          status: {
-            errorMessage: newStatus.errorMessage,
-            grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
-            executionStatus: newStatus.status,
-          },
-        }),
-      );
-    try {
-      await this.flowGatewayService
-        .getTxStatusSubscription(transactionId)
-        .onceSealed();
-    } catch (e: unknown) {
-      this.logger.error("Failed to wait on sealed transaction", e);
-    } finally {
-      // Once transaction is sealed, status won't change anymore.
-      unsubscribe();
-    }
-  }
-
-  private async processBlockData(data: BlockData) {
-    const blockPromise = this.blockIndex
-      .create(this.createBlockEntity({ block: data.block }))
+    await this.indexes.block
+      .create(this.createBlockEntity({ block }))
       .catch((e: unknown) => this.logger.error("block save error", e));
-    const transactionPromises = Promise.all(
-      data.transactions.map((transaction) =>
-        this.processNewTransaction({
-          block: data.block,
-          transaction: transaction,
-          transactionStatus: transaction.status,
-        }).catch((e: any) =>
-          this.logger.error(`transaction save error: ${e.message}`, e.stack),
-        ),
-      ),
-    );
-    const eventPromises = Promise.all(
-      data.events.map((flowEvent) =>
-        this.eventIndex
-          .create(this.createEventEntity(flowEvent))
-          .catch((e: any) =>
-            this.logger.error(`event save error: ${e.message}`, e.stack),
-          ),
-      ),
-    );
 
-    const eventProcessingPromises = Promise.all(
-      data.events.map((event) =>
-        this.processEvent(event).catch((e) => {
-          this.logger.error(
-            `Event handling error: ${e.message} (${JSON.stringify(event)})`,
-            e.stack,
-          );
-        }),
-      ),
-    );
+    if (!options.indexTransactions) {
+      return;
+    }
 
-    return Promise.all([
-      blockPromise,
-      transactionPromises,
-      eventPromises,
-      eventProcessingPromises,
-    ]);
-  }
-
-  private async getBlockData(height: number): Promise<BlockData> {
-    const block = await this.flowGatewayService.getBlockByHeight(height);
     const collections = await Promise.all(
       block.collectionGuarantees.map(async (guarantee) =>
         this.flowGatewayService.getCollectionById(guarantee.collectionId),
@@ -213,20 +132,13 @@ export class FlowIndexerService {
       .map((collection) => collection.transactionIds)
       .flat();
 
-    const transactionFutures = Promise.all(
-      transactionIds.map((txId) =>
-        this.flowGatewayService.getTransactionById(txId),
-      ),
-    );
-    const transactionStatusesFutures = Promise.all(
-      transactionIds.map((txId) =>
-        this.flowGatewayService.getTransactionStatusById(txId),
-      ),
-    );
-
     const [transactions, statuses] = await Promise.all([
-      transactionFutures,
-      transactionStatusesFutures,
+      Promise.all(transactionIds.map((txId) =>
+        this.flowGatewayService.getTransactionById(txId),
+      )),
+      Promise.all(transactionIds.map((txId) =>
+        this.flowGatewayService.getTransactionStatusById(txId),
+      )),
     ]);
 
     const transactionsWithStatuses = transactions.map((transaction, index) => ({
@@ -244,16 +156,38 @@ export class FlowIndexerService {
       )
       .flat();
 
-    return {
-      block,
-      collections,
-      transactions: transactionsWithStatuses,
-      events,
-    };
+    const transactionPromises = Promise.all(
+      transactionsWithStatuses.map((transaction) =>
+        this.processTransaction({
+          transaction: transaction,
+          transactionStatus: transaction.status,
+        }).catch((e: any) =>
+          this.logger.error(`transaction save error: ${e.message}`, e.stack),
+        ),
+      ),
+    );
+
+    const eventPromises = Promise.all(
+      events.map((event) =>
+        this.processEvent(event).catch((e) => {
+          this.logger.error(
+            `Event handling error: ${e.message} (${JSON.stringify(event)})`,
+            e.stack,
+          );
+        }),
+      ),
+    );
+
+    await Promise.all([
+      transactionPromises,
+      eventPromises,
+    ]);
   }
 
-  private async processEvent(event: flowResource.FlowEvent) {
+  public async processEvent(event: flowResource.FlowEvent) {
     this.logger.debug(`Processing event: ${JSON.stringify(event)}`);
+
+    await this.indexes.event.create(this.createEventEntity(event))
 
     const isFlowTokenWithdrawnEvent = (eventId: string) =>
       /A\..*\.FlowToken\.TokensWithdrawn/.test(eventId);
@@ -298,7 +232,7 @@ export class FlowIndexerService {
       event.data.address,
     );
 
-    await this.contractIndex.create(
+    await this.indexes.contract.create(
       this.createContractEntity({
         account,
         name: event.data.contract,
@@ -311,7 +245,7 @@ export class FlowIndexerService {
       event.data.address,
     );
 
-    await this.contractIndex.update(
+    await this.indexes.contract.update(
       this.createContractEntity({
         account,
         name: event.data.contract,
@@ -324,7 +258,7 @@ export class FlowIndexerService {
       event.data.address,
     );
 
-    await this.contractIndex.delete(
+    await this.indexes.contract.delete(
       this.createContractEntity({
         account,
         name: event.data.contract,
@@ -343,7 +277,7 @@ export class FlowIndexerService {
       throw new Error("Cannot find key from event");
     }
 
-    return this.accountKeyIndex.create(
+    return this.indexes.accountKey.create(
       this.createKeyEntity({
         key,
         address: account.address,
@@ -357,15 +291,14 @@ export class FlowIndexerService {
       address: event.data.address,
       publicKey: publicKey,
     });
-    await this.accountKeyIndex.delete({ id: keyId });
+    await this.indexes.accountKey.delete({ id: keyId });
   }
 
   private decodeUint8PublicKey(encodedKey: string[]) {
     return Buffer.from(new Uint8Array(encodedKey.map(Number))).toString("hex");
   }
 
-  private async processNewTransaction(options: {
-    block: flowResource.FlowBlock;
+  public async processTransaction(options: {
     transaction: flowResource.FlowTransaction;
     transactionStatus: flowResource.FlowTransactionStatus;
   }) {
@@ -377,16 +310,60 @@ export class FlowIndexerService {
         `Unexpected interaction parsing error: ${parsedInteraction.error}`,
       );
     }
-    return this.transactionIndex.create(
+
+    this.subscribeToTransactionStatusUpdates(options.transaction.id).then(() => {
+      // Ignore waiting for status update completion
+    });
+
+    return this.indexes.transaction.create(
       this.createTransactionEntity({ ...options, parsedInteraction }),
     );
+  }
+
+  private async subscribeToTransactionStatusUpdates(
+    transactionId: string,
+  ): Promise<void> {
+    const unsubscribe = this.flowGatewayService
+      .getTxStatusSubscription(transactionId)
+      .subscribe(async (newStatus) => {
+        const indexedBlock = await this.indexes.block.findOneById(newStatus.blockId)
+
+        // When initial status is fetched,
+        // transaction may not be included in the block yet.
+        if (newStatus.blockId && indexedBlock === undefined) {
+          const block = await this.flowGatewayService.getBlockById(newStatus.blockId);
+          await this.processBlock(block, {
+            indexTransactions: false
+          })
+        }
+
+        await this.indexes.transaction.update({
+          id: transactionId,
+          blockId: newStatus.blockId,
+          status: {
+            errorMessage: newStatus.errorMessage,
+            grcpStatus: this.reMapGrcpStatus(newStatus.statusCode),
+            executionStatus: newStatus.status
+          }
+        });
+      });
+    try {
+      await this.flowGatewayService
+        .getTxStatusSubscription(transactionId)
+        .onceSealed();
+    } catch (e: unknown) {
+      this.logger.error("Failed to wait on sealed transaction", e);
+    } finally {
+      // Once transaction is sealed, status won't change anymore.
+      unsubscribe();
+    }
   }
 
   private async updateAccountBalance(address: string) {
     const flowAccount = await this.flowGatewayService.getAccount(address);
     // Use `upsert` instead of `create` because we are processing a batch
     // of events (which may include "account created" event) in parallel.
-    await this.accountIndex.upsert(this.createAccountEntity(flowAccount));
+    await this.indexes.account.upsert(this.createAccountEntity(flowAccount));
   }
 
   private async createAccount(address: string) {
@@ -395,10 +372,10 @@ export class FlowIndexerService {
     await Promise.all([
       // Use `upsert` instead of `create` because we are processing a batch
       // of events (which may include "token balance updated" event) in parallel.
-      this.accountIndex.upsert(this.createAccountEntity(account)),
+      this.indexes.account.upsert(this.createAccountEntity(account)),
       Promise.all(
         account.keys.map((key) =>
-          this.accountKeyIndex.create(
+          this.indexes.accountKey.create(
             this.createKeyEntity({
               address,
               key,
@@ -408,7 +385,7 @@ export class FlowIndexerService {
       ),
       Promise.all(
         Object.keys(account.contracts).map((name) =>
-          this.contractIndex.create(
+          this.indexes.contract.create(
             this.createContractEntity({
               account,
               name,
@@ -420,7 +397,7 @@ export class FlowIndexerService {
   }
 
   private async reIndexAllAccountStorage() {
-    const allAccounts = await this.accountIndex.findAll();
+    const allAccounts = await this.indexes.account.findAll();
     this.logger.debug(
       `Processing storages for accounts: ${allAccounts
         .map((e) => e.address)
@@ -437,7 +414,7 @@ export class FlowIndexerService {
     const storages =
       await this.flowStorageService.getAccountStorageItems(address);
     return Promise.all(
-      storages.map((storage) => this.accountStorageIndex.upsert(storage)),
+      storages.map((storage) => this.indexes.accountStorage.upsert(storage)),
     );
   }
 
@@ -445,7 +422,7 @@ export class FlowIndexerService {
     await Promise.all(
       this.getAllWellKnownAddresses()
         .filter(
-          (address) => this.accountIndex.findOneById(address) !== undefined,
+          (address) => this.indexes.account.findOneById(address) !== undefined,
         )
         .map((address) =>
           this.createAccount(address).catch((error) => {
@@ -606,12 +583,11 @@ export class FlowIndexerService {
   }
 
   private createTransactionEntity(options: {
-    block: flowResource.FlowBlock;
     transaction: flowResource.FlowTransaction;
     transactionStatus: flowResource.FlowTransactionStatus;
     parsedInteraction: ParsedInteractionOrError;
   }): OmitTimestamps<flowserResource.FlowTransaction> {
-    const { block, transaction, transactionStatus, parsedInteraction } =
+    const { transaction, transactionStatus, parsedInteraction } =
       options;
 
     // FCL-JS returns type-annotated argument values.
@@ -649,7 +625,7 @@ export class FlowIndexerService {
       id: transaction.id,
       script: transaction.script,
       payer: ensurePrefixedAddress(transaction.payer),
-      blockId: block.id,
+      blockId: transactionStatus.blockId,
       referenceBlockId: transaction.referenceBlockId,
       gasLimit: transaction.gasLimit,
       authorizers: transaction.authorizers.map((address) =>

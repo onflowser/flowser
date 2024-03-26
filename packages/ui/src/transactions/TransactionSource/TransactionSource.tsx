@@ -24,6 +24,7 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
     const createdInteraction = create(
       {
         name: transactionName ?? "Unknown",
+        forkedFromTemplateId: undefined,
         code: transaction.script,
         fclValuesByIdentifier: new Map(
           transaction.arguments.map((arg) => [arg.identifier, arg.value]),
@@ -57,6 +58,8 @@ export const TransactionSource: FC<TransactionSourceProps> = ({
             {transaction.arguments.map((arg) => (
               <ParamBuilder
                 key={arg.identifier}
+                // TODO: Provide flix arguments?
+                flixArgument={undefined}
                 disabled
                 value={arg.value}
                 setValue={console.log}

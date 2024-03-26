@@ -12,21 +12,26 @@ import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixInfo } from "../FlixInfo/FlixInfo";
 import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 
-export function InteractionTemplates(): ReactElement {
+type InteractionTemplatesProps = {
+  enabledSourceTypes: InteractionSourceType[];
+}
+
+export function InteractionTemplates(props: InteractionTemplatesProps): ReactElement {
   return (
     <div className={classes.root}>
-      <StoredTemplates />
+      <TemplatesList {...props} />
       <FocusedInteraction />
     </div>
   );
 }
 
-function StoredTemplates() {
+function TemplatesList(props: InteractionTemplatesProps) {
   const { showDialog } = useConfirmDialog();
   const [searchTerm, setSearchTerm] = useState("");
   const { create, focusedDefinition, setFocused } = useInteractionRegistry();
-  const { templates, removeTemplate } = useTemplatesRegistry();
+  const { error, isLoading, templates, removeTemplate } = useTemplatesRegistry();
   const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
   const filteredTemplates = useMemo(() => {
     const searchQueryResults = searchTerm === "" ? templates : templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -52,6 +57,10 @@ function StoredTemplates() {
   }
 
   function renderSourceFilterBadge(sourceType: InteractionSourceType) {
+    if (!props.enabledSourceTypes.includes(sourceType)) {
+      return null;
+    }
+
     const nameLookup: Record<InteractionSourceType, string> = {
       flix: "flix",
       session: "snippets",
@@ -85,12 +94,20 @@ function StoredTemplates() {
           {renderSourceFilterBadge("workspace")}
         </div>
       </div>
-      <div className={classes.storedTemplates}>
+      <div className={classes.templatesList}>
+        {error && <span className={classes.error}>{error}</span>}
         {filteredAndSortedTemplates.map((template) => (
           <div
             key={template.id}
             onClick={() => {
-              const createdInteraction = create(template);
+              const createdInteraction = create({
+                ...template,
+                forkedFromTemplateId: template.id,
+                // Provide a different ID as the template,
+                // otherwise parsed data won't be reflected correctly
+                // when changing source code.
+                id: crypto.randomUUID()
+              });
               setFocused(createdInteraction.id);
             }}
             className={classNames(classes.item, {
@@ -101,7 +118,7 @@ function StoredTemplates() {
             {template.source === "session" && (
               <FlowserIcon.Trash
                 className={classes.trash}
-                onClick={(e) => {
+                onClick={(e: MouseEvent) => {
                   e.stopPropagation();
                   showDialog({
                     title: "Remove template",
@@ -120,6 +137,9 @@ function StoredTemplates() {
             )}
           </div>
         ))}
+        {isLoading && Array.from({length: 30}).map(() => (
+          <Shimmer height={24} />
+        ))}
       </div>
     </div>
   );
@@ -135,7 +155,7 @@ function FocusedInteraction() {
 
   return (
     <div className={classes.focusedTemplate}>
-      {focusedDefinition && <FlixInfo interaction={focusedDefinition} />}
+      {focusedDefinition && focusedDefinition.code !== "" && <FlixInfo interaction={focusedDefinition} />}
       {correspondingTemplate?.source === "workspace" && (
         <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />
       )}

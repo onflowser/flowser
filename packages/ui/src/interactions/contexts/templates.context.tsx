@@ -1,15 +1,21 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
-import { FclValue } from "@onflowser/core";
+import { FclValue, FlixV1Template } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import {
   useGetContracts,
   useGetWorkspaceInteractionTemplates,
 } from "../../api";
 import { WorkspaceTemplate } from "@onflowser/api";
-import { FlixTemplate, useListFlixTemplates } from "../../hooks/flix";
+import { useListFlixTemplates } from "../../hooks/use-flix";
+import { useFlowNetworkId } from "../../contexts/flow-network.context";
+import { FlixUtils } from "@onflowser/core/src/flix-utils";
+import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
+import { SWRResponse } from "swr";
 
 type InteractionTemplatesRegistry = {
+  isLoading: boolean;
+  error: string | undefined;
   templates: InteractionDefinitionTemplate[];
   saveTemplate: (definition: InteractionDefinition) => void;
   removeTemplate: (template: InteractionDefinitionTemplate) => void;
@@ -17,10 +23,10 @@ type InteractionTemplatesRegistry = {
 
 export type InteractionSourceType = "workspace" | "flix" | "session";
 
-export type InteractionDefinitionTemplate = InteractionDefinition & {
+export type InteractionDefinitionTemplate = Omit<InteractionDefinition, "forkedFromTemplateId"> & {
   source: InteractionSourceType;
 
-  flix: FlixTemplate | undefined;
+  flix: FlixV1Template | undefined;
   workspace: WorkspaceTemplate | undefined;
 };
 
@@ -45,14 +51,21 @@ const Context = createContext<InteractionTemplatesRegistry>(undefined as never);
 export function TemplatesRegistryProvider(props: {
   children: React.ReactNode;
 }): ReactElement {
-  const { data: workspaceTemplates } = useGetWorkspaceInteractionTemplates();
-  const { data: flixTemplates } = useListFlixTemplates();
+  const workspaceTemplates = useGetWorkspaceInteractionTemplates();
+  const flixTemplates = useListFlixTemplates();
+  const networkId = useFlowNetworkId()
   const { data: contracts } = useGetContracts();
   const [sessionTemplates, setSessionTemplates] = useLocalStorage<
     SerializedSessionTemplate[]
   >("interactions", []);
-
-  const randomId = () => String(Math.random() * 1000000);
+  const flowNetworkId = useFlowNetworkId();
+  const isLoading =
+    getIsLoading(workspaceTemplates) ||
+    getIsLoading(flixTemplates) ||
+    !contracts;
+  const error =
+    getErrorMessage("Fail to load file templates", workspaceTemplates) ||
+    getErrorMessage("Fail to load FLIX templates", flixTemplates);
 
   const flowCoreContractNames = new Set([
     "FlowStorageFees",
@@ -75,7 +88,18 @@ export function TemplatesRegistryProvider(props: {
     "FlowFees",
   ]);
 
-  function isFlixTemplateUseful(template: FlixTemplate) {
+  function isSupportedOnCurrentNetwork(template: FlixV1Template) {
+    if (networkId === "emulator") {
+      return isSupportedOnEmulatorNetwork(template)
+    } else {
+      return FlixUtils.hasDependenciesForNetwork(template, networkId);
+    }
+  }
+
+  // Since FLIX v1 doesn't officially support the emulator network,
+  // we must manually check if the provided template depends on contracts
+  // that are known to be deployed on the emulator network.
+  function isSupportedOnEmulatorNetwork(template: FlixV1Template) {
     const importedContractNames = Object.values(template.data.dependencies)
       .map((dependency) => Object.keys(dependency))
       .flat();
@@ -103,7 +127,7 @@ export function TemplatesRegistryProvider(props: {
     () => [
       ...sessionTemplates.map(
         (template): InteractionDefinitionTemplate => ({
-          id: randomId(),
+          id: template.name,
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
@@ -118,9 +142,9 @@ export function TemplatesRegistryProvider(props: {
           source: "session"
         }),
       ),
-      ...(workspaceTemplates?.map(
+      ...(workspaceTemplates.data?.map(
         (template): InteractionDefinitionTemplate => ({
-          id: randomId(),
+          id: template.id,
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
@@ -133,23 +157,24 @@ export function TemplatesRegistryProvider(props: {
           source: "workspace"
         }),
       ) ?? []),
-      ...(flixTemplates?.filter(isFlixTemplateUseful)?.map(
+      ...(flixTemplates.data?.filter(isSupportedOnCurrentNetwork)?.map(
         (template): InteractionDefinitionTemplate => ({
           id: template.id,
-          name: getFlixTemplateName(template),
-          code: getCadenceWithNewImportSyntax(template),
+          name: FlixUtils.getName(template),
+          code: FlixUtils.getCadenceSourceCode(template, networkId),
           transactionOptions: undefined,
           initialOutcome: undefined,
           fclValuesByIdentifier: new Map(),
-          createdDate: new Date(),
-          updatedDate: new Date(),
+          // Use the same date for all FLIX templates for consistent sorting.
+          createdDate: new Date(0),
+          updatedDate: new Date(0),
           workspace: undefined,
           flix: template,
           source: "flix"
         }),
       ) ?? []),
     ],
-    [sessionTemplates, workspaceTemplates],
+    [sessionTemplates, workspaceTemplates, flowNetworkId],
   );
 
   function saveTemplate(interaction: InteractionDefinition) {
@@ -183,6 +208,8 @@ export function TemplatesRegistryProvider(props: {
   return (
     <Context.Provider
       value={{
+        error,
+        isLoading,
         templates,
         removeTemplate,
         saveTemplate,
@@ -203,30 +230,14 @@ export function useTemplatesRegistry(): InteractionTemplatesRegistry {
   return context;
 }
 
-// Transform imports with replacement patterns to the new import syntax,
-// since FLIX v1.0 doesn't support new import syntax yet.
-// https://github.com/onflow/flow-interaction-template-tools/issues/12
-function getCadenceWithNewImportSyntax(template: FlixTemplate) {
-  const replacementPatterns = Object.keys(template.data.dependencies);
-  return replacementPatterns.reduce(
-    (cadence, pattern) => {
-      const contractName = Object.keys(template.data.dependencies[pattern])[0];
-
-      return cadence
-        .replace(new RegExp(`from\\s+${pattern}`), "")
-        .replace(new RegExp(`import\\s+${contractName}`), `import "${contractName}"`)
-    },
-    template.data.cadence,
-  );
+function getErrorMessage(label: string, swrResponse: SWRResponse) {
+  if (swrResponse.error) {
+    return `${label}: ${swrResponse.error?.message || swrResponse.error}`
+  } else {
+    return undefined;
+  }
 }
 
-function getFlixTemplateName(template: FlixTemplate) {
-  const englishTitle = template.data.messages?.title?.i18n?.["en-US"];
-  if (englishTitle) {
-    // Transactions generated with NFT catalog have this necessary prefix in titles.
-    // https://github.com/onflow/nft-catalog
-    return englishTitle.replace("This transaction ", "");
-  } else {
-    return "Unknown";
-  }
+function getIsLoading(swrResponse: SWRResponse) {
+  return !swrResponse.data && !swrResponse.error
 }

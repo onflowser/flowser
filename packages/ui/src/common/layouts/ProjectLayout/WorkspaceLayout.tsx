@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react";
 import classes from "./ProjectLayout.module.scss";
 import { Logs } from "../../../logs/Logs";
-import { useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { Breadcrumbs } from "../../misc/Breadcrumbs/Breadcrumbs";
 import { SideNavigation } from "../../misc/SideNavigation/SideNavigation";
+import { useLocation } from "../../../contexts/navigation.context";
 
 type ProjectLayoutProps = {
   children: ReactNode;

@@ -26,7 +26,10 @@ export const SnapshotDialog: FC<SnapshotDialogProps> = ({ show, setShow }) => {
 
   async function onConfirm() {
     if (!projectId) {
-      return;
+      throw new Error("Current project ID not found")
+    }
+    if (!snapshotService) {
+      throw new Error("Snapshot service not found")
     }
     setLoading(true);
     try {

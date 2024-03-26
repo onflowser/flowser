@@ -6,11 +6,16 @@ import { PopupPosition } from "reactjs-popup/dist/types";
 
 type TooltipProps = {
   children: ReactNode;
-  content: ReactNode | string;
+  content: ReactNode;
   position?: PopupPosition;
 };
 
 export function Tooltip(props: TooltipProps): ReactElement {
+
+  if (props.content === null) {
+    return <>{props.children}</>;
+  }
+
   return (
     <Popup
       trigger={() => <div>{props.children}</div>}
@@ -18,7 +23,6 @@ export function Tooltip(props: TooltipProps): ReactElement {
       closeOnDocumentClick
       on="hover"
     >
-      {/* @ts-ignore */}
       {props.content}
     </Popup>
   );

@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { FlowUtils } from "../../utils/flow-utils";
 import * as yup from "yup";
 import { useErrorHandler } from "../../hooks/use-error-handler";
-import { useProjectManager } from "../../contexts/workspace.context";
+import { useWorkspaceManager } from "../../contexts/workspace.context";
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 import {
   RadioField,
@@ -18,7 +18,7 @@ import {
   FieldProps,
   ToggleField,
 } from "../FormFields/FormFields";
-import { useFilePicker } from "../../contexts/platform-adapter.context";
+import { useFilePicker } from "../../contexts/file-picker.context";
 import { AnalyticEvent, useAnalytics } from "../../hooks/use-analytics";
 import {
   FlowEmulatorConfig,
@@ -48,7 +48,7 @@ export const WorkspaceSettings: FunctionComponent<ProjectSettingsProps> = (
   const { track } = useAnalytics();
   const { pickDirectory } = useFilePicker();
   const { openWorkspace, removeWorkspace, createWorkspace, updateWorkspace } =
-    useProjectManager();
+    useWorkspaceManager();
   const { data: flowCliInfo } = useGetFlowCliInfo();
   const { handleError } = useErrorHandler(WorkspaceSettings.name);
   const isExistingProject = Boolean(workspaceId);

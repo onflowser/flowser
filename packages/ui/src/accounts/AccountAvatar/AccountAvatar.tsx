@@ -19,7 +19,7 @@ import avatar14 from "./avatars/14.jpg";
 import avatar15 from "./avatars/15.jpg";
 import avatar16 from "./avatars/16.jpg";
 import { Spinner } from "../../common/loaders/Spinner/Spinner";
-import { useGetAddressIndex } from "../../api";
+import { useGetAddressIndex, useGetAddressNameInfo } from "../../api";
 
 const avatarUrls = [
   avatar1,
@@ -52,6 +52,7 @@ export function AccountAvatar({
   className,
 }: AccountAvatarProps): ReactElement | null {
   const { data: addressIndex } = useGetAddressIndex(address);
+  const { data: domainProfiles } = useGetAddressNameInfo(address);
 
   const avatarUrl = useMemo(() => {
     const isServiceAccount = [
@@ -74,6 +75,8 @@ export function AccountAvatar({
     return <Spinner size={size} />;
   }
 
+  const flowDomainAvatar = domainProfiles?.map(e => e.avatar)?.filter(Boolean)?.[0];
+
   return (
     <img
       className={className}
@@ -83,7 +86,8 @@ export function AccountAvatar({
         width: size,
       }}
       alt={address}
-      src={avatarUrl}
+      // @ts-ignore Url is an object when using Next.js.
+      src={flowDomainAvatar || avatarUrl?.src || avatarUrl}
     />
   );
 }

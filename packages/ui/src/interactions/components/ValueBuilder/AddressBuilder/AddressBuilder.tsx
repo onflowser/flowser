@@ -8,13 +8,27 @@ import classNames from "classnames";
 import { Spinner } from "../../../../common/loaders/Spinner/Spinner";
 import { FclValueUtils } from "@onflowser/core";
 import { FlowAccount } from "@onflowser/api";
-import { useServiceRegistry } from "../../../../contexts/service-registry.context";
+import { IWalletService, useServiceRegistry } from "../../../../contexts/service-registry.context";
 import { useGetAccounts, useGetManagedKeys } from "../../../../api";
+import { TextualBuilder } from "../TextualBuilder/TextualBuilder";
 
 export function AddressBuilder(props: CadenceValueBuilder): ReactElement {
-  const { disabled, value, type, setValue, addressBuilderOptions } = props;
-  const { data, mutate } = useGetAccounts();
   const { walletService } = useServiceRegistry();
+
+  if (walletService) {
+    return <CustomWalletAddressBuilder {...props} walletService={walletService} />
+  } else {
+    return <TextualBuilder {...props} />
+  }
+}
+
+type EmulatorAddressBuilderProps = CadenceValueBuilder & {
+  walletService: IWalletService;
+}
+
+function CustomWalletAddressBuilder(props: EmulatorAddressBuilderProps): ReactElement {
+  const { disabled, value, type, setValue, addressBuilderOptions, walletService } = props;
+  const { data, mutate } = useGetAccounts();
   const { data: allKeys } = useGetManagedKeys();
   const accountsWithPrivateKeysLookup = new Set(
     allKeys?.filter((key) => Boolean(key.privateKey)).map((key) => key.address),

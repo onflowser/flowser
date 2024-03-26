@@ -5,6 +5,7 @@ import {
   FlowSnapshotsEvent,
   FlowSnapshotsService,
   IFlowserLogger,
+  InMemoryIndex,
 } from '@onflowser/core';
 import {
   AsyncIntervalScheduler,
@@ -89,19 +90,21 @@ export class FlowserAppService {
       this.flowEmulatorService,
       new FileStorageService('flowser-workspaces.json'),
     );
-    this.blockchainIndexService = new BlockchainIndexService();
+    this.blockchainIndexService = new BlockchainIndexService({
+      accountKey: new InMemoryIndex(),
+      transaction: new InMemoryIndex(),
+      block: new InMemoryIndex(),
+      account: new InMemoryIndex(),
+      event: new InMemoryIndex(),
+      contract: new InMemoryIndex(),
+      accountStorage: new InMemoryIndex(),
+    });
     this.flowIndexerService = new FlowIndexerService(
       this.logger,
-      this.blockchainIndexService.indexes.transaction,
-      this.blockchainIndexService.indexes.account,
-      this.blockchainIndexService.indexes.block,
-      this.blockchainIndexService.indexes.event,
-      this.blockchainIndexService.indexes.contract,
-      this.blockchainIndexService.indexes.accountKey,
-      this.blockchainIndexService.indexes.accountStorage,
       this.flowAccountStorageService,
       this.flowGatewayService,
       this.flowInteractionsService,
+      this.blockchainIndexService.indexes,
     );
     this.flowDevWalletService = new FlowDevWalletService(
       this.logger,
@@ -121,7 +124,7 @@ export class FlowserAppService {
     this.processingScheduler = new AsyncIntervalScheduler({
       name: 'Blockchain processing',
       pollingIntervalInMs: indexSyncIntervalInMs,
-      functionToExecute: () => this.flowIndexerService.processBlockchainData(),
+      functionToExecute: () => this.flowIndexerService.processBlockchain(),
     });
     this.registerListeners();
   }
@@ -246,12 +249,9 @@ export class FlowserAppService {
     const openWorkspace = await this.workspaceService.getOpenWorkspace();
 
     if (openWorkspace) {
-      this.flowGatewayService.configure({
-        flowJSON: this.flowConfigService.getFlowJSON(),
-        restAccessApiUrl: `http://localhost:${
-          openWorkspace.emulator?.restServerPort ?? 8888
-        }`,
-      });
+      this.flowGatewayService.configureFlowJSON(
+        this.flowConfigService.getFlowJSON(),
+      );
     }
   }
 
@@ -289,17 +289,19 @@ export class FlowserAppService {
     const emulatorConfig =
       workspace.emulator ?? this.flowEmulatorService.getDefaultConfig();
 
-    const restAccessApiUrl = `http://localhost:${emulatorConfig.restServerPort}`;
+    const accessNodeRestApiUrl = `http://localhost:${emulatorConfig.restServerPort}`;
 
     const devWalletConfig: FlowDevWalletConfig = {
       workspacePath: workspace.filesystemPath,
-      restAccessApiUrl,
+      accessNodeRestApiUrl,
       port: 8701,
     };
 
     this.flowGatewayService.configure({
       flowJSON: this.flowConfigService.getFlowJSON(),
-      restAccessApiUrl,
+      accessNodeRestApiUrl,
+      discoveryWalletUrl: 'http://localhost:8701/fcl/authn',
+      network: 'local',
     });
 
     const isEmulatorOnline = await this.flowGatewayService.isRestApiReachable();

@@ -6,6 +6,9 @@
   border-radius: $border-radius-input;
   background: $gray-80;
   padding: $spacing-base;
+  .error {
+    color: $color-red-light;
+  }
   .header {
     font-weight: bold;
     display: flex;

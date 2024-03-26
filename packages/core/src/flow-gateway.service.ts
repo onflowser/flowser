@@ -5,9 +5,9 @@ import {
   FclValueUtils,
 } from "./fcl-value";
 import * as fcl from "@onflow/fcl";
-import axios from "axios";
 import { FclArgumentWithMetadata } from "@onflowser/api";
 import { HttpService } from "./http.service";
+import { FlowNetworkId } from "./flow-utils";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -76,8 +76,11 @@ export type FlowSignableObject = {
 
 // https://docs.onflow.org/fcl/reference/api/#transactionstatusobject
 export type FlowTransactionStatus = {
-  status: number;
-  statusCode: number;
+  blockId: string;
+  // https://developers.flow.com/tools/clients/fcl-js/api#transaction-statuses
+  status: 0 | 1 | 2 | 3 | 4 | 5;
+  statusString: string;
+  statusCode: 1 | 0;
   errorMessage: string;
   events: FlowEvent[];
 };
@@ -201,23 +204,63 @@ type FlowTxStatusSubscription = {
 };
 
 type FlowGatewayConfig = {
-  restAccessApiUrl: string;
-  flowJSON: unknown;
+  network: "local" | "canarynet" | "testnet" | "mainnet"
+  accessNodeRestApiUrl: string;
+  discoveryWalletUrl: string;
+  flowJSON?: unknown;
 };
 
 export class FlowGatewayService {
+  static defaultPorts = {
+    emulatorRestApiPort: 8888,
+    discoveryWalletPort: 8701
+  }
 
   constructor(private readonly httpService: HttpService) {}
 
+  public configureWithDefaults(networkId: FlowNetworkId) {
+    switch (networkId) {
+      case "emulator":
+        const { emulatorRestApiPort, discoveryWalletPort } = FlowGatewayService.defaultPorts;
+        return this.configure({
+          network: "local",
+          accessNodeRestApiUrl: `http://localhost:${emulatorRestApiPort}`,
+          discoveryWalletUrl: `http://localhost:${discoveryWalletPort}/fcl/authn`,
+        });
+      case "testnet":
+        return this.configure({
+          network: "testnet",
+          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
+        });
+      case "mainnet":
+        return this.configure({
+          network: "mainnet",
+          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
+        });
+    }
+  }
+
   public configure(config: FlowGatewayConfig): void {
-    fcl
+    const configured = fcl
       .config({
-        "accessNode.api": config.restAccessApiUrl,
-        "flow.network": "emulator",
-      })
-      .load({
-        flowJSON: config.flowJSON,
+        "accessNode.api": config.accessNodeRestApiUrl,
+        "flow.network": config.network,
+        "discovery.wallet": config.discoveryWalletUrl,
+        "app.detail.icon": "https://flowser.dev/icon.png",
+        "app.detail.title": "Flowser"
       });
+
+    if (config.flowJSON) {
+      configured.load({
+        flowJSON: config.flowJSON,
+      })
+    }
+  }
+
+  public configureFlowJSON(flowJSON?: unknown) {
+    fcl.config().load({ flowJSON })
   }
 
   public async executeScript<Result>(
@@ -279,6 +322,12 @@ export class FlowGatewayService {
       .then(fcl.decode);
   }
 
+  public async getBlockById(id: string): Promise<FlowBlock> {
+    return fcl
+      .send([fcl.getBlock(), fcl.atBlockId(id)])
+      .then(fcl.decode);
+  }
+
   public async getCollectionById(id: string): Promise<FlowCollection> {
     return fcl.send([fcl.getCollection(id)]).then(fcl.decode);
   }
@@ -310,5 +359,15 @@ export class FlowGatewayService {
     }
 
     return this.httpService.isReachable(restServerUrl);
+  }
+
+  public async isDiscoveryWalletReachable(): Promise<boolean> {
+    const discoveryWalletUrl = await fcl.config.get("discovery.wallet");
+
+    if (!discoveryWalletUrl) {
+      throw new Error("discovery.wallet not configured");
+    }
+
+    return this.httpService.isReachable(discoveryWalletUrl);
   }
 }

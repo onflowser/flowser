@@ -1,27 +1,35 @@
-import React from "react";
-import { NavLink, NavLinkProps, To } from "react-router-dom";
+import React, { ReactNode } from "react";
 import { ReactElement } from "react";
 import { useCurrentWorkspaceId } from "../../hooks/use-current-project-id";
+import { useNavigate } from "../../contexts/navigation.context";
 
-type ProjectLinkProps = NavLinkProps;
+type ProjectLinkProps = {
+  to: string;
+  className?: string;
+  children: ReactNode;
+  onClick?: () => void;
+};
 
 export function ProjectLink(props: ProjectLinkProps): ReactElement {
   const projectId = useCurrentWorkspaceId();
+  const navigate = useNavigate()
   const { to, ...otherProps } = props;
+
+  // TODO(web-mvp): Update styles
   return (
-    <NavLink
+    <div
       {...otherProps}
-      to={buildProjectUrl({
+      onClick={() => navigate(buildProjectUrl({
         projectId,
         subPath: to,
-      })}
+      }))}
     />
   );
 }
 
 export function buildProjectUrl(options: {
   projectId: string;
-  subPath: To;
+  subPath: string;
 }): string {
   return `/projects/${options.projectId}${options.subPath}`;
 }

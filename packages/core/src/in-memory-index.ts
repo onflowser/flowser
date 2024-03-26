@@ -8,7 +8,7 @@ import {
 export class InMemoryIndex<Resource extends IndexableResource>
   implements IResourceIndex<Resource>
 {
-  private readonly lookup: Map<string, Resource>;
+  protected lookup: Map<string, Resource>;
 
   constructor() {
     this.lookup = new Map();
@@ -59,7 +59,7 @@ export class InMemoryIndex<Resource extends IndexableResource>
   }
 
   async findAll(): Promise<Resource[]> {
-    return Array.from(this.lookup.values());
+    return Array.from(this.lookup.values()).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
 
   async findOneById(id: string): Promise<Resource | undefined> {

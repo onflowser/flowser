@@ -5,6 +5,7 @@ import CursorClick from "./assets/cursor_click.svg";
 import LogoRound from "./assets/logo_round.svg";
 import Logo from "./assets/logo.svg";
 import Star from "./assets/star.svg";
+import StarFill from "./assets/star-fill.svg";
 import Transaction from "./assets/transaction.svg";
 import ArtistPalette from "./assets/artist_palette.svg";
 import Settings from "./assets/settings.svg";
@@ -26,6 +27,7 @@ import Copy from "./assets/copy.svg";
 import Caret from "./assets/caret.svg";
 import CircleCross from "./assets/circle-cross.svg";
 import CircleCheck from "./assets/circle-check.svg";
+import DocumentWithArrow from "./assets/document-with-arrow.svg";
 import CircleQuestionMark from "./assets/circle-question-mark.svg";
 import Expand from "./assets/expand.svg";
 import Shrink from "./assets/shrink.svg";
@@ -35,6 +37,7 @@ import { SiWebstorm, SiIntellijidea } from "react-icons/si";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 export const FlowserIcon = {
+  DocumentWithArrow: DocumentWithArrow,
   Logs: Logs,
   Expand: Expand,
   Shrink: Shrink,
@@ -51,6 +54,7 @@ export const FlowserIcon = {
   CursorClick: CursorClick,
   LogoRound: LogoRound,
   Star: Star,
+  StarFill: StarFill,
   Transaction: Transaction,
   Script: Script,
   QuestionMark: QuestionMark,

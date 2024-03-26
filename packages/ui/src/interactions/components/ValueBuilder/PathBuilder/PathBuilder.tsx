@@ -4,8 +4,9 @@ import { CadenceValueBuilder } from "../interface";
 import SelectInput, {
   SelectInputOption,
 } from "../../../../common/inputs/SelectInput/SelectInput";
-import { Input } from "../../../../common/inputs/Input/Input";
+import { Input } from "../../../../common/inputs";
 import { FclPathDomain, FclValueUtils } from "@onflowser/core";
+import { CadenceType } from "@onflowser/api";
 
 export function PathBuilder(props: CadenceValueBuilder): ReactElement {
   const { disabled, type, value, setValue } = props;

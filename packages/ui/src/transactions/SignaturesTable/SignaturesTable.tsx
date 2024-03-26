@@ -7,6 +7,7 @@ import React, { ReactElement } from "react";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
 import { ProjectLink } from "../../common/links/ProjectLink";
 import { SignableObject } from "@onflowser/api";
+import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 
 const columnsHelper = createColumnHelper<SignableObject>();
 
@@ -15,9 +16,7 @@ const columns = [
     header: () => <Label variant="medium">ADDRESS</Label>,
     cell: (info) => (
       <Value>
-        <ProjectLink to={`/accounts/${info.getValue()}`}>
-          {info.getValue()}
-        </ProjectLink>
+        <AccountLink address={info.getValue()} />
       </Value>
     ),
   }),

@@ -20,6 +20,7 @@ module.exports = {
     'max-classes-per-file': 'off',
     'no-useless-constructor': 'off',
     'no-empty-function': 'off',
+    'react/destructuring-assignment': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,

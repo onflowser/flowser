@@ -18,6 +18,9 @@ import {
   ManagedKeyPair,
   ManagedProcess
 } from "@onflowser/api";
+import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
+import { FlowChainID } from "@onflowser/core/src/flow-utils";
+import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 
 export interface ISnapshotService {
   list(): Promise<FlowStateSnapshot[]>;
@@ -40,14 +43,18 @@ export interface IWorkspaceService {
 export interface IInteractionService {
   parse(sourceCode: string): Promise<ParsedInteractionOrError>;
   getTemplates(): Promise<WorkspaceTemplate[]>;
+  sendTransaction(
+    request: SendTransactionRequest,
+  ): Promise<TransactionOutcome>;
+  executeScript(request: ExecuteScriptRequest): Promise<ScriptOutcome>;
 }
 
 export type SendTransactionRequest = {
   // TODO(web): These should probably be of type FlowAuthorizationFunction when generalizing for web version
   cadence: string;
-  proposerAddress: string;
-  payerAddress: string;
-  authorizerAddresses: string[];
+  proposerAddress?: string;
+  payerAddress?: string;
+  authorizerAddresses?: string[];
   arguments: FclArgumentWithMetadata[];
 };
 
@@ -57,12 +64,7 @@ export type ExecuteScriptRequest = {
 };
 
 export interface IFlowService {
-  sendTransaction(
-    request: SendTransactionRequest,
-  ): Promise<{ transactionId: string }>;
-  executeScript(request: ExecuteScriptRequest): Promise<any>;
-  getIndexOfAddress(address: string): Promise<number>;
-  getFlowCliInfo(): Promise<FlowCliInfo>;
+  getIndexOfAddress(chainID: FlowChainID, address: string): Promise<number>;
 }
 
 export type FlowConfigAccount = {
@@ -81,6 +83,10 @@ export type FlowConfigContract = {
 export interface IFlowConfigService {
   getAccounts(): Promise<FlowConfigAccount[]>;
   getContracts(): Promise<FlowConfigContract[]>;
+}
+
+export interface IFlowCliService {
+  getFlowCliInfo(): Promise<FlowCliInfo>;
 }
 
 export interface IWalletService {
@@ -105,14 +111,6 @@ export interface IProcessManagerService {
 
 type ServiceRegistry = {
   interactionsService: IInteractionService;
-  flowService: IFlowService;
-  flowConfigService: IFlowConfigService;
-  walletService: IWalletService;
-  snapshotService: ISnapshotService;
-  workspaceService: IWorkspaceService;
-  analyticsService: IAnalyticsService;
-  monitoringService: IMonitoringService;
-  processManagerService: IProcessManagerService;
   accountIndex: IResourceIndexReader<FlowAccount>;
   accountStorageIndex: IResourceIndexReader<FlowAccountStorage>;
   contractIndex: IResourceIndexReader<FlowContract>;
@@ -120,6 +118,17 @@ type ServiceRegistry = {
   blocksIndex: IResourceIndexReader<FlowBlock>;
   eventsIndex: IResourceIndexReader<FlowEvent>;
   accountKeyIndex: IResourceIndexReader<FlowAccountKey>;
+  // Optional services, as they may not be available/relevant in all environments.
+  monitoringService?: IMonitoringService;
+  analyticsService?: IAnalyticsService;
+  processManagerService?: IProcessManagerService;
+  flowService: IFlowService;
+  flowCliService?: IFlowCliService;
+  flowConfigService?: IFlowConfigService;
+  walletService?: IWalletService;
+  snapshotService?: ISnapshotService;
+  workspaceService?: IWorkspaceService;
+  flowNamesService?: FlowNamesService;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(
@@ -147,4 +156,17 @@ export function useServiceRegistry(): ServiceRegistry {
   }
 
   return context;
+}
+
+
+export function useRequiredService<Key extends keyof ServiceRegistry>(name: Key): NonNullable<ServiceRegistry[Key]> {
+  const registry = useServiceRegistry();
+
+  const service = registry[name];
+
+  if (service === undefined) {
+    throw new Error(`Required service ${name} not found`)
+  }
+
+  return service;
 }

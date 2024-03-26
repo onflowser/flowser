@@ -8,20 +8,37 @@ import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
 import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
-import { useSnapshotsManager } from "../../../contexts/snapshots.context";
+import {
+  useOptionalSnapshotsManager,
+} from "../../../contexts/snapshots.context";
 import { FlowBlock, FlowTransaction } from "@onflowser/api";
 import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 
 export function InteractionHistory(): ReactElement {
-  const { data: blocks } = useGetBlocks();
+  const { data: blocks, error } = useGetBlocks();
 
-  // There should always be at least one (initial) block.
-  if (!blocks || blocks.length === 0) {
+  if (error) {
+    return (
+      <div className={classes.loadingRoot}>
+        Error: {error}
+      </div>
+    )
+  }
+
+  if (!blocks) {
     return (
       <div className={classes.loadingRoot}>
         <Spinner size={30} />
       </div>
     );
+  }
+
+  if (blocks.length === 0) {
+    return (
+      <div className={classes.loadingRoot}>
+        Empty history
+      </div>
+    )
   }
 
   return (
@@ -41,7 +58,7 @@ function BlockItem(props: BlockItemProps) {
   const { block } = props;
   const menuIconSize = 15;
 
-  const { checkoutBlock } = useSnapshotsManager();
+  const snapshotsManager = useOptionalSnapshotsManager();
   const { create, setFocused } = useInteractionRegistry();
   const { data } = useGetTransactionsByBlock(block.id);
   const firstTransaction = data?.[0];
@@ -50,12 +67,13 @@ function BlockItem(props: BlockItemProps) {
     transaction: firstTransaction,
   });
 
-  function onForkAsTemplate() {
+  function openTransaction() {
     if (!firstTransaction?.proposalKey) {
       return;
     }
     const createdInteraction = create({
       name: transactionName ?? `Tx from block #${block.height}`,
+      forkedFromTemplateId: undefined,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
         firstTransaction.arguments.map((arg) => [arg.identifier, arg.value]),
@@ -85,19 +103,21 @@ function BlockItem(props: BlockItemProps) {
         </div>
       }
     >
-      <MenuItem onClick={() => onForkAsTemplate()}>
+      <MenuItem onClick={() => openTransaction()}>
         <FlowserIcon.Share width={menuIconSize} height={menuIconSize} />
         <SizedBox width={10} />
         View transaction
       </MenuItem>
-      <MenuItem onClick={() => checkoutBlock(block.id)}>
-        <FlowserIcon.CircleArrowLeft
-          width={menuIconSize}
-          height={menuIconSize}
-        />
-        <SizedBox width={10} />
-        Rollback to block
-      </MenuItem>
+      {snapshotsManager && (
+        <MenuItem onClick={() => snapshotsManager.checkoutBlock(block.id)}>
+          <FlowserIcon.CircleArrowLeft
+            width={menuIconSize}
+            height={menuIconSize}
+          />
+          <SizedBox width={10} />
+          Rollback to block
+        </MenuItem>
+      )}
     </FlowserMenu>
   );
 }
