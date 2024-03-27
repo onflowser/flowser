@@ -33,8 +33,13 @@ import Expand from "./assets/expand.svg";
 import Shrink from "./assets/shrink.svg";
 import Logs from "./assets/logs.svg";
 import { TbBrandVscode } from "react-icons/tb";
+import { IoIosArrowDown } from "react-icons/io";
 import { SiWebstorm, SiIntellijidea } from "react-icons/si";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { RxExit } from "react-icons/rx";
+import { GoArrowSwitch } from "react-icons/go";
+import { GoLinkExternal } from "react-icons/go";
+import { TbPlugConnected } from "react-icons/tb";
 
 export const FlowserIcon = {
   DocumentWithArrow: DocumentWithArrow,
@@ -60,7 +65,7 @@ export const FlowserIcon = {
   QuestionMark: QuestionMark,
   ArtistPalette: ArtistPalette,
   Settings: Settings,
-  Exit: Exit,
+  Exit: RxExit,
   Restart: Restart,
   CircleArrowLeft: CircleArrowLeft,
   Plus: Plus,
@@ -69,10 +74,14 @@ export const FlowserIcon = {
   Search: Search,
   Cancel: Cancel,
   Link: Link,
+  ExternalLink: GoLinkExternal,
   Open: Open,
   Share: Share,
   WebStorm: SiWebstorm,
   VsCode: TbBrandVscode,
   IntellijIdea: SiIntellijidea,
-  VerifiedCheck: RiVerifiedBadgeFill
+  VerifiedCheck: RiVerifiedBadgeFill,
+  ArrowDown: IoIosArrowDown,
+  Switch: GoArrowSwitch,
+  Connect: TbPlugConnected
 };

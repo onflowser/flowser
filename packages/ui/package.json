@@ -27,7 +27,7 @@
     "@codemirror/legacy-modes": "^6.1.0",
     "@microlink/react-json-view": "^1.23.0",
     "@onflowser/api": "*",
-    "@szhsin/react-menu": "4.0.3",
+    "@szhsin/react-menu": "^4.0.3",
     "@tanstack/react-table": "^8.5.11",
     "@uidotdev/usehooks": "^2.3.1",
     "@uiw/codemirror-extensions-basic-setup": "^4.12.4",
