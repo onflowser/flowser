@@ -35,7 +35,7 @@ export function TransactionLink(props: TransactionLinkProps) {
   }
 }
 
-function useTransactionUrl(transactionId: string) {
+function useTransactionUrl(transactionId: string): string {
   const networkId = useFlowNetworkId();
 
   switch (networkId) {
@@ -45,5 +45,7 @@ function useTransactionUrl(transactionId: string) {
       return `https://www.flowdiver.io/tx/${transactionId}`
     case "testnet":
       return `https://www.testnet.flowdiver.io/tx/${transactionId}`
+    case "previewnet":
+      return `https://www.previewnet.flowdiver.io/tx/${transactionId}`
   }
 }

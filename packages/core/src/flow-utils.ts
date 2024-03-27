@@ -36,7 +36,7 @@ export class FlowUtils {
     return lookup[networkId];
   }
 
-  static getFlowViewAccountUrl(networkId: FlowNetworkId, address: string): string | undefined {
+  static getFlowViewAccountUrl(networkId: FlowNetworkId, address: string): string {
     switch (networkId) {
       case "emulator":
         return `https://www.emulator.flowview.app/account/${address}`
@@ -45,7 +45,7 @@ export class FlowUtils {
       case "testnet":
         return `https://www.testnet.flowview.app/account/${address}`
       case "previewnet":
-        return undefined;
+        return `https://www.previewnet.flowview.app/account/${address}`
     }
   }
 
