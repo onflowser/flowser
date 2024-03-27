@@ -45,7 +45,7 @@ export class FlowUtils {
       case "testnet":
         return `https://www.testnet.flowview.app/account/${address}`
       case "previewnet":
-        return `https://www.previewnet.flowview.app/account/${address}`
+        return `https://previewnet.flowview.app/account/${address}`
     }
   }
 

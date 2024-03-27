@@ -46,6 +46,6 @@ function useTransactionUrl(transactionId: string): string {
     case "testnet":
       return `https://www.testnet.flowdiver.io/tx/${transactionId}`
     case "previewnet":
-      return `https://www.previewnet.flowdiver.io/tx/${transactionId}`
+      return `https://previewnet.flowdiver.io/tx/${transactionId}`
   }
 }
