@@ -9,7 +9,13 @@
   overflow: hidden;
   height: 100%;
 
+  .tabAndEndContentWrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .tabWrapper {
+    flex: 1;
     display: flex;
     align-items: center;
     @include hiddenScrollbars();
@@ -66,8 +72,7 @@
     }
 
     .newTabButton {
-      width: 20px;
-      height: 20px;
+      padding: 5px;
       border: none;
       background: $gray-100;
       display: flex;

@@ -89,7 +89,10 @@ export function TemplatesRegistryProvider(props: {
   ]);
 
   function isSupportedOnCurrentNetwork(template: FlixV1Template) {
-    if (networkId === "emulator") {
+    if (networkId === "previewnet") {
+      // FLIX templates have not been migrated to Cadence v1.0 yet.
+      return false;
+    } if (networkId === "emulator") {
       return isSupportedOnEmulatorNetwork(template)
     } else {
       return FlixUtils.hasDependenciesForNetwork(template, networkId);

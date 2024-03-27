@@ -54,7 +54,7 @@ function installGo(filePath) {
 async function main() {
   const goInstalled = await isGoInstalled();
   if (!goInstalled && os.platform() === "linux") {
-    const goVersion = '1.19'; // Update this as needed
+    const goVersion = '1.21.4'; // Update this as needed
     const platform = 'linux-amd64';
     const url = `https://dl.google.com/go/go${goVersion}.${platform}.tar.gz`;
     const dest = `/tmp/go${goVersion}.${platform}.tar.gz`;
