@@ -10,7 +10,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: relative;
 
   .header {
     display: flex;
@@ -63,22 +62,6 @@
       font-size: $font-size-normal;
       color: $gray-20;
       @include whitenOnHover();
-
-      .trash {
-        @include scaleOnHover();
-        min-width: 20px;
-        * {
-          fill: $gray-50;
-        }
-      }
-    }
-    .focusedItem {
-      color: $blue;
-      .trash {
-        * {
-          fill: $blue !important;
-        }
-      }
     }
   }
 
