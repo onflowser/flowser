@@ -18,6 +18,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import { MenuItem } from "@szhsin/react-menu";
 import { EditTemplateNameDialog } from "../EditTemplateNameDialog/EditTemplateNameDialog";
+import { Menu } from "../../../common/overlays/Menu/Menu";
 
 type InteractionTemplatesProps = {
   enabledSourceTypes: InteractionSourceType[];
@@ -98,7 +99,7 @@ function StoredTemplates(props: InteractionTemplatesProps) {
         </div>
       </div>
       <div className={classes.templatesList}>
-        {templatesRegistry.error && <span className={classes.error}>{error}</span>}
+        {templatesRegistry.error && <span className={classes.error}>{templatesRegistry.error}</span>}
         {filteredAndSortedTemplates.map((template) => (
           <TemplateItem key={template.id} template={template} />
         ))}
