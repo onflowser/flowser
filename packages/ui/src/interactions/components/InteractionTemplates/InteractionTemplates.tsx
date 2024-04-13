@@ -145,6 +145,24 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
     });
   }
 
+  const menuActions = [
+    {
+      label: "Open in new tab",
+      onClick: () => openTemplate(template)
+    },
+  ];
+
+  if (template.source === "session") {
+    menuActions.push({
+      label: "Rename",
+      onClick: () => setShowEditModal(true)
+    });
+    menuActions.push({
+      label: "Delete",
+      onClick: () => removeTemplate(template)
+    });
+  }
+
   return (
     <>
       {showEditModal && (
@@ -153,32 +171,28 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
           onClose={() => setShowEditModal(false)}
         />
       )}
-      <Menu
-        position="auto"
-        align="center"
-        direction="right"
-        menuButton={
-          <div className={classes.item}>
-            <InteractionLabel interaction={template} />
-          </div>
-        }
-      >
-        <MenuItem onClick={() => openTemplate(template)}>
-          Open in new tab
-        </MenuItem>
-
-        {template.source === "session" && (
-          <MenuItem onClick={() => setShowEditModal(true)}>
-            Rename
-          </MenuItem>
-        )}
-
-        {template.source === "session" && (
-          <MenuItem onClick={() => removeTemplate(template)}>
-            Delete
-          </MenuItem>
-        )}
-      </Menu>
+      {menuActions.length === 1 ? (
+        <div className={classes.item} onClick={menuActions[0].onClick}>
+          <InteractionLabel interaction={template} />
+        </div>
+      ) : (
+        <Menu
+          position="auto"
+          align="center"
+          direction="right"
+          menuButton={
+            <div className={classes.item}>
+              <InteractionLabel interaction={template} />
+            </div>
+          }
+        >
+          {menuActions.map(action => (
+            <MenuItem onClick={() => action.onClick()}>
+              {action.label}
+            </MenuItem>
+          ))}
+        </Menu>
+      )}
     </>
   )
 }
