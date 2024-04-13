@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, ReactNode, useState } from "react";
 import classes from "./InteractionsPage.module.scss";
 import { BaseTabs, BaseTabItem } from "../common/tabs/BaseTabs/BaseTabs";
 import { useInteractionRegistry } from "./contexts/interaction-registry.context";
@@ -22,6 +22,7 @@ type InteractionsPageTab = "history" | "templates"
 type InteractionsPageProps = {
   tabOrder: InteractionsPageTab[];
   enabledInteractionSourceTypes: InteractionSourceType[];
+  headerRowContent?: ReactNode;
 }
 
 export function InteractionsPage(props: InteractionsPageProps): ReactElement {
@@ -83,6 +84,7 @@ export function InteractionsPage(props: InteractionsPageProps): ReactElement {
         tabLabelClassName={classes.label}
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
+        contentAfterTabs={props.headerRowContent}
         tabs={openEditorTabs}
         onClose={(tab) => {
           const interaction = definitions.find(e => e.id === tab.id)!;

@@ -6,7 +6,7 @@ import { Spinner } from "../../../common/loaders/Spinner/Spinner";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
-import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
+import { Menu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
 import {
   useOptionalSnapshotsManager,
@@ -93,7 +93,7 @@ function BlockItem(props: BlockItemProps) {
   }
 
   return (
-    <FlowserMenu
+    <Menu
       position="anchor"
       align="center"
       direction="right"
@@ -118,7 +118,7 @@ function BlockItem(props: BlockItemProps) {
           Rollback to block
         </MenuItem>
       )}
-    </FlowserMenu>
+    </Menu>
   );
 }
 

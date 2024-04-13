@@ -6,17 +6,22 @@ export type FlowNetworkId = "mainnet" | "testnet" | "emulator"
 
 export class FlowUtils {
 
-  static isValidFlowNetwork(value: unknown): value is FlowNetworkId {
-    if (typeof value !== "string") {
-      return false;
-    }
-    const validChainIds: Record<FlowNetworkId, true> = {
+  static getValidFlowNetworks(): FlowNetworkId[] {
+    const validNetworkIds: Record<FlowNetworkId, true> = {
       "mainnet": true,
       "testnet": true,
       "emulator": true
     };
 
-    return validChainIds[value as FlowNetworkId] ?? false
+    return Object.keys(validNetworkIds) as FlowNetworkId[];
+  }
+
+  static isValidFlowNetwork(value: unknown): value is FlowNetworkId {
+    if (typeof value !== "string") {
+      return false;
+    }
+
+    return this.getValidFlowNetworks().includes(value as FlowNetworkId);
   }
 
   static networkIdToChainId(networkId: FlowNetworkId): FlowChainID {
@@ -27,5 +32,36 @@ export class FlowUtils {
     }
 
     return lookup[networkId];
+  }
+
+  static getFlowViewAccountUrl(networkId: FlowNetworkId, address: string) {
+    switch (networkId) {
+      case "emulator":
+        return `https://www.emulator.flowview.app/account/${address}`
+      case "mainnet":
+        return `https://www.flowview.app/account/${address}`
+      case "testnet":
+        return `https://www.testnet.flowview.app/account/${address}`
+    }
+  }
+
+  static getContractBrowserAccountUrl(networkId: FlowNetworkId, address: string) {
+    if (networkId === "emulator") {
+      return undefined;
+    } else {
+      // Contract browser doesn't have separate URLs for each network for now
+      return `https://contractbrowser.com/account/${address}`
+    }
+  }
+
+  static getFlowDiverAccountUrl(networkId: FlowNetworkId, address: string) {
+    switch (networkId) {
+      case "emulator":
+        return undefined;
+      case "mainnet":
+        return `https://www.flowdiver.io/account/${address}`
+      case "testnet":
+        return `https://testnet.flowdiver.io/account/${address}`
+    }
   }
 }
