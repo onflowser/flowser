@@ -1,18 +1,24 @@
 import React, { ReactElement, useMemo, useState } from "react";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import classes from "./InteractionTemplates.module.scss";
-import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 import { SearchInput } from "../../../common/inputs";
 import { useConfirmDialog } from "../../../contexts/confirm-dialog.context";
 import classNames from "classnames";
 import { InteractionLabel } from "../InteractionLabel/InteractionLabel";
-import { InteractionSourceType, useTemplatesRegistry } from "../../contexts/templates.context";
+import {
+  InteractionDefinitionTemplate,
+  InteractionSourceType,
+  useTemplatesRegistry
+} from "../../contexts/templates.context";
 import { IdeLink } from "../../../common/links/IdeLink";
 import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixInfo } from "../FlixInfo/FlixInfo";
 import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
+import { MenuItem } from "@szhsin/react-menu";
+import { EditTemplateNameDialog } from "../EditTemplateNameDialog/EditTemplateNameDialog";
+import { Menu } from "../../../common/overlays/Menu/Menu";
 
 type InteractionTemplatesProps = {
   enabledSourceTypes: InteractionSourceType[];
@@ -21,25 +27,23 @@ type InteractionTemplatesProps = {
 export function InteractionTemplates(props: InteractionTemplatesProps): ReactElement {
   return (
     <div className={classes.root}>
-      <TemplatesList {...props} />
+      <StoredTemplates {...props} />
       <FocusedInteraction />
     </div>
   );
 }
 
-function TemplatesList(props: InteractionTemplatesProps) {
-  const { showDialog } = useConfirmDialog();
+function StoredTemplates(props: InteractionTemplatesProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const { create, focusedDefinition, setFocused } = useInteractionRegistry();
-  const { error, isLoading, templates, removeTemplate } = useTemplatesRegistry();
+  const templatesRegistry = useTemplatesRegistry();
   const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
   const filteredTemplates = useMemo(() => {
-    const searchQueryResults = searchTerm === "" ? templates : templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const searchQueryResults = searchTerm === "" ? templatesRegistry.templates : templatesRegistry.templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const sourceFilterResults = filterToSources.length === 0 ? searchQueryResults : searchQueryResults.filter(e => filterToSources.includes(e.source));
 
     return sourceFilterResults;
-  }, [searchTerm, filterToSources, templates]);
+  }, [searchTerm, filterToSources, templatesRegistry.templates]);
   const filteredAndSortedTemplates = useMemo(
     () =>
       filteredTemplates.sort(
@@ -95,54 +99,102 @@ function TemplatesList(props: InteractionTemplatesProps) {
         </div>
       </div>
       <div className={classes.templatesList}>
-        {error && <span className={classes.error}>{error}</span>}
+        {templatesRegistry.error && <span className={classes.error}>{templatesRegistry.error}</span>}
         {filteredAndSortedTemplates.map((template) => (
-          <div
-            key={template.id}
-            onClick={() => {
-              const createdInteraction = create({
-                ...template,
-                forkedFromTemplateId: template.id,
-                // Provide a different ID as the template,
-                // otherwise parsed data won't be reflected correctly
-                // when changing source code.
-                id: crypto.randomUUID()
-              });
-              setFocused(createdInteraction.id);
-            }}
-            className={classNames(classes.item, {
-              [classes.focusedItem]: focusedDefinition?.id === template.id
-            })}
-          >
-            <InteractionLabel interaction={template} />
-            {template.source === "session" && (
-              <FlowserIcon.Trash
-                className={classes.trash}
-                onClick={(e: MouseEvent) => {
-                  e.stopPropagation();
-                  showDialog({
-                    title: "Remove template",
-                    body: (
-                      <span style={{ textAlign: "center" }}>
-                        Do you wanna permanently remove stored template
-                        {`"${template.name}"`}?
-                      </span>
-                    ),
-                    confirmButtonLabel: "REMOVE",
-                    cancelButtonLabel: "CANCEL",
-                    onConfirm: () => removeTemplate(template)
-                  });
-                }}
-              />
-            )}
-          </div>
+          <TemplateItem key={template.id} template={template} />
         ))}
-        {isLoading && Array.from({length: 30}).map(() => (
+        {templatesRegistry.isLoading && Array.from({length: 30}).map(() => (
           <Shimmer height={24} />
         ))}
       </div>
     </div>
   );
+}
+
+function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
+  const { template } = props;
+  const interactionRegistry = useInteractionRegistry();
+  const templatesRegistry = useTemplatesRegistry();
+  const { showDialog } = useConfirmDialog();
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  function openTemplate(template: InteractionDefinitionTemplate) {
+    const createdInteraction = interactionRegistry.create({
+      ...template,
+      forkedFromTemplateId: template.id,
+      // Provide a different ID as the template,
+      // otherwise parsed data won't be reflected correctly
+      // when changing source code.
+      id: crypto.randomUUID()
+    });
+    interactionRegistry.setFocused(createdInteraction.id);
+  }
+
+  function removeTemplate(template: InteractionDefinitionTemplate) {
+    showDialog({
+      title: "Remove template",
+      body: (
+        <span style={{ textAlign: "center" }}>
+           Do you wanna permanently remove stored template
+          {` "${template.name}"`}?
+        </span>
+      ),
+      confirmButtonLabel: "REMOVE",
+      cancelButtonLabel: "CANCEL",
+      onConfirm: () => templatesRegistry.removeSessionTemplate(template)
+    });
+  }
+
+  const menuActions = [
+    {
+      label: "Open in new tab",
+      onClick: () => openTemplate(template)
+    },
+  ];
+
+  if (template.source === "session") {
+    menuActions.push({
+      label: "Rename",
+      onClick: () => setShowEditModal(true)
+    });
+    menuActions.push({
+      label: "Delete",
+      onClick: () => removeTemplate(template)
+    });
+  }
+
+  return (
+    <>
+      {showEditModal && (
+        <EditTemplateNameDialog
+          templateId={template.id}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+      {menuActions.length === 1 ? (
+        <div className={classes.item} onClick={menuActions[0].onClick}>
+          <InteractionLabel interaction={template} />
+        </div>
+      ) : (
+        <Menu
+          position="auto"
+          align="center"
+          direction="right"
+          menuButton={
+            <div className={classes.item}>
+              <InteractionLabel interaction={template} />
+            </div>
+          }
+        >
+          {menuActions.map(action => (
+            <MenuItem onClick={() => action.onClick()}>
+              {action.label}
+            </MenuItem>
+          ))}
+        </Menu>
+      )}
+    </>
+  )
 }
 
 function FocusedInteraction() {

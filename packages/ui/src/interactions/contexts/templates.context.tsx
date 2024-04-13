@@ -17,8 +17,8 @@ type InteractionTemplatesRegistry = {
   isLoading: boolean;
   error: string | undefined;
   templates: InteractionDefinitionTemplate[];
-  saveTemplate: (definition: InteractionDefinition) => void;
-  removeTemplate: (template: InteractionDefinitionTemplate) => void;
+  saveAsSessionTemplate: (definition: InteractionDefinition) => void;
+  removeSessionTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
 export type InteractionSourceType = "workspace" | "flix" | "session";
@@ -32,6 +32,7 @@ export type InteractionDefinitionTemplate = Omit<InteractionDefinition, "forkedF
 
 // Internal structure that's persisted in local storage.
 type SerializedSessionTemplate = {
+  id: string;
   name: string;
   code: string;
   fclValuesByIdentifier: Record<string, FclValue>;
@@ -126,11 +127,14 @@ export function TemplatesRegistryProvider(props: {
     return onlyImportsCoreContracts || importsSomeNonCoreDeployedContract;
   }
 
+  const randomId = () => String(Math.random() * 1000000);
+
   const templates = useMemo<InteractionDefinitionTemplate[]>(
     () => [
       ...sessionTemplates.map(
         (template): InteractionDefinitionTemplate => ({
-          id: template.name,
+          // Template ID was later at a later point, so it could be empty.
+          id: template.id || randomId(),
           name: template.name,
           code: template.code,
           transactionOptions: undefined,
@@ -180,8 +184,9 @@ export function TemplatesRegistryProvider(props: {
     [sessionTemplates, workspaceTemplates, flowNetworkId],
   );
 
-  function saveTemplate(interaction: InteractionDefinition) {
+  function saveAsSessionTemplate(interaction: InteractionDefinition) {
     const newTemplate: SerializedSessionTemplate = {
+      id: interaction.id,
       name: interaction.name,
       code: interaction.code,
       fclValuesByIdentifier: Object.fromEntries(
@@ -194,13 +199,13 @@ export function TemplatesRegistryProvider(props: {
 
     setSessionTemplates([
       ...sessionTemplates.filter(
-        (template) => template.name !== newTemplate.name,
+        (template) => template.id !== newTemplate.id,
       ),
       newTemplate,
     ]);
   }
 
-  function removeTemplate(template: InteractionDefinitionTemplate) {
+  function removeSessionTemplate(template: InteractionDefinitionTemplate) {
     setSessionTemplates((rawTemplates) =>
       rawTemplates.filter(
         (existingTemplate) => existingTemplate.name !== template.name,
@@ -214,8 +219,8 @@ export function TemplatesRegistryProvider(props: {
         error,
         isLoading,
         templates,
-        removeTemplate,
-        saveTemplate,
+        removeSessionTemplate,
+        saveAsSessionTemplate,
       }}
     >
       {props.children}
