@@ -20,13 +20,16 @@ export type OpenConfirmDialogProps = {
   onCancel?: () => void | Promise<void>;
 };
 
-const ConfirmDialogContext = createContext<ConfirmDialogContextState>({
-  showDialog: () => undefined,
-  hideDialog: () => undefined,
-});
+const ConfirmDialogContext = createContext<ConfirmDialogContextState>(undefined as never);
 
 export function useConfirmDialog(): ConfirmDialogContextState {
-  return useContext(ConfirmDialogContext);
+  const context = useContext(ConfirmDialogContext);
+
+  if (context === undefined) {
+    throw new Error("Confirm dialog context not found")
+  }
+
+  return context;
 }
 
 export function ConfirmDialogProvider({

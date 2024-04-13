@@ -49,6 +49,7 @@ import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseDialog";
 import { NetworkDropdown } from "./NetworkDropdown";
 import { ProfileDropdown } from "@/common/ProfileDropdown";
+import { ConfirmDialogProvider } from "@onflowser/ui/src/contexts/confirm-dialog.context";
 
 const indexSyncIntervalInMs = 500;
 
@@ -486,19 +487,21 @@ function Content() {
   }, [networkId]);
 
   return (
-    <InteractionsPage
-      headerRowContent={
-        <div className="m-2 flex gap-x-[10px]">
-          <ProfileDropdown currentNetwork={networkId} />
-          <NetworkDropdown value={networkId} onChange={setNetworkId} />
-        </div>
-      }
-      tabOrder={["templates", "history"]}
-      enabledInteractionSourceTypes={[
-        'session',
-        'flix',
-      ]}
-    />
+    <ConfirmDialogProvider>
+      <InteractionsPage
+        headerRowContent={
+          <div className="m-2 flex gap-x-[10px]">
+            <ProfileDropdown currentNetwork={networkId} />
+            <NetworkDropdown value={networkId} onChange={setNetworkId} />
+          </div>
+        }
+        tabOrder={["templates", "history"]}
+        enabledInteractionSourceTypes={[
+          'session',
+          'flix',
+        ]}
+      />
+    </ConfirmDialogProvider>
   );
 }
 

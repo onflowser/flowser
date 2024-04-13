@@ -136,7 +136,7 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
       body: (
         <span style={{ textAlign: "center" }}>
            Do you wanna permanently remove stored template
-          {`"${template.name}"`}?
+          {` "${template.name}"`}?
         </span>
       ),
       confirmButtonLabel: "REMOVE",
