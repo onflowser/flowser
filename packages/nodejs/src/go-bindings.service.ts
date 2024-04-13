@@ -80,6 +80,11 @@ export class GoBindingsService {
         rawResponse += data.toString();
       });
 
+      let rawError = "";
+      childProcess.stderr.on("data", data => {
+        rawError += data.toString();
+      })
+
       if (request.stdIn !== undefined) {
         childProcess.stdin.write(request.stdIn);
         // Write null char to signal the end of input.
@@ -88,7 +93,7 @@ export class GoBindingsService {
 
       childProcess.on("close", (code) => {
         if (code !== 0) {
-          reject(`Go executable exited with code: ${code}`);
+          reject(`Go executable exited with code ${code}: ${rawError}`);
         } else {
           resolve({ raw: rawResponse });
         }

@@ -204,7 +204,7 @@ type FlowTxStatusSubscription = {
 };
 
 type FlowGatewayConfig = {
-  network: "local" | "canarynet" | "testnet" | "mainnet"
+  network?: "local" | "previewnet" | "testnet" | "mainnet"
   accessNodeRestApiUrl: string;
   discoveryWalletUrl: string;
   flowJSON?: unknown;
@@ -238,6 +238,12 @@ export class FlowGatewayService {
           network: "mainnet",
           accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
           discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
+        });
+      case "previewnet":
+        return this.configure({
+          network: "previewnet",
+          accessNodeRestApiUrl: "https://rest-previewnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/previewnet/authn"
         });
     }
   }

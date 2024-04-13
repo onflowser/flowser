@@ -36,7 +36,7 @@ export function BlockLink(props: BlockLinkProps) {
   }
 }
 
-function useBlockUrl(blockId: string) {
+function useBlockUrl(blockId: string): string {
   const networkId = useFlowNetworkId();
   const { data } = useGetBlock(blockId)
 
@@ -47,5 +47,7 @@ function useBlockUrl(blockId: string) {
       return `https://www.flowdiver.io/block/${data?.blockHeight}`
     case "testnet":
       return `https://www.testnet.flowdiver.io/block/${data?.blockHeight}`
+    case "previewnet":
+      return `https://previewnet.flowdiver.io/block/${data?.blockHeight}`
   }
 }
