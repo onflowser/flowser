@@ -10,14 +10,13 @@ import { WorkspaceTemplate } from "@onflowser/api";
 import { useListFlixTemplates } from "../../hooks/use-flix";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { FlixUtils } from "@onflowser/core/src/flix-utils";
-import { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import { SWRResponse } from "swr";
 
 type InteractionTemplatesRegistry = {
   isLoading: boolean;
   error: string | undefined;
   templates: InteractionDefinitionTemplate[];
-  saveAsSessionTemplate: (definition: InteractionDefinition) => void;
+  saveAsSessionTemplate: (definition: InteractionDefinitionTemplate) => void;
   removeSessionTemplate: (template: InteractionDefinitionTemplate) => void;
 };
 
@@ -184,7 +183,7 @@ export function TemplatesRegistryProvider(props: {
     [sessionTemplates, workspaceTemplates, flowNetworkId],
   );
 
-  function saveAsSessionTemplate(interaction: InteractionDefinition) {
+  function saveAsSessionTemplate(interaction: InteractionDefinitionTemplate) {
     const newTemplate: SerializedSessionTemplate = {
       id: interaction.id,
       name: interaction.name,

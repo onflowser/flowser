@@ -34,7 +34,12 @@ export function SaveSnippetDialog(props: SaveSnippetDialogProps) {
             Discard
           </Button>
           <Button variant="middle" onClick={() => {
-            saveAsSessionTemplate(interaction);
+            saveAsSessionTemplate({
+              ...interaction,
+              source: "session",
+              flix: undefined,
+              workspace: undefined
+            });
             props.onClose();
           }}>
             Save
