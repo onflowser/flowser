@@ -5,7 +5,6 @@ import { Input } from "../../../common/inputs";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { useTemplatesRegistry } from "../../contexts/templates.context";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
-import { InteractionDefinition } from "../../core/core-types";
 
 type SaveSnippetDialogProps = {
   interactionId: string;

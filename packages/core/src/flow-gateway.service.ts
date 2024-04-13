@@ -5,9 +5,9 @@ import {
   FclValueUtils,
 } from "./fcl-value";
 import * as fcl from "@onflow/fcl";
-import axios from "axios";
 import { FclArgumentWithMetadata } from "@onflowser/api";
 import { HttpService } from "./http.service";
+import { FlowNetworkId } from "./flow-utils";
 
 // https://docs.onflow.org/fcl/reference/api/#collectionguaranteeobject
 export type FlowCollectionGuarantee = {
@@ -211,8 +211,36 @@ type FlowGatewayConfig = {
 };
 
 export class FlowGatewayService {
+  static defaultPorts = {
+    emulatorRestApiPort: 8888,
+    discoveryWalletPort: 8701
+  }
 
   constructor(private readonly httpService: HttpService) {}
+
+  public configureWithDefaults(networkId: FlowNetworkId) {
+    switch (networkId) {
+      case "emulator":
+        const { emulatorRestApiPort, discoveryWalletPort } = FlowGatewayService.defaultPorts;
+        return this.configure({
+          network: "local",
+          accessNodeRestApiUrl: `http://localhost:${emulatorRestApiPort}`,
+          discoveryWalletUrl: `http://localhost:${discoveryWalletPort}/fcl/authn`,
+        });
+      case "testnet":
+        return this.configure({
+          network: "testnet",
+          accessNodeRestApiUrl: "https://rest-testnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/testnet/authn"
+        });
+      case "mainnet":
+        return this.configure({
+          network: "mainnet",
+          accessNodeRestApiUrl: "https://rest-mainnet.onflow.org",
+          discoveryWalletUrl: "https://fcl-discovery.onflow.org/authn"
+        });
+    }
+  }
 
   public configure(config: FlowGatewayConfig): void {
     const configured = fcl
@@ -331,5 +359,15 @@ export class FlowGatewayService {
     }
 
     return this.httpService.isReachable(restServerUrl);
+  }
+
+  public async isDiscoveryWalletReachable(): Promise<boolean> {
+    const discoveryWalletUrl = await fcl.config.get("discovery.wallet");
+
+    if (!discoveryWalletUrl) {
+      throw new Error("discovery.wallet not configured");
+    }
+
+    return this.httpService.isReachable(discoveryWalletUrl);
   }
 }

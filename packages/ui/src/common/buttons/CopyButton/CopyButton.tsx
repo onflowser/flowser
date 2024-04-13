@@ -8,7 +8,7 @@ export type CopyButtonProps = {
   value: string;
 };
 
-const CopyButton: FunctionComponent<CopyButtonProps> = ({ value }) => {
+export const CopyButton: FunctionComponent<CopyButtonProps> = ({ value }) => {
   const MAX_CHARS_DISPLAY = 60;
 
   const displayValue =
@@ -26,5 +26,3 @@ const CopyButton: FunctionComponent<CopyButtonProps> = ({ value }) => {
     </span>
   );
 };
-
-export default CopyButton;

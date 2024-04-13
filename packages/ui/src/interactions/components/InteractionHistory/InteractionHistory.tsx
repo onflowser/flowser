@@ -6,7 +6,7 @@ import { Spinner } from "../../../common/loaders/Spinner/Spinner";
 import { useInteractionRegistry } from "../../contexts/interaction-registry.context";
 import { useTransactionName } from "../../hooks/use-transaction-name";
 import { MenuItem } from "@szhsin/react-menu";
-import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
+import { Menu } from "../../../common/overlays/Menu/Menu";
 import { GrcpStatusIcon } from "../../../common/status/GrcpStatus";
 import {
   useOptionalSnapshotsManager,
@@ -15,7 +15,15 @@ import { FlowBlock, FlowTransaction } from "@onflowser/api";
 import { useGetBlocks, useGetTransactionsByBlock } from "../../../api";
 
 export function InteractionHistory(): ReactElement {
-  const { data: blocks } = useGetBlocks();
+  const { data: blocks, error } = useGetBlocks();
+
+  if (error) {
+    return (
+      <div className={classes.loadingRoot}>
+        Error: {error}
+      </div>
+    )
+  }
 
   if (!blocks) {
     return (
@@ -28,7 +36,7 @@ export function InteractionHistory(): ReactElement {
   if (blocks.length === 0) {
     return (
       <div className={classes.loadingRoot}>
-        No blocks yet
+        Empty history
       </div>
     )
   }
@@ -59,12 +67,13 @@ function BlockItem(props: BlockItemProps) {
     transaction: firstTransaction,
   });
 
-  function onForkAsTemplate() {
+  function openTransaction() {
     if (!firstTransaction?.proposalKey) {
       return;
     }
     const createdInteraction = create({
       name: transactionName ?? `Tx from block #${block.height}`,
+      forkedFromTemplateId: undefined,
       code: firstTransaction.script,
       fclValuesByIdentifier: new Map(
         firstTransaction.arguments.map((arg) => [arg.identifier, arg.value]),
@@ -84,8 +93,8 @@ function BlockItem(props: BlockItemProps) {
   }
 
   return (
-    <FlowserMenu
-      position="auto"
+    <Menu
+      position="anchor"
       align="center"
       direction="right"
       menuButton={
@@ -94,7 +103,7 @@ function BlockItem(props: BlockItemProps) {
         </div>
       }
     >
-      <MenuItem onClick={() => onForkAsTemplate()}>
+      <MenuItem onClick={() => openTransaction()}>
         <FlowserIcon.Share width={menuIconSize} height={menuIconSize} />
         <SizedBox width={10} />
         View transaction
@@ -109,7 +118,7 @@ function BlockItem(props: BlockItemProps) {
           Rollback to block
         </MenuItem>
       )}
-    </FlowserMenu>
+    </Menu>
   );
 }
 

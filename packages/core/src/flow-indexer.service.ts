@@ -69,7 +69,9 @@ export class FlowIndexerService {
           // because objects on subsequent blocks can reference objects from previous blocks
           // (e.g. a transaction may reference an account from previous block)
           await Promise.all([
-            this.processBlock(block),
+            this.processBlock(block, {
+              indexTransactions: true
+            }),
             // We don't know when account storage changed
             // without parsing transaction source code.
             // For now just re-index storage of all accounts.
@@ -108,15 +110,16 @@ export class FlowIndexerService {
     return latestBlock;
   }
 
-  public async processBlock(block: flowResource.FlowBlock, options?: {
-    skipTransactionProcessing?: boolean;
+  public async processBlock(block: flowResource.FlowBlock, options: {
+    // Should index all block transaction
+    indexTransactions: boolean;
   }): Promise<void> {
 
     await this.indexes.block
       .create(this.createBlockEntity({ block }))
       .catch((e: unknown) => this.logger.error("block save error", e));
 
-    if (options?.skipTransactionProcessing) {
+    if (!options.indexTransactions) {
       return;
     }
 
@@ -330,7 +333,7 @@ export class FlowIndexerService {
         if (newStatus.blockId && indexedBlock === undefined) {
           const block = await this.flowGatewayService.getBlockById(newStatus.blockId);
           await this.processBlock(block, {
-            skipTransactionProcessing: true
+            indexTransactions: false
           })
         }
 

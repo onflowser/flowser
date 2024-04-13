@@ -1,5 +1,6 @@
 @import "../styles/spacings";
 @import "../styles/colors";
+@import "../styles/typography";
 
 .pageRoot {
   height: 100%;
@@ -16,6 +17,7 @@
   }
   .interactionsTabWrapper {
     overflow-x: scroll;
+    height: 50px;
     .interactionTab {
       max-width: 200px;
       min-width: 200px;

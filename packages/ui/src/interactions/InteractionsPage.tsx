@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, ReactNode, useState } from "react";
 import classes from "./InteractionsPage.module.scss";
 import { BaseTabs, BaseTabItem } from "../common/tabs/BaseTabs/BaseTabs";
 import { useInteractionRegistry } from "./contexts/interaction-registry.context";
@@ -15,16 +15,24 @@ import { InteractionOutcomeDisplay } from "./components/InteractionOutcomeDispla
 import { SpinnerWithLabel } from "../common/loaders/Spinner/SpinnerWithLabel";
 import { InteractionLabel } from "./components/InteractionLabel/InteractionLabel";
 import { SaveSnippetDialog } from "./components/SaveSnippetDialog/SaveSnippetDialog";
-import { useTemplatesRegistry } from "./contexts/templates.context";
-import { InteractionDefinition } from "./core/core-types";
+import { InteractionSourceType, useTemplatesRegistry } from "./contexts/templates.context";
 
-export function InteractionsPage(): ReactElement {
+type InteractionsPageTab = "history" | "templates"
+
+type InteractionsPageProps = {
+  tabOrder: InteractionsPageTab[];
+  enabledInteractionSourceTypes: InteractionSourceType[];
+  headerRowContent?: ReactNode;
+}
+
+export function InteractionsPage(props: InteractionsPageProps): ReactElement {
   const { definitions, focusedDefinition, setFocused, create, remove } =
     useInteractionRegistry();
   const {templates} = useTemplatesRegistry();
   const [interactionIdToSaveBeforeClose, setInteractionIdToSaveBeforeClose] = useState<string>();
 
-  const sideMenuTabs: BaseTabItem[] = [
+
+  const unOrderedTabs: BaseTabItem<InteractionsPageTab>[] = [
     {
       id: "history",
       label: "History",
@@ -33,9 +41,11 @@ export function InteractionsPage(): ReactElement {
     {
       id: "templates",
       label: "Templates",
-      content: <InteractionTemplates />,
+      content: <InteractionTemplates enabledSourceTypes={props.enabledInteractionSourceTypes} />,
     },
   ];
+
+  const sideMenuTabs: BaseTabItem<InteractionsPageTab>[] = props.tabOrder.map(tabId => unOrderedTabs.find(tab => tab.id === tabId)!);
   const [currentSideMenuTabId, setCurrentSideMenuTabId] = useState(
     sideMenuTabs[0].id,
   );
@@ -74,6 +84,7 @@ export function InteractionsPage(): ReactElement {
         tabLabelClassName={classes.label}
         currentTabId={focusedDefinition?.id}
         onChangeTab={(tab) => setFocused(tab.id)}
+        contentAfterTabs={props.headerRowContent}
         tabs={openEditorTabs}
         onClose={(tab) => {
           const interaction = definitions.find(e => e.id === tab.id)!;
@@ -87,8 +98,9 @@ export function InteractionsPage(): ReactElement {
         }}
         onAddNew={() => {
           const createdInteraction = create({
-            name: "New interaction",
+            name: "Untitled",
             code: "",
+            forkedFromTemplateId: undefined,
             fclValuesByIdentifier: new Map(),
             transactionOptions: undefined,
             initialOutcome: undefined,
@@ -139,3 +151,5 @@ function InteractionDetails() {
 
   return <InteractionOutcomeDisplay />;
 }
+
+export default InteractionsPage;

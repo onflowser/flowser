@@ -18,8 +18,9 @@ import {
   ManagedKeyPair,
   ManagedProcess
 } from "@onflowser/api";
-import { ChainID } from "./chain-id.context";
 import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
+import { FlowChainID } from "@onflowser/core/src/flow-utils";
+import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
 
 export interface ISnapshotService {
   list(): Promise<FlowStateSnapshot[]>;
@@ -63,7 +64,7 @@ export type ExecuteScriptRequest = {
 };
 
 export interface IFlowService {
-  getIndexOfAddress(chainID: ChainID, address: string): Promise<number>;
+  getIndexOfAddress(chainID: FlowChainID, address: string): Promise<number>;
 }
 
 export type FlowConfigAccount = {
@@ -127,6 +128,7 @@ type ServiceRegistry = {
   walletService?: IWalletService;
   snapshotService?: ISnapshotService;
   workspaceService?: IWorkspaceService;
+  flowNamesService?: FlowNamesService;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(

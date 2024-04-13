@@ -43,12 +43,16 @@
     }
   }
 
-  .storedTemplates {
+  .templatesList {
     display: flex;
     flex-direction: column;
     row-gap: $spacing-base;
     overflow-y: scroll;
     @include styledScrollbars();
+
+    .error {
+      color: $color-red-light;
+    }
 
     .item {
       cursor: pointer;

@@ -20,7 +20,8 @@ import { InteractionDefinition } from "./interactions/core/core-types";
 import { useEffect } from "react";
 import { TokenListProvider } from "flow-native-token-registry";
 import { ensureNonPrefixedAddress } from "@onflowser/core";
-import { useChainId } from "./contexts/chain-id.context";
+import { useChainId, useFlowNetworkId } from "./contexts/flow-network.context";
+import { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
 
 export function useGetAccounts(): SWRResponse<FlowAccount[]> {
   const { accountIndex } = useServiceRegistry();
@@ -239,8 +240,16 @@ export function useGetAddressIndex(address: string): SWRResponse<number> {
   );
 }
 
+export function useGetAddressNameInfo(address: string): SWRResponse<FlowNameProfile[]> {
+  const { flowNamesService } = useServiceRegistry();
+  const networkId = useFlowNetworkId();
+  return useSWR(`${networkId}/name-info/${address}`, () =>
+    flowNamesService?.getProfilesByAddress(address) ?? [],
+  );
+}
+
 export function useGetParsedInteraction(
-  request: InteractionDefinition,
+  request: Pick<InteractionDefinition, "code" | "id">,
 ): { data: ParsedInteractionOrError | undefined, isLoading: boolean } {
   const { interactionsService } = useServiceRegistry();
 

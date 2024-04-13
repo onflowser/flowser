@@ -15,20 +15,24 @@ import { WorkspaceTemplate } from "@onflowser/api";
 import { FlixInfo } from "../FlixInfo/FlixInfo";
 import { BaseBadge } from "../../../common/misc/BaseBadge/BaseBadge";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import { MenuItem } from "@szhsin/react-menu";
-import { FlowserMenu } from "../../../common/overlays/Menu/Menu";
 import { EditTemplateNameDialog } from "../EditTemplateNameDialog/EditTemplateNameDialog";
 
-export function InteractionTemplates(): ReactElement {
+type InteractionTemplatesProps = {
+  enabledSourceTypes: InteractionSourceType[];
+}
+
+export function InteractionTemplates(props: InteractionTemplatesProps): ReactElement {
   return (
     <div className={classes.root}>
-      <StoredTemplates />
+      <StoredTemplates {...props} />
       <FocusedInteraction />
     </div>
   );
 }
 
-function StoredTemplates() {
+function StoredTemplates(props: InteractionTemplatesProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const templatesRegistry = useTemplatesRegistry();
   const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
@@ -56,6 +60,10 @@ function StoredTemplates() {
   }
 
   function renderSourceFilterBadge(sourceType: InteractionSourceType) {
+    if (!props.enabledSourceTypes.includes(sourceType)) {
+      return null;
+    }
+
     const nameLookup: Record<InteractionSourceType, string> = {
       flix: "flix",
       session: "snippets",
@@ -89,9 +97,13 @@ function StoredTemplates() {
           {renderSourceFilterBadge("workspace")}
         </div>
       </div>
-      <div className={classes.storedTemplates}>
+      <div className={classes.templatesList}>
+        {templatesRegistry.error && <span className={classes.error}>{error}</span>}
         {filteredAndSortedTemplates.map((template) => (
           <TemplateItem key={template.id} template={template} />
+        ))}
+        {templatesRegistry.isLoading && Array.from({length: 30}).map(() => (
+          <Shimmer height={24} />
         ))}
       </div>
     </div>
@@ -108,6 +120,7 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
   function openTemplate(template: InteractionDefinitionTemplate) {
     const createdInteraction = interactionRegistry.create({
       ...template,
+      forkedFromTemplateId: template.id,
       // Provide a different ID as the template,
       // otherwise parsed data won't be reflected correctly
       // when changing source code.
@@ -139,7 +152,7 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
           onClose={() => setShowEditModal(false)}
         />
       )}
-      <FlowserMenu
+      <Menu
         position="auto"
         align="center"
         direction="right"
@@ -164,7 +177,7 @@ function TemplateItem(props: {template: InteractionDefinitionTemplate}) {
             Delete
           </MenuItem>
         )}
-      </FlowserMenu>
+      </Menu>
     </>
   )
 }
@@ -179,7 +192,7 @@ function FocusedInteraction() {
 
   return (
     <div className={classes.focusedTemplate}>
-      {focusedDefinition && <FlixInfo interaction={focusedDefinition} />}
+      {focusedDefinition && focusedDefinition.code !== "" && <FlixInfo interaction={focusedDefinition} />}
       {correspondingTemplate?.source === "workspace" && (
         <WorkspaceTemplateInfo workspaceTemplate={correspondingTemplate.workspace!} />
       )}

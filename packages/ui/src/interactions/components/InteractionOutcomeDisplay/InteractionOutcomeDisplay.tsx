@@ -15,6 +15,7 @@ import { ScriptOutcome, TransactionOutcome } from "../../core/core-types";
 import { InteractionKind } from "@onflowser/api";
 import { useGetTransaction } from "../../../api";
 import { ErrorMessage } from "../../../common/errors/ErrorMessage";
+import { FlowserIcon } from "../../../common/icons/FlowserIcon";
 
 export function InteractionOutcomeDisplay(): ReactElement {
   const { outcome } = useInteractionOutcomeManager();
@@ -24,75 +25,18 @@ export function InteractionOutcomeDisplay(): ReactElement {
       {outcome?.transaction && (
         <TransactionOutcomeDisplay outcome={outcome.transaction} />
       )}
-      {!outcome && (
-        <div className={classes.emptyStateWrapper}>
-          <EmptyState />
-        </div>
-      )}
+      {!outcome && <EmptyState />}
     </div>
   );
 }
 
 function EmptyState() {
-  const { parsedInteraction } = useInteractionDefinitionManager();
-
-  switch (parsedInteraction?.kind) {
-    case InteractionKind.INTERACTION_SCRIPT:
-      return (
-        <Callout
-          icon="💡"
-          title="Cadence scripts"
-          description={
-            <div>
-              <p>
-                Here are a few resources you can look into, to learn more about
-                Cadence scripts on Flow.
-              </p>
-              <LineSeparator horizontal />
-              <ExternalLink href="https://academy.ecdao.org/en/cadence-by-example/6-scripts" />
-              <ExternalLink href="https://academy.ecdao.org/en/catalog/courses/beginner-cadence/chapter2/lesson2#scripts" />
-            </div>
-          }
-        />
-      );
-    case InteractionKind.INTERACTION_TRANSACTION:
-      return (
-        <Callout
-          icon="💡"
-          title="Cadence transactions"
-          description={
-            <div>
-              <p>
-                Here are a few resources you can look into, to learn more about
-                Cadence transactions on Flow.
-              </p>
-              <LineSeparator horizontal />
-              <ExternalLink href="https://developers.flow.com/cadence/language/transactions" />
-              <ExternalLink href="https://academy.ecdao.org/en/cadence-by-example/5-transaction" />
-              <ExternalLink href="https://academy.ecdao.org/en/catalog/courses/beginner-cadence/chapter2/lesson2#transactions" />
-            </div>
-          }
-        />
-      );
-    default:
-      return (
-        <Callout
-          icon="🚀"
-          title="Getting started #onFlow"
-          description={
-            <div>
-              <p>
-                Here are some resources that should help you get started on
-                Flow.
-              </p>
-              <LineSeparator horizontal />
-              <ExternalLink href="https://developers.flow.com" />
-              <ExternalLink href="https://academy.ecdao.org" />
-            </div>
-          }
-        />
-      );
-  }
+  return (
+    <div className={classes.emptyState}>
+      <FlowserIcon.DocumentWithArrow className={classes.icon} />
+      <span>Not executed</span>
+    </div>
+  )
 }
 
 function TransactionOutcomeDisplay(props: { outcome: TransactionOutcome }) {
