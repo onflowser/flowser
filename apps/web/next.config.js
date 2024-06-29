@@ -10,11 +10,16 @@ const nextConfig = {
     ]
   },
   async redirects() {
+    if (process.env.NODE_ENV === "development") {
+      return [];
+    }
+
     return [
       {
         source: "/",
         destination: "/previewnet",
-        permanent: true
+        permanent: true,
+
       },
       // Redirect to the main release that doesn't support Cadence v1.0
       {
