@@ -19,6 +19,9 @@ import { Shimmer } from "../../../common/loaders/Shimmer/Shimmer";
 import { MenuItem } from "@szhsin/react-menu";
 import { EditTemplateNameDialog } from "../EditTemplateNameDialog/EditTemplateNameDialog";
 import { Menu } from "../../../common/overlays/Menu/Menu";
+import { useOptionalInteractionTemplateFilters } from "./interaction-templates-controller.provider";
+import { FlixUtils } from "@onflowser/core";
+import { useFlowNetworkId } from "../../../contexts/flow-network.context";
 
 type InteractionTemplatesProps = {
   enabledSourceTypes: InteractionSourceType[];
@@ -35,14 +38,38 @@ export function InteractionTemplates(props: InteractionTemplatesProps): ReactEle
 
 function StoredTemplates(props: InteractionTemplatesProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const networkId = useFlowNetworkId();
   const templatesRegistry = useTemplatesRegistry();
+  const filters = useOptionalInteractionTemplateFilters();
   const [filterToSources, setFilterToSources] = useLocalStorage<InteractionSourceType[]>("interaction-filters", []);
   const filteredTemplates = useMemo(() => {
-    const searchQueryResults = searchTerm === "" ? templatesRegistry.templates : templatesRegistry.templates.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    let results = Array.from(templatesRegistry.templates);
 
-    const sourceFilterResults = filterToSources.length === 0 ? searchQueryResults : searchQueryResults.filter(e => filterToSources.includes(e.source));
+    if (filters?.dependencies) {
+      results = results.filter(template => template.flix && FlixUtils.getDependencies(template.flix, networkId).some(dependency => {
+        let shouldInclude = true;
 
-    return sourceFilterResults;
+        if (filters.dependencies?.contractAddress) {
+          shouldInclude = shouldInclude && dependency.address == filters.dependencies.contractAddress;
+        }
+
+        if (filters.dependencies?.contractName) {
+          shouldInclude = shouldInclude && dependency.name === filters.dependencies.contractName;
+        }
+
+        return shouldInclude;
+      }));
+    }
+
+    if (searchTerm) {
+      results = results.filter((template) => template.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    }
+
+    if (filterToSources.length > 0) {
+      results = results.filter(template => filterToSources.includes(template.source))
+    }
+
+    return results;
   }, [searchTerm, filterToSources, templatesRegistry.templates]);
   const filteredAndSortedTemplates = useMemo(
     () =>

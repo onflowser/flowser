@@ -50,6 +50,9 @@ import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseD
 import { NetworkDropdown } from "./NetworkDropdown";
 import { ProfileDropdown } from "@/common/ProfileDropdown";
 import { ConfirmDialogProvider } from "@onflowser/ui/src/contexts/confirm-dialog.context";
+import {
+  InteractionTemplateFiltersProvider
+} from "@onflowser/ui/src/interactions/components/InteractionTemplates/interaction-templates-controller.provider";
 
 const indexSyncIntervalInMs = 500;
 
@@ -448,7 +451,7 @@ function ApiSetupPrompt(props: {
 }
 
 function Content() {
-  const { networkId, interaction, setNetworkId } = useInteractionsPageParams();
+  const { networkId, interaction, setNetworkId, templateFilters } = useInteractionsPageParams();
   const interactionRegistry = useInteractionRegistry();
   const templatesRegistry = useTemplatesRegistry();
 
@@ -488,19 +491,21 @@ function Content() {
 
   return (
     <ConfirmDialogProvider>
-      <InteractionsPage
-        headerRowContent={
-          <div className="m-2 flex gap-x-[10px]">
-            <ProfileDropdown currentNetwork={networkId} />
-            <NetworkDropdown value={networkId} onChange={setNetworkId} />
-          </div>
-        }
-        tabOrder={["templates", "history"]}
-        enabledInteractionSourceTypes={[
-          'session',
-          'flix',
-        ]}
-      />
+      <InteractionTemplateFiltersProvider filters={templateFilters}>
+        <InteractionsPage
+          headerRowContent={
+            <div className="m-2 flex gap-x-[10px]">
+              <ProfileDropdown currentNetwork={networkId} />
+              <NetworkDropdown value={networkId} onChange={setNetworkId} />
+            </div>
+          }
+          tabOrder={["templates", "history"]}
+          enabledInteractionSourceTypes={[
+            'session',
+            'flix',
+          ]}
+        />
+      </InteractionTemplateFiltersProvider>
     </ConfirmDialogProvider>
   );
 }
