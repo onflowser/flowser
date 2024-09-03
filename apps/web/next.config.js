@@ -13,18 +13,7 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/previewnet",
-        permanent: true
-      },
-      // Redirect to the main release that doesn't support Cadence v1.0
-      {
-        source: "/mainnet",
-        destination: "https://interact.flowser.dev/mainnet",
-        permanent: true
-      },
-      {
-        source: "/testnet",
-        destination: "https://interact.flowser.dev/testnet",
+        destination: "/mainnet",
         permanent: true
       }
     ]

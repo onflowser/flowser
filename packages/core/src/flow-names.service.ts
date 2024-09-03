@@ -143,11 +143,6 @@ export class FlowNamesService {
   }
 
   public async getProfilesByAddress(address: string): Promise<FlowNameProfile[]> {
-    // Dependant contracts are not yet deployed on previewnet.
-    if (this.configuredForNetworkId === "previewnet") {
-      return [];
-    }
-
     const namesLookup = await this.resolveAddressToFlowNames(address);
 
     if (Object.entries(namesLookup).length === 0) {

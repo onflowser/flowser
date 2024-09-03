@@ -70,11 +70,7 @@ export class FlixUtils {
   }
 
   static getCadenceSourceCode(template: FlixV1Template, networkId: FlowNetworkId) {
-    if (
-      networkId === "emulator" ||
-      // This is the best we can do for previewnet atm.
-      networkId === "previewnet"
-    ) {
+    if (networkId === "emulator") {
       return this.getCadenceWithNewImportSyntax(template);
     } else {
       return this.getCadenceWithNetworkDependencies(template, networkId)

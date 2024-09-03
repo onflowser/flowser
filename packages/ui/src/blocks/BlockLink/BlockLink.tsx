@@ -47,7 +47,5 @@ function useBlockUrl(blockId: string): string {
       return `https://www.flowdiver.io/block/${data?.blockHeight}`
     case "testnet":
       return `https://www.testnet.flowdiver.io/block/${data?.blockHeight}`
-    case "previewnet":
-      return `https://previewnet.flowdiver.io/block/${data?.blockHeight}`
   }
 }
