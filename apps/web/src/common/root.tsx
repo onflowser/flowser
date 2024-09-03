@@ -50,6 +50,7 @@ import { BaseDialog } from "@onflowser/ui/src/common/overlays/dialogs/base/BaseD
 import { NetworkDropdown } from "./NetworkDropdown";
 import { ProfileDropdown } from "@/common/ProfileDropdown";
 import { ConfirmDialogProvider } from "@onflowser/ui/src/contexts/confirm-dialog.context";
+import { Analytics } from "@vercel/analytics/react"
 
 const indexSyncIntervalInMs = 500;
 
@@ -337,6 +338,7 @@ export default function Root() {
 
   return (
     <OptionalEmulatorSetupPrompt appService={appService}>
+      <Analytics />
       <SWRConfig
         value={{
           refreshInterval: indexSyncIntervalInMs,
