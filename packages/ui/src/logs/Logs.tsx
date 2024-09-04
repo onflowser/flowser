@@ -36,6 +36,7 @@ export function Logs(props: LogsProps): ReactElement {
   const [logDrawerSize, setLogDrawerSize] = useState<LogDrawerSize>("tiny");
   const tinyLogRef = useRef<HTMLDivElement>(null);
   const nonTinyLogRef = useRef<HTMLDivElement>(null);
+  const seenErrorLogsCache = useRef<Set<string>>(new Set());
   const logWrapperRef = logDrawerSize === "tiny" ? tinyLogRef : nonTinyLogRef;
   const logWrapperElement = logWrapperRef.current;
   const scrollBottom =
@@ -77,10 +78,11 @@ export function Logs(props: LogsProps): ReactElement {
   }, [logDrawerSize, shouldScrollToBottom]);
 
   useEffect(() => {
-    const hasErrorLogs = logs.some(
-      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR,
+    const unseenErrorLogs = logs.filter(
+      (log) => log.source === ProcessOutputSource.OUTPUT_SOURCE_STDERR && !seenErrorLogsCache.current?.has(log.data)
     );
-    if (hasErrorLogs) {
+    if (unseenErrorLogs.length > 0) {
+      unseenErrorLogs.forEach(log => seenErrorLogsCache.current?.add(log.data));
       toast.error("Some process encountered errors", {
         duration: 4000,
       });
