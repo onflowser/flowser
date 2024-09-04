@@ -18,11 +18,11 @@ export function ProjectLink(props: ProjectLinkProps): ReactElement {
   // TODO(web-mvp): Update styles
   return (
     <div
-      {...otherProps}
       onClick={() => navigate(buildProjectUrl({
         projectId,
         subPath: to,
       }))}
+      {...otherProps}
     />
   );
 }
