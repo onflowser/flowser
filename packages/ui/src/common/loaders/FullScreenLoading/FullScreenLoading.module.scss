@@ -5,13 +5,15 @@
 
 .container {
   @include fadeInAnimation(0.4s);
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
+  & {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
   .logo {
     @include pulse(1s);
   }

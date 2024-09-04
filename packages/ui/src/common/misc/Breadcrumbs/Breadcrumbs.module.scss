@@ -4,28 +4,31 @@
 @import "../../../styles/spacings";
 
 .root {
-  display: flex;
-  padding: $spacing-s $spacing-base;
-  border-radius: $border-radius-card;
-  align-items: center;
-  height: 40px;
+  & {
+    display: flex;
+    padding: $spacing-s $spacing-base;
+    border-radius: $border-radius-card;
+    align-items: center;
+    height: 40px;
+  }
 
   .backButtonWrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0);
-    cursor: pointer;
+    & {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
 
     .backButton {
       width: 20px;
       height: 16px;
     }
-
-    transition: background 0.1s;
 
     &:hover {
       background: rgba(255, 255, 255, 0.12);
