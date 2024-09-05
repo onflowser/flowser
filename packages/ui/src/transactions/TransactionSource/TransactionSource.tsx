@@ -4,7 +4,7 @@ import classes from "./TransactionSource.module.scss";
 import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { ParamBuilder } from "../../interactions/components/ParamBuilder/ParamBuilder";
 import { SizedBox } from "../../common/misc/SizedBox/SizedBox";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { useInteractionRegistry } from "../../interactions/contexts/interaction-registry.context";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";

@@ -6,7 +6,7 @@ import {
 } from "../../common/cards/DetailsCard/DetailsCard";
 import { CadenceEditor } from "../../common/code/CadenceEditor/CadenceEditor";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { IdeLink } from "../../common/links/IdeLink";
 import {
   useGetEventsByContract,

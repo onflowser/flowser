@@ -4,7 +4,7 @@ import Value from "../../common/misc/Value/Value";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 import React, { ReactElement, useMemo } from "react";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { Tooltip } from "../../common/overlays/Tooltip/Tooltip";
 import { BaseBadge } from "../../common/misc/BaseBadge/BaseBadge";
 import classes from "./ContractsTable.module.scss";

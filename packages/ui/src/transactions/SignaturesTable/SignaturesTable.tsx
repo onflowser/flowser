@@ -5,7 +5,7 @@ import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import classes from "./SignaturesTable.module.scss";
 import React, { ReactElement } from "react";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { SignableObject } from "@onflowser/api";
 import { AccountLink } from "../../accounts/AccountLink/AccountLink";
 

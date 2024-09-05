@@ -1,0 +1,13 @@
+@import "../../../styles/colors";
+@import "../../../styles/spacings";
+
+.root {
+  color: transparentize($blue, 0.1);
+  cursor: pointer;
+
+  &:hover {
+    * {
+      text-decoration: underline;
+    }
+  }
+}

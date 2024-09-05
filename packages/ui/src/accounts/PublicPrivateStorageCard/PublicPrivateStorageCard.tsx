@@ -3,7 +3,7 @@ import classes from "./PublicPrivateStorageCard.module.scss";
 import { StorageDomainBadge } from "../StorageDomainBadge/StorageDomainBadge";
 import gradient from "./gradient.png";
 import classNames from "classnames";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { FlowAccountStorage } from "@onflowser/api";
 import { useGetTokenMetadataList } from "../../api";

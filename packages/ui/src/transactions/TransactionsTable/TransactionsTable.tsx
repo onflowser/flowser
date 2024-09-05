@@ -10,7 +10,7 @@ import React, { ReactElement } from "react";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
 import { useTransactionName } from "../../interactions/hooks/use-transaction-name";
 import { Ellipsis } from "../../common/ellipsis/Ellipsis";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
 
 const columnHelper = createColumnHelper<FlowTransaction>();

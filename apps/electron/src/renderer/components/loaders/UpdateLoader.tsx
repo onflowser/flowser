@@ -1,5 +1,5 @@
-import { Spinner } from '../../../../../../packages/ui/src/common/loaders/Spinner/Spinner';
 import React, { ReactElement } from 'react';
+import { Spinner } from '../../../../../../packages/ui/src/common/loaders/Spinner/Spinner';
 import classes from './Loader.module.scss';
 
 export type UpdateLoaderProps = {

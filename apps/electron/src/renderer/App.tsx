@@ -77,7 +77,7 @@ export function App() {
           errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <FlowNetworkProvider config={{ chainId: 'flow-emulator' }}>
+        <FlowNetworkProvider config={{ networkId: 'emulator' }}>
           <ServiceRegistryProvider
             services={{
               flowConfigService: window.electron.flowConfigService,
