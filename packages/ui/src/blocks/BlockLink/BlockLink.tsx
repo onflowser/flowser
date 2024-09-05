@@ -1,6 +1,6 @@
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import classes from "./BlockLink.module.scss";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import React from "react";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
@@ -23,7 +23,7 @@ export function BlockLink(props: BlockLinkProps) {
 
   if (networkId === "emulator") {
     return (
-      <ProjectLink to={`/blocks/${blockId}`}>
+      <ProjectLink to={blockUrl}>
         {blockIdDisplay}
       </ProjectLink>
     )
@@ -36,13 +36,13 @@ export function BlockLink(props: BlockLinkProps) {
   }
 }
 
-function useBlockUrl(blockId: string) {
+function useBlockUrl(blockId: string): string {
   const networkId = useFlowNetworkId();
   const { data } = useGetBlock(blockId)
 
   switch (networkId) {
     case "emulator":
-      throw new Error("Not supported for emulator network")
+      return `/blocks/${blockId}`;
     case "mainnet":
       return `https://www.flowdiver.io/block/${data?.blockHeight}`
     case "testnet":

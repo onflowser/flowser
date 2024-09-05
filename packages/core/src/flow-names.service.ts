@@ -10,7 +10,7 @@ const lookupDomainByFlownsNameHashSource = `
 import Domains from 0xFlownsAddress
 
 // Source: https://github.com/flowns-org/flow-name-service-contracts/blob/main/cadence/scripts/query_domain_info.cdc
-pub fun main(nameHash: String): Domains.DomainDetail? {
+access(all) fun main(nameHash: String): Domains.DomainDetail? {
   let address = Domains.getRecords(nameHash) ?? panic("Domain not exist")
   let account = getAccount(address)
   let collectionCap = account.getCapability<&{Domains.CollectionPublic}>(Domains.CollectionPublicPath)
@@ -32,7 +32,7 @@ pub fun main(nameHash: String): Domains.DomainDetail? {
 const resolveAddressToFlowDomains = `
 import DomainUtils from 0xDomainUtils
 
-pub fun main(address: Address): {String: String} {
+access(all) fun main(address: Address): {String: String} {
   return DomainUtils.getDefaultDomainsOfAddress(address)
 }
 `
@@ -41,7 +41,7 @@ pub fun main(address: Address): {String: String} {
 const lookupProfileByFindNameSource = `
 import FIND, Profile from 0xFindAddress
 
-pub fun main(name: String): Profile.UserProfile? {
+access(all) fun main(name: String): Profile.UserProfile? {
     return FIND.lookup(name)?.asProfile()
 }
 `;
@@ -114,7 +114,11 @@ type Config = {
 }
 
 export class FlowNamesService {
+  private readonly configuredForNetworkId: FlowNetworkId;
+
   constructor(config: Config) {
+    this.configuredForNetworkId = config.networkId;
+
     const findAddressByNetworkId = new Map<FlowNetworkId, string>([
       ["mainnet", "0x097bafa4e0b48eef"],
       ["testnet", "0afe396ebc8eee65"]

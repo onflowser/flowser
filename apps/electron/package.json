@@ -1,5 +1,6 @@
 {
   "name": "@onflowser/electron",
+  "version": "3.2.0",
   "description": "Supercharged development on Flow blockchain ⚡",
   "keywords": [
     "flow-blockchain",

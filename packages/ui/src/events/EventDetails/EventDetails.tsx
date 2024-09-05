@@ -8,7 +8,7 @@ import {
 import { SizedBox } from "../../common/misc/SizedBox/SizedBox";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { JsonView } from "../../common/code/JsonView/JsonView";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import Value from "../../common/misc/Value/Value";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";

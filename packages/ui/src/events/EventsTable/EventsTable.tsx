@@ -5,7 +5,7 @@ import Value from "../../common/misc/Value/Value";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { EventOriginLink } from "../EventOriginLink/EventOriginLink";
 import { EventUtils } from "../utils";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";

@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import { AccountAvatar } from "../AccountAvatar/AccountAvatar";
 import { AccountName } from "../AccountName/AccountName";
 import classes from "./AccountLink.module.scss";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 import { FlowUtils } from "@onflowser/core/src/flow-utils";

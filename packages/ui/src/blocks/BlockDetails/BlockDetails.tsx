@@ -9,7 +9,7 @@ import {
 import { SizedBox } from "../../common/misc/SizedBox/SizedBox";
 import { StyledTabs } from "../../common/tabs/StyledTabs/StyledTabs";
 import { TransactionsTable } from "../../transactions/TransactionsTable/TransactionsTable";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { DateDisplay } from "../../common/time/DateDisplay/DateDisplay";
 import { useGetBlock, useGetTransactionsByBlock } from "../../api";
 

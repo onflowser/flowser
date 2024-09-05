@@ -21,7 +21,9 @@ function build() {
   GOOS=$1
   GOARCH=$2
   POSTFIX=$3
-  GOOS=$GOOS GOARCH=$GOARCH go build -o "${OUT_PATH}/${BIN_PREFIX}-${GOARCH}-${GOOS}${POSTFIX}" "${SOURCE_PATH}"
+  # Ignore the onflow/crypto build errors for now.
+      # See: https://discord.com/channels/613813861610684416/1162086721471647874/1222484856043343942
+  GOOS=$GOOS GOARCH=$GOARCH go build -o "${OUT_PATH}/${BIN_PREFIX}-${GOARCH}-${GOOS}${POSTFIX}" "${SOURCE_PATH}" | true
 }
 
 # Windows

@@ -5,7 +5,7 @@ import classes from "./BlocksTable.module.scss";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import { createColumnHelper } from "@tanstack/table-core";
 import { BaseTable } from "../../common/misc/BaseTable/BaseTable";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { TimeAgo } from "../../common/time/TimeAgo/TimeAgo";
 import { FlowBlock } from "@onflowser/api";
 

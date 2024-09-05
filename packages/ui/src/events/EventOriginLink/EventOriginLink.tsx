@@ -1,4 +1,4 @@
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 import React, { ReactElement } from "react";
 import { EventUtils } from "../utils";

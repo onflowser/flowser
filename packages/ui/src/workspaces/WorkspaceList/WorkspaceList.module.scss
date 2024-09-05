@@ -54,15 +54,17 @@
             border-radius: 10px;
             margin-right: $spacing-l;
           }
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-          color: $gray-10;
-          font-size: $font-size-large;
-          width: 100%;
-          padding: $spacing-s $spacing-l;
-          box-sizing: border-box;
-          position: relative;
+          & {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: $gray-10;
+            font-size: $font-size-large;
+            width: 100%;
+            padding: $spacing-s $spacing-l;
+            box-sizing: border-box;
+            position: relative;
+          }
 
           .yellowLine {
             display: none;
@@ -105,24 +107,28 @@
           padding-right: 8px;
         }
 
-        padding: 0 14px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+        & {
+          padding: 0 14px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
 
-        margin-bottom: 12px;
-        border-radius: 6px;
-        box-sizing: border-box;
+          margin-bottom: 12px;
+          border-radius: 6px;
+          box-sizing: border-box;
+        }
       }
 
       .newProjectButton {
-        background-color: $violet-100;
-        color: $white;
         svg path {
           fill: white;
         }
-        border: none;
-        width: 100%;
+        & {
+          border: none;
+          width: 100%;
+          background-color: $violet-100;
+          color: $white;
+        }
       }
     }
   }
@@ -161,9 +167,11 @@
           @media (max-width: 1029px) {
             display: none;
           }
-          font-size: 13px;
-          line-height: 26px;
-          color: $grey;
+          & {
+            font-size: 13px;
+            line-height: 26px;
+            color: $grey;
+          }
         }
 
         .projectTrashcan {

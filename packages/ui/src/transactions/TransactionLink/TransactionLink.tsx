@@ -1,7 +1,7 @@
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
 import { MiddleEllipsis } from "../../common/ellipsis/MiddleEllipsis";
 import classes from "./TransactionLink.module.scss";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 import React from "react";
 import { ExternalLink } from "../../common/links/ExternalLink/ExternalLink";
 
@@ -22,7 +22,7 @@ export function TransactionLink(props: TransactionLinkProps) {
 
   if (networkId === "emulator") {
     return (
-      <ProjectLink to={`/transactions/${transactionId}`}>
+      <ProjectLink to={transactionUrl}>
         {transactionIdDisplay}
       </ProjectLink>
     )
@@ -35,12 +35,12 @@ export function TransactionLink(props: TransactionLinkProps) {
   }
 }
 
-function useTransactionUrl(transactionId: string) {
+function useTransactionUrl(transactionId: string): string {
   const networkId = useFlowNetworkId();
 
   switch (networkId) {
     case "emulator":
-      throw new Error("Not supported for emulator network")
+      return `/transactions/${transactionId}`;
     case "mainnet":
       return `https://www.flowdiver.io/tx/${transactionId}`
     case "testnet":

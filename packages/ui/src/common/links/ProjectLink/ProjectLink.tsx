@@ -1,7 +1,9 @@
 import React, { ReactNode } from "react";
 import { ReactElement } from "react";
-import { useCurrentWorkspaceId } from "../../hooks/use-current-project-id";
-import { useNavigate } from "../../contexts/navigation.context";
+import { useCurrentWorkspaceId } from "../../../hooks/use-current-project-id";
+import { useNavigate } from "../../../contexts/navigation.context";
+import classNames from "classnames";
+import classes from "./ProjectLink.module.scss";
 
 type ProjectLinkProps = {
   to: string;
@@ -13,16 +15,16 @@ type ProjectLinkProps = {
 export function ProjectLink(props: ProjectLinkProps): ReactElement {
   const projectId = useCurrentWorkspaceId();
   const navigate = useNavigate()
-  const { to, ...otherProps } = props;
+  const { to, className, ...otherProps } = props;
 
-  // TODO(web-mvp): Update styles
   return (
     <div
-      {...otherProps}
+      className={classNames(classes.root, className)}
       onClick={() => navigate(buildProjectUrl({
         projectId,
         subPath: to,
       }))}
+      {...otherProps}
     />
   );
 }

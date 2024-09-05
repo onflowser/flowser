@@ -15,7 +15,7 @@ import {
   FlowTransaction,
 } from '@onflowser/api';
 import { SWRConfig } from 'swr';
-import { FlowNetworkProvider } from 'packages/ui/src/contexts/flow-network.context';
+import { FlowNetworkProvider } from '@onflowser/ui/src/contexts/flow-network.context';
 import { DependencyErrors } from './components/DependencyErrors/DependencyErrors';
 import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
 import { FlowserRouter } from './router';
@@ -77,7 +77,7 @@ export function App() {
           errorRetryInterval: indexSyncIntervalInMs,
         }}
       >
-        <FlowNetworkProvider config={{ chainId: 'flow-emulator' }}>
+        <FlowNetworkProvider config={{ networkId: 'emulator' }}>
           <ServiceRegistryProvider
             services={{
               flowConfigService: window.electron.flowConfigService,

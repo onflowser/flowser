@@ -11,7 +11,7 @@ import { FlowserIcon } from "../../common/icons/FlowserIcon";
 import { TextUtils } from "../../utils/text-utils";
 import { useGetWorkspaces } from "../../api";
 import { useLocation, useNavigate } from "../../contexts/navigation.context";
-import { ProjectLink } from "../../common/links/ProjectLink";
+import { ProjectLink } from "../../common/links/ProjectLink/ProjectLink";
 
 type ProjectTab = {
   id: string;

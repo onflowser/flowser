@@ -204,7 +204,7 @@ type FlowTxStatusSubscription = {
 };
 
 type FlowGatewayConfig = {
-  network: "local" | "canarynet" | "testnet" | "mainnet"
+  network?: "local" | "testnet" | "mainnet"
   accessNodeRestApiUrl: string;
   discoveryWalletUrl: string;
   flowJSON?: unknown;

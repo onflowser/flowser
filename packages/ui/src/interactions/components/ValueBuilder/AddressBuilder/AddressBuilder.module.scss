@@ -6,9 +6,11 @@
 $avatar-size: 30px;
 
 .root {
-  width: 100%;
-  background: $gray-80;
-  border-radius: $border-radius-input;
+  & {
+    width: 100%;
+    background: $gray-80;
+    border-radius: $border-radius-input;
+  }
 
   @include hiddenScrollbars();
 
@@ -44,11 +46,13 @@ $avatar-size: 30px;
             border-color: $blue;
           }
         }
-        height: $avatar-size;
-        width: $avatar-size;
-        padding: $spacing-s;
-        border-radius: 50%;
-        border: 2px solid transparent;
+        & {
+          height: $avatar-size;
+          width: $avatar-size;
+          padding: $spacing-s;
+          border-radius: 50%;
+          border: 2px solid transparent;
+        }
         .avatar {
           width: 100%;
           height: 100%;
