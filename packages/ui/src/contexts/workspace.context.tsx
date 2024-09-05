@@ -66,7 +66,7 @@ export function WorkspaceManagerProvider({
   function removeWorkspace(project: FlowserWorkspace) {
     showDialog({
       title: "Delete project",
-      body: <span>Are you sure you want to delete this project?</span>,
+      body: <span>Are you sure you want to remove this project from the list?</span>,
       onConfirm: () => confirmWorkspaceRemove(project),
       confirmButtonLabel: "DELETE",
       cancelButtonLabel: "CANCEL",
