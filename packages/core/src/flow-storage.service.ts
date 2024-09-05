@@ -75,12 +75,13 @@ export class FlowAccountStorageService {
   private async fetchStorageByAddress(
     address: string,
   ): Promise<StorageTraversalResult> {
+    // language=Cadence
     const cadence = `
-      pub struct CapabilityPathItem {
-        pub let address: Address
-        pub let path: String
-        pub let type: Type
-        pub let targetPath: String?
+      access(all) struct CapabilityPathItem {
+        access(all) let address: Address
+        access(all) let path: String
+        access(all) let type: Type
+        access(all) let targetPath: String?
       
         init(
           address: Address,
@@ -95,10 +96,10 @@ export class FlowAccountStorageService {
         }
       }
       
-      pub struct StoragePathItem {
-        pub let address: Address
-        pub let path: String
-        pub let type: Type
+      access(all) struct StoragePathItem {
+        access(all) let address: Address
+        access(all) let path: String
+        access(all) let type: Type
       
         init(
           address: Address,
@@ -111,9 +112,9 @@ export class FlowAccountStorageService {
         }
       }
       
-      pub struct StorageTraversalResult {
-        pub let capabilityPathItems: [CapabilityPathItem]
-        pub let storagePathItems: [StoragePathItem]
+      access(all) struct StorageTraversalResult {
+        access(all) let capabilityPathItems: [CapabilityPathItem]
+        access(all) let storagePathItems: [StoragePathItem]
       
         init(
           capabilityPathItems: [CapabilityPathItem],
@@ -124,23 +125,25 @@ export class FlowAccountStorageService {
         }
       }
       
-      pub fun main(address: Address): StorageTraversalResult {
+      access(all) fun main(address: Address): StorageTraversalResult {
       
-        let account = getAuthAccount(address)
+        let account = getAuthAccount<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>(address)
         let capabilityPathItems: [CapabilityPathItem] = []
         let storagePathItems: [StoragePathItem] = []
       
-        account.forEachPrivate(fun (path: PrivatePath, type: Type): Bool {
+        // Note: This API is not available anymore since Cadence v1.0
+        // Related: https://github.com/33-Labs/flowview/pull/18
+        // account.storage.forEachPrivate(fun (path: PrivatePath, type: Type): Bool {
+        //   capabilityPathItems.append(buildCapabilityPathItem(account: account, path: path, type: type))
+        //   return true
+        // })
+      
+        var publicRes = account.storage.forEachPublic(fun (path: PublicPath, type: Type): Bool {
           capabilityPathItems.append(buildCapabilityPathItem(account: account, path: path, type: type))
           return true
         })
       
-        account.forEachPublic(fun (path: PublicPath, type: Type): Bool {
-          capabilityPathItems.append(buildCapabilityPathItem(account: account, path: path, type: type))
-          return true
-        })
-      
-        account.forEachStored(fun (path: StoragePath, type: Type): Bool {
+        var storedRes = account.storage.forEachStored(fun (path: StoragePath, type: Type): Bool {
           storagePathItems.append(buildStoragePathItem(account: account, path: path, type: type))
           return true
         })
@@ -151,11 +154,14 @@ export class FlowAccountStorageService {
         )
       }
       
-      priv fun buildCapabilityPathItem(account: AuthAccount, path: CapabilityPath, type: Type): CapabilityPathItem {
+      access(self) fun buildCapabilityPathItem(account: &Account, path: PublicPath, type: Type): CapabilityPathItem {
          var targetPath: String? = nil
-          if let target = account.getLinkTarget(path) {
-            targetPath = target.toString()
-          }
+        // Note: This is a workaround to check if the path is a capability
+        // There is no getLinkTarget method anymore
+        // Related: https://github.com/33-Labs/flowview/pull/18
+        if account.capabilities.exists(path) {
+            targetPath = path.toString()
+        }
         return CapabilityPathItem(
             address: account.address,
             path: path.toString(),
@@ -163,13 +169,13 @@ export class FlowAccountStorageService {
             targetPath: targetPath
           )
       }
-      
-      priv fun buildStoragePathItem(account: AuthAccount, path: StoragePath, type: Type): StoragePathItem {
-      
-        return StoragePathItem(
-            address: account.address,
-            path: path.toString(),
-            type: type,
+        
+      access(self) fun buildStoragePathItem(account: &Account, path: StoragePath, type: Type): StoragePathItem {
+        
+          return StoragePathItem(
+              address: account.address,
+              path: path.toString(),
+              type: type,
           )
       }
     `;
