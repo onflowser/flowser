@@ -36,12 +36,6 @@ export function NetworkDropdown(props: NetworkDropdownProps) {
           {network}
         </MenuItem>
       ))}
-      <MenuItem
-        onClick={() => window.open("https://previewnet.flowser.dev/previewnet")}
-        className="capitalize"
-      >
-        Previewnet
-      </MenuItem>
     </Menu>
   )
 }

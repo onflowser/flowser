@@ -30,7 +30,6 @@ func getChainID(targetChainID string) (flow.ChainID, error) {
 		flow.Testnet,
 		flow.Emulator,
 		flow.Sandboxnet,
-		flow.Previewnet,
 	}
 
 	for _, chainID := range chainIDs {
