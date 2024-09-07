@@ -1,10 +1,11 @@
 import { ImageResponse } from 'next/og';
-import { FlixUtils } from "@onflowser/core/src/flix-utils";
+import { FlixV11Utils } from "@onflowser/core/src/flix-v11-utils";
 import { FlowUtils } from "@onflowser/core/src/flow-utils";
 import type { FlowNetworkId } from "@onflowser/core/src/flow-utils";
 import type { FlowNameProfile } from "@onflowser/core/src/flow-names.service";
-import type { FlixV1Auditor, FlixV1Template } from "@onflowser/core/src/flix-v1";
 import type { InteractionsPageParams } from "@/common/interaction-page-params";
+import type { FlixV11Template } from "@onflowser/core/src/flix-v11";
+import { FlixV1Auditor } from "@onflowser/core";
 
 // Don't use edge runtime because of the code size limit.
 // See: https://github.com/vercel/commerce/issues/1028
@@ -31,17 +32,18 @@ export default async function Image(props: Props) {
   ])
 
   if (interaction) {
-    const [flix, auditors] = await Promise.all([
+    const [flix] = await Promise.all([
       fetchFlixTemplateById(interaction),
-      fetchFlixAuditorsById(interaction, networkId),
+      // Auditing not implemented yet
+      // fetchFlixAuditorsById(interaction, networkId),
     ]);
 
     if (!flix) {
       return new ImageResponse(<FallbackPreview />, size);
     }
 
-    const cadenceSourceCode = FlixUtils.getCadenceSourceCode(flix, networkId);
-    const dependencies = FlixUtils.getDependencies(flix, networkId);
+    const cadenceSourceCode = FlixV11Utils.getCadenceSourceCode(flix, networkId);
+    const dependencies = FlixV11Utils.getDependencies(flix, networkId);
     const address = dependencies[0].address;
 
     const [flowNameProfiles, addressIndex] = await Promise.all([
@@ -71,7 +73,7 @@ export default async function Image(props: Props) {
             }}
           >
             <TitleAndDescription flix={flix} />
-            <AuditorInfo auditors={auditors} />
+            {/*<AuditorInfo auditors={auditors} />*/}
             <CodePreview cadence={cadenceSourceCode} />
           </div>
           <div
@@ -115,7 +117,7 @@ function FallbackPreview() {
   )
 }
 
-function TitleAndDescription(props: {flix: FlixV1Template}) {
+function TitleAndDescription(props: {flix: FlixV11Template}) {
   return (
     <div
       style={{
@@ -132,7 +134,7 @@ function TitleAndDescription(props: {flix: FlixV1Template}) {
           color: "#31363C",
         }}
       >
-        {FlixUtils.getName(props.flix)}
+        {FlixV11Utils.getName(props.flix)}
       </span>
       <span
         style={{
@@ -141,12 +143,13 @@ function TitleAndDescription(props: {flix: FlixV1Template}) {
           color: "#56595E",
         }}
       >
-        {FlixUtils.getDescription(props.flix)}
+        {FlixV11Utils.getDescription(props.flix)}
       </span>
     </div>
   )
 }
 
+// TODO(flix-v11): Add support for auditors?
 function AuditorInfo(props: { auditors: FlixV1Auditor[]}) {
   const {auditors} = props;
   const iconSize = 25;
@@ -292,10 +295,10 @@ function RiStarFill(props: IconProps) {
 // and axios can't be used in edge runtime.
 // See: https://github.com/axios/axios/issues/5523
 
-const flixApiHost = `https://flowser-flix-368a32c94da2.herokuapp.com`;
+const flixApiHost = `https://flix-indexer.fly.dev`;
 
-async function fetchFlixTemplateById(id: string): Promise<FlixV1Template | undefined> {
-  const res = await fetch(`${flixApiHost}/v1/templates/${id}`);
+async function fetchFlixTemplateById(id: string): Promise<FlixV11Template | undefined> {
+  const res = await fetch(`${flixApiHost}/v1.1/templates/${id}`);
   if (res.status === 200) {
     return await res.json();
   } else {
@@ -303,8 +306,9 @@ async function fetchFlixTemplateById(id: string): Promise<FlixV1Template | undef
   }
 }
 
+// TODO(flix-v11) Migrate to flix v1.1
 async function fetchFlixAuditorsById(id: string, networkId: string): Promise<FlixV1Auditor[]> {
-  const res = await fetch(`${flixApiHost}/v1/templates/${id}/auditors?network=${networkId}`);
+  const res = await fetch(`${flixApiHost}/v1.1/templates/${id}/auditors?network=${networkId}`);
   return await res.json();
 }
 

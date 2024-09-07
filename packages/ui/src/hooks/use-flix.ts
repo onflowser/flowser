@@ -1,24 +1,20 @@
 import useSWR, { SWRResponse } from "swr";
 import { InteractionDefinition } from "../interactions/core/core-types";
 import { useEffect } from "react";
-import { useFlowNetworkId } from "../contexts/flow-network.context";
-import { FlixV1Auditor, FlixV1Template } from "@onflowser/core";
+import { useServiceRegistry } from "../contexts/service-registry.context";
+import { FlixV11Template } from "@onflowser/core/src/flix-v11";
 
-export const FLOW_FLIX_URL = "https://flix.flow.com";
-export const FLOWSER_FLIX_URL = "https://flowser-flix-368a32c94da2.herokuapp.com";
+export const FLOWSER_FLIX_URL = "https://flix-indexer.fly.dev";
 
-export function useListFlixTemplates(): SWRResponse<FlixV1Template[]> {
-  return useSWR(`flix/templates`, () =>
-    fetch(`${FLOWSER_FLIX_URL}/v1/templates`).then((res) => res.json()),
-    {
-      refreshInterval: 0
-    }
-  );
-}
+export function useListFlixTemplates(): SWRResponse<FlixV11Template[]> {
+  const { flixService } = useServiceRegistry();
 
-export function useGetFlixTemplate(id: string | undefined): SWRResponse<FlixV1Template> {
-  return useSWR(id ? `flix/templates/${id}` : null, () =>
-    fetch(`${FLOWSER_FLIX_URL}/v1/templates/${id}`).then((res) => res.json()),
+  if (flixService === undefined) {
+    throw new Error("Flix service not found")
+  }
+
+  return useSWR(`flix/templates`, () => flixService.list(),
+    { refreshInterval: 0 }
   );
 }
 
@@ -28,25 +24,22 @@ export const FLIX_TEMPLATE_NOT_FOUND = null;
 
 export function useFlixSearch(options: {
   interaction: InteractionDefinition;
-}): SWRResponse<FlixV1Template | null> {
-  const networkId = useFlowNetworkId();
+}): SWRResponse<FlixV11Template | null> {
+  const { flixService } = useServiceRegistry();
+
+  if (flixService === undefined) {
+    throw new Error("Flix service not found")
+  }
+
+  console.log(options.interaction.code);
+
+  const cadenceBase64 = btoa(options.interaction.code);
 
   // We are not using `sourceCode` as the cache key,
   // to avoid the flickering UI effect that's caused
   // by undefined parsed interaction every time the source code changes.
-  const state = useSWR(`flix/templates/${options.interaction.id}`, () =>
-    fetch(`${FLOWSER_FLIX_URL}/v1/templates/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        cadence_base64: btoa(options.interaction.code),
-        // Supports "any" network as of:
-        // https://github.com/onflowser/flow-interaction-template-service/pull/4
-        network: networkId === "emulator" ? "any" : networkId
-      })
-    }).then((res) => res.status === 200 ? res.json() : null),
+  const state = useSWR<FlixV11Template | null>(`flix/templates/${options.interaction.id}`, () =>
+    flixService.list({ cadenceBase64 }).then(res => res[0] ?? null),
     {
       refreshInterval: 0,
       shouldRetryOnError: false,
@@ -63,10 +56,9 @@ export function useFlixSearch(options: {
 export function useFlixTemplateAuditors(options: {
   templateId: string;
   network: "testnet" | "mainnet";
-}): SWRResponse<FlixV1Auditor[]> {
-  return useSWR(`flix/${options.network}/templates/${options.templateId}/auditors`, () =>
-      fetch(`${FLOWSER_FLIX_URL}/v1/templates/${options.templateId}/auditors?network=${options.network}`)
-        .then((res) => res.json()),
+}): SWRResponse<any[]> {
+  // TODO(flix-v11): Add support for auditors?
+  return useSWR(`flix/${options.network}/templates/${options.templateId}/auditors`, () => [] as any[],
     {
       refreshInterval: 0,
       shouldRetryOnError: false

@@ -1,6 +1,6 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
-import { FclValue, FlixV1Template } from "@onflowser/core";
+import { FclValue } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import {
   useGetContracts,
@@ -9,8 +9,9 @@ import {
 import { WorkspaceTemplate } from "@onflowser/api";
 import { useListFlixTemplates } from "../../hooks/use-flix";
 import { useFlowNetworkId } from "../../contexts/flow-network.context";
-import { FlixUtils } from "@onflowser/core/src/flix-utils";
 import { SWRResponse } from "swr";
+import { FlixV11Utils } from "@onflowser/core/src/flix-v11-utils";
+import { FlixV11Template } from "@onflowser/core/src/flix-v11";
 
 type InteractionTemplatesRegistry = {
   isLoading: boolean;
@@ -25,7 +26,7 @@ export type InteractionSourceType = "workspace" | "flix" | "session";
 export type InteractionDefinitionTemplate = Omit<InteractionDefinition, "forkedFromTemplateId"> & {
   source: InteractionSourceType;
 
-  flix: FlixV1Template | undefined;
+  flix: FlixV11Template | undefined;
   workspace: WorkspaceTemplate | undefined;
 };
 
@@ -67,60 +68,8 @@ export function TemplatesRegistryProvider(props: {
     getErrorMessage("Fail to load file templates", workspaceTemplates) ||
     getErrorMessage("Fail to load FLIX templates", flixTemplates);
 
-  const flowCoreContractNames = new Set([
-    "FlowStorageFees",
-    "MetadataViews",
-    "NonFungibleToken",
-    "ViewResolver",
-    "FungibleToken",
-    "FungibleTokenMetadataViews",
-    "FlowToken",
-    "FlowClusterQC",
-    "FlowDKG",
-    "FlowEpoch",
-    "FlowIDTableStaking",
-    "FlowServiceAccount",
-    "FlowStakingCollection",
-    "LockedTokens",
-    "NFTStorefront",
-    "NFTStorefrontV2",
-    "StakingProxy",
-    "FlowFees",
-  ]);
-
-  function isSupportedOnCurrentNetwork(template: FlixV1Template) {
-    if (networkId === "emulator") {
-      return isSupportedOnEmulatorNetwork(template)
-    } else {
-      return FlixUtils.hasDependenciesForNetwork(template, networkId);
-    }
-  }
-
-  // Since FLIX v1 doesn't officially support the emulator network,
-  // we must manually check if the provided template depends on contracts
-  // that are known to be deployed on the emulator network.
-  function isSupportedOnEmulatorNetwork(template: FlixV1Template) {
-    const importedContractNames = Object.values(template.data.dependencies)
-      .map((dependency) => Object.keys(dependency))
-      .flat();
-    const nonCoreImportedContractNames = importedContractNames.filter(
-      (name) => !flowCoreContractNames.has(name),
-    );
-    const nonCoreDeployedContractNamesLookup = new Set(
-      contracts
-        ?.filter((contract) => !flowCoreContractNames.has(contract.name))
-        .map((contract) => contract.name),
-    );
-
-    // Interactions that only import core contracts are most likely generic ones,
-    // not tailored specifically to some third party contract/project.
-    const onlyImportsCoreContracts = nonCoreImportedContractNames.length === 0;
-    const importsSomeNonCoreDeployedContract =
-      nonCoreImportedContractNames.some((contractName) =>
-        nonCoreDeployedContractNamesLookup.has(contractName),
-      );
-
-    return onlyImportsCoreContracts || importsSomeNonCoreDeployedContract;
+  function isSupportedOnCurrentNetwork(template: FlixV11Template) {
+    return FlixV11Utils.hasDependenciesForNetwork(template, networkId);
   }
 
   const randomId = () => String(Math.random() * 1000000);
@@ -163,8 +112,8 @@ export function TemplatesRegistryProvider(props: {
       ...(flixTemplates.data?.filter(isSupportedOnCurrentNetwork)?.map(
         (template): InteractionDefinitionTemplate => ({
           id: template.id,
-          name: FlixUtils.getName(template),
-          code: FlixUtils.getCadenceSourceCode(template, networkId),
+          name: FlixV11Utils.getName(template),
+          code: FlixV11Utils.getCadenceSourceCode(template, networkId),
           transactionOptions: undefined,
           initialOutcome: undefined,
           fclValuesByIdentifier: new Map(),

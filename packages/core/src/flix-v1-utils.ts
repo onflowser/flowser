@@ -6,7 +6,7 @@ type FlixDependencySummary = {
   address: string;
 }
 
-export class FlixUtils {
+export class FlixV1Utils {
 
   static getDependencies(template: FlixV1Template, networkId: FlowNetworkId): FlixDependencySummary[] {
     return Object

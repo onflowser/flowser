@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import { HttpService } from "@onflowser/core/src/http.service";
-import { FlixUtils, FlowFlixService } from "@onflowser/core";
 import { InteractionsPageParams } from "@/common/interaction-page-params";
+import { FlowFlixV11Service } from "@onflowser/core/src/flow-flix-v11.service";
+import { FlixV11Utils } from "@onflowser/core/src/flix-v11-utils";
 
 export async function getInteractionPageMetadata(
   params: InteractionsPageParams
@@ -21,15 +22,15 @@ async function getFlixMetadata(flixId: string): Promise<Metadata> {
     verbose: console.debug
   });
   const flixConfig = {
-    flixServerUrl: "https://flowser-flix-368a32c94da2.herokuapp.com"
+    flixServerUrl: "https://flix-indexer.fly.dev"
   };
-  const flixService = new FlowFlixService(flixConfig, httpService);
+  const flixService = new FlowFlixV11Service(flixConfig, httpService);
 
   const template = await flixService.getById(flixId);
 
   if (template) {
-    const title = `Interaction: ${FlixUtils.getName(template)}`;
-    const description = FlixUtils.getDescription(template)
+    const title = `Interaction: ${FlixV11Utils.getName(template)}`;
+    const description = FlixV11Utils.getDescription(template)
 
     return {
       title,

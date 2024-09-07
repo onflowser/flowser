@@ -21,6 +21,7 @@ import {
 import { ScriptOutcome, TransactionOutcome } from "../interactions/core/core-types";
 import { FlowChainID } from "@onflowser/core/src/flow-utils";
 import { FlowNamesService } from "@onflowser/core/src/flow-names.service";
+import { FlowFlixV11Service } from "@onflowser/core/src/flow-flix-v11.service";
 
 export interface ISnapshotService {
   list(): Promise<FlowStateSnapshot[]>;
@@ -129,6 +130,7 @@ type ServiceRegistry = {
   snapshotService?: ISnapshotService;
   workspaceService?: IWorkspaceService;
   flowNamesService?: FlowNamesService;
+  flixService?: FlowFlixV11Service;
 };
 
 const ServiceRegistryContext = createContext<ServiceRegistry>(

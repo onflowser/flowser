@@ -4,7 +4,7 @@ import { FlowNetworkId } from "./flow-utils";
 export type FlixV1Template = {
   id: string;
   f_type: "InteractionTemplate";
-  f_version: string;
+  f_version: "1.0.0";
   data: {
     messages: FlixV1Messages;
     dependencies: Record<string, FlixV1Dependency>;

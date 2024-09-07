@@ -16,12 +16,15 @@ import {
 } from '@onflowser/api';
 import { SWRConfig } from 'swr';
 import { FlowNetworkProvider } from '@onflowser/ui/src/contexts/flow-network.context';
+import { FlowFlixV11Service } from '@onflowser/core/src/flow-flix-v11.service';
+import { HttpService } from '@onflowser/core/src/http.service';
+import { IFlowserLogger } from '@onflowser/core';
 import { DependencyErrors } from './components/DependencyErrors/DependencyErrors';
-import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
 import { FlowserRouter } from './router';
 import { UpdateLoader } from './components/loaders/UpdateLoader';
 import { AnalyticsService } from '../services/analytics.service';
 import { SentryRendererService } from '../services/sentry-renderer.service';
+import { indexSyncIntervalInMs, IpcIndexCache } from './ipc-index-cache';
 
 const indexes = {
   accountStorage: new IpcIndexCache<FlowAccountStorage>('accountStorage'),
@@ -35,6 +38,28 @@ const indexes = {
 
 const analyticsService = new AnalyticsService();
 const monitoringService = new SentryRendererService();
+
+class WebLogger implements IFlowserLogger {
+  debug(message: any): void {
+    console.debug(message);
+  }
+
+  error(message: any, error?: unknown): void {
+    console.error(message, error);
+  }
+
+  log(message: any): void {
+    console.log(message);
+  }
+
+  verbose(message: any): void {
+    console.debug(message);
+  }
+
+  warn(message: any): void {
+    console.warn(message);
+  }
+}
 
 export function App() {
   const [isExiting, setIsExiting] = useState(false);
@@ -97,6 +122,12 @@ export function App() {
               analyticsService,
               workspaceService: window.electron.workspaces,
               snapshotService: window.electron.snapshots,
+              flixService: new FlowFlixV11Service(
+                {
+                  flixServerUrl: 'https://flix-indexer.fly.dev',
+                },
+                new HttpService(new WebLogger()),
+              ),
             }}
           >
             <ConfirmDialogProvider>

@@ -1,13 +1,13 @@
 import { HttpService } from "./http.service";
 import { FlixV1Template } from "./flix-v1";
 
-type FlowV1FlixServiceConfig = {
+type FlowFlixV1ServiceConfig = {
   flixServerUrl: string;
 }
 
-export class FlowFlixService {
+export class FlowFlixV1Service {
   constructor(
-    private readonly config: FlowV1FlixServiceConfig,
+    private readonly config: FlowFlixV1ServiceConfig,
     private readonly httpService: HttpService
   ) {}
 
