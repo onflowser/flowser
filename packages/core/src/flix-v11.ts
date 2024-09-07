@@ -48,5 +48,5 @@ export type FlixV11Parameter = {
   label: string;
   index: 0;
   type: string;
-  messages: unknown[];
+  messages: FlixV11Message[];
 }

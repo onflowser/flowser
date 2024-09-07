@@ -6,11 +6,11 @@ import classes from "./ParamBuilder.module.scss";
 import { CadenceValueBuilder } from "../ValueBuilder/interface";
 import { CadenceParameter } from "@onflowser/api";
 import { SizedBox } from "../../../common/misc/SizedBox/SizedBox";
-import { FlixV1Argument, FlixV1Template } from "@onflowser/core";
+import { FlixV11Template, FlixV11Parameter } from "@onflowser/core/src/flix-v11";
 
 export type ParameterListBuilderProps = InteractionParameterBuilder & {
   parameters: CadenceParameter[];
-  flixTemplate: FlixV1Template | undefined;
+  flixTemplate: FlixV11Template | undefined;
 };
 
 export function ParamListBuilder(
@@ -25,7 +25,7 @@ export function ParamListBuilder(
           parameter={parameter}
           value={fclValuesByIdentifier.get(parameter.identifier)}
           setValue={(value) => setFclValue(parameter.identifier, value)}
-          flixArgument={flixTemplate?.data?.arguments?.[parameter.identifier]}
+          flixArgument={flixTemplate?.data?.parameters.find(param => param.label === parameter.identifier)}
         />
       ))}
     </div>
@@ -34,7 +34,7 @@ export function ParamListBuilder(
 
 export type ParameterBuilderProps = Omit<CadenceValueBuilder, "type"> & {
   parameter: CadenceParameter;
-  flixArgument: FlixV1Argument | undefined;
+  flixArgument: FlixV11Parameter | undefined;
 };
 
 export function ParamBuilder(props: ParameterBuilderProps): ReactElement {
@@ -43,7 +43,9 @@ export function ParamBuilder(props: ParameterBuilderProps): ReactElement {
     throw new Error("Expected parameter.type");
   }
 
-  const description = flixArgument?.messages?.title?.i18n?.["en-US"];
+  const description = flixArgument?.messages
+    ?.find(e => e.key === "description")?.i18n
+    ?.find(e => e.tag === "en-US")?.translation;
 
   return (
     <div className={classes.paramRoot}>
