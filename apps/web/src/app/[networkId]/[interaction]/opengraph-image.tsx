@@ -74,7 +74,7 @@ export default async function Image(props: Props) {
           >
             <TitleAndDescription flix={flix} />
             {/*<AuditorInfo auditors={auditors} />*/}
-            <CodePreview cadence={cadenceSourceCode} />
+            {cadenceSourceCode && <CodePreview cadence={cadenceSourceCode} />}
           </div>
           <div
             style={{
