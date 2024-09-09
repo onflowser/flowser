@@ -39,7 +39,7 @@ export class FlowFlixV11Service {
     if (response.status === 404) {
       return undefined;
     } else if (response.status === 200) {
-      return (response.data as any).data as FlixV11Template;
+      return (response.data as any) as FlixV11Template;
     } else {
       throw new Error(`HTTP error ${response.status}`)
     }

@@ -1,6 +1,6 @@
 import type { FlowNetworkId } from "./flow-utils";
 import type { FlixV11Template } from "./flix-v11";
-import { isDefined } from "./utils";
+import { ensurePrefixedAddress, isDefined } from "./utils";
 
 type FlixDependencySummary = {
   name: string;
@@ -28,31 +28,34 @@ export class FlixV11Utils {
       .filter(isDefined) ?? [];
   }
 
-  static getDescription(template: FlixV11Template) {
+  static getDescription(template: FlixV11Template): string | undefined {
     return template.data.messages
       ?.find(message => message.key === "description")?.i18n
       ?.find(i18n => i18n.tag === "en-US")?.translation;
   }
 
-  static getName(template: FlixV11Template) {
+  static getName(template: FlixV11Template): string {
     const englishTitle =  template.data.messages
       ?.find(message => message.key === "title")?.i18n
       ?.find(i18n => i18n.tag === "en-US")?.translation;
-    if (englishTitle) {
-      return this.shortenTitle(englishTitle)
-    } else {
-      return "Unknown";
+    return englishTitle ?? "Unknown";
+  }
+
+  static getCadenceSourceCode(template: FlixV11Template, networkId: FlowNetworkId): string | undefined {
+    let source = template.data.cadence.body;
+    const contractDependency = template.data.dependencies?.flatMap(e => e.contracts) ?? [];
+    for (const dependency of contractDependency) {
+      const networkConfig = dependency.networks.find(network => network.network === networkId);
+      if (!networkConfig) {
+        return undefined;
+      }
+
+      source = source.replace(
+        new RegExp(`import +"${dependency.contract}"`),
+        `import ${dependency.contract} from ${ensurePrefixedAddress(networkConfig.address)}`
+      );
     }
-  }
-
-  private static shortenTitle(title: string) {
-    // TODO(flix-v11): Do we need to shorten titles?
-    return title;
-  }
-
-  static getCadenceSourceCode(template: FlixV11Template, networkId: FlowNetworkId) {
-    // TODO(flix-v11): Insert contract addresses in code
-    return template.data.cadence.body;
+    return source;
   }
 
   static hasDependenciesForNetwork(template: FlixV11Template, networkId: FlowNetworkId): boolean {

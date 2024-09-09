@@ -1,6 +1,6 @@
 import React, { createContext, ReactElement, useContext, useMemo } from "react";
 import { InteractionDefinition } from "../core/core-types";
-import { FclValue } from "@onflowser/core";
+import { FclValue, isDefined } from "@onflowser/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import {
   useGetContracts,
@@ -110,21 +110,29 @@ export function TemplatesRegistryProvider(props: {
         }),
       ) ?? []),
       ...(flixTemplates.data?.filter(isSupportedOnCurrentNetwork)?.map(
-        (template): InteractionDefinitionTemplate => ({
-          id: template.id,
-          name: FlixV11Utils.getName(template),
-          code: FlixV11Utils.getCadenceSourceCode(template, networkId),
-          transactionOptions: undefined,
-          initialOutcome: undefined,
-          fclValuesByIdentifier: new Map(),
-          // Use the same date for all FLIX templates for consistent sorting.
-          createdDate: new Date(0),
-          updatedDate: new Date(0),
-          workspace: undefined,
-          flix: template,
-          source: "flix"
-        }),
-      ) ?? []),
+        (template): InteractionDefinitionTemplate | undefined => {
+          const code = FlixV11Utils.getCadenceSourceCode(template, networkId);
+
+          if (!code) {
+            return undefined;
+          }
+
+          return {
+            id: template.id,
+            name: FlixV11Utils.getName(template),
+            code,
+            transactionOptions: undefined,
+            initialOutcome: undefined,
+            fclValuesByIdentifier: new Map(),
+            // Use the same date for all FLIX templates for consistent sorting.
+            createdDate: new Date(0),
+            updatedDate: new Date(0),
+            workspace: undefined,
+            flix: template,
+            source: "flix"
+          }
+        },
+      )?.filter(isDefined) ?? []),
     ],
     [sessionTemplates, workspaceTemplates, flowNetworkId],
   );
