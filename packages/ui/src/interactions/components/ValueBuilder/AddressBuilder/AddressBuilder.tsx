@@ -35,11 +35,11 @@ function CustomWalletAddressBuilder(props: EmulatorAddressBuilderProps): ReactEl
   );
   const accountsToShow = useMemo(
     () =>
-      addressBuilderOptions?.showManagedAccountsOnly
+      (addressBuilderOptions?.showManagedAccountsOnly
         ? data?.filter((account) =>
             accountsWithPrivateKeysLookup.has(account.address),
           )
-        : data,
+        : data)?.sort((a, b) => a.address.localeCompare(b.address)),
     [addressBuilderOptions?.showManagedAccountsOnly, data],
   );
 

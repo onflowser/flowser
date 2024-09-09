@@ -234,7 +234,8 @@ export class FlowserAppService {
           message: errorMessage,
           detail: isErrorWithMessage(error) ? error.message : undefined,
           type: 'error',
-          buttons: ['Restart app'],
+          cancelId: 1,
+          buttons: ['Restart app', 'Cancel'],
         });
         const quitClicked = result.response === 0;
         if (quitClicked) {

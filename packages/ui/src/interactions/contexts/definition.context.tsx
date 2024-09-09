@@ -10,14 +10,15 @@ import {
   InteractionDefinition,
 } from "../core/core-types";
 import { ParsedInteraction } from "@onflowser/api";
-import { FclValue, FlixV1Template } from "@onflowser/core";
+import { FclValue } from "@onflowser/core";
 import { useGetParsedInteraction } from "../../api";
 import { useFlixSearch } from "../../hooks/use-flix";
+import { FlixV11Template } from "@onflowser/core/src/flix-v11";
 
 type InteractionDefinitionManager = InteractionParameterBuilder & {
   isParsing: boolean;
   parseError: string | undefined;
-  flixTemplate: FlixV1Template | undefined;
+  flixTemplate: FlixV11Template | undefined;
   parsedInteraction: ParsedInteraction | undefined;
   definition: InteractionDefinition;
   partialUpdate: (definition: Partial<InteractionDefinition>) => void;

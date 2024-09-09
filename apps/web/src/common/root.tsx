@@ -51,6 +51,7 @@ import { NetworkDropdown } from "./NetworkDropdown";
 import { ProfileDropdown } from "@/common/ProfileDropdown";
 import { ConfirmDialogProvider } from "@onflowser/ui/src/contexts/confirm-dialog.context";
 import { Analytics } from "@vercel/analytics/react"
+import { FlowFlixV11Service } from "@onflowser/core/src/flow-flix-v11.service";
 
 const indexSyncIntervalInMs = 500;
 
@@ -352,6 +353,9 @@ export default function Root() {
             <ServiceRegistryProvider
               services={{
                 flowService: new FlowService(),
+                flixService: new FlowFlixV11Service({
+                  flixServerUrl:"https://flix-indexer.fly.dev"
+                }, appService.httpService),
                 interactionsService: appService.interactionsService,
                 transactionsIndex: appService.getTransactionIndex(),
                 blocksIndex: appService.getBlockIndex(),
